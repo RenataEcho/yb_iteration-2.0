@@ -1144,6 +1144,144 @@
       margin-top: 8px;
     }
 
+    .req-page {
+      display: grid;
+      gap: 16px;
+    }
+
+    .req-hero {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: linear-gradient(135deg, #fff8f1, #eef8ff);
+      padding: 18px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .req-hero h2 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .req-hero p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .req-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .req-tabs button {
+      height: 34px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--muted);
+      padding: 0 12px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .req-tabs button.active {
+      border-color: var(--primary);
+      background: var(--primary-soft);
+      color: var(--primary);
+    }
+
+    .req-panel {
+      display: none;
+    }
+
+    .req-panel.active {
+      display: block;
+    }
+
+    .req-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .req-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 10px 28px rgba(18, 28, 45, .04);
+      overflow: hidden;
+    }
+
+    .req-card h3 {
+      margin: 0;
+      padding: 14px 16px 10px;
+      font-size: 15px;
+      border-bottom: 1px solid var(--line);
+      background: #fbfcfe;
+    }
+
+    .req-card ul {
+      margin: 0;
+      padding: 14px 18px 16px 34px;
+      display: grid;
+      gap: 9px;
+    }
+
+    .req-card li {
+      color: #40506a;
+      font-size: 13px;
+      line-height: 1.65;
+    }
+
+    .req-card.full {
+      grid-column: 1 / -1;
+    }
+
+    .flow-steps {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+      padding: 16px;
+    }
+
+    .flow-step {
+      min-height: 110px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfe;
+      padding: 12px;
+    }
+
+    .flow-step span {
+      display: inline-grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      background: var(--primary);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .flow-step strong {
+      display: block;
+      margin-top: 10px;
+      font-size: 13px;
+    }
+
+    .flow-step p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
     @media (max-width: 1180px) {
       .metrics {
         grid-template-columns: repeat(3, minmax(160px, 1fr));
@@ -1191,7 +1329,10 @@
 
       .metrics,
       .stat-strip,
-      .form {
+      .form,
+      .req-grid,
+      .req-hero,
+      .flow-steps {
         grid-template-columns: 1fr;
       }
 
@@ -1261,6 +1402,7 @@
             <button data-section="users"><i data-lucide="users"></i>用户账户</button>
             <button data-section="flows"><i data-lucide="list-filter"></i>流水订单</button>
             <button data-section="wallet"><i data-lucide="wallet-cards"></i>钱包配置</button>
+            <button data-section="frontendReq"><i data-lucide="braces"></i>前后端交互需求</button>
           </div>
         </div>
       </nav>
@@ -1413,7 +1555,7 @@
             <tbody>
               <tr><td>F202608170001</td><td>UID 826173</td><td>入账</td><td>购买</td><td>购买右豹积分 880</td><td style="color:var(--primary);font-weight:800">+880</td><td>¥8.80</td><td><span class="status on">成功</span></td><td>2026.08.17 13:22</td></tr>
               <tr><td>F202608170002</td><td>UID 791204</td><td>支出</td><td>消耗</td><td>视频提取消耗积分</td><td style="font-weight:800">-40</td><td>-</td><td><span class="status on">成功</span></td><td>2026.08.17 12:41</td></tr>
-              <tr><td>F202608170003</td><td>UID 592810</td><td>入账</td><td>兑换</td><td>兑换码核销入账</td><td style="color:var(--primary);font-weight:800">+300</td><td>-</td><td><span class="status warn">待复核</span></td><td>2026.08.17 11:07</td></tr>
+              <tr><td>F202608170003</td><td>UID 592810</td><td>入账</td><td>兑换</td><td>兑换码核销入账</td><td style="color:var(--primary);font-weight:800">+300</td><td>-</td><td><span class="status danger">失败</span></td><td>2026.08.17 11:07</td></tr>
             </tbody>
           </table>
         </div>
@@ -1427,6 +1569,199 @@
             <div class="switch-row"><div><strong>团队奖励钱包</strong><p>可独立支付，也可参与组合支付。</p></div><button class="toggle on" aria-label="团队奖励钱包开关"></button></div>
             <div class="switch-row"><div><strong>分红奖励钱包</strong><p>余额为 0 时前端置灰。</p></div><button class="toggle on" aria-label="分红奖励钱包开关"></button></div>
             <div class="switch-row"><div><strong>组合支付</strong><p>按项目收益、团队奖励、分红奖励顺序扣款。</p></div><button class="toggle on" aria-label="组合支付开关"></button></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="frontendReq">
+        <div class="req-page">
+          <div class="req-hero">
+            <div>
+              <h2>前端需求与前后端数据交互</h2>
+              <p>基于用户端截图梳理积分中心、兑换码弹窗、积分明细、钱包扣款兑换和任务奖励链路，明确前端展示规则、字段校验、接口入参出参、状态流转与异常处理。</p>
+            </div>
+            <div class="req-tabs" aria-label="前后端交互需求视图">
+              <button class="active" data-req-tab="frontend">前端需求</button>
+              <button data-req-tab="api">接口契约</button>
+              <button data-req-tab="state">状态与异常</button>
+            </div>
+          </div>
+
+          <div class="req-panel active" data-req-panel="frontend">
+            <div class="req-grid">
+              <article class="req-card">
+                <h3>1. 积分中心首页</h3>
+                <ul>
+                  <li>顶部展示页面标题“积分中心”，左侧返回按钮，右侧提供“明细”“规则”两个胶囊按钮。</li>
+                  <li>余额区域展示“右豹积分”和当前可用积分，积分数值大号突出，需使用后端返回的可用余额。</li>
+                  <li>积分商品以卡片网格展示，字段包含积分名称、积分数量、售价、标签和选中态。</li>
+                  <li>标签只展示推荐、上新、限时活动；后端为空时前端不展示标签占位。</li>
+                  <li>默认选中推荐或排序最靠前的上架商品；选中卡片需高亮边框和主色积分数字。</li>
+                  <li>底部协议勾选为兑换前置条件，未勾选时点击“立即兑换”需提示先阅读并同意协议。</li>
+                </ul>
+              </article>
+              <article class="req-card">
+                <h3>2. 兑换码弹窗</h3>
+                <ul>
+                  <li>点击首页“兑换码”按钮后弹出居中弹窗，背景加半透明遮罩，保留当前积分商品选择状态。</li>
+                  <li>弹窗字段包含兑换码输入框、兑换码获取链接、取消按钮和立即兑换按钮。</li>
+                  <li>兑换码输入框必填，提交前需去除首尾空格；为空时按钮不可提交或展示校验提示。</li>
+                  <li>“点击复制”复制兑换码获取链接，复制成功后展示轻提示。</li>
+                  <li>兑换成功后关闭弹窗，刷新余额、积分明细和兑换码核销状态。</li>
+                  <li>兑换失败时弹窗不关闭，展示后端返回的失败原因。</li>
+                </ul>
+              </article>
+              <article class="req-card">
+                <h3>3. 积分明细页</h3>
+                <ul>
+                  <li>页面标题为“积分明细”，顶部返回按钮回到积分中心首页。</li>
+                  <li>筛选 tab 固定为全部、消耗、获得；默认选中全部。</li>
+                  <li>流水卡片展示描述、时间和积分变动值；获得为正数并用主色展示，消耗为负数。</li>
+                  <li>时间展示格式为 YYYY.MM.DD HH:mm，来自流水创建时间。</li>
+                  <li>分页加载采用下拉刷新和触底加载更多；无更多数据时展示底部状态。</li>
+                  <li>失败流水默认不展示在用户明细中，如业务需要展示，需以失败状态单独标识且不影响余额。</li>
+                </ul>
+              </article>
+              <article class="req-card">
+                <h3>4. 钱包扣款兑换</h3>
+                <ul>
+                  <li>点击“立即兑换”后打开钱包扣款确认弹窗，顶部展示兑换金额。</li>
+                  <li>钱包列表展示项目收益钱包、团队奖励钱包、分红奖励钱包和组合支付。</li>
+                  <li>每个钱包展示钱包名称、余额和可选状态；余额不足或关闭时置灰不可选。</li>
+                  <li>默认选中第一个余额充足且后台开启的钱包；组合支付在单钱包不足且组合支付开启时可选。</li>
+                  <li>支付密码为 6 位数字输入，输入满 6 位后可提交兑换。</li>
+                  <li>支付密码校验、锁定、失败次数和扣款重试由后端处理，前端仅承接结果和提示。</li>
+                </ul>
+              </article>
+              <article class="req-card full">
+                <h3>5. 任务奖励展示与领取</h3>
+                <ul>
+                  <li>首页“完成任务得积分”展示启用状态任务，按排序升序排列。</li>
+                  <li>任务卡片展示图标、任务名称、完成条件文案、奖励积分和领取状态。</li>
+                  <li>完成条件只有有效拉新和项目出单；有效拉新单位为人，项目出单单位为元。</li>
+                  <li>项目出单任务需展示项目名称和达标金额，例如“今日项目出单>=50.00元”。</li>
+                  <li>状态包含可领取、未完成、已领取；可领取展示主按钮，未完成展示弱提示，已领取不可重复领取。</li>
+                  <li>点击领取需调用后端领取接口，后端校验达标、是否重复领取、任务是否启用和奖励积分是否可发放。</li>
+                </ul>
+              </article>
+            </div>
+          </div>
+
+          <div class="req-panel" data-req-panel="api">
+            <div class="req-grid">
+              <article class="req-card full">
+                <h3>1. 页面初始化数据流</h3>
+                <div class="flow-steps">
+                  <div class="flow-step"><span>1</span><strong>进入积分中心</strong><p>前端请求用户积分账户、商品列表、任务列表和钱包概览。</p></div>
+                  <div class="flow-step"><span>2</span><strong>选择商品</strong><p>本地记录 selectedGoodsId，并校验商品状态、协议勾选。</p></div>
+                  <div class="flow-step"><span>3</span><strong>创建兑换单</strong><p>提交商品、钱包、支付密码前置 token，后端返回订单号。</p></div>
+                  <div class="flow-step"><span>4</span><strong>扣款发放</strong><p>后端完成钱包扣款、积分发放、流水入账和订单状态写入。</p></div>
+                  <div class="flow-step"><span>5</span><strong>刷新结果</strong><p>前端刷新余额、流水、任务状态和商品购买人数。</p></div>
+                </div>
+              </article>
+              <article class="req-card">
+                <h3>2. 前端需要的核心接口</h3>
+                <ul>
+                  <li>GET /points/account：获取可用积分、冻结积分、累计获得、累计消耗和最近变动时间。</li>
+                  <li>GET /points/goods：获取上架商品列表，包含名称、积分、售价、标签、购买人数、排序和协议信息。</li>
+                  <li>GET /points/tasks：获取启用任务列表，包含完成条件、阈值、单位、项目、奖励积分和领取状态。</li>
+                  <li>GET /points/flows：按全部、消耗、获得分页查询用户积分明细。</li>
+                  <li>POST /points/redeem-code：提交兑换码并返回兑换结果、积分变动和失败原因。</li>
+                  <li>POST /points/orders：创建积分商品兑换订单并返回支付确认信息。</li>
+                  <li>POST /points/orders/{orderId}/pay：提交钱包类型和支付密码，返回扣款与发放结果。</li>
+                  <li>POST /points/tasks/{taskId}/claim：领取任务奖励，返回奖励积分和最新任务状态。</li>
+                </ul>
+              </article>
+              <article class="req-card">
+                <h3>3. 后台配置到前端的映射</h3>
+                <ul>
+                  <li>积分商品状态为上架时才进入前端商品列表，草稿和下架不返回。</li>
+                  <li>商品标签为空时不返回 tag 或返回 null，前端不占位展示。</li>
+                  <li>购买人数用于商品卡片运营氛围展示，不参与库存和支付校验。</li>
+                  <li>兑换码批次的面额、有效期、状态和兑换限制由后端兑换接口统一校验。</li>
+                  <li>任务奖励仅返回启用任务；禁用任务不可展示、不可领取。</li>
+                  <li>钱包配置控制前端可展示的钱包入口，支付安全策略不从后台配置读取。</li>
+                </ul>
+              </article>
+              <article class="req-card full">
+                <h3>4. 字段清单</h3>
+                <ul>
+                  <li>account：availablePoints、frozenPoints、totalEarnedPoints、totalSpentPoints、lastChangedAt。</li>
+                  <li>goods：goodsId、goodsName、pointsAmount、salePrice、tag、buyerCount、sortNo、agreementRequired、agreementName、status。</li>
+                  <li>task：taskId、taskName、conditionType、threshold、unit、projectName、rewardPoints、claimStatus、qualified、sortNo。</li>
+                  <li>flow：flowId、flowType、accountType、description、pointsChange、createdAt、orderId、status。</li>
+                  <li>wallet：walletType、walletName、balanceAmount、enabled、selectable、disabledReason。</li>
+                  <li>order：orderId、goodsId、payAmount、walletType、orderStatus、payStatus、grantStatus、failReason。</li>
+                </ul>
+              </article>
+            </div>
+          </div>
+
+          <div class="req-panel" data-req-panel="state">
+            <div class="req-grid">
+              <article class="req-card">
+                <h3>1. 状态规则</h3>
+                <ul>
+                  <li>商品状态：上架、下架、草稿；只有上架可在前端售卖。</li>
+                  <li>兑换码批次状态：启用、冻结、已结束；只有启用且未过期可兑换。</li>
+                  <li>任务状态：启用、禁用；用户端任务领取状态由后端计算为可领取、未完成、已领取。</li>
+                  <li>流水状态：成功、失败；失败不影响用户余额。</li>
+                  <li>订单状态：待支付、支付中、成功、失败；支付成功但发放失败需可重试或补偿。</li>
+                </ul>
+              </article>
+              <article class="req-card">
+                <h3>2. 校验规则</h3>
+                <ul>
+                  <li>兑换商品前必须校验商品是否上架、价格是否一致、协议是否勾选、钱包是否可用。</li>
+                  <li>兑换码需校验码是否存在、批次是否启用、是否在有效期内、是否超过单用户兑换限制。</li>
+                  <li>任务领取需校验任务启用、用户是否达标、是否已领取、奖励积分是否配置正确。</li>
+                  <li>支付密码只允许 6 位数字；前端不保存密码，不在日志和埋点中上报明文。</li>
+                  <li>金额、积分、阈值等数字字段以后端返回为准，前端不得自行计算最终发放结果。</li>
+                </ul>
+              </article>
+              <article class="req-card">
+                <h3>3. 异常与提示</h3>
+                <ul>
+                  <li>余额不足：提示选择其他钱包或组合支付。</li>
+                  <li>商品下架：提示当前档位不可兑换，并刷新商品列表。</li>
+                  <li>兑换码无效：提示兑换码不存在、已过期、已用完、超出个人兑换次数或批次冻结。</li>
+                  <li>任务未达标：提示还差多少人或多少元，文案需匹配完成条件单位。</li>
+                  <li>支付失败：展示后端失败原因；支付密码锁定等安全状态由后端返回。</li>
+                  <li>扣款成功但积分发放失败：前端展示处理中状态，并引导用户稍后查看积分明细或联系客服。</li>
+                </ul>
+              </article>
+              <article class="req-card">
+                <h3>4. 刷新与幂等</h3>
+                <ul>
+                  <li>兑换码兑换、商品兑换和任务领取都需要请求幂等键，避免重复点击造成重复发放。</li>
+                  <li>支付和领取按钮提交后进入 loading，不允许重复点击。</li>
+                  <li>成功后必须刷新积分账户、积分明细和当前操作对象状态。</li>
+                  <li>失败后不刷新余额，但可刷新商品、兑换码批次或任务状态，避免用户继续操作失效配置。</li>
+                  <li>网络超时时前端展示结果确认中，并通过订单查询接口轮询最终状态。</li>
+                </ul>
+              </article>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <div><h2>交互清单</h2><p>用于产品、前端、后端联调时逐项确认。</p></div>
+              <div>
+                <button class="btn ghost" data-action="show-field-list"><i data-lucide="list-checks"></i>字段清单</button>
+                <button class="btn ghost" data-action="show-api-list"><i data-lucide="waypoints"></i>接口清单</button>
+                <button class="btn ghost" data-action="show-state-list"><i data-lucide="shield-alert"></i>状态规则</button>
+              </div>
+            </div>
+            <table>
+              <thead><tr><th>模块</th><th>前端触发</th><th>后端交互</th><th>成功后刷新</th><th>失败处理</th></tr></thead>
+              <tbody>
+                <tr><td>积分中心</td><td>进入页面</td><td>账户、商品、任务、钱包并行查询</td><td>余额、商品卡片、任务列表</td><td>展示空态和重试</td></tr>
+                <tr><td>兑换码</td><td>输入兑换码并提交</td><td>兑换码校验、发放积分、写流水</td><td>余额、明细、兑换结果</td><td>弹窗内展示失败原因</td></tr>
+                <tr><td>积分明细</td><td>切换全部/消耗/获得</td><td>分页查询流水</td><td>流水列表和分页游标</td><td>保留筛选条件并提示重试</td></tr>
+                <tr><td>钱包扣款</td><td>选择钱包并输入密码</td><td>创建订单、扣款、发放积分</td><td>订单、余额、流水</td><td>展示支付失败或处理中</td></tr>
+                <tr><td>任务奖励</td><td>点击领取</td><td>校验达标、幂等领取、发放积分</td><td>任务状态、余额、流水</td><td>提示未达标/已领取/任务禁用</td></tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </section>
@@ -1469,7 +1804,8 @@
       tasks: ["任务奖励", "配置有效拉新、项目出单等积分奖励任务。"],
       users: ["用户账户", "查询用户积分余额、冻结积分、调账和审计记录。"],
       flows: ["流水订单", "追踪积分获得、消耗、钱包扣款订单和异常补偿。"],
-      wallet: ["钱包配置", "配置钱包扣款来源和组合支付展示规则，支付安全由后端逻辑处理。"]
+      wallet: ["钱包配置", "配置钱包扣款来源和组合支付展示规则，支付安全由后端逻辑处理。"],
+      frontendReq: ["前后端交互需求", "说明用户端积分功能的前端页面规则、接口字段、状态流转和异常处理。"]
     };
 
     const requirementRules = {
@@ -1516,6 +1852,14 @@
         { title: "2. 字段规则", items: ["钱包来源包含项目收益钱包、团队奖励钱包、分红奖励钱包和组合支付。", "每个钱包来源具备开启和关闭状态。", "文案说明用于解释该钱包在前端支付时的展示和扣款含义。"] },
         { title: "3. 交互规则", items: ["点击开关可立即切换钱包来源状态。", "切换后展示操作成功提示。", "关闭钱包来源后，前端不展示对应支付入口。"] },
         { title: "4. 边界规则", items: ["后台仅配置钱包支付来源和组合支付展示规则。", "支付安全整体设置不在后台侧写入。", "支付密码、失败次数、锁定时长和重试策略由后端逻辑统一处理。", "余额不足、支付密码校验等逻辑由后端返回结果。"] }
+      ],
+      frontendReq: [
+        { title: "1. 用户端页面范围", items: ["覆盖积分中心首页、兑换码弹窗、积分明细页、钱包扣款弹窗和任务奖励列表。", "首页需要展示当前右豹积分余额、可兑换积分商品、兑换码入口、协议勾选和任务奖励。", "积分明细需要支持全部、消耗、获得三个筛选口径。", "钱包扣款需要展示可用钱包、余额、组合支付和 6 位支付密码输入。"] },
+        { title: "2. 前端展示规则", items: ["积分商品只展示上架状态，按后台排序展示，默认选中推荐商品或排序最靠前商品。", "商品标签只允许推荐、上新、限时活动；标签为空时不展示。", "任务只展示启用状态，按排序升序展示。", "任务领取按钮根据后端返回状态展示为领取、未完成或已领取。", "获得积分用正数和主色展示，消耗积分用负数展示。"] },
+        { title: "3. 字段规则", items: ["账户字段包含可用积分、冻结积分、累计获得、累计消耗和最近变动时间。", "商品字段包含商品 ID、商品名称、积分数量、售价、标签、购买人数、排序、协议要求和状态。", "任务字段包含任务 ID、任务名称、完成条件、阈值、单位、项目名称、奖励积分、领取状态和排序。", "流水字段包含流水号、流水类型、动账类型、描述、积分变动、状态、时间和关联订单。", "钱包字段包含钱包类型、钱包名称、余额、是否开启、是否可选和不可选原因。"] },
+        { title: "4. 接口交互规则", items: ["进入积分中心时需并行拉取账户、商品、任务和钱包概览。", "兑换码提交由后端完成码校验、兑换限制校验、积分发放和流水写入。", "商品兑换由后端创建订单、校验钱包、执行扣款、发放积分并返回最终状态。", "任务领取由后端校验用户是否达标、是否重复领取和任务是否启用。", "所有发放类接口都需要幂等键，前端提交中禁止重复点击。"] },
+        { title: "5. 状态与异常规则", items: ["商品下架、兑换码冻结、任务禁用时，前端需刷新配置并阻止继续提交。", "兑换码失败原因包括不存在、已过期、已用完、超出个人兑换次数和批次冻结。", "钱包余额不足时提示选择其他钱包或组合支付。", "支付密码失败、锁定和扣款重试策略由后端返回，前端只展示结果。", "扣款成功但积分发放失败时展示处理中，并引导用户查看明细或联系客服。"] },
+        { title: "6. 后台联动边界", items: ["积分商品、兑换码、任务奖励和钱包配置是后台到用户端的配置来源。", "流水订单负责承接前端交易、兑换、任务领取后的结果查询和异常定位。", "支付安全整体设置不在后台侧写入，必须由后端支付逻辑统一控制。", "后台配置变更后，前端需通过接口实时读取或按缓存失效策略刷新。"] }
       ]
     };
 
@@ -1934,6 +2278,63 @@
       toast("趋势已切换", `当前查看 ${range} 积分趋势。`);
     }
 
+    function switchReqTab(target) {
+      document.querySelectorAll(".req-tabs button").forEach((button) => {
+        button.classList.toggle("active", button.dataset.reqTab === target);
+      });
+      document.querySelectorAll(".req-panel").forEach((panel) => {
+        panel.classList.toggle("active", panel.dataset.reqPanel === target);
+      });
+      const names = { frontend: "前端需求", api: "接口契约", state: "状态与异常" };
+      toast("需求视图已切换", `当前查看${names[target]}。`);
+    }
+
+    function openReqList(type) {
+      const configs = {
+        fields: {
+          title: "前端字段清单",
+          desc: "用户端页面、后台配置和后端接口需要保持一致的核心字段。",
+          rows: [
+            ["账户", "availablePoints / frozenPoints / totalEarnedPoints / totalSpentPoints / lastChangedAt"],
+            ["积分商品", "goodsId / goodsName / pointsAmount / salePrice / tag / buyerCount / sortNo / agreementRequired / status"],
+            ["兑换码", "code / batchId / pointsSource / pointsAmount / productBatchId / limitEnabled / perUserLimit / status"],
+            ["任务奖励", "taskId / taskName / conditionType / threshold / unit / projectName / rewardPoints / claimStatus"],
+            ["积分流水", "flowId / flowType / accountType / description / pointsChange / status / failReason / createdAt"],
+            ["钱包支付", "walletType / walletName / balanceAmount / enabled / selectable / disabledReason"]
+          ]
+        },
+        apis: {
+          title: "前后端接口清单",
+          desc: "用于用户端积分功能联调的接口边界。",
+          rows: [
+            ["GET /points/account", "获取用户积分账户余额和累计统计。"],
+            ["GET /points/goods", "获取用户端可展示的上架积分商品。"],
+            ["GET /points/tasks", "获取启用任务及用户领取状态。"],
+            ["GET /points/flows", "分页查询全部、消耗、获得流水。"],
+            ["POST /points/redeem-code", "兑换码校验、发放积分并写入流水。"],
+            ["POST /points/orders", "创建积分商品兑换订单。"],
+            ["POST /points/orders/{orderId}/pay", "提交钱包和支付密码，完成扣款发放。"],
+            ["POST /points/tasks/{taskId}/claim", "领取任务奖励，后端做达标和幂等校验。"]
+          ]
+        },
+        states: {
+          title: "状态与异常规则",
+          desc: "前端展示、后端返回和后台查询需要统一的状态口径。",
+          rows: [
+            ["商品", "上架可兑换；下架和草稿不可展示、不可提交。"],
+            ["兑换码", "启用可兑换；冻结、已结束、过期、超限均需返回明确失败原因。"],
+            ["任务", "后台只有启用和禁用；用户端领取状态为可领取、未完成、已领取。"],
+            ["流水", "状态只有成功和失败；失败不改变余额，后台悬浮展示失败原因。"],
+            ["钱包", "关闭或余额不足时不可选；组合支付由后端返回可用性。"],
+            ["支付", "密码失败、锁定、重试和安全策略全部由后端处理。"]
+          ]
+        }
+      };
+      const config = configs[type];
+      const body = `<dl class="detail-list">${config.rows.map(([key, value]) => `<div><dt>${key}</dt><dd>${value}</dd></div>`).join("")}</dl>`;
+      openModal(config.title, config.desc, body, `<button class="btn primary" data-modal-close>知道了</button>`);
+    }
+
     function syncTaskProjectField() {
       const condition = document.getElementById("taskConditionType");
       const projectField = document.getElementById("taskProjectField");
@@ -2031,6 +2432,9 @@
         return openDetail("用户兑换订单", { 用户: user.uid, 最近订单: "O20260817088", 商品: "右豹积分 6800", 支付金额: "¥68.00", 钱包来源: "组合支付", 状态: "扣款成功发放失败" });
       }
       if (action === "show-rules") return openRequirementRules();
+      if (action === "show-field-list") return openReqList("fields");
+      if (action === "show-api-list") return openReqList("apis");
+      if (action === "show-state-list") return openReqList("states");
       if (action === "save-wallet") return toast("钱包设置已保存", "支付密码、扣款重试和余额提示已更新。");
     }
 
@@ -2114,6 +2518,10 @@
           renderFlows(button.textContent.trim());
           toast("流水筛选已更新", `当前筛选：${button.textContent.trim()}。`);
         });
+      });
+
+      document.querySelectorAll(".req-tabs button").forEach((button) => {
+        button.addEventListener("click", () => switchReqTab(button.dataset.reqTab));
       });
 
       document.querySelectorAll(".toggle").forEach((toggle) => {
