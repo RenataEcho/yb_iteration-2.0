@@ -1,0 +1,2137 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>右豹管理后台原型</title>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --surface: #ffffff;
+      --line: #e7ebf2;
+      --text: #172033;
+      --muted: #7a8599;
+      --primary: #ff4b19;
+      --primary-soft: #fff0eb;
+      --teal: #13a89e;
+      --blue: #286fe8;
+      --amber: #f5a524;
+      --green: #21a67a;
+      --danger: #e84c4f;
+      --shadow: 0 18px 45px rgba(22, 32, 51, .08);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      letter-spacing: 0;
+    }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 248px minmax(0, 1fr);
+    }
+
+    .sidebar {
+      background: #111827;
+      color: #d7dee9;
+      padding: 22px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 8px 10px;
+    }
+
+    .brand-mark {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--primary), #ff9b38);
+      display: grid;
+      place-items: center;
+      color: white;
+      font-weight: 800;
+    }
+
+    .brand strong {
+      display: block;
+      color: #fff;
+      font-size: 17px;
+    }
+
+    .brand span {
+      color: #97a3b6;
+      font-size: 12px;
+    }
+
+    .nav {
+      display: grid;
+      gap: 10px;
+    }
+
+    .nav button {
+      border: 0;
+      width: 100%;
+      height: 42px;
+      border-radius: 8px;
+      background: transparent;
+      color: #cbd5e1;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 12px;
+      font-size: 14px;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .nav-group {
+      display: grid;
+      gap: 6px;
+    }
+
+    .nav-parent {
+      border: 0;
+      width: 100%;
+      height: 40px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 12px;
+      color: #fff;
+      background: rgba(255, 255, 255, .08);
+      font-size: 14px;
+      font-weight: 750;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .nav-parent svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .nav-parent .chevron {
+      margin-left: auto;
+      transition: transform .18s ease;
+    }
+
+    .nav-group.collapsed .nav-parent .chevron {
+      transform: rotate(-90deg);
+    }
+
+    .nav-child {
+      display: grid;
+      gap: 4px;
+      padding-left: 12px;
+      border-left: 1px solid rgba(255,255,255,.12);
+      margin-left: 17px;
+    }
+
+    .nav-group.collapsed .nav-child {
+      display: none;
+    }
+
+    .nav-child button {
+      height: 36px;
+      font-size: 13px;
+      padding-left: 10px;
+    }
+
+    .nav button:hover,
+    .nav button.active {
+      background: rgba(255, 255, 255, .09);
+      color: #fff;
+    }
+
+    .nav svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .side-note {
+      margin-top: auto;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 8px;
+      padding: 14px;
+      color: #aab5c6;
+      font-size: 12px;
+      line-height: 1.7;
+      background: rgba(255,255,255,.04);
+    }
+
+    .main {
+      min-width: 0;
+      padding: 22px 28px 36px;
+    }
+
+    .topbar {
+      height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 20px;
+    }
+
+    .title h1 {
+      margin: 0 0 5px;
+      font-size: 24px;
+      line-height: 1.2;
+    }
+
+    .title-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .rule-btn {
+      height: 28px;
+      border: 1px solid #ffd8ce;
+      border-radius: 8px;
+      background: var(--primary-soft);
+      color: var(--primary);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 0 9px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .rule-btn svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .title p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .search {
+      width: 260px;
+      height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 12px;
+      color: var(--muted);
+      box-shadow: 0 8px 22px rgba(18, 28, 45, .04);
+    }
+
+    .search input {
+      border: 0;
+      outline: 0;
+      width: 100%;
+      font-size: 13px;
+    }
+
+    .btn {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      height: 38px;
+      padding: 0 13px;
+      background: var(--surface);
+      color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+
+    .btn.primary {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+      box-shadow: 0 10px 24px rgba(255,75,25,.22);
+    }
+
+    .btn.ghost {
+      color: var(--primary);
+      background: var(--primary-soft);
+      border-color: #ffd8ce;
+    }
+
+    .grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .metrics {
+      grid-template-columns: repeat(6, minmax(132px, 1fr));
+    }
+
+    .metric {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+      box-shadow: 0 10px 28px rgba(18, 28, 45, .04);
+      min-height: 112px;
+    }
+
+    .metric span {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 14px;
+      font-size: 25px;
+      line-height: 1;
+    }
+
+    .metric em {
+      display: block;
+      margin-top: 10px;
+      font-style: normal;
+      color: var(--green);
+      font-size: 12px;
+    }
+
+    .content {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 360px;
+      gap: 16px;
+      margin-top: 16px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .panel-head {
+      min-height: 58px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .panel-head h2 {
+      margin: 0;
+      font-size: 16px;
+    }
+
+    .panel-head p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .tabs {
+      display: inline-grid;
+      grid-auto-flow: column;
+      gap: 2px;
+      padding: 3px;
+      background: #eef2f7;
+      border-radius: 8px;
+    }
+
+    .tabs button {
+      border: 0;
+      height: 32px;
+      border-radius: 6px;
+      padding: 0 12px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .tabs button.active {
+      background: #fff;
+      color: var(--text);
+      box-shadow: 0 4px 12px rgba(22, 32, 51, .06);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    th,
+    td {
+      padding: 13px 16px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      font-size: 13px;
+      vertical-align: middle;
+    }
+
+    th {
+      color: var(--muted);
+      font-weight: 650;
+      background: #fbfcfe;
+    }
+
+    td {
+      color: #263246;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      border-radius: 999px;
+      padding: 0 9px;
+      font-size: 12px;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+
+    .status.on {
+      background: #e9f8f2;
+      color: var(--green);
+    }
+
+    .status.warn {
+      background: #fff6df;
+      color: #ad7100;
+    }
+
+    .status.off {
+      background: #eef2f7;
+      color: #67748a;
+    }
+
+    .status.danger {
+      background: #ffe9ea;
+      color: var(--danger);
+    }
+
+    .status-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .fail-tip {
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 8px);
+      transform: translateX(-50%) translateY(4px);
+      width: max-content;
+      max-width: 260px;
+      border-radius: 8px;
+      background: #172033;
+      color: #fff;
+      padding: 8px 10px;
+      font-size: 12px;
+      line-height: 1.5;
+      box-shadow: 0 12px 30px rgba(17,24,39,.22);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .15s ease, transform .15s ease;
+      z-index: 12;
+    }
+
+    .fail-tip::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 100%;
+      transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-top-color: #172033;
+    }
+
+    .status-wrap:hover .fail-tip {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .link-btn {
+      border: 0;
+      background: transparent;
+      color: var(--blue);
+      padding: 4px 6px;
+      cursor: pointer;
+      font-weight: 650;
+    }
+
+    .mini-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .mini-row:last-child {
+      border-bottom: 0;
+    }
+
+    .mini-row strong {
+      display: block;
+      font-size: 14px;
+    }
+
+    .mini-row span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .progress {
+      height: 7px;
+      border-radius: 99px;
+      background: #edf1f6;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    .progress b {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--teal), var(--blue));
+    }
+
+    .form {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      padding: 16px;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .field label {
+      color: #445064;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      min-height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 0 11px;
+      outline: 0;
+      background: #fff;
+      color: var(--text);
+      font-size: 13px;
+    }
+
+    .field textarea {
+      min-height: 88px;
+      padding-top: 10px;
+      resize: vertical;
+    }
+
+    .span-2 {
+      grid-column: span 2;
+    }
+
+    .switch-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .switch-row:last-child {
+      border-bottom: 0;
+    }
+
+    .switch-row strong {
+      font-size: 14px;
+    }
+
+    .switch-row p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .toggle {
+      width: 46px;
+      height: 26px;
+      border-radius: 99px;
+      border: 0;
+      background: #d7dee9;
+      padding: 3px;
+      cursor: pointer;
+      flex: 0 0 auto;
+    }
+
+    .toggle::after {
+      content: "";
+      display: block;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: white;
+      transition: transform .2s;
+      box-shadow: 0 2px 8px rgba(0,0,0,.16);
+    }
+
+    .toggle.on {
+      background: var(--primary);
+    }
+
+    .toggle.on::after {
+      transform: translateX(20px);
+    }
+
+    .chart {
+      padding: 18px 16px 14px;
+    }
+
+    .bars {
+      height: 190px;
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 12px;
+      align-items: end;
+      border-bottom: 1px solid var(--line);
+      padding-top: 18px;
+    }
+
+    .bar {
+      min-width: 0;
+      display: grid;
+      gap: 8px;
+      justify-items: center;
+      align-items: end;
+    }
+
+    .bar i {
+      display: block;
+      width: 100%;
+      max-width: 32px;
+      border-radius: 6px 6px 0 0;
+      background: linear-gradient(180deg, var(--primary), #ff9b38);
+    }
+
+    .bar:nth-child(even) i {
+      background: linear-gradient(180deg, var(--teal), #61d4cb);
+    }
+
+    .bar span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .section {
+      display: none;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    .hide-row {
+      display: none;
+    }
+
+    .empty-row td {
+      color: var(--muted);
+      text-align: center;
+      padding: 30px 16px;
+    }
+
+    .toast-stack {
+      position: fixed;
+      right: 22px;
+      top: 22px;
+      z-index: 40;
+      display: grid;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .toast {
+      min-width: 260px;
+      max-width: 360px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 18px 45px rgba(22, 32, 51, .18);
+      padding: 12px 14px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      animation: slideIn .18s ease-out;
+    }
+
+    .toast i {
+      width: 18px;
+      height: 18px;
+      color: var(--green);
+      flex: 0 0 auto;
+      margin-top: 1px;
+    }
+
+    .toast strong {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 3px;
+    }
+
+    .toast span {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .modal-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 35;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(17, 24, 39, .48);
+    }
+
+    .modal-layer.open {
+      display: flex;
+    }
+
+    .modal {
+      width: min(680px, 100%);
+      max-height: min(760px, calc(100vh - 48px));
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 30px 80px rgba(17,24,39,.28);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-head {
+      min-height: 60px;
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .modal-head h3 {
+      margin: 0;
+      font-size: 17px;
+    }
+
+    .modal-head p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .icon-btn {
+      width: 34px;
+      height: 34px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      color: var(--muted);
+    }
+
+    .modal-body {
+      padding: 16px 18px;
+      overflow: auto;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 14px 18px;
+      border-top: 1px solid var(--line);
+      background: #fbfcfe;
+    }
+
+    .detail-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .detail-list div {
+      display: grid;
+      grid-template-columns: 132px 1fr;
+      gap: 12px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfe;
+      font-size: 13px;
+    }
+
+    .detail-list dt {
+      color: var(--muted);
+    }
+
+    .detail-list dd {
+      margin: 0;
+      color: var(--text);
+      font-weight: 650;
+    }
+
+    .choice-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .choice-grid button {
+      min-height: 70px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      cursor: pointer;
+      text-align: left;
+      padding: 12px;
+    }
+
+    .choice-grid button:hover,
+    .choice-grid button.active {
+      border-color: var(--primary);
+      background: var(--primary-soft);
+      color: var(--primary);
+    }
+
+    .drawer-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 36;
+      display: none;
+      justify-content: flex-end;
+      background: rgba(17, 24, 39, .36);
+    }
+
+    .drawer-layer.open {
+      display: flex;
+    }
+
+    .rules-drawer {
+      width: min(640px, 100%);
+      height: 100%;
+      background: #eef4fb;
+      box-shadow: -24px 0 60px rgba(17, 24, 39, .22);
+      display: flex;
+      flex-direction: column;
+      transform: translateX(100%);
+      animation: drawerIn .2s ease-out forwards;
+    }
+
+    .rules-head {
+      padding: 22px 24px 16px;
+      background: linear-gradient(90deg, #f8fbff, #e9f2fb);
+      border-bottom: 1px solid #d9e5f1;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .rules-head h3 {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.2;
+    }
+
+    .rules-head p {
+      margin: 8px 0 0;
+      color: #8a98aa;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .rules-body {
+      overflow: auto;
+      padding: 0 0 20px;
+    }
+
+    .rule-section {
+      margin-top: 12px;
+      padding: 18px 24px 18px 28px;
+      background: #f8fbff;
+      border-top: 1px solid #dce8f4;
+      border-bottom: 1px solid #dce8f4;
+      border-left: 4px solid #2f73ff;
+      box-shadow: 0 8px 24px rgba(52, 85, 125, .06);
+    }
+
+    .rule-section h4 {
+      margin: 0 0 12px;
+      color: #1e2a3a;
+      font-size: 15px;
+      line-height: 1.45;
+    }
+
+    .rule-section ul {
+      margin: 0;
+      padding-left: 17px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .rule-section li {
+      color: #40506a;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    @keyframes drawerIn {
+      from {
+        transform: translateX(100%);
+      }
+
+      to {
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .phone-preview {
+      width: 260px;
+      min-height: 516px;
+      margin: 18px auto;
+      border: 10px solid #111827;
+      border-radius: 30px;
+      background: linear-gradient(160deg, #f1f6ff, #fff5f1 58%, #fff);
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(17,24,39,.22);
+      padding: 16px 14px;
+    }
+
+    .phone-top {
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .phone-score {
+      margin-top: 28px;
+    }
+
+    .phone-score span {
+      font-size: 11px;
+      color: #667188;
+    }
+
+    .phone-score strong {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 34px;
+      margin-top: 5px;
+    }
+
+    .flame {
+      width: 18px;
+      height: 18px;
+      border-radius: 60% 60% 60% 0;
+      transform: rotate(-45deg);
+      background: var(--primary);
+      display: inline-block;
+    }
+
+    .packages {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 20px;
+    }
+
+    .pkg {
+      border: 1px solid #f0d8d2;
+      border-radius: 8px;
+      min-height: 72px;
+      display: grid;
+      place-items: center;
+      background: rgba(255,255,255,.8);
+      position: relative;
+      font-size: 11px;
+    }
+
+    .pkg.hot {
+      border-color: var(--primary);
+    }
+
+    .pkg b {
+      color: var(--primary);
+      display: block;
+      font-size: 20px;
+      line-height: 1.1;
+    }
+
+    .pkg small {
+      color: #7d8795;
+      font-weight: 700;
+    }
+
+    .phone-actions {
+      display: grid;
+      grid-template-columns: 96px 1fr;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .phone-actions button {
+      border: 1px solid #ffcabd;
+      height: 40px;
+      border-radius: 8px;
+      background: white;
+      color: var(--primary);
+      font-weight: 800;
+    }
+
+    .phone-actions button:last-child {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .task-preview {
+      margin-top: 16px;
+      background: white;
+      border-radius: 8px;
+      padding: 10px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .task-item {
+      display: grid;
+      grid-template-columns: 34px 1fr auto;
+      gap: 8px;
+      align-items: center;
+      min-height: 44px;
+    }
+
+    .coin {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #ffd138, #ff5d55);
+    }
+
+    .task-item strong {
+      font-size: 11px;
+      display: block;
+    }
+
+    .task-item span {
+      font-size: 10px;
+      color: #8994a6;
+    }
+
+    .task-item button {
+      border: 0;
+      border-radius: 99px;
+      background: var(--primary);
+      color: white;
+      height: 24px;
+      padding: 0 12px;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .stat-strip {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      padding: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .stat-strip div {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      min-height: 74px;
+    }
+
+    .stat-strip span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .stat-strip strong {
+      display: block;
+      font-size: 22px;
+      margin-top: 8px;
+    }
+
+    @media (max-width: 1180px) {
+      .metrics {
+        grid-template-columns: repeat(3, minmax(160px, 1fr));
+      }
+
+      .content {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 820px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+      }
+
+      .nav {
+        grid-template-columns: 1fr;
+      }
+
+      .nav-child {
+        margin-left: 0;
+        padding-left: 0;
+        border-left: 0;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .main {
+        padding: 18px;
+      }
+
+      .topbar {
+        height: auto;
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .toolbar,
+      .search {
+        width: 100%;
+      }
+
+      .metrics,
+      .stat-strip,
+      .form {
+        grid-template-columns: 1fr;
+      }
+
+      .span-2 {
+        grid-column: auto;
+      }
+
+      table {
+        min-width: 760px;
+      }
+
+      .panel {
+        overflow-x: auto;
+      }
+
+      .toast-stack {
+        left: 16px;
+        right: 16px;
+      }
+
+      .toast {
+        min-width: 0;
+        max-width: none;
+      }
+
+      .modal-layer {
+        padding: 12px;
+      }
+
+      .rules-drawer {
+        width: 100%;
+      }
+
+      .rules-head {
+        padding: 18px 18px 14px;
+      }
+
+      .rule-section {
+        padding: 16px 18px 16px 20px;
+      }
+
+      .choice-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+          <div class="brand-mark">积</div>
+        <div>
+          <strong>右豹管理后台</strong>
+          <span>Youbao Admin Console</span>
+        </div>
+      </div>
+
+      <nav class="nav" aria-label="后台导航">
+        <div class="nav-group">
+          <button class="nav-parent" type="button" aria-expanded="true"><i data-lucide="coins"></i>积分管理<i class="chevron" data-lucide="chevron-down"></i></button>
+          <div class="nav-child">
+            <button class="active" data-section="dashboard"><i data-lucide="layout-dashboard"></i>数据看板</button>
+            <button data-section="goods"><i data-lucide="package-plus"></i>积分商品</button>
+            <button data-section="codes"><i data-lucide="ticket"></i>兑换码</button>
+            <button data-section="tasks"><i data-lucide="badge-check"></i>任务奖励</button>
+            <button data-section="users"><i data-lucide="users"></i>用户账户</button>
+            <button data-section="flows"><i data-lucide="list-filter"></i>流水订单</button>
+            <button data-section="wallet"><i data-lucide="wallet-cards"></i>钱包配置</button>
+          </div>
+        </div>
+      </nav>
+
+      <div class="side-note">
+        右豹管理后台采用可迭代菜单架构。当前版本先建设积分管理，后续可继续加入其他业务模块。
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="title">
+          <div class="title-row">
+            <h1 id="pageTitle">数据看板</h1>
+            <button class="rule-btn" data-action="show-rules"><i data-lucide="book-open-check"></i>需求规则</button>
+          </div>
+          <p id="pageDesc">监控积分发放、消耗、收入和兑换码核销情况。</p>
+        </div>
+        <div class="toolbar">
+          <label class="search">
+            <i data-lucide="search"></i>
+            <input placeholder="搜索用户、订单号、兑换码批次">
+          </label>
+          <button class="btn"><i data-lucide="download"></i>导出</button>
+        </div>
+      </header>
+
+      <section class="section active" id="dashboard">
+        <div class="grid metrics">
+          <div class="metric"><span><i data-lucide="sparkles"></i>今日发放积分</span><strong>128,800</strong><em>较昨日 +12.4%</em></div>
+          <div class="metric"><span><i data-lucide="flame"></i>今日消耗积分</span><strong>46,520</strong><em>兑换转化 28.6%</em></div>
+          <div class="metric"><span><i data-lucide="trending-up"></i>累计发放积分</span><strong>9,842,600</strong><em>本月 +18.3%</em></div>
+          <div class="metric"><span><i data-lucide="trending-down"></i>累计消耗积分</span><strong>4,312,940</strong><em>消耗率 43.8%</em></div>
+          <div class="metric"><span><i data-lucide="receipt-yen"></i>兑换收入</span><strong>¥18,742</strong><em>客单价 ¥42.8</em></div>
+          <div class="metric"><span><i data-lucide="ticket-check"></i>兑换码核销</span><strong>1,936</strong><em>核销率 61.2%</em></div>
+        </div>
+
+        <div class="content" style="grid-template-columns:1fr">
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <h2>近 7 日积分趋势</h2>
+                <p>橙色为发放，青色为消耗。</p>
+              </div>
+              <div class="tabs">
+                <button class="active">7日</button>
+                <button>30日</button>
+                <button>自定义</button>
+              </div>
+            </div>
+            <div class="chart">
+              <div class="bars" aria-label="近7日积分趋势">
+                <div class="bar"><i style="height:64%"></i><span>周一</span></div>
+                <div class="bar"><i style="height:48%"></i><span>周二</span></div>
+                <div class="bar"><i style="height:78%"></i><span>周三</span></div>
+                <div class="bar"><i style="height:55%"></i><span>周四</span></div>
+                <div class="bar"><i style="height:86%"></i><span>周五</span></div>
+                <div class="bar"><i style="height:70%"></i><span>周六</span></div>
+                <div class="bar"><i style="height:92%"></i><span>周日</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="goods">
+        <div class="panel">
+          <div class="panel-head">
+            <div><h2>积分商品档位</h2><p>控制用户端卡片展示、售价、标签、购买人数与上下架状态。</p></div>
+            <button class="btn primary"><i data-lucide="plus"></i>新增档位</button>
+          </div>
+          <table>
+            <thead><tr><th>商品名称</th><th>积分</th><th>售价</th><th>标签</th><th>购买人数</th><th>状态</th><th>操作</th></tr></thead>
+            <tbody>
+              <tr><td>右豹积分 880</td><td>880</td><td>¥8.80</td><td><span class="status warn">推荐</span></td><td>8,216</td><td><span class="status on">上架</span></td><td><button class="link-btn">编辑</button><button class="link-btn">下架</button></td></tr>
+              <tr><td>右豹积分 6800</td><td>6,800</td><td>¥68.00</td><td><span class="status warn">上新</span></td><td>3,140</td><td><span class="status on">上架</span></td><td><button class="link-btn">编辑</button><button class="link-btn">复制</button></td></tr>
+              <tr><td>右豹积分 12800</td><td>12,800</td><td>¥128.00</td><td><span class="status warn">限时活动</span></td><td>1,278</td><td><span class="status off">草稿</span></td><td><button class="link-btn">编辑</button><button class="link-btn">上架</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section" id="codes">
+        <div class="content" style="grid-template-columns:1fr">
+          <div class="panel">
+            <div class="panel-head">
+              <div><h2>兑换码批次</h2><p>生成、冻结、核销和追踪兑换码。</p></div>
+              <button class="btn primary"><i data-lucide="ticket-plus"></i>生成批次</button>
+            </div>
+            <table>
+              <thead><tr><th>批次</th><th>面额</th><th>总量</th><th>已核销</th><th>有效期</th><th>状态</th><th>操作</th></tr></thead>
+              <tbody>
+                <tr><td>八月拉新礼包</td><td>880</td><td>10,000</td><td>6,214</td><td>2026.08.01-08.31</td><td><span class="status on">启用</span></td><td><button class="link-btn">明细</button><button class="link-btn">冻结</button></td></tr>
+                <tr><td>客服补偿码</td><td>300</td><td>500</td><td>86</td><td>长期</td><td><span class="status on">启用</span></td><td><button class="link-btn">明细</button><button class="link-btn">冻结</button></td></tr>
+                <tr><td>直播间福利</td><td>100</td><td>3,000</td><td>3,000</td><td>2026.08.12</td><td><span class="status off">已结束</span></td><td><button class="link-btn">导出</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="tasks">
+        <div class="panel">
+          <div class="panel-head">
+            <div><h2>任务奖励配置</h2><p>控制“完成任务得积分”的门槛、奖励和领取状态。</p></div>
+            <button class="btn primary"><i data-lucide="plus"></i>新增任务</button>
+          </div>
+          <table>
+            <thead><tr><th>任务名称</th><th>完成条件</th><th>阈值</th><th>单位</th><th>项目</th><th>奖励积分</th><th>达标人数</th><th>排序</th><th>状态</th><th>操作</th></tr></thead>
+            <tbody>
+              <tr><td>有效拉新奖励·初</td><td>有效拉新</td><td>1</td><td>人</td><td>-</td><td>+100</td><td>1,286</td><td>1</td><td><span class="status on">启用</span></td><td><button class="link-btn">编辑</button><button class="link-btn">禁用</button></td></tr>
+              <tr><td>项目出单奖励·番茄小说</td><td>项目出单</td><td>50</td><td>元</td><td>番茄小说</td><td>+300</td><td>420</td><td>2</td><td><span class="status on">启用</span></td><td><button class="link-btn">编辑</button><button class="link-btn">禁用</button></td></tr>
+              <tr><td>项目出单奖励·红果短剧</td><td>项目出单</td><td>100</td><td>元</td><td>红果短剧</td><td>+500</td><td>98</td><td>3</td><td><span class="status off">禁用</span></td><td><button class="link-btn">编辑</button><button class="link-btn">启用</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section" id="users">
+        <div class="panel">
+          <div class="panel-head">
+            <div><h2>用户积分账户</h2><p>查询余额、冻结积分、累计获得与消耗，支持调账申请。</p></div>
+            <button class="btn ghost"><i data-lucide="file-pen-line"></i>发起调账</button>
+          </div>
+          <div class="stat-strip">
+            <div><span>可用积分总额</span><strong>9,804,220</strong></div>
+            <div><span>冻结积分</span><strong>126,800</strong></div>
+            <div><span>今日调账</span><strong>42</strong></div>
+            <div><span>余额不一致</span><strong style="color:var(--danger)">3</strong></div>
+          </div>
+          <table>
+            <thead><tr><th>用户</th><th>可用积分</th><th>冻结积分</th><th>累计获得</th><th>累计消耗</th><th>最近变动</th><th>操作</th></tr></thead>
+            <tbody>
+              <tr><td>UID 826173<br><span class="muted">138****9021</span></td><td>12,000</td><td>0</td><td>58,800</td><td>46,800</td><td>2026.08.17 13:22</td><td><button class="link-btn">流水</button><button class="link-btn">调账</button></td></tr>
+              <tr><td>UID 791204<br><span class="muted">186****3499</span></td><td>880</td><td>300</td><td>14,680</td><td>13,500</td><td>2026.08.17 12:08</td><td><button class="link-btn">解冻</button><button class="link-btn">订单</button></td></tr>
+              <tr><td>UID 592810<br><span class="muted">159****7096</span></td><td>6,800</td><td>0</td><td>22,800</td><td>16,000</td><td>2026.08.16 20:49</td><td><button class="link-btn">流水</button><button class="link-btn">冻结</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section" id="flows">
+        <div class="panel">
+          <div class="panel-head">
+            <div><h2>积分流水与兑换订单</h2><p>按流水类型、动账类型和描述追踪积分变化。</p></div>
+            <div class="tabs"><button class="active">全部</button><button>入账</button><button>支出</button><button>失败</button></div>
+          </div>
+          <table>
+            <thead><tr><th>流水号</th><th>用户</th><th>流水类型</th><th>动账类型</th><th>描述</th><th>积分变动</th><th>支付金额</th><th>状态</th><th>时间</th></tr></thead>
+            <tbody>
+              <tr><td>F202608170001</td><td>UID 826173</td><td>入账</td><td>购买</td><td>购买右豹积分 880</td><td style="color:var(--primary);font-weight:800">+880</td><td>¥8.80</td><td><span class="status on">成功</span></td><td>2026.08.17 13:22</td></tr>
+              <tr><td>F202608170002</td><td>UID 791204</td><td>支出</td><td>消耗</td><td>视频提取消耗积分</td><td style="font-weight:800">-40</td><td>-</td><td><span class="status on">成功</span></td><td>2026.08.17 12:41</td></tr>
+              <tr><td>F202608170003</td><td>UID 592810</td><td>入账</td><td>兑换</td><td>兑换码核销入账</td><td style="color:var(--primary);font-weight:800">+300</td><td>-</td><td><span class="status warn">待复核</span></td><td>2026.08.17 11:07</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section" id="wallet">
+        <div class="content" style="grid-template-columns:1fr">
+          <div class="panel">
+            <div class="panel-head"><div><h2>钱包支付来源</h2><p>控制兑换积分时可选择的钱包与组合支付规则。</p></div></div>
+            <div class="switch-row"><div><strong>项目收益钱包</strong><p>截图中默认选中，余额充足时优先扣款。</p></div><button class="toggle on" aria-label="项目收益钱包开关"></button></div>
+            <div class="switch-row"><div><strong>团队奖励钱包</strong><p>可独立支付，也可参与组合支付。</p></div><button class="toggle on" aria-label="团队奖励钱包开关"></button></div>
+            <div class="switch-row"><div><strong>分红奖励钱包</strong><p>余额为 0 时前端置灰。</p></div><button class="toggle on" aria-label="分红奖励钱包开关"></button></div>
+            <div class="switch-row"><div><strong>组合支付</strong><p>按项目收益、团队奖励、分红奖励顺序扣款。</p></div><button class="toggle on" aria-label="组合支付开关"></button></div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <div class="toast-stack" id="toastStack" aria-live="polite"></div>
+  <div class="drawer-layer" id="rulesDrawerLayer" role="dialog" aria-modal="true" aria-labelledby="rulesDrawerTitle">
+    <aside class="rules-drawer">
+      <div class="rules-head">
+        <div>
+          <h3 id="rulesDrawerTitle">需求梳理</h3>
+          <p id="rulesDrawerDesc">基于当前后台板块整理业务范围、数据字段与状态流转，供研发与产品对齐。</p>
+        </div>
+        <button class="icon-btn" data-drawer-close aria-label="关闭需求规则"><i data-lucide="x"></i></button>
+      </div>
+      <div class="rules-body" id="rulesDrawerBody"></div>
+    </aside>
+  </div>
+  <div class="modal-layer" id="modalLayer" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal">
+      <div class="modal-head">
+        <div>
+          <h3 id="modalTitle">操作</h3>
+          <p id="modalDesc">请确认当前配置。</p>
+        </div>
+        <button class="icon-btn" data-modal-close aria-label="关闭弹窗"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+      <div class="modal-actions" id="modalActions"></div>
+    </div>
+  </div>
+
+  <script>
+    const labels = {
+      dashboard: ["数据看板", "监控积分发放、消耗、收入和兑换码核销情况。"],
+      goods: ["积分商品", "管理用户端兑换档位、售价、标签、购买人数和上架状态。"],
+      codes: ["兑换码", "批量生成、导入、发放、核销、冻结和导出兑换码。"],
+      tasks: ["任务奖励", "配置有效拉新、项目出单等积分奖励任务。"],
+      users: ["用户账户", "查询用户积分余额、冻结积分、调账和审计记录。"],
+      flows: ["流水订单", "追踪积分获得、消耗、钱包扣款订单和异常补偿。"],
+      wallet: ["钱包配置", "配置钱包扣款来源和组合支付展示规则，支付安全由后端逻辑处理。"]
+    };
+
+    const requirementRules = {
+      dashboard: [
+        { title: "1. 业务目标", items: ["聚合积分发放、消耗、收入与兑换码核销数据。", "帮助运营判断积分规模、消耗效率、兑换转化和异常趋势。", "看板只做运营监控，不承载商品、任务、兑换码等配置操作。"] },
+        { title: "2. 字段规则", items: ["今日发放积分：统计当日所有入账类积分。", "今日消耗积分：统计当日所有支出类积分。", "累计发放积分和累计消耗积分按平台历史总量统计。", "兑换收入按积分商品购买支付金额统计；兑换码核销按成功核销次数统计。"] },
+        { title: "3. 交互规则", items: ["趋势图支持 7日、30日和自定义口径切换。", "点击导出按钮导出当前看板汇总数据。", "不展示用户端预览、任务领取率和待处理异常统计。"] },
+        { title: "4. 数据口径", items: ["统计数据需按自然日归集。", "失败流水不计入成功发放或成功消耗。", "金额类指标保留人民币符号和两位小数口径。"] }
+      ],
+      goods: [
+        { title: "1. 业务目标", items: ["管理用户端积分兑换商品档位。", "支持运营配置售价、标签、购买人数和上下架状态。", "为后续活动运营提供可复制、可快速上下架的商品配置能力。"] },
+        { title: "2. 字段规则", items: ["商品名称必填。", "积分数量必填且必须为正整数。", "售价必填，展示为人民币金额。", "标签非必填，可选推荐、上新、限时活动；为空时列表展示为 -。", "购买人数为运营展示字段，可由真实数据或运营配置数据回填。", "状态为上架、下架或草稿。"] },
+        { title: "3. 交互规则", items: ["新增档位通过弹窗完成。", "编辑保存后列表立即刷新。", "复制商品生成草稿副本，标签默认清空。", "上架商品可在用户端展示，下架/草稿不展示。"] },
+        { title: "4. 边界规则", items: ["后台不配置限购规则。", "后台不配置适用钱包。", "协议勾选、库存扣减、支付校验由前端和后端交易链路处理。"] }
+      ],
+      codes: [
+        { title: "1. 业务目标", items: ["管理兑换码批次生成、核销、冻结和导出。", "支持运营通过兑换码向用户发放积分。", "兑换码新增配置必须通过弹窗完成。"] },
+        { title: "2. 字段规则", items: ["批次名称必填。", "生成数量必填且必须为正整数。", "有效期必填，支持长期或日期区间。", "状态包含启用、冻结、已结束。", "备注用于记录批次发放策略、适用人群或异常说明。"] },
+        { title: "3. 积分面额规则", items: ["积分面额方式支持积分商品批次和自定义积分数额。", "选择积分商品批次时展示商品批次下拉，并自动带出积分面额。", "选择自定义积分数额时展示数字输入，输入值同步为积分面额。"] },
+        { title: "4. 兑换限制规则", items: ["兑换限制可开启或关闭。", "开启后必须配置每个用户可兑换 X 次。", "该次数表示该批次兑换码每个用户最多可兑换的次数。", "关闭后不限制单用户兑换次数，但仍受兑换码总量和状态限制。"] },
+        { title: "5. 交互规则", items: ["点击生成批次打开配置弹窗。", "点击明细展示面额方式、积分商品批次、兑换限制、每用户次数、总量、已核销、剩余和状态。", "冻结后该批次不可继续核销；再次点击可启用。", "导出按钮导出该批次核销明细。", "兑换码后台不设置审批字段。"] }
+      ],
+      tasks: [
+        { title: "1. 业务目标", items: ["管理完成任务得积分的奖励规则。", "通过有效拉新和项目出单两类条件驱动积分发放。", "为运营提供任务排序、状态、达标人数和奖励积分配置能力。"] },
+        { title: "2. 字段规则", items: ["任务名称必填。", "完成条件固定为有效拉新和项目出单。", "阈值必填且必须为正数。", "有效拉新单位为人；项目出单单位为元。", "奖励积分必填且必须为正整数。", "达标人数为该任务当前满足条件的用户人数。", "排序为正整数，数值越小展示越靠前。", "状态只有启用和禁用。"] },
+        { title: "3. 项目规则", items: ["选择项目出单时必须选择项目。", "项目下拉 mock 数据为番茄小说、红果短剧、红果漫剧、知乎故事、知乎知识。", "有效拉新不需要选择项目，列表中项目字段展示为 -。"] },
+        { title: "4. 交互规则", items: ["新增任务和编辑任务均通过弹窗完成。", "切换完成条件时，单位自动变化。", "选择项目出单时展示项目下拉；选择有效拉新时隐藏项目下拉。", "列表操作支持编辑、启用和禁用，不存在审核流程。"] },
+        { title: "5. 发放规则", items: ["启用状态的任务可参与用户端展示和奖励发放。", "禁用状态的任务不参与展示和发放。", "用户达标后领取奖励，需要后端校验是否重复领取。"] }
+      ],
+      users: [
+        { title: "1. 业务目标", items: ["支持客服和运营查询用户积分账户。", "追踪可用积分、冻结积分、累计获得、累计消耗和最近变动。", "处理用户积分异常、冻结和调账。"] },
+        { title: "2. 字段规则", items: ["用户字段展示 UID 和脱敏手机号。", "可用积分表示当前可消费积分。", "冻结积分表示被限制使用的积分。", "累计获得和累计消耗用于账户历史统计。", "最近变动时间取最近一笔积分流水时间。"] },
+        { title: "3. 交互规则", items: ["点击流水跳转到流水订单并按当前用户筛选。", "点击订单打开用户最近兑换订单详情。", "点击调账打开调账弹窗。", "冻结和解冻按钮根据当前冻结积分动态切换。"] },
+        { title: "4. 调账规则", items: ["调账类型包含增加、扣减、冻结、解冻。", "调账必须填写原因。", "冻结积分不可用于用户端消费。", "解冻后积分回到可用积分。"] }
+      ],
+      flows: [
+        { title: "1. 业务目标", items: ["追踪所有积分入账和支出记录。", "为客服查询、财务对账和异常排查提供依据。", "统一流水描述口径，降低来源字段歧义。"] },
+        { title: "2. 字段规则", items: ["字段包含流水号、用户、流水类型、动账类型、描述、积分变动、支付金额、状态和时间。", "流水类型固定为入账和支出。", "动账类型包含奖励、购买、兑换和消耗。", "来源字段统一调整为描述。", "状态只展示成功和失败。"] },
+        { title: "3. 失败规则", items: ["失败记录必须有失败原因。", "鼠标悬浮失败状态标签时展示失败原因。", "失败流水不计入成功发放或成功消耗统计。"] },
+        { title: "4. 查询交互", items: ["支持按全部、入账、支出和失败筛选。", "支持按用户、订单号、兑换码批次等关键词搜索当前模块。", "导出按钮导出当前模块数据。"] }
+      ],
+      wallet: [
+        { title: "1. 业务目标", items: ["配置积分兑换时可展示的钱包支付来源。", "支持项目收益钱包、团队奖励钱包、分红奖励钱包和组合支付。", "帮助运营控制前端钱包入口可见性。"] },
+        { title: "2. 字段规则", items: ["钱包来源包含项目收益钱包、团队奖励钱包、分红奖励钱包和组合支付。", "每个钱包来源具备开启和关闭状态。", "文案说明用于解释该钱包在前端支付时的展示和扣款含义。"] },
+        { title: "3. 交互规则", items: ["点击开关可立即切换钱包来源状态。", "切换后展示操作成功提示。", "关闭钱包来源后，前端不展示对应支付入口。"] },
+        { title: "4. 边界规则", items: ["后台仅配置钱包支付来源和组合支付展示规则。", "支付安全整体设置不在后台侧写入。", "支付密码、失败次数、锁定时长和重试策略由后端逻辑统一处理。", "余额不足、支付密码校验等逻辑由后端返回结果。"] }
+      ]
+    };
+
+    const state = {
+      activeSection: "dashboard",
+      activeFlowFilter: "全部",
+      activeTrend: "7日",
+      projects: ["番茄小说", "红果短剧", "红果漫剧", "知乎故事", "知乎知识"],
+      goods: [
+        { name: "右豹积分 880", points: 880, price: "¥8.80", tag: "推荐", buyers: 8216, status: "上架" },
+        { name: "右豹积分 6800", points: 6800, price: "¥68.00", tag: "上新", buyers: 3140, status: "上架" },
+        { name: "右豹积分 12800", points: 12800, price: "¥128.00", tag: "限时活动", buyers: 1278, status: "草稿" }
+      ],
+      codes: [
+        { batch: "八月拉新礼包", points: 880, pointsSource: "积分商品批次", productName: "右豹积分 880", total: 10000, used: 6214, valid: "2026.08.01-08.31", status: "启用", limitEnabled: true, perUserLimit: 1 },
+        { batch: "客服补偿码", points: 300, pointsSource: "自定义积分数额", productName: "-", total: 500, used: 86, valid: "长期", status: "启用", limitEnabled: true, perUserLimit: 2 },
+        { batch: "直播间福利", points: 100, pointsSource: "自定义积分数额", productName: "-", total: 3000, used: 3000, valid: "2026.08.12", status: "已结束", limitEnabled: false, perUserLimit: "-" }
+      ],
+      tasks: [
+        { name: "有效拉新奖励·初", conditionType: "有效拉新", threshold: 1, unit: "人", project: "-", reward: 100, qualifiedUsers: 1286, sort: 1, status: "启用" },
+        { name: "项目出单奖励·番茄小说", conditionType: "项目出单", threshold: 50, unit: "元", project: "番茄小说", reward: 300, qualifiedUsers: 420, sort: 2, status: "启用" },
+        { name: "项目出单奖励·红果短剧", conditionType: "项目出单", threshold: 100, unit: "元", project: "红果短剧", reward: 500, qualifiedUsers: 98, sort: 3, status: "禁用" }
+      ],
+      users: [
+        { uid: "UID 826173", phone: "138****9021", available: 12000, frozen: 0, gained: 58800, spent: 46800, changed: "2026.08.17 13:22" },
+        { uid: "UID 791204", phone: "186****3499", available: 880, frozen: 300, gained: 14680, spent: 13500, changed: "2026.08.17 12:08" },
+        { uid: "UID 592810", phone: "159****7096", available: 6800, frozen: 0, gained: 22800, spent: 16000, changed: "2026.08.16 20:49" }
+      ],
+      flows: [
+        { id: "F202608170001", user: "UID 826173", flowType: "入账", accountType: "购买", desc: "购买右豹积分 880", change: 880, pay: "¥8.80", status: "成功", time: "2026.08.17 13:22" },
+        { id: "F202608170002", user: "UID 791204", flowType: "支出", accountType: "消耗", desc: "视频提取消耗积分", change: -40, pay: "-", status: "成功", time: "2026.08.17 12:41" },
+        { id: "F202608170003", user: "UID 592810", flowType: "入账", accountType: "兑换", desc: "兑换码核销入账", change: 300, pay: "-", status: "失败", failReason: "兑换码批次已结束，核销回滚。", time: "2026.08.17 11:07" },
+        { id: "F202608170004", user: "UID 438021", flowType: "入账", accountType: "购买", desc: "购买右豹积分 6800，扣款成功待发放", change: null, pay: "¥68.00", status: "失败", failReason: "钱包扣款成功，但积分发放服务超时。", time: "2026.08.17 10:55" },
+        { id: "F202608170005", user: "UID 826173", flowType: "入账", accountType: "奖励", desc: "有效拉新 1 人任务奖励", change: 100, pay: "-", status: "成功", time: "2026.08.17 10:12" },
+        { id: "F202608170006", user: "UID 671920", flowType: "支出", accountType: "消耗", desc: "AI 文案生成消耗积分", change: -80, pay: "-", status: "成功", time: "2026.08.17 09:48" },
+        { id: "F202608170007", user: "UID 671920", flowType: "入账", accountType: "奖励", desc: "番茄小说项目出单 62 元奖励", change: 300, pay: "-", status: "成功", time: "2026.08.17 09:30" },
+        { id: "F202608170008", user: "UID 302918", flowType: "入账", accountType: "兑换", desc: "直播间福利兑换码核销", change: 100, pay: "-", status: "成功", time: "2026.08.17 08:46" },
+        { id: "F202608170009", user: "UID 810236", flowType: "支出", accountType: "消耗", desc: "权益包兑换消耗积分", change: -680, pay: "-", status: "成功", time: "2026.08.16 21:16" },
+        { id: "F202608170010", user: "UID 592810", flowType: "入账", accountType: "购买", desc: "购买右豹积分 12800", change: 12800, pay: "¥128.00", status: "成功", time: "2026.08.16 20:49" }
+      ]
+    };
+
+    const money = new Intl.NumberFormat("zh-CN");
+
+    function fmt(value) {
+      return money.format(value);
+    }
+
+    function statusClass(status) {
+      if (["上架", "启用", "成功", "已处理", "已审批"].includes(status)) return "on";
+      if (["待复核", "待处理", "待审批"].includes(status)) return "warn";
+      if (["失败", "扣款成功发放失败", "高"].includes(status)) return "danger";
+      return "off";
+    }
+
+    function toast(title, message) {
+      const stack = document.getElementById("toastStack");
+      const item = document.createElement("div");
+      item.className = "toast";
+      item.innerHTML = `<i data-lucide="check-circle-2"></i><div><strong>${title}</strong><span>${message}</span></div>`;
+      stack.appendChild(item);
+      lucide.createIcons();
+      setTimeout(() => item.remove(), 2800);
+    }
+
+    function openModal(title, desc, body, actions) {
+      document.getElementById("modalTitle").textContent = title;
+      document.getElementById("modalDesc").textContent = desc;
+      document.getElementById("modalBody").innerHTML = body;
+      document.getElementById("modalActions").innerHTML = actions || "";
+      document.getElementById("modalLayer").classList.add("open");
+      lucide.createIcons();
+    }
+
+    function closeModal() {
+      document.getElementById("modalLayer").classList.remove("open");
+    }
+
+    function activeTableBody(section) {
+      return document.querySelector(`#${section} tbody`);
+    }
+
+    function renderGoods() {
+      activeTableBody("goods").innerHTML = state.goods.map((item, index) => `
+        <tr>
+          <td>${item.name}</td>
+          <td>${fmt(item.points)}</td>
+          <td>${item.price}</td>
+          <td>${item.tag ? `<span class="status warn">${item.tag}</span>` : '-'}</td>
+          <td>${fmt(item.buyers)}</td>
+          <td><span class="status ${statusClass(item.status)}">${item.status}</span></td>
+          <td>
+            <button class="link-btn" data-action="edit-good" data-index="${index}">编辑</button>
+            <button class="link-btn" data-action="toggle-good" data-index="${index}">${item.status === "上架" ? "下架" : "上架"}</button>
+            <button class="link-btn" data-action="copy-good" data-index="${index}">复制</button>
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    function renderCodes() {
+      activeTableBody("codes").innerHTML = state.codes.map((item, index) => `
+        <tr>
+          <td>${item.batch}</td>
+          <td>${fmt(item.points)}</td>
+          <td>${fmt(item.total)}</td>
+          <td>${fmt(item.used)}</td>
+          <td>${item.valid}</td>
+          <td><span class="status ${statusClass(item.status)}">${item.status}</span></td>
+          <td>
+            <button class="link-btn" data-action="code-detail" data-index="${index}">明细</button>
+            <button class="link-btn" data-action="toggle-code" data-index="${index}">${item.status === "冻结" ? "启用" : "冻结"}</button>
+            <button class="link-btn" data-action="export-code" data-index="${index}">导出</button>
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    function renderTasks() {
+      activeTableBody("tasks").innerHTML = state.tasks.map((item, index) => `
+        <tr>
+          <td>${item.name}</td>
+          <td>${item.conditionType}</td>
+          <td>${fmt(item.threshold)}</td>
+          <td>${item.unit}</td>
+          <td>${item.project}</td>
+          <td>+${fmt(item.reward)}</td>
+          <td>${fmt(item.qualifiedUsers)}</td>
+          <td>${item.sort}</td>
+          <td><span class="status ${statusClass(item.status)}">${item.status}</span></td>
+          <td>
+            <button class="link-btn" data-action="edit-task" data-index="${index}">编辑</button>
+            <button class="link-btn" data-action="toggle-task" data-index="${index}">${item.status === "启用" ? "禁用" : "启用"}</button>
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    function renderUsers() {
+      activeTableBody("users").innerHTML = state.users.map((item, index) => `
+        <tr>
+          <td>${item.uid}<br><span class="muted">${item.phone}</span></td>
+          <td>${fmt(item.available)}</td>
+          <td>${fmt(item.frozen)}</td>
+          <td>${fmt(item.gained)}</td>
+          <td>${fmt(item.spent)}</td>
+          <td>${item.changed}</td>
+          <td>
+            <button class="link-btn" data-action="user-flow" data-index="${index}">流水</button>
+            <button class="link-btn" data-action="adjust-user" data-index="${index}">调账</button>
+            <button class="link-btn" data-action="toggle-freeze" data-index="${index}">${item.frozen > 0 ? "解冻" : "冻结"}</button>
+            <button class="link-btn" data-action="user-order" data-index="${index}">订单</button>
+          </td>
+        </tr>
+      `).join("");
+      updateUserStats();
+    }
+
+    function renderFlows(filter = state.activeFlowFilter) {
+      state.activeFlowFilter = filter;
+      const rows = state.flows.filter((item) => filter === "全部" || item.flowType === filter || item.status.includes(filter));
+      activeTableBody("flows").innerHTML = rows.length ? rows.map((item) => {
+        const changeText = item.change === null ? "待发放" : `${item.change > 0 ? "+" : ""}${fmt(item.change)}`;
+        const changeStyle = item.change > 0 ? "color:var(--primary);font-weight:800" : "font-weight:800";
+        const statusCell = item.status === "失败"
+          ? `<span class="status-wrap"><span class="status danger">失败</span><span class="fail-tip">${item.failReason || "暂无失败原因"}</span></span>`
+          : `<span class="status ${statusClass(item.status)}">${item.status}</span>`;
+        return `
+          <tr>
+            <td>${item.id}</td>
+            <td>${item.user}</td>
+            <td>${item.flowType}</td>
+            <td>${item.accountType}</td>
+            <td>${item.desc}</td>
+            <td style="${item.change === null ? "" : changeStyle}">${changeText}</td>
+            <td>${item.pay}</td>
+            <td>${statusCell}</td>
+            <td>${item.time}</td>
+          </tr>
+        `;
+      }).join("") : `<tr class="empty-row"><td colspan="9">没有符合条件的流水记录</td></tr>`;
+    }
+
+    function updateUserStats() {
+      const totals = state.users.reduce((acc, user) => {
+        acc.available += user.available;
+        acc.frozen += user.frozen;
+        return acc;
+      }, { available: 0, frozen: 0 });
+      const stats = document.querySelectorAll("#users .stat-strip strong");
+      stats[0].textContent = fmt(totals.available);
+      stats[1].textContent = fmt(totals.frozen);
+    }
+
+    function switchSection(target) {
+      state.activeSection = target;
+      document.querySelectorAll(".nav button").forEach((item) => item.classList.toggle("active", item.dataset.section === target));
+      document.querySelectorAll(".section").forEach((section) => section.classList.toggle("active", section.id === target));
+      document.getElementById("pageTitle").textContent = labels[target][0];
+      document.getElementById("pageDesc").textContent = labels[target][1];
+    }
+
+    function formField(label, value, type = "text") {
+      return `<div class="field"><label>${label}</label><input type="${type}" value="${value}"></div>`;
+    }
+
+    function openGoodForm(index) {
+      const item = state.goods[index] || { name: "右豹积分 1880", points: 1880, price: "¥18.80", tag: "", buyers: 0, status: "草稿" };
+      openModal(index == null ? "新增积分档位" : "编辑积分档位", "保存后会同步影响用户端积分中心展示。", `
+        <div class="form" id="goodForm">
+          ${formField("商品名称", item.name)}
+          ${formField("积分数量", item.points, "number")}
+          ${formField("售价", item.price)}
+          ${formField("购买人数", item.buyers, "number")}
+          <div class="field"><label>标签</label><select><option value="" ${!item.tag ? "selected" : ""}>不设置</option><option ${item.tag === "推荐" ? "selected" : ""}>推荐</option><option ${item.tag === "上新" ? "selected" : ""}>上新</option><option ${item.tag === "限时活动" ? "selected" : ""}>限时活动</option></select></div>
+          <div class="field"><label>状态</label><select><option ${item.status === "上架" ? "selected" : ""}>上架</option><option ${item.status === "草稿" ? "selected" : ""}>草稿</option><option ${item.status === "下架" ? "selected" : ""}>下架</option></select></div>
+        </div>
+      `, `<button class="btn" data-modal-close>取消</button><button class="btn primary" data-action="save-good" data-index="${index ?? ""}">保存</button>`);
+    }
+
+    function saveGood(index) {
+      const values = [...document.querySelectorAll("#goodForm input, #goodForm select")].map((input) => input.value.trim());
+      const item = { name: values[0], points: Number(values[1] || 0), price: values[2], buyers: Number(values[3] || 0), tag: values[4], status: values[5] };
+      if (index === "") state.goods.unshift(item);
+      else state.goods[Number(index)] = item;
+      renderGoods();
+      closeModal();
+      toast("积分档位已保存", `${item.name} 已更新到商品列表。`);
+    }
+
+    function openTaskForm(index) {
+      const item = state.tasks[index] || { name: "有效拉新奖励", conditionType: "有效拉新", threshold: 1, unit: "人", project: "-", reward: 100, qualifiedUsers: 0, sort: state.tasks.length + 1, status: "启用" };
+      openModal(index == null ? "新增任务奖励" : "编辑任务奖励", "用于控制用户端任务卡片、奖励积分与领取条件。", `
+        <div class="form" id="taskForm">
+          ${formField("任务名称", item.name)}
+          <div class="field"><label>完成条件</label><select id="taskConditionType"><option ${item.conditionType === "有效拉新" ? "selected" : ""}>有效拉新</option><option ${item.conditionType === "项目出单" ? "selected" : ""}>项目出单</option></select></div>
+          ${formField("阈值", item.threshold, "number")}
+          <div class="field"><label>单位</label><input id="taskUnit" value="${item.unit}" readonly></div>
+          <div class="field" id="taskProjectField"><label>项目</label><select id="taskProject">${state.projects.map((project) => `<option ${item.project === project ? "selected" : ""}>${project}</option>`).join("")}</select></div>
+          ${formField("奖励积分", item.reward, "number")}
+          ${formField("达标人数", item.qualifiedUsers, "number")}
+          ${formField("排序", item.sort, "number")}
+          <div class="field"><label>状态</label><select><option ${item.status === "启用" ? "selected" : ""}>启用</option><option ${item.status === "禁用" ? "selected" : ""}>禁用</option></select></div>
+        </div>
+      `, `<button class="btn" data-modal-close>取消</button><button class="btn primary" data-action="save-task" data-index="${index ?? ""}">保存</button>`);
+      syncTaskProjectField();
+    }
+
+    function saveTask(index) {
+      const fields = [...document.querySelectorAll("#taskForm .field")];
+      const getValue = (label) => {
+        const field = fields.find((item) => item.querySelector("label")?.textContent.trim() === label);
+        const control = field?.querySelector("input, select, textarea");
+        return control ? control.value.trim() : "";
+      };
+      const conditionType = getValue("完成条件");
+      const item = {
+        name: getValue("任务名称"),
+        conditionType,
+        threshold: Number(getValue("阈值") || 0),
+        unit: conditionType === "项目出单" ? "元" : "人",
+        project: conditionType === "项目出单" ? getValue("项目") : "-",
+        reward: Number(getValue("奖励积分") || 0),
+        qualifiedUsers: Number(getValue("达标人数") || 0),
+        sort: Number(getValue("排序") || 0),
+        status: getValue("状态")
+      };
+      if (index === "") state.tasks.push(item);
+      else state.tasks[Number(index)] = item;
+      renderTasks();
+      closeModal();
+      toast("任务奖励已保存", `${item.name} 已同步到任务配置。`);
+    }
+
+    function openCodeForm() {
+      openModal("新增兑换码配置", "创建后会进入兑换码批次列表，并可继续导出核销明细。", `
+        <div class="form" id="codeForm">
+          <div class="field span-2"><label>批次名称</label><input value="项目收益钱包专属兑换码"></div>
+          <div class="field"><label>积分面额方式</label><select id="codePointsMode"><option>积分商品批次</option><option>自定义积分数额</option></select></div>
+          <div class="field" id="codeProductField"><label>积分商品批次</label><select id="codeProduct">${state.goods.map((item, index) => `<option value="${index}">${item.name} / ${fmt(item.points)}积分</option>`).join("")}</select></div>
+          <div class="field" id="codeCustomPointsField"><label>自定义积分数额</label><input id="codeCustomPoints" type="number" value="880"></div>
+          <div class="field"><label>积分面额</label><input id="codePointsValue" type="number" value="${state.goods[0]?.points || 880}" readonly></div>
+          ${formField("生成数量", 10000, "number")}
+          ${formField("有效期", "2026.08.17-09.17")}
+          <div class="field"><label>状态</label><select><option>启用</option><option>冻结</option><option>已结束</option></select></div>
+          <div class="field"><label>兑换限制</label><select id="codeLimitEnabled"><option>开启</option><option>关闭</option></select></div>
+          <div class="field" id="codeLimitField"><label>每用户可兑换次数</label><input id="codePerUserLimit" type="number" min="1" value="1"></div>
+          <div class="field span-2"><label>备注</label><textarea>兑换限制开启后，该批次兑换码每个用户最多可兑换指定次数。</textarea></div>
+        </div>
+      `, `<button class="btn" data-modal-close>取消</button><button class="btn primary" data-action="save-code">生成</button>`);
+      syncCodePointsFields();
+      syncCodeLimitField();
+    }
+
+    function saveCode() {
+      const fields = [...document.querySelectorAll("#codeForm .field")];
+      const getValue = (label) => {
+        const field = fields.find((item) => item.querySelector("label")?.textContent.trim() === label);
+        const control = field?.querySelector("input, select, textarea");
+        return control ? control.value.trim() : "";
+      };
+      const mode = getValue("积分面额方式");
+      const productIndex = Number(document.getElementById("codeProduct")?.value || 0);
+      const selectedProduct = state.goods[productIndex];
+      const limitEnabled = getValue("兑换限制") === "开启";
+      state.codes.unshift({
+        batch: getValue("批次名称"),
+        points: Number(getValue("积分面额") || 0),
+        pointsSource: mode,
+        productName: mode === "积分商品批次" ? selectedProduct.name : "-",
+        total: Number(getValue("生成数量") || 0),
+        used: 0,
+        valid: getValue("有效期"),
+        status: getValue("状态"),
+        limitEnabled,
+        perUserLimit: limitEnabled ? Number(getValue("每用户可兑换次数") || 1) : "-"
+      });
+      renderCodes();
+      closeModal();
+      toast("兑换码批次已生成", `${state.codes[0].batch} 已创建，当前已核销 0 个。`);
+    }
+
+    function openAdjustForm(index) {
+      const user = state.users[index] || state.users[0];
+      openModal("发起积分调账", "调账会写入审计日志，大额调整进入审批队列。", `
+        <div class="form" id="adjustForm">
+          <div class="field"><label>用户</label><select>${state.users.map((item, i) => `<option value="${i}" ${i === Number(index || 0) ? "selected" : ""}>${item.uid} ${item.phone}</option>`).join("")}</select></div>
+          <div class="field"><label>调账类型</label><select><option>增加</option><option>扣减</option><option>冻结</option><option>解冻</option></select></div>
+          ${formField("积分数量", 100, "number")}
+          <div class="field span-2"><label>原因</label><textarea>客服补偿 / 异常订单处理</textarea></div>
+        </div>
+      `, `<button class="btn" data-modal-close>取消</button><button class="btn primary" data-action="save-adjust">提交</button>`);
+    }
+
+    function saveAdjust() {
+      const fields = document.querySelectorAll("#adjustForm select, #adjustForm input, #adjustForm textarea");
+      const userIndex = Number(fields[0].value);
+      const type = fields[1].value;
+      const amount = Number(fields[2].value || 0);
+      const user = state.users[userIndex];
+      if (type === "增加") user.available += amount;
+      if (type === "扣减") user.available = Math.max(0, user.available - amount);
+      if (type === "冻结") {
+        const freeze = Math.min(user.available, amount);
+        user.available -= freeze;
+        user.frozen += freeze;
+      }
+      if (type === "解冻") {
+        const unfreeze = Math.min(user.frozen, amount);
+        user.frozen -= unfreeze;
+        user.available += unfreeze;
+      }
+      user.changed = "2026.08.17 14:58";
+      renderUsers();
+      closeModal();
+      toast("调账已提交", `${user.uid} 已${type} ${fmt(amount)} 积分。`);
+    }
+
+    function openDetail(title, data) {
+      const body = `<dl class="detail-list">${Object.entries(data).map(([key, value]) => `<div><dt>${key}</dt><dd>${value}</dd></div>`).join("")}</dl>`;
+      openModal(title, "以下为当前记录的关键字段，可用于客服查询或运营复核。", body, `<button class="btn primary" data-modal-close>知道了</button>`);
+    }
+
+    function openRequirementRules(section = state.activeSection) {
+      const rules = requirementRules[section] || [];
+      document.getElementById("rulesDrawerTitle").textContent = `${labels[section][0]}需求梳理`;
+      document.getElementById("rulesDrawerDesc").textContent = labels[section][1];
+      document.getElementById("rulesDrawerBody").innerHTML = rules.map((group) => `
+        <section class="rule-section">
+          <h4>${group.title}</h4>
+          <ul>${group.items.map((item) => `<li>${item}</li>`).join("")}</ul>
+        </section>
+      `).join("");
+      document.getElementById("rulesDrawerLayer").classList.add("open");
+      lucide.createIcons();
+    }
+
+    function closeRulesDrawer() {
+      document.getElementById("rulesDrawerLayer").classList.remove("open");
+    }
+
+    function exportCsv(name, rows) {
+      const csv = rows.map((row) => row.map((cell) => `"${String(cell).replaceAll('"', '""')}"`).join(",")).join("\n");
+      const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = name;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast("导出已开始", `${name} 已生成到浏览器下载任务。`);
+    }
+
+    function doSearch(keyword) {
+      document.querySelectorAll("tbody tr").forEach((row) => row.classList.remove("hide-row"));
+      document.querySelectorAll(`#${state.activeSection} tbody tr`).forEach((row) => {
+        if (!keyword) {
+          row.classList.remove("hide-row");
+          return;
+        }
+        row.classList.toggle("hide-row", !row.textContent.toLowerCase().includes(keyword.toLowerCase()));
+      });
+      toast("搜索完成", keyword ? `已按“${keyword}”筛选当前页面数据。` : "已清空搜索条件。");
+    }
+
+    function updateTrend(range) {
+      state.activeTrend = range;
+      const heightSets = {
+        "7日": [64, 48, 78, 55, 86, 70, 92],
+        "30日": [42, 68, 54, 83, 63, 75, 58],
+        "自定义": [76, 36, 66, 47, 92, 60, 81]
+      };
+      document.querySelectorAll(".bars .bar i").forEach((bar, index) => {
+        bar.style.height = `${heightSets[range][index]}%`;
+      });
+      toast("趋势已切换", `当前查看 ${range} 积分趋势。`);
+    }
+
+    function syncTaskProjectField() {
+      const condition = document.getElementById("taskConditionType");
+      const projectField = document.getElementById("taskProjectField");
+      const unit = document.getElementById("taskUnit");
+      if (!condition || !projectField || !unit) return;
+      const isProjectOrder = condition.value === "项目出单";
+      projectField.style.display = isProjectOrder ? "grid" : "none";
+      unit.value = isProjectOrder ? "元" : "人";
+    }
+
+    function syncCodePointsFields() {
+      const mode = document.getElementById("codePointsMode");
+      const productField = document.getElementById("codeProductField");
+      const product = document.getElementById("codeProduct");
+      const customField = document.getElementById("codeCustomPointsField");
+      const customPoints = document.getElementById("codeCustomPoints");
+      const pointsValue = document.getElementById("codePointsValue");
+      if (!mode || !productField || !customField || !pointsValue) return;
+      const useProduct = mode.value === "积分商品批次";
+      productField.style.display = useProduct ? "grid" : "none";
+      customField.style.display = useProduct ? "none" : "grid";
+      pointsValue.value = useProduct ? state.goods[Number(product?.value || 0)]?.points || 0 : Number(customPoints?.value || 0);
+    }
+
+    function syncCodeLimitField() {
+      const limit = document.getElementById("codeLimitEnabled");
+      const limitField = document.getElementById("codeLimitField");
+      if (!limit || !limitField) return;
+      limitField.style.display = limit.value === "开启" ? "grid" : "none";
+    }
+
+    function handleAction(action, target) {
+      const index = target.dataset.index;
+      if (action === "save-good") return saveGood(index);
+      if (action === "save-task") return saveTask(index);
+      if (action === "save-code") return saveCode();
+      if (action === "save-adjust") return saveAdjust();
+      if (action === "edit-good") return openGoodForm(Number(index));
+      if (action === "copy-good") {
+        const copy = { ...state.goods[Number(index)], name: `${state.goods[Number(index)].name} 副本`, status: "草稿", tag: "" };
+        state.goods.splice(Number(index) + 1, 0, copy);
+        renderGoods();
+        return toast("已复制档位", `${copy.name} 已生成草稿。`);
+      }
+      if (action === "toggle-good") {
+        const item = state.goods[Number(index)];
+        item.status = item.status === "上架" ? "下架" : "上架";
+        renderGoods();
+        return toast("商品状态已更新", `${item.name} 当前为${item.status}。`);
+      }
+      if (action === "edit-task") return openTaskForm(Number(index));
+      if (action === "toggle-task") {
+        const item = state.tasks[Number(index)];
+        item.status = item.status === "启用" ? "禁用" : "启用";
+        renderTasks();
+        return toast("任务状态已更新", `${item.name} 当前为${item.status}。`);
+      }
+      if (action === "code-detail") {
+        const item = state.codes[Number(index)];
+        return openDetail("兑换码批次明细", { 批次: item.batch, 积分面额: item.points, 面额方式: item.pointsSource, 积分商品批次: item.productName, 兑换限制: item.limitEnabled ? "开启" : "关闭", 每用户可兑换次数: item.perUserLimit, 总量: fmt(item.total), 已核销: fmt(item.used), 剩余: fmt(item.total - item.used), 有效期: item.valid, 状态: item.status });
+      }
+      if (action === "toggle-code") {
+        const item = state.codes[Number(index)];
+        item.status = item.status === "冻结" ? "启用" : "冻结";
+        renderCodes();
+        return toast("兑换码状态已更新", `${item.batch} 当前为${item.status}。`);
+      }
+      if (action === "export-code") {
+        const item = state.codes[Number(index)];
+        return exportCsv(`${item.batch}-核销明细.csv`, [["批次", "面额", "总量", "已核销"], [item.batch, item.points, item.total, item.used]]);
+      }
+      if (action === "user-flow") {
+        const user = state.users[Number(index)];
+        switchSection("flows");
+        renderFlows("全部");
+        return doSearch(user.uid);
+      }
+      if (action === "adjust-user") return openAdjustForm(Number(index));
+      if (action === "toggle-freeze") {
+        const user = state.users[Number(index)];
+        if (user.frozen > 0) {
+          user.available += user.frozen;
+          user.frozen = 0;
+          toast("积分已解冻", `${user.uid} 的冻结积分已转为可用。`);
+        } else {
+          const amount = Math.min(300, user.available);
+          user.available -= amount;
+          user.frozen += amount;
+          toast("积分已冻结", `${user.uid} 已冻结 ${fmt(amount)} 积分。`);
+        }
+        return renderUsers();
+      }
+      if (action === "user-order") {
+        const user = state.users[Number(index)];
+        return openDetail("用户兑换订单", { 用户: user.uid, 最近订单: "O20260817088", 商品: "右豹积分 6800", 支付金额: "¥68.00", 钱包来源: "组合支付", 状态: "扣款成功发放失败" });
+      }
+      if (action === "show-rules") return openRequirementRules();
+      if (action === "save-wallet") return toast("钱包设置已保存", "支付密码、扣款重试和余额提示已更新。");
+    }
+
+    function bindEvents() {
+      document.querySelectorAll(".nav-parent").forEach((button) => {
+        button.addEventListener("click", () => {
+          const group = button.closest(".nav-group");
+          const collapsed = group.classList.toggle("collapsed");
+          button.setAttribute("aria-expanded", String(!collapsed));
+        });
+      });
+
+      document.querySelectorAll(".nav button").forEach((button) => {
+        if (!button.dataset.section) return;
+        button.addEventListener("click", () => switchSection(button.dataset.section));
+      });
+
+      document.querySelector(".toolbar .btn:not(.primary)").addEventListener("click", () => {
+        const rows = [[labels[state.activeSection][0], "导出时间", "2026-08-17 14:58"], ["当前模块", state.activeSection, "原型数据"]];
+        exportCsv(`${labels[state.activeSection][0]}-导出.csv`, rows);
+      });
+
+      document.querySelector(".search input").addEventListener("keydown", (event) => {
+        if (event.key === "Enter") doSearch(event.currentTarget.value.trim());
+      });
+
+      document.querySelector(".search input").addEventListener("input", (event) => {
+        if (!event.currentTarget.value.trim()) doSearch("");
+      });
+
+      document.body.addEventListener("click", (event) => {
+        const drawerClose = event.target.closest("[data-drawer-close]");
+        if (drawerClose) return closeRulesDrawer();
+        const close = event.target.closest("[data-modal-close]");
+        if (close) return closeModal();
+        const actionTarget = event.target.closest("[data-action]");
+        if (actionTarget) return handleAction(actionTarget.dataset.action, actionTarget);
+        const choice = event.target.closest(".choice-grid button");
+        if (choice) {
+          choice.closest(".choice-grid").querySelectorAll("button").forEach((button) => button.classList.remove("active"));
+          choice.classList.add("active");
+          return;
+        }
+      });
+
+      document.getElementById("modalLayer").addEventListener("click", (event) => {
+        if (event.target.id === "modalLayer") closeModal();
+      });
+
+      document.getElementById("rulesDrawerLayer").addEventListener("click", (event) => {
+        if (event.target.id === "rulesDrawerLayer") closeRulesDrawer();
+      });
+
+      document.getElementById("modalBody").addEventListener("change", (event) => {
+        if (event.target.id === "taskConditionType") syncTaskProjectField();
+        if (["codePointsMode", "codeProduct"].includes(event.target.id)) syncCodePointsFields();
+        if (event.target.id === "codeLimitEnabled") syncCodeLimitField();
+      });
+
+      document.getElementById("modalBody").addEventListener("input", (event) => {
+        if (event.target.id === "codeCustomPoints") syncCodePointsFields();
+      });
+
+      document.querySelector("#goods .panel-head .btn").addEventListener("click", () => openGoodForm());
+      document.querySelector("#codes .panel-head .btn").addEventListener("click", openCodeForm);
+      document.querySelector("#tasks .panel-head .btn").addEventListener("click", () => openTaskForm());
+      document.querySelector("#users .panel-head .btn").addEventListener("click", () => openAdjustForm(0));
+
+      document.querySelectorAll("#dashboard .tabs button").forEach((button) => {
+        button.addEventListener("click", () => {
+          document.querySelectorAll("#dashboard .tabs button").forEach((item) => item.classList.remove("active"));
+          button.classList.add("active");
+          updateTrend(button.textContent.trim());
+        });
+      });
+
+      document.querySelectorAll("#flows .tabs button").forEach((button) => {
+        button.addEventListener("click", () => {
+          document.querySelectorAll("#flows .tabs button").forEach((item) => item.classList.remove("active"));
+          button.classList.add("active");
+          renderFlows(button.textContent.trim());
+          toast("流水筛选已更新", `当前筛选：${button.textContent.trim()}。`);
+        });
+      });
+
+      document.querySelectorAll(".toggle").forEach((toggle) => {
+        toggle.addEventListener("click", () => {
+          toggle.classList.toggle("on");
+          const name = toggle.closest(".switch-row").querySelector("strong").textContent;
+          toast("钱包开关已更新", `${name} 已${toggle.classList.contains("on") ? "开启" : "关闭"}。`);
+        });
+      });
+    }
+
+    renderGoods();
+    renderCodes();
+    renderTasks();
+    renderUsers();
+    renderFlows();
+    bindEvents();
+    lucide.createIcons();
+  </script>
+</body>
+</html>
