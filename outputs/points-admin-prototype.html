@@ -1282,6 +1282,184 @@
       line-height: 1.55;
     }
 
+    .filter-bar {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(140px, 1fr)) auto auto;
+      gap: 12px;
+      align-items: end;
+      margin-bottom: 16px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 10px 28px rgba(18, 28, 45, .04);
+    }
+
+    .filter-item {
+      display: grid;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .filter-item label {
+      color: #445064;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .filter-item input,
+    .filter-item select {
+      min-height: 36px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 0 10px;
+      outline: 0;
+      background: #fff;
+      color: var(--text);
+      font-size: 13px;
+    }
+
+    .tool-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      display: inline-grid;
+      place-items: center;
+      color: #fff;
+      font-weight: 900;
+      box-shadow: 0 10px 22px rgba(44, 81, 212, .2);
+    }
+
+    .tool-icon.blue {
+      background: linear-gradient(135deg, #2374ff, #5d44ff);
+    }
+
+    .tool-icon.purple {
+      background: linear-gradient(135deg, #895cff, #c09cff);
+    }
+
+    .tool-icon.orange {
+      background: linear-gradient(135deg, #ff9a57, #ff4b31);
+    }
+
+    .tool-icon.cyan {
+      background: linear-gradient(135deg, #2e75ff, #64d4ff);
+    }
+
+    .tool-icon.green {
+      background: linear-gradient(135deg, #18b982, #8fd65a);
+    }
+
+    .tag-chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 22px;
+      border-radius: 6px;
+      padding: 0 7px;
+      background: #eef2ff;
+      color: #3858ff;
+      border: 1px solid #dbe2ff;
+      font-size: 12px;
+      font-weight: 700;
+      margin-right: 4px;
+    }
+
+    .stepper {
+      display: inline-grid;
+      grid-template-columns: 32px 74px 32px;
+      height: 34px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .stepper button {
+      border: 0;
+      background: #fbfcfe;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .stepper input {
+      border: 0;
+      border-left: 1px solid var(--line);
+      border-right: 1px solid var(--line);
+      text-align: center;
+      outline: 0;
+      min-width: 0;
+    }
+
+    .rich-editor {
+      grid-column: span 2;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      overflow: hidden;
+    }
+
+    .rich-editor .editor-tools {
+      min-height: 42px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 6px 10px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .rich-editor .editor-tools button {
+      width: 28px;
+      height: 28px;
+      border: 0;
+      border-radius: 6px;
+      background: transparent;
+      cursor: pointer;
+      color: #445064;
+      font-weight: 800;
+    }
+
+    .rich-editor textarea {
+      width: 100%;
+      min-height: 118px;
+      border: 0;
+      resize: vertical;
+      padding: 12px;
+      outline: 0;
+      color: var(--text);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .preview-box {
+      grid-column: span 2;
+      height: 210px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfe;
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+    }
+
+    .mini-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+
+    #toolList table {
+      min-width: 1500px;
+    }
+
+    #toolData table {
+      min-width: 720px;
+    }
+
     @media (max-width: 1180px) {
       .metrics {
         grid-template-columns: repeat(3, minmax(160px, 1fr));
@@ -1332,7 +1510,8 @@
       .form,
       .req-grid,
       .req-hero,
-      .flow-steps {
+      .flow-steps,
+      .filter-bar {
         grid-template-columns: 1fr;
       }
 
@@ -1405,10 +1584,17 @@
             <button data-section="frontendReq"><i data-lucide="braces"></i>前后端交互需求</button>
           </div>
         </div>
+        <div class="nav-group">
+          <button class="nav-parent" type="button" aria-expanded="true"><i data-lucide="wrench"></i>工具管理<i class="chevron" data-lucide="chevron-down"></i></button>
+          <div class="nav-child">
+            <button data-section="toolList"><i data-lucide="blocks"></i>工具列表</button>
+            <button data-section="toolData"><i data-lucide="bar-chart-3"></i>工具数据</button>
+          </div>
+        </div>
       </nav>
 
       <div class="side-note">
-        右豹管理后台采用可迭代菜单架构。当前版本先建设积分管理，后续可继续加入其他业务模块。
+        右豹管理后台采用可迭代菜单架构。当前版本包含积分管理和工具管理，后续可继续加入其他业务模块。
       </div>
     </aside>
 
@@ -1779,6 +1965,48 @@
         </div>
       </section>
 
+      <section class="section" id="toolList">
+        <div class="filter-bar">
+          <div class="filter-item"><label>名称</label><input id="toolNameFilter" placeholder="请输入工具名称"></div>
+          <div class="filter-item"><label>区域</label><select id="toolRegionFilter"><option>全部</option><option>国内工具</option><option>海外工具</option></select></div>
+          <div class="filter-item"><label>所属平台</label><select id="toolPlatformFilter"><option>全部</option><option>右豹</option><option>小程序</option></select></div>
+          <div class="filter-item"><label>赛道</label><select id="toolTrackFilter"><option>全部</option><option>短剧推广</option><option>工具应用</option><option>内容创作</option></select></div>
+          <div class="filter-item"><label>状态</label><select id="toolStatusFilter"><option>全部</option><option>上架</option><option>下架</option></select></div>
+          <button class="btn primary" data-action="search-tools"><i data-lucide="search"></i>搜索</button>
+          <button class="btn" data-action="reset-tools"><i data-lucide="rotate-ccw"></i>重置</button>
+          <button class="btn" data-action="open-tool-tags"><i data-lucide="tags"></i>标签管理</button>
+          <button class="btn primary" data-action="new-tool"><i data-lucide="plus"></i>新增</button>
+        </div>
+        <div class="panel">
+          <div class="panel-head">
+            <div><h2>工具列表</h2><p>管理工具基础信息、平台、区域、赛道、标签、评分、热度、可见范围和上下架状态。</p></div>
+          </div>
+          <table>
+            <thead><tr><th>序号</th><th>图标</th><th>名称</th><th>所属平台</th><th>区域</th><th>赛道</th><th>标签</th><th>评分</th><th>热度</th><th>状态</th><th>可见范围</th><th>排序</th><th>更新时间</th><th>操作</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section" id="toolData">
+        <div class="grid metrics">
+          <div class="metric"><span><i data-lucide="mouse-pointer-click"></i>总点击量</span><strong id="toolClickTotal">0</strong><em>按当前工具统计</em></div>
+          <div class="metric"><span><i data-lucide="play-circle"></i>总使用量</span><strong id="toolUseTotal">0</strong><em>包含跳转后使用</em></div>
+          <div class="metric"><span><i data-lucide="flame"></i>平均热度</span><strong id="toolAvgHeat">0</strong><em>工具热度均值</em></div>
+          <div class="metric"><span><i data-lucide="badge-check"></i>上架工具</span><strong id="toolOnlineTotal">0</strong><em>当前可见工具</em></div>
+        </div>
+        <div class="panel" style="margin-top:16px">
+          <div class="panel-head">
+            <div><h2>工具数据</h2><p>按工具名称、图标、点击量和使用量统计运营表现。</p></div>
+            <button class="btn" data-action="export-tool-data"><i data-lucide="download"></i>导出数据</button>
+          </div>
+          <table>
+            <thead><tr><th>工具名称</th><th>图标</th><th>点击量</th><th>使用量</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
     </main>
   </div>
 
@@ -1818,7 +2046,9 @@
       users: ["用户账户", "查询用户积分余额、冻结积分、调账和审计记录。"],
       flows: ["流水订单", "追踪积分获得、消耗、钱包扣款订单和异常补偿。"],
       wallet: ["钱包配置", "配置钱包扣款来源和组合支付展示规则，支付安全由后端逻辑处理。"],
-      frontendReq: ["前后端交互需求", "说明用户端积分功能的前端页面规则、接口字段、状态流转和异常处理。"]
+      frontendReq: ["前后端交互需求", "说明用户端积分功能的前端页面规则、接口字段、状态流转和异常处理。"],
+      toolList: ["工具列表", "管理工具基础信息、图标、标签、跳转、可见范围、排序和上下架状态。"],
+      toolData: ["工具数据", "查看各工具点击量、使用量和运营表现。"]
     };
 
     const requirementRules = {
@@ -1874,6 +2104,18 @@
         { title: "5. 状态与异常规则", items: ["商品下架、兑换码冻结、任务禁用时，前端需刷新配置并阻止继续提交。", "兑换码失败原因包括不存在、已过期、已用完、超出个人兑换次数和批次冻结。", "钱包余额不足时提示选择其他钱包或组合支付。", "支付密码失败、锁定和扣款重试策略由后端返回，前端只展示结果。", "扣款成功但积分发放失败时展示处理中，并引导用户查看明细或联系客服。"] },
         { title: "6. 重要规则：钱包收益明细", items: ["端内支付购买积分成功后，必须在对应扣款钱包的收益明细中增加记录。", "单钱包支付时收益明细标题固定为“积分购买”。", "单钱包支付时收益明细描述按积分数生成，例如“购买积分880”。", "组合支付时每个参与扣款的钱包都需要写入收益明细。", "组合支付描述需写为“组合支付购买积分880,与项目收益钱包组合购买”等明确文案。", "收益明细、积分购买订单、钱包扣款流水和积分入账流水需具备同一业务关联编号。"] },
         { title: "7. 后台联动边界", items: ["积分商品、兑换码、任务奖励和钱包配置是后台到用户端的配置来源。", "流水订单负责承接前端交易、兑换、任务领取后的结果查询和异常定位。", "支付安全整体设置不在后台侧写入，必须由后端支付逻辑统一控制。", "后台配置变更后，前端需通过接口实时读取或按缓存失效策略刷新。"] }
+      ],
+      toolList: [
+        { title: "1. 业务目标", items: ["管理右豹工具入口的基础信息、图标、标签、跳转和上下架状态。", "支持运营通过筛选快速定位工具，并对工具进行新增、编辑、删除和状态维护。", "列表字段和操作参考截图，保持紧凑表格形态。"] },
+        { title: "2. 字段规则", items: ["列表字段包含序号、图标、名称、所属平台、区域、赛道、标签、评分、热度、状态、可见范围、排序、更新时间和操作。", "工具名称必填，最多 100 字。", "所属平台、区域、一级赛道、状态、图标为必填。", "区域当前包含国内工具和海外工具。", "状态包含上架和下架。", "可见范围包含全部、团等级、个人等级。"] },
+        { title: "3. 新增/编辑规则", items: ["点击新增打开新增推广工具弹窗。", "弹窗基础信息包含所属平台、工具名称、区域、一级赛道、状态、图标、排序、标签、金句、简介、工具详情。", "弹窗数据与跳转包含评分、热度、NEW 角标、开发者、开发者等级、跳转类型、跳转链接和是否可见。", "保存后新增工具进入列表并刷新工具数据。", "编辑时回填当前工具字段。"] },
+        { title: "4. 标签管理规则", items: ["点击标签管理打开标签管理弹窗。", "标签字段包含名称、排序、状态和操作。", "支持新增标签、编辑标签、删除标签。", "启用标签可在工具新增/编辑时选择。"] },
+        { title: "5. 交互规则", items: ["筛选条件包含名称、区域、所属平台、赛道和状态。", "点击搜索按条件过滤当前列表；点击重置恢复全部。", "删除工具需弹窗确认，确认后从列表移除。", "工具数据页按工具名称、图标、点击量、使用量展示统计。"] }
+      ],
+      toolData: [
+        { title: "1. 业务目标", items: ["按工具维度查看点击量和使用量。", "帮助运营判断工具曝光后的访问和实际使用表现。", "数据页只做统计展示和导出，不承载工具配置。"] },
+        { title: "2. 字段规则", items: ["字段包含工具名称、图标、点击量和使用量。", "点击量表示用户点击工具入口次数。", "使用量表示用户进入工具后完成一次有效使用的次数。", "统计口径按工具 ID 聚合，不按展示名称模糊聚合。"] },
+        { title: "3. 交互规则", items: ["进入页面自动汇总总点击量、总使用量、平均热度和上架工具数量。", "点击导出数据导出当前工具数据表。", "工具列表新增、编辑、删除后，工具数据同步刷新。"] }
       ]
     };
 
@@ -1913,6 +2155,18 @@
         { id: "F202608170008", user: "UID 302918", flowType: "入账", accountType: "兑换", desc: "直播间福利兑换码核销", change: 100, pay: "-", status: "成功", time: "2026.08.17 08:46" },
         { id: "F202608170009", user: "UID 810236", flowType: "支出", accountType: "消耗", desc: "权益包兑换消耗积分", change: -680, pay: "-", status: "成功", time: "2026.08.16 21:16" },
         { id: "F202608170010", user: "UID 592810", flowType: "入账", accountType: "购买", desc: "购买右豹积分 12800", change: 12800, pay: "¥128.00", status: "成功", time: "2026.08.16 20:49" }
+      ],
+      toolTags: [
+        { name: "文字工具", sort: 3, status: "启用" },
+        { name: "AI工具", sort: 2, status: "启用" },
+        { name: "行业神器", sort: 1, status: "启用" }
+      ],
+      tools: [
+        { iconText: "豹", iconColor: "blue", name: "豹赞数据", platform: "右豹", region: "国内工具", track: "短剧推广", tags: ["AI工具"], score: 5.0, heat: 5, status: "上架", visible: "L2", sort: 1, updated: "2026-08-13 19:50:46", slogan: "短剧推广数据分析", intro: "聚合短剧推广数据，辅助投放复盘。", developer: "右豹团队", developerLevel: "L3", newTag: true, jumpType: "内链", jumpUrl: "/tools/baozan-data", clicks: 12860, uses: 4680 },
+        { iconText: "T", iconColor: "purple", name: "文字处理", platform: "右豹", region: "国内工具", track: "工具应用", tags: ["文字工具"], score: 0.0, heat: 0, status: "上架", visible: "全部", sort: 0, updated: "2025-09-07 21:22:27", slogan: "批量处理文本", intro: "支持文案整理、格式化和批量替换。", developer: "工具中台", developerLevel: "L2", newTag: false, jumpType: "内链", jumpUrl: "/tools/text", clicks: 3920, uses: 1188 },
+        { iconText: "A", iconColor: "orange", name: "文章提取", platform: "右豹", region: "国内工具", track: "工具应用", tags: ["文字工具"], score: 0.0, heat: 0, status: "上架", visible: "全部", sort: 0, updated: "2025-09-07 21:22:02", slogan: "提取文章正文", intro: "从链接中提取文章标题、正文和封面。", developer: "工具中台", developerLevel: "L2", newTag: false, jumpType: "内链", jumpUrl: "/tools/article", clicks: 2660, uses: 904 },
+        { iconText: "Q", iconColor: "cyan", name: "违禁词检测", platform: "右豹", region: "国内工具", track: "工具应用", tags: ["文字工具"], score: 0.0, heat: 0, status: "上架", visible: "全部", sort: 0, updated: "2025-09-07 21:22:36", slogan: "检测敏感词", intro: "检测文案中的违禁词和风险表达。", developer: "工具中台", developerLevel: "L2", newTag: false, jumpType: "内链", jumpUrl: "/tools/risk-word", clicks: 5480, uses: 3312 },
+        { iconText: "创", iconColor: "green", name: "爆款标题创作", platform: "右豹", region: "国内工具", track: "内容创作", tags: ["行业神器", "AI工具"], score: 4.8, heat: 4, status: "下架", visible: "团等级", sort: 2, updated: "2025-09-07 21:25:12", slogan: "快速生成标题", intro: "基于行业模板生成短剧推广标题。", developer: "增长实验室", developerLevel: "L4", newTag: true, jumpType: "外链", jumpUrl: "https://example.com/title", clicks: 890, uses: 320 }
       ]
     };
 
@@ -2055,6 +2309,59 @@
           </tr>
         `;
       }).join("") : `<tr class="empty-row"><td colspan="9">没有符合条件的流水记录</td></tr>`;
+    }
+
+    function toolIcon(item) {
+      return `<span class="tool-icon ${item.iconColor}">${item.iconText}</span>`;
+    }
+
+    function renderTools(rows = state.tools) {
+      activeTableBody("toolList").innerHTML = rows.length ? rows.map((item, index) => {
+        const originalIndex = state.tools.indexOf(item);
+        return `
+          <tr>
+            <td>${index + 1}</td>
+            <td>${toolIcon(item)}</td>
+            <td>${item.name}</td>
+            <td>${item.platform}</td>
+            <td>${item.region}</td>
+            <td>${item.track}</td>
+            <td>${item.tags.map((tag) => `<span class="tag-chip">${tag}</span>`).join("") || "-"}</td>
+            <td>${Number(item.score).toFixed(1)}</td>
+            <td>${fmt(item.heat)}</td>
+            <td><span class="status ${statusClass(item.status)}">${item.status}</span></td>
+            <td>${item.visible}</td>
+            <td>${item.sort}</td>
+            <td>${item.updated}</td>
+            <td>
+              <button class="link-btn" data-action="edit-tool" data-index="${originalIndex}">编辑</button>
+              <button class="link-btn" data-action="toggle-tool" data-index="${originalIndex}">${item.status === "上架" ? "下架" : "上架"}</button>
+              <button class="link-btn" data-action="delete-tool" data-index="${originalIndex}" style="color:var(--danger)">删除</button>
+            </td>
+          </tr>
+        `;
+      }).join("") : `<tr class="empty-row"><td colspan="14">没有符合条件的工具</td></tr>`;
+      renderToolData();
+    }
+
+    function renderToolData() {
+      const tbody = activeTableBody("toolData");
+      if (!tbody) return;
+      tbody.innerHTML = state.tools.map((item) => `
+        <tr>
+          <td>${item.name}</td>
+          <td>${toolIcon(item)}</td>
+          <td>${fmt(item.clicks)}</td>
+          <td>${fmt(item.uses)}</td>
+        </tr>
+      `).join("");
+      const clickTotal = state.tools.reduce((sum, item) => sum + item.clicks, 0);
+      const useTotal = state.tools.reduce((sum, item) => sum + item.uses, 0);
+      const avgHeat = state.tools.length ? state.tools.reduce((sum, item) => sum + item.heat, 0) / state.tools.length : 0;
+      document.getElementById("toolClickTotal").textContent = fmt(clickTotal);
+      document.getElementById("toolUseTotal").textContent = fmt(useTotal);
+      document.getElementById("toolAvgHeat").textContent = avgHeat.toFixed(1);
+      document.getElementById("toolOnlineTotal").textContent = fmt(state.tools.filter((item) => item.status === "上架").length);
     }
 
     function updateUserStats() {
@@ -2230,6 +2537,130 @@
       renderUsers();
       closeModal();
       toast("调账已提交", `${user.uid} 已${type} ${fmt(amount)} 积分。`);
+    }
+
+    function openToolForm(index) {
+      const item = state.tools[index] || { iconText: "+", iconColor: "blue", name: "", platform: "右豹", region: "国内工具", track: "工具应用", tags: [], score: 0, heat: 0, status: "上架", visible: "全部", sort: 0, updated: "", slogan: "", intro: "", developer: "", developerLevel: "", newTag: false, jumpType: "内链", jumpUrl: "", clicks: 0, uses: 0 };
+      openModal(index == null ? "新增推广工具" : "编辑推广工具", "配置工具基础信息、图标、数据与跳转，保存后同步工具列表和工具数据。", `
+        <div class="form" id="toolForm">
+          <div class="field"><label>所属平台</label><select><option ${item.platform === "右豹" ? "selected" : ""}>右豹</option><option ${item.platform === "小程序" ? "selected" : ""}>小程序</option></select></div>
+          ${formField("工具名称", item.name || "数据助手")}
+          <div class="field"><label>区域</label><select><option ${item.region === "国内工具" ? "selected" : ""}>国内工具</option><option ${item.region === "海外工具" ? "selected" : ""}>海外工具</option></select></div>
+          <div class="field"><label>一级赛道</label><select><option ${item.track === "工具应用" ? "selected" : ""}>工具应用</option><option ${item.track === "短剧推广" ? "selected" : ""}>短剧推广</option><option ${item.track === "内容创作" ? "selected" : ""}>内容创作</option></select></div>
+          <div class="field"><label>状态</label><select><option ${item.status === "上架" ? "selected" : ""}>上架</option><option ${item.status === "下架" ? "selected" : ""}>下架</option></select></div>
+          <div class="field"><label>图标字</label><input value="${item.iconText}" maxlength="2"></div>
+          <div class="field"><label>图标颜色</label><select><option value="blue" ${item.iconColor === "blue" ? "selected" : ""}>蓝色</option><option value="purple" ${item.iconColor === "purple" ? "selected" : ""}>紫色</option><option value="orange" ${item.iconColor === "orange" ? "selected" : ""}>橙色</option><option value="cyan" ${item.iconColor === "cyan" ? "selected" : ""}>青色</option><option value="green" ${item.iconColor === "green" ? "selected" : ""}>绿色</option></select></div>
+          ${formField("排序", item.sort, "number")}
+          <div class="field span-2"><label>标签</label><select multiple>${state.toolTags.filter((tag) => tag.status === "启用").map((tag) => `<option ${item.tags.includes(tag.name) ? "selected" : ""}>${tag.name}</option>`).join("")}</select></div>
+          ${formField("金句", item.slogan)}
+          <div class="field"><label>NEW角标</label><select><option ${item.newTag ? "selected" : ""}>开启</option><option ${!item.newTag ? "selected" : ""}>关闭</option></select></div>
+          <div class="field span-2"><label>简介</label><textarea>${item.intro}</textarea></div>
+          <div class="rich-editor">
+            <div class="editor-tools"><button type="button">B</button><button type="button"><u>U</u></button><button type="button"><i>I</i></button><button type="button">•</button><button type="button">1.</button><button type="button">链</button><button type="button">图</button><button type="button">码</button></div>
+            <textarea aria-label="工具详情">${item.intro || "工具详情"}</textarea>
+          </div>
+          <div class="preview-box">图文详情预览区域</div>
+          ${formField("评分", item.score, "number")}
+          ${formField("热度", item.heat, "number")}
+          ${formField("开发者", item.developer)}
+          ${formField("开发者等级", item.developerLevel)}
+          <div class="field"><label>跳转类型</label><select><option ${item.jumpType === "内链" ? "selected" : ""}>内链</option><option ${item.jumpType === "外链" ? "selected" : ""}>外链</option></select></div>
+          ${formField("跳转链接", item.jumpUrl)}
+          <div class="field span-2"><label>是否可见</label><select><option ${item.visible === "全部" ? "selected" : ""}>全部</option><option ${item.visible === "团等级" ? "selected" : ""}>团等级</option><option ${item.visible === "个人等级" ? "selected" : ""}>个人等级</option><option ${item.visible === "L2" ? "selected" : ""}>L2</option></select></div>
+        </div>
+      `, `<button class="btn" data-modal-close>取消</button><button class="btn primary" data-action="save-tool" data-index="${index ?? ""}">保存</button>`);
+    }
+
+    function saveTool(index) {
+      const controls = [...document.querySelectorAll("#toolForm input, #toolForm select, #toolForm textarea")];
+      const get = (label) => {
+        const field = [...document.querySelectorAll("#toolForm .field")].find((item) => item.querySelector("label")?.textContent.trim() === label);
+        const control = field?.querySelector("input, select, textarea");
+        if (!control) return "";
+        if (control.multiple) return [...control.selectedOptions].map((option) => option.value);
+        return control.value.trim();
+      };
+      const item = {
+        platform: get("所属平台"),
+        name: get("工具名称") || "未命名工具",
+        region: get("区域"),
+        track: get("一级赛道"),
+        status: get("状态"),
+        iconText: get("图标字") || "工",
+        iconColor: get("图标颜色"),
+        sort: Number(get("排序") || 0),
+        tags: get("标签"),
+        slogan: get("金句"),
+        newTag: get("NEW角标") === "开启",
+        intro: get("简介"),
+        score: Number(get("评分") || 0),
+        heat: Number(get("热度") || 0),
+        developer: get("开发者"),
+        developerLevel: get("开发者等级"),
+        jumpType: get("跳转类型"),
+        jumpUrl: get("跳转链接"),
+        visible: get("是否可见"),
+        updated: "2026-08-17 19:18:00",
+        clicks: index === "" ? 0 : state.tools[Number(index)].clicks,
+        uses: index === "" ? 0 : state.tools[Number(index)].uses
+      };
+      if (index === "") state.tools.unshift(item);
+      else state.tools[Number(index)] = item;
+      renderTools();
+      closeModal();
+      toast("工具已保存", `${item.name} 已同步到工具列表。`);
+    }
+
+    function openToolTags() {
+      const rows = state.toolTags.map((tag, index) => `
+        <tr>
+          <td>${tag.name}</td>
+          <td>${tag.sort}</td>
+          <td><span class="status ${statusClass(tag.status)}">${tag.status}</span></td>
+          <td><button class="link-btn" data-action="edit-tool-tag" data-index="${index}">编辑</button><button class="link-btn" data-action="delete-tool-tag" data-index="${index}" style="color:var(--danger)">删除</button></td>
+        </tr>
+      `).join("");
+      openModal("标签管理", "管理工具标签名称、排序和启用状态。", `
+        <div class="mini-actions"><button class="btn primary" data-action="new-tool-tag"><i data-lucide="plus"></i>新增标签</button></div>
+        <table style="margin-top:12px"><thead><tr><th>名称</th><th>排序</th><th>状态</th><th>操作</th></tr></thead><tbody>${rows}</tbody></table>
+      `, `<button class="btn primary" data-modal-close>关闭</button>`);
+    }
+
+    function openToolTagForm(index) {
+      const tag = state.toolTags[index] || { name: "", sort: state.toolTags.length + 1, status: "启用" };
+      openModal(index == null ? "新增标签" : "编辑标签", "标签启用后可在工具新增或编辑时选择。", `
+        <div class="form" id="toolTagForm">
+          ${formField("名称", tag.name || "新标签")}
+          ${formField("排序", tag.sort, "number")}
+          <div class="field"><label>状态</label><select><option ${tag.status === "启用" ? "selected" : ""}>启用</option><option ${tag.status === "禁用" ? "selected" : ""}>禁用</option></select></div>
+        </div>
+      `, `<button class="btn" data-action="open-tool-tags">返回</button><button class="btn primary" data-action="save-tool-tag" data-index="${index ?? ""}">保存</button>`);
+    }
+
+    function saveToolTag(index) {
+      const values = [...document.querySelectorAll("#toolTagForm input, #toolTagForm select")].map((input) => input.value.trim());
+      const tag = { name: values[0], sort: Number(values[1] || 0), status: values[2] };
+      if (index === "") state.toolTags.push(tag);
+      else state.toolTags[Number(index)] = tag;
+      openToolTags();
+      toast("标签已保存", `${tag.name} 已更新。`);
+    }
+
+    function filterTools() {
+      const name = document.getElementById("toolNameFilter").value.trim();
+      const region = document.getElementById("toolRegionFilter").value;
+      const platform = document.getElementById("toolPlatformFilter").value;
+      const track = document.getElementById("toolTrackFilter").value;
+      const status = document.getElementById("toolStatusFilter").value;
+      const rows = state.tools.filter((item) => {
+        return (!name || item.name.includes(name))
+          && (region === "全部" || item.region === region)
+          && (platform === "全部" || item.platform === platform)
+          && (track === "全部" || item.track === track)
+          && (status === "全部" || item.status === status);
+      });
+      renderTools(rows);
+      toast("工具筛选完成", `当前命中 ${fmt(rows.length)} 条工具。`);
     }
 
     function openDetail(title, data) {
@@ -2451,6 +2882,52 @@
       if (action === "show-api-list") return openReqList("apis");
       if (action === "show-state-list") return openReqList("states");
       if (action === "save-wallet") return toast("钱包设置已保存", "支付密码、扣款重试和余额提示已更新。");
+      if (action === "new-tool") return openToolForm();
+      if (action === "edit-tool") return openToolForm(Number(index));
+      if (action === "save-tool") return saveTool(index);
+      if (action === "toggle-tool") {
+        const item = state.tools[Number(index)];
+        item.status = item.status === "上架" ? "下架" : "上架";
+        item.updated = "2026-08-17 19:24:00";
+        renderTools();
+        return toast("工具状态已更新", `${item.name} 当前为${item.status}。`);
+      }
+      if (action === "delete-tool") {
+        const item = state.tools[Number(index)];
+        return openModal("删除工具", "删除后该工具将从工具列表和工具数据中移除。", `<p style="margin:0;color:#40506a">确认删除“${item.name}”吗？</p>`, `<button class="btn" data-modal-close>取消</button><button class="btn primary" data-action="confirm-delete-tool" data-index="${index}">确认删除</button>`);
+      }
+      if (action === "confirm-delete-tool") {
+        const [item] = state.tools.splice(Number(index), 1);
+        renderTools();
+        closeModal();
+        return toast("工具已删除", `${item.name} 已移除。`);
+      }
+      if (action === "search-tools") return filterTools();
+      if (action === "reset-tools") {
+        ["toolNameFilter", "toolRegionFilter", "toolPlatformFilter", "toolTrackFilter", "toolStatusFilter"].forEach((id) => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          el.value = id === "toolNameFilter" ? "" : "全部";
+        });
+        renderTools();
+        return toast("筛选已重置", "已恢复全部工具。");
+      }
+      if (action === "open-tool-tags") return openToolTags();
+      if (action === "new-tool-tag") return openToolTagForm();
+      if (action === "edit-tool-tag") return openToolTagForm(Number(index));
+      if (action === "save-tool-tag") return saveToolTag(index);
+      if (action === "delete-tool-tag") {
+        const [tag] = state.toolTags.splice(Number(index), 1);
+        state.tools.forEach((tool) => {
+          tool.tags = tool.tags.filter((item) => item !== tag.name);
+        });
+        openToolTags();
+        renderTools();
+        return toast("标签已删除", `${tag.name} 已从工具标签中移除。`);
+      }
+      if (action === "export-tool-data") {
+        return exportCsv("工具数据.csv", [["工具名称", "点击量", "使用量"], ...state.tools.map((item) => [item.name, item.clicks, item.uses])]);
+      }
     }
 
     function bindEvents() {
@@ -2553,6 +3030,8 @@
     renderTasks();
     renderUsers();
     renderFlows();
+    renderTools();
+    renderToolData();
     bindEvents();
     lucide.createIcons();
   </script>
