@@ -1284,7 +1284,7 @@
 
     .filter-bar {
       display: grid;
-      grid-template-columns: repeat(5, minmax(140px, 1fr)) auto auto;
+      grid-template-columns: repeat(5, minmax(140px, 1fr)) repeat(4, auto);
       gap: 12px;
       align-items: end;
       margin-bottom: 16px;
@@ -1458,6 +1458,11 @@
 
     #toolData table {
       min-width: 720px;
+    }
+
+    #toolList .panel,
+    #toolData .panel {
+      overflow-x: auto;
     }
 
     @media (max-width: 1180px) {
