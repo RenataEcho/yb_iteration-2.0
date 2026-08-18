@@ -2884,12 +2884,12 @@
         <div class="panel">
           <div class="panel-head">
             <div><h2>工具使用门槛交互原型</h2><p>演示工具完全免费、免费次数、积分消耗、积分不足和充值引导的用户端交互流程。</p></div>
-            <a class="btn" href="tool-frontend-interaction-demo.html" target="_blank" rel="noopener"><i data-lucide="external-link"></i>新窗口打开</a>
+            <a class="btn" data-demo-link target="_blank" rel="noopener"><i data-lucide="external-link"></i>新窗口打开</a>
           </div>
           <div class="demo-link-row">
             <p>该页面作为工具管理下的前端交互需求 demo，可用于产品、前端和测试对齐工具使用门槛规则。</p>
           </div>
-          <iframe class="embedded-demo" title="工具使用门槛交互原型" src="tool-frontend-interaction-demo.html"></iframe>
+          <iframe class="embedded-demo" data-demo-frame title="工具使用门槛交互原型"></iframe>
         </div>
       </section>
 
@@ -3832,6 +3832,24 @@
       chart.classList.remove("refresh");
       void chart.offsetWidth;
       chart.classList.add("refresh");
+    }
+
+    function resolveToolDemoUrl() {
+      const fileName = "tool-frontend-interaction-demo.html";
+      const path = window.location.pathname || "";
+      if (path.endsWith("/outputs/points-admin-prototype.html")) return fileName;
+      if (path.includes("/outputs/")) return fileName;
+      return `outputs/${fileName}`;
+    }
+
+    function syncToolDemoLinks() {
+      const demoUrl = resolveToolDemoUrl();
+      document.querySelectorAll("[data-demo-link]").forEach((link) => {
+        link.href = demoUrl;
+      });
+      document.querySelectorAll("[data-demo-frame]").forEach((frame) => {
+        frame.src = demoUrl;
+      });
     }
 
     function toast(title, message) {
@@ -4973,6 +4991,7 @@
     renderToolData();
     renderTrackingRequirements();
     document.querySelectorAll(".line-compare").forEach((chart) => renderLineCompare(chart, "day"));
+    syncToolDemoLinks();
     bindEvents();
     lucide.createIcons();
   </script>
