@@ -1,0 +1,1082 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>工具使用门槛 · 交互原型</title>
+  <style>
+    :root {
+      --bg: #eef2f6;
+      --surface: #ffffff;
+      --text: #1a2332;
+      --text-secondary: #6b7280;
+      --text-muted: #9ca3af;
+      --border: #e5e7eb;
+      --primary: #e07a4a;
+      --primary-hover: #d06a3a;
+      --primary-light: #fef3ec;
+      --success: #16a34a;
+      --success-bg: #f0fdf4;
+      --warning: #d97706;
+      --warning-bg: #fffbeb;
+      --danger: #dc2626;
+      --danger-bg: #fef2f2;
+      --info: #2563eb;
+      --info-bg: #eff6ff;
+      --radius: 12px;
+      --radius-sm: 8px;
+      --shadow: 0 2px 12px rgba(30,40,60,0.08);
+      --phone-w: 375px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font: 14px/1.5 'PingFang SC', 'Microsoft YaHei', -apple-system, sans-serif;
+      background: linear-gradient(135deg, #dbeafe 0%, #f0f4f8 50%, #e0f2fe 100%);
+      min-height: 100vh;
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ===== 原型控制台（左侧说明区） ===== */
+    .proto-layout {
+      display: flex;
+      min-height: 100vh;
+      gap: 32px;
+      padding: 24px;
+      max-width: 1200px;
+      margin: 0 auto;
+      align-items: flex-start;
+    }
+    .proto-panel {
+      flex: 1;
+      min-width: 0;
+      padding-top: 8px;
+    }
+    .proto-panel h1 {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #1e3a8a;
+    }
+    .proto-panel .subtitle {
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+      font-size: 13px;
+    }
+    .rule-card {
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.6);
+      border-radius: 14px;
+      padding: 16px 18px;
+      margin-bottom: 14px;
+      box-shadow: var(--shadow);
+    }
+    .rule-card h3 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .rule-card h3 .tag {
+      font-size: 11px;
+      font-weight: 500;
+      padding: 2px 8px;
+      border-radius: 999px;
+    }
+    .tag-free { background: var(--success-bg); color: var(--success); }
+    .tag-points { background: var(--warning-bg); color: var(--warning); }
+    .rule-card p, .rule-card li {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+    .rule-card ul { padding-left: 18px; margin-top: 6px; }
+
+    .scenario-group { margin-top: 20px; }
+    .scenario-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .scenario-btns {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .scenario-btns button {
+      padding: 8px 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: #fff;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .scenario-btns button:hover { border-color: var(--info); color: var(--info); }
+    .scenario-btns button.active {
+      background: var(--info-bg);
+      border-color: #93c5fd;
+      color: var(--info);
+      font-weight: 600;
+    }
+
+    .flow-note {
+      margin-top: 20px;
+      padding: 14px 16px;
+      background: #f8fafc;
+      border-radius: var(--radius-sm);
+      border-left: 3px solid var(--info);
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.8;
+    }
+    .flow-note strong { color: var(--text); }
+
+    /* ===== 手机容器 ===== */
+    .phone-wrap {
+      flex-shrink: 0;
+      position: sticky;
+      top: 24px;
+    }
+    .phone {
+      width: var(--phone-w);
+      background: #1a1a2e;
+      border-radius: 40px;
+      padding: 12px;
+      box-shadow: 0 24px 64px rgba(30,40,80,0.25), inset 0 0 0 1px rgba(255,255,255,0.1);
+    }
+    .phone-notch {
+      width: 120px;
+      height: 28px;
+      background: #1a1a2e;
+      border-radius: 0 0 16px 16px;
+      margin: 0 auto -14px;
+      position: relative;
+      z-index: 2;
+    }
+    .phone-screen {
+      background: var(--bg);
+      border-radius: 32px;
+      overflow: hidden;
+      height: 720px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* ===== 小程序导航栏 ===== */
+    .mp-nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 44px;
+      background: var(--bg);
+      position: relative;
+      flex-shrink: 0;
+    }
+    .mp-nav .back {
+      position: absolute;
+      left: 12px;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: var(--text);
+      cursor: pointer;
+    }
+    .mp-nav .title {
+      font-size: 16px;
+      font-weight: 600;
+    }
+    .mp-nav .capsule {
+      position: absolute;
+      right: 8px;
+      display: flex;
+      align-items: center;
+      gap: 0;
+      background: rgba(255,255,255,0.6);
+      border: 1px solid rgba(0,0,0,0.08);
+      border-radius: 16px;
+      padding: 4px 10px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .mp-nav .capsule span { padding: 0 4px; }
+
+    /* ===== 页面内容 ===== */
+    .page-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 16px 24px;
+    }
+
+    /* 使用额度条 */
+    .usage-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      background: var(--surface);
+      border-radius: var(--radius);
+      margin-bottom: 12px;
+      box-shadow: var(--shadow);
+      font-size: 13px;
+    }
+    .usage-bar .left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .usage-bar .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .badge-free { background: var(--success-bg); color: var(--success); }
+    .badge-points { background: var(--warning-bg); color: var(--warning); }
+    .badge-unlimited { background: var(--info-bg); color: var(--info); }
+    .usage-bar .detail {
+      color: var(--text-secondary);
+      font-size: 12px;
+    }
+    .usage-bar .points-link {
+      color: var(--primary);
+      font-size: 12px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .usage-bar .points-link:hover { text-decoration: underline; }
+
+    /* 输入卡片 */
+    .input-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
+    }
+    .input-card .card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .input-card .card-head .label {
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .input-card .card-head .counter {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .input-card textarea {
+      width: 100%;
+      min-height: 200px;
+      border: none;
+      outline: none;
+      resize: none;
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text);
+      background: transparent;
+    }
+    .input-card textarea::placeholder { color: var(--text-muted); }
+    .input-card .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+    .input-card .toolbar-left {
+      display: flex;
+      gap: 8px;
+    }
+    .tool-btn {
+      padding: 6px 14px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: #f9fafb;
+      font-size: 13px;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+    .tool-btn:hover { background: #f3f4f6; }
+
+    /* 主按钮 */
+    .btn-detect {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: var(--radius);
+      background: var(--primary);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+      position: relative;
+    }
+    .btn-detect:hover { background: var(--primary-hover); }
+    .btn-detect:disabled {
+      background: #d1d5db;
+      cursor: not-allowed;
+    }
+    .btn-detect .cost-hint {
+      display: block;
+      font-size: 11px;
+      font-weight: 400;
+      opacity: 0.85;
+      margin-top: 2px;
+    }
+
+    /* 结果区 */
+    .result-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow);
+      margin-top: 16px;
+      display: none;
+    }
+    .result-card.show { display: block; }
+    .result-card h4 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .result-card .result-meta {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+    .result-card .result-content {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      padding: 12px;
+      background: #f9fafb;
+      border-radius: var(--radius-sm);
+    }
+
+    /* ===== 弹窗 ===== */
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 24px;
+      border-radius: 32px;
+    }
+    .overlay.show { display: flex; }
+    .modal {
+      background: var(--surface);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 300px;
+      overflow: hidden;
+      animation: modalIn 0.22s ease;
+    }
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.92) translateY(8px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .modal-head {
+      padding: 20px 20px 0;
+      text-align: center;
+    }
+    .modal-head .icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 12px;
+      font-size: 22px;
+    }
+    .icon-warn { background: var(--warning-bg); }
+    .icon-danger { background: var(--danger-bg); }
+    .icon-info { background: var(--info-bg); }
+    .modal-head h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .modal-head p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      padding: 0 4px 16px;
+    }
+    .modal-head .highlight {
+      color: var(--warning);
+      font-weight: 600;
+    }
+    .modal-actions {
+      display: flex;
+      border-top: 1px solid var(--border);
+    }
+    .modal-actions button {
+      flex: 1;
+      padding: 14px;
+      border: none;
+      background: none;
+      font-size: 15px;
+      cursor: pointer;
+    }
+    .modal-actions .cancel {
+      color: var(--text-secondary);
+      border-right: 1px solid var(--border);
+    }
+    .modal-actions .confirm {
+      color: var(--primary);
+      font-weight: 600;
+    }
+    .modal-actions .confirm-danger { color: var(--danger); }
+
+    /* Toast */
+    .toast {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.9);
+      background: rgba(0,0,0,0.78);
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s;
+      white-space: nowrap;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    /* 演示工具栏 */
+    .demo-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px dashed var(--border);
+    }
+    .demo-toolbar button {
+      padding: 9px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s;
+    }
+    .btn-demo-primary {
+      background: var(--info);
+      color: #fff;
+    }
+    .btn-demo-primary:hover { background: #1d4ed8; }
+    .btn-demo-secondary {
+      background: #fff;
+      border: 1px solid var(--border) !important;
+      color: var(--text-secondary);
+    }
+    .btn-demo-secondary:hover { border-color: var(--info) !important; color: var(--info); }
+    .btn-demo-present {
+      background: linear-gradient(135deg, #6366f1, #2563eb);
+      color: #fff;
+    }
+    .btn-demo-present:hover { opacity: 0.92; }
+
+    .demo-steps {
+      margin-top: 16px;
+      counter-reset: step;
+    }
+    .demo-step {
+      display: flex;
+      gap: 10px;
+      padding: 10px 0;
+      font-size: 13px;
+      color: var(--text-secondary);
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .demo-step:last-child { border-bottom: none; }
+    .demo-step::before {
+      counter-increment: step;
+      content: counter(step);
+      flex-shrink: 0;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--info-bg);
+      color: var(--info);
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .demo-step.active { color: var(--text); font-weight: 500; }
+    .demo-step.active::before { background: var(--info); color: #fff; }
+
+    /* 演示模式：全屏仅手机 */
+    body.present-mode .proto-panel { display: none; }
+    body.present-mode .proto-layout {
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 0;
+      max-width: none;
+    }
+    body.present-mode .phone-wrap { position: static; }
+    body.present-mode .present-exit {
+      display: flex;
+    }
+    .present-exit {
+      display: none;
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 999;
+      padding: 10px 18px;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      align-items: center;
+      gap: 6px;
+    }
+    .present-exit:hover { background: #fff; }
+
+    .current-scene-tip {
+      margin-top: 12px;
+      padding: 10px 14px;
+      background: var(--primary-light);
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      color: #9a3412;
+      line-height: 1.6;
+    }
+    .current-scene-tip strong { color: #c2410c; }
+
+    @media (max-width: 900px) {
+      .proto-layout { flex-direction: column; align-items: center; }
+      .phone-wrap { position: static; }
+      .proto-panel { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="proto-layout">
+    <!-- 左侧说明与场景切换 -->
+    <div class="proto-panel">
+      <h1>工具使用门槛 · 交互原型</h1>
+      <p class="subtitle">以「文本检测」工具页为例，演示两种计费模式下的完整交互流程</p>
+
+      <div class="rule-card">
+        <h3><span class="tag tag-free">模式 A</span> 完全免费</h3>
+        <ul>
+          <li>不展示额度/积分信息，或仅展示「免费使用」标识</li>
+          <li>点击「立即检测」直接执行，无二次确认</li>
+          <li>可无限次使用，按钮始终可用</li>
+        </ul>
+      </div>
+
+      <div class="rule-card">
+        <h3><span class="tag tag-points">模式 B</span> 积分使用</h3>
+        <ul>
+          <li>后台可配置<strong>每日免费次数</strong>（如 3 次/天）和<strong>单次消耗积分</strong>（如 10 积分/次）</li>
+          <li>顶部展示「今日免费剩余 X/Y」+ 当前积分余额</li>
+          <li>有免费次数 → 直接检测，消耗 1 次免费额度</li>
+          <li>免费用完 → 点击检测弹出确认：「本次将消耗 N 积分」</li>
+          <li>积分不足 → 按钮仍可点，弹窗引导充值/做任务</li>
+        </ul>
+      </div>
+
+      <div class="scenario-group">
+        <label>切换演示场景（点击后观察手机界面变化）</label>
+        <div class="scenario-btns" id="scenarioBtns">
+          <button class="active" data-scenario="free-unlimited">A · 完全免费</button>
+          <button data-scenario="points-has-free">B · 有免费次数 (2/3)</button>
+          <button data-scenario="points-no-free">B · 免费已用完</button>
+          <button data-scenario="points-low">B · 积分不足</button>
+          <button data-scenario="points-zero-free">B · 无免费配置 (纯积分)</button>
+        </div>
+      </div>
+
+      <div class="flow-note">
+        <strong>交互流程（模式 B）</strong><br>
+        ① 进入页面 → 读取今日已用次数 & 积分余额 → 渲染额度条<br>
+        ② 点击「立即检测」→ 校验输入 → 判断免费/付费路径<br>
+        ③ 免费路径：直接检测 → Toast「检测完成，今日免费剩余 X 次」<br>
+        ④ 付费路径：弹窗确认消耗积分 → 确认后检测 → 扣积分 → 展示结果<br>
+        ⑤ 积分不足：弹窗「积分不足，去充值 / 做任务赚积分」
+      </div>
+
+      <div class="current-scene-tip" id="sceneTip">
+        <strong>当前场景：</strong>完全免费 — 点击「立即检测」直接出结果，无额度限制
+      </div>
+
+      <div class="demo-toolbar">
+        <button class="btn-demo-primary" id="btnFillSample">填入示例文本</button>
+        <button class="btn-demo-primary" id="btnRunDemo">一键演示当前场景</button>
+        <button class="btn-demo-secondary" id="btnReset">重置状态</button>
+        <button class="btn-demo-present" id="btnPresent">进入演示模式</button>
+      </div>
+
+      <div class="rule-card" style="margin-top:16px">
+        <h3>推荐演示顺序</h3>
+        <div class="demo-steps" id="demoSteps">
+          <div class="demo-step active" data-step="1">模式 A · 完全免费 → 填入文本 → 立即检测</div>
+          <div class="demo-step" data-step="2">模式 B · 有免费次数 → 检测扣减免费额度</div>
+          <div class="demo-step" data-step="3">模式 B · 免费已用完 → 弹窗确认消耗积分</div>
+          <div class="demo-step" data-step="4">模式 B · 积分不足 → 引导充值</div>
+        </div>
+      </div>
+    </div>
+
+    <button class="present-exit" id="btnExitPresent">✕ 退出演示模式</button>
+
+    <!-- 右侧手机预览 -->
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-screen" id="phoneScreen">
+          <!-- 导航 -->
+          <div class="mp-nav">
+            <div class="back">‹</div>
+            <div class="title">文本检测</div>
+            <div class="capsule"><span>···</span><span>—</span><span>○</span></div>
+          </div>
+
+          <div class="page-body">
+            <!-- 使用额度条（模式 B 显示） -->
+            <div class="usage-bar" id="usageBar" style="display:none">
+              <div class="left">
+                <span class="badge badge-points" id="usageBadge">积分模式</span>
+                <span class="detail" id="usageDetail">今日免费 2/3 · 积分 128</span>
+              </div>
+              <a class="points-link" id="pointsLink">充值 ›</a>
+            </div>
+
+            <!-- 完全免费标识（模式 A 显示） -->
+            <div class="usage-bar" id="freeBar" style="display:none">
+              <div class="left">
+                <span class="badge badge-unlimited">免费使用</span>
+                <span class="detail">不限次数，畅享检测</span>
+              </div>
+            </div>
+
+            <!-- 输入区 -->
+            <div class="input-card">
+              <div class="card-head">
+                <span class="label">检测内容</span>
+                <span class="counter" id="charCounter">0/9000</span>
+              </div>
+              <textarea id="textInput" placeholder="在此输入或粘贴文本" maxlength="9000"></textarea>
+              <div class="toolbar">
+                <div class="toolbar-left">
+                  <button class="tool-btn" id="btnPaste">粘贴</button>
+                  <button class="tool-btn" id="btnCopy">复制</button>
+                </div>
+                <button class="tool-btn" id="btnClear">清除</button>
+              </div>
+            </div>
+
+            <button class="btn-detect" id="btnDetect">
+              立即检测
+              <span class="cost-hint" id="costHint" style="display:none"></span>
+            </button>
+
+            <!-- 检测结果 -->
+            <div class="result-card" id="resultCard">
+              <h4>✓ 检测完成</h4>
+              <div class="result-meta" id="resultMeta"></div>
+              <div class="result-content" id="resultContent"></div>
+            </div>
+          </div>
+
+          <!-- 弹窗：积分消耗确认 -->
+          <div class="overlay" id="modalConfirm">
+            <div class="modal">
+              <div class="modal-head">
+                <div class="icon icon-warn">💎</div>
+                <h3>确认消耗积分</h3>
+                <p>今日免费次数已用完，本次检测将消耗 <span class="highlight" id="confirmCost">10</span> 积分<br>当前余额：<span id="confirmBalance">128</span> 积分</p>
+              </div>
+              <div class="modal-actions">
+                <button class="cancel" data-close="modalConfirm">取消</button>
+                <button class="confirm" id="btnConfirmPay">确认检测</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 弹窗：积分不足 -->
+          <div class="overlay" id="modalInsufficient">
+            <div class="modal">
+              <div class="modal-head">
+                <div class="icon icon-danger">⚠️</div>
+                <h3>积分不足</h3>
+                <p>本次检测需要 <span class="highlight" id="needPoints">10</span> 积分，当前余额 <span id="currentPoints">5</span> 积分<br>充值或完成任务可获取积分</p>
+              </div>
+              <div class="modal-actions">
+                <button class="cancel" data-close="modalInsufficient">稍后再说</button>
+                <button class="confirm" id="btnGoRecharge">去充值</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 弹窗：充值引导（演示） -->
+          <div class="overlay" id="modalRecharge">
+            <div class="modal">
+              <div class="modal-head">
+                <div class="icon icon-info">💰</div>
+                <h3>获取积分</h3>
+                <p>① 每日签到 +5 积分<br>② 邀请好友 +20 积分<br>③ 充值购买积分包</p>
+              </div>
+              <div class="modal-actions">
+                <button class="confirm" data-close="modalRecharge" style="flex:1">我知道了</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="toast" id="toast"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ===== 配置常量（后台可配） =====
+    const CONFIG = {
+      dailyFreeLimit: 3,   // 每日免费次数，0 = 无免费
+      costPerUse: 10,      // 单次消耗积分
+    };
+
+    // ===== 状态 =====
+    let state = {
+      mode: 'free',           // 'free' | 'points'
+      dailyUsed: 0,
+      dailyFreeLimit: 3,
+      points: 128,
+      costPerUse: 10,
+    };
+
+    const $ = id => document.getElementById(id);
+
+    const SAMPLE_TEXT = '这是一段用于演示的检测文本。右豹工具可帮助创作者快速检测内容原创度与合规性，提升创作效率。';
+
+    const SCENE_TIPS = {
+      'free-unlimited': '<strong>当前场景：</strong>完全免费 — 点击「立即检测」直接出结果，无额度限制',
+      'points-has-free': '<strong>当前场景：</strong>积分模式 · 有免费次数 — 直接检测，消耗 1 次今日免费额度',
+      'points-no-free': '<strong>当前场景：</strong>积分模式 · 免费已用完 — 点击检测会弹出积分确认弹窗',
+      'points-low': '<strong>当前场景：</strong>积分模式 · 积分不足 — 点击检测弹出充值引导',
+      'points-zero-free': '<strong>当前场景：</strong>纯积分模式（无免费配置）— 每次检测均需确认消耗积分',
+    };
+
+    const STEP_MAP = {
+      'free-unlimited': 1,
+      'points-has-free': 2,
+      'points-no-free': 3,
+      'points-low': 4,
+      'points-zero-free': 3,
+    };
+
+    let currentScenario = 'free-unlimited';
+
+    // ===== 场景预设 =====
+    const SCENARIOS = {
+      'free-unlimited': {
+        mode: 'free', dailyUsed: 0, points: 128, dailyFreeLimit: 0,
+      },
+      'points-has-free': {
+        mode: 'points', dailyUsed: 1, points: 128, dailyFreeLimit: 3,
+      },
+      'points-no-free': {
+        mode: 'points', dailyUsed: 3, points: 128, dailyFreeLimit: 3,
+      },
+      'points-low': {
+        mode: 'points', dailyUsed: 3, points: 5, dailyFreeLimit: 3,
+      },
+      'points-zero-free': {
+        mode: 'points', dailyUsed: 0, points: 128, dailyFreeLimit: 0,
+      },
+    };
+
+    function fillSampleText() {
+      $('textInput').value = SAMPLE_TEXT;
+      $('charCounter').textContent = `${SAMPLE_TEXT.length}/9000`;
+      $('resultCard').classList.remove('show');
+    }
+
+    function updateSceneTip(key) {
+      $('sceneTip').innerHTML = SCENE_TIPS[key] || '';
+      document.querySelectorAll('.demo-step').forEach(el => {
+        el.classList.toggle('active', Number(el.dataset.step) === STEP_MAP[key]);
+      });
+    }
+
+    function applyScenario(key) {
+      const s = SCENARIOS[key];
+      if (!s) return;
+      currentScenario = key;
+      state = { ...state, ...s, costPerUse: CONFIG.costPerUse };
+      renderUI();
+      updateSceneTip(key);
+      $('resultCard').classList.remove('show');
+      document.querySelectorAll('.overlay').forEach(ov => ov.classList.remove('show'));
+    }
+
+    function resetDemo() {
+      fillSampleText();
+      applyScenario(currentScenario);
+    }
+
+    async function runDemo() {
+      fillSampleText();
+      await delay(400);
+      handleDetect();
+    }
+
+    function delay(ms) {
+      return new Promise(r => setTimeout(r, ms));
+    }
+
+    function getFreeRemaining() {
+      if (state.mode !== 'points' || state.dailyFreeLimit <= 0) return 0;
+      return Math.max(0, state.dailyFreeLimit - state.dailyUsed);
+    }
+
+    function renderUI() {
+      const usageBar = $('usageBar');
+      const freeBar = $('freeBar');
+      const costHint = $('costHint');
+      const btnDetect = $('btnDetect');
+
+      if (state.mode === 'free') {
+        usageBar.style.display = 'none';
+        freeBar.style.display = 'flex';
+        costHint.style.display = 'none';
+        btnDetect.disabled = false;
+        btnDetect.innerHTML = '立即检测';
+      } else {
+        freeBar.style.display = 'none';
+        usageBar.style.display = 'flex';
+        const remaining = getFreeRemaining();
+
+        if (state.dailyFreeLimit > 0) {
+          $('usageDetail').textContent = `今日免费 ${remaining}/${state.dailyFreeLimit} · 积分 ${state.points}`;
+          $('usageBadge').textContent = remaining > 0 ? '免费剩余' : '积分模式';
+          $('usageBadge').className = 'badge ' + (remaining > 0 ? 'badge-free' : 'badge-points');
+        } else {
+          $('usageDetail').textContent = `每次 ${state.costPerUse} 积分 · 余额 ${state.points}`;
+          $('usageBadge').textContent = '积分模式';
+          $('usageBadge').className = 'badge badge-points';
+        }
+
+        // 按钮副文案
+        if (remaining > 0) {
+          costHint.style.display = 'none';
+          btnDetect.innerHTML = '立即检测';
+        } else if (state.points >= state.costPerUse) {
+          costHint.style.display = 'block';
+          costHint.textContent = `本次消耗 ${state.costPerUse} 积分`;
+          btnDetect.innerHTML = `立即检测<span class="cost-hint">本次消耗 ${state.costPerUse} 积分</span>`;
+        } else {
+          costHint.style.display = 'block';
+          costHint.textContent = `积分不足（需 ${state.costPerUse} 积分）`;
+          btnDetect.innerHTML = `立即检测<span class="cost-hint">积分不足（需 ${state.costPerUse} 积分）</span>`;
+        }
+        btnDetect.disabled = false;
+      }
+    }
+
+    function showToast(msg, duration = 1800) {
+      const t = $('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), duration);
+    }
+
+    function showModal(id) { $(id).classList.add('show'); }
+    function hideModal(id) { $(id).classList.remove('show'); }
+
+    function runDetection(paidViaPoints = false) {
+      const text = $('textInput').value.trim();
+      if (!text) {
+        showToast('请先输入检测内容');
+        return;
+      }
+
+      // 模拟检测
+      const remaining = getFreeRemaining();
+      let meta = '';
+
+      if (state.mode === 'free') {
+        meta = '免费检测 · 不限次数';
+      } else if (paidViaPoints) {
+        state.points -= state.costPerUse;
+        meta = `消耗 ${state.costPerUse} 积分 · 余额 ${state.points}`;
+      } else if (remaining > 0) {
+        state.dailyUsed += 1;
+        const left = getFreeRemaining();
+        meta = `消耗 1 次免费额度 · 今日剩余 ${left}/${state.dailyFreeLimit}`;
+        showToast(`检测完成，今日免费剩余 ${left} 次`);
+      }
+
+      $('resultMeta').textContent = meta;
+      $('resultContent').textContent = `已对 ${text.length} 字内容进行检测。检测结果：未发现违规内容，原创度 92%。（演示数据）`;
+      $('resultCard').classList.add('show');
+      renderUI();
+    }
+
+    function handleDetect() {
+      const text = $('textInput').value.trim();
+      if (!text) {
+        showToast('请先输入检测内容');
+        return;
+      }
+
+      if (state.mode === 'free') {
+        runDetection();
+        showToast('检测完成');
+        return;
+      }
+
+      const remaining = getFreeRemaining();
+
+      // 有免费次数 → 直接检测
+      if (remaining > 0) {
+        runDetection();
+        return;
+      }
+
+      // 无免费 → 检查积分
+      if (state.points >= state.costPerUse) {
+        $('confirmCost').textContent = state.costPerUse;
+        $('confirmBalance').textContent = state.points;
+        showModal('modalConfirm');
+        return;
+      }
+
+      // 积分不足
+      $('needPoints').textContent = state.costPerUse;
+      $('currentPoints').textContent = state.points;
+      showModal('modalInsufficient');
+    }
+
+    // ===== 事件绑定 =====
+    $('textInput').addEventListener('input', e => {
+      $('charCounter').textContent = `${e.target.value.length}/9000`;
+    });
+
+    $('btnPaste').addEventListener('click', async () => {
+      try {
+        const t = await navigator.clipboard.readText();
+        $('textInput').value = t.slice(0, 9000);
+        $('charCounter').textContent = `${$('textInput').value.length}/9000`;
+      } catch { showToast('无法读取剪贴板'); }
+    });
+
+    $('btnCopy').addEventListener('click', async () => {
+      const t = $('textInput').value;
+      if (!t) { showToast('暂无内容'); return; }
+      try {
+        await navigator.clipboard.writeText(t);
+        showToast('已复制');
+      } catch { showToast('复制失败'); }
+    });
+
+    $('btnClear').addEventListener('click', () => {
+      $('textInput').value = '';
+      $('charCounter').textContent = '0/9000';
+      $('resultCard').classList.remove('show');
+    });
+
+    $('btnDetect').addEventListener('click', handleDetect);
+
+    $('btnConfirmPay').addEventListener('click', () => {
+      hideModal('modalConfirm');
+      runDetection(true);
+      showToast(`检测完成，已消耗 ${state.costPerUse} 积分`);
+    });
+
+    $('btnGoRecharge').addEventListener('click', () => {
+      hideModal('modalInsufficient');
+      showModal('modalRecharge');
+    });
+
+    $('pointsLink').addEventListener('click', () => showModal('modalRecharge'));
+
+    document.querySelectorAll('[data-close]').forEach(el => {
+      el.addEventListener('click', () => hideModal(el.dataset.close));
+    });
+
+    document.querySelectorAll('.overlay').forEach(ov => {
+      ov.addEventListener('click', e => {
+        if (e.target === ov) hideModal(ov.id);
+      });
+    });
+
+    // 场景切换
+    $('scenarioBtns').addEventListener('click', e => {
+      const btn = e.target.closest('button[data-scenario]');
+      if (!btn) return;
+      document.querySelectorAll('.scenario-btns button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      applyScenario(btn.dataset.scenario);
+    });
+
+    $('btnFillSample').addEventListener('click', fillSampleText);
+    $('btnRunDemo').addEventListener('click', runDemo);
+    $('btnReset').addEventListener('click', resetDemo);
+    $('btnPresent').addEventListener('click', () => {
+      document.body.classList.add('present-mode');
+    });
+    $('btnExitPresent').addEventListener('click', () => {
+      document.body.classList.remove('present-mode');
+    });
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') document.body.classList.remove('present-mode');
+      if (e.key === 'p' && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        document.body.classList.toggle('present-mode');
+      }
+    });
+
+    // 初始化
+    applyScenario('free-unlimited');
+    fillSampleText();
+  </script>
+</body>
+</html>
