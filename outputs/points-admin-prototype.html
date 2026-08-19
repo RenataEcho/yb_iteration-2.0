@@ -2473,19 +2473,10 @@
             <button data-section="trackingOperation"><i data-lucide="monitor-dot"></i>经营分析</button>
           </div>
         </div>
-        <div class="nav-group">
-          <button class="nav-parent" type="button" aria-expanded="true"><i data-lucide="network"></i>OPD开放平台<i class="chevron" data-lucide="chevron-down"></i></button>
-          <div class="nav-child">
-            <button data-section="opdOverview"><i data-lucide="panel-top"></i>开放平台概览</button>
-            <button data-section="opdApps"><i data-lucide="app-window"></i>应用管理</button>
-            <button data-section="opdApis"><i data-lucide="plug"></i>接口能力</button>
-            <button data-section="opdMetrics"><i data-lucide="gauge"></i>调用数据</button>
-          </div>
-        </div>
       </nav>
 
       <div class="side-note">
-        右豹管理后台采用可迭代菜单架构。当前版本包含积分管理、工具管理、埋点统计和 OPD 开放平台，后续可继续加入其他业务模块。
+        右豹管理后台采用可迭代菜单架构。当前版本包含积分管理、工具管理和埋点统计，后续可继续加入其他业务模块。
       </div>
     </aside>
 
@@ -3370,107 +3361,6 @@
         </div>
       </section>
 
-      <section class="section" id="opdOverview">
-        <div class="analytics-filter">
-          <div class="filter-item"><label>时间范围</label><select><option>近7日</option><option>今日</option><option>近30日</option><option>自定义</option></select></div>
-          <div class="filter-item"><label>应用类型</label><select><option>全部应用</option><option>内部应用</option><option>合作方应用</option><option>测试应用</option></select></div>
-          <div class="filter-item"><label>接口分组</label><select><option>全部接口</option><option>用户能力</option><option>项目能力</option><option>工具能力</option><option>数据能力</option></select></div>
-          <div class="filter-item"><label>状态</label><select><option>全部状态</option><option>正常</option><option>告警</option><option>停用</option></select></div>
-          <button class="btn primary" data-action="apply-opd-filter"><i data-lucide="refresh-cw"></i>刷新</button>
-          <button class="btn" data-action="export-opd"><i data-lucide="download"></i>导出</button>
-        </div>
-        <div class="analytics-kpis">
-          <div class="analytics-kpi"><span>接入应用数</span><strong>24</strong><em>已上线 18 / 测试 6</em></div>
-          <div class="analytics-kpi"><span>开放接口数</span><strong>42</strong><em>用户/项目/工具/数据</em></div>
-          <div class="analytics-kpi"><span>今日调用量</span><strong>286,420</strong><em>较昨日 +12.6%</em></div>
-          <div class="analytics-kpi"><span>调用成功率</span><strong>99.21%</strong><em>失败需进入异常排查</em></div>
-        </div>
-        <div class="analytics-grid">
-          <div class="panel">
-            <div class="panel-head"><div><h2>开放能力概览</h2><p>按接口能力域展示调用规模、成功率和风险状态。</p></div></div>
-            <div class="analytics-table-scroll">
-              <table>
-                <thead><tr><th>能力域</th><th>接口数量</th><th>今日调用</th><th>成功率</th><th>平均耗时</th><th>状态</th></tr></thead>
-                <tbody>
-                  <tr><td>用户能力</td><td>8</td><td>92,640</td><td>99.58%</td><td>128ms</td><td><span class="status on">正常</span></td></tr>
-                  <tr><td>项目能力</td><td>14</td><td>116,204</td><td>99.12%</td><td>186ms</td><td><span class="status on">正常</span></td></tr>
-                  <tr><td>工具能力</td><td>11</td><td>54,820</td><td>98.76%</td><td>214ms</td><td><span class="status warn">关注</span></td></tr>
-                  <tr><td>数据能力</td><td>9</td><td>22,756</td><td>99.34%</td><td>162ms</td><td><span class="status on">正常</span></td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div class="panel">
-            <div class="panel-head"><div><h2>平台告警</h2><p>展示调用异常、配额风险和鉴权失败。</p></div></div>
-            <div class="event-health">
-              <div class="health-row"><div><strong>工具能力耗时升高</strong><span>opd_tool_result_query 平均耗时 386ms，超过关注阈值。</span></div><span class="status warn">中</span></div>
-              <div class="health-row"><div><strong>合作方 A 接近配额</strong><span>日配额已使用 87%，需关注剩余额度。</span></div><span class="status warn">中</span></div>
-              <div class="health-row"><div><strong>鉴权失败稳定</strong><span>近 1 小时失败率 0.08%，处于正常范围。</span></div><span class="status on">正常</span></div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="section" id="opdApps">
-        <div class="filter-bar">
-          <input id="opdAppKeyword" placeholder="搜索应用名称、AppID、负责人">
-          <select><option>全部类型</option><option>内部应用</option><option>合作方应用</option><option>测试应用</option></select>
-          <select><option>全部状态</option><option>启用</option><option>停用</option><option>待配置</option></select>
-          <button class="btn primary" data-action="apply-opd-filter"><i data-lucide="search"></i>查询</button>
-          <button class="btn"><i data-lucide="plus"></i>新增应用</button>
-        </div>
-        <div class="panel">
-          <div class="panel-head"><div><h2>应用管理</h2><p>管理接入方应用、密钥、授权能力、回调地址和配额状态。</p></div></div>
-          <table>
-            <thead><tr><th>应用名称</th><th>AppID</th><th>类型</th><th>负责人</th><th>授权能力</th><th>日调用配额</th><th>回调地址</th><th>状态</th><th>操作</th></tr></thead>
-            <tbody>
-              <tr><td>右豹增长助手</td><td>opd_app_10001</td><td>内部应用</td><td>增长运营</td><td>用户能力、项目能力、工具能力</td><td>300,000</td><td>https://api.youbao/app/callback</td><td><span class="status on">启用</span></td><td><button class="link-btn">编辑</button><button class="link-btn">重置密钥</button><button class="link-btn">停用</button></td></tr>
-              <tr><td>合作方数据看板</td><td>opd_app_20018</td><td>合作方应用</td><td>商务团队</td><td>项目能力、数据能力</td><td>120,000</td><td>https://partner.example.com/yibao</td><td><span class="status warn">待配置</span></td><td><button class="link-btn">编辑</button><button class="link-btn">审核</button><button class="link-btn">停用</button></td></tr>
-              <tr><td>工具联调沙箱</td><td>opd_app_30006</td><td>测试应用</td><td>研发测试</td><td>工具能力</td><td>20,000</td><td>https://sandbox.youbao/callback</td><td><span class="status on">启用</span></td><td><button class="link-btn">编辑</button><button class="link-btn">重置密钥</button><button class="link-btn">停用</button></td></tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <section class="section" id="opdApis">
-        <div class="panel">
-          <div class="panel-head"><div><h2>接口能力</h2><p>维护开放接口分组、请求方式、鉴权方式、限流规则和上线状态。</p></div></div>
-          <div class="analytics-table-scroll">
-            <table>
-              <thead><tr><th>接口名称</th><th>接口路径</th><th>能力域</th><th>请求方式</th><th>鉴权方式</th><th>限流规则</th><th>数据权限</th><th>状态</th></tr></thead>
-              <tbody>
-                <tr><td>查询用户基础信息</td><td>/opd/v1/user/profile</td><td>用户能力</td><td>GET</td><td>AppKey + Sign</td><td>100 QPS / 应用</td><td>仅授权用户</td><td><span class="status on">上线</span></td></tr>
-                <tr><td>查询项目列表</td><td>/opd/v1/project/list</td><td>项目能力</td><td>GET</td><td>AppKey + Sign</td><td>80 QPS / 应用</td><td>按项目授权</td><td><span class="status on">上线</span></td></tr>
-                <tr><td>查询工具使用结果</td><td>/opd/v1/tool/result</td><td>工具能力</td><td>POST</td><td>AppKey + Sign</td><td>50 QPS / 应用</td><td>按工具授权</td><td><span class="status warn">灰度</span></td></tr>
-                <tr><td>查询行为统计</td><td>/opd/v1/data/event-summary</td><td>数据能力</td><td>POST</td><td>AppKey + Sign</td><td>20 QPS / 应用</td><td>脱敏聚合</td><td><span class="status on">上线</span></td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <section class="section" id="opdMetrics">
-        <div class="analytics-kpis">
-          <div class="analytics-kpi"><span>今日成功调用</span><strong>284,158</strong><em>success_count</em></div>
-          <div class="analytics-kpi"><span>今日失败调用</span><strong>2,262</strong><em>失败率 0.79%</em></div>
-          <div class="analytics-kpi"><span>鉴权失败</span><strong>382</strong><em>签名/过期/权限不足</em></div>
-          <div class="analytics-kpi"><span>限流拒绝</span><strong>126</strong><em>超过 QPS 或日配额</em></div>
-        </div>
-        <div class="panel">
-          <div class="panel-head"><div><h2>调用数据明细</h2><p>按应用和接口查看调用量、成功率、失败原因和平均耗时。</p></div></div>
-          <div class="analytics-table-scroll">
-            <table>
-              <thead><tr><th>应用名称</th><th>接口名称</th><th>调用量</th><th>成功率</th><th>平均耗时</th><th>P95耗时</th><th>主要失败原因</th><th>最后调用时间</th></tr></thead>
-              <tbody>
-                <tr><td>右豹增长助手</td><td>查询项目列表</td><td>86,420</td><td>99.42%</td><td>156ms</td><td>288ms</td><td>-</td><td>2026-08-19 14:20:10</td></tr>
-                <tr><td>合作方数据看板</td><td>查询行为统计</td><td>22,756</td><td>99.34%</td><td>162ms</td><td>316ms</td><td>参数缺失</td><td>2026-08-19 14:18:33</td></tr>
-                <tr><td>工具联调沙箱</td><td>查询工具使用结果</td><td>18,906</td><td>98.76%</td><td>214ms</td><td>386ms</td><td>结果未生成</td><td>2026-08-19 14:17:52</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
     </main>
   </div>
 
@@ -3520,11 +3410,7 @@
       trackingEvents: ["页面事件分析", "按页面、模块、事件类型查看曝光、点击、提交和完成事件表现。"],
       trackingFunnels: ["转化漏斗", "配置并查看首页到项目、Banner位置转化、项目入口页对比、冷启动激活和工具使用漏斗。"],
       trackingQuality: ["事件质量", "监控埋点上报成功率、缺参、重复上报、异常波动和待修复问题。"],
-      trackingOperation: ["经营分析", "参考经营驾驶舱形态，聚合埋点行为数据分析访问、项目入口、Banner、冷启动和工具使用表现。"],
-      opdOverview: ["开放平台概览", "查看 OPD 开放平台的应用接入、接口能力、调用规模、成功率和告警状态。"],
-      opdApps: ["应用管理", "管理开放平台接入应用、AppID、密钥、授权能力、回调地址、配额和状态。"],
-      opdApis: ["接口能力", "维护开放接口分组、路径、鉴权、限流、数据权限和上线状态。"],
-      opdMetrics: ["调用数据", "按应用和接口分析调用量、成功率、失败原因、耗时和限流情况。"]
+      trackingOperation: ["经营分析", "参考经营驾驶舱形态，聚合埋点行为数据分析访问、项目入口、Banner、冷启动和工具使用表现。"]
     };
 
     const requirementRules = {
@@ -3656,26 +3542,6 @@
         { title: "4. Banner位置分析公式", items: ["Banner曝光UV：事件ID=yb_banner_exposure；按 banner_position、banner_page 分组 count_distinct(user_id)。", "Banner点击UV：事件ID=yb_banner_click；按 banner_position、banner_page 分组 count_distinct(user_id)。", "Banner点击率：Banner点击UV/Banner曝光UV。", "详情承接UV：Banner点击后进入项目详情的去重用户数，事件链路 yb_banner_click → yb_project_detail_view。", "详情承接率：详情承接UV/Banner点击UV。"] },
         { title: "5. 项目入口页对比公式", items: ["入口页项目曝光UV：事件ID=yb_project_entry_exposure 或对应入口曝光事件；按 source_page/page_id 分组 count_distinct(user_id)。", "入口页项目点击UV：事件ID in (yb_project_card_click,yb_workbench_project_click,yb_first_project_click)；按 source_page/source_module 分组 count_distinct(user_id)。", "入口页点击率：入口页项目点击UV/入口页项目曝光UV。", "入口页详情承接率：项目详情UV/入口页项目点击UV。", "运营可按该表对比哪个入口页转化更高，并据此调整资源位。"] },
         { title: "6. 交互规则", items: ["支持按日期范围、端口、用户类型、入口页、项目筛选。", "趋势区支持 UV、项目、激活三类趋势切换。", "Banner表按点击率降序，点击率相同时按曝光UV降序。", "项目入口页表按项目点击率或详情承接率排序。", "点击导出导出当前筛选口径下的经营分析明细。"] }
-      ],
-      opdOverview: [
-        { title: "1. 页面目标", items: ["作为 OPD 开放平台的默认页，展示应用接入规模、接口能力数量、调用量、成功率和告警。", "帮助平台运营和研发快速判断开放平台是否稳定。", "页面只做监控和入口汇总，不直接编辑应用密钥。"] },
-        { title: "2. 字段规则", items: ["接入应用数：统计启用、待配置和测试状态的应用数量。", "开放接口数：统计已配置的开放 API 数量。", "今日调用量：统计当日全部应用调用开放接口次数。", "调用成功率：成功调用次数/总调用次数。", "平均耗时：接口响应耗时均值，单位 ms。"] },
-        { title: "3. 交互规则", items: ["筛选项包含时间范围、应用类型、接口分组和状态。", "点击刷新后按筛选条件刷新指标、能力表和告警列表。", "点击导出导出当前开放平台概览数据。", "告警状态按成功率、耗时、配额和鉴权失败率综合判断。"] }
-      ],
-      opdApps: [
-        { title: "1. 页面目标", items: ["管理 OPD 接入应用，包含内部应用、合作方应用和测试应用。", "用于维护 AppID、密钥、授权能力、回调地址、调用配额和应用状态。", "支持运营、商务、研发共同确认接入范围和权限边界。"] },
-        { title: "2. 字段规则", items: ["应用名称必填，最多 60 字。", "AppID 系统生成，不允许手动修改。", "应用类型包含内部应用、合作方应用和测试应用。", "授权能力可多选用户能力、项目能力、工具能力和数据能力。", "回调地址必须为 HTTPS 地址。", "日调用配额必须为正整数。", "状态包含启用、停用和待配置。"] },
-        { title: "3. 安全规则", items: ["AppSecret 只在创建或重置后展示一次。", "重置密钥需要二次确认，并记录操作人和操作时间。", "停用应用后立即拒绝该 AppID 的所有接口调用。", "合作方应用上线前必须完成授权能力和回调地址审核。"] }
-      ],
-      opdApis: [
-        { title: "1. 页面目标", items: ["维护开放平台对外 API 的能力目录。", "用于配置接口路径、请求方式、鉴权方式、限流规则、数据权限和上线状态。", "帮助研发、测试和合作方对齐接口边界。"] },
-        { title: "2. 字段规则", items: ["接口名称必填，需能明确描述能力。", "接口路径必须以 /opd/v1/ 开头。", "能力域包含用户能力、项目能力、工具能力和数据能力。", "请求方式支持 GET 和 POST。", "鉴权方式当前固定 AppKey + Sign。", "限流规则需配置 QPS 和应用维度配额。", "数据权限需标明仅授权用户、按项目授权、按工具授权或脱敏聚合。"] },
-        { title: "3. 版本与上线规则", items: ["新接口默认进入灰度状态。", "接口上线前必须完成鉴权、限流、参数校验和错误码验收。", "涉及用户明细或项目明细的接口必须有数据权限边界。", "废弃接口需要保留兼容周期，并在接口文档中标记下线时间。"] }
-      ],
-      opdMetrics: [
-        { title: "1. 页面目标", items: ["按应用和接口查看 OPD 调用数据。", "帮助平台运营定位失败调用、鉴权异常、限流拒绝和接口性能问题。", "支持对接入方 SLA 和调用质量进行复盘。"] },
-        { title: "2. 字段规则", items: ["调用量：当前筛选范围内接口请求总次数。", "成功率：成功请求次数/请求总次数。", "平均耗时：接口响应耗时平均值。", "P95耗时：95 分位响应耗时。", "主要失败原因：按错误码出现次数最高的失败原因展示。", "最后调用时间：该应用调用该接口的最近一次时间。"] },
-        { title: "3. 统计公式", items: ["今日成功调用=count(status=success)。", "今日失败调用=count(status=fail)。", "失败率=今日失败调用/(今日成功调用+今日失败调用)。", "鉴权失败=count(error_code in SIGN_INVALID,TOKEN_EXPIRED,PERMISSION_DENIED)。", "限流拒绝=count(error_code in QPS_LIMIT,DAILY_QUOTA_LIMIT)。", "平均耗时=avg(response_time_ms)，P95耗时=percentile(response_time_ms,95)。"] }
       ]
     };
 
