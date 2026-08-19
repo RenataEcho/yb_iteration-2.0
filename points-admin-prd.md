@@ -2,7 +2,7 @@
 
 ## 1. 背景
 
-右豹管理后台作为可持续迭代的统一后台，后续会继续加入其他业务功能。本期包含一级菜单“积分管理”和“工具管理”。积分管理承接用户端“积分中心”相关能力，包括积分余额展示、积分充值/兑换、兑换码兑换、积分明细、任务领奖励、钱包扣款支付等流程；工具管理承接工具入口配置、标签管理和工具数据统计。
+右豹管理后台作为可持续迭代的统一后台，后续会继续加入其他业务功能。本期包含一级菜单“积分管理”“工具管理”和“埋点统计”。积分管理承接用户端“积分中心”相关能力，包括积分余额展示、积分充值/兑换、兑换码兑换、积分明细、任务领奖励、钱包扣款支付等流程；工具管理承接工具入口配置、标签管理和工具数据统计；埋点统计承接首页、变现、项目入口、Banner、工具和冷启动链路的事件数据分析。
 
 ## 2. 产品目标
 
@@ -15,10 +15,13 @@
 - 提供运营数据看板，帮助判断积分发放、消耗、转化与异常情况。
 - 支持工具列表配置，包括工具名称、图标、平台、区域、赛道、标签、评分、热度、状态、可见范围、排序、跳转和使用门槛。
 - 支持工具标签管理和工具数据统计，工具数据按今日、近 7 日、累计三个时间维度统计点击量、使用量、获得积分和变现。
+- 支持埋点统计看板，帮助运营查看核心事件趋势、冷启动激活、页面事件表现、业务漏斗转化和埋点质量。
+- 支持数据分析师按事件、页面、模块、用户类型、渠道、项目和工具维度进行筛选、导出和口径核查。
 
 ## 3. 用户角色
 
 - 运营：配置积分商品、任务奖励、兑换码活动、工具入口、工具标签、页面文案和活动状态。
+- 数据分析师：查看埋点统计、核对事件口径、分析转化漏斗、发现缺参/重复/异常波动等数据质量问题。
 - 客服：查询用户积分余额、流水、订单状态，处理补发、撤销、冻结等问题。
 - 财务：查看支付金额、钱包扣款、退款、对账导出。
 - 管理员：管理角色权限和系统开关。
@@ -46,11 +49,12 @@
 ### 5.0 通用交互
 
 - 后台命名为“右豹管理后台”。
-- 侧边栏采用一级/二级菜单结构；本期包含一级菜单“积分管理”和“工具管理”。
+- 侧边栏采用一级/二级菜单结构；本期包含一级菜单“积分管理”“工具管理”和“埋点统计”。
 - 一级菜单支持展开/折叠操作，展开后展示二级菜单，折叠后隐藏二级菜单。
 - 当前所有积分相关菜单均归属在“积分管理”下，作为二级菜单展示。
 - “积分管理”下新增二级菜单“前后端交互需求”，用于说明用户端积分功能的前端规则、接口字段、状态流转和异常处理。
-- “工具管理”下包含二级菜单“工具列表”和“工具数据”。
+- “工具管理”下包含二级菜单“工具列表”“工具数据”和“前端交互需求”；其中“前端交互需求”用于展示工具使用门槛交互 demo。
+- “埋点统计”下包含二级菜单“统计总览”“埋点事件需求”“冷启动分析”“页面事件分析”“转化漏斗”“事件质量”“经营分析”。
 - 菜单结构需为后续增加其他一级业务模块预留扩展空间。
 - 每个菜单标题旁展示“需求规则”入口。
 - 点击“需求规则”后，通过右侧抽屉展示当前板块的规则说明。
@@ -179,6 +183,133 @@
 - 今日数据按当日自然日统计；近 7 日数据按最近 7 个自然日累计；累计数据为工具创建以来的历史总量。
 - 统计口径按工具 ID 聚合，不按工具名称模糊聚合，避免工具重名导致数据混淆。
 - 支持导出当前工具数据。
+- “前端交互需求”菜单用于内嵌展示工具使用门槛交互原型 `tool-frontend-interaction-demo.html`，便于对齐前端交互流程。
+
+### 5.11 埋点统计
+
+#### 5.11.0 埋点事件需求
+
+- 埋点事件需求页用于在后台内查看《右豹小程序首页-变现埋点需求.xlsx》的核心事件清单。
+- 页面不提供编辑能力，只作为产品、前端、后端、测试和数据分析师联调时的事件索引。
+- 埋点事件声明需要覆盖三个端口：小程序、安卓、iOS；表格增加“适用端口”字段，默认展示“小程序 / 安卓 / iOS”。
+- 页面支持按事件总表、冷启动、首页、变现、项目详情、公共参数切换。
+- 表格字段包含事件ID、事件中文名、适用端口、触发位置、事件类型、核心参数和分析用途。
+- 长事件ID、英文参数和中文说明必须自动换行，不允许与相邻列重叠。
+- 页面保留“查看 Excel 文件”入口，用于打开完整原始 Excel 交付物。
+- 钱包相关事件、组合提词结果、官方任务台/钱包/其他复制事件、消息入口事件不进入埋点统计需求。
+- 项目发布相关事件只保留项目详情页面曝光，其他项目发布过程事件不进入埋点统计需求。
+- Banner 需增加位置埋点，字段包含 banner_id、banner_name、banner_position、banner_page；banner_position 支持 1号位、2号位、3号位等。
+- 每个字段都需在需求规则抽屉中给出字段注释，说明字段来源、枚举和分析用途。
+
+#### 5.11.1 统计总览
+
+- 统计总览作为埋点统计一级菜单的默认页，面向运营日常巡盘和数据分析师快速定位趋势变化。
+- 筛选项包含日期范围、端口、端来源、用户类型、渠道和事件名称。
+- 核心指标包含事件触发次数、触发用户数、新用户激活率和埋点成功率。
+- 趋势区支持按曝光、点击、提交和完成事件切换。
+- 事件排行展示事件名、事件中文名、所属模块、触发次数、触发用户数、人均次数和转化说明。
+- 事件排行需增加对比趋势图，支持今日/昨日、本周/上周和日期筛选，用于分析核心事件的周期变化。
+- 点击查询后刷新全部指标、图表和表格；点击导出后导出当前筛选条件下的汇总与明细数据。
+- 需求规则抽屉必须写清每个统计值关联的事件ID和计算公式。
+- 事件触发次数关联全部 yb_ 前缀事件，公式为 count(event_id)。
+- 触发用户数关联全部 yb_ 前缀事件，公式为 count_distinct(user_id)。
+- 新用户激活率公式为 count_distinct(user_id where event_id=yb_new_user_activation_complete) / count_distinct(user_id where event_id=yb_new_user_first_open)。
+- 曝光趋势关联 yb_page_view、yb_module_exposure、yb_cold_start_page_view、yb_first_project_recommend_exposure、yb_project_entry_exposure、yb_banner_exposure。
+- 点击趋势关联 yb_search_entry_click、yb_banner_click、yb_project_card_click、yb_tool_entry_click 等 click 事件。
+- 完成趋势关联 yb_route_customization_complete、yb_tool_use_result、yb_new_user_activation_complete。
+
+#### 5.11.2 冷启动分析
+
+- 冷启动分析用于分析新用户从首次打开到激活完成的完整链路。
+- 筛选项包含新用户周期、来源场景、用户目标、激活类型和项目。
+- 冷启动归因维度固定为小程序码、服务号、小程序分享。
+- 核心指标包含新用户首次打开数、路径定制完成率、首次项目点击率和新用户激活率。
+- 漏斗节点包含首次打开、首页曝光、路径定制完成、首次项目点击、首次详情曝光和首次关键动作。
+- 首个项目表现表按 first_project_id 聚合，展示曝光用户、首次点击用户、详情曝光用户、首次关键动作用户、激活完成用户、点击率和激活率。
+- 首个项目表现需增加对比趋势图，支持今日/昨日、本周/上周和日期筛选，展示项目点击率、详情承接率和激活率变化。
+- 轻激活口径建议为完成路径定制且进入至少 1 个项目详情；强激活口径建议为触发首次关键动作或新用户激活完成。
+- 需求规则抽屉必须写清每个统计值关联的事件ID和计算公式。
+- 新用户首次打开关联 yb_new_user_first_open，公式为 count_distinct(user_id)。
+- 路径定制完成率公式为 count_distinct(user_id where event_id=yb_route_customization_complete) / count_distinct(user_id where event_id=yb_new_user_first_open)。
+- 首次项目点击率公式为 count_distinct(user_id where event_id=yb_first_project_click) / count_distinct(user_id where event_id=yb_new_user_first_open)。
+- 新用户激活率公式为 count_distinct(user_id where event_id=yb_new_user_activation_complete) / count_distinct(user_id where event_id=yb_new_user_first_open)。
+- 首次详情承接率公式为 count_distinct(user_id where event_id=yb_first_project_detail_view) / count_distinct(user_id where event_id=yb_first_project_click)。
+
+#### 5.11.3 页面事件分析
+
+- 页面事件分析按页面、模块、事件类型查看曝光、点击、提交和完成事件表现。
+- 筛选项包含页面、模块、事件类型、用户类型和关键词。
+- 明细字段包含页面、模块、事件名、事件中文名、事件类型、触发次数、用户数、点击率/成功率和核心参数。
+- 页面与模块事件明细需补充“变现-Banner”和“变现-项目赛道”两类模块。
+- 变现-Banner 关联 yb_banner_exposure、yb_banner_click，条件 banner_page=monetize。
+- 变现-项目赛道关联 yb_track_click，按 track_id、track_name 聚合。
+- 页面与模块事件明细需增加对比趋势图，支持今日/昨日、本周/上周和日期筛选，用于分析页面模块的点击率和承接率变化。
+- 点击率优先按点击用户数/曝光用户数计算；结果类事件展示成功率。
+- 该页面用于判断首页、变现、项目详情、Banner 和工具入口的用户行为重心。
+- 需求规则抽屉必须写清每个统计值关联的事件ID和计算公式。
+- 页面曝光PV关联 yb_page_view、yb_cold_start_page_view、yb_route_question_view、yb_first_project_detail_view，公式为 count(event_id)。
+- 模块曝光关联 yb_module_exposure、yb_banner_exposure、yb_project_entry_exposure、yb_first_project_recommend_exposure、yb_onboarding_popup_exposure，公式为 count(event_id)。
+- 点击次数关联所有 event_type=click 的事件，公式为 count(event_id)。
+- 点击转化率公式为点击事件去重用户数 / 对应页面或模块曝光去重用户数。
+
+#### 5.11.4 转化漏斗
+
+- 转化漏斗用于沉淀常用业务链路，帮助运营定位转化断点。
+- 支持漏斗类型包含首页到项目、Banner位置转化、项目入口页对比、冷启动激活和工具使用。
+- 日期范围支持今日、昨日、本周、上周、近7日、近30日和自定义。
+- 转化漏斗需增加对比趋势模块，支持今日/昨日、本周/上周和日期筛选。
+- 漏斗对比趋势需要展示每一步当前周期人数、对比周期人数、单步转化率差值和流失率差值。
+- 首页到项目漏斗：首页曝光 → 搜索/项目入口点击 → 项目卡片点击 → 项目详情曝光 → 关键动作点击。
+- Banner位置转化漏斗：Banner曝光 → Banner点击 → 目标页曝光 → 项目详情曝光。
+- 项目入口页对比漏斗：入口页曝光 → 项目入口曝光 → 项目点击 → 项目详情曝光。
+- 冷启动激活漏斗：首次打开 → 路径定制完成 → 首次项目点击 → 首次项目详情 → 激活完成。
+- 工具使用漏斗：工具曝光 → 工具点击 → 使用开始 → 使用结果。
+- 漏斗人数按 user_id 去重，同一用户在同一漏斗周期内每一步只计入一次。
+- 步骤顺序需按事件 client_time 严格递增，乱序事件进入事件质量问题。
+- 需求规则抽屉必须写清每个漏斗步骤关联的事件ID和计算公式。
+- 首页到项目漏斗：首页曝光 yb_page_view(page_id=home) → 搜索/项目入口点击 yb_search_entry_click、yb_workbench_project_click、yb_track_click、yb_banner_click → 项目卡片点击 yb_project_card_click → 项目详情曝光 yb_project_detail_view 或 yb_page_view(page_id=project_detail) → 关键动作点击 yb_first_action_click。
+- Banner位置转化按 banner_position 分组，公式为 yb_banner_click 去重用户数 / yb_banner_exposure 去重用户数。
+- 项目入口页对比按 source_page/page_id 分组，公式为 yb_project_card_click 去重用户数 / yb_project_entry_exposure 去重用户数。
+- 单步转化率=当前步骤去重用户数/上一步去重用户数。
+- 整体转化率=最后一步去重用户数/第一步去重用户数。
+- 流失率=1-下一步去重用户数/当前步骤去重用户数。
+- 单步转化率差值=当前周期单步转化率-对比周期单步转化率。
+- 流失扩大判断：当前周期流失率-对比周期流失率超过阈值时标记为断点风险。
+
+#### 5.11.5 事件质量
+
+- 事件质量用于监控埋点上报成功率、缺参、重复上报、异常波动和未上报。
+- 筛选项包含日期范围、质量类型、影响等级、责任方和事件名。
+- 核心指标包含上报成功率、缺参事件数、异常波动数和待修复问题数。
+- 质量明细字段包含事件名、问题类型、影响字段、发生次数、影响等级、责任方和处理状态。
+- 公共参数 user_id、session_id、client_time、app_version、platform 必须存在。
+- 冷启动首访事件 yb_new_user_first_open 同一用户只能有一次。
+- submit/click 后应在约定时间内产生完成事件或可解释的超时状态。
+- event_type、result_status、source_scene 等枚举值必须在字典范围内。
+- 需求规则抽屉必须写清每个质量统计值关联的事件ID和计算公式。
+- 上报成功率关联全部 yb_ 事件接收日志和入库日志，公式为 success_ingest_count / received_count。
+- 缺参事件关联全部 yb_ 事件，公式为 count(event_id where required_param is null or empty)。
+- 首访事件去重关联 yb_new_user_first_open，公式为 max(count(event_id by user_id)) <= 1。
+- 行为完成闭环关联 yb_search_submit、yb_prompt_combo_submit_click、yb_tool_use_start 以及 yb_route_customization_complete、yb_tool_use_result、yb_new_user_activation_complete 等完成事件，公式为 30 秒内存在完成事件或可解释状态的起点用户数 / 起点用户数。
+
+#### 5.11.6 经营分析
+
+- 经营分析参考“首页经营分析驾驶舱”结构，面向运营和数据分析师展示整体行为经营数据。
+- 页面只展示访问、曝光、点击、详情、激活、工具使用等行为指标，不展示金额、订单、支付、钱包、兑换码和收益指标。
+- 筛选项包含日期范围、端口、用户类型、入口页和项目。
+- 核心指标包含访问UV、项目曝光UV、项目点击UV、项目详情UV、新用户激活UV和有效使用UV。
+- 首页核心行为漏斗为访问UV → 项目曝光UV → 项目点击UV → 详情曝光UV → 关键动作UV → 激活UV。
+- 7日行为趋势支持 UV、项目、激活三个维度切换。
+- 项目入口页转化对比按入口页展示项目曝光UV、项目点击UV、项目点击率、详情曝光UV和详情承接率，用于判断哪个入口页转化更高。
+- Banner位置效果分析按 1号位、2号位、3号位等展示曝光UV、点击UV、点击率、详情承接UV和详情承接率，用于判断哪个资源位点击率最高。
+- 访问UV关联 yb_page_view，公式为 count_distinct(user_id)。
+- 项目曝光UV关联 yb_project_entry_exposure、yb_workbench_project_exposure、yb_first_project_recommend_exposure，公式为 count_distinct(user_id)。
+- 项目点击UV关联 yb_project_card_click、yb_workbench_project_click、yb_first_project_click，公式为 count_distinct(user_id)。
+- 项目点击率=项目点击UV/项目曝光UV。
+- 项目详情UV关联 yb_project_detail_view、yb_first_project_detail_view 或 yb_page_view(page_id=project_detail)，公式为 count_distinct(user_id)。
+- 详情承接率=项目详情UV/项目点击UV。
+- Banner点击率=count_distinct(user_id where event_id=yb_banner_click and banner_position=X) / count_distinct(user_id where event_id=yb_banner_exposure and banner_position=X)。
+- 有效使用UV关联 yb_tool_use_result、yb_route_customization_complete、yb_first_action_click，公式为 count_distinct(user_id)。
 
 ## 6. 核心业务流程
 
