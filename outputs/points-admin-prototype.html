@@ -1221,6 +1221,207 @@
       display: block;
     }
 
+    .realname-sub-panel {
+      display: none;
+    }
+
+    .realname-sub-panel.active {
+      display: block;
+    }
+
+    .realname-placeholder {
+      min-height: 420px;
+      border: 1px dashed var(--line);
+      border-radius: 8px;
+      background: #fbfcfe;
+      display: grid;
+      place-items: center;
+      padding: 40px 20px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .realname-placeholder strong {
+      display: block;
+      color: var(--text);
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+
+    .settlement-meta {
+      display: grid;
+      gap: 4px;
+      font-size: 12px;
+      line-height: 1.55;
+      color: #40506a;
+    }
+
+    .settlement-meta strong {
+      color: var(--text);
+      font-size: 13px;
+    }
+
+    .settlement-meta span {
+      color: var(--muted);
+    }
+
+    .settlement-meta .link-btn {
+      justify-self: start;
+      padding-left: 0;
+      text-align: left;
+    }
+
+    .settlement-filter {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      background: #fbfcfe;
+    }
+
+    .settlement-filter .filter-bar {
+      margin-bottom: 0;
+      grid-template-columns: repeat(3, minmax(180px, 1fr)) repeat(2, auto);
+    }
+
+    .settlement-detail-drawer {
+      width: min(620px, 100%);
+      height: 100%;
+      background: #fff;
+      box-shadow: -24px 0 60px rgba(17, 24, 39, .22);
+      display: flex;
+      flex-direction: column;
+      transform: translateX(100%);
+      animation: drawerIn .2s ease-out forwards;
+    }
+
+    .settlement-detail-head {
+      padding: 20px 22px 16px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      background: #fbfcfe;
+    }
+
+    .settlement-detail-head h3 {
+      margin: 0;
+      font-size: 17px;
+    }
+
+    .settlement-detail-head p {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .settlement-detail-body {
+      padding: 18px 22px 24px;
+      overflow: auto;
+      display: grid;
+      gap: 18px;
+    }
+
+    .settlement-info-grid {
+      display: grid;
+      gap: 22px;
+      align-items: start;
+    }
+
+    .settlement-info-section h4 {
+      margin: 0 0 12px;
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .settlement-info-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .settlement-info-list div {
+      display: grid;
+      grid-template-columns: 76px minmax(0, 1fr);
+      gap: 8px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .settlement-info-list dt {
+      color: var(--muted);
+    }
+
+    .settlement-info-list dd {
+      margin: 0;
+      color: #40506a;
+      font-weight: 650;
+      word-break: break-all;
+    }
+
+    .settlement-proof-list {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .settlement-proof {
+      width: 34px;
+      height: 34px;
+      border: 1px solid #e1e8f2;
+      border-radius: 2px;
+      background: #fff7ef;
+      display: grid;
+      place-items: center;
+      color: #a45b1c;
+      font-size: 10px;
+      line-height: 1.1;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .settlement-proof.portrait {
+      background: linear-gradient(180deg, #d6eff5, #f8d8c1);
+      color: #243447;
+      font-weight: 900;
+    }
+
+    .settlement-log-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .settlement-log-item {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfe;
+      padding: 12px 14px;
+      display: grid;
+      gap: 7px;
+    }
+
+    .settlement-log-item strong {
+      font-size: 13px;
+      color: var(--text);
+    }
+
+    .settlement-log-item span {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .settlement-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: flex-start;
+    }
+
+    .settlement-actions .link-btn {
+      padding-left: 0;
+      text-align: left;
+    }
+
     .req-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1298,6 +1499,497 @@
       color: var(--muted);
       font-size: 12px;
       line-height: 1.55;
+    }
+
+    .identity-overview {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .identity-stat {
+      min-height: 118px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      padding: 14px;
+      box-shadow: 0 10px 28px rgba(18, 28, 45, .04);
+    }
+
+    .identity-stat span {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .identity-stat strong {
+      display: block;
+      margin-top: 14px;
+      font-size: 24px;
+      line-height: 1;
+    }
+
+    .identity-stat em {
+      display: block;
+      margin-top: 10px;
+      color: var(--green);
+      font-size: 12px;
+      font-style: normal;
+    }
+
+    .identity-flow {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+      padding: 16px;
+    }
+
+    .identity-flow .flow-step {
+      min-height: 134px;
+    }
+
+    .mentor-review-table table {
+      min-width: 1260px;
+    }
+
+    .mentor-review-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .mentor-status {
+      display: inline-flex;
+      align-items: center;
+      height: 24px;
+      border-radius: 999px;
+      padding: 0 9px;
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .mentor-status.pending {
+      background: #fff7df;
+      color: #9a6a00;
+    }
+
+    .mentor-status.approved {
+      background: #eaf8f2;
+      color: #16815e;
+    }
+
+    .mentor-status.rejected {
+      background: #fff0f0;
+      color: #c43b42;
+    }
+
+    .mentor-preview-grid {
+      display: grid;
+      grid-template-columns: minmax(320px, .86fr) minmax(0, 1.14fr);
+      gap: 16px;
+      align-items: start;
+    }
+
+    .mentor-phone {
+      width: min(360px, 100%);
+      margin: 0 auto;
+      border: 10px solid #111827;
+      border-radius: 30px;
+      background: #f6f7fb;
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(17,24,39,.2);
+    }
+
+    .mentor-screen {
+      min-height: 690px;
+      background: #f6f7fb;
+      padding: 14px 14px 16px;
+      color: #111827;
+    }
+
+    .mentor-alert {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      height: 24px;
+      border-radius: 999px;
+      background: #fff1e8;
+      color: var(--primary);
+      padding: 0 10px;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .mentor-title {
+      margin: 12px 0 12px;
+      font-size: 22px;
+      line-height: 1.25;
+      font-weight: 900;
+    }
+
+    .mentor-title strong {
+      color: var(--primary);
+    }
+
+    .mentor-card {
+      border-radius: 14px;
+      background: #fff;
+      padding: 14px;
+      box-shadow: 0 14px 34px rgba(17,24,39,.08);
+      margin-bottom: 12px;
+    }
+
+    .mentor-profile {
+      display: grid;
+      grid-template-columns: 44px 1fr;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .mentor-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #1f2937, #cbd5e1);
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-weight: 900;
+    }
+
+    .mentor-profile strong {
+      display: block;
+      font-size: 16px;
+    }
+
+    .mentor-profile span {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .mentor-desc {
+      margin-top: 12px;
+      border-radius: 8px;
+      background: #f5f7fb;
+      padding: 12px;
+      color: #4b5563;
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .mentor-bound {
+      border: 1px solid #e9edf4;
+      border-radius: 10px;
+      padding: 10px;
+      background: #fbfcfe;
+      display: grid;
+      gap: 7px;
+      margin-bottom: 10px;
+    }
+
+    .mentor-bound div {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 12px;
+    }
+
+    .mentor-bound span {
+      color: var(--muted);
+    }
+
+    .community-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .community-option {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      min-height: 58px;
+      padding: 10px;
+      display: grid;
+      grid-template-columns: 42px 1fr auto;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .community-option.active {
+      border-color: var(--primary);
+      background: #fff8f5;
+    }
+
+    .community-logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--primary), #ff9a3d);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+    }
+
+    .community-option strong {
+      display: block;
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .community-option span {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .community-check {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .mentor-form {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .mentor-field label {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 12px;
+      color: #334155;
+      font-weight: 800;
+    }
+
+    .mentor-field input,
+    .mentor-field textarea {
+      width: 100%;
+      border: 1px solid #d9e1ed;
+      border-radius: 8px;
+      min-height: 42px;
+      padding: 0 12px;
+      color: #9aa5b5;
+      background: #fff;
+      font-size: 13px;
+    }
+
+    .mentor-field textarea {
+      min-height: 68px;
+      padding: 10px 12px;
+      resize: none;
+    }
+
+    .mentor-submit {
+      width: 100%;
+      height: 48px;
+      border: 0;
+      border-radius: 8px;
+      background: var(--primary);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 900;
+      margin-top: 10px;
+      cursor: pointer;
+      transition: background .18s ease;
+    }
+
+    .mentor-submit.pending {
+      background: #f5a524;
+    }
+
+    .mentor-submit.approved {
+      background: var(--green);
+    }
+
+    .mentor-submit.rejected {
+      background: var(--danger);
+    }
+
+    .mentor-result-note {
+      display: none;
+      margin-top: 10px;
+      border-radius: 8px;
+      background: #fff7df;
+      color: #805600;
+      padding: 9px 10px;
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .mentor-result-note.show {
+      display: block;
+    }
+
+    .mentor-state-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .mentor-state-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      padding: 14px;
+      min-height: 132px;
+    }
+
+    .mentor-state-card strong {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .mentor-state-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.65;
+    }
+
+    .identity-route-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 0 16px 16px;
+    }
+
+    .identity-preview-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(174px, 1fr));
+      gap: 14px;
+      padding: 16px;
+    }
+
+    .identity-phone {
+      min-width: 0;
+      border: 1px solid #e8edf5;
+      border-radius: 8px;
+      background: #f3f6fb;
+      padding: 8px;
+      box-shadow: 0 10px 28px rgba(18, 28, 45, .05);
+    }
+
+    .identity-screen {
+      aspect-ratio: 9 / 18.8;
+      border-radius: 8px;
+      background: #f4f7fb;
+      padding: 10px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      overflow: hidden;
+      color: #172033;
+    }
+
+    .identity-statusbar,
+    .identity-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 8px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .identity-nav {
+      justify-content: center;
+      position: relative;
+      height: 18px;
+      font-size: 10px;
+    }
+
+    .identity-nav i {
+      position: absolute;
+      left: 0;
+      width: 12px;
+      height: 12px;
+      color: #40506a;
+    }
+
+    .identity-result-card {
+      border-radius: 4px;
+      background: #fff;
+      padding: 10px 8px;
+      text-align: center;
+      box-shadow: 0 5px 14px rgba(18, 28, 45, .03);
+    }
+
+    .identity-result-card strong {
+      display: block;
+      font-size: 11px;
+      margin-bottom: 5px;
+    }
+
+    .identity-result-card p {
+      margin: 0;
+      color: #8792a6;
+      font-size: 8px;
+      line-height: 1.5;
+    }
+
+    .identity-result-card .mini-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 20px;
+      margin-top: 8px;
+      border-radius: 4px;
+      background: var(--primary);
+      color: #fff;
+      padding: 0 10px;
+      font-size: 8px;
+      font-weight: 800;
+    }
+
+    .identity-info-block {
+      border-radius: 4px;
+      background: #fff;
+      padding: 8px;
+      box-shadow: 0 5px 14px rgba(18, 28, 45, .03);
+    }
+
+    .identity-info-block h4 {
+      margin: 0 0 8px;
+      font-size: 9px;
+    }
+
+    .identity-info-row {
+      display: grid;
+      grid-template-columns: 52px 1fr;
+      gap: 6px;
+      padding: 4px 0;
+      font-size: 8px;
+      line-height: 1.35;
+    }
+
+    .identity-info-row span {
+      color: #8792a6;
+    }
+
+    .identity-info-row strong {
+      min-width: 0;
+      text-align: right;
+      font-weight: 700;
+      overflow-wrap: anywhere;
     }
 
     .filter-bar {
@@ -2287,6 +2979,16 @@
       display: block;
     }
 
+    .embedded-demo[data-realname-demo-frame] {
+      height: 980px;
+      min-height: 980px;
+    }
+
+    .embedded-demo[data-withdraw-demo-frame] {
+      height: 980px;
+      min-height: 980px;
+    }
+
     .demo-link-row {
       display: flex;
       align-items: center;
@@ -2369,12 +3071,24 @@
         min-height: 720px;
       }
 
+      .embedded-demo[data-realname-demo-frame] {
+        height: 980px;
+        min-height: 980px;
+      }
+
+      .embedded-demo[data-withdraw-demo-frame] {
+        height: 980px;
+        min-height: 980px;
+      }
+
       .metrics,
       .stat-strip,
       .form,
       .req-grid,
       .req-hero,
       .flow-steps,
+      .mentor-preview-grid,
+      .mentor-state-grid,
       .filter-bar,
       .analytics-filter,
       .analytics-kpis,
@@ -2471,6 +3185,13 @@
             <button data-section="trackingFunnels"><i data-lucide="git-branch"></i>转化漏斗</button>
             <button data-section="trackingQuality"><i data-lucide="shield-check"></i>事件质量</button>
             <button data-section="trackingOperation"><i data-lucide="monitor-dot"></i>经营分析</button>
+          </div>
+        </div>
+        <div class="nav-group">
+          <button class="nav-parent" type="button" aria-expanded="true"><i data-lucide="badge-plus"></i>迭代需求<i class="chevron" data-lucide="chevron-down"></i></button>
+          <div class="nav-child">
+            <button data-section="realnameReq"><i data-lucide="id-card"></i>实名相关</button>
+            <button data-section="mentorOptimizeReq"><i data-lucide="graduation-cap"></i>导师优化</button>
           </div>
         </div>
       </nav>
@@ -2892,12 +3613,12 @@
         <div class="panel">
           <div class="panel-head">
             <div><h2>工具使用门槛交互原型</h2><p>演示工具完全免费、免费次数、积分消耗、积分不足和充值引导的用户端交互流程。</p></div>
-            <a class="btn" data-demo-link target="_blank" rel="noopener"><i data-lucide="external-link"></i>新窗口打开</a>
+            <a class="btn" data-tool-demo-link target="_blank" rel="noopener"><i data-lucide="external-link"></i>新窗口打开</a>
           </div>
           <div class="demo-link-row">
             <p>该页面作为工具管理下的前端交互需求 demo，可用于产品、前端和测试对齐工具使用门槛规则。</p>
           </div>
-          <iframe class="embedded-demo" data-demo-frame title="工具使用门槛交互原型"></iframe>
+          <iframe class="embedded-demo" data-tool-demo-frame title="工具使用门槛交互原型"></iframe>
         </div>
       </section>
 
@@ -3361,6 +4082,207 @@
         </div>
       </section>
 
+      <section class="section" id="realnameReq">
+        <div class="req-page">
+          <div class="panel">
+            <div class="panel-head">
+              <div><h2>实名相关</h2><p>沉淀实名认证共存、提现绑定账户和对公结算账户数据表需求。</p></div>
+              <div class="req-tabs" aria-label="实名相关需求视图">
+                <button class="active" data-realname-tab="settlement">对公结算账户</button>
+                <button data-realname-tab="frontend">前端交互需求</button>
+              </div>
+            </div>
+
+            <div class="req-panel active" data-realname-panel="settlement">
+              <div class="settlement-filter">
+                <div class="filter-bar">
+                  <div class="filter-item"><label>用户ID</label><input id="settlementUserFilter" type="text" placeholder="请输入用户ID"></div>
+                  <div class="filter-item"><label>公司名称</label><input id="settlementCompanyFilter" type="text" placeholder="请输入公司名称"></div>
+                  <div class="filter-item"><label>状态</label><select id="settlementStatusFilter">
+                    <option>全部状态</option>
+                    <option>正常</option>
+                    <option>已释放</option>
+                  </select></div>
+                  <button class="btn primary" data-action="search-settlement"><i data-lucide="search"></i>搜索</button>
+                  <button class="btn" data-action="reset-settlement"><i data-lucide="rotate-ccw"></i>重置</button>
+                </div>
+              </div>
+              <div class="analytics-table-scroll">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>用户ID</th>
+                      <th>用户手机号</th>
+                      <th>公司信息</th>
+                      <th>对公账户类型</th>
+                      <th>对公账户信息</th>
+                      <th>对公协议</th>
+                      <th>状态</th>
+                      <th>创建时间</th>
+                      <th>操作</th>
+                    </tr>
+                  </thead>
+                  <tbody data-settlement-body></tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="req-panel" data-realname-panel="frontend">
+              <div class="panel-head" style="margin-bottom:12px">
+                <div><h2>前端交互需求</h2><p>结果页直接预览。</p></div>
+                <div class="req-tabs" aria-label="实名前端交互需求视图">
+                  <button class="active" data-realname-sub-tab="identity">实名页面</button>
+                  <button data-realname-sub-tab="withdraw">提现相关</button>
+                </div>
+              </div>
+              <div class="realname-sub-panel active" data-realname-sub-panel="identity">
+                <iframe class="embedded-demo" data-realname-demo-frame title="实名相关交互原型" src="realname-frontend-interaction-demo.html"></iframe>
+              </div>
+              <div class="realname-sub-panel" data-realname-sub-panel="withdraw">
+                <iframe class="embedded-demo" data-withdraw-demo-frame title="提现相关交互原型" src="withdraw-interaction-demo.html"></iframe>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="mentorOptimizeReq">
+        <div class="req-page">
+          <div class="req-hero">
+            <div>
+              <h2>导师优化</h2>
+              <p>围绕导师换绑流程新增后台审核与前端状态展示：用户提交换榜申请后，后台审核当前绑定导师、目标导师和飞书信息，前端展示待审核、通过和驳回状态。</p>
+            </div>
+            <div class="req-tabs" aria-label="导师优化需求视图">
+              <button class="active" data-mentor-tab="review">换榜审核</button>
+              <button data-mentor-tab="frontend">前端交互</button>
+            </div>
+          </div>
+
+          <div class="req-panel active" data-mentor-panel="review">
+            <div class="tracking-event-summary">
+              <div class="tracking-event-card"><span>待审核申请</span><strong>18</strong></div>
+              <div class="tracking-event-card"><span>今日通过</span><strong>42</strong></div>
+              <div class="tracking-event-card"><span>今日驳回</span><strong>7</strong></div>
+              <div class="tracking-event-card"><span>平均处理时长</span><strong>2.4h</strong></div>
+            </div>
+            <div class="panel mentor-review-table">
+              <div class="panel-head">
+                <div>
+                  <h2>换榜审核</h2>
+                  <p>审核用户从当前绑定导师切换到新导师及对应社群的申请。</p>
+                </div>
+                <div class="mentor-review-actions">
+                  <div class="tabs">
+                    <button class="active" data-mentor-review-filter="all">全部</button>
+                    <button data-mentor-review-filter="pending">待审核</button>
+                    <button data-mentor-review-filter="approved">审核通过</button>
+                    <button data-mentor-review-filter="rejected">已驳回</button>
+                  </div>
+                  <button class="btn" data-action="mentor-batch-approve"><i data-lucide="check-check"></i>批量通过</button>
+                  <button class="btn" data-action="mentor-batch-reject"><i data-lucide="x-circle"></i>批量驳回</button>
+                </div>
+              </div>
+              <table>
+                <thead>
+                  <tr><th><input type="checkbox" data-action="mentor-select-all" aria-label="全选换榜审核"></th><th>用户ID</th><th>飞书信息</th><th>当前绑定导师</th><th>换榜导师</th><th>换绑原因</th><th>状态</th><th>申请时间</th><th>操作</th></tr>
+                </thead>
+                <tbody data-mentor-review-body>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="req-panel" data-mentor-panel="frontend">
+            <div class="mentor-preview-grid">
+              <div class="mentor-phone">
+                <div class="mentor-screen">
+                  <div class="mentor-alert">检测到导师团 点击打榜营销量号·漫剧小航海</div>
+                  <div class="mentor-title">你被 <strong>蓝轩</strong> 邀请加入右豹</div>
+                  <div class="mentor-card">
+                    <div class="mentor-profile">
+                      <div class="mentor-avatar">蓝</div>
+                      <div><strong>蓝轩</strong><span>专项运营</span></div>
+                    </div>
+                    <div class="mentor-desc">盘点打榜营销量号·漫剧小航海是第一艘旗下专注漫剧盘点玩法推广专项训练营，主打红果漫剧等平台漫剧盘点玩法基础全流程实操教学。</div>
+                  </div>
+                  <div class="mentor-card">
+                    <div class="mentor-profile">
+                      <div class="mentor-avatar">已</div>
+                      <div><strong>当前已绑定导师</strong><span>换绑用户进入时必须展示</span></div>
+                    </div>
+                    <div class="mentor-bound">
+                      <div><span>导师</span><strong>阿洛</strong></div>
+                      <div><span>已绑定社群</span><strong>项目拆解陪跑社群</strong></div>
+                      <div><span>绑定时间</span><strong>2026.07.28 14:20</strong></div>
+                    </div>
+                  </div>
+                  <div class="mentor-card">
+                    <div class="mentor-field"><label>选择新导师对应社群</label></div>
+                    <div class="community-list">
+                      <div class="community-option active">
+                        <div class="community-logo">右</div>
+                        <div><strong>盘点打榜营销量号·漫剧小航海</strong><span>12+ 成员</span></div>
+                        <div class="community-check">✓</div>
+                      </div>
+                      <div class="community-option">
+                        <div class="community-logo">航</div>
+                        <div><strong>漫剧盘点进阶答疑群</strong><span>36+ 成员</span></div>
+                      </div>
+                    </div>
+                    <div class="mentor-form">
+                      <div class="mentor-field"><label>换绑原因</label><textarea readonly>可填写希望换绑到新导师的原因</textarea></div>
+                    </div>
+                    <button class="mentor-submit" data-action="mentor-submit-frontend">申请换绑</button>
+                    <div class="mentor-result-note" id="mentorFrontendState">提交后将展示审核中状态，后台审核通过或驳回后同步刷新。</div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div class="panel">
+                  <div class="panel-head">
+                    <div><h2>前端交互状态</h2><p>换绑用户在绑定页看到当前导师、新导师社群选择、申请入口和审核结果。</p></div>
+                  </div>
+                  <div class="mentor-state-grid">
+                    <div class="mentor-state-card">
+                      <strong>待审核</strong>
+                      <p>提交后按钮置为“换绑审核中”，页面继续展示当前绑定导师和本次申请的新导师/社群，不允许重复提交。</p>
+                    </div>
+                    <div class="mentor-state-card">
+                      <strong>申请通过</strong>
+                      <p>前端展示“换绑成功”，当前绑定导师刷新为新导师，并展示加入新导师对应社群的入口。</p>
+                    </div>
+                    <div class="mentor-state-card">
+                      <strong>申请未通过</strong>
+                      <p>前端展示“换绑未通过”和后台驳回原因，用户可修改飞书信息、社群或原因后重新申请。</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="req-grid" style="margin-top:16px">
+                  <article class="req-card">
+                    <h3>1. 页面展示规则</h3>
+                    <ul>
+                      <li>当用户已有绑定导师时，页面必须展示当前导师名称、所属社群和绑定时间。</li>
+                      <li>新导师信息沿用邀请页卡片样式，包含导师头像、名称、身份和介绍。</li>
+                      <li>新导师可关联多个社群时，用户必须选择一个目标社群后才能提交换绑。</li>
+                    </ul>
+                  </article>
+                  <article class="req-card">
+                    <h3>2. 提交与校验</h3>
+                    <ul>
+                      <li>申请换绑前需先校验是否已填写飞书信息；未填写时必须先补齐飞书ID、飞书昵称、签约姓名、签约手机号、飞书主页截图。</li>
+                      <li>申请换绑需提交用户ID、飞书信息、当前绑定导师、换榜导师、目标社群和申请原因。</li>
+                      <li>同一用户存在待审核申请时，不允许再次提交换绑。</li>
+                      <li>审核通过后更新绑定关系；驳回后保留原绑定导师。</li>
+                    </ul>
+                  </article>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
     </main>
   </div>
 
@@ -3375,6 +4297,18 @@
         <button class="icon-btn" data-drawer-close aria-label="关闭需求规则"><i data-lucide="x"></i></button>
       </div>
       <div class="rules-body" id="rulesDrawerBody"></div>
+    </aside>
+  </div>
+  <div class="drawer-layer" id="settlementDetailLayer" role="dialog" aria-modal="true" aria-labelledby="settlementDetailTitle">
+    <aside class="settlement-detail-drawer">
+      <div class="settlement-detail-head">
+        <div>
+          <h3 id="settlementDetailTitle">实名详情</h3>
+          <p id="settlementDetailDesc">查看法人信息和公司信息。</p>
+        </div>
+        <button class="icon-btn" data-settlement-drawer-close aria-label="关闭详情"><i data-lucide="x"></i></button>
+      </div>
+      <div class="settlement-detail-body" id="settlementDetailBody"></div>
     </aside>
   </div>
   <div class="modal-layer" id="modalLayer" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
@@ -3410,7 +4344,9 @@
       trackingEvents: ["页面事件分析", "按页面、模块、事件类型查看曝光、点击、提交和完成事件表现。"],
       trackingFunnels: ["转化漏斗", "配置并查看首页到项目、Banner位置转化、项目入口页对比、冷启动激活和工具使用漏斗。"],
       trackingQuality: ["事件质量", "监控埋点上报成功率、缺参、重复上报、异常波动和待修复问题。"],
-      trackingOperation: ["经营分析", "参考经营驾驶舱形态，聚合埋点行为数据分析访问、项目入口、Banner、冷启动和工具使用表现。"]
+      trackingOperation: ["经营分析", "参考经营驾驶舱形态，聚合埋点行为数据分析访问、项目入口、Banner、冷启动和工具使用表现。"],
+      realnameReq: ["实名相关", "说明个人实名与企业实名共存后的前端结果页交互、按钮跳转、审核中补充认证和双认证切换查看规则。"],
+      mentorOptimizeReq: ["导师优化", "承接导师换绑审核与前端换绑申请、审核通过和驳回状态展示。"]
     };
 
     const requirementRules = {
@@ -3542,6 +4478,21 @@
         { title: "4. Banner位置分析公式", items: ["Banner曝光UV：事件ID=yb_banner_exposure；按 banner_position、banner_page 分组 count_distinct(user_id)。", "Banner点击UV：事件ID=yb_banner_click；按 banner_position、banner_page 分组 count_distinct(user_id)。", "Banner点击率：Banner点击UV/Banner曝光UV。", "详情承接UV：Banner点击后进入项目详情的去重用户数，事件链路 yb_banner_click → yb_project_detail_view。", "详情承接率：详情承接UV/Banner点击UV。"] },
         { title: "5. 项目入口页对比公式", items: ["入口页项目曝光UV：事件ID=yb_project_entry_exposure 或对应入口曝光事件；按 source_page/page_id 分组 count_distinct(user_id)。", "入口页项目点击UV：事件ID in (yb_project_card_click,yb_workbench_project_click,yb_first_project_click)；按 source_page/source_module 分组 count_distinct(user_id)。", "入口页点击率：入口页项目点击UV/入口页项目曝光UV。", "入口页详情承接率：项目详情UV/入口页项目点击UV。", "运营可按该表对比哪个入口页转化更高，并据此调整资源位。"] },
         { title: "6. 交互规则", items: ["支持按日期范围、端口、用户类型、入口页、项目筛选。", "趋势区支持 UV、项目、激活三类趋势切换。", "Banner表按点击率降序，点击率相同时按曝光UV降序。", "项目入口页表按项目点击率或详情承接率排序。", "点击导出导出当前筛选口径下的经营分析明细。"] }
+      ],
+      realnameReq: [
+        { title: "1. 页面范围", items: ["实名相关包含两个顶层 Tab：对公结算账户、前端交互需求。", "前端交互需求下继续保留实名页面和提现相关两个交互原型。", "不设计选择认证方式页和资料填写页。"] },
+        { title: "2. 对公结算账户表", items: ["新增独立数据表“对公结算账户”，数据从当前企业账户中迁出。", "表字段包含用户ID、用户手机号、公司信息、对公账户类型、对公账户信息、对公协议、状态、创建时间和操作。", "状态枚举包含正常、已释放。", "公司信息聚合展示企业名称、社会编码、公司电话和查看详情按钮。", "对公账户信息聚合展示收款账户名称、开户行名称、支行名称、收款银行账户、发票类型和发票税率。", "对公协议聚合展示查看按钮和合同编号。"] },
+        { title: "3. 账户限制规则", items: ["企业认证默认企业账户，不显示对公类型字段。", "对公类型字段只有个体户显示，支持企业账户和法人账户。", "企业认证只能绑定 1 个企业账户类型的对公结算账户。", "个体户最多绑定 1 个企业账户和 1 个法人账户，不支持更多。"] },
+        { title: "4. 校验规则", items: ["法人类型对公账户添加字段与用户添加银行卡字段一致。", "添加法人账户时必须校验法人姓名一致。", "个人账户银行卡与法人账户重复时，不支持添加。"] },
+        { title: "5. 表格交互规则", items: ["列表支持按用户ID、公司名称和状态查询。", "点击公司信息内“查看详情”打开抽屉，按法人信息、公司信息上下分区展示。", "点击“编辑”打开弹窗，支持编辑对公账户信息内全部字段。", "点击“释放”需要二次确认，确认后状态更新为已释放。", "操作列增加“日志”，点击后用抽屉展示后台操作日志，包括但不限于创建、修改、释放等记录。", "数据表内的文字按钮需要与对应字段左对齐。"] },
+        { title: "6. 前端跳转与共存", items: ["个人已认证时展示“升级企业认证”，点击跳转企业认证流程。", "企业已认证时展示“添加个人认证”，点击跳转个人认证流程。", "审核中状态仍允许添加另一种认证方式。", "个人实名和企业实名相互独立，同一账号可同时保留两套认证结果。"] }
+      ],
+      mentorOptimizeReq: [
+        { title: "1. 页面目标", items: ["在一级菜单“迭代需求”下新增二级菜单“导师优化”。", "页面包含横向 Tab：换榜审核、前端交互。", "后台负责审核用户导师换绑申请，前端负责展示当前绑定导师、新导师社群选择和申请状态。"] },
+        { title: "2. 换榜审核字段", items: ["审核列表字段包含用户ID、飞书信息、当前绑定导师、换榜导师、换绑原因、状态和申请时间。", "当前绑定导师需要展示绑定时间。", "状态枚举包含待审核、审核通过、已驳回。", "待审核状态支持审核通过和驳回操作；审核通过和已驳回状态只允许查看。"] },
+        { title: "3. 换榜审核交互", items: ["支持按全部、待审核、审核通过、已驳回切换查看列表。", "点击通过直接更新状态为审核通过。", "点击驳回需先输入驳回原因，提交后状态变更为已驳回。", "点击查看原因可查看已记录的驳回原因。", "支持批量通过和批量驳回，批量驳回同样需要填写原因。"] },
+        { title: "4. 前端交互规则", items: ["已有导师绑定的用户进入邀请页时，必须展示当前已绑定导师信息。", "新导师存在多个社群时，用户需要选择新导师对应社群。", "提交申请前需校验是否已填写飞书信息；未填写时需补齐飞书ID、飞书昵称、签约姓名、签约手机号、飞书主页截图。", "提交申请后进入待审核状态，不允许重复提交。", "申请通过后刷新当前绑定导师为新导师，并展示新社群入口。", "申请未通过时展示驳回原因，保留原导师绑定关系。"] },
+        { title: "5. 数据边界", items: ["换绑申请需记录用户ID、飞书信息、当前导师、目标导师、目标社群、申请原因、申请时间和审核结果。", "审核通过后才更新绑定关系；驳回不改变当前导师。", "后台审核结果需要同步给前端状态查询接口。"] }
       ]
     };
 
@@ -3594,7 +4545,178 @@
         { iconText: "Q", iconColor: "cyan", name: "违禁词检测", platform: "右豹", region: "国内工具", track: "工具应用", tags: ["文字工具"], score: 0.0, heat: 0, status: "上架", visible: "全部", sort: 0, updated: "2025-09-07 21:22:36", slogan: "检测敏感词", intro: "检测文案中的违禁词和风险表达。", detail: "支持输入文案后标记疑似风险词，并给出替换建议。", developer: "工具中台", developerLevel: "L2", newTag: false, jumpType: "内链", jumpUrl: "/tools/risk-word", usageMode: "完全免费", freeMode: "每日免费", freeDaily: 5, costPoints: 0, todayClicks: 210, todayUses: 148, weekClicks: 1600, weekUses: 980, clicks: 5480, uses: 3312, earnedPoints: 0, monetized: 0 },
         { iconText: "创", iconColor: "green", name: "爆款标题创作", platform: "右豹", region: "国内工具", track: "内容创作", tags: ["行业神器", "AI工具"], score: 4.8, heat: 4, status: "下架", visible: "团等级", sort: 2, updated: "2025-09-07 21:25:12", slogan: "快速生成标题", intro: "基于行业模板生成短剧推广标题。", detail: "选择行业和风格后生成标题候选，支持复制和收藏。", developer: "增长实验室", developerLevel: "L4", newTag: true, jumpType: "外链", jumpUrl: "https://example.com/title", usageMode: "积分使用", freeMode: "每日免费", freeDaily: 2, costPoints: 30, todayClicks: 24, todayUses: 8, weekClicks: 180, weekUses: 62, clicks: 890, uses: 320, earnedPoints: 9600, monetized: 2360 }
       ],
-      trackingReqTab: "all"
+      settlementAccounts: [
+        {
+          userId: "100238",
+          phone: "135****8004",
+          status: "正常",
+          company: {
+            name: "深圳不鸣文化科技有限公司",
+            socialCode: "91440300MA5H8Y2Q4R",
+            phone: "0755-8666 1024",
+            address: "广东省深圳市南山区科技园科兴科学园B栋12层"
+          },
+          legal: {
+            name: "梁爽",
+            idNo: "511322198910064719",
+            phone: "15811272282",
+            address: "北京市朝阳区雪云路雪云公寓云天阁8号楼"
+          },
+          accountType: "企业账户",
+          account: {
+            payeeName: "深圳不鸣文化科技有限公司",
+            bankName: "招商银行深圳科技园支行",
+            branchName: "科技园支行",
+            bankAccount: "7559 **** **** 2392",
+            invoiceType: "增值专用发票",
+            taxRate: "6%"
+          },
+          agreement: {
+            contractNo: "YB-SETTLE-20260821001"
+          },
+          createdAt: "2026.08.21 10:26",
+          logs: [
+            { type: "创建", operator: "系统迁移", time: "2026.08.21 10:26", content: "从原企业账户数据迁出并生成对公结算账户。" },
+            { type: "修改", operator: "运营小张", time: "2026.08.21 11:08", content: "补充发票类型为增值专用发票，发票税率调整为 6%。" }
+          ]
+        },
+        {
+          userId: "100641",
+          phone: "188****4416",
+          status: "正常",
+          company: {
+            name: "杭州星河个体工商户",
+            socialCode: "92330110MA8G7K6N3P",
+            phone: "0571-8800 6120",
+            address: "浙江省杭州市余杭区未来科技城海创园18幢302"
+          },
+          legal: {
+            name: "曾青",
+            idNo: "330106199203184211",
+            phone: "18844166012",
+            address: "浙江省杭州市西湖区文三路478号"
+          },
+          accountType: "法人账户",
+          account: {
+            payeeName: "曾**",
+            bankName: "中国农业银行杭州余杭支行",
+            branchName: "余杭支行",
+            bankAccount: "6228 **** **** 4699",
+            invoiceType: "普通发票",
+            taxRate: "3%"
+          },
+          agreement: {
+            contractNo: "YB-SETTLE-20260818007"
+          },
+          createdAt: "2026.08.18 16:33",
+          logs: [
+            { type: "创建", operator: "系统迁移", time: "2026.08.18 16:33", content: "从原企业账户数据迁出并生成法人账户类型的对公结算账户。" },
+            { type: "修改", operator: "财务小王", time: "2026.08.19 09:12", content: "校验法人姓名一致后更新支行名称。" }
+          ]
+        },
+        {
+          userId: "100729",
+          phone: "177****2097",
+          status: "已释放",
+          company: {
+            name: "北京云橙文化传媒有限公司",
+            socialCode: "91110112MAEBH4QCX5",
+            phone: "15811272282",
+            address: "北京市通州区德仁务村东8号10幢1层14"
+          },
+          legal: {
+            name: "梁爽",
+            idNo: "511322198910064719",
+            phone: "15811272282",
+            address: "北京市朝阳区雪云路雪云公寓云天阁"
+          },
+          accountType: "企业账户",
+          account: {
+            payeeName: "北京云橙文化传媒有限公司",
+            bankName: "中国银行北京通州支行",
+            branchName: "通州支行",
+            bankAccount: "6216 **** **** 8842",
+            invoiceType: "普通发票",
+            taxRate: "1%"
+          },
+          agreement: {
+            contractNo: "YB-SETTLE-20260812003"
+          },
+          createdAt: "2026.08.12 09:18",
+          logs: [
+            { type: "创建", operator: "系统迁移", time: "2026.08.12 09:18", content: "从原企业账户数据迁出并生成对公结算账户。" },
+            { type: "释放", operator: "财务小王", time: "2026.08.15 17:42", content: "释放该对公结算账户，账户状态更新为已释放。" }
+          ]
+        }
+      ],
+      trackingReqTab: "all",
+      activeMentorReviewFilter: "all",
+      mentorReviews: [
+        {
+          uid: "UID 826173",
+          feishuName: "王小雨",
+          feishuPhone: "186****3499",
+          currentMentor: "蓝轩",
+          currentGroup: "盘点打榜营销号·漫剧小航海",
+          bindingTime: "2026.07.28 14:20",
+          newMentor: "小豹",
+          newGroup: "爆款短剧投流增长营",
+          reason: "希望转到短剧投流方向，便于跟进当前项目。",
+          status: "pending",
+          applyTime: "2026.08.19 09:42",
+          reviewer: "",
+          reviewTime: "",
+          reviewReason: ""
+        },
+        {
+          uid: "UID 791204",
+          feishuName: "陈青",
+          feishuPhone: "135****9044",
+          currentMentor: "阿洛",
+          currentGroup: "项目拆解陪跑社群",
+          bindingTime: "2026.07.12 10:06",
+          newMentor: "蓝轩",
+          newGroup: "盘点打榜营销号·漫剧小航海",
+          reason: "导师课程方向调整，需要加入漫剧小航海社群。",
+          status: "approved",
+          applyTime: "2026.08.18 18:16",
+          reviewer: "管理员A",
+          reviewTime: "2026.08.18 18:46",
+          reviewReason: "申请信息完整，当前导师方向匹配，审核通过。"
+        },
+        {
+          uid: "UID 592810",
+          feishuName: "林一",
+          feishuPhone: "159****7096",
+          currentMentor: "蓝轩",
+          currentGroup: "盘点打榜营销号·漫剧小航海",
+          bindingTime: "2026.08.01 16:33",
+          newMentor: "云舟",
+          newGroup: "小说推文起号训练营",
+          reason: "希望切到小说推文方向。",
+          status: "rejected",
+          applyTime: "2026.08.18 15:31",
+          reviewer: "管理员A",
+          reviewTime: "2026.08.18 16:03",
+          reviewReason: "当前项目仍在推进中，暂不支持切换到小说推文方向。"
+        },
+        {
+          uid: "UID 438021",
+          feishuName: "周可",
+          feishuPhone: "177****8261",
+          currentMentor: "小豹",
+          currentGroup: "爆款短剧投流增长营",
+          bindingTime: "2026.07.30 09:18",
+          newMentor: "蓝轩",
+          newGroup: "盘点打榜营销号·漫剧小航海",
+          reason: "当前社群节奏不匹配，希望跟随蓝轩导师训练。",
+          status: "pending",
+          applyTime: "2026.08.19 11:08",
+          reviewer: "",
+          reviewTime: "",
+          reviewReason: ""
+        }
+      ]
     };
 
     const trackingRequirementRows = {
@@ -3791,6 +4913,15 @@
       return "off";
     }
 
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
     function renderLineCompare(chart, key) {
       const data = lineCompareData[chart.id]?.[key] || lineCompareData[chart.id]?.day;
       if (!data) return;
@@ -3842,21 +4973,43 @@
       chart.classList.add("refresh");
     }
 
-    function resolveToolDemoUrl() {
-      const fileName = "tool-frontend-interaction-demo.html";
+    function resolveOutputUrl(fileName) {
       const path = window.location.pathname || "";
       if (path.endsWith("/outputs/points-admin-prototype.html")) return fileName;
       if (path.includes("/outputs/")) return fileName;
       return `outputs/${fileName}`;
     }
 
+    function resolveToolDemoUrl() {
+      return resolveOutputUrl("tool-frontend-interaction-demo.html");
+    }
+
+    function resolveRealnameDemoUrl() {
+      return resolveOutputUrl("realname-frontend-interaction-demo.html");
+    }
+
+    function resolveWithdrawDemoUrl() {
+      return resolveOutputUrl("withdraw-interaction-demo.html");
+    }
+
     function syncToolDemoLinks() {
       const demoUrl = resolveToolDemoUrl();
-      document.querySelectorAll("[data-demo-link]").forEach((link) => {
+      document.querySelectorAll("[data-tool-demo-link]").forEach((link) => {
         link.href = demoUrl;
       });
-      document.querySelectorAll("[data-demo-frame]").forEach((frame) => {
+      document.querySelectorAll("[data-tool-demo-frame]").forEach((frame) => {
         frame.src = demoUrl;
+      });
+      const realnameDemoUrl = resolveRealnameDemoUrl();
+      document.querySelectorAll("[data-realname-demo-link]").forEach((link) => {
+        link.href = realnameDemoUrl;
+      });
+      document.querySelectorAll("[data-realname-demo-frame]").forEach((frame) => {
+        frame.src = realnameDemoUrl;
+      });
+      const withdrawDemoUrl = resolveWithdrawDemoUrl();
+      document.querySelectorAll("[data-withdraw-demo-frame]").forEach((frame) => {
+        frame.src = withdrawDemoUrl;
       });
     }
 
@@ -3883,8 +5036,218 @@
       document.getElementById("modalLayer").classList.remove("open");
     }
 
+    function closeSettlementDrawer() {
+      document.getElementById("settlementDetailLayer")?.classList.remove("open");
+    }
+
     function activeTableBody(section) {
       return document.querySelector(`#${section} tbody`);
+    }
+
+    function settlementStatusClass(status) {
+      return status === "正常" ? "on" : "off";
+    }
+
+    function renderSettlementAccounts(rows = state.settlementAccounts.map((item, index) => ({ ...item, index }))) {
+      const tbody = document.querySelector("[data-settlement-body]");
+      if (!tbody) return;
+      tbody.innerHTML = rows.length ? rows.map((item) => `
+        <tr>
+          <td>${escapeHtml(item.userId)}</td>
+          <td>${escapeHtml(item.phone)}</td>
+          <td>
+            <div class="settlement-meta">
+              <strong>${escapeHtml(item.company.name)}</strong>
+              <span>社会编码：${escapeHtml(item.company.socialCode)}</span>
+              <span>公司电话：${escapeHtml(item.company.phone)}</span>
+              <button class="link-btn" type="button" data-action="settlement-detail" data-index="${item.index}">查看详情</button>
+            </div>
+          </td>
+          <td><span class="status ${item.accountType === "企业账户" ? "on" : "warn"}">${escapeHtml(item.accountType)}</span></td>
+          <td>
+            <div class="settlement-meta">
+              <strong>${escapeHtml(item.account.payeeName)}</strong>
+              <span>开户行：${escapeHtml(item.account.bankName)}</span>
+              <span>支行名称：${escapeHtml(item.account.branchName)}</span>
+              <span>收款银行账户：${escapeHtml(item.account.bankAccount)}</span>
+              <span>发票类型：${escapeHtml(item.account.invoiceType)}</span>
+              <span>发票税率：${escapeHtml(item.account.taxRate)}</span>
+            </div>
+          </td>
+          <td>
+            <div class="settlement-meta">
+              <button class="link-btn" type="button" data-action="settlement-agreement" data-index="${item.index}">查看</button>
+              <span>合同编号：${escapeHtml(item.agreement.contractNo)}</span>
+            </div>
+          </td>
+          <td><span class="status ${settlementStatusClass(item.status)}">${escapeHtml(item.status)}</span></td>
+          <td>${escapeHtml(item.createdAt)}</td>
+          <td>
+            <div class="settlement-actions">
+              <button class="link-btn" type="button" data-action="settlement-edit" data-index="${item.index}">编辑</button>
+              <button class="link-btn" type="button" data-action="settlement-release" data-index="${item.index}">释放</button>
+              <button class="link-btn" type="button" data-action="settlement-logs" data-index="${item.index}">日志</button>
+            </div>
+          </td>
+        </tr>
+      `).join("") : `<tr><td colspan="9" class="muted">暂无符合条件的对公结算账户。</td></tr>`;
+    }
+
+    function filterSettlementAccounts() {
+      const userId = document.getElementById("settlementUserFilter")?.value.trim() || "";
+      const companyName = document.getElementById("settlementCompanyFilter")?.value.trim() || "";
+      const status = document.getElementById("settlementStatusFilter")?.value || "全部状态";
+      const rows = state.settlementAccounts
+        .map((item, index) => ({ ...item, index }))
+        .filter((item) => !userId || item.userId.includes(userId))
+        .filter((item) => !companyName || item.company.name.includes(companyName))
+        .filter((item) => status === "全部状态" || item.status === status);
+      renderSettlementAccounts(rows);
+      return toast("查询已完成", `当前匹配 ${rows.length} 条对公结算账户。`);
+    }
+
+    function resetSettlementAccounts() {
+      const userFilter = document.getElementById("settlementUserFilter");
+      const companyFilter = document.getElementById("settlementCompanyFilter");
+      const statusFilter = document.getElementById("settlementStatusFilter");
+      if (userFilter) userFilter.value = "";
+      if (companyFilter) companyFilter.value = "";
+      if (statusFilter) statusFilter.value = "全部状态";
+      renderSettlementAccounts();
+      return toast("筛选已重置", "已恢复全部对公结算账户。");
+    }
+
+    function settlementProofs(type) {
+      if (type === "legal") {
+        return `<div class="settlement-proof">身份证<br>人像面</div><div class="settlement-proof">身份证<br>国徽面</div><div class="settlement-proof portrait">头像</div>`;
+      }
+      return `<div class="settlement-proof">营业<br>执照</div>`;
+    }
+
+    function infoSection(title, fields, proofType) {
+      return `
+        <section class="settlement-info-section">
+          <h4>${title}</h4>
+          <dl class="settlement-info-list">
+            ${fields.map(([label, value]) => `<div><dt>${label}：</dt><dd>${escapeHtml(value)}</dd></div>`).join("")}
+          </dl>
+          <div class="settlement-proof-list">${settlementProofs(proofType)}</div>
+        </section>
+      `;
+    }
+
+    function openSettlementDetail(index) {
+      const item = state.settlementAccounts[Number(index)];
+      if (!item) return;
+      document.getElementById("settlementDetailTitle").textContent = "实名详情";
+      document.getElementById("settlementDetailDesc").textContent = `${item.userId} / ${item.company.name}`;
+      document.getElementById("settlementDetailBody").innerHTML = `
+        <div class="settlement-info-grid">
+          ${infoSection("法人信息", [["姓名", item.legal.name], ["身份证", item.legal.idNo], ["手机号", item.legal.phone], ["地址", item.legal.address]], "legal")}
+          ${infoSection("公司信息", [["企业名称", item.company.name], ["社会编码", item.company.socialCode], ["公司电话", item.company.phone], ["公司地址", item.company.address]], "company")}
+        </div>
+      `;
+      document.getElementById("settlementDetailLayer").classList.add("open");
+      lucide.createIcons();
+    }
+
+    function openSettlementLogs(index) {
+      const item = state.settlementAccounts[Number(index)];
+      if (!item) return;
+      const logs = item.logs || [];
+      document.getElementById("settlementDetailTitle").textContent = "操作日志";
+      document.getElementById("settlementDetailDesc").textContent = `${item.userId} / ${item.company.name}`;
+      document.getElementById("settlementDetailBody").innerHTML = logs.length ? `
+        <div class="settlement-log-list">
+          ${logs.map((log) => `
+            <div class="settlement-log-item">
+              <strong>${escapeHtml(log.type)} · ${escapeHtml(log.operator)}</strong>
+              <span>${escapeHtml(log.time)}</span>
+              <span>${escapeHtml(log.content)}</span>
+            </div>
+          `).join("")}
+        </div>
+      ` : `<p class="muted" style="margin:0">暂无操作日志。</p>`;
+      document.getElementById("settlementDetailLayer").classList.add("open");
+      lucide.createIcons();
+    }
+
+    function openSettlementAgreement(index) {
+      const item = state.settlementAccounts[Number(index)];
+      if (!item) return;
+      return openDetail("对公协议", {
+        用户ID: item.userId,
+        公司名称: item.company.name,
+        合同编号: item.agreement.contractNo,
+        协议状态: item.status === "已释放" ? "账户已释放，协议仅保留历史记录" : "协议生效中"
+      });
+    }
+
+    function settlementEditField(id, label, value, options = null) {
+      if (options) {
+        return `<div class="field"><label>${label}</label><select id="${id}">${options.map((option) => `<option ${option === value ? "selected" : ""}>${option}</option>`).join("")}</select></div>`;
+      }
+      return `<div class="field"><label>${label}</label><input id="${id}" value="${escapeHtml(value)}"></div>`;
+    }
+
+    function openSettlementEdit(index) {
+      const item = state.settlementAccounts[Number(index)];
+      if (!item) return;
+      const body = `
+        <div class="form" id="settlementEditForm">
+          ${settlementEditField("settlementPayeeName", "收款账户名称", item.account.payeeName)}
+          ${settlementEditField("settlementBankName", "开户行名称", item.account.bankName)}
+          ${settlementEditField("settlementBranchName", "支行名称", item.account.branchName)}
+          ${settlementEditField("settlementBankAccount", "收款银行账户", item.account.bankAccount)}
+          ${settlementEditField("settlementInvoiceType", "发票类型", item.account.invoiceType, ["普通发票", "增值专用发票"])}
+          ${settlementEditField("settlementTaxRate", "发票税率", item.account.taxRate, ["1%", "3%", "6%"])}
+        </div>
+      `;
+      return openModal(
+        "编辑对公账户信息",
+        "对公账户信息内字段均可编辑，保存后刷新当前原型表格。",
+        body,
+        `<button class="btn" data-modal-close>取消</button><button class="btn primary" data-action="settlement-save" data-index="${index}">保存</button>`
+      );
+    }
+
+    function saveSettlement(index) {
+      const item = state.settlementAccounts[Number(index)];
+      if (!item) return;
+      item.account.payeeName = document.getElementById("settlementPayeeName")?.value.trim() || item.account.payeeName;
+      item.account.bankName = document.getElementById("settlementBankName")?.value.trim() || item.account.bankName;
+      item.account.branchName = document.getElementById("settlementBranchName")?.value.trim() || item.account.branchName;
+      item.account.bankAccount = document.getElementById("settlementBankAccount")?.value.trim() || item.account.bankAccount;
+      item.account.invoiceType = document.getElementById("settlementInvoiceType")?.value || item.account.invoiceType;
+      item.account.taxRate = document.getElementById("settlementTaxRate")?.value || item.account.taxRate;
+      item.logs = item.logs || [];
+      item.logs.unshift({ type: "修改", operator: "当前管理员", time: "2026.08.21 16:30", content: "编辑对公账户信息并保存。" });
+      renderSettlementAccounts();
+      closeModal();
+      return toast("保存成功", `${item.userId} 的对公账户信息已更新。`);
+    }
+
+    function openReleaseSettlement(index) {
+      const item = state.settlementAccounts[Number(index)];
+      if (!item) return;
+      if (item.status === "已释放") return toast("无需释放", "该对公结算账户已处于已释放状态。");
+      return openModal(
+        "释放对公结算账户",
+        "释放后该账户状态更新为已释放，列表保留历史记录。",
+        `<p style="margin:0;color:#40506a">确认释放“${escapeHtml(item.company.name)}”的${escapeHtml(item.accountType)}吗？</p>`,
+        `<button class="btn" data-modal-close>取消</button><button class="btn primary" data-action="settlement-confirm-release" data-index="${index}">确认释放</button>`
+      );
+    }
+
+    function confirmReleaseSettlement(index) {
+      const item = state.settlementAccounts[Number(index)];
+      if (!item) return;
+      item.status = "已释放";
+      item.logs = item.logs || [];
+      item.logs.unshift({ type: "释放", operator: "当前管理员", time: "2026.08.21 16:31", content: "确认释放该对公结算账户，状态更新为已释放。" });
+      renderSettlementAccounts();
+      closeModal();
+      return toast("释放成功", `${item.company.name} 的对公结算账户已释放。`);
     }
 
     function renderGoods() {
@@ -4611,6 +5974,208 @@
       toast("需求视图已切换", `当前查看${names[target]}。`);
     }
 
+    function switchMentorTab(target) {
+      document.querySelectorAll("[data-mentor-tab]").forEach((button) => {
+        button.classList.toggle("active", button.dataset.mentorTab === target);
+      });
+      document.querySelectorAll("[data-mentor-panel]").forEach((panel) => {
+        panel.classList.toggle("active", panel.dataset.mentorPanel === target);
+      });
+      const names = { review: "换榜审核", frontend: "前端交互" };
+      toast("导师优化已切换", `当前查看${names[target]}。`);
+    }
+
+    function switchRealnameSubTab(target) {
+      document.querySelectorAll("[data-realname-sub-tab]").forEach((button) => {
+        button.classList.toggle("active", button.dataset.realnameSubTab === target);
+      });
+      document.querySelectorAll("[data-realname-sub-panel]").forEach((panel) => {
+        panel.classList.toggle("active", panel.dataset.realnameSubPanel === target);
+      });
+    }
+
+    function switchRealnameTab(target) {
+      document.querySelectorAll("[data-realname-tab]").forEach((button) => {
+        button.classList.toggle("active", button.dataset.realnameTab === target);
+      });
+      document.querySelectorAll("[data-realname-panel]").forEach((panel) => {
+        panel.classList.toggle("active", panel.dataset.realnamePanel === target);
+      });
+      const names = { settlement: "对公结算账户", frontend: "前端交互需求" };
+      toast("实名相关已切换", `当前查看${names[target]}。`);
+    }
+
+    function mentorReviewStatus(status) {
+      return {
+        pending: { className: "pending", label: "待审核" },
+        approved: { className: "approved", label: "审核通过" },
+        rejected: { className: "rejected", label: "已驳回" }
+      }[status] || { className: "pending", label: "待审核" };
+    }
+
+    function renderMentorReviewStats() {
+      const cards = document.querySelectorAll('#mentorOptimizeReq [data-mentor-panel="review"] .tracking-event-card strong');
+      if (!cards.length) return;
+      cards[0].textContent = state.mentorReviews.filter((item) => item.status === "pending").length;
+      cards[1].textContent = state.mentorReviews.filter((item) => item.status === "approved").length;
+      cards[2].textContent = state.mentorReviews.filter((item) => item.status === "rejected").length;
+    }
+
+    function renderMentorReviews(filter = state.activeMentorReviewFilter) {
+      state.activeMentorReviewFilter = filter;
+      document.querySelectorAll("[data-mentor-review-filter]").forEach((button) => {
+        button.classList.toggle("active", button.dataset.mentorReviewFilter === filter);
+      });
+      const tbody = document.querySelector("[data-mentor-review-body]");
+      if (!tbody) return;
+      const rows = state.mentorReviews
+        .map((item, index) => ({ ...item, index }))
+        .filter((item) => filter === "all" || item.status === filter);
+      tbody.innerHTML = rows.length ? rows.map((item) => {
+        const status = mentorReviewStatus(item.status);
+        const disabled = item.status === "pending" ? "" : " disabled";
+        const action = item.status === "pending"
+          ? `<button class="link-btn" data-action="mentor-approve" data-index="${item.index}">通过</button><button class="link-btn" data-action="mentor-reject" data-index="${item.index}">驳回</button>`
+          : item.status === "rejected"
+            ? `<button class="link-btn" data-action="mentor-view-reason" data-index="${item.index}">查看原因</button>`
+            : `<button class="link-btn" data-action="mentor-view-detail" data-index="${item.index}">查看</button>`;
+        return `
+          <tr>
+            <td><input type="checkbox" data-mentor-row data-index="${item.index}"${disabled}></td>
+            <td>${escapeHtml(item.uid)}</td>
+            <td>${escapeHtml(item.feishuName)} / ${escapeHtml(item.feishuPhone)}</td>
+            <td>${escapeHtml(item.currentMentor)}<br><span class="muted">${escapeHtml(item.currentGroup)}<br>绑定时间：${escapeHtml(item.bindingTime)}</span></td>
+            <td>${escapeHtml(item.newMentor)}<br><span class="muted">${escapeHtml(item.newGroup)}</span></td>
+            <td>${escapeHtml(item.reason || "-")}</td>
+            <td><span class="mentor-status ${status.className}">${status.label}</span></td>
+            <td>${escapeHtml(item.applyTime)}</td>
+            <td>${action}</td>
+          </tr>
+        `;
+      }).join("") : `<tr class="empty-row"><td colspan="9">没有符合条件的换榜申请</td></tr>`;
+      const selectAll = document.querySelector('#mentorOptimizeReq [data-action="mentor-select-all"]');
+      if (selectAll) selectAll.checked = false;
+      renderMentorReviewStats();
+    }
+
+    function setMentorReviewStatus(index, status, reason = "") {
+      const item = state.mentorReviews[Number(index)];
+      if (!item || item.status !== "pending") return false;
+      item.status = status;
+      item.reviewer = "当前管理员";
+      item.reviewTime = "2026.08.20 14:30";
+      item.reviewReason = status === "rejected" ? reason : (reason || "申请信息完整，审核通过。");
+      renderMentorReviews();
+      return true;
+    }
+
+    function selectedPendingMentorIndexes() {
+      return [...document.querySelectorAll("#mentorOptimizeReq [data-mentor-row]:checked")]
+        .map((checkbox) => Number(checkbox.dataset.index))
+        .filter((index) => state.mentorReviews[index]?.status === "pending");
+    }
+
+    function openMentorRejectModal(indexes) {
+      const list = Array.isArray(indexes) ? indexes : [Number(indexes)];
+      const validIndexes = list.filter((index) => state.mentorReviews[index]?.status === "pending");
+      if (!validIndexes.length) return toast("无需驳回", "请选择待审核状态的换榜申请。");
+      const names = validIndexes.map((index) => state.mentorReviews[index].uid).join("、");
+      openModal(
+        validIndexes.length > 1 ? "批量驳回换榜申请" : "驳回换榜申请",
+        `驳回后前端将展示未通过状态和驳回原因：${names}`,
+        `<div class="field"><label>驳回原因</label><textarea id="mentorRejectReason" placeholder="请输入驳回原因，前端会展示给用户查看"></textarea></div>`,
+        `<button class="btn" data-modal-close>取消</button><button class="btn primary" data-action="mentor-confirm-reject" data-indexes="${validIndexes.join(",")}">确认驳回</button>`
+      );
+    }
+
+    function confirmMentorReject(indexesText) {
+      const reason = document.getElementById("mentorRejectReason")?.value.trim();
+      if (!reason) return toast("请填写驳回原因", "驳回原因会展示给用户，不能为空。");
+      const indexes = String(indexesText || "").split(",").map(Number).filter((index) => !Number.isNaN(index));
+      let count = 0;
+      indexes.forEach((index) => {
+        if (setMentorReviewStatus(index, "rejected", reason)) count += 1;
+      });
+      closeModal();
+      toast("已驳回", `已驳回 ${count} 条导师换绑申请，并记录驳回原因。`);
+    }
+
+    function openMentorReviewDetail(index, forceReason = false) {
+      const item = state.mentorReviews[Number(index)];
+      if (!item) return toast("未找到申请", "当前换榜申请不存在。");
+      const status = mentorReviewStatus(item.status).label;
+      const body = `<dl class="detail-list">
+        <div><dt>用户ID</dt><dd>${escapeHtml(item.uid)}</dd></div>
+        <div><dt>飞书信息</dt><dd>${escapeHtml(item.feishuName)} / ${escapeHtml(item.feishuPhone)}</dd></div>
+        <div><dt>当前导师</dt><dd>${escapeHtml(item.currentMentor)}，${escapeHtml(item.currentGroup)}<br>绑定时间：${escapeHtml(item.bindingTime)}</dd></div>
+        <div><dt>换榜导师</dt><dd>${escapeHtml(item.newMentor)}，${escapeHtml(item.newGroup)}</dd></div>
+        <div><dt>换绑原因</dt><dd>${escapeHtml(item.reason || "-")}</dd></div>
+        <div><dt>审核状态</dt><dd>${escapeHtml(status)}</dd></div>
+        <div><dt>审核时间</dt><dd>${escapeHtml(item.reviewTime || "-")}</dd></div>
+        <div><dt>${item.status === "rejected" || forceReason ? "驳回原因" : "审核说明"}</dt><dd>${escapeHtml(item.reviewReason || "-")}</dd></div>
+      </dl>`;
+      openModal(item.status === "rejected" || forceReason ? "查看驳回原因" : "查看审核记录", "用于运营复核导师换榜申请的处理结果。", body, `<button class="btn primary" data-modal-close>知道了</button>`);
+    }
+
+    function batchUpdateMentorReviews(status) {
+      const indexes = selectedPendingMentorIndexes();
+      if (!indexes.length) return toast("请选择申请", "请先勾选待审核状态的换榜申请。");
+      if (status === "rejected") return openMentorRejectModal(indexes);
+      indexes.forEach((index) => setMentorReviewStatus(index, "approved"));
+      toast("批量通过", `已通过 ${indexes.length} 条导师换绑申请。`);
+    }
+
+    function submitMentorFrontendApply(button) {
+      button.classList.remove("approved", "rejected");
+      button.classList.add("pending");
+      button.textContent = "换绑审核中";
+      button.disabled = true;
+      const note = document.getElementById("mentorFrontendState");
+      if (note) {
+        note.className = "mentor-result-note show";
+        note.textContent = "申请已提交，当前状态：待审核。审核期间保留原导师绑定关系，提交按钮已锁定。";
+      }
+      toast("换绑申请已提交", "当前前端状态已变更为待审核。");
+    }
+
+    function openRealnameResult(mode) {
+      const configs = {
+        "personal-done": {
+          title: "个人认证结果",
+          desc: "个人实名已通过，保留企业实名补充入口。",
+          body: `
+            <div class="detail-list">
+              <div><dt>认证状态</dt><dd>已认证</dd></div>
+              <div><dt>保留信息</dt><dd>企业实名可继续补充，不覆盖当前个人实名。</dd></div>
+              <div><dt>跳转入口</dt><dd>前往企业认证</dd></div>
+            </div>`
+        },
+        "company-review": {
+          title: "企业审核中结果",
+          desc: "企业实名正在审核，个人实名结果仍需保留展示。",
+          body: `
+            <div class="detail-list">
+              <div><dt>认证状态</dt><dd>审核中</dd></div>
+              <div><dt>保留信息</dt><dd>个人实名保持已认证状态，不因企业审核中而丢失。</dd></div>
+              <div><dt>跳转入口</dt><dd>查看审核进度 / 返回实名认证中心</dd></div>
+            </div>`
+        },
+        "coexist-done": {
+          title: "实名共存结果",
+          desc: "个人实名与企业实名同时存在，互不覆盖。",
+          body: `
+            <div class="detail-list">
+              <div><dt>个人实名</dt><dd>已认证</dd></div>
+              <div><dt>企业实名</dt><dd>已认证</dd></div>
+              <div><dt>结果口径</dt><dd>双实名共存，支持分别追踪和分别跳转。</dd></div>
+            </div>`
+        }
+      };
+      const config = configs[mode];
+      if (!config) return toast("未找到结果页", "当前认证状态暂未配置。");
+      openModal(config.title, config.desc, config.body, `<button class="btn" data-modal-close>关闭</button><button class="btn primary" data-action="toast-only">知道了</button>`);
+    }
+
     function openReqList(type) {
       const configs = {
         fields: {
@@ -4739,6 +6304,8 @@
       if (action === "save-task") return saveTask(index);
       if (action === "save-code") return saveCode();
       if (action === "save-adjust") return saveAdjust();
+      if (action === "toast-only") return toast("跳转已记录", "本期仅承接流程跳转和结果页预览，不展开具体表单。");
+      if (action === "open-realname-result") return openRealnameResult(target.dataset.realnameResult);
       if (action === "edit-good") return openGoodForm(Number(index));
       if (action === "copy-good") {
         const copy = { ...state.goods[Number(index)], name: `${state.goods[Number(index)].name} 副本`, status: "草稿", tag: "" };
@@ -4882,6 +6449,43 @@
           ])
         ]);
       }
+      if (action === "search-settlement") return filterSettlementAccounts();
+      if (action === "reset-settlement") return resetSettlementAccounts();
+      if (action === "settlement-detail") return openSettlementDetail(index);
+      if (action === "settlement-agreement") return openSettlementAgreement(index);
+      if (action === "settlement-edit") return openSettlementEdit(index);
+      if (action === "settlement-logs") return openSettlementLogs(index);
+      if (action === "settlement-save") return saveSettlement(index);
+      if (action === "settlement-release") return openReleaseSettlement(index);
+      if (action === "settlement-confirm-release") return confirmReleaseSettlement(index);
+      if (action === "mentor-approve") {
+        if (setMentorReviewStatus(index, "approved")) {
+          return toast("审核通过", "已通过该用户导师换绑申请。");
+        }
+        return toast("无法通过", "仅待审核状态可执行通过操作。");
+      }
+      if (action === "mentor-reject") {
+        const item = state.mentorReviews[Number(index)];
+        if (!item || item.status !== "pending") return toast("无法驳回", "仅待审核状态可执行驳回操作。");
+        return openMentorRejectModal(Number(index));
+      }
+      if (action === "mentor-confirm-reject") return confirmMentorReject(target.dataset.indexes);
+      if (action === "mentor-view-reason") return openMentorReviewDetail(index, true);
+      if (action === "mentor-view-detail") return openMentorReviewDetail(index);
+      if (action === "mentor-batch-approve") {
+        const indexes = selectedPendingMentorIndexes();
+        if (!indexes.length) return toast("请选择申请", "请先勾选待审核状态的换榜申请。");
+        indexes.forEach((itemIndex) => setMentorReviewStatus(itemIndex, "approved"));
+        return toast("批量通过", `已通过 ${indexes.length} 条导师换绑申请。`);
+      }
+      if (action === "mentor-batch-reject") return batchUpdateMentorReviews("rejected");
+      if (action === "mentor-select-all") {
+        document.querySelectorAll("#mentorOptimizeReq [data-mentor-row]").forEach((checkbox) => {
+          checkbox.checked = !checkbox.disabled && target.checked;
+        });
+        return;
+      }
+      if (action === "mentor-submit-frontend") return submitMentorFrontendApply(target);
     }
 
     function bindEvents() {
@@ -4914,6 +6518,8 @@
       document.body.addEventListener("click", (event) => {
         const drawerClose = event.target.closest("[data-drawer-close]");
         if (drawerClose) return closeRulesDrawer();
+        const settlementDrawerClose = event.target.closest("[data-settlement-drawer-close]");
+        if (settlementDrawerClose) return closeSettlementDrawer();
         const close = event.target.closest("[data-modal-close]");
         if (close) return closeModal();
         const formTab = event.target.closest("[data-form-tab]");
@@ -4946,6 +6552,10 @@
 
       document.getElementById("rulesDrawerLayer").addEventListener("click", (event) => {
         if (event.target.id === "rulesDrawerLayer") closeRulesDrawer();
+      });
+
+      document.getElementById("settlementDetailLayer").addEventListener("click", (event) => {
+        if (event.target.id === "settlementDetailLayer") closeSettlementDrawer();
       });
 
       document.getElementById("modalBody").addEventListener("change", (event) => {
@@ -4981,8 +6591,24 @@
         });
       });
 
-      document.querySelectorAll(".req-tabs button").forEach((button) => {
+      document.querySelectorAll("#frontendReq .req-tabs button").forEach((button) => {
         button.addEventListener("click", () => switchReqTab(button.dataset.reqTab));
+      });
+
+      document.querySelectorAll("[data-mentor-tab]").forEach((button) => {
+        button.addEventListener("click", () => switchMentorTab(button.dataset.mentorTab));
+      });
+
+      document.querySelectorAll("[data-mentor-review-filter]").forEach((button) => {
+        button.addEventListener("click", () => renderMentorReviews(button.dataset.mentorReviewFilter));
+      });
+
+      document.querySelectorAll("[data-realname-sub-tab]").forEach((button) => {
+        button.addEventListener("click", () => switchRealnameSubTab(button.dataset.realnameSubTab));
+      });
+
+      document.querySelectorAll("[data-realname-tab]").forEach((button) => {
+        button.addEventListener("click", () => switchRealnameTab(button.dataset.realnameTab));
       });
 
       document.querySelectorAll("[data-tracking-trend]").forEach((button) => {
@@ -5030,7 +6656,9 @@
     renderFlows();
     renderTools();
     renderToolData();
+    renderSettlementAccounts();
     renderTrackingRequirements();
+    renderMentorReviews();
     document.querySelectorAll(".line-compare").forEach((chart) => renderLineCompare(chart, "day"));
     syncToolDemoLinks();
     bindEvents();

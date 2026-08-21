@@ -1,0 +1,744 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>实名相关 · 前端交互需求</title>
+  <style>
+    :root {
+      --page-bg: #eef2f8;
+      --phone-bg: #f3f6fb;
+      --card: #ffffff;
+      --text: #17213a;
+      --muted: #8f97a8;
+      --link: #24589c;
+      --orange: #ff6038;
+      --orange-hover: #ec512c;
+      --line: #edf1f6;
+      --panel: #ffffff;
+      --panel-line: #e6ebf2;
+      --shadow: 0 18px 48px rgba(20, 31, 52, .10);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--page-bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      letter-spacing: 0;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .workspace {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: minmax(460px, 560px) minmax(414px, 1fr);
+      gap: 28px;
+      align-items: start;
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 26px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--panel-line);
+      border-radius: 8px;
+      box-shadow: 0 10px 28px rgba(24, 34, 52, .06);
+      padding: 20px;
+    }
+
+    .panel h1 {
+      margin: 0 0 8px;
+      font-size: 22px;
+      line-height: 1.3;
+      color: #17213a;
+    }
+
+    .panel > p {
+      margin: 0 0 18px;
+      color: #7e8798;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .scenario-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .scenario-btn {
+      width: 100%;
+      min-height: 86px;
+      border: 1px solid var(--panel-line);
+      border-radius: 8px;
+      background: #fff;
+      color: #2a354f;
+      padding: 12px 14px;
+      text-align: left;
+      cursor: pointer;
+      transition: border-color .16s ease, background .16s ease, color .16s ease;
+    }
+
+    .scenario-btn strong {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 3px;
+    }
+
+    .scenario-btn span {
+      display: block;
+      color: #8c95a6;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .scenario-btn.active {
+      border-color: #ffcabd;
+      background: #fff5f1;
+      color: var(--orange);
+    }
+
+    .scenario-btn.active span {
+      color: #b97763;
+    }
+
+    .rule {
+      border-top: 1px dashed var(--panel-line);
+      padding-top: 16px;
+      color: #596275;
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    .rule strong {
+      color: #17213a;
+    }
+
+    .route-output {
+      margin-top: 14px;
+      min-height: 42px;
+      border-radius: 8px;
+      background: #f6f8fb;
+      border: 1px solid #e9eef5;
+      color: #6f788c;
+      font-size: 13px;
+      line-height: 1.6;
+      padding: 10px 12px;
+    }
+
+    .route-output strong {
+      color: #17213a;
+    }
+
+    .phone-shell {
+      position: sticky;
+      top: 20px;
+      justify-self: center;
+      width: 414px;
+      background: #111827;
+      border-radius: 34px;
+      padding: 10px;
+      box-shadow: var(--shadow);
+    }
+
+    .phone-screen {
+      position: relative;
+      overflow: hidden;
+      width: 394px;
+      height: 812px;
+      background: var(--phone-bg);
+      border-radius: 28px;
+    }
+
+    .status-bar {
+      height: 46px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      color: #0f172a;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .system-icons {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 16px;
+    }
+
+    .signal {
+      display: inline-flex;
+      align-items: flex-end;
+      gap: 2px;
+      height: 14px;
+    }
+
+    .signal i {
+      display: block;
+      width: 3px;
+      background: #0f172a;
+      border-radius: 2px;
+    }
+
+    .signal i:nth-child(1) { height: 5px; }
+    .signal i:nth-child(2) { height: 8px; }
+    .signal i:nth-child(3) { height: 11px; }
+    .signal i:nth-child(4) { height: 14px; }
+
+    .wifi {
+      width: 15px;
+      height: 11px;
+      border: 3px solid #0f172a;
+      border-left-color: transparent;
+      border-right-color: transparent;
+      border-bottom: 0;
+      border-radius: 15px 15px 0 0;
+      position: relative;
+    }
+
+    .wifi::after {
+      content: "";
+      position: absolute;
+      left: 4px;
+      bottom: -4px;
+      width: 5px;
+      height: 5px;
+      background: #0f172a;
+      border-radius: 50%;
+    }
+
+    .battery {
+      width: 25px;
+      height: 13px;
+      border: 2px solid #0f172a;
+      border-radius: 4px;
+      position: relative;
+      padding: 2px;
+    }
+
+    .battery::before {
+      content: "";
+      display: block;
+      height: 100%;
+      width: 75%;
+      background: #0f172a;
+      border-radius: 2px;
+    }
+
+    .battery::after {
+      content: "";
+      position: absolute;
+      top: 3px;
+      right: -5px;
+      width: 3px;
+      height: 5px;
+      background: #0f172a;
+      border-radius: 0 2px 2px 0;
+    }
+
+    .nav {
+      height: 58px;
+      display: grid;
+      grid-template-columns: 48px 1fr 48px;
+      align-items: center;
+      color: #17213a;
+    }
+
+    .back {
+      border: 0;
+      background: transparent;
+      color: #17213a;
+      font-size: 38px;
+      line-height: 1;
+      font-weight: 200;
+      cursor: pointer;
+      padding: 0 0 4px 8px;
+    }
+
+    .nav-title {
+      text-align: center;
+      font-size: 22px;
+      line-height: 1;
+      font-weight: 800;
+    }
+
+    .content {
+      height: 660px;
+      overflow-y: auto;
+      padding: 12px 8px 28px;
+    }
+
+    .result-card {
+      margin: 0 0 28px;
+      border-radius: 8px;
+      background: var(--card);
+      padding: 24px 18px 26px;
+      text-align: center;
+    }
+
+    .result-status {
+      font-size: 21px;
+      line-height: 1.2;
+      font-weight: 800;
+      color: #17213a;
+      margin-bottom: 8px;
+    }
+
+    .result-desc {
+      margin: 0;
+      color: #9299a9;
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+    .result-desc a {
+      color: var(--link);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .primary-btn {
+      display: none;
+      min-width: 116px;
+      height: 34px;
+      margin-top: 13px;
+      border: 0;
+      border-radius: 6px;
+      background: var(--orange);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 0 16px;
+      cursor: pointer;
+    }
+
+    .primary-btn.show {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .primary-btn:hover {
+      background: var(--orange-hover);
+    }
+
+    .switcher {
+      display: none;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin: 0 8px 12px;
+    }
+
+    .switcher.show {
+      display: grid;
+    }
+
+    .switcher button {
+      height: 36px;
+      border-radius: 6px;
+      border: 1px solid #dde4ef;
+      background: #fff;
+      color: #6d778b;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .switcher button.active {
+      border-color: #ffcabd;
+      background: #fff5f1;
+      color: var(--orange);
+      font-weight: 700;
+    }
+
+    .section-title {
+      margin: 0 7px 12px;
+      color: #17213a;
+      font-size: 17px;
+      font-weight: 800;
+    }
+
+    .info-card {
+      background: var(--card);
+      border-radius: 8px;
+      padding: 22px 24px;
+      margin: 0 0 24px;
+    }
+
+    .info-row {
+      display: grid;
+      grid-template-columns: 96px minmax(0, 1fr);
+      column-gap: 10px;
+      align-items: start;
+      min-height: 38px;
+      color: #17213a;
+      font-size: 16px;
+      line-height: 1.45;
+    }
+
+    .info-row:last-child {
+      min-height: 22px;
+    }
+
+    .info-label {
+      color: #979eac;
+      white-space: nowrap;
+    }
+
+    .info-value {
+      text-align: right;
+      overflow-wrap: anywhere;
+    }
+
+    .route-toast {
+      position: absolute;
+      left: 50%;
+      top: 106px;
+      transform: translateX(-50%) translateY(-12px);
+      opacity: 0;
+      pointer-events: none;
+      max-width: 330px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: rgba(15, 23, 42, .9);
+      color: #fff;
+      font-size: 13px;
+      line-height: 1.5;
+      text-align: center;
+      transition: opacity .18s ease, transform .18s ease;
+      z-index: 5;
+    }
+
+    .route-toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 920px) {
+      .workspace {
+        display: block;
+        padding: 16px;
+      }
+
+      .scenario-list {
+        grid-template-columns: 1fr;
+      }
+
+      .panel {
+        margin-bottom: 18px;
+      }
+
+      .phone-shell {
+        position: static;
+        width: min(414px, 100%);
+      }
+
+      .phone-screen {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="workspace">
+    <aside class="panel">
+      <h1>实名相关 · 前端交互需求</h1>
+      <p>按截图结果页样式还原认证信息展示；选择认证方式和填写资料页只做跳转承接，不在本页设计。</p>
+
+      <div class="scenario-list" id="scenarioList">
+        <button class="scenario-btn active" data-scene="personalCertified">
+          <strong>个人已认证</strong>
+          <span>结果页新增“升级企业认证”，点击跳转企业认证流程。</span>
+        </button>
+        <button class="scenario-btn" data-scene="companyCertified">
+          <strong>企业已认证</strong>
+          <span>结果页新增“添加个人认证”，点击跳转个人认证流程。</span>
+        </button>
+        <button class="scenario-btn" data-scene="bothCertified">
+          <strong>双认证共存</strong>
+          <span>同一账号已完成个人和企业认证，支持切换查看。</span>
+        </button>
+        <button class="scenario-btn" data-scene="bothReviewing">
+          <strong>双认证均审核中</strong>
+          <span>个人和企业认证都处于审核中，支持切换查看审核资料。</span>
+        </button>
+        <button class="scenario-btn" data-scene="personalRejected">
+          <strong>个人驳回 / 企业已认证</strong>
+          <span>企业认证保留，个人认证展示驳回并支持重新提交。</span>
+        </button>
+        <button class="scenario-btn" data-scene="companyRejected">
+          <strong>企业驳回 / 个人已认证</strong>
+          <span>个人认证保留，企业驳回后跳转对公认证方式选择页。</span>
+        </button>
+        <button class="scenario-btn" data-scene="companyReviewing">
+          <strong>企业审核中</strong>
+          <span>审核中仍支持添加个人认证。</span>
+        </button>
+        <button class="scenario-btn" data-scene="personalReviewing">
+          <strong>个人审核中</strong>
+          <span>审核中仍支持添加企业认证。</span>
+        </button>
+      </div>
+
+      <div class="rule">
+        <strong>交互口径：</strong><br>
+        个人和企业认证结果独立存在；已认证结果页引导补充另一种实名；审核中不阻断另一种认证；共存后通过顶部切换查看两套认证信息，支持已认证、审核中和驳回状态。企业认证被驳回时，重新提交需跳转至对公认证方式选择页，可选择企业认证或个体工商认证。
+      </div>
+
+      <div class="route-output" id="routeOutput">
+        <strong>跳转反馈：</strong>点击手机中的橙色按钮后显示对应目标页面。
+      </div>
+    </aside>
+
+    <section class="phone-shell" aria-label="手机结果页预览">
+      <div class="phone-screen">
+        <div class="status-bar">
+          <span>12:40</span>
+          <span class="system-icons">
+            <span class="signal"><i></i><i></i><i></i><i></i></span>
+            <span class="wifi"></span>
+            <span class="battery"></span>
+          </span>
+        </div>
+
+        <div class="nav">
+          <button class="back" type="button" aria-label="返回">‹</button>
+          <div class="nav-title" id="pageTitle">实名认证</div>
+          <div></div>
+        </div>
+
+        <div class="switcher" id="switcher">
+          <button type="button" class="active" data-view="personal">个人认证信息</button>
+          <button type="button" data-view="company">企业认证信息</button>
+        </div>
+
+        <div class="content">
+          <div class="result-card">
+            <div class="result-status" id="resultStatus">已认证</div>
+            <p class="result-desc" id="resultDesc">认证信息已通过，暂不支持修改。<a href="javascript:void(0)">如有疑问请联系客服</a></p>
+            <button class="primary-btn show" id="actionBtn" type="button">升级企业认证</button>
+          </div>
+
+          <div id="infoArea"></div>
+        </div>
+
+        <div class="route-toast" id="routeToast"></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const el = (id) => document.getElementById(id);
+
+    const personalRows = [
+      ["真实姓名", "**阳"],
+      ["身份证号", "230221*********0218"],
+      ["联系地址", "黑龙江省齐齐哈尔市龙江县龙江县龙江县龙江县"],
+      ["联系电话", "135****8004"]
+    ];
+
+    const companyRows = [
+      ["企业名称", "深圳不鸣文化科技有限公司"],
+      ["统一社会信用代码", "8958444582469144444"]
+    ];
+
+    const legalRows = [
+      ["真实姓名", "**阳"],
+      ["身份证号", "230221*********0218"],
+      ["联系地址", "黑龙江省齐齐哈尔市龙江县龙江县龙江县龙江县"],
+      ["联系电话", "135****8004"]
+    ];
+
+    const scenes = {
+      personalCertified: {
+        status: "已认证",
+        desc: "认证信息已通过，暂不支持修改。",
+        action: "升级企业认证",
+        route: "企业认证资料填写页",
+        sections: [["身份信息", personalRows]]
+      },
+      companyCertified: {
+        status: "已认证",
+        desc: "认证信息已通过，暂不支持修改。",
+        action: "添加个人认证",
+        route: "个人认证资料填写页",
+        sections: [["企业信息", companyRows], ["法人信息", legalRows]]
+      },
+      companyReviewing: {
+        status: "审核中",
+        desc: "认证信息正在审核中，请耐心等待。",
+        action: "添加个人认证",
+        route: "个人认证资料填写页",
+        sections: [["企业信息", companyRows], ["法人信息", legalRows]]
+      },
+      personalReviewing: {
+        status: "审核中",
+        desc: "认证信息正在审核中，请耐心等待。",
+        action: "升级企业认证",
+        route: "企业认证资料填写页",
+        sections: [["身份信息", personalRows]]
+      }
+    };
+
+    const dualScenes = {
+      bothCertified: {
+        personal: {
+          status: "已认证",
+          desc: "认证信息已通过，暂不支持修改。",
+          sections: [["身份信息", personalRows]]
+        },
+        company: {
+          status: "已认证",
+          desc: "认证信息已通过，暂不支持修改。",
+          sections: [["企业信息", companyRows], ["法人信息", legalRows]]
+        }
+      },
+      bothReviewing: {
+        personal: {
+          status: "审核中",
+          desc: "认证信息正在审核中，请耐心等待。",
+          sections: [["身份信息", personalRows]]
+        },
+        company: {
+          status: "审核中",
+          desc: "认证信息正在审核中，请耐心等待。",
+          sections: [["企业信息", companyRows], ["法人信息", legalRows]]
+        }
+      },
+      personalRejected: {
+        personal: {
+          status: "已驳回",
+          desc: "认证信息未通过，请修改后重新提交。",
+          action: "重新提交个人认证",
+          route: "个人认证资料填写页",
+          sections: [["身份信息", personalRows]]
+        },
+        company: {
+          status: "已认证",
+          desc: "认证信息已通过，暂不支持修改。",
+          sections: [["企业信息", companyRows], ["法人信息", legalRows]]
+        }
+      },
+      companyRejected: {
+        personal: {
+          status: "已认证",
+          desc: "认证信息已通过，暂不支持修改。",
+          sections: [["身份信息", personalRows]]
+        },
+        company: {
+          status: "已驳回",
+          desc: "认证信息未通过，请修改后重新提交。",
+          action: "重新提交对公认证",
+          route: "对公认证方式选择页（企业认证 / 个体工商认证）",
+          sections: [["企业信息", companyRows], ["法人信息", legalRows]]
+        }
+      }
+    };
+
+    let currentScene = "personalCertified";
+    let dualView = "personal";
+    let toastTimer = null;
+
+    function renderRows(rows) {
+      return rows.map(([label, value]) => `
+        <div class="info-row">
+          <div class="info-label">${label}</div>
+          <div class="info-value">${value}</div>
+        </div>
+      `).join("");
+    }
+
+    function renderSections(sections) {
+      el("infoArea").innerHTML = sections.map(([title, rows]) => `
+        <div class="section-title">${title}</div>
+        <div class="info-card">${renderRows(rows)}</div>
+      `).join("");
+    }
+
+    function setButtons(sceneKey) {
+      document.querySelectorAll(".scenario-btn").forEach((button) => {
+        button.classList.toggle("active", button.dataset.scene === sceneKey);
+      });
+    }
+
+    function showRoute(route) {
+      const text = `跳转至：${route}（本期仅承接流程，不设计该页面）`;
+      el("routeOutput").innerHTML = `<strong>跳转反馈：</strong>${text}`;
+      el("routeToast").textContent = text;
+      el("routeToast").classList.add("show");
+      window.clearTimeout(toastTimer);
+      toastTimer = window.setTimeout(() => el("routeToast").classList.remove("show"), 1800);
+      window.location.hash = `route=${encodeURIComponent(route)}`;
+    }
+
+    function applyScene(sceneKey) {
+      currentScene = sceneKey;
+      setButtons(sceneKey);
+      el("pageTitle").textContent = "实名认证";
+      el("switcher").classList.toggle("show", Boolean(dualScenes[sceneKey]));
+
+      if (dualScenes[sceneKey]) {
+        applyDualView(dualView);
+        return;
+      }
+
+      const scene = scenes[sceneKey];
+      el("resultStatus").textContent = scene.status;
+      el("resultDesc").innerHTML = `${scene.desc}<a href="javascript:void(0)">如有疑问请联系客服</a>`;
+      el("actionBtn").textContent = scene.action;
+      el("actionBtn").dataset.route = scene.route;
+      el("actionBtn").classList.add("show");
+      renderSections(scene.sections);
+    }
+
+    function applyDualView(view) {
+      dualView = view;
+      document.querySelectorAll(".switcher button").forEach((button) => {
+        button.classList.toggle("active", button.dataset.view === view);
+      });
+      el("pageTitle").textContent = "实名认证";
+      const scene = dualScenes[currentScene]?.[view] || dualScenes.bothCertified[view];
+      el("resultStatus").textContent = scene.status;
+      el("resultDesc").innerHTML = `${scene.desc}<a href="javascript:void(0)">如有疑问请联系客服</a>`;
+      if (scene.action) {
+        el("actionBtn").textContent = scene.action;
+        el("actionBtn").dataset.route = scene.route;
+        el("actionBtn").classList.add("show");
+      } else {
+        el("actionBtn").classList.remove("show");
+      }
+      renderSections(scene.sections);
+    }
+
+    el("scenarioList").addEventListener("click", (event) => {
+      const button = event.target.closest(".scenario-btn");
+      if (!button) return;
+      if (dualScenes[button.dataset.scene]) dualView = "personal";
+      applyScene(button.dataset.scene);
+    });
+
+    el("switcher").addEventListener("click", (event) => {
+      const button = event.target.closest("button[data-view]");
+      if (!button || !dualScenes[currentScene]) return;
+      applyDualView(button.dataset.view);
+    });
+
+    el("actionBtn").addEventListener("click", () => {
+      if (!el("actionBtn").classList.contains("show")) return;
+      showRoute(el("actionBtn").dataset.route);
+    });
+
+    applyScene("personalCertified");
+  </script>
+</body>
+</html>
