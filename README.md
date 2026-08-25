@@ -1,2 +1,22 @@
-# yb_iteration-2.0
-右豹2.0迭代需求
+# YBDD2.0
+右豹 2.0 迭代需求 Demo（FR-002 ~ FR-005）
+
+## 预览入口
+
+- **Sprint 总览**：[`demo/iteration/framework-shell.html`](demo/iteration/framework-shell.html)
+- **GitHub Pages**：https://renataecho.github.io/YBDD2.0/demo/iteration/framework-shell.html
+
+## 迭代需求
+
+| FR | 名称 | 路径 |
+|----|------|------|
+| FR-002 | 代发收益 | `demo/iteration/fr-opc-daifa-revenue.html` |
+| FR-003 | 品牌退款 | `demo/iteration/fr-finance-brand-refund.html` |
+| FR-004 | 预估数据 | `demo/iteration/fr-project-estimated-data.html` |
+| FR-005 | 订单优化 | `demo/iteration/fr-project-order-optimize.html` |
+
+## 废纸篓
+
+| FR | 名称 | 路径 |
+|----|------|------|
+| FR-001 | 代发分配 | `demo/iteration/fr-opc-daifa-allocation.html` |

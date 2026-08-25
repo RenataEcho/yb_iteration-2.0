@@ -16,7 +16,8 @@
       items: [
         { id: 'fr-opc-daifa-revenue', label: '代发收益', href: 'fr-opc-daifa-revenue.html' },
         { id: 'fr-finance-brand-refund', label: '品牌退款', href: 'fr-finance-brand-refund.html' },
-        { id: 'fr-project-estimated-data', label: '预估数据', href: 'fr-project-estimated-data.html' }
+        { id: 'fr-project-estimated-data', label: '预估数据', href: 'fr-project-estimated-data.html' },
+        { id: 'fr-project-order-optimize', label: '订单优化', href: 'fr-project-order-optimize.html' }
       ]
     },
     {

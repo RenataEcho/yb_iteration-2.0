@@ -227,6 +227,42 @@
       opacity: 0; transition: all 0.25s; z-index: 600; pointer-events: none;
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(15,23,42,0.35); z-index: 550;
+      display: flex; align-items: center; justify-content: center; padding: 20px;
+      opacity: 0; pointer-events: none; transition: opacity 0.25s;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: auto; }
+    .modal {
+      width: 100%; max-width: 400px; background: var(--surface);
+      border-radius: var(--radius-lg); box-shadow: 0 20px 60px rgba(30,40,80,0.18);
+      transform: translateY(12px) scale(0.98); transition: transform 0.22s;
+    }
+    .modal-overlay.open .modal { transform: translateY(0) scale(1); }
+    .modal.modal-md { max-width: 480px; }
+    .modal-header { padding: 16px 20px 0; }
+    .modal-header h3 { font-size: 15px; font-weight: 700; }
+    .modal-header p { font-size: 12px; color: var(--text-muted); margin-top: 6px; line-height: 1.55; }
+    .modal-body { padding: 16px 20px; }
+    .form-field { margin-bottom: 12px; }
+    .form-field:last-child { margin-bottom: 0; }
+    .form-field label { display: block; font-size: 11px; font-weight: 500; color: var(--text-muted); margin-bottom: 4px; }
+    .form-field input, .form-field select {
+      width: 100%; height: 34px; padding: 0 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px;
+    }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .confirm-summary {
+      padding: 12px 14px; background: #f8fafc; border-radius: var(--radius-sm); border: 1px solid var(--border);
+      font-size: 13px; line-height: 1.7; color: var(--text-secondary);
+    }
+    .modal-footer { padding: 12px 20px 16px; display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid var(--border); }
+    .detail-kv { display: grid; grid-template-columns: 100px 1fr; gap: 8px 12px; font-size: 13px; margin-bottom: 16px; }
+    .detail-kv dt { color: var(--text-muted); }
+    .detail-kv dd { color: var(--text-primary); font-weight: 500; }
+    .log-item { padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 12px; line-height: 1.6; }
+    .log-item:last-child { border-bottom: none; }
+    .log-item time { display: block; color: var(--text-muted); font-size: 11px; margin-bottom: 4px; }
+    .empty-hint { padding: 24px; text-align: center; color: var(--text-muted); font-size: 13px; }
   </style>
 </head>
 <body>
@@ -296,18 +332,14 @@
             </button>
             <button class="scene-btn" type="button" data-screen="screen-sub-agreement">
               <div class="scene-title">图3 · 协议确认（子用户）</div>
-              <div class="scene-desc">系统通知进入；同意/拒绝协议；同意后进入「我的代发收益」</div>
+              <div class="scene-desc">系统通知进入；同意/拒绝协议（子用户仅此一页）；同意后进入「我的代发收益」</div>
             </button>
             <button class="scene-btn" type="button" data-screen="screen-sub-alloc">
               <div class="scene-title">图4 · 我的代发收益（子用户）</div>
-              <div class="scene-desc">累计已获得 + 授权帐号数；分配 record-card；右上角「查看帐号」入口</div>
-            </button>
-            <button class="scene-btn" type="button" data-screen="screen-sub-auth">
-              <div class="scene-title">图5 · 发布帐号授权（子用户）</div>
-              <div class="scene-desc">从「我的代发收益」右上角进入；顶部提示文案 + 发布帐号列表，无编辑/无授权按钮</div>
+              <div class="scene-desc">累计已获得 + 授权帐号数；分配 record-card；三方授权在平台外部完成</div>
             </button>
           </div>
-          <div class="scene-note">协议确认与三方授权为分配前置条件；关键词出单分配口径与 FR-001 一致。</div>
+          <div class="scene-note">子用户协议确认仅一页；三方发布帐号授权走平台外部 API，不在 C 端单独展示授权页。</div>
         </div>
         <div class="glass-card mockup-panel">
           <div class="mockup-frame-wrap">
@@ -332,16 +364,16 @@
             <div class="admin-metric"><label>启用关系</label><strong>2</strong><span>协议已同意</span></div>
             <div class="admin-metric"><label>待确认协议</label><strong>1</strong><span>站内信待处理</span></div>
           </div>
-          <div class="filter-bar">
-            <div class="filter-field"><label>关系 ID</label><input type="text" placeholder="R-1001" /></div>
-            <div class="filter-field"><label>主用户 ID</label><input type="text" placeholder="U20260813001" /></div>
-            <div class="filter-field"><label>子用户 ID</label><input type="text" placeholder="U20260813088" /></div>
-            <div class="filter-field"><label>协议状态</label><select><option>全部</option><option>待确认</option><option>已同意</option><option>已拒绝</option></select></div>
-            <div class="filter-field"><label>分配状态</label><select><option>全部</option><option>启用</option><option>禁用</option></select></div>
+          <div class="filter-bar" id="relationsFilterBar">
+            <div class="filter-field"><label>关系 ID</label><input type="text" id="filterRelId" placeholder="R-1001" /></div>
+            <div class="filter-field"><label>主用户 ID</label><input type="text" id="filterMainUser" placeholder="U20260813001" /></div>
+            <div class="filter-field"><label>子用户 ID</label><input type="text" id="filterSubUser" placeholder="U20260813088" /></div>
+            <div class="filter-field"><label>协议状态</label><select id="filterAgreement"><option value="">全部</option><option>待确认</option><option>已同意</option><option>已拒绝</option></select></div>
+            <div class="filter-field"><label>分配状态</label><select id="filterAllocStatus"><option value="">全部</option><option>启用</option><option>禁用</option></select></div>
             <div class="filter-actions">
-              <button class="btn-ghost-sm" type="button" onclick="showToast('Demo：已重置筛选')">重置</button>
-              <button class="btn btn-primary" type="button" onclick="showToast('Demo：筛选仅影响 Mock 展示')">查询</button>
-              <button class="btn btn-primary" type="button" onclick="showToast('Demo：新增关系')">新增关系</button>
+              <button class="btn-ghost-sm" type="button" onclick="resetRelationsFilter()">重置</button>
+              <button class="btn btn-primary" type="button" onclick="queryRelations()">查询</button>
+              <button class="btn btn-primary" type="button" onclick="openRelationForm()">新增关系</button>
             </div>
           </div>
           <div class="table-wrap">
@@ -352,44 +384,25 @@
                   <th>协议状态</th><th>分配状态</th><th>发布帐号数</th><th>已分配金额</th><th>操作</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td>R-1001</td><td>U20260813001</td><td>U20260813088</td><td>40%</td>
-                  <td><span class="tag tag-ok">已同意</span></td><td><span class="tag tag-ok">启用</span></td>
-                  <td>2</td><td>12,400.00</td>
-                  <td><a class="link" onclick="showToast('Demo：详情')">详情</a><a class="link" onclick="showToast('Demo：编辑')">编辑</a><a class="link" onclick="showToast('Demo：重发协议')">重发协议</a></td>
-                </tr>
-                <tr>
-                  <td>R-1002</td><td>U20260813001</td><td>U20260813099</td><td>35%</td>
-                  <td><span class="tag tag-ok">已同意</span></td><td><span class="tag tag-ok">启用</span></td>
-                  <td>1</td><td>8,320.00</td>
-                  <td><a class="link">详情</a><a class="link">编辑</a><a class="link">重发协议</a></td>
-                </tr>
-                <tr>
-                  <td>R-1003</td><td>U20260813001</td><td>U20260813102</td><td>25%</td>
-                  <td><span class="tag" style="background:#fffbeb;color:#d97706;border:1px solid #fde68a">待确认</span></td><td><span class="tag tag-ok">启用</span></td>
-                  <td>0</td><td>0.00</td>
-                  <td><a class="link">详情</a><a class="link">编辑</a><a class="link">重发协议</a></td>
-                </tr>
-              </tbody>
+              <tbody id="relationsTableBody"></tbody>
             </table>
           </div>
         </div>
         <div id="panel-accounts" class="admin-panel">
-          <div class="filter-bar">
-            <div class="filter-field"><label>发布帐号 ID</label><input type="text" placeholder="PA-10021" /></div>
-            <div class="filter-field"><label>帐号昵称</label><input type="text" placeholder="豹豹1号" /></div>
-            <div class="filter-field"><label>帐号 ID（平台唯一）</label><input type="text" placeholder="dy_8829103" /></div>
-            <div class="filter-field"><label>主用户 ID</label><input type="text" placeholder="U20260813001" /></div>
-            <div class="filter-field"><label>子用户 ID</label><input type="text" placeholder="U20260813088" /></div>
-            <div class="filter-field"><label>三方授权状态</label><select><option>全部</option><option>已授权</option><option>已失效</option><option>未授权</option></select></div>
-            <div class="filter-field"><label>帐号平台</label><select><option>全部</option><option>抖音</option><option>快手</option><option>TK</option></select></div>
-            <div class="filter-field"><label>状态</label><select><option>全部</option><option>正常</option><option>已删除</option></select></div>
-            <div class="filter-field"><label>添加时间起</label><input type="date" /></div>
-            <div class="filter-field"><label>添加时间止</label><input type="date" /></div>
+          <div class="filter-bar" id="accountsFilterBar">
+            <div class="filter-field"><label>发布帐号 ID</label><input type="text" id="filterAccountId" placeholder="PA-10021" /></div>
+            <div class="filter-field"><label>帐号昵称</label><input type="text" id="filterAccountName" placeholder="豹豹1号" /></div>
+            <div class="filter-field"><label>帐号 ID（平台唯一）</label><input type="text" id="filterPlatformId" placeholder="dy_8829103" /></div>
+            <div class="filter-field"><label>主用户 ID</label><input type="text" id="filterAccMainUser" placeholder="U20260813001" /></div>
+            <div class="filter-field"><label>子用户 ID</label><input type="text" id="filterAccSubUser" placeholder="U20260813088" /></div>
+            <div class="filter-field"><label>三方授权状态</label><select id="filterAuthStatus"><option value="">全部</option><option>已授权</option><option>已失效</option><option>未授权</option></select></div>
+            <div class="filter-field"><label>帐号平台</label><select id="filterPlatform"><option value="">全部</option><option>抖音</option><option>快手</option><option>TK</option></select></div>
+            <div class="filter-field"><label>状态</label><select id="filterAccountStatus"><option value="">全部</option><option>正常</option><option>已删除</option></select></div>
+            <div class="filter-field"><label>添加时间起</label><input type="date" id="filterAccDateFrom" /></div>
+            <div class="filter-field"><label>添加时间止</label><input type="date" id="filterAccDateTo" /></div>
             <div class="filter-actions">
-              <button class="btn-ghost-sm" type="button" onclick="showToast('Demo：已重置筛选')">重置</button>
-              <button class="btn btn-primary" type="button" onclick="showToast('Demo：筛选仅影响 Mock 展示')">查询</button>
+              <button class="btn-ghost-sm" type="button" onclick="resetAccountsFilter()">重置</button>
+              <button class="btn btn-primary" type="button" onclick="queryAccounts()">查询</button>
             </div>
           </div>
           <div class="table-wrap">
@@ -400,52 +413,24 @@
                   <th>子用户</th><th>授权主用户</th><th>三方授权</th><th>帐号平台</th><th>状态</th><th>授权时间</th><th>操作</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td>PA-20021</td><td>豹豹1号</td><td>dy_8829103</td>
-                  <td><a class="link" href="#">打开</a></td>
-                  <td><div>U20260813088</div></td>
-                  <td><div>U20260813001</div></td>
-                  <td><span class="tag tag-ok">已授权</span></td>
-                  <td>抖音</td><td><span class="tag tag-ok">正常</span></td><td>2026.08.10 09:20</td>
-                  <td><a class="link" onclick="showToast('Demo：日志')">日志</a></td>
-                </tr>
-                <tr>
-                  <td>PA-20022</td><td>豹豹2号</td><td>ks_6610238</td>
-                  <td><a class="link" href="#">打开</a></td>
-                  <td><div>U20260813088</div></td>
-                  <td><div>U20260813001</div></td>
-                  <td><span class="tag tag-ok">已授权</span></td>
-                  <td>快手</td><td><span class="tag tag-ok">正常</span></td><td>2026.08.12 14:05</td>
-                  <td><a class="link">日志</a></td>
-                </tr>
-                <tr>
-                  <td>PA-20023</td><td>leopard_en</td><td>tk_9900122</td>
-                  <td><a class="link" href="#">打开</a></td>
-                  <td><div>U20260813099</div></td>
-                  <td><div>U20260813001</div></td>
-                  <td><span class="tag" style="background:#fffbeb;color:#d97706;border:1px solid #fde68a">已失效</span></td>
-                  <td>TK</td><td><span class="tag tag-del">已删除</span></td><td>2026.08.15 11:30</td>
-                  <td><a class="link">日志</a></td>
-                </tr>
-              </tbody>
+              <tbody id="accountsTableBody"></tbody>
             </table>
           </div>
         </div>
         <div id="panel-keywords" class="admin-panel">
-          <div class="filter-bar">
-            <div class="filter-field"><label>关键词</label><input type="text" placeholder="右豹代发教程" /></div>
-            <div class="filter-field"><label>项目方</label><input type="text" placeholder="右豹官方" /></div>
-            <div class="filter-field"><label>主用户 ID</label><input type="text" placeholder="U20260813001" /></div>
-            <div class="filter-field"><label>子用户 ID</label><input type="text" placeholder="U20260813088" /></div>
-            <div class="filter-field"><label>发布帐号 ID</label><input type="text" placeholder="dy_8829103" /></div>
-            <div class="filter-field"><label>发布帐号昵称</label><input type="text" placeholder="豹豹1号" /></div>
-            <div class="filter-field"><label>所属子用户 ID</label><input type="text" placeholder="U20260813088" /></div>
-            <div class="filter-field"><label>更新时间起</label><input type="date" /></div>
-            <div class="filter-field"><label>更新时间止</label><input type="date" /></div>
+          <div class="filter-bar" id="keywordsFilterBar">
+            <div class="filter-field"><label>关键词</label><input type="text" id="filterKeyword" placeholder="右豹代发教程" /></div>
+            <div class="filter-field"><label>项目方</label><input type="text" id="filterProject" placeholder="右豹官方" /></div>
+            <div class="filter-field"><label>主用户 ID</label><input type="text" id="filterKwMainUser" placeholder="U20260813001" /></div>
+            <div class="filter-field"><label>子用户 ID</label><input type="text" id="filterKwSubUser" placeholder="U20260813088" /></div>
+            <div class="filter-field"><label>发布帐号 ID</label><input type="text" id="filterKwAccountId" placeholder="dy_8829103" /></div>
+            <div class="filter-field"><label>发布帐号昵称</label><input type="text" id="filterKwAccountName" placeholder="豹豹1号" /></div>
+            <div class="filter-field"><label>所属子用户 ID</label><input type="text" id="filterKwOwnerSub" placeholder="U20260813088" /></div>
+            <div class="filter-field"><label>更新时间起</label><input type="date" id="filterKwDateFrom" /></div>
+            <div class="filter-field"><label>更新时间止</label><input type="date" id="filterKwDateTo" /></div>
             <div class="filter-actions">
-              <button class="btn-ghost-sm" type="button" onclick="showToast('Demo：已重置筛选')">重置</button>
-              <button class="btn btn-primary" type="button" onclick="showToast('Demo：筛选仅影响 Mock 展示')">查询</button>
+              <button class="btn-ghost-sm" type="button" onclick="resetKeywordsFilter()">重置</button>
+              <button class="btn btn-primary" type="button" onclick="queryKeywords()">查询</button>
             </div>
           </div>
           <div class="table-wrap">
@@ -456,32 +441,7 @@
                   <th>累计产生收益</th><th>累计分配</th><th>数据更新时间</th><th>操作</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td>右豹代发教程</td><td>右豹官方</td>
-                  <td><div>U20260813001</div></td>
-                  <td><div>豹豹1号</div><div class="cell-sub">dy_8829103</div></td>
-                  <td><div>U20260813088</div></td>
-                  <td>680.00</td><td>520.00</td><td>2023.12.24 13:00</td>
-                  <td><a class="link" onclick="openKeywordDetail('右豹代发教程')">详情</a></td>
-                </tr>
-                <tr>
-                  <td>关键词推广A</td><td>番茄小说</td>
-                  <td><div>U20260813001</div></td>
-                  <td><div>豹豹2号</div><div class="cell-sub">ks_6610238</div></td>
-                  <td><div>U20260813088</div></td>
-                  <td>450.00</td><td>380.50</td><td>2023.12.24 13:00</td>
-                  <td><a class="link" onclick="openKeywordDetail('关键词推广A')">详情</a></td>
-                </tr>
-                <tr>
-                  <td>TIK出海词</td><td>出海项目</td>
-                  <td><div>U20260813001</div></td>
-                  <td><div>leopard_en</div><div class="cell-sub">tk_9900122</div></td>
-                  <td><div>U20260813099</div></td>
-                  <td>1100.00</td><td>890.00</td><td>2023.12.23 09:30</td>
-                  <td><a class="link" onclick="openKeywordDetail('TIK出海词')">详情</a></td>
-                </tr>
-              </tbody>
+              <tbody id="keywordsTableBody"></tbody>
             </table>
           </div>
         </div>
@@ -560,9 +520,9 @@
               </g>
               <g class="flow-nodes">
                 <rect x="280" y="12" width="320" height="40" rx="8" fill="#eff6ff" stroke="#2563eb"/>
-                <text x="440" y="38" text-anchor="middle" font-size="12" fill="#18222f">「我的代发收益」右上角「查看帐号」</text>
-                <rect x="320" y="76" width="240" height="40" rx="8" fill="#eff6ff" stroke="#2563eb"/>
-                <text x="440" y="102" text-anchor="middle" font-size="12" fill="#18222f">跳转三方授权页（对接三方 API）</text>
+                <text x="440" y="38" text-anchor="middle" font-size="12" fill="#18222f">子用户在三方平台完成发布帐号授权</text>
+                <rect x="320" y="76" width="240" height="40" rx="8" fill="#fff7ed" stroke="#ea580c"/>
+                <text x="440" y="102" text-anchor="middle" font-size="12" fill="#18222f">三方 API 回调写入发布帐号表</text>
                 <polygon points="440,140 540,178 440,216 340,178" fill="#fffbeb" stroke="#d97706"/>
                 <text x="440" y="176" text-anchor="middle" font-size="11" fill="#92400e">平台帐号ID唯一?</text>
                 <text x="250" y="170" font-size="11" fill="#dc2626">否/重复</text>
@@ -693,6 +653,67 @@
     </div>
   </aside>
 
+  <!-- 主子关系详情抽屉 -->
+  <div class="drawer-overlay" id="relationDetailOverlay" onclick="closeRelationDetail()"></div>
+  <aside class="drawer" id="relationDetailDrawer">
+    <div class="drawer-header">
+      <h2 id="relationDetailTitle">关系详情</h2>
+      <button class="drawer-close" type="button" onclick="closeRelationDetail()">×</button>
+    </div>
+    <div class="drawer-body" id="relationDetailBody"></div>
+  </aside>
+
+  <!-- 发布帐号日志抽屉 -->
+  <div class="drawer-overlay" id="accountLogOverlay" onclick="closeAccountLog()"></div>
+  <aside class="drawer" id="accountLogDrawer">
+    <div class="drawer-header">
+      <h2 id="accountLogTitle">授权日志</h2>
+      <button class="drawer-close" type="button" onclick="closeAccountLog()">×</button>
+    </div>
+    <div class="drawer-body" id="accountLogBody"></div>
+  </aside>
+
+  <!-- 新增/编辑关系弹窗 -->
+  <div class="modal-overlay" id="relationFormOverlay" onclick="closeRelationForm()">
+    <div class="modal modal-md" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3 id="relationFormTitle">新增关系</h3>
+        <p>填写主子用户与分配比例，保存后向子用户推送协议邀请。</p>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-field"><label>主用户 ID</label><input type="text" id="formMainUser" placeholder="U20260813001" /></div>
+          <div class="form-field"><label>子用户 ID</label><input type="text" id="formSubUser" placeholder="U20260813102" /></div>
+        </div>
+        <div class="form-row">
+          <div class="form-field"><label>分配比例 (%)</label><input type="number" id="formRatio" min="1" max="99" placeholder="25" /></div>
+          <div class="form-field"><label>分配状态</label><select id="formAllocStatus"><option>启用</option><option>禁用</option></select></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" type="button" onclick="closeRelationForm()">取消</button>
+        <button class="btn btn-primary" type="button" onclick="submitRelationForm()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 操作确认弹窗 -->
+  <div class="modal-overlay" id="confirmOverlay" onclick="closeConfirmModal()">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3 id="confirmTitle">操作确认</h3>
+        <p id="confirmDesc"></p>
+      </div>
+      <div class="modal-body">
+        <div class="confirm-summary" id="confirmSummary"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" type="button" onclick="closeConfirmModal()">取消</button>
+        <button class="btn btn-primary" id="confirmBtn" type="button" onclick="submitConfirm()">确认</button>
+      </div>
+    </div>
+  </div>
+
   <!-- 需求规则抽屉 overlay -->
   <div class="drawer-overlay" id="ruleOverlay" onclick="setRuleDrawer(false)"></div>
   <aside class="drawer" id="ruleDrawer" role="dialog">
@@ -722,11 +743,10 @@
               <li><strong>分配详情 · 明细卡片</strong>：标题 = <code>{关键词} · {分配金额}</code>；灰色信息域<strong>仅</strong>展示用户昵称、帐号昵称、账号ID。<strong>不展示</strong>发布平台标签、编辑入口、粉丝量、主页链接。</li>
               <li><strong>子用户详情 · 分配明细</strong>：卡片标题 = <code>{关键词} · {分配金额}</code>（非「分配金额·xxx」）；三列统计：出单金额、发布帐号、分配时间。</li>
               <li><strong>子用户详情 · 授权帐号</strong>：发布帐号卡片（平台徽章 + 昵称 + 灰色信息域：账号ID、粉丝量、主页链接 + 创建时间），<strong>无编辑操作</strong>。</li>
-              <li><strong>我的代发收益（子用户首页）</strong>：接受邀请并同意协议后<strong>默认进入本页</strong>；顶部统计区：<strong>累计已获得</strong>（主大字）+ 授权帐号数（底栏左右分布）；右上角<strong>「查看帐号」</strong>入口，点击进入「发布帐号授权」页；分配 record-card 标题「分配金额·xxx」；三列：关键词、发布帐号、分配时间；<strong>不展示</strong>「代发」标签与「系统自动分配，不可撤回」文案。</li>
-              <li><strong>子用户发布帐号授权</strong>：从「我的代发收益」右上角「查看帐号」进入；顶部提示文案通过后台<strong>「说明内容」</strong>功能配置；下方展示发布帐号列表（样式同子用户详情「授权帐号」Tab），<strong>无编辑操作、无底部授权按钮</strong>（三方授权流程不在本页触发）。</li>
+              <li><strong>我的代发收益（子用户首页）</strong>：接受邀请并同意协议后<strong>默认进入本页</strong>；顶部统计区：<strong>累计已获得</strong>（主大字）+ 授权帐号数（底栏左右分布）；分配 record-card 标题「分配金额·xxx」；三列：关键词、发布帐号、分配时间；<strong>不展示</strong>「代发」标签与「系统自动分配，不可撤回」文案。</li>
               <li><strong>子用户信息 Tab</strong>：头像卡片列表（昵称/ID + 协议状态 + 协议/邀请时间）；底部三列：<strong>已分配金额</strong>、<strong>授权帐号</strong>、<strong>分配比例</strong>；点击进入子用户详情（头像信息卡 + Tab 分配明细 / 授权帐号）。</li>
               <li><strong>发起协议（主用户）</strong>：上方填写子用户 ID + 比例；下方展示<strong>分配信息</strong>与<strong>协议内容</strong>（布局参考子用户协议确认页）；底部「发送协议邀请」。</li>
-              <li><strong>协议确认（子用户）</strong>：协议正文读取现有说明内容（<code>rev_share_agreement</code>）；同意后跳转「我的代发收益」。</li>
+              <li><strong>协议确认（子用户 · 唯一接受页）</strong>：系统通知进入；展示分配信息与协议正文（<code>rev_share_agreement</code>）；同意/拒绝后分别跳转「我的代发收益」或返回；<strong>无额外 C 端授权页</strong>，三方发布帐号授权在平台外部完成。</li>
             </ul>
           </div>
         </div>
@@ -734,7 +754,7 @@
           <h3><span>3</span>交互规则</h3>
           <div class="rule-content">
             <ul>
-              <li>子用户视角闭环：<strong>接受邀请 → 同意协议 → 进入「我的代发收益」→ 右上角「查看帐号」→「发布帐号授权」</strong>。</li>
+              <li>子用户视角闭环：<strong>接受邀请 → 同意协议（仅此一页）→ 进入「我的代发收益」</strong>；三方发布帐号授权在平台外部 API 完成，不在 C 端单独展示授权页。</li>
               <li>一个主用户可绑定<strong>多个子用户</strong>；每条主子关系独立维护协议状态与分配比例。</li>
               <li>分配前置条件：<strong>协议已同意</strong> + <strong>发布帐号三方授权有效</strong> + 分配状态启用。</li>
               <li>代发收益首页分配 record-card <strong>不展示</strong>「代发」标签与「不可撤回」说明；与 FR-001 代发分配 C 端展示区分。</li>

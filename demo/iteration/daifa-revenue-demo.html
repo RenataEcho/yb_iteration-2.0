@@ -320,7 +320,7 @@
   <div class="demo-shell">
     <div class="demo-header">
       <h1>代发收益 · 前端交互 Demo</h1>
-      <p>主用户：按日分配 list · 右上角添加 · 发起协议含协议内容</p>
+      <p>主用户：按日分配 list · 右上角添加 · 发起协议含协议内容；子用户仅需一页协议确认</p>
       <div class="demo-nav">
         <button class="active" data-screen="screen-main-home">主 · 代发收益管理</button>
         <button data-screen="screen-main-alloc-list">主 · 分配信息详情</button>
@@ -328,7 +328,6 @@
         <button data-screen="screen-main-invite">主 · 发起协议</button>
         <button data-screen="screen-sub-agreement">子 · 协议确认</button>
         <button data-screen="screen-sub-alloc">子 · 我的代发收益</button>
-        <button data-screen="screen-sub-auth">子 · 发布帐号授权</button>
       </div>
     </div>
 
@@ -666,56 +665,13 @@
         </div>
       </div>
 
-      <!-- 子 · 发布帐号授权 -->
-      <div id="screen-sub-auth" class="screen">
-        <div class="status-bar"><span>9:41</span><span>●●●</span></div>
-        <div class="nav-bar">
-          <button class="back" onclick="goTo('screen-sub-alloc')">‹</button>
-          <span class="title">发布帐号授权</span>
-          <span style="width:32px"></span>
-        </div>
-        <div class="scroll-content">
-          <div class="card">
-            <p class="desc">请确认以下发布帐号已授权给主用户 <strong>U20260813001</strong>，授权完成后主用户方可按约定比例参与代发收益分配。</p>
-          </div>
-          <div class="publish-account-card">
-            <div class="publish-account-head">
-              <div class="publish-account-head-left">
-                <span class="platform-badge">抖音</span>
-                <span class="publish-account-name">豹豹1号</span>
-              </div>
-            </div>
-            <div class="publish-account-data">
-              <div><div class="cell-label">账号ID</div><div class="cell-value">118717767</div></div>
-              <div><div class="cell-label">粉丝量</div><div class="cell-value">584</div></div>
-              <div><div class="cell-label">主页链接</div><div class="cell-value link">https://v.douyin.com/…</div></div>
-            </div>
-            <div class="publish-account-foot">创建时间·2026-07-31 15:19:33</div>
-          </div>
-          <div class="publish-account-card">
-            <div class="publish-account-head">
-              <div class="publish-account-head-left">
-                <span class="platform-badge">快手</span>
-                <span class="publish-account-name">豹豹2号</span>
-              </div>
-            </div>
-            <div class="publish-account-data">
-              <div><div class="cell-label">账号ID</div><div class="cell-value">6610238</div></div>
-              <div><div class="cell-label">粉丝量</div><div class="cell-value">1.2k</div></div>
-              <div><div class="cell-label">主页链接</div><div class="cell-value link">https://v.kuaishou.com/…</div></div>
-            </div>
-            <div class="publish-account-foot">创建时间·2026-07-28 09:12:08</div>
-          </div>
-        </div>
-      </div>
-
       <!-- 子 · 我的代发收益 -->
       <div id="screen-sub-alloc" class="screen">
         <div class="status-bar"><span>9:41</span><span>●●●</span></div>
         <div class="nav-bar">
           <button class="back">‹</button>
           <span class="title">我的代发收益</span>
-          <button class="action" type="button" onclick="goTo('screen-sub-auth')">查看帐号</button>
+          <span style="width:32px"></span>
         </div>
         <div class="scroll-content">
           <div class="hero-card">
