@@ -1,0 +1,1852 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FR-004 · 预估数据 · 右豹迭代需求记录</title>
+  <style>
+    :root {
+      --primary: #2563eb; --primary-hover: #1d4ed8; --primary-light: #eff6ff; --primary-border: #bfdbfe;
+      --accent-rule: #0891b2; --accent-version: #7c3aed; --accent-fr: #d97706;
+      --success: #16a34a; --success-bg: #f0fdf4; --danger: #dc2626; --danger-bg: #fef2f2;
+      --surface: #fff; --surface-glass: rgba(255,255,255,0.72); --surface-hover: #f8fafc; --border: #e8edf3;
+      --text-primary: #18222f; --text-secondary: #4a5568; --text-muted: #9aa5b4;
+      --sidebar-w: 240px; --drawer-w: 480px; --radius-sm: 7px; --radius-lg: 14px;
+      --shadow: 0 8px 32px rgba(30,40,80,0.10);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 13px;
+      color: var(--text-primary);
+      background: linear-gradient(135deg, #e0e7ff 0%, #f0f4f8 40%, #e0f2fe 100%);
+      background-attachment: fixed; min-height: 100vh;
+    }
+    .sidebar {
+      position: fixed; inset: 0 auto 0 0; width: var(--sidebar-w); z-index: 200;
+      display: flex; flex-direction: column;
+      background: rgba(240,244,255,0.95); backdrop-filter: blur(20px);
+      border-right: 1px solid rgba(148,163,196,0.22);
+    }
+    .sidebar-brand { padding: 16px 14px 12px; border-bottom: 1px solid rgba(148,163,196,0.22); }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: linear-gradient(135deg, #2563eb, #7c3aed); color: #fff;
+      display: flex; align-items: center; justify-content: center; font-weight: 700;
+    }
+    .brand-text { font-size: 14px; font-weight: 700; }
+    .brand-sub { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+    .sprint-pill {
+      display: inline-block; margin-top: 10px; font-size: 11px; font-weight: 600;
+      padding: 3px 8px; border-radius: 999px; background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0;
+    }
+    .sidebar-scroll { flex: 1; overflow-y: auto; padding: 8px 0 16px; }
+    .nav-group-label { padding: 12px 16px 6px; font-size: 11px; font-weight: 600; color: var(--text-muted); }
+    .nav-item {
+      position: relative; display: flex; align-items: center; height: 40px;
+      padding: 0 12px 0 14px; margin: 1px 8px; width: calc(100% - 16px);
+      border-radius: 8px; font-size: 13px; font-weight: 500; color: var(--text-secondary);
+      text-decoration: none; transition: all 0.18s;
+    }
+    .nav-item:hover { background: rgba(99,102,241,0.06); color: var(--text-primary); }
+    .nav-item.active { color: var(--primary); background: rgba(37,99,235,0.12); font-weight: 600; }
+    .nav-item.active::before {
+      content: ''; position: absolute; left: 0; top: 7px; bottom: 7px;
+      width: 3px; border-radius: 0 2px 2px 0; background: var(--primary);
+    }
+    .sidebar-foot { padding: 10px 14px 14px; border-top: 1px solid rgba(148,163,196,0.22); font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+    .main { margin-left: var(--sidebar-w); padding: 16px 20px 40px; min-height: 100vh; }
+    .breadcrumb { padding: 4px 0 12px; font-size: 12px; color: var(--text-muted); }
+    .breadcrumb a { color: var(--primary); text-decoration: none; }
+    .page-header { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; }
+    .page-header h1 { font-size: 19px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .page-desc { font-size: 12px; color: var(--text-muted); max-width: 720px; line-height: 1.55; }
+    .badge { display: inline-flex; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: var(--radius-sm); }
+    .badge-fr { background: #fffbeb; color: var(--accent-fr); border: 1px solid #fde68a; }
+    .badge-version { background: #f5f3ff; color: var(--accent-version); border: 1px solid #ddd6fe; }
+    .page-tab-bar {
+      display: flex; gap: 0; margin-bottom: 16px;
+      background: var(--surface-glass); backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.55); border-radius: var(--radius-lg);
+      padding: 4px; box-shadow: var(--shadow); width: fit-content;
+    }
+    .page-tab-bar button {
+      padding: 8px 20px; border: none; background: transparent; cursor: pointer;
+      font-size: 13px; font-weight: 500; color: var(--text-secondary); border-radius: 10px;
+    }
+    .page-tab-bar button.active { background: var(--primary); color: #fff; font-weight: 600; }
+    .page-view { display: none; }
+    .page-view.active { display: block; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      height: 34px; padding: 0 14px; border-radius: var(--radius-sm);
+      font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid transparent;
+      transition: background 0.15s, border-color 0.15s, color 0.15s; white-space: nowrap;
+    }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover:not(:disabled) { background: var(--primary-hover); }
+    .btn-rule { background: var(--primary-light); color: var(--primary); border-color: var(--primary-border); }
+    .btn-rule:hover:not(:disabled) { background: #dbeafe; }
+    .btn-rule.active { background: var(--primary); color: #fff; }
+    .btn-ghost { background: var(--surface); color: var(--text-secondary); border-color: var(--border); }
+    .btn-ghost:hover:not(:disabled) { background: var(--surface-hover); color: var(--text-primary); }
+    .btn-ghost-sm {
+      display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+      background: var(--surface); color: var(--text-secondary); border: 1px solid var(--border);
+      height: 32px; padding: 0 12px; border-radius: var(--radius-sm); cursor: pointer; font-size: 12px;
+      transition: background 0.15s, color 0.15s;
+    }
+    .btn-ghost-sm:hover:not(:disabled) { background: var(--surface-hover); color: var(--text-primary); }
+    .btn-sm { height: 32px; padding: 0 12px; font-size: 12px; }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn-danger:hover:not(:disabled) { background: #b91c1c; }
+    .btn-danger-ghost { background: var(--surface); color: var(--danger); border: 1px solid #fecaca; }
+    .btn-danger-ghost:hover:not(:disabled) { background: var(--danger-bg); }
+    .btn-icon { width: 14px; height: 14px; flex-shrink: 0; stroke: currentColor; fill: none; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+    .btn-icon-fill { width: 14px; height: 14px; flex-shrink: 0; fill: currentColor; stroke: none; }
+    .icon-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 28px; height: 28px; padding: 0; border: 1px solid var(--border);
+      border-radius: 6px; background: var(--surface); color: var(--text-secondary);
+      cursor: pointer; transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+    .icon-btn:hover:not(:disabled) { background: var(--surface-hover); color: var(--primary); border-color: var(--primary-border); }
+    .icon-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .icon-btn-danger:hover:not(:disabled) { color: var(--danger); border-color: #fecaca; background: var(--danger-bg); }
+    .icon-btn .btn-icon, .icon-btn .btn-icon-fill { width: 13px; height: 13px; }
+    .sort-cell { display: inline-flex; align-items: center; justify-content: center; }
+    .icon-btn-grip { cursor: grab; color: var(--text-muted); border-style: dashed; width: 28px; height: 28px; }
+    .icon-btn-grip:active { cursor: grabbing; }
+    .action-group { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 0; }
+    .link {
+      display: inline-flex; align-items: center; gap: 4px; min-height: 28px; padding: 0 2px;
+      color: var(--primary); font-size: 12px; font-weight: 500; cursor: pointer;
+      text-decoration: none; border: none; background: none; transition: color 0.15s;
+    }
+    .link:hover { color: var(--primary-hover); text-decoration: underline; }
+    .link + .link { margin-left: 12px; }
+    .link .btn-icon { width: 12px; height: 12px; }
+    .link-danger { color: var(--danger); }
+    .link-danger:hover { color: #b91c1c; }
+    .page-header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .glass-card {
+      background: var(--surface-glass); backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.55); border-radius: var(--radius-lg);
+      box-shadow: var(--shadow); overflow: hidden;
+    }
+    /* 模板 B · 前端交互 */
+    .demo-layout { display: grid; grid-template-columns: minmax(280px, 5fr) minmax(360px, 7fr); gap: 16px; }
+    @media (max-width: 1024px) { .demo-layout { grid-template-columns: 1fr; } }
+    .scene-panel { padding: 16px 18px; }
+    .scene-panel h2 { font-size: 14px; font-weight: 700; margin-bottom: 10px; }
+    .scene-list { display: flex; flex-direction: column; gap: 6px; }
+    .scene-btn {
+      text-align: left; padding: 10px 12px; border-radius: var(--radius-sm);
+      border: 1px solid var(--border); background: rgba(255,255,255,0.6); cursor: pointer;
+    }
+    .scene-btn.active { border-color: var(--primary-border); background: var(--primary-light); color: var(--primary); font-weight: 600; }
+    .scene-btn .scene-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+    .scene-btn .scene-desc { font-size: 11px; color: var(--text-muted); line-height: 1.45; }
+    .scene-btn.active .scene-desc { color: #3b82f6; }
+    .scene-note { margin-top: 14px; padding: 10px 12px; border-radius: var(--radius-sm); background: #fffbeb; border: 1px solid #fde68a; font-size: 12px; color: #92400e; line-height: 1.55; }
+    .mockup-panel { padding: 16px; display: flex; justify-content: center; min-height: 420px; }
+    .mockup-frame-wrap {
+      width: 100%; max-width: 375px; border-radius: 28px; overflow: hidden;
+      background: #1e293b; box-shadow: 0 16px 48px rgba(0,0,0,0.18); aspect-ratio: 375 / 812;
+    }
+    .mockup-frame-wrap iframe { width: 100%; height: 100%; border: none; display: block; background: #eef1f5; }
+    .tab-bar-inline { display: flex; gap: 4px; padding: 12px 16px 0; border-bottom: 1px solid var(--border); }
+    .tab-bar-inline button {
+      padding: 8px 14px; border: none; background: none; cursor: pointer;
+      font-size: 13px; color: var(--text-secondary); border-bottom: 2px solid transparent; margin-bottom: -1px;
+    }
+    .tab-bar-inline button.active { color: var(--primary); font-weight: 600; border-bottom-color: var(--primary); }
+    .admin-panel { display: none; }
+    .admin-panel.active { display: block; }
+    .config-section { padding: 16px 18px 20px; border-bottom: 1px solid var(--border); }
+    .config-section:last-child { border-bottom: none; }
+    .config-section-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+    .config-section-head h3 { font-size: 14px; font-weight: 700; }
+    .config-section-head p { font-size: 12px; color: var(--text-muted); margin-top: 4px; line-height: 1.5; }
+    .stats-bar {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 0;
+      border-bottom: 1px solid var(--border); background: rgba(248,250,252,0.85);
+    }
+    .stat-item { padding: 14px 16px; border-right: 1px solid var(--border); }
+    .stat-item:last-child { border-right: none; }
+    .stat-item .label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+    .stat-item .value { font-size: 18px; font-weight: 700; }
+    .table-toolbar {
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
+      padding: 12px 16px; border-bottom: 1px solid var(--border);
+    }
+    .table-toolbar h3 { font-size: 14px; font-weight: 700; }
+    .toolbar-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .batch-bar {
+      display: none; align-items: center; gap: 12px; flex-wrap: wrap;
+      padding: 10px 16px; background: var(--primary-light); border-bottom: 1px solid var(--primary-border);
+      font-size: 12px;
+    }
+    .batch-bar.show { display: flex; }
+    .batch-bar .batch-info { color: var(--primary); font-weight: 600; }
+    .batch-bar .batch-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-left: auto; }
+    .filter-bar { display: flex; flex-wrap: wrap; gap: 10px; padding: 14px 16px; align-items: flex-end; border-bottom: 1px solid var(--border); }
+    .filter-field { display: flex; flex-direction: column; gap: 4px; }
+    .filter-field label { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+    .filter-field input, .filter-field select { height: 32px; padding: 0 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 12px; min-width: 130px; }
+    .filter-actions { display: flex; gap: 8px; margin-left: auto; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 800px; }
+    th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); font-size: 12px; vertical-align: middle; }
+    th { font-size: 11px; font-weight: 600; color: var(--text-muted); background: rgba(248,250,252,0.9); white-space: nowrap; }
+    tr:hover td { background: var(--surface-hover); }
+    .cell-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .tag { display: inline-flex; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+    .tag-ok { background: var(--success-bg); color: var(--success); }
+    .tag-muted { background: #f1f5f9; color: var(--text-muted); }
+    th.col-actions, td.col-actions { white-space: nowrap; }
+    th.col-check, td.col-check { width: 40px; text-align: center; padding-left: 16px; }
+    th.col-check input, td.col-check input { cursor: pointer; width: 15px; height: 15px; }
+    th.col-sort { width: 44px; text-align: center; }
+    /* 展示配置 · 左配置 + 右 C 端预览 */
+    .config-split-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 360px;
+      align-items: start;
+    }
+    @media (max-width: 1280px) {
+      .config-split-layout { grid-template-columns: 1fr; }
+      .config-preview-panel { border-top: 1px solid var(--border); }
+    }
+    .config-main { min-width: 0; border-right: 1px solid var(--border); }
+    .config-main .table-wrap table { min-width: 640px; }
+    .config-preview-panel {
+      padding: 14px 16px 18px;
+      background: rgba(248,250,252,0.72);
+      position: sticky;
+      top: 12px;
+    }
+    .preview-panel-head {
+      display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;
+      margin-bottom: 12px;
+    }
+    .preview-panel-head h3 { font-size: 13px; font-weight: 700; }
+    .preview-panel-head p { font-size: 11px; color: var(--text-muted); margin-top: 4px; line-height: 1.45; }
+    .preview-sync-tag {
+      font-size: 10px; font-weight: 600; color: var(--success); background: var(--success-bg);
+      border: 1px solid #bbf7d0; padding: 3px 8px; border-radius: 999px; white-space: nowrap;
+    }
+    .mockup-phone {
+      width: 100%; max-width: 320px; margin: 0 auto;
+      border-radius: 28px; overflow: hidden;
+      background: #1e293b; box-shadow: 0 16px 48px rgba(0,0,0,0.16);
+      border: 3px solid #1e293b;
+      position: relative;
+    }
+    .mockup-phone-screen {
+      background: #eef1f5; min-height: 560px; max-height: 720px; overflow-y: auto;
+      padding: 14px 12px 16px; font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    .fe-label { font-size: 10px; letter-spacing: 0.08em; color: #9aa5b4; font-weight: 600; margin-bottom: 4px; }
+    .fe-title { font-size: 22px; font-weight: 800; color: #18222f; line-height: 1.2; margin-bottom: 6px; }
+    .fe-disclaimer { font-size: 11px; color: #9aa5b4; line-height: 1.45; margin-bottom: 12px; }
+    .fe-project-card {
+      display: flex; align-items: center; gap: 10px; background: #fff; border-radius: 16px;
+      padding: 12px; margin-bottom: 14px; box-shadow: 0 2px 8px rgba(30,40,80,0.06);
+      cursor: pointer; border: none; width: 100%; text-align: left;
+    }
+    .fe-project-card:active { background: #fafafa; }
+    .fe-project-icon {
+      width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: #fff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .fe-project-meta { flex: 1; min-width: 0; }
+    .fe-project-meta .sub { font-size: 10px; color: #9aa5b4; margin-bottom: 2px; }
+    .fe-project-meta .name { font-size: 13px; font-weight: 700; color: #18222f; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .fe-chevron { color: #cbd5e1; font-size: 18px; line-height: 1; flex-shrink: 0; }
+    .fe-project-picker-overlay {
+      position: absolute; inset: 0; background: rgba(15,23,42,0.45); z-index: 20;
+      display: none; align-items: flex-end; justify-content: center;
+    }
+    .fe-project-picker-overlay.open { display: flex; }
+    .fe-project-picker-sheet {
+      width: 100%; max-height: 75%; background: #fff;
+      border-radius: 16px 16px 0 0; overflow: hidden; display: flex; flex-direction: column;
+    }
+    .fe-project-picker-head {
+      padding: 12px 14px 8px; font-size: 13px; font-weight: 700; color: #18222f;
+      border-bottom: 1px solid #e8edf3; flex-shrink: 0;
+    }
+    .fe-project-picker-list { overflow-y: auto; padding: 4px 0 10px; max-height: 280px; }
+    .fe-project-picker-item {
+      display: flex; align-items: center; gap: 8px; width: 100%; padding: 10px 14px;
+      border: none; background: none; cursor: pointer; text-align: left;
+    }
+    .fe-project-picker-item:hover { background: #f8fafc; }
+    .fe-project-picker-item.active { background: #fff4eb; }
+    .fe-project-picker-item .icon {
+      width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: #fff; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .fe-project-picker-item .label { font-size: 12px; font-weight: 600; color: #18222f; flex: 1; min-width: 0; }
+    .fe-project-picker-item .check { font-size: 13px; color: #f07167; font-weight: 700; flex-shrink: 0; }
+    .fe-section { margin-bottom: 12px; }
+    .fe-section-head {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 0 2px;
+    }
+    .fe-section-title { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: #18222f; }
+    .fe-section-num {
+      width: 22px; height: 22px; border-radius: 6px; background: #ffe8e3; color: #f07167;
+      font-size: 11px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center;
+    }
+    .fe-section-actions { font-size: 11px; color: #9aa5b4; display: flex; align-items: center; gap: 8px; }
+    .fe-section-actions button {
+      border: none; background: none; color: #9aa5b4; font-size: 11px; cursor: pointer; padding: 0;
+    }
+    .fe-card {
+      background: #fff; border-radius: 18px; padding: 14px; box-shadow: 0 2px 10px rgba(30,40,80,0.06);
+    }
+    .fe-field { margin-bottom: 12px; }
+    .fe-field:last-child { margin-bottom: 0; }
+    .fe-field-label {
+      display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; color: #18222f; margin-bottom: 6px;
+    }
+    .fe-field-label i { width: 6px; height: 6px; border-radius: 50%; background: #f07167; display: inline-block; }
+    .fe-input-row { display: flex; align-items: center; gap: 8px; }
+    .fe-input {
+      flex: 1; height: 36px; border: 1px solid #e8edf3; border-radius: 10px; background: #f8fafc;
+      padding: 0 10px; font-size: 12px; color: #64748b;
+    }
+    .fe-input-full { width: 100%; height: 36px; border: 1px solid #e8edf3; border-radius: 10px; background: #f8fafc; padding: 0 10px; font-size: 12px; color: #64748b; }
+    .fe-sep { font-size: 12px; color: #9aa5b4; flex-shrink: 0; }
+    .fe-btn-query {
+      width: 100%; height: 42px; margin-top: 14px; border: none; border-radius: 12px;
+      background: linear-gradient(135deg, #ff8a75, #f07167); color: #fff;
+      font-size: 14px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 14px rgba(240,113,103,0.35);
+    }
+    .fe-stat-hero {
+      position: relative; background: #fff; border-radius: 16px; padding: 14px; margin-bottom: 10px;
+      box-shadow: 0 2px 8px rgba(30,40,80,0.06); min-height: 88px;
+    }
+    .fe-stat-hero .name { font-size: 12px; color: #64748b; margin-bottom: 8px; }
+    .fe-stat-hero .val { font-size: 28px; font-weight: 800; color: #18222f; line-height: 1; }
+    .fe-stat-hero .chart-icon {
+      position: absolute; right: 12px; bottom: 10px; width: 36px; height: 28px;
+      display: flex; align-items: flex-end; gap: 3px; opacity: 0.35;
+    }
+    .fe-stat-hero .chart-icon span { width: 5px; background: #f07167; border-radius: 2px; }
+    .fe-stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .fe-stat-mini {
+      position: relative; background: #fff; border-radius: 14px; padding: 12px 10px 14px;
+      box-shadow: 0 2px 8px rgba(30,40,80,0.05); min-height: 78px;
+    }
+    .fe-stat-mini .name { font-size: 11px; color: #64748b; margin-bottom: 10px; padding-right: 28px; line-height: 1.3; }
+    .fe-stat-mini .val { font-size: 22px; font-weight: 800; color: #18222f; }
+    .fe-stat-badge {
+      position: absolute; top: 8px; right: 8px; font-size: 9px; font-weight: 700;
+      padding: 2px 6px; border-radius: 6px; background: #f1f5f9; color: #64748b;
+    }
+    .fe-footer-note {
+      margin-top: 12px; font-size: 10px; color: #9aa5b4; text-align: center; line-height: 1.45;
+    }
+    .fe-card.fe-query-collapsed .fe-query-body { display: none; }
+    .fe-query-collapsed-hint {
+      display: none; font-size: 11px; color: #64748b; line-height: 1.45; padding: 2px 2px 0;
+    }
+    .fe-card.fe-query-collapsed .fe-query-collapsed-hint { display: block; }
+    .fe-detail-card {
+      background: #fff; border-radius: 16px; padding: 14px; margin-bottom: 10px;
+      box-shadow: 0 2px 8px rgba(30,40,80,0.06);
+    }
+    .fe-detail-card:last-child { margin-bottom: 0; }
+    .fe-detail-head { margin-bottom: 10px; }
+    .fe-detail-title {
+      font-size: 15px; font-weight: 700; color: #18222f; line-height: 1.35;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .fe-detail-data {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+      background: #f5f6f8; border-radius: 10px; padding: 12px 10px; margin-bottom: 8px;
+    }
+    .fe-detail-data .cell-label { font-size: 10px; color: #9aa5b4; margin-bottom: 4px; }
+    .fe-detail-data .cell-value {
+      font-size: 12px; font-weight: 700; color: #18222f; word-break: break-all; line-height: 1.35;
+    }
+    .fe-detail-data .cell-value.link { color: #2563eb; font-weight: 600; }
+    .fe-detail-data .cell-sub { font-size: 10px; color: #9aa5b4; margin-top: 2px; font-weight: 400; }
+    .fe-detail-foot { font-size: 10px; color: #9aa5b4; }
+    .fe-detail-empty {
+      padding: 20px 12px; text-align: center; font-size: 11px; color: #9aa5b4;
+      background: #fff; border-radius: 14px;
+    }
+    .import-hint {
+      padding: 10px 12px; background: #f8fafc; border: 1px solid var(--border);
+      border-radius: var(--radius-sm); font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px;
+    }
+    .import-hint code { background: #f1f5f9; padding: 1px 5px; border-radius: 4px; font-size: 11px; }
+    .drawer-overlay {
+      position: fixed; inset: 0; background: rgba(15,23,42,0.35); z-index: 500;
+      opacity: 0; pointer-events: none; transition: opacity 0.25s;
+    }
+    .drawer-overlay.open { opacity: 1; pointer-events: auto; }
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(15,23,42,0.4); z-index: 600;
+      display: flex; align-items: center; justify-content: center; padding: 20px;
+      opacity: 0; pointer-events: none; transition: opacity 0.22s;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: auto; }
+    .drawer {
+      position: fixed; top: 0; right: 0; bottom: 0; width: var(--drawer-w); z-index: 501;
+      background: rgba(255,255,255,0.98); backdrop-filter: blur(12px);
+      box-shadow: -8px 0 40px rgba(30,40,60,0.18);
+      transform: translateX(100%); transition: transform 0.28s ease;
+      display: flex; flex-direction: column;
+    }
+    .drawer.open { transform: translateX(0); }
+    .drawer-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .drawer-header h2 { font-size: 15px; font-weight: 700; }
+    .drawer-close { width: 28px; height: 28px; border: none; background: #f1f5f9; border-radius: 6px; cursor: pointer; font-size: 16px; }
+    .rule-tab-bar { display: flex; gap: 0; padding: 0 16px; border-bottom: 1px solid var(--border); }
+    .rule-tab-bar button {
+      padding: 10px 18px; border: none; background: none; cursor: pointer;
+      font-size: 13px; color: var(--text-secondary); border-bottom: 2px solid transparent; margin-bottom: -1px;
+    }
+    .rule-tab-bar button.active { color: var(--primary); font-weight: 600; border-bottom-color: var(--primary); }
+    .drawer-body { flex: 1; overflow-y: auto; padding: 16px 20px 32px; }
+    .rule-panel { display: none; }
+    .rule-panel.active { display: block; }
+    .rule-section { margin-bottom: 22px; }
+    .rule-section h3 { font-size: 14px; font-weight: 700; color: var(--accent-rule); margin-bottom: 8px; }
+    .rule-section h3 span {
+      display: inline-flex; width: 22px; height: 22px; align-items: center; justify-content: center;
+      background: #ecfeff; color: var(--accent-rule); border-radius: 6px; font-size: 12px; margin-right: 8px;
+    }
+    .rule-content { font-size: 13px; color: var(--text-secondary); line-height: 1.65; }
+    .rule-content ul { padding-left: 18px; margin-top: 6px; }
+    .rule-content li { margin-bottom: 5px; }
+    .rule-content code { font-family: ui-monospace, monospace; font-size: 12px; background: #f1f5f9; padding: 1px 5px; border-radius: 4px; }
+    .rule-note {
+      margin-top: 10px; padding: 10px 12px; border-radius: var(--radius-sm);
+      background: #fffbeb; border: 1px solid #fde68a; font-size: 12px; color: #92400e; line-height: 1.55;
+    }
+    .modal {
+      width: 100%; max-width: 400px; background: var(--surface);
+      border-radius: var(--radius-lg); box-shadow: 0 20px 60px rgba(30,40,80,0.18);
+      transform: translateY(12px) scale(0.98); transition: transform 0.22s;
+    }
+    .modal-overlay.open .modal { transform: translateY(0) scale(1); }
+    .modal.modal-md { max-width: 480px; }
+    .modal-header { padding: 16px 20px 0; }
+    .modal-header h3 { font-size: 15px; font-weight: 700; }
+    .modal-header p { font-size: 12px; color: var(--text-muted); margin-top: 6px; line-height: 1.55; }
+    .modal-body { padding: 16px 20px; }
+    .form-field { margin-bottom: 12px; }
+    .form-field:last-child { margin-bottom: 0; }
+    .form-field label { display: block; font-size: 11px; font-weight: 500; color: var(--text-muted); margin-bottom: 4px; }
+    .form-field input, .form-field select {
+      width: 100%; height: 34px; padding: 0 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px;
+    }
+    .form-field input:focus, .form-field select:focus {
+      outline: none; border-color: var(--primary-border); box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+    }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .confirm-summary {
+      padding: 12px 14px; background: #f8fafc; border-radius: var(--radius-sm); border: 1px solid var(--border);
+      font-size: 13px; line-height: 1.7; color: var(--text-secondary);
+    }
+    .modal-footer { padding: 12px 20px 16px; display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid var(--border); }
+    .file-upload {
+      display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+      border: 1px dashed var(--border); border-radius: var(--radius-sm); background: #f8fafc;
+    }
+    .file-upload input[type="file"] { font-size: 12px; flex: 1; }
+    .flow-page-intro { padding: 16px 18px 0; font-size: 12px; color: var(--text-muted); line-height: 1.55; }
+    .flow-scroll-hint { padding: 8px 18px 0; font-size: 11px; color: var(--text-muted); }
+    .flow-svg-wrap {
+      overflow: auto; padding: 16px 18px 24px; max-height: 72vh; border-top: 1px solid var(--border);
+      -webkit-overflow-scrolling: touch;
+    }
+    .flow-svg-wrap svg { display: block; margin: 0 auto; min-width: 860px; }
+    .flow-edges line { stroke: #94a3b8; stroke-width: 1.5; fill: none; }
+    .flow-legend { display: flex; flex-wrap: wrap; gap: 12px; padding: 0 18px 20px; font-size: 11px; color: var(--text-muted); }
+    .flow-legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 4px; vertical-align: -2px; }
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: #1e293b; color: #fff; padding: 10px 18px; border-radius: 999px; font-size: 13px;
+      opacity: 0; transition: all 0.25s; z-index: 600; pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+  <!-- 图标 sprite（全页复用） -->
+  <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+    <symbol id="i-plus" viewBox="0 0 16 16"><path d="M8 3v10M3 8h10"/></symbol>
+    <symbol id="i-download" viewBox="0 0 16 16"><path d="M8 2v8M5 7l3 3 3-3M3 13h10"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 16 16"><path d="M8 11V3M5 6l3-3 3 3M3 13h10"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 16 16"><path d="M11 2l3 3-8 8H3v-3l8-8z"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 16 16"><path d="M3 4h10M6 4V3h4v1M5 4v9h6V4"/></symbol>
+    <symbol id="i-grip" viewBox="0 0 16 16"><circle cx="6" cy="4" r="1" fill="currentColor"/><circle cx="10" cy="4" r="1" fill="currentColor"/><circle cx="6" cy="8" r="1" fill="currentColor"/><circle cx="10" cy="8" r="1" fill="currentColor"/><circle cx="6" cy="12" r="1" fill="currentColor"/><circle cx="10" cy="12" r="1" fill="currentColor"/></symbol>
+    <symbol id="i-chevron-up" viewBox="0 0 16 16"><path d="M4 10l4-4 4 4"/></symbol>
+    <symbol id="i-chevron-down" viewBox="0 0 16 16"><path d="M4 6l4 4 4-4"/></symbol>
+    <symbol id="i-rule" viewBox="0 0 16 16"><path d="M3 3h10v10H3zM5 6h6M5 9h4"/></symbol>
+    <symbol id="i-search" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4"/><path d="M10 10l3 3"/></symbol>
+    <symbol id="i-reset" viewBox="0 0 16 16"><path d="M3 8a5 5 0 019-2M13 8a5 5 0 01-9 2M3 5v3h3M13 11v-3h-3"/></symbol>
+  </svg>
+
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand">
+        <div class="brand-icon">迭</div>
+        <div>
+          <div class="brand-text">右豹迭代需求记录</div>
+          <div class="brand-sub">PRD Demo · 产品交付研发</div>
+        </div>
+      </div>
+      <span class="sprint-pill">YBDD2.0 · 迭代 v1</span>
+    </div>
+    <div class="sidebar-scroll" data-iteration-sidebar></div>
+    <div class="sidebar-foot">FR-004 · 页内 Tab<br />前端交互 / 管理后台 / 业务流程</div>
+  </aside>
+
+  <main class="main">
+    <nav class="breadcrumb">
+      <a href="framework-shell.html">Sprint 概览</a>
+      <span> / 项目管理 / 预估数据</span>
+    </nav>
+
+    <header class="page-header">
+      <div>
+        <h1>
+          预估数据
+          <span class="badge badge-fr">FR-004</span>
+          <span class="badge badge-version">v1 当前</span>
+        </h1>
+        <p class="page-desc">C 端「数据查询」页（查询条件折叠 + 数据统计 + 数据明细卡片）；管理后台维护展示配置与预估数据表（动态列、批量删除/导入）。项目编辑弹窗「预估数据」开关仅写入需求规则。</p>
+      </div>
+      <div class="page-header-actions">
+        <button class="btn btn-rule" id="toggleRuleDrawer" type="button" aria-expanded="false">
+          <svg class="btn-icon" aria-hidden="true"><use href="#i-rule"/></svg>
+          需求规则
+        </button>
+      </div>
+    </header>
+
+    <div class="page-tab-bar" role="tablist">
+      <button type="button" class="active" data-page="view-fe" role="tab">前端交互</button>
+      <button type="button" data-page="view-admin" role="tab">管理后台</button>
+      <button type="button" data-page="view-flow" role="tab">业务流程</button>
+    </div>
+
+    <!-- 前端交互 -->
+    <div id="view-fe" class="page-view active">
+      <div class="demo-layout">
+        <div class="glass-card scene-panel">
+          <h2>场景切换</h2>
+          <div class="scene-list">
+            <button class="scene-btn active" type="button" data-screen="screen-data-query">
+              <div class="scene-title">数据查询 · 默认态</div>
+              <div class="scene-desc">查询条件默认折叠（时间范围 + 关键词）；02 数据统计（首项大卡 + 三列网格）；03 数据明细卡片</div>
+            </button>
+            <button class="scene-btn" type="button" data-screen="screen-query-expanded">
+              <div class="scene-title">查询条件展开</div>
+              <div class="scene-desc">仅时间范围与关键词；立即查询后折叠并刷新统计与明细</div>
+            </button>
+            <button class="scene-btn" type="button" data-screen="screen-empty-result">
+              <div class="scene-title">无明细空态</div>
+              <div class="scene-desc">查询无匹配结果时，数据明细区展示空态提示</div>
+            </button>
+          </div>
+          <div class="scene-note">C 端查询条件固定为「时间范围 + 关键词」；明细卡片底部展示「数据日期」；统计区首项大卡，其余为三列网格小卡。</div>
+        </div>
+        <div class="glass-card mockup-panel">
+          <div class="mockup-frame-wrap">
+            <iframe id="mockupFrame" title="预估数据 C 端 Mockup" src="about:blank" data-src="estimated-data-demo.html"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 管理后台 -->
+    <div id="view-admin" class="page-view">
+      <div class="glass-card">
+        <div class="tab-bar-inline" role="tablist">
+          <button type="button" class="active" data-panel="panel-config">预估数据展示配置</button>
+          <button type="button" data-panel="panel-data">预估数据表</button>
+        </div>
+
+        <!-- 展示配置：左配置 + 右 C 端预览 -->
+        <div id="panel-config" class="admin-panel active">
+          <div class="config-split-layout">
+            <div class="config-main">
+              <div class="config-section">
+                <div class="config-section-head">
+                  <div>
+                    <h3>列表展示字段</h3>
+                    <p>配置 C 端明细展示字段与后台列表列；支持拖拽排序、关联展示字段、是否参与 Excel 导入。查询条件固定为时间范围 + 关键词。</p>
+                  </div>
+                  <button class="btn btn-primary btn-sm" type="button" onclick="openListFieldModal('add')">
+                    <svg class="btn-icon" aria-hidden="true"><use href="#i-plus"/></svg>
+                    新增字段
+                  </button>
+                </div>
+                <div class="table-wrap">
+                  <table id="listFieldTable">
+                    <thead>
+                      <tr>
+                        <th class="col-sort">排序</th>
+                        <th>展示字段</th>
+                        <th>字段标识</th>
+                        <th>关联展示字段</th>
+                        <th>支持导入</th>
+                        <th class="col-actions">操作</th>
+                      </tr>
+                    </thead>
+                    <tbody id="listFieldBody"></tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="config-section">
+                <div class="config-section-head">
+                  <div>
+                    <h3>数据统计</h3>
+                    <p>从「列表展示字段」中选择来源字段配置统计项；首项为大卡，其余为三列网格小卡，按排序渲染。</p>
+                  </div>
+                  <button class="btn btn-primary btn-sm" type="button" onclick="openStatFieldModal('add')" id="btnAddStatField">
+                    <svg class="btn-icon" aria-hidden="true"><use href="#i-plus"/></svg>
+                    新增统计项
+                  </button>
+                </div>
+                <div class="table-wrap">
+                  <table id="statFieldTable">
+                    <thead>
+                      <tr>
+                        <th class="col-sort">排序</th>
+                        <th>统计字段名</th>
+                        <th>来源列表字段</th>
+                        <th>字段标识</th>
+                        <th class="col-actions">操作</th>
+                      </tr>
+                    </thead>
+                    <tbody id="statFieldBody"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <aside class="config-preview-panel" aria-label="C 端预览">
+              <div class="preview-panel-head">
+                <div>
+                  <h3>前端预览</h3>
+                  <p>随左侧配置实时联动 · 查询条件可折叠 · 含数据明细卡片</p>
+                </div>
+                <span class="preview-sync-tag">实时同步</span>
+              </div>
+              <div class="mockup-phone">
+                <div class="mockup-phone-screen" id="fePreview"></div>
+                <div class="fe-project-picker-overlay" id="feProjectPickerOverlay" onclick="closeFeProjectPicker()">
+                  <div class="fe-project-picker-sheet" onclick="event.stopPropagation()">
+                    <div class="fe-project-picker-head">选择项目</div>
+                    <div class="fe-project-picker-list" id="feProjectPickerList"></div>
+                  </div>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </div>
+
+        <!-- 预估数据表 -->
+        <div id="panel-data" class="admin-panel">
+          <div class="stats-bar" id="statsBar"></div>
+
+          <div class="table-toolbar">
+            <h3>预估数据表 · 右豹品牌合作</h3>
+            <div class="toolbar-actions">
+              <button class="btn btn-ghost btn-sm" type="button" onclick="downloadTemplate()">
+                <svg class="btn-icon" aria-hidden="true"><use href="#i-download"/></svg>
+                下载导入模版
+              </button>
+              <button class="btn btn-ghost btn-sm" type="button" onclick="openImportModal()">
+                <svg class="btn-icon" aria-hidden="true"><use href="#i-upload"/></svg>
+                批量导入
+              </button>
+            </div>
+          </div>
+
+          <div class="batch-bar" id="batchBar">
+            <span class="batch-info" id="batchInfo">已选 0 条</span>
+            <div class="batch-btns">
+              <button class="btn btn-danger-ghost btn-sm" type="button" onclick="openConfirmModal('batchDelete')">
+                <svg class="btn-icon" aria-hidden="true"><use href="#i-trash"/></svg>
+                批量删除
+              </button>
+            </div>
+          </div>
+
+          <div class="filter-bar">
+            <div class="filter-field"><label>关键词</label><input type="text" placeholder="Summer推广词" id="filterKeyword" /></div>
+            <div class="filter-field"><label>用户信息</label><input type="text" placeholder="张三 / U-10086" id="filterUser" /></div>
+            <div class="filter-actions">
+              <button class="btn-ghost-sm" type="button" onclick="resetFilter()">
+                <svg class="btn-icon" aria-hidden="true"><use href="#i-reset"/></svg>
+                重置
+              </button>
+              <button class="btn btn-primary btn-sm" type="button" onclick="applyFilter()">
+                <svg class="btn-icon" aria-hidden="true"><use href="#i-search"/></svg>
+                查询
+              </button>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th class="col-check"><input type="checkbox" id="checkAll" title="全选" onchange="toggleCheckAll(this)" /></th>
+                  <th>关键词</th>
+                  <th>预估曝光量</th>
+                  <th>预估转化量</th>
+                  <th>用户信息</th>
+                  <th>数据更新时间</th>
+                  <th class="col-actions">操作</th>
+                </tr>
+              </thead>
+              <tbody id="dataTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 业务流程 -->
+    <div id="view-flow" class="page-view">
+      <div class="glass-card flow-page">
+        <p class="flow-page-intro">预估数据配置 → 项目开关 → 数据导入/展示链路。菱形为校验节点。</p>
+        <p class="flow-scroll-hint">流程图超出可视区域时，可在此面板内上下或左右滚动查看。</p>
+        <div class="flow-svg-wrap">
+          <svg viewBox="0 0 900 620" width="900" height="620" xmlns="http://www.w3.org/2000/svg">
+            <defs><marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8"/></marker></defs>
+            <g class="flow-edges">
+              <!-- 主链 -->
+              <line x1="450" y1="52" x2="450" y2="76" marker-end="url(#arr)"/>
+              <line x1="450" y1="120" x2="450" y2="144" marker-end="url(#arr)"/>
+              <line x1="450" y1="188" x2="450" y2="212" marker-end="url(#arr)"/>
+              <!-- 分支：否 → 左 CRUD -->
+              <line x1="370" y1="248" x2="180" y2="248" marker-end="url(#arr)"/>
+              <!-- 分支：是 → 右导入链 -->
+              <line x1="530" y1="248" x2="710" y2="248" marker-end="url(#arr)"/>
+              <line x1="790" y1="272" x2="790" y2="296" marker-end="url(#arr)"/>
+              <line x1="790" y1="340" x2="790" y2="364" marker-end="url(#arr)"/>
+              <line x1="790" y1="408" x2="790" y2="432" marker-end="url(#arr)"/>
+              <!-- 导入完成 → 汇聚通道 y=470 -->
+              <line x1="790" y1="476" x2="790" y2="470"/>
+              <line x1="180" y1="276" x2="180" y2="470"/>
+              <line x1="180" y1="470" x2="790" y2="470"/>
+              <line x1="450" y1="288" x2="450" y2="470"/>
+              <line x1="450" y1="470" x2="450" y2="504" marker-end="url(#arr)"/>
+            </g>
+            <g class="flow-nodes">
+              <rect x="250" y="12" width="400" height="40" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
+              <text x="450" y="38" text-anchor="middle" font-size="12" fill="#18222f">配置列表展示字段 + 从列表字段选择数据统计项</text>
+              <rect x="270" y="76" width="360" height="44" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
+              <text x="450" y="104" text-anchor="middle" font-size="12" fill="#18222f">项目编辑 · 预估数据=显示</text>
+              <rect x="290" y="144" width="320" height="44" rx="8" fill="#eff6ff" stroke="#2563eb"/>
+              <text x="450" y="172" text-anchor="middle" font-size="12" fill="#18222f">进入项目 · 预估数据表 Tab 可见</text>
+              <polygon points="450,212 530,252 450,292 370,252" fill="#fffbeb" stroke="#d97706"/>
+              <text x="450" y="250" text-anchor="middle" font-size="11" fill="#92400e">批量导入?</text>
+              <text x="248" y="242" font-size="11" fill="#64748b">否 · 手工维护</text>
+              <rect x="60" y="230" width="120" height="36" rx="8" fill="#eff6ff" stroke="#2563eb"/>
+              <text x="120" y="252" text-anchor="middle" font-size="10" fill="#18222f">列表 CRUD</text>
+              <text x="618" y="242" font-size="11" fill="#16a34a">是</text>
+              <rect x="710" y="230" width="160" height="36" rx="8" fill="#eff6ff" stroke="#2563eb"/>
+              <text x="790" y="252" text-anchor="middle" font-size="11" fill="#18222f">下载动态模版</text>
+              <rect x="670" y="296" width="240" height="44" rx="8" fill="#eff6ff" stroke="#2563eb"/>
+              <text x="790" y="324" text-anchor="middle" font-size="11" fill="#18222f">按「支持导入」字段校验 Excel</text>
+              <rect x="670" y="364" width="240" height="44" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
+              <text x="790" y="392" text-anchor="middle" font-size="11" fill="#18222f">写入预估数据表</text>
+              <rect x="670" y="432" width="240" height="44" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
+              <text x="790" y="460" text-anchor="middle" font-size="11" fill="#18222f">刷新统计区 + 列表列</text>
+              <rect x="290" y="504" width="320" height="44" rx="8" fill="#eff6ff" stroke="#2563eb"/>
+              <text x="450" y="532" text-anchor="middle" font-size="11" fill="#18222f">C 端数据查询 · 统计 + 明细展示</text>
+              <rect x="270" y="568" width="360" height="44" rx="8" fill="#fef2f2" stroke="#dc2626"/>
+              <text x="450" y="596" text-anchor="middle" font-size="11" fill="#991b1b">预估数据=隐藏 · 入口与 Tab 不可见</text>
+            </g>
+          </svg>
+        </div>
+        <div class="flow-legend">
+          <span><i style="background:#eff6ff;border:1px solid #2563eb"></i>前端 / 操作</span>
+          <span><i style="background:#f0fdf4;border:1px solid #16a34a"></i>后端 / 配置与数据</span>
+          <span><i style="background:#fffbeb;border:1px solid #d97706"></i>校验 / 分支</span>
+          <span><i style="background:#fef2f2;border:1px solid #dc2626"></i>隐藏 / 终止</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 批量导入弹窗 -->
+  <div class="modal-overlay" id="importOverlay" onclick="closeImportModal()">
+    <div class="modal modal-md" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3>批量导入 · Excel</h3>
+        <p>列字段按「列表展示字段 · 支持导入=是」动态生成</p>
+      </div>
+      <div class="modal-body">
+        <div class="import-hint" id="importHint"></div>
+        <div class="form-field">
+          <label>选择 Excel 文件</label>
+          <div class="file-upload">
+            <svg class="btn-icon" aria-hidden="true"><use href="#i-upload"/></svg>
+            <input type="file" accept=".xlsx,.xls,.csv" id="importFileInput" onchange="onImportFileChange(this)" />
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" type="button" onclick="closeImportModal()">取消</button>
+        <button class="btn btn-primary" type="button" onclick="submitImport()">
+          <svg class="btn-icon" aria-hidden="true"><use href="#i-upload"/></svg>
+          开始导入
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 列表字段编辑弹窗 -->
+  <div class="modal-overlay" id="listFieldOverlay" onclick="closeListFieldModal()">
+    <div class="modal modal-md" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3 id="listFieldModalTitle">新增列表展示字段</h3>
+      </div>
+      <div class="modal-body">
+        <div class="form-field">
+          <label>展示字段 *</label>
+          <input type="text" id="lfLabel" placeholder="如：关键词" />
+        </div>
+        <div class="form-field">
+          <label>字段标识 *</label>
+          <input type="text" id="lfKey" placeholder="如：keyword" />
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label>关联展示字段名</label>
+            <input type="text" id="lfRelLabel" placeholder="如：用户昵称" />
+          </div>
+          <div class="form-field">
+            <label>关联字段标识</label>
+            <input type="text" id="lfRelKey" placeholder="如：user_nickname" />
+          </div>
+        </div>
+        <div class="form-field">
+          <label>支持导入</label>
+          <select id="lfImportable">
+            <option value="yes">是</option>
+            <option value="no">否</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" type="button" onclick="closeListFieldModal()">取消</button>
+        <button class="btn btn-primary" type="button" onclick="saveListField()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 统计项编辑弹窗 -->
+  <div class="modal-overlay" id="statFieldOverlay" onclick="closeStatFieldModal()">
+    <div class="modal modal-md" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3 id="statFieldModalTitle">新增统计项</h3>
+        <p id="statFieldModalDesc">从已配置的列表展示字段中选择来源，系统自动生成统计名称与标识</p>
+      </div>
+      <div class="modal-body">
+        <div class="form-field" id="sfListFieldWrap">
+          <label>列表展示字段 *</label>
+          <select id="sfListField" onchange="onStatListFieldChange()"></select>
+        </div>
+        <div class="form-field">
+          <label>统计字段名</label>
+          <input type="text" id="sfLabel" readonly />
+        </div>
+        <div class="form-field">
+          <label>字段标识</label>
+          <input type="text" id="sfKey" readonly />
+        </div>
+        <div class="rule-note" id="sfSystemNote" style="display:none;margin-top:0">
+          系统统计项「数据条数」（<code>row_count</code>）为固定计数，不关联列表展示字段。
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" type="button" onclick="closeStatFieldModal()">取消</button>
+        <button class="btn btn-primary" type="button" onclick="saveStatField()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 确认弹窗 -->
+  <div class="modal-overlay" id="confirmOverlay" onclick="closeConfirmModal()">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3 id="confirmTitle">操作确认</h3>
+        <p id="confirmDesc"></p>
+      </div>
+      <div class="modal-body">
+        <div class="confirm-summary" id="confirmSummary"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" type="button" onclick="closeConfirmModal()">取消</button>
+        <button class="btn btn-danger" id="confirmBtn" type="button" onclick="submitConfirm()">确认</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 需求规则抽屉 -->
+  <div class="drawer-overlay" id="ruleOverlay" onclick="setRuleDrawer(false)"></div>
+  <aside class="drawer" id="ruleDrawer" role="dialog">
+    <div class="drawer-header">
+      <h2>FR-004 · 需求规则 · v1</h2>
+      <button class="drawer-close" type="button" onclick="setRuleDrawer(false)">×</button>
+    </div>
+    <div class="rule-tab-bar" role="tablist">
+      <button type="button" class="active" data-rule="rule-fe" role="tab">前端需求</button>
+      <button type="button" data-rule="rule-admin" role="tab">后台需求</button>
+    </div>
+    <div class="drawer-body">
+      <!-- 前端需求 -->
+      <div id="rule-fe" class="rule-panel active">
+        <div class="rule-section">
+          <h3><span>1</span>业务目标</h3>
+          <div class="rule-content">
+            <p>为已开启「预估数据=显示」的项目，在 C 端提供<strong>数据查询</strong>能力：用户可按条件查询运营导入/维护的预估数据，查看聚合统计与明细列表。查询结果<strong>仅供参考</strong>，实际结算以平台结算数据为准。</p>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>2</span>页面与入口</h3>
+          <div class="rule-content">
+            <ul>
+              <li><strong>入口</strong>：项目详情 / 数据工具区「数据查询」（具体入口位置复用既有 C 端项目页，本 FR 不重定义导航层级）。</li>
+              <li><strong>可见条件</strong>：项目「预估数据=显示」且运营已在后台配置展示字段；否则入口不可见。</li>
+              <li><strong>页头</strong>：标题「数据查询」+ 免责声明「查询数据仅供参考，实际以结算数据为准」。</li>
+              <li><strong>当前项目卡片</strong>：展示项目 icon（名称前两字）/ 名称；点击展开<strong>项目选择器</strong>（底部浮层列表），切换后刷新当前项目展示（Demo Mock 18 个项目：番茄小说、知乎故事…悟空网文）。</li>
+              <li><strong>01 查询条件</strong>：固定「时间范围」+「关键词」两项；<strong>默认折叠</strong>，折叠态展示「时间范围 · 关键词」摘要。</li>
+              <li><strong>02 数据统计</strong>：按后台「数据统计」配置渲染；排序第 1 项为大卡，其余为<strong>三列</strong>网格小卡；支持隐藏/刷新。</li>
+              <li><strong>03 数据明细</strong>：卡片列表；<strong>列表展示字段排序第 1 项的值</strong>为卡片标题；其余字段入内嵌灰色三列信息域（关联展示字段合并：主值 + 副值）；底部「数据日期·{日期}」。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>3</span>交互规则</h3>
+          <div class="rule-content">
+            <ul>
+              <li>点击「立即查询」→ 请求后端按条件聚合统计 + 返回明细分页列表；查询完成后<strong>查询条件自动折叠</strong>。</li>
+              <li>「刷新 ↻」仅重算当前条件下的统计与明细，不重置已填查询条件。</li>
+              <li>明细卡片为<strong>只读展示</strong>，不提供编辑/删除（数据维护在管理后台）。</li>
+              <li>链接类字段（字段名/标识含 link、url、链接、主页，或值为 http 开头）以链接色展示，点击行为复用 C 端外链打开规范。</li>
+              <li>无匹配数据时，数据明细区展示空态「暂无数据，请调整查询条件」；统计区展示 0 或空值（口径由后端定义）。</li>
+              <li>字段集合、顺序、统计项名称均读取后台展示配置，C 端<strong>不可自定义列</strong>。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>4</span>边界规则</h3>
+          <div class="rule-content">
+            <ul>
+              <li>项目「预估数据=隐藏」时，C 端入口不可见；已有数据保留，再次显示后恢复。</li>
+              <li>C 端仅展示当前用户有权限查看的项目预估数据（权限口径与既有项目数据可见性一致）。</li>
+              <li>时间范围为必填（具体校验提示文案由前端统一规范）；其余查询字段选填。</li>
+              <li>统计数据与明细列表须来自<strong>同一次查询</strong>，避免统计与明细口径不一致。</li>
+              <li>明细列表建议分页加载；首屏默认展示 N 条（N 由研发与性能约定，Demo 展示 3 条样例）。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>5</span>业务流程</h3>
+          <div class="rule-content">
+            <p>配置下发 → C 端查询 → 统计聚合 → 明细展示链路见页内 Tab <strong>「业务流程」</strong>流程图。</p>
+          </div>
+        </div>
+      </div>
+      <!-- 后台需求 -->
+      <div id="rule-admin" class="rule-panel">
+        <div class="rule-section">
+          <h3><span>1</span>业务目标</h3>
+          <div class="rule-content">
+            <p>为项目提供可配置的<strong>预估数据</strong>维护与展示能力：运营可在项目维度开启/关闭预估数据入口，并通过展示配置定义列表列与统计指标，在项目下维护预估数据明细，支持 Excel 批量导入与批量删除。</p>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>2</span>数据表与字段</h3>
+          <div class="rule-content">
+            <p><strong>项目编辑弹窗（扩展现有 · 仅规则，本 FR 不做 UI 设计）</strong>：</p>
+            <ul>
+              <li>新增字段 <strong>预估数据</strong>，枚举：<code>显示</code> / <code>隐藏</code>。</li>
+              <li>默认建议为 <code>隐藏</code>；设为 <code>显示</code> 后，该项目详情/管理后台出现「预估数据」相关入口与 Tab。</li>
+              <li>设为 <code>隐藏</code> 后，预估数据表入口不可见，已有数据保留不物理删除。</li>
+            </ul>
+            <div class="rule-note">本字段<strong>仅写入需求规则</strong>，不在本 FR Demo 中设计项目编辑弹窗 UI；研发对照既有项目编辑弹窗扩展。</div>
+            <p style="margin-top:14px;"><strong>预估数据展示配置</strong>（项目级或全局配置域，与具体项目绑定）：</p>
+            <p style="margin-top:8px;"><strong>① 列表展示字段</strong>（可多条、可排序）：</p>
+            <ul>
+              <li><strong>展示字段</strong>：列头展示名称。</li>
+              <li><strong>字段标识</strong>：唯一 key，用于存储、导入列映射、API 字段名。</li>
+              <li><strong>关联展示字段</strong>（可选）：如 <code>user_id</code> 关联展示 <code>user_nickname</code>；列表/C 端合并展示，导入时可由系统反查填充。</li>
+              <li><strong>是否支持导入</strong>：是/否；仅「是」的字段进入 Excel 模版列与导入校验。</li>
+              <li>支持拖拽或序号调整<strong>排序</strong>，决定列表列顺序与导入模版列顺序。</li>
+            </ul>
+            <p style="margin-top:8px;"><strong>② 数据统计</strong>（可多条、可排序）：</p>
+            <ul>
+              <li><strong>来源字段</strong>：新增时从「列表展示字段」下拉选择；同一列表字段不可重复添加为统计项。</li>
+              <li><strong>统计字段名</strong>：系统根据来源字段自动生成（如「预估曝光量」→「预估曝光合计」）。</li>
+              <li><strong>字段标识</strong>：系统生成（如 <code>sum_est_exposure</code>）；后端按配置聚合（sum / count）。</li>
+              <li>支持排序，决定 C 端统计区展示顺序与后台表头统计区顺序。</li>
+              <li>系统固定项「数据条数」（<code>row_count</code>）可保留，不关联列表字段。</li>
+            </ul>
+            <p style="margin-top:14px;"><strong>预估数据表</strong>（项目维度数据）：</p>
+            <ul>
+              <li>列表列<strong>动态渲染</strong>，与「列表展示字段」配置一致（含关联展示字段合并列）。</li>
+              <li>表头统计区按「数据统计」配置动态渲染，随筛选/导入/删除联动刷新。</li>
+              <li>系统字段（建议）：数据 ID、所属项目 ID、数据更新时间；操作：删除。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>3</span>列表与交互</h3>
+          <div class="rule-content">
+            <p><strong>展示配置</strong>：列表展示字段与数据统计均为可增删改表格；排序变更即时影响预估数据表列顺序、C 端明细字段顺序与统计区顺序。右侧「前端预览」与配置实时联动（Demo 用途）。</p>
+            <p style="margin-top:8px;"><strong>预估数据表</strong>：</p>
+            <ul>
+              <li><strong>批量删除</strong>：勾选多行 → 确认 → 删除；删除后统计区重算。</li>
+              <li><strong>批量导入</strong>：Excel 列与「列表展示字段」中<strong>支持导入=是</strong>的字段一一对应，列顺序与字段排序一致。</li>
+              <li><strong>下载导入模版</strong>：根据当前展示配置<strong>动态生成</strong> Excel 模版（表头=展示字段名）；配置变更后再次下载应反映最新列集合。</li>
+              <li>导入校验失败行整批或逐行报错策略由研发约定，需反馈失败原因与行号。</li>
+              <li>关联展示字段不参与模版列；导入后由系统根据主字段（如 ID）匹配填充。</li>
+            </ul>
+            <p style="margin-top:8px;"><strong>筛选项</strong>（Demo 示例）：关键词、用户信息；实际筛选项可与可检索的列表展示字段对齐。</p>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>4</span>边界规则</h3>
+          <div class="rule-content">
+            <ul>
+              <li>项目 <code>预估数据=隐藏</code> 时，C 端/后台预估数据入口均不可见；数据保留，再次设为 <code>显示</code> 后恢复展示。</li>
+              <li>删除列表展示字段前，需确认是否影响已有数据列展示；已存储的扩展字段数据建议保留，仅不再展示。</li>
+              <li>字段标识创建后不建议修改（避免历史数据与导入模版不一致）；若必须修改需有迁移策略。</li>
+              <li>同一项目下预估数据表与展示配置一一绑定；不同项目可独立配置字段集合。</li>
+              <li>导入模版、列表列、导入校验三者必须以同一套「列表展示字段 + 支持导入」配置为单一数据源。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>5</span>业务流程</h3>
+          <div class="rule-content">
+            <p>见页内 Tab <strong>「业务流程」</strong>流程图。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const listFields = [
+      { id: 'lf1', label: '关键词', key: 'keyword', relLabel: '', relKey: '', importable: true },
+      { id: 'lf2', label: '预估曝光量', key: 'est_exposure', relLabel: '', relKey: '', importable: true },
+      { id: 'lf3', label: '预估转化量', key: 'est_conversion', relLabel: '', relKey: '', importable: true },
+      { id: 'lf4', label: '用户信息', key: 'user_id', relLabel: '用户昵称', relKey: 'user_nickname', importable: false },
+    ];
+
+    const statFields = [
+      { id: 'sf1', label: '预估曝光合计', key: 'sum_est_exposure', listFieldId: 'lf2', value: '1,280,500', badge: 'T1' },
+      { id: 'sf2', label: '预估转化合计', key: 'sum_est_conversion', listFieldId: 'lf3', value: '32,680', badge: 'T2' },
+      { id: 'sf3', label: '关键词数', key: 'keyword_count', listFieldId: 'lf1', value: '156', badge: 'T3' },
+      { id: 'sf4', label: '数据条数', key: 'row_count', listFieldId: null, value: '156', badge: 'CT' },
+    ];
+
+    const ALL_DATA_ROWS = [
+      { id: 'd1', keyword: 'Summer推广词', exposure: '520,000', conversion: '12,800', userName: '张三', userId: 'U-10086', dataDate: '2026.08.23', updated: '2026.08.23 14:30' },
+      { id: 'd2', keyword: '秋季新品词', exposure: '380,500', conversion: '9,200', userName: '李四', userId: 'U-10201', dataDate: '2026.08.22', updated: '2026.08.22 10:00' },
+      { id: 'd3', keyword: '达人种草词', exposure: '280,000', conversion: '6,680', userName: '王五', userId: 'U-10388', dataDate: '2026.08.21', updated: '2026.08.21 16:45' },
+    ];
+
+    const MOCK_PROJECTS = [
+      '番茄小说', '知乎故事', '番茄畅听', '红果短剧APP-短剧', '红果漫剧APP', '迅雷网盘',
+      '书旗短篇', '最右', 'UC故事会', '起点', 'QQ阅读', '飞卢小说', '七猫小说',
+      '掌阅长篇', '书旗长篇', '盐言星图', '盐言聚星', '悟空网文',
+    ];
+
+    let dataRows = ALL_DATA_ROWS.map(r => ({ ...r }));
+
+    let listFieldEditId = null;
+    let statFieldEditId = null;
+    let confirmAction = null;
+    let confirmTargetId = null;
+    let feQueryCollapsed = true;
+    let fePreviewRows = ALL_DATA_ROWS.map(r => ({ ...r }));
+    let feSelectedProject = MOCK_PROJECTS[0];
+
+    function projectIconAbbr(name) {
+      return String(name).slice(0, 2);
+    }
+
+    function renderFeProjectPickerList() {
+      const list = document.getElementById('feProjectPickerList');
+      if (!list) return;
+      list.innerHTML = MOCK_PROJECTS.map(name => `
+        <button type="button" class="fe-project-picker-item${name === feSelectedProject ? ' active' : ''}" onclick="selectFeProject('${name.replace(/'/g, "\\'")}')">
+          <span class="icon">${esc(projectIconAbbr(name))}</span>
+          <span class="label">${esc(name)}</span>
+          ${name === feSelectedProject ? '<span class="check">✓</span>' : ''}
+        </button>
+      `).join('');
+    }
+
+    function openFeProjectPicker() {
+      renderFeProjectPickerList();
+      document.getElementById('feProjectPickerOverlay')?.classList.add('open');
+    }
+
+    function closeFeProjectPicker() {
+      document.getElementById('feProjectPickerOverlay')?.classList.remove('open');
+    }
+
+    function selectFeProject(name) {
+      if (!MOCK_PROJECTS.includes(name)) return;
+      feSelectedProject = name;
+      closeFeProjectPicker();
+      renderFePreview();
+      showToast('已切换项目：' + name);
+    }
+
+    function renderFeProjectCard() {
+      return `
+        <button type="button" class="fe-project-card" onclick="openFeProjectPicker()">
+          <div class="fe-project-icon">${esc(projectIconAbbr(feSelectedProject))}</div>
+          <div class="fe-project-meta">
+            <div class="sub">当前项目</div>
+            <div class="name">${esc(feSelectedProject)}</div>
+          </div>
+          <span class="fe-chevron">⌄</span>
+        </button>`;
+    }
+
+    function getRowFieldValue(row, field) {
+      const legacy = {
+        est_exposure: row.est_exposure ?? row.exposure,
+        est_conversion: row.est_conversion ?? row.conversion,
+        user_id: row.user_id ?? row.userId,
+      };
+      if (field.relKey) {
+        const main = row[field.key] ?? legacy[field.key] ?? '—';
+        const sub = row[field.relKey] ?? row.userName ?? '';
+        return { main: String(main), sub: sub ? String(sub) : '' };
+      }
+      const val = row[field.key] ?? legacy[field.key];
+      return { main: val != null && val !== '' ? String(val) : '—', sub: '' };
+    }
+
+    function isLinkField(field, value) {
+      if (!value || value === '—') return false;
+      return /link|url|链接|主页/i.test(field.label + field.key) || /^https?:\/\//i.test(value);
+    }
+
+    function renderFeDetailCell(field, row) {
+      const { main, sub } = getRowFieldValue(row, field);
+      const linkClass = isLinkField(field, main) ? ' link' : '';
+      return `
+        <div>
+          <div class="cell-label">${esc(field.label)}</div>
+          <div class="cell-value${linkClass}">${esc(main)}</div>
+          ${sub ? `<div class="cell-sub">${esc(sub)}</div>` : ''}
+        </div>`;
+    }
+
+    function renderFeDetailCards() {
+      if (!listFields.length) {
+        return '<div class="fe-detail-empty">请先在左侧配置列表展示字段</div>';
+      }
+      const titleField = listFields[0];
+      const bodyFields = listFields.slice(1);
+      if (!fePreviewRows.length) {
+        return '<div class="fe-detail-empty">暂无数据，请调整查询条件</div>';
+      }
+      return fePreviewRows.map(row => {
+        const titleVal = getRowFieldValue(row, titleField);
+        const gridCols = bodyFields.length <= 2 ? bodyFields.length || 1 : 3;
+        return `
+          <div class="fe-detail-card">
+            <div class="fe-detail-head">
+              <div class="fe-detail-title">${esc(titleVal.main)}</div>
+            </div>
+            ${bodyFields.length ? `
+              <div class="fe-detail-data" style="grid-template-columns:repeat(${gridCols},1fr)">
+                ${bodyFields.map(f => renderFeDetailCell(f, row)).join('')}
+              </div>` : ''}
+            <div class="fe-detail-foot">数据日期·${esc(row.dataDate || '—')}</div>
+          </div>`;
+      }).join('');
+    }
+
+    function toggleFeQueryCollapse() {
+      feQueryCollapsed = !feQueryCollapsed;
+      renderFePreview();
+    }
+
+    function feQuerySummary() {
+      return '时间范围 · 关键词';
+    }
+
+    function getFeKeywordField() {
+      return listFields.find(f => f.key === 'keyword' || f.label === '关键词') || null;
+    }
+
+    function runFeQuery() {
+      feQueryCollapsed = true;
+      fePreviewRows = dataRows.map(r => ({ ...r }));
+      renderFePreview();
+      showToast('Demo：已查询「' + feSelectedProject + '」（Mock），已刷新统计与数据明细');
+    }
+
+    function esc(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+    }
+
+    function sortControls(type, id, index, total) {
+      return `
+        <div class="sort-cell">
+          <button class="icon-btn icon-btn-grip" type="button" title="拖拽排序" aria-label="拖拽排序"
+            draggable="true"
+            ondragstart="onDragStart(event,'${type}','${id}')"
+            ondragover="onDragOver(event)"
+            ondrop="onDrop(event,'${type}','${id}')">
+            <svg class="btn-icon-fill" aria-hidden="true"><use href="#i-grip"/></svg>
+          </button>
+        </div>`;
+    }
+
+    let dragType = null;
+    let dragId = null;
+
+    function onDragStart(e, type, id) {
+      dragType = type;
+      dragId = id;
+      e.dataTransfer.effectAllowed = 'move';
+    }
+
+    function onDragOver(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+    }
+
+    function onDrop(e, type, targetId) {
+      e.preventDefault();
+      if (!dragId || dragType !== type || dragId === targetId) return;
+      const arr = type === 'list' ? listFields : statFields;
+      const from = arr.findIndex(x => x.id === dragId);
+      const to = arr.findIndex(x => x.id === targetId);
+      if (from < 0 || to < 0) return;
+      const [item] = arr.splice(from, 1);
+      arr.splice(to, 0, item);
+      dragId = null;
+      if (type === 'list') { renderListFields(); renderFePreview(); }
+      else { renderStatFields(); renderFePreview(); }
+      showToast('Demo：拖拽排序已更新（Mock）');
+    }
+
+    function statBadge(f, index) {
+      if (f.badge) return f.badge;
+      return (f.key || '').replace(/^sum_/, '').slice(0, 2).toUpperCase() || ('S' + (index + 1));
+    }
+
+    function renderFePreview() {
+      const el = document.getElementById('fePreview');
+      if (!el) return;
+      const keywordField = getFeKeywordField();
+
+      const queryHtml = `
+        <div class="fe-field">
+          <div class="fe-field-label"><i></i>时间范围</div>
+          <div class="fe-input-row">
+            <input class="fe-input" type="text" placeholder="开始时间" readonly />
+            <span class="fe-sep">至</span>
+            <input class="fe-input" type="text" placeholder="结束时间" readonly />
+          </div>
+        </div>
+        ${keywordField ? `
+          <div class="fe-field">
+            <div class="fe-field-label"><i></i>${esc(keywordField.label)}</div>
+            <input class="fe-input-full" type="text" placeholder="输入${esc(keywordField.label)}" readonly />
+          </div>
+        ` : ''}`;
+
+      const hero = statFields[0];
+      const grid = statFields.slice(1);
+      const queryToggleLabel = feQueryCollapsed ? '展开 ⌄' : '收起 ⌃';
+
+      el.innerHTML = `
+        <div class="fe-label">DATA EXPLORER</div>
+        <div class="fe-title">数据查询</div>
+        <div class="fe-disclaimer">查询数据仅供参考，实际以结算数据为准</div>
+
+        ${renderFeProjectCard()}
+
+        <div class="fe-section">
+          <div class="fe-section-head">
+            <div class="fe-section-title"><span class="fe-section-num">01</span>查询条件</div>
+            <div class="fe-section-actions">
+              <button type="button" onclick="toggleFeQueryCollapse()">${queryToggleLabel}</button>
+            </div>
+          </div>
+          <div class="fe-card${feQueryCollapsed ? ' fe-query-collapsed' : ''}">
+            <div class="fe-query-collapsed-hint">${esc(feQuerySummary())}</div>
+            <div class="fe-query-body">
+              ${queryHtml}
+              <button class="fe-btn-query" type="button" onclick="runFeQuery()">立即查询</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="fe-section">
+          <div class="fe-section-head">
+            <div class="fe-section-title"><span class="fe-section-num">02</span>数据统计</div>
+            <div class="fe-section-actions">
+              <button type="button">隐藏</button>
+              <button type="button" onclick="runFeQuery()">刷新 ↻</button>
+            </div>
+          </div>
+          ${hero ? `
+            <div class="fe-stat-hero">
+              <div class="name">${esc(hero.label)}</div>
+              <div class="val">${esc(hero.value)}</div>
+              <div class="chart-icon"><span style="height:10px"></span><span style="height:16px"></span><span style="height:22px"></span><span style="height:14px"></span></div>
+            </div>` : ''}
+          <div class="fe-stat-grid">
+            ${grid.map((f, i) => `
+              <div class="fe-stat-mini">
+                <span class="fe-stat-badge">${esc(statBadge(f, i + 1))}</span>
+                <div class="name">${esc(f.label)}</div>
+                <div class="val">${esc(f.value)}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <div class="fe-section">
+          <div class="fe-section-head">
+            <div class="fe-section-title"><span class="fe-section-num">03</span>数据明细</div>
+          </div>
+          ${renderFeDetailCards()}
+        </div>
+
+        <div class="fe-footer-note">当前为交互演示，查询数据仅供参考，实际以结算数据为准</div>
+      `;
+    }
+
+    function actionLinks(editFn, deleteFn) {
+      return `
+        <span class="action-group">
+          <button class="link" type="button" onclick="${editFn}">
+            <svg class="btn-icon" aria-hidden="true"><use href="#i-edit"/></svg>
+            编辑
+          </button>
+          <button class="link link-danger" type="button" onclick="${deleteFn}">
+            <svg class="btn-icon" aria-hidden="true"><use href="#i-trash"/></svg>
+            删除
+          </button>
+        </span>`;
+    }
+
+    function renderListFields() {
+      const body = document.getElementById('listFieldBody');
+      body.innerHTML = listFields.map((f, i) => `
+        <tr data-id="${f.id}">
+          <td>${sortControls('list', f.id, i, listFields.length)}</td>
+          <td>${esc(f.label)}</td>
+          <td><code>${esc(f.key)}</code></td>
+          <td>${f.relKey ? esc(f.relLabel) + ' <code>' + esc(f.relKey) + '</code>' : '<span class="tag tag-muted">—</span>'}</td>
+          <td><span class="tag ${f.importable ? 'tag-ok' : 'tag-muted'}">${f.importable ? '是' : '否'}</span></td>
+          <td class="col-actions">${actionLinks(`openListFieldModal('edit','${f.id}')`, `openConfirmModal('deleteListField','${f.id}')`)}</td>
+        </tr>
+      `).join('');
+      updateImportHint();
+      renderFePreview();
+      updateStatAddButton();
+    }
+
+    function renderStatFields() {
+      const body = document.getElementById('statFieldBody');
+      const bar = document.getElementById('statsBar');
+      body.innerHTML = statFields.map((f, i) => {
+        const src = f.listFieldId ? listFields.find(lf => lf.id === f.listFieldId) : null;
+        const srcCell = src
+          ? `${esc(src.label)} <code>${esc(src.key)}</code>`
+          : '<span class="tag tag-muted">系统 · 数据条数</span>';
+        return `
+        <tr data-id="${f.id}">
+          <td>${sortControls('stat', f.id, i, statFields.length)}</td>
+          <td>${esc(f.label)}</td>
+          <td>${srcCell}</td>
+          <td><code>${esc(f.key)}</code></td>
+          <td class="col-actions">${actionLinks(`openStatFieldModal('edit','${f.id}')`, `openConfirmModal('deleteStatField','${f.id}')`)}</td>
+        </tr>`;
+      }).join('');
+      bar.innerHTML = statFields.map(f => `
+        <div class="stat-item">
+          <div class="label">${esc(f.label)}</div>
+          <div class="value">${esc(f.value)}</div>
+        </div>
+      `).join('');
+      renderFePreview();
+      updateStatAddButton();
+    }
+
+    function renderDataTable() {
+      const body = document.getElementById('dataTableBody');
+      body.innerHTML = dataRows.map(r => `
+        <tr data-id="${r.id}">
+          <td class="col-check"><input type="checkbox" class="row-check" onchange="updateBatchBar()" /></td>
+          <td>${esc(r.keyword)}</td>
+          <td>${esc(r.exposure)}</td>
+          <td>${esc(r.conversion)}</td>
+          <td><div>${esc(r.userName)}</div><div class="cell-sub">${esc(r.userId)}</div></td>
+          <td>${esc(r.updated)}</td>
+          <td class="col-actions">
+            <span class="action-group">
+              <button class="link link-danger" type="button" onclick="openConfirmModal('deleteDataRow','${r.id}')">
+                <svg class="btn-icon" aria-hidden="true"><use href="#i-trash"/></svg>
+                删除
+              </button>
+            </span>
+          </td>
+        </tr>
+      `).join('');
+      document.getElementById('checkAll').checked = false;
+      updateBatchBar();
+    }
+
+    function getImportableLabels() {
+      return listFields.filter(f => f.importable).map(f => f.label);
+    }
+
+    function updateImportHint() {
+      const labels = getImportableLabels();
+      document.getElementById('importHint').innerHTML =
+        '<strong>Excel 列字段（按展示配置 · 支持导入=是 动态生成）：</strong><br />' +
+        labels.map(l => '<code>' + esc(l) + '</code>').join(' · ') +
+        '<br />列顺序与「列表展示字段」排序一致；关联展示字段由系统反查填充，不要求出现在 Excel 中。';
+    }
+
+    function openListFieldModal(mode, id) {
+      listFieldEditId = mode === 'edit' ? id : null;
+      const item = listFieldEditId ? listFields.find(f => f.id === id) : null;
+      document.getElementById('listFieldModalTitle').textContent = mode === 'edit' ? '编辑列表展示字段' : '新增列表展示字段';
+      document.getElementById('lfLabel').value = item?.label || '';
+      document.getElementById('lfKey').value = item?.key || '';
+      document.getElementById('lfRelLabel').value = item?.relLabel || '';
+      document.getElementById('lfRelKey').value = item?.relKey || '';
+      document.getElementById('lfImportable').value = item?.importable === false ? 'no' : 'yes';
+      document.getElementById('listFieldOverlay').classList.add('open');
+    }
+
+    function closeListFieldModal() {
+      document.getElementById('listFieldOverlay').classList.remove('open');
+    }
+
+    function saveListField() {
+      const label = document.getElementById('lfLabel').value.trim();
+      const key = document.getElementById('lfKey').value.trim();
+      if (!label || !key) { showToast('请填写展示字段与字段标识'); return; }
+      const payload = {
+        label,
+        key,
+        relLabel: document.getElementById('lfRelLabel').value.trim(),
+        relKey: document.getElementById('lfRelKey').value.trim(),
+        importable: document.getElementById('lfImportable').value === 'yes',
+      };
+      if (listFieldEditId) {
+        const item = listFields.find(f => f.id === listFieldEditId);
+        Object.assign(item, payload);
+      } else {
+        listFields.push({ id: 'lf' + Date.now(), ...payload });
+      }
+      closeListFieldModal();
+      renderListFields();
+      showToast('Demo：列表字段已保存（Mock）');
+    }
+
+    function statLabelFromListField(lf) {
+      if (!lf) return '';
+      if (lf.label.endsWith('量')) return lf.label.slice(0, -1) + '合计';
+      return lf.label + '合计';
+    }
+
+    function statKeyFromListField(lf) {
+      return lf ? 'sum_' + lf.key : '';
+    }
+
+    function isSystemStatField(item) {
+      return item?.key === 'row_count' && !item?.listFieldId;
+    }
+
+    function getAvailableListFieldsForStat(excludeStatId) {
+      const usedIds = statFields
+        .filter(s => s.listFieldId && s.id !== excludeStatId)
+        .map(s => s.listFieldId);
+      return listFields.filter(lf => !usedIds.includes(lf.id));
+    }
+
+    function updateStatAddButton() {
+      const btn = document.getElementById('btnAddStatField');
+      if (!btn) return;
+      const hasAvailable = getAvailableListFieldsForStat(null).length > 0;
+      btn.disabled = !hasAvailable;
+      btn.title = hasAvailable ? '' : '所有列表展示字段均已添加为统计项';
+    }
+
+    function populateStatListFieldSelect(selectedId, excludeStatId) {
+      const select = document.getElementById('sfListField');
+      if (!select) return;
+      const available = getAvailableListFieldsForStat(excludeStatId);
+      if (selectedId && !available.some(lf => lf.id === selectedId)) {
+        const current = listFields.find(lf => lf.id === selectedId);
+        if (current) available.unshift(current);
+      }
+      if (!available.length) {
+        select.innerHTML = '<option value="">暂无可选列表字段</option>';
+        select.disabled = true;
+        return;
+      }
+      select.disabled = false;
+      select.innerHTML = available.map(lf =>
+        `<option value="${esc(lf.id)}"${lf.id === selectedId ? ' selected' : ''}>${esc(lf.label)}（${esc(lf.key)}）</option>`
+      ).join('');
+    }
+
+    function onStatListFieldChange() {
+      const lf = listFields.find(f => f.id === document.getElementById('sfListField').value);
+      document.getElementById('sfLabel').value = statLabelFromListField(lf);
+      document.getElementById('sfKey').value = statKeyFromListField(lf);
+    }
+
+    function openStatFieldModal(mode, id) {
+      statFieldEditId = mode === 'edit' ? id : null;
+      const item = statFieldEditId ? statFields.find(f => f.id === id) : null;
+      const isSystem = isSystemStatField(item);
+      document.getElementById('statFieldModalTitle').textContent = mode === 'edit' ? '编辑统计项' : '新增统计项';
+      document.getElementById('statFieldModalDesc').textContent = isSystem
+        ? '系统统计项，字段不可更换来源'
+        : '从已配置的列表展示字段中选择来源，系统自动生成统计名称与标识';
+      document.getElementById('sfListFieldWrap').style.display = isSystem ? 'none' : '';
+      document.getElementById('sfSystemNote').style.display = isSystem ? 'block' : 'none';
+      if (isSystem) {
+        document.getElementById('sfLabel').value = item.label;
+        document.getElementById('sfKey').value = item.key;
+      } else {
+        if (mode === 'add') {
+          const available = getAvailableListFieldsForStat(null);
+          if (!available.length) {
+            showToast('所有列表展示字段均已添加为统计项');
+            return;
+          }
+        }
+        populateStatListFieldSelect(item?.listFieldId || getAvailableListFieldsForStat(statFieldEditId)[0]?.id, statFieldEditId);
+        onStatListFieldChange();
+      }
+      document.getElementById('statFieldOverlay').classList.add('open');
+    }
+
+    function closeStatFieldModal() {
+      document.getElementById('statFieldOverlay').classList.remove('open');
+    }
+
+    function saveStatField() {
+      const item = statFieldEditId ? statFields.find(f => f.id === statFieldEditId) : null;
+      if (isSystemStatField(item)) {
+        closeStatFieldModal();
+        showToast('Demo：系统统计项不可修改来源（Mock）');
+        return;
+      }
+      const lfId = document.getElementById('sfListField').value;
+      const lf = listFields.find(f => f.id === lfId);
+      if (!lf) { showToast('请选择列表展示字段'); return; }
+      const payload = {
+        label: statLabelFromListField(lf),
+        key: statKeyFromListField(lf),
+        listFieldId: lf.id,
+      };
+      if (statFieldEditId) {
+        Object.assign(item, payload);
+      } else {
+        statFields.push({ id: 'sf' + Date.now(), ...payload, value: '0' });
+      }
+      closeStatFieldModal();
+      renderStatFields();
+      showToast('Demo：统计项已保存（Mock）');
+    }
+
+    function openConfirmModal(action, targetId) {
+      confirmAction = action;
+      confirmTargetId = targetId || null;
+      const title = document.getElementById('confirmTitle');
+      const desc = document.getElementById('confirmDesc');
+      const summary = document.getElementById('confirmSummary');
+      const btn = document.getElementById('confirmBtn');
+      if (action === 'batchDelete') {
+        const n = document.querySelectorAll('.row-check:checked').length;
+        title.textContent = '批量删除确认';
+        desc.textContent = '删除后统计区将重新计算，此操作不可恢复。';
+        summary.innerHTML = '即将删除 <strong>' + n + '</strong> 条预估数据。';
+        btn.className = 'btn btn-danger';
+        btn.innerHTML = '<svg class="btn-icon" aria-hidden="true"><use href="#i-trash"/></svg> 确认删除';
+      } else if (action === 'deleteDataRow') {
+        const row = dataRows.find(r => r.id === targetId);
+        title.textContent = '删除预估数据';
+        desc.textContent = '确认删除该条记录？';
+        summary.innerHTML = '关键词：<strong>' + esc(row?.keyword || '') + '</strong>';
+        btn.className = 'btn btn-danger';
+        btn.innerHTML = '<svg class="btn-icon" aria-hidden="true"><use href="#i-trash"/></svg> 确认删除';
+      } else if (action === 'deleteListField') {
+        const f = listFields.find(x => x.id === targetId);
+        const linked = statFields.filter(s => s.listFieldId === targetId);
+        title.textContent = '删除列表字段';
+        desc.textContent = '删除后预估数据表列与导入模版将同步移除该字段。';
+        summary.innerHTML = '展示字段：<strong>' + esc(f?.label || '') + '</strong>（<code>' + esc(f?.key || '') + '</code>）'
+          + (linked.length ? '<br /><span style="color:#dc2626">关联统计项 ' + linked.length + ' 项将一并移除</span>' : '');
+        btn.className = 'btn btn-danger';
+        btn.innerHTML = '<svg class="btn-icon" aria-hidden="true"><use href="#i-trash"/></svg> 确认删除';
+      } else if (action === 'deleteStatField') {
+        const f = statFields.find(x => x.id === targetId);
+        title.textContent = '删除统计项';
+        desc.textContent = '删除后表头统计区将不再展示该项。';
+        summary.innerHTML = '统计字段：<strong>' + esc(f?.label || '') + '</strong>';
+        btn.className = 'btn btn-danger';
+        btn.innerHTML = '<svg class="btn-icon" aria-hidden="true"><use href="#i-trash"/></svg> 确认删除';
+      }
+      document.getElementById('confirmOverlay').classList.add('open');
+    }
+
+    function closeConfirmModal() {
+      document.getElementById('confirmOverlay').classList.remove('open');
+      confirmAction = null;
+      confirmTargetId = null;
+    }
+
+    function submitConfirm() {
+      if (confirmAction === 'batchDelete') {
+        const ids = [...document.querySelectorAll('.row-check:checked')].map(cb => cb.closest('tr').dataset.id);
+        dataRows = dataRows.filter(r => !ids.includes(r.id));
+        ALL_DATA_ROWS.splice(0, ALL_DATA_ROWS.length, ...ALL_DATA_ROWS.filter(r => !ids.includes(r.id)));
+        statFields.find(s => s.key === 'row_count').value = String(ALL_DATA_ROWS.length);
+        fePreviewRows = dataRows.map(r => ({ ...r }));
+        renderDataTable();
+        renderStatFields();
+        renderFePreview();
+        showToast('Demo：已批量删除 ' + ids.length + ' 条（Mock）');
+      } else if (confirmAction === 'deleteDataRow') {
+        dataRows = dataRows.filter(r => r.id !== confirmTargetId);
+        const idx = ALL_DATA_ROWS.findIndex(r => r.id === confirmTargetId);
+        if (idx >= 0) ALL_DATA_ROWS.splice(idx, 1);
+        statFields.find(s => s.key === 'row_count').value = String(ALL_DATA_ROWS.length);
+        fePreviewRows = dataRows.map(r => ({ ...r }));
+        renderDataTable();
+        renderStatFields();
+        renderFePreview();
+        showToast('Demo：已删除（Mock）');
+      } else if (confirmAction === 'deleteListField') {
+        const idx = listFields.findIndex(f => f.id === confirmTargetId);
+        if (idx >= 0) listFields.splice(idx, 1);
+        for (let i = statFields.length - 1; i >= 0; i--) {
+          if (statFields[i].listFieldId === confirmTargetId) statFields.splice(i, 1);
+        }
+        renderListFields();
+        renderStatFields();
+        showToast('Demo：列表字段已删除（Mock）');
+      } else if (confirmAction === 'deleteStatField') {
+        const idx = statFields.findIndex(f => f.id === confirmTargetId);
+        if (idx >= 0) statFields.splice(idx, 1);
+        renderStatFields();
+        showToast('Demo：统计项已删除（Mock）');
+      }
+      closeConfirmModal();
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2500);
+    }
+
+    document.querySelectorAll('.page-tab-bar button').forEach(btn => {
+      btn.addEventListener('click', () => switchPageTab(btn.dataset.page, btn));
+    });
+
+    function getActiveScene() {
+      return document.querySelector('.scene-btn.active')?.dataset.screen || 'screen-data-query';
+    }
+
+    function loadMockupFrame(forceReload) {
+      const frame = document.getElementById('mockupFrame');
+      if (!frame) return;
+      const src = `estimated-data-demo.html?embed=1&screen=${encodeURIComponent(getActiveScene())}`;
+      const current = frame.getAttribute('src') || '';
+      if (forceReload || current === 'about:blank' || !current.includes('estimated-data-demo.html')) {
+        frame.src = src;
+        return;
+      }
+      try {
+        frame.contentWindow?.postMessage({ type: 'goToScreen', screen: getActiveScene() }, '*');
+      } catch (_) {
+        frame.src = src;
+      }
+    }
+
+    function switchPageTab(pageId, btn) {
+      document.querySelectorAll('.page-tab-bar button').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.page-view').forEach(v => v.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(pageId).classList.add('active');
+      if (pageId === 'view-fe') requestAnimationFrame(() => loadMockupFrame(false));
+      const tabMap = { 'view-fe': 'fe', 'view-admin': 'admin', 'view-flow': 'flow' };
+      history.replaceState(null, '', '?tab=' + (tabMap[pageId] || 'fe'));
+    }
+
+    document.querySelectorAll('.scene-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.scene-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        loadMockupFrame(false);
+      });
+    });
+
+    document.querySelectorAll('.tab-bar-inline button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-bar-inline button').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.panel).classList.add('active');
+      });
+    });
+
+    function toggleCheckAll(el) {
+      document.querySelectorAll('.row-check').forEach(c => { c.checked = el.checked; });
+      updateBatchBar();
+    }
+
+    function updateBatchBar() {
+      const n = document.querySelectorAll('.row-check:checked').length;
+      document.getElementById('batchBar').classList.toggle('show', n > 0);
+      document.getElementById('batchInfo').textContent = '已选 ' + n + ' 条';
+    }
+
+    function resetFilter() {
+      document.getElementById('filterKeyword').value = '';
+      document.getElementById('filterUser').value = '';
+      dataRows = ALL_DATA_ROWS.map(r => ({ ...r }));
+      renderDataTable();
+      showToast('Demo：已重置筛选');
+    }
+
+    function applyFilter() {
+      const kw = document.getElementById('filterKeyword').value.trim().toLowerCase();
+      const user = document.getElementById('filterUser').value.trim().toLowerCase();
+      dataRows = ALL_DATA_ROWS.filter(r =>
+        (!kw || r.keyword.toLowerCase().includes(kw)) &&
+        (!user || r.userName.toLowerCase().includes(user) || r.userId.toLowerCase().includes(user))
+      ).map(r => ({ ...r }));
+      renderDataTable();
+      showToast('Demo：筛选完成（Mock）');
+    }
+
+    function openImportModal() {
+      updateImportHint();
+      document.getElementById('importOverlay').classList.add('open');
+    }
+
+    function closeImportModal() {
+      document.getElementById('importOverlay').classList.remove('open');
+    }
+
+    function onImportFileChange(input) {
+      if (input.files?.[0]) showToast('已选择：' + input.files[0].name);
+    }
+
+    function submitImport() {
+      closeImportModal();
+      showToast('Demo：导入完成（Mock，按支持导入字段校验）');
+    }
+
+    function downloadTemplate() {
+      const cols = getImportableLabels().join(' · ');
+      showToast('Demo：已下载动态模版（' + cols + '）');
+    }
+
+    const ruleDrawer = document.getElementById('ruleDrawer');
+    const toggleRuleBtn = document.getElementById('toggleRuleDrawer');
+
+    function switchRuleTab(ruleId, btn) {
+      document.querySelectorAll('.rule-tab-bar button').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.rule-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(ruleId).classList.add('active');
+    }
+
+    function syncRuleTabToPage() {
+      const activePage = document.querySelector('.page-view.active')?.id || 'view-fe';
+      const ruleId = activePage === 'view-admin' ? 'rule-admin' : 'rule-fe';
+      const btn = document.querySelector('.rule-tab-bar button[data-rule="' + ruleId + '"]');
+      if (btn) switchRuleTab(ruleId, btn);
+    }
+
+    document.querySelectorAll('.rule-tab-bar button').forEach(btn => {
+      btn.addEventListener('click', () => switchRuleTab(btn.dataset.rule, btn));
+    });
+
+    function setRuleDrawer(open) {
+      ruleDrawer.classList.toggle('open', open);
+      document.getElementById('ruleOverlay').classList.toggle('open', open);
+      toggleRuleBtn.classList.toggle('active', open);
+      toggleRuleBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (open) syncRuleTabToPage();
+    }
+
+    toggleRuleBtn.onclick = () => setRuleDrawer(!ruleDrawer.classList.contains('open'));
+
+    function closeAllOverlays() {
+      closeImportModal();
+      closeListFieldModal();
+      closeStatFieldModal();
+      closeConfirmModal();
+      setRuleDrawer(false);
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeAllOverlays();
+    });
+
+    const tab = new URLSearchParams(location.search).get('tab');
+    const tabPageMap = { admin: 'view-admin', flow: 'view-flow', fe: 'view-fe' };
+    if (tab && tabPageMap[tab]) {
+      const btn = document.querySelector('[data-page="' + tabPageMap[tab] + '"]');
+      if (btn) switchPageTab(tabPageMap[tab], btn);
+    }
+
+    if (document.querySelector('.page-view.active')?.id === 'view-fe') {
+      loadMockupFrame(true);
+    }
+
+    renderListFields();
+    renderStatFields();
+    renderDataTable();
+    updateStatAddButton();
+    fePreviewRows = dataRows.map(r => ({ ...r }));
+    renderFeProjectPickerList();
+    renderFePreview();
+  </script>
+  <script src="fe-copy-html.js"></script>
+  <script src="sidebar-nav.js"></script>
+</body>
+</html>

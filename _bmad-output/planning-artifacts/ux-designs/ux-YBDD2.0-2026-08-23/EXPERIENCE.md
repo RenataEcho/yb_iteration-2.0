@@ -1,0 +1,185 @@
+---
+name: 右豹迭代需求记录后台
+status: draft
+updated: 2026-08-23
+sources:
+  - conversation: 迭代需求框架封板（Sprint、FR 版本链、三模板）
+  - https://renataecho.github.io/yb_iteration-2.0/
+---
+
+# 右豹迭代需求记录后台 — Experience Spine
+
+> 基础 UI 框架 v0.2 · 单层左侧主导航。Spines win on conflict with mockups.
+
+## Foundation
+
+- **Form-factor**：桌面 Web 优先（≥1280px 为设计基准）；1024px 以下 Sidebar 可折叠为图标轨，模板 B mockup 下移。
+- **导航模式**：**单层 Sidebar 主导航** — 迭代入口、业务模块、Demo 页均在左侧；不用顶部一级 Tab（TopNav 适用于 SaaS 多版本/多模块，本迭代需求台不采用）。
+- **UI system**：纯 HTML/CSS/JS 原型栈（与现有 [yb_iteration-2.0](https://renataecho.github.io/yb_iteration-2.0/) 一致）；视觉 token 见同目录 `DESIGN.md`。
+- **定位**：产品侧迭代需求 **记录 + Demo 交付**，非运营后台；无登录与权限。
+- **交互深度**：模板 A 增删改弹窗 **可点、Mock 提交**；模板 B 场景按钮 **驱动 mockup 联动**。
+
+## Information Architecture
+
+| Surface | 路径 / 入口 | 模板 | 用途 |
+|---------|-------------|------|------|
+| Sprint 概览 | Sidebar → 迭代 | — | 当前 Sprint FR 清单、变更摘要 |
+| Sprint 列表 | Sidebar → 迭代 | — | 小批次迭代列表 |
+| Sprint 详情 | Sprint 列表 → 详情 | — | 本批次需求包 + FR 版本 |
+| 业务 Demo 页 | Sidebar 模块分组下 | A / B / C | 可交互 Demo + 需求规则 |
+| FR 版本对比 | Sprint 详情 / Page Header 版本下拉 | — | v1→v2→v3 |
+
+### Sidebar 结构（主导航）
+
+```
+[品牌 + 当前 Sprint 徽章]
+── 迭代 ──
+  Sprint 概览 · Sprint 列表
+── 积分管理 ──
+  积分商品 · 前后端交互需求
+── 工具管理 ──
+  前端交互需求
+── 埋点统计 ──
+  埋点事件需求（仅需求清单类）
+── 迭代需求专题 ──
+  实名相关 · 导师优化 …
+```
+
+### 导航原则
+
+- **全部主需求在左侧**；主内容区无顶栏 Tab。
+- 仅挂 **本 Sprint 有变更** 的 Demo 页。
+- 面包屑在主内容区顶，辅助定位（模块 / 页面名），不替代 Sidebar。
+
+→ 框架预览：`mockups/framework-shell.html`
+
+## Voice and Tone
+
+| Do | Don't |
+|----|-------|
+| 「需求规则」「业务流程」「边界规则」 | 「系统配置」「运营分析」 |
+| 「Demo 数据，提交后不保存」 | 假装真实后端已成功 |
+| 「FR-012 · v3 当前」 | 「工单 #1234」 |
+| 描述用「本迭代变更…」 | 写成完整产品说明书 |
+
+## Component Patterns
+
+### 框架 Shell
+
+| 区域 | 行为 |
+|------|------|
+| Sidebar | **唯一主导航**；顶品牌+Sprint；分组展示迭代/模块/Demo 页；可折叠 |
+| 主内容区 | 无 TopNav；面包屑 + Page Header + Demo |
+| Page Header | 标题 + FR 徽章 + 版本下拉 + 「需求规则」 |
+
+### 模板 A — 后台数据表类
+
+| 区块 | 行为 |
+|------|------|
+| Filter Card | 可选；筛选仅影响 Demo 表 Mock 数据 |
+| Table Card | 示例数据；操作列：编辑 / 复制 / 上下架等 |
+| 新增/编辑 Modal | 表单校验（必填、正整数等）；提交 → toast + 表刷新 |
+| 需求规则 Drawer | 点击「需求规则」右侧滑入；Esc / 关闭钮 / 再次点击收起 |
+
+**抽屉内容顺序（固定）**：①业务目标 ②字段规则 ③交互规则 ④边界规则 ⑤业务流程（文字 + 流程图）。
+
+### 模板 B — 前端页面类
+
+| 区块 | 行为 |
+|------|------|
+| 场景切换器 | 单选；切换 → 左文案 + 右 mockup 同步 |
+| Mockup 区 | 手机框；展示 C 端态（banner、按钮文案、禁用态） |
+| 新窗口打开 | 新 tab 仅 mockup + 场景条，便于评审截图 |
+
+### 模板 C — 前后端交互链路类
+
+| 区块 | 行为 |
+|------|------|
+| Tab | 前端需求 \| 接口契约 \| 状态与异常 |
+| 交互清单表 | 模块 × 触发 × 后端交互 × 刷新 × 失败处理 |
+| 业务流程 | 跨 Tab 总览区；文字 + 流程图 |
+
+### FR 版本选择器
+
+- 默认 **当前最新版**；下拉 v3 / v2 / v1。
+- 切换版本 → Page Header 徽章、抽屉规则、Demo 表字段 **整页快照切换**。
+- 历史版只读，展示所属 Sprint 标签。
+
+## State Patterns
+
+| 状态 | 处理 |
+|------|------|
+| 规则抽屉关闭 | Demo 全宽；「需求规则」按钮 default |
+| 规则抽屉打开 | Demo 可继续操作；抽屉 overlay，不 modal 阻断 |
+| Modal 打开 | 一层；打开时抽屉保持但不可点（z-index 低于 modal） |
+| 版本切换中 | Header 版本徽章 loading 200ms → 内容 cross-fade |
+| Mock 提交成功 | toast 3s：「Demo 已保存（Mock，不写入后端）」 |
+| 空 Sprint | Sprint 详情空态 + 链到「如何新增 FR」说明 |
+
+## Interaction Primitives
+
+- **需求规则**：Page Header 按钮 toggle 抽屉；抽屉内锚点目录（1–5）点击滚动。
+- **版本**：Header 下拉；Sprint 详情页可点 FR 行跳转对应 Demo 页并带版本 query。
+- **模板 A CRUD**：新增 → modal；编辑行 → modal 预填；删除/上下架 → confirm dialog。
+- **模板 B 场景**：键盘 1–5 切换场景（可选增强）；默认鼠标点击。
+- **Esc**：关闭最顶层 overlay（modal > drawer）。
+
+## Accessibility Floor
+
+- 抽屉：`role="dialog"` + `aria-labelledby`；打开时焦点 trap 在抽屉内。
+- 场景切换：`aria-pressed` 表示选中。
+- 表格操作链接：≥44px 点击热区（padding 扩展）。
+- 流程图：抽屉内提供文字步骤 duplicate（不依赖纯图形理解）。
+- 对比度：规则正文 `{colors.text-primary}` on `{colors.drawer-bg}` ≥ 4.5:1。
+
+## Key Flows
+
+### Flow 1 — 研发小陈：按模块找 Demo
+
+1. 打开原型，Sidebar **工具管理 → 前端交互需求**。
+2. Page Header 见 **FR-024 · v2**；点 **需求规则** 浏览边界与业务流程。
+3. 切换场景 **「积分不足」**，mockup 按钮变为充值引导。
+4. ** climax **：不看 PRD 文档，抽屉 + mockup 已足够开工。
+
+### Flow 2 — 产品阿琳：发布 FR 新版本
+
+1. **Sprint 管理 → Sprint-W38** 见 FR-012 待交付。
+2. 进入 **积分商品** Demo 页，版本下拉切 **v3**，确认表字段与抽屉规则一致。
+3. 通知研发：「FR-012 v3 已更新，看 Demo 页即可。」
+
+### Flow 3 — 模板 A 可点 Demo
+
+1. **积分商品** → **新增档位** → 填表单 → 提交。
+2. Toast 提示 Mock；表新增一行草稿态。
+3. **编辑** 行 → 改标签 → 保存 → 行内 Tag 更新。
+
+## Product-Specific Sections
+
+### FR Demo 写入规范（canonical）
+
+后续迭代 FR 的 Demo 结构、需求规则抽屉、流程图呈现等**默认按项目规范文档执行**：
+
+→ [`demo/iteration/ITERATION-FR-GUIDE.md`](../../../../demo/iteration/ITERATION-FR-GUIDE.md)（2026-08-23 确认，参考 FR-001）
+
+交互组件 live Demo：[`demo/iteration/component-spec-demo.html`](../../../../demo/iteration/component-spec-demo.html)
+
+### 业务流程图呈现（FR Demo · 业务流程 Tab）
+
+- **分层渲染**：SVG 连线层（`flow-edges`）置于节点层（`flow-nodes`）下方，避免连线横穿线框。
+- **正交路由**：分叉与汇聚使用水平/垂直折线，走节点间隙专用通道（如 y=208、y=402），不穿过线框。
+- **间距**：相邻节点纵向 ≥24px；决策菱形与上下节点 ≥30px。
+- **文本**：线框内超 12 字用 `tspan` 换行；副文案降字号、降对比度。
+- **Tab 切换**：多张流程图横向 Tab，单面板仅展示一张，底部共用图例。
+
+
+| 层 | 载体 | 读者 |
+|----|------|------|
+| 可交互 Demo | 主内容区 | 研发看「长什么样、怎么点」 |
+| 结构化规则 | 抽屉 / 模板 B 左栏 | 研发看「字段/边界/流程」 |
+| 版本快照 | FR + vN | 追溯「这 Sprint 改了什么」 |
+
+### 非目标（Anti-patterns）
+
+- 不做真实权限、审批、数据持久化。
+- 不默认挂载无变更的运营分析页。
+- 不用 Swagger 替代模板 C 的「接口契约」Tab  prose。

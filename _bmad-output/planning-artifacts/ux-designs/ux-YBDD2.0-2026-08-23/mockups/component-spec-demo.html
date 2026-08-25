@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>组件规范 · 右豹迭代需求记录</title>
+  <style>
+    :root {
+      --primary: #2563eb; --primary-hover: #1d4ed8; --primary-light: #eff6ff; --primary-border: #bfdbfe;
+      --accent-rule: #0891b2; --accent-version: #7c3aed; --accent-fr: #d97706;
+      --success: #16a34a; --success-bg: #f0fdf4; --warning: #d97706; --warning-bg: #fffbeb;
+      --danger: #dc2626; --danger-hover: #b91c1c; --danger-bg: #fef2f2; --danger-border: #fecaca;
+      --bg: #f0f4f8; --surface: #fff; --surface-glass: rgba(255,255,255,0.72);
+      --surface-hover: #f8fafc; --border: #e8edf3;
+      --text-primary: #18222f; --text-secondary: #4a5568; --text-muted: #9aa5b4;
+      --sidebar-w: 240px; --drawer-w: 480px;
+      --radius-sm: 7px; --radius-lg: 14px;
+      --shadow: 0 8px 32px rgba(30,40,80,0.10);
+      --shadow-modal: 0 20px 60px rgba(30,40,80,0.18);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 13px;
+      color: var(--text-primary);
+      background: linear-gradient(135deg, #e0e7ff 0%, #f0f4f8 40%, #e0f2fe 100%);
+      background-attachment: fixed; min-height: 100vh;
+    }
+    .sidebar {
+      position: fixed; inset: 0 auto 0 0; width: var(--sidebar-w); z-index: 200;
+      display: flex; flex-direction: column;
+      background: rgba(240,244,255,0.95); backdrop-filter: blur(20px);
+      border-right: 1px solid rgba(148,163,196,0.22);
+    }
+    .sidebar-brand { padding: 16px 14px 12px; border-bottom: 1px solid rgba(148,163,196,0.22); }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: linear-gradient(135deg, #2563eb, #7c3aed); color: #fff;
+      display: flex; align-items: center; justify-content: center; font-weight: 700;
+    }
+    .brand-text { font-size: 14px; font-weight: 700; }
+    .brand-sub { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+    .sprint-pill {
+      display: inline-block; margin-top: 10px; font-size: 11px; font-weight: 600;
+      padding: 3px 8px; border-radius: 999px; background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0;
+    }
+    .sidebar-scroll { flex: 1; overflow-y: auto; padding: 8px 0 16px; }
+    .nav-group-label { padding: 12px 16px 6px; font-size: 11px; font-weight: 600; color: var(--text-muted); }
+    .nav-item {
+      position: relative; display: flex; align-items: center; height: 40px;
+      padding: 0 12px 0 14px; margin: 1px 8px; width: calc(100% - 16px);
+      border-radius: 8px; font-size: 13px; font-weight: 500; color: var(--text-secondary);
+      text-decoration: none; transition: all 0.18s;
+    }
+    .nav-item:hover { background: rgba(99,102,241,0.06); color: var(--text-primary); }
+    .nav-item.active { color: var(--primary); background: rgba(37,99,235,0.12); font-weight: 600; }
+    .nav-item.active::before {
+      content: ''; position: absolute; left: 0; top: 7px; bottom: 7px;
+      width: 3px; border-radius: 0 2px 2px 0; background: var(--primary);
+    }
+    .sidebar-foot { padding: 10px 14px 14px; border-top: 1px solid rgba(148,163,196,0.22); font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+    .main { margin-left: var(--sidebar-w); padding: 16px 20px 48px; min-height: 100vh; }
+    .breadcrumb { padding: 4px 0 12px; font-size: 12px; color: var(--text-muted); }
+    .breadcrumb a { color: var(--primary); text-decoration: none; }
+    .page-header { margin-bottom: 16px; }
+    .page-header h1 { font-size: 19px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .page-desc { font-size: 12px; color: var(--text-muted); max-width: 820px; line-height: 1.55; }
+    .badge { display: inline-flex; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: var(--radius-sm); }
+    .badge-spec { background: #ecfeff; color: var(--accent-rule); border: 1px solid #a5f3fc; }
+    .spec-nav {
+      display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px;
+      background: var(--surface-glass); backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.55); border-radius: var(--radius-lg);
+      padding: 10px 12px; box-shadow: var(--shadow);
+    }
+    .spec-nav a {
+      padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 500;
+      color: var(--text-secondary); text-decoration: none; border: 1px solid var(--border); background: var(--surface);
+    }
+    .spec-nav a:hover { border-color: var(--primary-border); color: var(--primary); background: var(--primary-light); }
+    .glass-card {
+      background: var(--surface-glass); backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.55); border-radius: var(--radius-lg);
+      box-shadow: var(--shadow); overflow: hidden; margin-bottom: 16px; scroll-margin-top: 16px;
+    }
+    .spec-section-head {
+      padding: 14px 18px; border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap;
+    }
+    .spec-section-head h2 { font-size: 15px; font-weight: 700; }
+    .spec-section-head p { font-size: 12px; color: var(--text-muted); margin-top: 4px; line-height: 1.5; max-width: 640px; }
+    .spec-body { padding: 16px 18px 20px; }
+    .spec-row { display: grid; grid-template-columns: 140px 1fr; gap: 16px; align-items: start; padding: 12px 0; border-bottom: 1px solid var(--border); }
+    .spec-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .spec-label { font-size: 12px; font-weight: 600; color: var(--text-secondary); padding-top: 8px; }
+    .spec-meta { font-size: 11px; color: var(--text-muted); margin-top: 4px; line-height: 1.45; }
+    .spec-demo { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+    .spec-code { font-family: ui-monospace, monospace; font-size: 11px; color: var(--accent-rule); background: #f1f5f9; padding: 2px 6px; border-radius: 4px; }
+
+    /* —— 按钮 —— */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      height: 34px; padding: 0 14px; border-radius: var(--radius-sm);
+      font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid transparent;
+      transition: background 0.15s, border-color 0.15s, color 0.15s; white-space: nowrap;
+    }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover:not(:disabled) { background: var(--primary-hover); }
+    .btn-ghost { background: var(--surface); color: var(--text-secondary); border-color: var(--border); }
+    .btn-ghost:hover:not(:disabled) { background: var(--surface-hover); color: var(--text-primary); }
+    .btn-rule { background: var(--primary-light); color: var(--primary); border-color: var(--primary-border); }
+    .btn-rule:hover:not(:disabled) { background: #dbeafe; }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn-danger:hover:not(:disabled) { background: var(--danger-hover); }
+    .btn-danger-ghost { background: var(--surface); color: var(--danger); border-color: var(--danger-border); }
+    .btn-danger-ghost:hover:not(:disabled) { background: var(--danger-bg); }
+    .btn-sm { height: 32px; padding: 0 12px; font-size: 12px; }
+
+    /* —— 文字链 / 表格操作 —— */
+    .link {
+      display: inline-flex; align-items: center; min-height: 28px; padding: 0 2px;
+      color: var(--primary); font-size: 12px; font-weight: 500; cursor: pointer;
+      text-decoration: none; border: none; background: none; transition: color 0.15s;
+    }
+    .link:hover { color: var(--primary-hover); text-decoration: underline; }
+    .link + .link { margin-left: 12px; }
+    .link-danger { color: var(--danger); }
+    .link-danger:hover { color: var(--danger-hover); }
+    .link-muted { color: var(--text-muted); font-weight: 400; }
+    .link-muted:hover { color: var(--text-secondary); }
+    .action-group { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 0; }
+
+    /* —— Tag —— */
+    .tag { display: inline-flex; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+    .tag-ok { background: var(--success-bg); color: var(--success); }
+    .tag-warn { background: var(--warning-bg); color: var(--warning); }
+    .tag-del { background: var(--danger-bg); color: var(--danger); }
+
+    /* —— 表格操作列示例 —— */
+    .mini-table { width: 100%; border-collapse: collapse; }
+    .mini-table th, .mini-table td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); font-size: 12px; }
+    .mini-table th { font-size: 11px; font-weight: 600; color: var(--text-muted); background: rgba(248,250,252,0.9); }
+    .mini-table tr:hover td { background: var(--surface-hover); }
+
+    /* —— 居中 Modal（确认 / 编辑） —— */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(15,23,42,0.4); z-index: 600;
+      display: flex; align-items: center; justify-content: center; padding: 20px;
+      opacity: 0; pointer-events: none; transition: opacity 0.22s;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: auto; }
+    .modal {
+      width: 100%; max-width: 400px; background: var(--surface);
+      border-radius: var(--radius-lg); box-shadow: var(--shadow-modal);
+      transform: translateY(12px) scale(0.98); transition: transform 0.22s;
+    }
+    .modal-overlay.open .modal { transform: translateY(0) scale(1); }
+    .modal.modal-md { max-width: 480px; }
+    .modal-header { padding: 16px 20px 0; }
+    .modal-header h3 { font-size: 15px; font-weight: 700; }
+    .modal-header p { font-size: 12px; color: var(--text-muted); margin-top: 6px; line-height: 1.55; }
+    .modal-body { padding: 16px 20px; }
+    .modal-footer {
+      padding: 12px 20px 16px; display: flex; justify-content: flex-end; gap: 8px;
+      border-top: 1px solid var(--border);
+    }
+    .form-field { margin-bottom: 12px; }
+    .form-field:last-child { margin-bottom: 0; }
+    .form-field label { display: block; font-size: 11px; font-weight: 500; color: var(--text-muted); margin-bottom: 4px; }
+    .form-field input, .form-field select {
+      width: 100%; height: 34px; padding: 0 10px; border: 1px solid var(--border);
+      border-radius: var(--radius-sm); font-size: 13px;
+    }
+    .form-field input:focus, .form-field select:focus {
+      outline: none; border-color: var(--primary-border); box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+    }
+
+    /* —— 右侧详情 Drawer —— */
+    .drawer-overlay {
+      position: fixed; inset: 0; background: rgba(15,23,42,0.35); z-index: 500;
+      opacity: 0; pointer-events: none; transition: opacity 0.25s;
+    }
+    .drawer-overlay.open { opacity: 1; pointer-events: auto; }
+    .drawer {
+      position: fixed; top: 0; right: 0; bottom: 0; width: var(--drawer-w); z-index: 501;
+      background: rgba(255,255,255,0.98); backdrop-filter: blur(12px);
+      box-shadow: -8px 0 40px rgba(30,40,60,0.18);
+      transform: translateX(100%); transition: transform 0.28s ease;
+      display: flex; flex-direction: column;
+    }
+    .drawer.open { transform: translateX(0); }
+    .drawer-header {
+      padding: 16px 20px; border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;
+    }
+    .drawer-header h2 { font-size: 15px; font-weight: 700; }
+    .drawer-close {
+      width: 28px; height: 28px; border: none; background: #f1f5f9;
+      border-radius: 6px; cursor: pointer; font-size: 16px; color: var(--text-secondary);
+    }
+    .drawer-close:hover { background: #e2e8f0; }
+    .drawer-body { flex: 1; overflow-y: auto; padding: 16px 20px 24px; font-size: 13px; color: var(--text-secondary); line-height: 1.65; }
+    .drawer-meta { display: grid; grid-template-columns: 100px 1fr; gap: 8px 12px; font-size: 12px; margin-bottom: 16px; }
+    .drawer-meta dt { color: var(--text-muted); }
+    .drawer-meta dd { color: var(--text-primary); }
+
+    /* —— Toast —— */
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: #1e293b; color: #fff; padding: 10px 18px; border-radius: 999px; font-size: 13px;
+      opacity: 0; transition: all 0.25s; z-index: 700; pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    .usage-note {
+      margin-top: 14px; padding: 10px 12px; border-radius: var(--radius-sm);
+      background: #fffbeb; border: 1px solid #fde68a; font-size: 12px; color: #92400e; line-height: 1.55;
+    }
+  </style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand">
+        <div class="brand-icon">迭</div>
+        <div>
+          <div class="brand-text">右豹迭代需求记录</div>
+          <div class="brand-sub">PRD Demo · 产品交付研发</div>
+        </div>
+      </div>
+      <span class="sprint-pill">YBDD2.0 · 迭代 v1</span>
+    </div>
+    <div class="sidebar-scroll" data-iteration-sidebar></div>
+    <div class="sidebar-foot">全站交互组件样式基准<br />后续 FR Demo 须复用</div>
+  </aside>
+
+  <main class="main">
+    <nav class="breadcrumb">
+      <a href="framework-shell.html">Sprint 概览</a>
+      <span> / 组件规范</span>
+    </nav>
+
+    <header class="page-header">
+      <h1>组件规范 <span class="badge badge-spec">Design System</span></h1>
+      <p class="page-desc">迭代需求 Demo 内按钮、文字链、确认弹窗、编辑弹窗、详情抽屉、Toast 的统一规范。所有 FR 页（模板 A / B）须复用以下 class 与交互模式，保证全站一致。</p>
+    </header>
+
+    <nav class="spec-nav" aria-label="规范章节">
+      <a href="#sec-btn">Button</a>
+      <a href="#sec-link">文字链</a>
+      <a href="#sec-table">表格操作</a>
+      <a href="#sec-confirm">确认弹窗</a>
+      <a href="#sec-edit">编辑弹窗</a>
+      <a href="#sec-detail">详情抽屉</a>
+      <a href="#sec-toast">Toast</a>
+      <a href="#sec-tag">Tag</a>
+    </nav>
+
+    <!-- Button -->
+    <section class="glass-card" id="sec-btn">
+      <div class="spec-section-head">
+        <div>
+          <h2>1 · Button 按钮</h2>
+          <p>高度 34px（筛选区 32px）；圆角 7px。主操作每区域仅一个 Primary。</p>
+        </div>
+      </div>
+      <div class="spec-body">
+        <div class="spec-row">
+          <div>
+            <div class="spec-label">Primary</div>
+            <div class="spec-meta">查询、提交、保存、确认</div>
+            <div class="spec-code">.btn .btn-primary</div>
+          </div>
+          <div class="spec-demo">
+            <button class="btn btn-primary" type="button">查询</button>
+            <button class="btn btn-primary" type="button">保存</button>
+            <button class="btn btn-primary" type="button" disabled>禁用</button>
+          </div>
+        </div>
+        <div class="spec-row">
+          <div>
+            <div class="spec-label">Ghost</div>
+            <div class="spec-meta">取消、重置、次要操作</div>
+            <div class="spec-code">.btn .btn-ghost</div>
+          </div>
+          <div class="spec-demo">
+            <button class="btn btn-ghost" type="button">取消</button>
+            <button class="btn btn-ghost btn-sm" type="button">重置</button>
+          </div>
+        </div>
+        <div class="spec-row">
+          <div>
+            <div class="spec-label">Rule</div>
+            <div class="spec-meta">Page Header「需求规则」入口</div>
+            <div class="spec-code">.btn .btn-rule</div>
+          </div>
+          <div class="spec-demo">
+            <button class="btn btn-rule" type="button">📋 需求规则</button>
+            <button class="btn btn-rule" type="button" style="background:var(--primary);color:#fff;border-color:var(--primary);">打开态</button>
+          </div>
+        </div>
+        <div class="spec-row">
+          <div>
+            <div class="spec-label">Danger</div>
+            <div class="spec-meta">确认弹窗内 destructive 主按钮；慎用大面积使用</div>
+            <div class="spec-code">.btn-danger / .btn-danger-ghost</div>
+          </div>
+          <div class="spec-demo">
+            <button class="btn btn-danger" type="button">确认删除</button>
+            <button class="btn btn-danger-ghost" type="button">删除</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Link -->
+    <section class="glass-card" id="sec-link">
+      <div class="spec-section-head">
+        <div>
+          <h2>2 · 文字链（Text Link）</h2>
+          <p>表格操作列、行内轻量操作。不用 Button 样式，保持信息密度。</p>
+        </div>
+      </div>
+      <div class="spec-body">
+        <div class="spec-row">
+          <div>
+            <div class="spec-label">Default</div>
+            <div class="spec-meta">详情、编辑、导出等常规操作</div>
+            <div class="spec-code">.link</div>
+          </div>
+          <div class="spec-demo action-group">
+            <button class="link" type="button">详情</button>
+            <button class="link" type="button">编辑</button>
+            <button class="link" type="button">导出</button>
+          </div>
+        </div>
+        <div class="spec-row">
+          <div>
+            <div class="spec-label">Muted</div>
+            <div class="spec-meta">日志、次要查看类</div>
+            <div class="spec-code">.link .link-muted</div>
+          </div>
+          <div class="spec-demo">
+            <button class="link link-muted" type="button">日志</button>
+          </div>
+        </div>
+        <div class="spec-row">
+          <div>
+            <div class="spec-label">Danger</div>
+            <div class="spec-meta">删除、下架等；点击后须出确认弹窗</div>
+            <div class="spec-code">.link .link-danger</div>
+          </div>
+          <div class="spec-demo">
+            <button class="link link-danger" type="button" onclick="openConfirm('delete')">删除</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Table -->
+    <section class="glass-card" id="sec-table">
+      <div class="spec-section-head">
+        <div>
+          <h2>3 · 表格操作列组合</h2>
+          <p>顺序建议：详情 → 编辑 → 日志 → 删除。链接间距 12px；危险操作置末。</p>
+        </div>
+      </div>
+      <div class="spec-body">
+        <table class="mini-table">
+          <thead>
+            <tr><th>ID</th><th>名称</th><th>状态</th><th>操作</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>PA-10021</td><td>豹豹1号</td><td><span class="tag tag-ok">正常</span></td>
+              <td>
+                <span class="action-group">
+                  <button class="link" type="button" onclick="openDetail()">详情</button>
+                  <button class="link" type="button" onclick="openEdit()">编辑</button>
+                  <button class="link link-muted" type="button" onclick="showToast('Demo：打开日志')">日志</button>
+                  <button class="link link-danger" type="button" onclick="openConfirm('delete')">删除</button>
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="usage-note">列表区右上角「新增」使用 <code class="spec-code">.btn-primary</code>，不与行内文字链混用。</div>
+      </div>
+    </section>
+
+    <!-- Confirm -->
+    <section class="glass-card" id="sec-confirm">
+      <div class="spec-section-head">
+        <div>
+          <h2>4 · 确认弹窗（Confirm Modal）</h2>
+          <p>居中 overlay；宽 400px。删除/撤回/不可逆操作用 Danger 主按钮；可取消操作用 Ghost + Primary。</p>
+        </div>
+        <button class="btn btn-primary" type="button" onclick="openConfirm('generic')">预览确认弹窗</button>
+      </div>
+      <div class="spec-body">
+        <div class="spec-row">
+          <div class="spec-label">使用场景</div>
+          <div>
+            <ul style="padding-left:18px;font-size:12px;color:var(--text-secondary);line-height:1.65;">
+              <li>删除发布帐号、撤回分配（若允许）等<strong>不可逆</strong>操作</li>
+              <li>二次确认提交（如批量操作）</li>
+              <li><strong>不用</strong>于详情/编辑（详情→Drawer，编辑→Modal 表单）</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Edit -->
+    <section class="glass-card" id="sec-edit">
+      <div class="spec-section-head">
+        <div>
+          <h2>5 · 编辑弹窗（Edit Modal）</h2>
+          <p>居中 overlay；宽 480px。Footer：取消 Ghost + 保存 Primary。Demo 提交后 Toast + 关闭。</p>
+        </div>
+        <button class="btn btn-primary" type="button" onclick="openEdit()">预览编辑弹窗</button>
+      </div>
+    </section>
+
+    <!-- Detail Drawer -->
+    <section class="glass-card" id="sec-detail">
+      <div class="spec-section-head">
+        <div>
+          <h2>6 · 详情抽屉（Detail Drawer）</h2>
+          <p>右侧滑入 overlay；宽 480px。关键词详情 list、需求规则等长内容只读场景。不挤压主列表宽度。</p>
+        </div>
+        <button class="btn btn-primary" type="button" onclick="openDetail()">预览详情抽屉</button>
+      </div>
+    </section>
+
+    <!-- Toast -->
+    <section class="glass-card" id="sec-toast">
+      <div class="spec-section-head">
+        <div>
+          <h2>7 · Toast 反馈</h2>
+          <p>底部居中；深色胶囊。Mock 提交成功、筛选重置等轻量反馈，2.5s 自动消失。</p>
+        </div>
+        <button class="btn btn-ghost" type="button" onclick="showToast('Demo：保存成功')">预览 Toast</button>
+      </div>
+    </section>
+
+    <!-- Tag -->
+    <section class="glass-card" id="sec-tag">
+      <div class="spec-section-head">
+        <div>
+          <h2>8 · 状态 Tag</h2>
+          <p>仅用于表格内业务状态，不用于框架 chrome（FR 徽章除外）。</p>
+        </div>
+      </div>
+      <div class="spec-body">
+        <div class="spec-demo">
+          <span class="tag tag-ok">正常</span>
+          <span class="tag tag-warn">待审核</span>
+          <span class="tag tag-del">已删除</span>
+        </div>
+        <div class="spec-meta" style="margin-top:10px;">class：<code class="spec-code">.tag-ok</code> <code class="spec-code">.tag-warn</code> <code class="spec-code">.tag-del</code></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 确认弹窗 -->
+  <div class="modal-overlay" id="confirmOverlay" onclick="if(event.target===this)closeConfirm()">
+    <div class="modal" role="dialog" aria-labelledby="confirmTitle">
+      <div class="modal-header">
+        <h3 id="confirmTitle">确认操作</h3>
+        <p id="confirmDesc">确定要执行此操作吗？此操作在 Demo 中仅为 Mock 反馈。</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" type="button" onclick="closeConfirm()">取消</button>
+        <button class="btn btn-primary" type="button" id="confirmOkBtn" onclick="confirmAction()">确定</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 编辑弹窗 -->
+  <div class="modal-overlay" id="editOverlay" onclick="if(event.target===this)closeEdit()">
+    <div class="modal modal-md" role="dialog" aria-labelledby="editTitle">
+      <div class="modal-header">
+        <h3 id="editTitle">编辑 · 发布帐号</h3>
+        <p>Demo 表单提交后 Toast 提示，不持久化。</p>
+      </div>
+      <div class="modal-body">
+        <div class="form-field">
+          <label>帐号昵称</label>
+          <input type="text" value="豹豹1号" />
+        </div>
+        <div class="form-field">
+          <label>帐号平台</label>
+          <select><option>抖音</option><option>快手</option><option>TK</option></select>
+        </div>
+        <div class="form-field">
+          <label>状态</label>
+          <select><option>正常</option><option>已删除</option></select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" type="button" onclick="closeEdit()">取消</button>
+        <button class="btn btn-primary" type="button" onclick="submitEdit()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 详情抽屉 -->
+  <div class="drawer-overlay" id="detailOverlay" onclick="closeDetail()"></div>
+  <aside class="drawer" id="detailDrawer">
+    <div class="drawer-header">
+      <h2>关键词详情 · 右豹代发教程</h2>
+      <button class="drawer-close" type="button" onclick="closeDetail()" aria-label="关闭">×</button>
+    </div>
+    <div class="drawer-body">
+      <dl class="drawer-meta">
+        <dt>关键词</dt><dd>右豹代发教程</dd>
+        <dt>项目方</dt><dd>右豹官方</dd>
+        <dt>累计分配</dt><dd>777.28</dd>
+      </dl>
+      <table class="mini-table">
+        <thead>
+          <tr><th>分配金额</th><th>分配时间</th><th>分配批次</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>520.00</td><td>2023.12.24 13:00</td><td>代发批次 20231224</td></tr>
+          <tr><td>257.28</td><td>2023.12.20 11:15</td><td>代发批次 20231220</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </aside>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    let confirmMode = 'generic';
+
+    function openConfirm(mode) {
+      confirmMode = mode;
+      const title = document.getElementById('confirmTitle');
+      const desc = document.getElementById('confirmDesc');
+      const ok = document.getElementById('confirmOkBtn');
+      if (mode === 'delete') {
+        title.textContent = '确认删除';
+        desc.textContent = '删除后帐号状态变为「已删除」，历史记录保留。Demo 中不会真实删除数据。';
+        ok.className = 'btn btn-danger';
+        ok.textContent = '确认删除';
+      } else {
+        title.textContent = '确认提交';
+        desc.textContent = '确定要执行此操作吗？';
+        ok.className = 'btn btn-primary';
+        ok.textContent = '确定';
+      }
+      document.getElementById('confirmOverlay').classList.add('open');
+    }
+
+    function closeConfirm() {
+      document.getElementById('confirmOverlay').classList.remove('open');
+    }
+
+    function confirmAction() {
+      closeConfirm();
+      showToast(confirmMode === 'delete' ? 'Demo：已删除（Mock）' : 'Demo：操作已确认');
+    }
+
+    function openEdit() {
+      document.getElementById('editOverlay').classList.add('open');
+    }
+
+    function closeEdit() {
+      document.getElementById('editOverlay').classList.remove('open');
+    }
+
+    function submitEdit() {
+      closeEdit();
+      showToast('Demo：保存成功');
+    }
+
+    function openDetail() {
+      document.getElementById('detailOverlay').classList.add('open');
+      document.getElementById('detailDrawer').classList.add('open');
+    }
+
+    function closeDetail() {
+      document.getElementById('detailOverlay').classList.remove('open');
+      document.getElementById('detailDrawer').classList.remove('open');
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2500);
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') { closeConfirm(); closeEdit(); closeDetail(); }
+    });
+  </script>
+  <script src="sidebar-nav.js"></script>
+</body>
+</html>

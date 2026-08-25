@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>品牌退款 · C 端展示卡片 Demo</title>
+  <style>
+    :root {
+      --primary: #ff6b00;
+      --primary-light: #fff4eb;
+      --text-primary: #18222f;
+      --text-secondary: #4a5568;
+      --text-muted: #9aa5b4;
+      --border: #e8edf3;
+      --danger: #dc2626;
+      --success: #16a34a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif;
+      font-size: 13px; color: var(--text-primary);
+      background: #f5f5f5; min-height: 100vh; padding: 16px;
+    }
+    .screen { display: none; }
+    .screen.active { display: block; }
+    .demo-note {
+      font-size: 11px; color: var(--text-muted); text-align: center;
+      margin-bottom: 12px; line-height: 1.5;
+    }
+    .phone {
+      max-width: 340px; margin: 0 auto;
+      background: #fff; border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+    .phone-head {
+      padding: 14px 16px 10px; border-bottom: 1px solid var(--border);
+      font-size: 15px; font-weight: 700;
+    }
+    .phone-sub { font-size: 11px; color: var(--text-muted); font-weight: 400; margin-top: 2px; }
+    .list { padding: 8px 0; }
+    .record-card {
+      padding: 14px 16px; border-bottom: 1px solid var(--border);
+    }
+    .record-card:last-child { border-bottom: none; }
+    .record-title {
+      font-size: 14px; font-weight: 600; color: var(--text-primary);
+      display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;
+    }
+    .record-subtitle {
+      font-size: 12px; color: var(--text-muted); margin-top: 4px; line-height: 1.45;
+    }
+    .record-meta {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 8px; font-size: 11px; color: var(--text-muted);
+    }
+    .amount { font-size: 15px; font-weight: 700; color: var(--danger); white-space: nowrap; }
+    .amount.income { color: var(--danger); }
+    .tag {
+      display: inline-flex; padding: 2px 8px; border-radius: 999px;
+      font-size: 10px; font-weight: 600; background: #fef2f2; color: var(--danger);
+    }
+    .field-map {
+      margin: 12px 16px 16px; padding: 10px 12px;
+      background: var(--primary-light); border-radius: 10px;
+      border: 1px solid #ffd4b0; font-size: 11px; color: #92400e; line-height: 1.6;
+    }
+    .field-map strong { color: #c2410c; }
+  </style>
+</head>
+<body>
+
+  <!-- 场景1 · 订单列表 -->
+  <div id="screen-order-list" class="screen active">
+    <p class="demo-note">本 Demo 仅展示退款记录在 C 端的卡片信息结构，非完整页面设计</p>
+    <div class="phone">
+      <div class="phone-head">
+        订单列表
+        <div class="phone-sub">退款记录插入既有列表，样式沿用现有订单卡片</div>
+      </div>
+      <div class="list">
+        <div class="record-card">
+          <div class="record-title">
+            <span>品牌退款 · 右豹官方</span>
+            <span class="amount">-128.00</span>
+          </div>
+          <div class="record-subtitle">关键词违规，品牌方发起退款</div>
+          <div class="record-meta">
+            <span>产生 2024.03.12 · 更新 2024.03.15</span>
+          </div>
+        </div>
+        <div class="record-card" style="opacity:0.55">
+          <div class="record-title">
+            <span>（示例）普通收益订单</span>
+            <span class="amount" style="color:var(--success)">+680.00</span>
+          </div>
+          <div class="record-subtitle">既有订单卡片，本 FR 不重设计</div>
+          <div class="record-meta"><span>产生 2024.03.10 · 更新 2024.03.10</span></div>
+        </div>
+      </div>
+      <div class="field-map">
+        <strong>字段映射（订单列表）</strong><br />
+        标题 · 副标题（退款原因）· 订单产生日期 · 订单更新日期 · 扣减金额（负值展示）
+      </div>
+    </div>
+  </div>
+
+  <!-- 场景2 · 钱包收益明细 -->
+  <div id="screen-wallet-income" class="screen">
+    <p class="demo-note">审核通过且扣回完成后，同步写入钱包收益明细</p>
+    <div class="phone">
+      <div class="phone-head">
+        钱包 · 收益明细
+        <div class="phone-sub">退款扣减以独立明细行展示</div>
+      </div>
+      <div class="list">
+        <div class="record-card">
+          <div class="record-title">
+            <span>右豹官方「右豹代发教程」产生退款</span>
+            <span class="amount income">-128.00</span>
+          </div>
+          <div class="record-subtitle">关键词违规，品牌方发起退款</div>
+          <div class="record-meta">
+            <span>2024.03.15 14:30</span>
+            <span class="tag">已扣减</span>
+          </div>
+        </div>
+        <div class="record-card" style="opacity:0.55">
+          <div class="record-title">
+            <span>（示例）关键词收益入账</span>
+            <span class="amount" style="color:var(--success)">+520.00</span>
+          </div>
+          <div class="record-subtitle">既有收益明细，本 FR 不重设计</div>
+          <div class="record-meta"><span>2024.03.12 13:00</span></div>
+        </div>
+      </div>
+      <div class="field-map">
+        <strong>字段映射（收益明细）</strong><br />
+        标题（项目名称「关键词」产生退款）· 副标题（退款原因）· 时间 · 金额 · 状态（已扣减）
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const screens = ['screen-order-list', 'screen-wallet-income'];
+
+    function showScreen(id) {
+      screens.forEach(s => {
+        document.getElementById(s).classList.toggle('active', s === id);
+      });
+    }
+
+    window.addEventListener('message', e => {
+      if (e.data?.type === 'goToScreen' && screens.includes(e.data.screen)) {
+        showScreen(e.data.screen);
+      }
+    });
+
+    const params = new URLSearchParams(location.search);
+    const screen = params.get('screen');
+    if (screen && screens.includes(screen)) showScreen(screen);
+  </script>
+</body>
+</html>

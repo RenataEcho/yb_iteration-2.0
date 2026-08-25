@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FR-001 · 代发分配 · 右豹迭代需求记录</title>
+  <style>
+    :root {
+      --primary: #2563eb; --primary-hover: #1d4ed8; --primary-light: #eff6ff; --primary-border: #bfdbfe;
+      --accent-rule: #0891b2; --accent-version: #7c3aed; --accent-fr: #d97706;
+      --success: #16a34a; --success-bg: #f0fdf4; --danger: #dc2626; --danger-bg: #fef2f2;
+      --bg: #f0f4f8; --surface: #fff; --surface-glass: rgba(255,255,255,0.72);
+      --surface-hover: #f8fafc; --border: #e8edf3;
+      --text-primary: #18222f; --text-secondary: #4a5568; --text-muted: #9aa5b4;
+      --sidebar-w: 240px; --drawer-w: 480px;
+      --radius-sm: 7px; --radius-lg: 14px;
+      --shadow: 0 8px 32px rgba(30,40,80,0.10);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 13px;
+      color: var(--text-primary);
+      background: linear-gradient(135deg, #e0e7ff 0%, #f0f4f8 40%, #e0f2fe 100%);
+      background-attachment: fixed; min-height: 100vh;
+    }
+    .sidebar {
+      position: fixed; inset: 0 auto 0 0; width: var(--sidebar-w); z-index: 200;
+      display: flex; flex-direction: column;
+      background: rgba(240,244,255,0.95); backdrop-filter: blur(20px);
+      border-right: 1px solid rgba(148,163,196,0.22);
+    }
+    .sidebar-brand { padding: 16px 14px 12px; border-bottom: 1px solid rgba(148,163,196,0.22); }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: linear-gradient(135deg, #2563eb, #7c3aed); color: #fff;
+      display: flex; align-items: center; justify-content: center; font-weight: 700;
+    }
+    .brand-text { font-size: 14px; font-weight: 700; }
+    .brand-sub { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+    .sprint-pill {
+      display: inline-block; margin-top: 10px; font-size: 11px; font-weight: 600;
+      padding: 3px 8px; border-radius: 999px; background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0;
+    }
+    .sidebar-scroll { flex: 1; overflow-y: auto; padding: 8px 0 16px; }
+    .nav-group-label { padding: 12px 16px 6px; font-size: 11px; font-weight: 600; color: var(--text-muted); }
+    .nav-item {
+      position: relative; display: flex; align-items: center; height: 40px;
+      padding: 0 12px 0 14px; margin: 1px 8px; width: calc(100% - 16px);
+      border-radius: 8px; font-size: 13px; font-weight: 500; color: var(--text-secondary);
+      text-decoration: none; transition: all 0.18s;
+    }
+    .nav-item:hover { background: rgba(99,102,241,0.06); color: var(--text-primary); }
+    .nav-item.active { color: var(--primary); background: rgba(37,99,235,0.12); font-weight: 600; }
+    .nav-item.active::before {
+      content: ''; position: absolute; left: 0; top: 7px; bottom: 7px;
+      width: 3px; border-radius: 0 2px 2px 0; background: var(--primary);
+    }
+    .sidebar-foot { padding: 10px 14px 14px; border-top: 1px solid rgba(148,163,196,0.22); font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+    .main { margin-left: var(--sidebar-w); padding: 16px 20px 40px; min-height: 100vh; }
+    .breadcrumb { padding: 4px 0 12px; font-size: 12px; color: var(--text-muted); }
+    .breadcrumb a { color: var(--primary); text-decoration: none; }
+    .page-header { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; }
+    .page-header h1 { font-size: 19px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .page-desc { font-size: 12px; color: var(--text-muted); max-width: 720px; line-height: 1.55; }
+    .badge { display: inline-flex; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: var(--radius-sm); }
+    .badge-fr { background: #fffbeb; color: var(--accent-fr); border: 1px solid #fde68a; }
+    .badge-version { background: #f5f3ff; color: var(--accent-version); border: 1px solid #ddd6fe; }
+    .page-tab-bar {
+      display: flex; gap: 0; margin-bottom: 16px;
+      background: var(--surface-glass); backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.55); border-radius: var(--radius-lg);
+      padding: 4px; box-shadow: var(--shadow); width: fit-content;
+    }
+    .page-tab-bar button {
+      padding: 8px 20px; border: none; background: transparent; cursor: pointer;
+      font-size: 13px; font-weight: 500; color: var(--text-secondary); border-radius: 10px;
+    }
+    .page-tab-bar button.active { background: var(--primary); color: #fff; font-weight: 600; }
+    .page-view { display: none; }
+    .page-view.active { display: block; }
+    /* 前端 iframe 容器：避免 Tab 切换后高度塌陷 */
+    .mockup-panel { min-height: 520px; }
+    .page-header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex; align-items: center; height: 34px; padding: 0 14px;
+      border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid transparent;
+      text-decoration: none;
+    }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-rule { background: var(--primary-light); color: var(--primary); border-color: var(--primary-border); }
+    .btn-rule.active { background: var(--primary); color: #fff; }
+    .btn-ghost { background: var(--surface); color: var(--text-secondary); border-color: var(--border); }
+    .btn-ghost:hover { background: var(--surface-hover); }
+    .glass-card {
+      background: var(--surface-glass); backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.55); border-radius: var(--radius-lg);
+      box-shadow: var(--shadow); overflow: hidden;
+    }
+    /* 模板 B */
+    .demo-layout { display: grid; grid-template-columns: minmax(280px, 5fr) minmax(360px, 7fr); gap: 16px; }
+    @media (max-width: 1024px) { .demo-layout { grid-template-columns: 1fr; } }
+    .scene-panel { padding: 16px 18px; }
+    .scene-panel h2 { font-size: 14px; font-weight: 700; margin-bottom: 10px; }
+    .scene-list { display: flex; flex-direction: column; gap: 6px; }
+    .scene-btn {
+      text-align: left; padding: 10px 12px; border-radius: var(--radius-sm);
+      border: 1px solid var(--border); background: rgba(255,255,255,0.6); cursor: pointer;
+    }
+    .scene-btn.active { border-color: var(--primary-border); background: var(--primary-light); color: var(--primary); font-weight: 600; }
+    .scene-btn .scene-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+    .scene-btn .scene-desc { font-size: 11px; color: var(--text-muted); line-height: 1.45; }
+    .scene-btn.active .scene-desc { color: #3b82f6; }
+    .scene-note { margin-top: 14px; padding: 10px 12px; border-radius: var(--radius-sm); background: #fffbeb; border: 1px solid #fde68a; font-size: 12px; color: #92400e; line-height: 1.55; }
+    .mockup-panel { padding: 16px; display: flex; justify-content: center; }
+    .mockup-frame-wrap {
+      width: 100%; max-width: 400px; border-radius: 28px; overflow: hidden;
+      background: #1e293b; box-shadow: 0 16px 48px rgba(0,0,0,0.18); aspect-ratio: 375 / 812;
+    }
+    .mockup-frame-wrap iframe { width: 100%; height: 100%; border: none; display: block; background: #f5f5f5; }
+    /* 模板 A */
+    .tab-bar-inline { display: flex; gap: 4px; padding: 12px 16px 0; border-bottom: 1px solid var(--border); }
+    .tab-bar-inline button {
+      padding: 8px 14px; border: none; background: none; cursor: pointer;
+      font-size: 13px; color: var(--text-secondary); border-bottom: 2px solid transparent; margin-bottom: -1px;
+    }
+    .tab-bar-inline button.active { color: var(--primary); font-weight: 600; border-bottom-color: var(--primary); }
+    .filter-bar { display: flex; flex-wrap: wrap; gap: 10px; padding: 14px 16px; align-items: flex-end; border-bottom: 1px solid var(--border); }
+    .filter-bar input, .filter-bar select { height: 32px; padding: 0 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 12px; min-width: 120px; }
+    .filter-field { display: flex; flex-direction: column; gap: 4px; }
+    .filter-field label { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+    .filter-field input, .filter-field select { min-width: 130px; }
+    .filter-actions { display: flex; gap: 8px; margin-left: auto; }
+    .btn-ghost-sm { background: var(--surface); color: var(--text-secondary); border: 1px solid var(--border); height: 32px; padding: 0 12px; border-radius: var(--radius-sm); cursor: pointer; font-size: 12px; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 900px; }
+    th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); font-size: 12px; vertical-align: top; }
+    th { font-size: 11px; font-weight: 600; color: var(--text-muted); background: rgba(248,250,252,0.9); white-space: nowrap; }
+    tr:hover td { background: var(--surface-hover); }
+    .cell-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .link { color: var(--primary); cursor: pointer; text-decoration: none; margin-right: 10px; font-size: 12px; font-weight: 500; background: none; border: none; padding: 0; }
+    .link:hover { color: var(--primary-hover); text-decoration: underline; }
+    .link-muted { color: var(--text-muted); font-weight: 400; }
+    .link-muted:hover { color: var(--text-secondary); }
+    .link-danger { color: var(--danger); margin-right: 0; }
+    .link-danger:hover { color: #b91c1c; }
+    .tag { display: inline-flex; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+    .tag-ok { background: var(--success-bg); color: var(--success); }
+    .tag-del { background: var(--danger-bg); color: var(--danger); }
+    .admin-panel { display: none; }
+    .admin-panel.active { display: block; }
+    /* 抽屉 overlay 层 — 不挤压主内容 */
+    .drawer-overlay {
+      position: fixed; inset: 0; background: rgba(15,23,42,0.35); z-index: 500;
+      opacity: 0; pointer-events: none; transition: opacity 0.25s;
+    }
+    .drawer-overlay.open { opacity: 1; pointer-events: auto; }
+    .drawer {
+      position: fixed; top: 0; right: 0; bottom: 0; width: var(--drawer-w); z-index: 501;
+      background: rgba(255,255,255,0.98); backdrop-filter: blur(12px);
+      box-shadow: -8px 0 40px rgba(30,40,60,0.18);
+      transform: translateX(100%); transition: transform 0.28s ease;
+      display: flex; flex-direction: column;
+    }
+    .drawer.open { transform: translateX(0); }
+    .drawer-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+    .drawer-header h2 { font-size: 15px; font-weight: 700; }
+    .drawer-close { width: 28px; height: 28px; border: none; background: #f1f5f9; border-radius: 6px; cursor: pointer; font-size: 16px; }
+    .drawer-nav { display: flex; gap: 4px; padding: 10px 16px; border-bottom: 1px solid var(--border); overflow-x: auto; flex-shrink: 0; }
+    .drawer-nav button { padding: 4px 10px; font-size: 11px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); cursor: pointer; white-space: nowrap; }
+    .rule-tab-bar {
+      display: flex; gap: 0; padding: 0 16px; border-bottom: 1px solid var(--border); flex-shrink: 0;
+    }
+    .rule-tab-bar button {
+      padding: 10px 18px; border: none; background: none; cursor: pointer;
+      font-size: 13px; color: var(--text-secondary); border-bottom: 2px solid transparent; margin-bottom: -1px;
+    }
+    .rule-tab-bar button.active { color: var(--primary); font-weight: 600; border-bottom-color: var(--primary); }
+    .rule-panel { display: none; }
+    .rule-panel.active { display: block; }
+    .drawer-body { flex: 1; overflow-y: auto; padding: 16px 20px 32px; }
+    .rule-section { margin-bottom: 22px; scroll-margin-top: 12px; }
+    .rule-section h3 { font-size: 14px; font-weight: 700; color: var(--accent-rule); margin-bottom: 8px; }
+    .rule-section h3 span {
+      display: inline-flex; width: 22px; height: 22px; align-items: center; justify-content: center;
+      background: #ecfeff; color: var(--accent-rule); border-radius: 6px; font-size: 12px; margin-right: 8px;
+    }
+    .rule-content { font-size: 13px; color: var(--text-secondary); line-height: 1.65; }
+    .rule-content ul { padding-left: 18px; margin-top: 6px; }
+    .rule-content li { margin-bottom: 5px; }
+    .rule-content code { font-family: ui-monospace, monospace; font-size: 12px; background: #f1f5f9; padding: 1px 5px; border-radius: 4px; }
+    .flow-steps { padding: 10px 12px; background: #f8fafc; border-radius: var(--radius-sm); border: 1px solid var(--border); font-size: 12px; line-height: 1.7; }
+    .detail-table { min-width: 680px; }
+    /* 业务流程 Tab */
+    .flow-page { padding: 0; }
+    .flow-page-intro { padding: 16px 18px 0; font-size: 12px; color: var(--text-muted); line-height: 1.55; }
+    .flow-tab-bar {
+      display: flex; gap: 4px; padding: 12px 16px 0; border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+    }
+    .flow-tab-bar button {
+      padding: 8px 16px; border: none; background: none; cursor: pointer; white-space: nowrap;
+      font-size: 13px; color: var(--text-secondary); border-bottom: 2px solid transparent; margin-bottom: -1px;
+    }
+    .flow-tab-bar button.active { color: var(--primary); font-weight: 600; border-bottom-color: var(--primary); }
+    .flow-panel-body { padding: 16px 18px 24px; display: none; }
+    .flow-panel-body.active { display: block; }
+    .flow-panel-desc { font-size: 12px; color: var(--text-secondary); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .flow-panel-desc .tag-flow { font-size: 11px; font-weight: 600; color: var(--primary); background: var(--primary-light); padding: 2px 8px; border-radius: 999px; }
+    .flow-svg-wrap { overflow: auto; padding: 8px 0; min-height: 480px; max-height: 72vh; }
+    .flow-svg-wrap svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+    .flow-edges line, .flow-edges polyline { stroke: #94a3b8; stroke-width: 1.5; fill: none; }
+    .flow-nodes rect, .flow-nodes polygon { stroke-width: 1.5; }
+    .flow-nodes text { font-family: inherit; }
+    .flow-legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px; font-size: 11px; color: var(--text-muted); }
+    .flow-legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 4px; vertical-align: -2px; }
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: #1e293b; color: #fff; padding: 10px 18px; border-radius: 999px; font-size: 13px;
+      opacity: 0; transition: all 0.25s; z-index: 600; pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand">
+        <div class="brand-icon">迭</div>
+        <div>
+          <div class="brand-text">右豹迭代需求记录</div>
+          <div class="brand-sub">PRD Demo · 产品交付研发</div>
+        </div>
+      </div>
+      <span class="sprint-pill">YBDD2.0 · 迭代 v1</span>
+    </div>
+    <div class="sidebar-scroll" data-iteration-sidebar></div>
+    <div class="sidebar-foot">FR-001 · 页内 Tab<br />前端交互 / 管理后台 / 业务流程</div>
+  </aside>
+
+  <main class="main" id="main">
+    <nav class="breadcrumb">
+      <a href="framework-shell.html">Sprint 概览</a>
+      <span> / OPC协作结算 / 代发分配</span>
+    </nav>
+
+    <header class="page-header">
+      <div>
+        <h1>
+          代发分配
+          <span class="badge badge-fr">FR-001</span>
+          <span class="badge badge-version">v1 当前</span>
+        </h1>
+        <p class="page-desc">融入 OPC 协作结算的代发分配能力：C 端按岗位比例自动分配（模板 B），后台发布帐号与关键词数据表（模板 A）。</p>
+      </div>
+      <div class="page-header-actions">
+        <button class="btn btn-rule" id="toggleRuleDrawer" type="button">📋 需求规则</button>
+      </div>
+    </header>
+
+    <div class="page-tab-bar" role="tablist">
+      <button type="button" class="active" data-page="view-fe" role="tab">前端交互</button>
+      <button type="button" data-page="view-admin" role="tab">管理后台</button>
+      <button type="button" data-page="view-flow" role="tab">业务流程</button>
+    </div>
+
+    <!-- 前端交互 -->
+    <div id="view-fe" class="page-view active">
+      <div class="demo-layout">
+        <div class="glass-card scene-panel">
+          <h2>场景切换</h2>
+          <div class="scene-list">
+            <button class="scene-btn active" type="button" data-screen="screen-studio">
+              <div class="scene-title">图1 · 我的工作室</div>
+              <div class="scene-desc">分配记录「代发」标签；代发不可撤回</div>
+            </button>
+            <button class="scene-btn" type="button" data-screen="screen-members">
+              <div class="scene-title">图2 · 成员详情</div>
+              <div class="scene-desc">代发成员「授权帐号:x」；点击进入代发成员详情</div>
+            </button>
+            <button class="scene-btn" type="button" data-screen="screen-alloc-admin">
+              <div class="scene-title">图3 · 分配详情（负责人）</div>
+              <div class="scene-desc">成员汇总 + 浮层明细 + 导出</div>
+            </button>
+            <button class="scene-btn" type="button" data-screen="screen-member-view">
+              <div class="scene-title">图4 · 成员视角</div>
+              <div class="scene-desc">分配详情 / 发布帐号入口</div>
+            </button>
+            <button class="scene-btn" type="button" data-screen="screen-member-alloc">
+              <div class="scene-title">图4.1 · 成员分配详情</div>
+              <div class="scene-desc">代发累计收益 + 明细 list</div>
+            </button>
+            <button class="scene-btn" type="button" data-screen="screen-publish-accounts">
+              <div class="scene-title">补充1 · 发布帐号</div>
+              <div class="scene-desc">平台、昵称、ID、编辑；添加复用右豹流程</div>
+            </button>
+            <button class="scene-btn" type="button" data-screen="screen-daifa-member-detail">
+              <div class="scene-title">补充2 · 代发成员详情</div>
+              <div class="scene-desc">Tab：分配记录 / 分配详情 / 授权帐号</div>
+            </button>
+          </div>
+          <div class="scene-note">Mockup 内可继续点击跳转；抽屉类弹窗为 overlay 浮层，不挤压本页布局。</div>
+        </div>
+        <div class="glass-card mockup-panel">
+          <div class="mockup-frame-wrap">
+            <iframe id="mockupFrame" title="代发分配 Mockup" src="about:blank" data-src="daifa-allocation-demo.html"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 管理后台 -->
+    <div id="view-admin" class="page-view">
+      <div class="glass-card">
+        <div class="tab-bar-inline">
+          <button type="button" class="active" data-panel="panel-accounts">发布帐号</button>
+          <button type="button" data-panel="panel-keywords">代发关键词</button>
+        </div>
+        <div id="panel-accounts" class="admin-panel active">
+          <div class="filter-bar">
+            <div class="filter-field"><label>发布帐号 ID</label><input type="text" placeholder="PA-10021" /></div>
+            <div class="filter-field"><label>帐号昵称</label><input type="text" placeholder="豹豹1号" /></div>
+            <div class="filter-field"><label>帐号 ID（平台唯一）</label><input type="text" placeholder="dy_8829103" /></div>
+            <div class="filter-field"><label>成员 ID</label><input type="text" placeholder="M-2001" /></div>
+            <div class="filter-field"><label>成员昵称</label><input type="text" placeholder="剪辑手A" /></div>
+            <div class="filter-field"><label>负责人 ID</label><input type="text" placeholder="U-1001" /></div>
+            <div class="filter-field"><label>工作室名称</label><input type="text" placeholder="别暴躁的工作室" /></div>
+            <div class="filter-field"><label>帐号平台</label><select><option>全部</option><option>抖音</option><option>快手</option><option>TK</option></select></div>
+            <div class="filter-field"><label>状态</label><select><option>全部</option><option>正常</option><option>已删除</option></select></div>
+            <div class="filter-field"><label>添加时间起</label><input type="date" /></div>
+            <div class="filter-field"><label>添加时间止</label><input type="date" /></div>
+            <div class="filter-actions">
+              <button class="btn-ghost-sm" type="button" onclick="showToast('Demo：已重置筛选')">重置</button>
+              <button class="btn btn-primary" type="button" onclick="showToast('Demo：筛选仅影响 Mock 展示')">查询</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th><th>帐号昵称</th><th>帐号ID</th><th>主页链接</th>
+                  <th>成员信息</th><th>工作室</th><th>帐号平台</th><th>状态</th><th>添加时间</th><th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>PA-10021</td><td>豹豹1号</td><td>dy_8829103</td>
+                  <td><a class="link" href="#">打开</a></td>
+                  <td><div>剪辑手A</div><div class="cell-sub">成员ID M-2001</div></td>
+                  <td><div>别暴躁的工作室</div><div class="cell-sub">负责人ID U-1001</div></td>
+                  <td>抖音</td><td><span class="tag tag-ok">正常</span></td><td>2023.11.10 09:20</td>
+                  <td><a class="link" onclick="showToast('Demo：编辑')">编辑</a><a class="link" onclick="showToast('Demo：日志')">日志</a></td>
+                </tr>
+                <tr>
+                  <td>PA-10022</td><td>豹豹2号</td><td>ks_6610238</td>
+                  <td><a class="link" href="#">打开</a></td>
+                  <td><div>剪辑手A</div><div class="cell-sub">成员ID M-2001</div></td>
+                  <td><div>别暴躁的工作室</div><div class="cell-sub">负责人ID U-1001</div></td>
+                  <td>快手</td><td><span class="tag tag-ok">正常</span></td><td>2023.11.12 14:05</td>
+                  <td><a class="link" onclick="showToast('Demo：编辑')">编辑</a><a class="link" onclick="showToast('Demo：日志')">日志</a></td>
+                </tr>
+                <tr>
+                  <td>PA-10023</td><td>leopard_en</td><td>tk_9900122</td>
+                  <td><a class="link" href="#">打开</a></td>
+                  <td><div>发布手B</div><div class="cell-sub">成员ID M-2002</div></td>
+                  <td><div>别暴躁的工作室</div><div class="cell-sub">负责人ID U-1001</div></td>
+                  <td>TK</td><td><span class="tag tag-ok">正常</span></td><td>2023.11.15 11:30</td>
+                  <td><a class="link" onclick="showToast('Demo：编辑')">编辑</a><a class="link" onclick="showToast('Demo：日志')">日志</a></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div id="panel-keywords" class="admin-panel">
+          <div class="filter-bar">
+            <div class="filter-field"><label>关键词</label><input type="text" placeholder="右豹代发教程" /></div>
+            <div class="filter-field"><label>项目方</label><input type="text" placeholder="右豹官方" /></div>
+            <div class="filter-field"><label>负责人 ID</label><input type="text" placeholder="U-1001" /></div>
+            <div class="filter-field"><label>工作室名称</label><input type="text" placeholder="别暴躁的工作室" /></div>
+            <div class="filter-field"><label>发布帐号 ID</label><input type="text" placeholder="dy_8829103" /></div>
+            <div class="filter-field"><label>发布帐号昵称</label><input type="text" placeholder="豹豹1号" /></div>
+            <div class="filter-field"><label>所属成员 ID</label><input type="text" placeholder="M-2001" /></div>
+            <div class="filter-field"><label>所属成员昵称</label><input type="text" placeholder="剪辑手A" /></div>
+            <div class="filter-field"><label>更新时间起</label><input type="date" /></div>
+            <div class="filter-field"><label>更新时间止</label><input type="date" /></div>
+            <div class="filter-actions">
+              <button class="btn-ghost-sm" type="button" onclick="showToast('Demo：已重置筛选')">重置</button>
+              <button class="btn btn-primary" type="button" onclick="showToast('Demo：筛选仅影响 Mock 展示')">查询</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>关键词</th><th>项目方</th><th>工作室</th><th>发布帐号</th><th>所属成员</th>
+                  <th>累计产生收益</th><th>累计分配</th><th>数据更新时间</th><th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>右豹代发教程</td><td>右豹官方</td>
+                  <td><div>别暴躁的工作室</div><div class="cell-sub">负责人ID U-1001</div></td>
+                  <td><div>豹豹1号</div><div class="cell-sub">dy_8829103</div></td>
+                  <td><div>剪辑手A</div><div class="cell-sub">M-2001</div></td>
+                  <td>680.00</td><td>520.00</td><td>2023.12.24 13:00</td>
+                  <td><a class="link" onclick="openKeywordDetail('右豹代发教程')">详情</a></td>
+                </tr>
+                <tr>
+                  <td>关键词推广A</td><td>番茄小说</td>
+                  <td><div>别暴躁的工作室</div><div class="cell-sub">负责人ID U-1001</div></td>
+                  <td><div>豹豹2号</div><div class="cell-sub">ks_6610238</div></td>
+                  <td><div>剪辑手A</div><div class="cell-sub">M-2001</div></td>
+                  <td>450.00</td><td>380.50</td><td>2023.12.24 13:00</td>
+                  <td><a class="link" onclick="openKeywordDetail('关键词推广A')">详情</a></td>
+                </tr>
+                <tr>
+                  <td>TIK出海词</td><td>出海项目</td>
+                  <td><div>别暴躁的工作室</div><div class="cell-sub">负责人ID U-1001</div></td>
+                  <td><div>leopard_en</div><div class="cell-sub">tk_9900122</div></td>
+                  <td><div>发布手B</div><div class="cell-sub">M-2002</div></td>
+                  <td>1100.00</td><td>890.00</td><td>2023.12.23 09:30</td>
+                  <td><a class="link" onclick="openKeywordDetail('TIK出海词')">详情</a></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 业务流程 -->
+    <div id="view-flow" class="page-view">
+      <div class="glass-card flow-page">
+        <p class="flow-page-intro">前后端交互与校验逻辑流程图（研发对照用）。菱形节点为校验/分支；蓝色为前端，绿色为后端，橙色为异步任务。</p>
+
+        <div class="flow-tab-bar" role="tablist">
+          <button type="button" class="active" data-flow="flow-1" role="tab">流程1 · 代发自动分配</button>
+          <button type="button" data-flow="flow-2" role="tab">流程2 · 发布帐号授权</button>
+          <button type="button" data-flow="flow-3" role="tab">流程3 · 出单结算分配</button>
+        </div>
+
+        <div id="flow-1" class="flow-panel-body active">
+          <div class="flow-panel-desc">流程 1 · 代发自动分配 <span class="tag-flow">系统自动</span></div>
+          <div class="flow-svg-wrap">
+            <svg viewBox="0 0 920 520" width="920" height="520" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8"/></marker>
+              </defs>
+              <g class="flow-edges">
+                <line x1="460" y1="60" x2="460" y2="88" marker-end="url(#arr)"/>
+                <line x1="460" y1="132" x2="460" y2="160" marker-end="url(#arr)"/>
+                <line x1="360" y1="200" x2="200" y2="200" marker-end="url(#arr)"/>
+                <line x1="560" y1="200" x2="720" y2="200" marker-end="url(#arr)"/>
+                <line x1="800" y1="222" x2="800" y2="260" marker-end="url(#arr)"/>
+                <line x1="800" y1="304" x2="800" y2="332" marker-end="url(#arr)"/>
+                <line x1="680" y1="356" x2="460" y2="356"/>
+                <line x1="460" y1="356" x2="460" y2="400" marker-end="url(#arr)"/>
+                <line x1="460" y1="240" x2="460" y2="400" stroke-dasharray="4 3"/>
+              </g>
+              <g class="flow-nodes">
+                <rect x="360" y="16" width="200" height="44" rx="8" fill="#eff6ff" stroke="#2563eb"/>
+                <text x="460" y="44" text-anchor="middle" font-size="13" fill="#18222f">关键词视频出单确认</text>
+                <rect x="330" y="88" width="260" height="44" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
+                <text x="460" y="116" text-anchor="middle" font-size="12" fill="#18222f">后端：匹配关键词→发布帐号→成员</text>
+                <polygon points="460,160 560,200 460,240 360,200" fill="#fffbeb" stroke="#d97706"/>
+                <text x="460" y="198" text-anchor="middle" font-size="11" fill="#92400e">成员可参与分配?</text>
+                <text x="460" y="212" text-anchor="middle" font-size="10" fill="#92400e">实名+账户+满24h</text>
+                <text x="270" y="192" text-anchor="middle" font-size="11" fill="#dc2626">否</text>
+                <rect x="60" y="178" width="140" height="44" rx="8" fill="#fef2f2" stroke="#dc2626"/>
+                <text x="130" y="206" text-anchor="middle" font-size="11" fill="#991b1b">跳过该成员分配</text>
+                <text x="640" y="192" text-anchor="middle" font-size="11" fill="#16a34a">是</text>
+                <rect x="720" y="178" width="160" height="44" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
+                <text x="800" y="206" text-anchor="middle" font-size="11" fill="#18222f">读取岗位分配比例</text>
+                <rect x="700" y="260" width="200" height="44" rx="8" fill="#fff7ed" stroke="#ea580c"/>
+                <text x="800" y="282" text-anchor="middle" font-size="11" fill="#18222f">计算分配金额+预扣税额</text>
+                <text x="800" y="296" text-anchor="middle" font-size="10" fill="#64748b">异步任务</text>
+                <rect x="680" y="332" width="240" height="48" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
+                <text x="800" y="354" text-anchor="middle" font-size="11" fill="#18222f">写入分配批次</text>
+                <text x="800" y="370" text-anchor="middle" font-size="10" fill="#64748b">分配行为=系统自动</text>
+                <rect x="340" y="400" width="240" height="44" rx="8" fill="#eff6ff" stroke="#2563eb"/>
+                <text x="460" y="428" text-anchor="middle" font-size="12" fill="#18222f">C端：分配记录展示「代发」标签</text>
+                <text x="472" y="320" font-size="10" fill="#64748b">汇总落库后</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+
+        <div id="flow-2" class="flow-panel-body">
+          <div class="flow-panel-desc">流程 2 · 发布帐号授权绑定 <span class="tag-flow">成员 C 端</span></div>
+          <div class="flow-svg-wrap">
+            <svg viewBox="0 0 880 380" width="880" height="380" xmlns="http://www.w3.org/2000/svg">
+              <defs><marker id="arr2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8"/></marker></defs>
+              <g class="flow-edges">
+                <line x1="440" y1="52" x2="440" y2="76" marker-end="url(#arr2)"/>
+                <line x1="440" y1="116" x2="440" y2="140" marker-end="url(#arr2)"/>
+                <line x1="340" y1="178" x2="180" y2="178" marker-end="url(#arr2)"/>
+                <line x1="540" y1="178" x2="700" y2="178" marker-end="url(#arr2)"/>
+                <line x1="780" y1="200" x2="780" y2="240" marker-end="url(#arr2)"/>
+                <line x1="780" y1="288" x2="780" y2="296"/>
+                <line x1="780" y1="296" x2="440" y2="296"/>
+                <line x1="440" y1="296" x2="440" y2="300" marker-end="url(#arr2)"/>
+              </g>
+              <g class="flow-nodes">
+                <rect x="340" y="12" width="200" height="40" rx="8" fill="#eff6ff" stroke="#2563eb"/>
+                <text x="440" y="38" text-anchor="middle" font-size="12" fill="#18222f">成员进入「发布帐号」</text>
+                <rect x="320" y="76" width="240" height="40" rx="8" fill="#eff6ff" stroke="#2563eb"/>
+                <text x="440" y="102" text-anchor="middle" font-size="12" fill="#18222f">点击「添加」→ 复用右豹添加帐号流程</text>
+                <polygon points="440,140 540,178 440,216 340,178" fill="#fffbeb" stroke="#d97706"/>
+                <text x="440" y="176" text-anchor="middle" font-size="11" fill="#92400e">平台帐号ID唯一?</text>
+                <text x="250" y="170" font-size="11" fill="#dc2626">否/重复</text>
+                <rect x="40" y="156" width="140" height="44" rx="8" fill="#fef2f2" stroke="#dc2626"/>
+                <text x="110" y="184" text-anchor="middle" font-size="11" fill="#991b1b">Toast：帐号已存在</text>
+                <text x="620" y="170" font-size="11" fill="#16a34a">是</text>
+                <rect x="700" y="156" width="160" height="44" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
+                <text x="780" y="184" text-anchor="middle" font-size="11" fill="#18222f">写入发布帐号表</text>
+                <rect x="660" y="240" width="240" height="48" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
+                <text x="780" y="262" text-anchor="middle" font-size="11" fill="#18222f">关联成员ID+工作室负责人ID</text>
+                <text x="780" y="278" text-anchor="middle" font-size="10" fill="#64748b">状态=正常</text>
+                <rect x="300" y="300" width="280" height="44" rx="8" fill="#eff6ff" stroke="#2563eb"/>
+                <text x="440" y="328" text-anchor="middle" font-size="12" fill="#18222f">刷新列表；成员详情展示授权帐号数+1</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+
+        <div id="flow-3" class="flow-panel-body">
+          <div class="flow-panel-desc">流程 3 · 关键词出单→结算→分配明细 <span class="tag-flow">前后端</span></div>
+          <div class="flow-svg-wrap">
+            <svg viewBox="0 0 960 600" width="960" height="600" xmlns="http://www.w3.org/2000/svg">
+              <defs><marker id="arr3" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8"/></marker></defs>
+              <g class="flow-edges">
+                <line x1="132" y1="50" x2="148" y2="50" marker-end="url(#arr3)"/>
+                <line x1="296" y1="50" x2="302" y2="50" marker-end="url(#arr3)"/>
+                <line x1="378" y1="50" x2="392" y2="50" marker-end="url(#arr3)"/>
+                <line x1="340" y1="72" x2="340" y2="92" marker-end="url(#arr3)"/>
+                <line x1="446" y1="72" x2="446" y2="132"/>
+                <line x1="446" y1="132" x2="480" y2="132"/>
+                <line x1="480" y1="132" x2="480" y2="148" marker-end="url(#arr3)"/>
+                <line x1="480" y1="218" x2="480" y2="232"/>
+                <line x1="480" y1="232" x2="150" y2="232"/>
+                <line x1="150" y1="232" x2="150" y2="248" marker-end="url(#arr3)"/>
+                <line x1="480" y1="232" x2="810" y2="232"/>
+                <line x1="810" y1="232" x2="810" y2="248" marker-end="url(#arr3)"/>
+                <line x1="150" y1="320" x2="150" y2="348" marker-end="url(#arr3)"/>
+                <line x1="150" y1="420" x2="150" y2="468"/>
+                <line x1="150" y1="468" x2="442" y2="468"/>
+                <line x1="442" y1="468" x2="442" y2="488" marker-end="url(#arr3)"/>
+                <line x1="810" y1="320" x2="810" y2="468"/>
+                <line x1="810" y1="468" x2="518" y2="468"/>
+                <line x1="518" y1="468" x2="518" y2="488" marker-end="url(#arr3)"/>
+                <line x1="442" y1="510" x2="130" y2="510"/>
+                <line x1="130" y1="510" x2="130" y2="548" marker-end="url(#arr3)"/>
+                <line x1="518" y1="510" x2="840" y2="510"/>
+                <line x1="840" y1="510" x2="840" y2="548" marker-end="url(#arr3)"/>
+              </g>
+              <g class="flow-nodes">
+                <rect x="24" y="28" width="108" height="44" rx="8" fill="#fff7ed" stroke="#ea580c"/>
+                <text x="78" y="48" text-anchor="middle" font-size="11" fill="#18222f">
+                  <tspan x="78" dy="0">出单事件</tspan><tspan x="78" dy="13">入队</tspan>
+                </text>
+                <rect x="148" y="28" width="148" height="44" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
+                <text x="222" y="48" text-anchor="middle" font-size="10" fill="#18222f">
+                  <tspan x="222" dy="0">更新关键词</tspan><tspan x="222" dy="13">累计产生收益</tspan>
+                </text>
+                <polygon points="340,28 378,50 340,72 302,50" fill="#fffbeb" stroke="#d97706"/>
+                <text x="340" y="54" text-anchor="middle" font-size="10" fill="#92400e">收益已结算?</text>
+                <text x="384" y="42" font-size="10" fill="#16a34a">是</text>
+                <rect x="392" y="28" width="108" height="44" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
+                <text x="446" y="54" text-anchor="middle" font-size="10" fill="#18222f">触发代发分配</text>
+                <text x="348" y="86" font-size="10" fill="#dc2626">否</text>
+                <rect x="268" y="92" width="144" height="36" rx="8" fill="#f8fafc" stroke="#94a3b8"/>
+                <text x="340" y="114" text-anchor="middle" font-size="10" fill="#64748b">等待结算回调</text>
+                <rect x="360" y="148" width="240" height="70" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
+                <text x="480" y="172" text-anchor="middle" font-size="11" fill="#18222f">
+                  <tspan x="480" dy="0">写入分配明细</tspan><tspan x="480" dy="14">+ 累计分配</tspan>
+                </text>
+                <text x="480" y="206" text-anchor="middle" font-size="10" fill="#64748b">更新数据更新时间</text>
+                <rect x="40" y="248" width="220" height="72" rx="8" fill="#eff6ff" stroke="#2563eb"/>
+                <text x="150" y="274" text-anchor="middle" font-size="11" fill="#18222f">
+                  <tspan x="150" dy="0">负责人 C 端</tspan><tspan x="150" dy="14">分配详情 / 浮层</tspan>
+                </text>
+                <text x="150" y="306" text-anchor="middle" font-size="10" fill="#64748b">含分配时间字段</text>
+                <rect x="40" y="348" width="220" height="72" rx="8" fill="#eff6ff" stroke="#2563eb"/>
+                <text x="150" y="374" text-anchor="middle" font-size="11" fill="#18222f">
+                  <tspan x="150" dy="0">成员 C 端</tspan><tspan x="150" dy="14">分配详情页</tspan>
+                </text>
+                <text x="150" y="406" text-anchor="middle" font-size="10" fill="#64748b">仅代发累计收益</text>
+                <rect x="700" y="248" width="220" height="72" rx="8" fill="#eff6ff" stroke="#2563eb"/>
+                <text x="810" y="274" text-anchor="middle" font-size="11" fill="#18222f">
+                  <tspan x="810" dy="0">管理后台</tspan><tspan x="810" dy="14">关键词详情 list</tspan>
+                </text>
+                <text x="810" y="306" text-anchor="middle" font-size="10" fill="#64748b">6 列合并明细</text>
+                <polygon points="480,488 518,510 480,532 442,510" fill="#fffbeb" stroke="#d97706"/>
+                <text x="480" y="514" text-anchor="middle" font-size="11" fill="#92400e">主动分配?</text>
+                <text x="280" y="502" font-size="10" fill="#16a34a">否 · 代发</text>
+                <text x="680" y="502" font-size="10" fill="#2563eb">是</text>
+                <rect x="40" y="548" width="180" height="44" rx="8" fill="#fef2f2" stroke="#dc2626"/>
+                <text x="130" y="574" text-anchor="middle" font-size="10" fill="#991b1b">不可撤回</text>
+                <rect x="740" y="548" width="200" height="48" rx="8" fill="#eff6ff" stroke="#2563eb"/>
+                <text x="840" y="568" text-anchor="middle" font-size="10" fill="#18222f">
+                  <tspan x="840" dy="0">分配行为 = 负责人主动</tspan><tspan x="840" dy="13" fill="#64748b">可撤回</tspan>
+                </text>
+              </g>
+            </svg>
+          </div>
+        </div>
+
+        <div class="flow-legend">
+          <span><i style="background:#eff6ff;border:1px solid #2563eb"></i>前端 / C 端</span>
+          <span><i style="background:#f0fdf4;border:1px solid #16a34a"></i>后端 / 数据写入</span>
+          <span><i style="background:#fff7ed;border:1px solid #ea580c"></i>异步 / 任务</span>
+          <span><i style="background:#fffbeb;border:1px solid #d97706"></i>校验 / 分支</span>
+          <span><i style="background:#fef2f2;border:1px solid #dc2626"></i>拒绝 / 阻断</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 关键词详情抽屉 overlay -->
+  <div class="drawer-overlay" id="detailOverlay" onclick="closeDetailDrawer()"></div>
+  <aside class="drawer" id="detailDrawer">
+    <div class="drawer-header">
+      <h2 id="detailTitle">关键词详情</h2>
+      <button class="drawer-close" type="button" onclick="closeDetailDrawer()">×</button>
+    </div>
+    <div class="drawer-body">
+      <div class="table-wrap">
+        <table class="detail-table">
+          <thead>
+            <tr>
+              <th>收益金额</th><th>收益产生时间</th><th>收益结算时间</th>
+              <th>分配金额</th><th>分配时间</th><th>分配批次</th>
+            </tr>
+          </thead>
+          <tbody id="keywordDetailList"></tbody>
+        </table>
+      </div>
+    </div>
+  </aside>
+
+  <!-- 需求规则抽屉 overlay -->
+  <div class="drawer-overlay" id="ruleOverlay" onclick="setRuleDrawer(false)"></div>
+  <aside class="drawer" id="ruleDrawer" role="dialog">
+    <div class="drawer-header">
+      <h2>FR-001 · 需求规则 · v1</h2>
+      <button class="drawer-close" type="button" onclick="setRuleDrawer(false)">×</button>
+    </div>
+    <div class="rule-tab-bar" role="tablist">
+      <button type="button" class="active" data-rule="rule-fe" role="tab">前端需求</button>
+      <button type="button" data-rule="rule-admin" role="tab">后台需求</button>
+    </div>
+    <div class="drawer-body">
+      <!-- 前端需求 -->
+      <div id="rule-fe" class="rule-panel active">
+        <div class="rule-section" id="rule-fe-1">
+          <h3><span>1</span>业务目标</h3>
+          <div class="rule-content">
+            <p>在 OPC 协作结算 C 端增加「代发分配」能力：关键词出单后，系统按成员岗位比例<strong>自动分配</strong>收益，与负责人<strong>主动分配</strong>区分展示与权限。</p>
+          </div>
+        </div>
+        <div class="rule-section" id="rule-fe-2">
+          <h3><span>2</span>页面与入口</h3>
+          <div class="rule-content">
+            <ul>
+              <li><strong>我的工作室</strong>：分配记录增加「代发」标签；代发记录不可撤回。</li>
+              <li><strong>成员详情</strong>：仅代发成员展示「授权帐号:x」；点击进入代发成员详情。</li>
+              <li><strong>分配详情（负责人）</strong>：成员汇总（名称、金额、预扣税额、关键词数、帐号数）；点击行出底部浮层明细；支持导出（关键词、出单金额、分配金额、发布帐号、分配时间）。</li>
+              <li><strong>成员视角</strong>：新增「分配详情」「发布帐号」入口；发布帐号列表含平台、昵称、ID、编辑，右上角「添加」复用右豹现有流程。</li>
+              <li><strong>成员分配详情</strong>：代发累计收益（仅统计代发）、授权帐号数、关联关键词；明细 list 含关键词、分配金额、发布帐号、分配时间。</li>
+              <li><strong>代发成员详情（负责人下级）</strong>：昵称、岗位、绑定时间、分配比例、累计已分配/已提现；Tab：分配记录 / 分配详情 / 授权帐号。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section" id="rule-fe-3">
+          <h3><span>3</span>交互规则</h3>
+          <div class="rule-content">
+            <ul>
+              <li>分配详情浮层、导出等为 overlay 浮层，不挤压列表页布局。</li>
+              <li>「代发」标签仅用于系统自动分配产生的记录；主动分配无此标签。</li>
+              <li>成员「代发累计收益」仅汇总代发分配，不含负责人主动分配。</li>
+              <li>发布帐号「添加」跳转/复用右豹既有添加帐号流程，本需求不重新定义添加步骤。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section" id="rule-fe-4">
+          <h3><span>4</span>边界规则</h3>
+          <div class="rule-content">
+            <ul>
+              <li>代发分配记录<strong>不可撤回</strong>；主动分配记录可撤回（沿用现有逻辑）。</li>
+              <li>「授权帐号」入口与计数<strong>仅代发成员</strong>展示。</li>
+              <li>成员侧分配明细需包含<strong>分配时间</strong>字段（负责人浮层/export 同步）。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section" id="rule-fe-5">
+          <h3><span>5</span>业务流程</h3>
+          <div class="rule-content">
+            <p>前后端交互与校验逻辑见页内 Tab <strong>「业务流程」</strong>（流程图，含校验节点）。</p>
+            <p style="margin-top:8px;font-size:12px;color:var(--text-muted);">涉及：代发自动分配、发布帐号授权、出单→结算→分配明细、代发 vs 主动撤回差异。</p>
+          </div>
+        </div>
+      </div>
+      <!-- 后台需求 -->
+      <div id="rule-admin" class="rule-panel">
+        <div class="rule-section" id="rule-admin-1">
+          <h3><span>1</span>业务目标</h3>
+          <div class="rule-content">
+            <p>为代发分配提供运营/研发可查的数据面：发布帐号归属、代发关键词收益与分配明细，支撑问题排查与对账。</p>
+          </div>
+        </div>
+        <div class="rule-section" id="rule-admin-2">
+          <h3><span>2</span>数据表与字段</h3>
+          <div class="rule-content">
+            <p><strong>发布帐号表</strong>：ID、帐号昵称、帐号ID、主页链接、成员信息（ID+昵称）、工作室（负责人ID+名称）、帐号平台、状态、添加时间；操作：编辑、日志。</p>
+            <p style="margin-top:8px;"><strong>代发关键词表</strong>：关键词、项目方、工作室、发布帐号、所属成员、累计产生收益、累计分配、数据更新时间；操作：详情。</p>
+            <p style="margin-top:8px;"><strong>关键词详情 list（详情抽屉 · 合并 6 列）</strong>：收益金额、收益产生时间、收益结算时间、分配金额、分配时间、分配批次。</p>
+            <p style="margin-top:8px;"><strong>分配记录表（扩展字段 · 本需求仅定规则）</strong>：<code>分配行为</code> = 系统自动 / 负责人主动；不在 C 端原型体现。</p>
+          </div>
+        </div>
+        <div class="rule-section" id="rule-admin-3">
+          <h3><span>3</span>列表与筛选</h3>
+          <div class="rule-content">
+            <p><strong>发布帐号</strong>筛选：发布帐号 ID、帐号昵称、帐号 ID（平台唯一）、成员 ID/昵称、负责人 ID、工作室名称、帐号平台、状态、添加时间范围。</p>
+            <p style="margin-top:8px;"><strong>代发关键词</strong>筛选：关键词、项目方、负责人 ID、工作室、发布帐号 ID/昵称、成员 ID/昵称、更新时间范围。</p>
+            <p style="margin-top:8px;">关键词「详情」以 overlay 抽屉展示合并 list，不挤压列表页宽度。</p>
+          </div>
+        </div>
+        <div class="rule-section" id="rule-admin-4">
+          <h3><span>4</span>边界规则</h3>
+          <div class="rule-content">
+            <ul>
+              <li>已删除发布帐号保留历史记录，状态标记为已删除。</li>
+              <li>关键词累计产生收益、累计分配以<strong>数据更新时间</strong>为准展示。</li>
+              <li>代发自动分配写入时 <code>分配行为=系统自动</code>；负责人主动分配为 <code>负责人主动</code>。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const keywordDetails = {
+      '右豹代发教程': [
+        { revenueAmount: '680.00', revenueTime: '2023.12.24 12:58', settleTime: '2023.12.24 13:00', allocAmount: '520.00', allocTime: '2023.12.24 13:00', batch: '代发批次 20231224' },
+        { revenueAmount: '320.00', revenueTime: '2023.12.20 10:12', settleTime: '2023.12.20 11:00', allocAmount: '257.28', allocTime: '2023.12.20 11:15', batch: '代发批次 20231220' },
+      ],
+      '关键词推广A': [
+        { revenueAmount: '450.00', revenueTime: '2023.12.24 12:50', settleTime: '2023.12.24 13:00', allocAmount: '380.50', allocTime: '2023.12.24 13:00', batch: '代发批次 20231224' },
+      ],
+      'TIK出海词': [
+        { revenueAmount: '1100.00', revenueTime: '2023.12.23 09:28', settleTime: '2023.12.23 09:30', allocAmount: '890.00', allocTime: '2023.12.23 09:30', batch: '代发批次 20231223' },
+      ],
+    };
+
+    function getActiveScene() {
+      return document.querySelector('.scene-btn.active')?.dataset.screen || 'screen-studio';
+    }
+
+    function buildMockupSrc(screen) {
+      return `daifa-allocation-demo.html?embed=1&screen=${encodeURIComponent(screen)}`;
+    }
+
+    function loadMockupFrame(forceReload) {
+      const frame = document.getElementById('mockupFrame');
+      if (!frame) return;
+      const src = buildMockupSrc(getActiveScene());
+      const current = frame.getAttribute('src') || '';
+      if (forceReload || current === 'about:blank' || !current.includes('daifa-allocation-demo.html')) {
+        frame.src = src;
+        return;
+      }
+      try {
+        frame.contentWindow?.postMessage({ type: 'goToScreen', screen: getActiveScene() }, '*');
+      } catch (_) {
+        frame.src = src;
+      }
+    }
+
+    function switchPageTab(pageId, btn) {
+      document.querySelectorAll('.page-tab-bar button').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.page-view').forEach(v => v.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(pageId).classList.add('active');
+      if (pageId === 'view-fe') {
+        requestAnimationFrame(() => loadMockupFrame(false));
+      }
+      const tabMap = { 'view-fe': 'fe', 'view-admin': 'admin', 'view-flow': 'flow' };
+      const params = new URLSearchParams();
+      params.set('tab', tabMap[pageId] || 'fe');
+      if (pageId === 'view-flow') {
+        const activeFlow = document.querySelector('.flow-tab-bar button.active')?.dataset.flow || 'flow-1';
+        params.set('flow', activeFlow.replace('flow-', ''));
+      }
+      history.replaceState(null, '', '?' + params.toString());
+    }
+
+    function switchFlowTab(flowId, btn) {
+      document.querySelectorAll('.flow-tab-bar button').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.flow-panel-body').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(flowId).classList.add('active');
+      const params = new URLSearchParams(location.search);
+      params.set('tab', 'flow');
+      params.set('flow', flowId.replace('flow-', ''));
+      history.replaceState(null, '', '?' + params.toString());
+    }
+
+    document.querySelectorAll('.flow-tab-bar button').forEach(btn => {
+      btn.addEventListener('click', () => switchFlowTab(btn.dataset.flow, btn));
+    });
+
+    document.querySelectorAll('.page-tab-bar button').forEach(btn => {
+      btn.addEventListener('click', () => switchPageTab(btn.dataset.page, btn));
+    });
+
+    document.querySelectorAll('.scene-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.scene-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const frame = document.getElementById('mockupFrame');
+        const currentSrc = frame?.getAttribute('src') || '';
+        if (currentSrc.includes('daifa-allocation-demo.html') && frame.contentWindow) {
+          frame.contentWindow.postMessage({ type: 'goToScreen', screen: btn.dataset.screen }, '*');
+        } else {
+          loadMockupFrame(true);
+        }
+      });
+    });
+
+    document.querySelectorAll('.tab-bar-inline button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-bar-inline button').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.panel).classList.add('active');
+      });
+    });
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2500);
+    }
+
+    function openKeywordDetail(keyword) {
+      const rows = keywordDetails[keyword] || [];
+      document.getElementById('detailTitle').textContent = '关键词详情 · ' + keyword;
+      document.getElementById('keywordDetailList').innerHTML = rows.map(r =>
+        `<tr><td>${r.revenueAmount}</td><td>${r.revenueTime}</td><td>${r.settleTime}</td><td>${r.allocAmount}</td><td>${r.allocTime}</td><td>${r.batch}</td></tr>`
+      ).join('');
+      document.getElementById('detailOverlay').classList.add('open');
+      document.getElementById('detailDrawer').classList.add('open');
+    }
+
+    function closeDetailDrawer() {
+      document.getElementById('detailOverlay').classList.remove('open');
+      document.getElementById('detailDrawer').classList.remove('open');
+    }
+
+    const ruleDrawer = document.getElementById('ruleDrawer');
+    const toggleRuleBtn = document.getElementById('toggleRuleDrawer');
+
+    function switchRuleTab(ruleId, btn) {
+      document.querySelectorAll('.rule-tab-bar button').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.rule-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(ruleId).classList.add('active');
+      document.querySelector('.drawer-body').scrollTop = 0;
+    }
+
+    document.querySelectorAll('.rule-tab-bar button').forEach(btn => {
+      btn.addEventListener('click', () => switchRuleTab(btn.dataset.rule, btn));
+    });
+
+    function syncRuleTabToPage() {
+      const activePage = document.querySelector('.page-view.active')?.id;
+      const ruleId = activePage === 'view-admin' ? 'rule-admin' : 'rule-fe';
+      const btn = document.querySelector('.rule-tab-bar button[data-rule="' + ruleId + '"]');
+      if (btn) switchRuleTab(ruleId, btn);
+    }
+
+    function setRuleDrawer(open) {
+      ruleDrawer.classList.toggle('open', open);
+      document.getElementById('ruleOverlay').classList.toggle('open', open);
+      toggleRuleBtn.classList.toggle('active', open);
+      if (open) syncRuleTabToPage();
+    }
+
+    toggleRuleBtn.onclick = () => setRuleDrawer(!ruleDrawer.classList.contains('open'));
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') { closeDetailDrawer(); setRuleDrawer(false); }
+    });
+
+    const tab = new URLSearchParams(location.search).get('tab');
+    const tabPageMap = { admin: 'view-admin', flow: 'view-flow', fe: 'view-fe' };
+    if (tab && tabPageMap[tab]) {
+      const btn = document.querySelector('[data-page="' + tabPageMap[tab] + '"]');
+      if (btn) switchPageTab(tabPageMap[tab], btn);
+    }
+    const flowParam = new URLSearchParams(location.search).get('flow');
+    if (flowParam) {
+      const flowId = flowParam.startsWith('flow-') ? flowParam : 'flow-' + flowParam;
+      const flowBtn = document.querySelector('.flow-tab-bar button[data-flow="' + flowId + '"]');
+      if (flowBtn) switchFlowTab(flowId, flowBtn);
+    }
+
+    if (document.querySelector('.page-view.active')?.id === 'view-fe') {
+      loadMockupFrame(true);
+    }
+  </script>
+  <script src="fe-copy-html.js"></script>
+  <script src="sidebar-nav.js"></script>
+</body>
+</html>

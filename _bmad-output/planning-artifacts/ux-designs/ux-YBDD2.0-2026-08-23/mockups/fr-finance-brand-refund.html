@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FR-003 · 品牌退款 · 右豹迭代需求记录</title>
+  <style>
+    :root {
+      --primary: #2563eb; --primary-hover: #1d4ed8; --primary-light: #eff6ff; --primary-border: #bfdbfe;
+      --accent-rule: #0891b2; --accent-version: #7c3aed; --accent-fr: #d97706;
+      --success: #16a34a; --success-bg: #f0fdf4; --warning: #d97706; --warning-bg: #fffbeb;
+      --danger: #dc2626; --danger-bg: #fef2f2;
+      --surface: #fff; --surface-glass: rgba(255,255,255,0.72); --surface-hover: #f8fafc; --border: #e8edf3;
+      --text-primary: #18222f; --text-secondary: #4a5568; --text-muted: #9aa5b4;
+      --sidebar-w: 240px; --drawer-w: 480px; --radius-sm: 7px; --radius-lg: 14px;
+      --shadow: 0 8px 32px rgba(30,40,80,0.10);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 13px;
+      color: var(--text-primary);
+      background: linear-gradient(135deg, #e0e7ff 0%, #f0f4f8 40%, #e0f2fe 100%);
+      background-attachment: fixed; min-height: 100vh;
+    }
+    .sidebar {
+      position: fixed; inset: 0 auto 0 0; width: var(--sidebar-w); z-index: 200;
+      display: flex; flex-direction: column;
+      background: rgba(240,244,255,0.95); backdrop-filter: blur(20px);
+      border-right: 1px solid rgba(148,163,196,0.22);
+    }
+    .sidebar-brand { padding: 16px 14px 12px; border-bottom: 1px solid rgba(148,163,196,0.22); }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: linear-gradient(135deg, #2563eb, #7c3aed); color: #fff;
+      display: flex; align-items: center; justify-content: center; font-weight: 700;
+    }
+    .brand-text { font-size: 14px; font-weight: 700; }
+    .brand-sub { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+    .sprint-pill {
+      display: inline-block; margin-top: 10px; font-size: 11px; font-weight: 600;
+      padding: 3px 8px; border-radius: 999px; background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0;
+    }
+    .sidebar-scroll { flex: 1; overflow-y: auto; padding: 8px 0 16px; }
+    .nav-group-label { padding: 12px 16px 6px; font-size: 11px; font-weight: 600; color: var(--text-muted); }
+    .nav-item {
+      position: relative; display: flex; align-items: center; height: 40px;
+      padding: 0 12px 0 14px; margin: 1px 8px; width: calc(100% - 16px);
+      border-radius: 8px; font-size: 13px; font-weight: 500; color: var(--text-secondary);
+      text-decoration: none; transition: all 0.18s;
+    }
+    .nav-item:hover { background: rgba(99,102,241,0.06); color: var(--text-primary); }
+    .nav-item.active { color: var(--primary); background: rgba(37,99,235,0.12); font-weight: 600; }
+    .nav-item.active::before {
+      content: ''; position: absolute; left: 0; top: 7px; bottom: 7px;
+      width: 3px; border-radius: 0 2px 2px 0; background: var(--primary);
+    }
+    .sidebar-foot { padding: 10px 14px 14px; border-top: 1px solid rgba(148,163,196,0.22); font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+    .main { margin-left: var(--sidebar-w); padding: 16px 20px 40px; min-height: 100vh; }
+    .breadcrumb { padding: 4px 0 12px; font-size: 12px; color: var(--text-muted); }
+    .breadcrumb a { color: var(--primary); text-decoration: none; }
+    .page-header { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; }
+    .page-header h1 { font-size: 19px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .page-desc { font-size: 12px; color: var(--text-muted); max-width: 720px; line-height: 1.55; }
+    .badge { display: inline-flex; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: var(--radius-sm); }
+    .badge-fr { background: #fffbeb; color: var(--accent-fr); border: 1px solid #fde68a; }
+    .badge-version { background: #f5f3ff; color: var(--accent-version); border: 1px solid #ddd6fe; }
+    .page-tab-bar {
+      display: flex; gap: 0; margin-bottom: 16px;
+      background: var(--surface-glass); backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.55); border-radius: var(--radius-lg);
+      padding: 4px; box-shadow: var(--shadow); width: fit-content;
+    }
+    .page-tab-bar button {
+      padding: 8px 20px; border: none; background: transparent; cursor: pointer;
+      font-size: 13px; font-weight: 500; color: var(--text-secondary); border-radius: 10px;
+    }
+    .page-tab-bar button.active { background: var(--primary); color: #fff; font-weight: 600; }
+    .page-view { display: none; }
+    .page-view.active { display: block; }
+    .btn {
+      display: inline-flex; align-items: center; height: 34px; padding: 0 14px;
+      border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid transparent;
+    }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-rule { background: var(--primary-light); color: var(--primary); border-color: var(--primary-border); }
+    .btn-rule.active { background: var(--primary); color: #fff; }
+    .btn-ghost { background: var(--surface); color: var(--text-secondary); border-color: var(--border); }
+    .btn-ghost:hover { background: var(--surface-hover); }
+    .btn-ghost-sm { background: var(--surface); color: var(--text-secondary); border: 1px solid var(--border); height: 32px; padding: 0 12px; border-radius: var(--radius-sm); cursor: pointer; font-size: 12px; }
+    .glass-card {
+      background: var(--surface-glass); backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.55); border-radius: var(--radius-lg);
+      box-shadow: var(--shadow); overflow: hidden;
+    }
+    .demo-layout { display: grid; grid-template-columns: minmax(280px, 5fr) minmax(360px, 7fr); gap: 16px; }
+    @media (max-width: 1024px) { .demo-layout { grid-template-columns: 1fr; } }
+    .scene-panel { padding: 16px 18px; }
+    .scene-panel h2 { font-size: 14px; font-weight: 700; margin-bottom: 10px; }
+    .scene-list { display: flex; flex-direction: column; gap: 6px; }
+    .scene-btn {
+      text-align: left; padding: 10px 12px; border-radius: var(--radius-sm);
+      border: 1px solid var(--border); background: rgba(255,255,255,0.6); cursor: pointer;
+    }
+    .scene-btn.active { border-color: var(--primary-border); background: var(--primary-light); color: var(--primary); font-weight: 600; }
+    .scene-btn .scene-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+    .scene-btn .scene-desc { font-size: 11px; color: var(--text-muted); line-height: 1.45; }
+    .scene-btn.active .scene-desc { color: #3b82f6; }
+    .scene-note { margin-top: 14px; padding: 10px 12px; border-radius: var(--radius-sm); background: #fffbeb; border: 1px solid #fde68a; font-size: 12px; color: #92400e; line-height: 1.55; }
+    .mockup-panel { padding: 16px; display: flex; justify-content: center; min-height: 420px; }
+    .mockup-frame-wrap {
+      width: 100%; max-width: 375px; border-radius: 28px; overflow: hidden;
+      background: #1e293b; box-shadow: 0 16px 48px rgba(0,0,0,0.18); min-height: 380px;
+    }
+    .mockup-frame-wrap iframe { width: 100%; height: 380px; border: none; display: block; background: #f5f5f5; }
+    /* 表头统计 */
+    .stats-bar {
+      display: grid; grid-template-columns: repeat(5, 1fr); gap: 0;
+      border-bottom: 1px solid var(--border); background: rgba(248,250,252,0.85);
+    }
+    @media (max-width: 1100px) { .stats-bar { grid-template-columns: repeat(3, 1fr); } }
+    .stat-item { padding: 14px 16px; border-right: 1px solid var(--border); }
+    .stat-item:last-child { border-right: none; }
+    .stat-item .label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+    .stat-item .value { font-size: 18px; font-weight: 700; }
+    .stat-item .value.warn { color: var(--warning); }
+    .stat-item .value.danger { color: var(--danger); }
+    .stat-item .value.ok { color: var(--success); }
+    .table-toolbar {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 16px; border-bottom: 1px solid var(--border);
+    }
+    .table-toolbar h3 { font-size: 14px; font-weight: 700; }
+    .filter-bar { display: flex; flex-wrap: wrap; gap: 10px; padding: 14px 16px; align-items: flex-end; border-bottom: 1px solid var(--border); }
+    .filter-field { display: flex; flex-direction: column; gap: 4px; }
+    .filter-field label { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+    .filter-field input, .filter-field select { height: 32px; padding: 0 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 12px; min-width: 130px; }
+    .filter-actions { display: flex; gap: 8px; margin-left: auto; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 1100px; }
+    th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); font-size: 12px; vertical-align: top; }
+    th { font-size: 11px; font-weight: 600; color: var(--text-muted); background: rgba(248,250,252,0.9); white-space: nowrap; }
+    tr:hover td { background: var(--surface-hover); }
+    .cell-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .link { color: var(--primary); cursor: pointer; text-decoration: none; margin-right: 10px; font-size: 12px; font-weight: 500; background: none; border: none; padding: 0; }
+    .link-danger { color: var(--danger); margin-right: 0; }
+    .tag { display: inline-flex; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+    .tag-ok { background: var(--success-bg); color: var(--success); }
+    .tag-warn { background: var(--warning-bg); color: var(--warning); }
+    .tag-del { background: var(--danger-bg); color: var(--danger); }
+    .tag-muted { background: #f1f5f9; color: var(--text-muted); }
+    /* 抽屉 / Modal */
+    .drawer-overlay, .modal-overlay {
+      position: fixed; inset: 0; background: rgba(15,23,42,0.35); z-index: 500;
+      opacity: 0; pointer-events: none; transition: opacity 0.25s;
+    }
+    .drawer-overlay.open, .modal-overlay.open { opacity: 1; pointer-events: auto; }
+    .drawer {
+      position: fixed; top: 0; right: 0; bottom: 0; width: var(--drawer-w); z-index: 501;
+      background: rgba(255,255,255,0.98); backdrop-filter: blur(12px);
+      box-shadow: -8px 0 40px rgba(30,40,60,0.18);
+      transform: translateX(100%); transition: transform 0.28s ease;
+      display: flex; flex-direction: column;
+    }
+    .drawer.open { transform: translateX(0); }
+    .drawer-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .drawer-header h2 { font-size: 15px; font-weight: 700; }
+    .drawer-close { width: 28px; height: 28px; border: none; background: #f1f5f9; border-radius: 6px; cursor: pointer; font-size: 16px; }
+    .rule-tab-bar { display: flex; gap: 0; padding: 0 16px; border-bottom: 1px solid var(--border); }
+    .rule-tab-bar button {
+      padding: 10px 18px; border: none; background: none; cursor: pointer;
+      font-size: 13px; color: var(--text-secondary); border-bottom: 2px solid transparent; margin-bottom: -1px;
+    }
+    .rule-tab-bar button.active { color: var(--primary); font-weight: 600; border-bottom-color: var(--primary); }
+    .drawer-body { flex: 1; overflow-y: auto; padding: 16px 20px 32px; }
+    .rule-panel { display: none; }
+    .rule-panel.active { display: block; }
+    .rule-section { margin-bottom: 22px; }
+    .rule-section h3 { font-size: 14px; font-weight: 700; color: var(--accent-rule); margin-bottom: 8px; }
+    .rule-section h3 span {
+      display: inline-flex; width: 22px; height: 22px; align-items: center; justify-content: center;
+      background: #ecfeff; color: var(--accent-rule); border-radius: 6px; font-size: 12px; margin-right: 8px;
+    }
+    .rule-content { font-size: 13px; color: var(--text-secondary); line-height: 1.65; }
+    .rule-content ul { padding-left: 18px; margin-top: 6px; }
+    .rule-content li { margin-bottom: 5px; }
+    .rule-content code { font-family: ui-monospace, monospace; font-size: 12px; background: #f1f5f9; padding: 1px 5px; border-radius: 4px; }
+    .modal {
+      position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.95);
+      width: 480px; max-width: calc(100vw - 32px); z-index: 501;
+      background: #fff; border-radius: var(--radius-lg); box-shadow: 0 16px 48px rgba(30,40,60,0.2);
+      opacity: 0; pointer-events: none; transition: all 0.2s;
+    }
+    .modal-overlay.open .modal { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
+    .modal-header { padding: 16px 20px; border-bottom: 1px solid var(--border); font-size: 15px; font-weight: 700; }
+    .modal-body { padding: 16px 20px; }
+    .form-field { margin-bottom: 12px; }
+    .form-field label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
+    .form-field input, .form-field select, .form-field textarea {
+      width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px;
+    }
+    .form-field textarea { min-height: 72px; resize: vertical; }
+    .modal-footer { padding: 12px 20px 16px; display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid var(--border); }
+    /* 流程 */
+    .flow-page-intro { padding: 16px 18px 0; font-size: 12px; color: var(--text-muted); line-height: 1.55; }
+    .flow-scroll-hint { padding: 8px 18px 0; font-size: 11px; color: var(--text-muted); }
+    .flow-svg-wrap {
+      overflow: auto; padding: 16px 18px 24px; max-height: 72vh; border-top: 1px solid var(--border);
+      -webkit-overflow-scrolling: touch;
+    }
+    .flow-svg-wrap svg { display: block; margin: 0 auto; min-width: 920px; }
+    .flow-edges line, .flow-edges polyline { stroke: #94a3b8; stroke-width: 1.5; fill: none; }
+    .flow-legend { display: flex; flex-wrap: wrap; gap: 12px; padding: 0 18px 20px; font-size: 11px; color: var(--text-muted); }
+    .flow-legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 4px; vertical-align: -2px; }
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: #1e293b; color: #fff; padding: 10px 18px; border-radius: 999px; font-size: 13px;
+      opacity: 0; transition: all 0.25s; z-index: 600; pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand">
+        <div class="brand-icon">迭</div>
+        <div>
+          <div class="brand-text">右豹迭代需求记录</div>
+          <div class="brand-sub">PRD Demo · 产品交付研发</div>
+        </div>
+      </div>
+      <span class="sprint-pill">YBDD2.0 · 迭代 v1</span>
+    </div>
+    <div class="sidebar-scroll" data-iteration-sidebar></div>
+    <div class="sidebar-foot">FR-003 · 页内 Tab<br />前端交互 / 管理后台 / 业务流程</div>
+  </aside>
+
+  <main class="main">
+    <nav class="breadcrumb">
+      <a href="framework-shell.html">Sprint 概览</a>
+      <span> / 财务 / 品牌退款</span>
+    </nav>
+
+    <header class="page-header">
+      <div>
+        <h1>
+          品牌退款
+          <span class="badge badge-fr">FR-003</span>
+          <span class="badge badge-version">v1 当前</span>
+        </h1>
+        <p class="page-desc">针对品牌项目支持退款：财务后台录入/审核退款记录，审核通过并完成扣回后，同步写入 C 端订单列表与钱包收益明细（卡片级展示）。</p>
+      </div>
+      <div class="page-header-actions">
+        <button class="btn btn-rule" id="toggleRuleDrawer" type="button">📋 需求规则</button>
+      </div>
+    </header>
+
+    <div class="page-tab-bar" role="tablist">
+      <button type="button" class="active" data-page="view-fe" role="tab">前端交互</button>
+      <button type="button" data-page="view-admin" role="tab">管理后台</button>
+      <button type="button" data-page="view-flow" role="tab">业务流程</button>
+    </div>
+
+    <!-- 前端交互：卡片展示 -->
+    <div id="view-fe" class="page-view active">
+      <div class="demo-layout">
+        <div class="glass-card scene-panel">
+          <h2>场景切换</h2>
+          <div class="scene-list">
+            <button class="scene-btn active" type="button" data-screen="screen-order-list">
+              <div class="scene-title">订单列表 · 退款卡片</div>
+              <div class="scene-desc">标题、副标题(退款原因)、产生/更新日期、扣减金额</div>
+            </button>
+            <button class="scene-btn" type="button" data-screen="screen-wallet-income">
+              <div class="scene-title">钱包 · 收益明细 · 退款卡片</div>
+              <div class="scene-desc">项目名称「关键词」产生退款、退款原因、时间、金额、已扣减</div>
+            </button>
+          </div>
+          <div class="scene-note">本 FR <strong>不重做 C 端完整页面</strong>，仅展示退款记录在订单列表与收益明细中的卡片信息形态。</div>
+        </div>
+        <div class="glass-card mockup-panel">
+          <div class="mockup-frame-wrap">
+            <iframe id="mockupFrame" title="品牌退款卡片 Mockup" src="about:blank" data-src="brand-refund-demo.html"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 管理后台 -->
+    <div id="view-admin" class="page-view">
+      <div class="glass-card">
+        <div class="stats-bar">
+          <div class="stat-item">
+            <div class="label">退款总笔数</div>
+            <div class="value">128</div>
+          </div>
+          <div class="stat-item">
+            <div class="label">退款总金额(元)</div>
+            <div class="value danger">86,420.50</div>
+          </div>
+          <div class="stat-item">
+            <div class="label">待审核</div>
+            <div class="value warn">12</div>
+          </div>
+          <div class="stat-item">
+            <div class="label">待扣回</div>
+            <div class="value warn">8</div>
+          </div>
+          <div class="stat-item">
+            <div class="label">已扣回笔数</div>
+            <div class="value ok">108</div>
+          </div>
+        </div>
+
+        <div class="table-toolbar">
+          <h3>品牌退款</h3>
+          <button class="btn btn-primary" type="button" onclick="openEditModal()">新增退款</button>
+        </div>
+
+        <div class="filter-bar">
+          <div class="filter-field"><label>用户 ID</label><input type="text" placeholder="U-10086" /></div>
+          <div class="filter-field"><label>关键词</label><input type="text" placeholder="Summer推广词" /></div>
+          <div class="filter-field"><label>项目名称</label><input type="text" placeholder="右豹品牌合作" /></div>
+          <div class="filter-field">
+            <label>扣回状态</label>
+            <select><option>全部</option><option>已扣回</option><option>待扣回</option></select>
+          </div>
+          <div class="filter-actions">
+            <button class="btn-ghost-sm" type="button" onclick="showToast('Demo：已重置筛选')">重置</button>
+            <button class="btn btn-primary" type="button" onclick="showToast('Demo：筛选仅影响 Mock 展示')">查询</button>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>用户ID</th>
+                <th>关键词</th>
+                <th>项目信息</th>
+                <th>退款订单日期</th>
+                <th>退款金额</th>
+                <th>退款原因</th>
+                <th>审核状态</th>
+                <th>扣回状态</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>U-10086</td>
+                <td>Summer推广词</td>
+                <td><div>右豹品牌合作</div><div class="cell-sub">项目ID P-8801</div></td>
+                <td>2026.08.20 14:30</td>
+                <td>128.50</td>
+                <td>项目方核实后发起退款，关键词数据异常</td>
+                <td><span class="tag tag-ok">已通过</span></td>
+                <td><span class="tag tag-ok">已扣回</span></td>
+                <td>
+                  <button class="link" type="button" onclick="openEditModal('U-10086')">编辑</button>
+                  <button class="link link-danger" type="button" onclick="confirmDelete()">删除</button>
+                </td>
+              </tr>
+              <tr>
+                <td>U-10201</td>
+                <td>秋季新品词</td>
+                <td><div>某品牌联名</div><div class="cell-sub">项目ID P-8805</div></td>
+                <td>2026.08.22 10:00</td>
+                <td>560.00</td>
+                <td>重复结算，需退回多余收益</td>
+                <td><span class="tag tag-ok">已通过</span></td>
+                <td><span class="tag tag-warn">待扣回</span></td>
+                <td>
+                  <button class="link" type="button" onclick="openEditModal('U-10201')">编辑</button>
+                  <button class="link link-danger" type="button" onclick="confirmDelete()">删除</button>
+                </td>
+              </tr>
+              <tr>
+                <td>U-10388</td>
+                <td>达人种草词</td>
+                <td><div>美妆品牌A</div><div class="cell-sub">项目ID P-8812</div></td>
+                <td>2026.08.23 16:45</td>
+                <td>89.00</td>
+                <td>视频未达标，品牌方要求退款</td>
+                <td><span class="tag tag-warn">待审核</span></td>
+                <td><span class="tag tag-muted">—</span></td>
+                <td>
+                  <button class="link" type="button" onclick="openEditModal('U-10388')">编辑</button>
+                  <button class="link link-danger" type="button" onclick="confirmDelete()">删除</button>
+                </td>
+              </tr>
+              <tr>
+                <td>U-10456</td>
+                <td>618大促词</td>
+                <td><div>电商品牌B</div><div class="cell-sub">项目ID P-8820</div></td>
+                <td>2026.08.18 09:20</td>
+                <td>320.00</td>
+                <td>订单归属争议，协商退款</td>
+                <td><span class="tag tag-del">已驳回</span></td>
+                <td><span class="tag tag-muted">—</span></td>
+                <td>
+                  <button class="link" type="button" onclick="openEditModal('U-10456')">编辑</button>
+                  <button class="link link-danger" type="button" onclick="confirmDelete()">删除</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 业务流程 -->
+    <div id="view-flow" class="page-view">
+      <div class="glass-card flow-page">
+        <p class="flow-page-intro">品牌退款从后台录入到 C 端展示的完整链路。菱形为校验/分支；蓝色前端、绿色后端、橙色异步。</p>
+        <p class="flow-scroll-hint">流程图超出可视区域时，可在此面板内上下或左右滚动查看。</p>
+        <div class="flow-svg-wrap">
+          <svg viewBox="0 0 920 640" width="920" height="640" xmlns="http://www.w3.org/2000/svg">
+            <defs><marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8"/></marker></defs>
+            <g class="flow-edges">
+              <!-- 主链 -->
+              <line x1="460" y1="52" x2="460" y2="76" marker-end="url(#arr)"/>
+              <line x1="460" y1="120" x2="460" y2="144" marker-end="url(#arr)"/>
+              <!-- 审核分支 -->
+              <line x1="360" y1="184" x2="200" y2="184" marker-end="url(#arr)"/>
+              <line x1="560" y1="184" x2="720" y2="184" marker-end="url(#arr)"/>
+              <!-- 扣回链 -->
+              <line x1="800" y1="206" x2="800" y2="240" marker-end="url(#arr)"/>
+              <line x1="800" y1="284" x2="800" y2="308" marker-end="url(#arr)"/>
+              <line x1="800" y1="356" x2="800" y2="368"/>
+              <line x1="800" y1="368" x2="460" y2="368"/>
+              <line x1="460" y1="368" x2="460" y2="380" marker-end="url(#arr)"/>
+              <!-- 展示分支 -->
+              <line x1="460" y1="420" x2="460" y2="428" marker-end="url(#arr)"/>
+              <polyline points="360,460 120,460 120,520" fill="none" marker-end="url(#arr)"/>
+              <polyline points="560,460 800,460 800,520" fill="none" marker-end="url(#arr)"/>
+              <line x1="460" y1="492" x2="460" y2="580" marker-end="url(#arr)"/>
+            </g>
+            <g class="flow-nodes">
+              <rect x="340" y="12" width="240" height="40" rx="8" fill="#eff6ff" stroke="#2563eb"/>
+              <text x="460" y="38" text-anchor="middle" font-size="12" fill="#18222f">财务后台 · 新增/编辑品牌退款</text>
+              <rect x="320" y="76" width="280" height="44" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
+              <text x="460" y="104" text-anchor="middle" font-size="12" fill="#18222f">写入退款记录 · 审核状态=待审核</text>
+              <polygon points="460,144 560,184 460,224 360,184" fill="#fffbeb" stroke="#d97706"/>
+              <text x="460" y="182" text-anchor="middle" font-size="11" fill="#92400e">审核通过?</text>
+              <text x="250" y="176" font-size="11" fill="#dc2626">驳回</text>
+              <rect x="60" y="162" width="140" height="44" rx="8" fill="#fef2f2" stroke="#dc2626"/>
+              <text x="130" y="190" text-anchor="middle" font-size="11" fill="#991b1b">流程终止</text>
+              <text x="640" y="176" font-size="11" fill="#16a34a">通过</text>
+              <rect x="720" y="162" width="160" height="44" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
+              <text x="800" y="190" text-anchor="middle" font-size="11" fill="#18222f">审核状态=已通过</text>
+              <rect x="680" y="240" width="240" height="44" rx="8" fill="#fff7ed" stroke="#ea580c"/>
+              <text x="800" y="268" text-anchor="middle" font-size="11" fill="#18222f">异步任务 · 扣减用户钱包余额</text>
+              <rect x="680" y="308" width="240" height="48" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
+              <text x="800" y="330" text-anchor="middle" font-size="11" fill="#18222f">扣回状态=已扣回</text>
+              <text x="800" y="346" text-anchor="middle" font-size="10" fill="#64748b">更新订单更新日期</text>
+              <rect x="340" y="380" width="240" height="40" rx="8" fill="#eff6ff" stroke="#2563eb"/>
+              <text x="460" y="406" text-anchor="middle" font-size="12" fill="#18222f">同步写入 C 端展示层</text>
+              <polygon points="460,428 560,460 460,492 360,460" fill="#fffbeb" stroke="#d97706"/>
+              <text x="460" y="458" text-anchor="middle" font-size="11" fill="#92400e">展示入口</text>
+              <text x="120" y="512" font-size="10" fill="#2563eb">订单列表</text>
+              <rect x="40" y="520" width="160" height="44" rx="8" fill="#eff6ff" stroke="#2563eb"/>
+              <text x="120" y="540" text-anchor="middle" font-size="10" fill="#18222f">标题=品牌退款</text>
+              <text x="120" y="554" text-anchor="middle" font-size="10" fill="#64748b">副标题=退款原因</text>
+              <text x="800" y="512" font-size="10" fill="#2563eb">收益明细</text>
+              <rect x="720" y="520" width="160" height="44" rx="8" fill="#eff6ff" stroke="#2563eb"/>
+              <text x="800" y="540" text-anchor="middle" font-size="10" fill="#18222f">标题=项目「词」退款</text>
+              <text x="800" y="554" text-anchor="middle" font-size="10" fill="#64748b">状态=已扣减</text>
+              <rect x="340" y="580" width="240" height="44" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
+              <text x="460" y="608" text-anchor="middle" font-size="11" fill="#18222f">表头统计随退款记录变更刷新</text>
+            </g>
+          </svg>
+        </div>
+        <div class="flow-legend">
+          <span><i style="background:#eff6ff;border:1px solid #2563eb"></i>前端 / C 端</span>
+          <span><i style="background:#f0fdf4;border:1px solid #16a34a"></i>后端 / 数据写入</span>
+          <span><i style="background:#fff7ed;border:1px solid #ea580c"></i>异步 / 扣回任务</span>
+          <span><i style="background:#fffbeb;border:1px solid #d97706"></i>校验 / 分支</span>
+          <span><i style="background:#fef2f2;border:1px solid #dc2626"></i>驳回 / 终止</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 编辑弹窗 -->
+  <div class="modal-overlay" id="editOverlay" onclick="closeEditModal()">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header" id="editModalTitle">新增品牌退款</div>
+      <div class="modal-body">
+        <div class="form-field"><label>用户 ID *</label><input type="text" placeholder="U-10086" /></div>
+        <div class="form-field"><label>关键词 *</label><input type="text" placeholder="Summer推广词" /></div>
+        <div class="form-field"><label>项目 ID *</label><input type="text" placeholder="P-8801" /></div>
+        <div class="form-field"><label>项目名称 *</label><input type="text" placeholder="右豹品牌合作" /></div>
+        <div class="form-field"><label>退款订单日期 *</label><input type="datetime-local" /></div>
+        <div class="form-field"><label>退款金额(元) *</label><input type="number" step="0.01" placeholder="128.50" /></div>
+        <div class="form-field"><label>退款原因 *</label><textarea placeholder="项目方核实后发起退款，关键词数据异常"></textarea></div>
+        <div class="form-field">
+          <label>审核状态</label>
+          <select><option>待审核</option><option>已通过</option><option>已驳回</option></select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" type="button" onclick="closeEditModal()">取消</button>
+        <button class="btn btn-primary" type="button" onclick="saveEdit()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 需求规则抽屉 -->
+  <div class="drawer-overlay" id="ruleOverlay" onclick="setRuleDrawer(false)"></div>
+  <aside class="drawer" id="ruleDrawer" role="dialog">
+    <div class="drawer-header">
+      <h2>FR-003 · 需求规则 · v1</h2>
+      <button class="drawer-close" type="button" onclick="setRuleDrawer(false)">×</button>
+    </div>
+    <div class="rule-tab-bar" role="tablist">
+      <button type="button" class="active" data-rule="rule-fe" role="tab">前端需求</button>
+      <button type="button" data-rule="rule-admin" role="tab">后台需求</button>
+    </div>
+    <div class="drawer-body">
+      <div id="rule-fe" class="rule-panel active">
+        <div class="rule-section">
+          <h3><span>1</span>业务目标</h3>
+          <div class="rule-content">
+            <p>品牌项目发生退款时，用户在 C 端<strong>订单列表</strong>与<strong>钱包收益明细</strong>中可看到对应扣减记录。本迭代仅定义卡片信息展示，不重做完整页面。</p>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>2</span>展示入口与字段</h3>
+          <div class="rule-content">
+            <p><strong>订单列表</strong>（审核通过且已扣回后展示）：</p>
+            <ul>
+              <li><strong>标题</strong>：固定「品牌退款」</li>
+              <li><strong>副标题</strong>：退款原因</li>
+              <li><strong>订单产生日期</strong>：退款订单日期</li>
+              <li><strong>订单更新日期</strong>：扣回完成时间（未扣回时不展示该条）</li>
+              <li><strong>扣减金额</strong>：负向展示，如 <code>-128.50</code></li>
+            </ul>
+            <p style="margin-top:10px;"><strong>钱包 · 收益明细</strong>（审核通过且已扣回后展示）：</p>
+            <ul>
+              <li><strong>标题</strong>：<code>{项目名称}「{关键词}」产生退款</code></li>
+              <li><strong>副标题</strong>：退款原因</li>
+              <li><strong>时间</strong>：扣回完成时间</li>
+              <li><strong>金额</strong>：负向展示</li>
+              <li><strong>状态</strong>：固定「已扣减」</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>3</span>交互规则</h3>
+          <div class="rule-content">
+            <ul>
+              <li>待审核、已驳回、已通过但未扣回的记录<strong>不在 C 端展示</strong>。</li>
+              <li>订单列表与收益明细为既有页面新增记录类型，沿用现有列表卡片样式。</li>
+              <li>金额为扣减方向，使用负号或红色样式（沿用现有扣减展示规范）。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>4</span>边界规则</h3>
+          <div class="rule-content">
+            <ul>
+              <li>仅<strong>品牌项目</strong>支持本退款类型；非品牌项目不走此链路。</li>
+              <li>删除后台退款记录后，C 端对应展示同步移除（若已展示）。</li>
+              <li>编辑退款金额/原因后，C 端展示字段同步更新。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>5</span>业务流程</h3>
+          <div class="rule-content">
+            <p>见页内 Tab <strong>「业务流程」</strong>流程图。</p>
+          </div>
+        </div>
+      </div>
+      <div id="rule-admin" class="rule-panel">
+        <div class="rule-section">
+          <h3><span>1</span>业务目标</h3>
+          <div class="rule-content">
+            <p>在财务板块新增一级菜单「品牌退款」，供运营录入、审核、追踪品牌项目退款，并支撑对账与客诉排查。</p>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>2</span>数据表与字段</h3>
+          <div class="rule-content">
+            <p><strong>品牌退款表</strong>：</p>
+            <ul>
+              <li>用户 ID</li>
+              <li>关键词</li>
+              <li>项目信息：项目 ID、项目名称</li>
+              <li>退款订单日期</li>
+              <li>退款金额</li>
+              <li>退款原因</li>
+              <li>审核状态：待审核 / 已通过 / 已驳回</li>
+              <li>扣回状态：已扣回 / 待扣回（审核未通过时为空）</li>
+              <li>操作：编辑、删除</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>3</span>列表与筛选</h3>
+          <div class="rule-content">
+            <p><strong>筛选项</strong>：用户 ID、关键词、项目名称、扣回状态；<strong>默认折叠</strong>展示。</p>
+            <p style="margin-top:8px;"><strong>数据明细卡片</strong>：统计区下方，列表字段第 1 位（用户 ID）为卡片标题；Tag 展示审核状态；其余字段入内嵌灰色三列/四列区。</p>
+            <p style="margin-top:8px;"><strong>表头基础统计</strong>（随筛选结果联动）：</p>
+            <ul>
+              <li>退款总笔数</li>
+              <li>退款总金额</li>
+              <li>待审核笔数</li>
+              <li>待扣回笔数</li>
+              <li>已扣回笔数</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>4</span>边界规则</h3>
+          <div class="rule-content">
+            <ul>
+              <li>审核状态为<strong>已通过</strong>后，方可进入扣回流程；扣回成功后扣回状态变为「已扣回」。</li>
+              <li>审核<strong>已驳回</strong>的记录不参与扣回，扣回状态为空。</li>
+              <li>删除需二次确认；已扣回记录删除时同步撤销 C 端展示并回滚钱包（具体回滚策略由后端定义）。</li>
+              <li>新增/编辑提交后刷新列表与表头统计。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    function toggleAdminFilter() {
+      document.getElementById('adminFilterToggle').classList.toggle('open');
+      document.getElementById('adminFilterBar').classList.toggle('collapsed');
+    }
+    function switchAdminView(view, btn) {
+      document.querySelectorAll('.view-toggle button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('adminCardView').classList.toggle('hidden', view !== 'cards');
+      document.getElementById('adminTableView').classList.toggle('hidden', view !== 'table');
+    }
+    function getActiveScene() {
+      return document.querySelector('.scene-btn.active')?.dataset.screen || 'screen-order-list';
+    }
+    function loadMockupFrame(forceReload) {
+      const frame = document.getElementById('mockupFrame');
+      if (!frame) return;
+      const src = `brand-refund-demo.html?embed=1&screen=${encodeURIComponent(getActiveScene())}`;
+      const current = frame.getAttribute('src') || '';
+      if (forceReload || current === 'about:blank' || !current.includes('brand-refund-demo.html')) {
+        frame.src = src;
+        return;
+      }
+      try {
+        frame.contentWindow?.postMessage({ type: 'goToScreen', screen: getActiveScene() }, '*');
+      } catch (_) {
+        frame.src = src;
+      }
+    }
+    function switchPageTab(pageId, btn) {
+      document.querySelectorAll('.page-tab-bar button').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.page-view').forEach(v => v.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(pageId).classList.add('active');
+      if (pageId === 'view-fe') requestAnimationFrame(() => loadMockupFrame(false));
+      const tabMap = { 'view-fe': 'fe', 'view-admin': 'admin', 'view-flow': 'flow' };
+      history.replaceState(null, '', '?' + new URLSearchParams({ tab: tabMap[pageId] || 'fe' }).toString());
+    }
+    document.querySelectorAll('.page-tab-bar button').forEach(btn => {
+      btn.addEventListener('click', () => switchPageTab(btn.dataset.page, btn));
+    });
+    document.querySelectorAll('.scene-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.scene-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        loadMockupFrame(false);
+      });
+    });
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2500);
+    }
+    function openEditModal(userId) {
+      document.getElementById('editModalTitle').textContent = userId ? '编辑品牌退款 · ' + userId : '新增品牌退款';
+      document.getElementById('editOverlay').classList.add('open');
+    }
+    function closeEditModal() {
+      document.getElementById('editOverlay').classList.remove('open');
+    }
+    function saveEdit() {
+      closeEditModal();
+      showToast('Demo 已保存（Mock，不写入后端）');
+    }
+    function confirmDelete() {
+      if (confirm('确认删除该退款记录？（Demo）')) showToast('Demo：已删除');
+    }
+    const ruleDrawer = document.getElementById('ruleDrawer');
+    const toggleRuleBtn = document.getElementById('toggleRuleDrawer');
+    function switchRuleTab(ruleId, btn) {
+      document.querySelectorAll('.rule-tab-bar button').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.rule-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(ruleId).classList.add('active');
+      document.querySelector('#ruleDrawer .drawer-body').scrollTop = 0;
+    }
+    document.querySelectorAll('.rule-tab-bar button').forEach(btn => {
+      btn.addEventListener('click', () => switchRuleTab(btn.dataset.rule, btn));
+    });
+    function syncRuleTabToPage() {
+      const activePage = document.querySelector('.page-view.active')?.id;
+      const ruleId = activePage === 'view-admin' ? 'rule-admin' : 'rule-fe';
+      const btn = document.querySelector('.rule-tab-bar button[data-rule="' + ruleId + '"]');
+      if (btn) switchRuleTab(ruleId, btn);
+    }
+    function setRuleDrawer(open) {
+      ruleDrawer.classList.toggle('open', open);
+      document.getElementById('ruleOverlay').classList.toggle('open', open);
+      toggleRuleBtn.classList.toggle('active', open);
+      if (open) syncRuleTabToPage();
+    }
+    toggleRuleBtn.onclick = () => setRuleDrawer(!ruleDrawer.classList.contains('open'));
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') { closeEditModal(); setRuleDrawer(false); }
+    });
+    const tab = new URLSearchParams(location.search).get('tab');
+    const tabPageMap = { admin: 'view-admin', flow: 'view-flow', fe: 'view-fe' };
+    if (tab && tabPageMap[tab]) {
+      const btn = document.querySelector('[data-page="' + tabPageMap[tab] + '"]');
+      if (btn) switchPageTab(tabPageMap[tab], btn);
+    }
+    if (document.querySelector('.page-view.active')?.id === 'view-fe') loadMockupFrame(true);
+  </script>
+  <script src="fe-copy-html.js"></script>
+  <script src="sidebar-nav.js"></script>
+</body>
+</html>

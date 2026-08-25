@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FR-002 · 代发收益 · 右豹迭代需求记录</title>
+  <style>
+    :root {
+      --primary: #2563eb; --primary-hover: #1d4ed8; --primary-light: #eff6ff; --primary-border: #bfdbfe;
+      --accent-rule: #0891b2; --accent-version: #7c3aed; --accent-fr: #d97706;
+      --success: #16a34a; --success-bg: #f0fdf4; --danger: #dc2626; --danger-bg: #fef2f2;
+      --bg: #f0f4f8; --surface: #fff; --surface-glass: rgba(255,255,255,0.72);
+      --surface-hover: #f8fafc; --border: #e8edf3;
+      --text-primary: #18222f; --text-secondary: #4a5568; --text-muted: #9aa5b4;
+      --sidebar-w: 240px; --drawer-w: 480px;
+      --radius-sm: 7px; --radius-lg: 14px;
+      --shadow: 0 8px 32px rgba(30,40,80,0.10);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 13px;
+      color: var(--text-primary);
+      background: linear-gradient(135deg, #e0e7ff 0%, #f0f4f8 40%, #e0f2fe 100%);
+      background-attachment: fixed; min-height: 100vh;
+    }
+    .sidebar {
+      position: fixed; inset: 0 auto 0 0; width: var(--sidebar-w); z-index: 200;
+      display: flex; flex-direction: column;
+      background: rgba(240,244,255,0.95); backdrop-filter: blur(20px);
+      border-right: 1px solid rgba(148,163,196,0.22);
+    }
+    .sidebar-brand { padding: 16px 14px 12px; border-bottom: 1px solid rgba(148,163,196,0.22); }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: linear-gradient(135deg, #2563eb, #7c3aed); color: #fff;
+      display: flex; align-items: center; justify-content: center; font-weight: 700;
+    }
+    .brand-text { font-size: 14px; font-weight: 700; }
+    .brand-sub { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+    .sprint-pill {
+      display: inline-block; margin-top: 10px; font-size: 11px; font-weight: 600;
+      padding: 3px 8px; border-radius: 999px; background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0;
+    }
+    .sidebar-scroll { flex: 1; overflow-y: auto; padding: 8px 0 16px; }
+    .nav-group-label { padding: 12px 16px 6px; font-size: 11px; font-weight: 600; color: var(--text-muted); }
+    .nav-item {
+      position: relative; display: flex; align-items: center; height: 40px;
+      padding: 0 12px 0 14px; margin: 1px 8px; width: calc(100% - 16px);
+      border-radius: 8px; font-size: 13px; font-weight: 500; color: var(--text-secondary);
+      text-decoration: none; transition: all 0.18s;
+    }
+    .nav-item:hover { background: rgba(99,102,241,0.06); color: var(--text-primary); }
+    .nav-item.active { color: var(--primary); background: rgba(37,99,235,0.12); font-weight: 600; }
+    .nav-item.active::before {
+      content: ''; position: absolute; left: 0; top: 7px; bottom: 7px;
+      width: 3px; border-radius: 0 2px 2px 0; background: var(--primary);
+    }
+    .sidebar-foot { padding: 10px 14px 14px; border-top: 1px solid rgba(148,163,196,0.22); font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+    .main { margin-left: var(--sidebar-w); padding: 16px 20px 40px; min-height: 100vh; }
+    .breadcrumb { padding: 4px 0 12px; font-size: 12px; color: var(--text-muted); }
+    .breadcrumb a { color: var(--primary); text-decoration: none; }
+    .page-header { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; }
+    .page-header h1 { font-size: 19px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .page-desc { font-size: 12px; color: var(--text-muted); max-width: 720px; line-height: 1.55; }
+    .badge { display: inline-flex; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: var(--radius-sm); }
+    .badge-fr { background: #fffbeb; color: var(--accent-fr); border: 1px solid #fde68a; }
+    .badge-version { background: #f5f3ff; color: var(--accent-version); border: 1px solid #ddd6fe; }
+    .page-tab-bar {
+      display: flex; gap: 0; margin-bottom: 16px;
+      background: var(--surface-glass); backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.55); border-radius: var(--radius-lg);
+      padding: 4px; box-shadow: var(--shadow); width: fit-content;
+    }
+    .page-tab-bar button {
+      padding: 8px 20px; border: none; background: transparent; cursor: pointer;
+      font-size: 13px; font-weight: 500; color: var(--text-secondary); border-radius: 10px;
+    }
+    .page-tab-bar button.active { background: var(--primary); color: #fff; font-weight: 600; }
+    .page-view { display: none; }
+    .page-view.active { display: block; }
+    /* 前端 iframe 容器：避免 Tab 切换后高度塌陷 */
+    .mockup-panel { min-height: 520px; }
+    .page-header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex; align-items: center; height: 34px; padding: 0 14px;
+      border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid transparent;
+      text-decoration: none;
+    }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-rule { background: var(--primary-light); color: var(--primary); border-color: var(--primary-border); }
+    .btn-rule.active { background: var(--primary); color: #fff; }
+    .btn-ghost { background: var(--surface); color: var(--text-secondary); border-color: var(--border); }
+    .btn-ghost:hover { background: var(--surface-hover); }
+    .glass-card {
+      background: var(--surface-glass); backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.55); border-radius: var(--radius-lg);
+      box-shadow: var(--shadow); overflow: hidden;
+    }
+    /* 模板 B */
+    .demo-layout { display: grid; grid-template-columns: minmax(280px, 5fr) minmax(360px, 7fr); gap: 16px; }
+    @media (max-width: 1024px) { .demo-layout { grid-template-columns: 1fr; } }
+    .scene-panel { padding: 16px 18px; }
+    .scene-panel h2 { font-size: 14px; font-weight: 700; margin-bottom: 10px; }
+    .scene-list { display: flex; flex-direction: column; gap: 6px; }
+    .scene-btn {
+      text-align: left; padding: 10px 12px; border-radius: var(--radius-sm);
+      border: 1px solid var(--border); background: rgba(255,255,255,0.6); cursor: pointer;
+    }
+    .scene-btn.active { border-color: var(--primary-border); background: var(--primary-light); color: var(--primary); font-weight: 600; }
+    .scene-btn .scene-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+    .scene-btn .scene-desc { font-size: 11px; color: var(--text-muted); line-height: 1.45; }
+    .scene-btn.active .scene-desc { color: #3b82f6; }
+    .scene-note { margin-top: 14px; padding: 10px 12px; border-radius: var(--radius-sm); background: #fffbeb; border: 1px solid #fde68a; font-size: 12px; color: #92400e; line-height: 1.55; }
+    .mockup-panel { padding: 16px; display: flex; justify-content: center; }
+    .mockup-frame-wrap {
+      width: 100%; max-width: 400px; border-radius: 28px; overflow: hidden;
+      background: #1e293b; box-shadow: 0 16px 48px rgba(0,0,0,0.18); aspect-ratio: 375 / 812;
+    }
+    .mockup-frame-wrap iframe { width: 100%; height: 100%; border: none; display: block; background: #f5f5f5; }
+    /* 模板 A */
+    .tab-bar-inline { display: flex; gap: 4px; padding: 12px 16px 0; border-bottom: 1px solid var(--border); }
+    .tab-bar-inline button {
+      padding: 8px 14px; border: none; background: none; cursor: pointer;
+      font-size: 13px; color: var(--text-secondary); border-bottom: 2px solid transparent; margin-bottom: -1px;
+    }
+    .tab-bar-inline button.active { color: var(--primary); font-weight: 600; border-bottom-color: var(--primary); }
+    .filter-bar { display: flex; flex-wrap: wrap; gap: 10px; padding: 14px 16px; align-items: flex-end; border-bottom: 1px solid var(--border); }
+    .filter-bar input, .filter-bar select { height: 32px; padding: 0 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 12px; min-width: 120px; }
+    .filter-field { display: flex; flex-direction: column; gap: 4px; }
+    .filter-field label { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+    .filter-field input, .filter-field select { min-width: 130px; }
+    .filter-actions { display: flex; gap: 8px; margin-left: auto; }
+    .btn-ghost-sm { background: var(--surface); color: var(--text-secondary); border: 1px solid var(--border); height: 32px; padding: 0 12px; border-radius: var(--radius-sm); cursor: pointer; font-size: 12px; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 900px; }
+    th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); font-size: 12px; vertical-align: top; }
+    th { font-size: 11px; font-weight: 600; color: var(--text-muted); background: rgba(248,250,252,0.9); white-space: nowrap; }
+    tr:hover td { background: var(--surface-hover); }
+    .cell-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .link { color: var(--primary); cursor: pointer; text-decoration: none; margin-right: 10px; font-size: 12px; font-weight: 500; background: none; border: none; padding: 0; }
+    .link:hover { color: var(--primary-hover); text-decoration: underline; }
+    .link-muted { color: var(--text-muted); font-weight: 400; }
+    .link-muted:hover { color: var(--text-secondary); }
+    .link-danger { color: var(--danger); margin-right: 0; }
+    .link-danger:hover { color: #b91c1c; }
+    .tag { display: inline-flex; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+    .tag-ok { background: var(--success-bg); color: var(--success); }
+    .tag-del { background: var(--danger-bg); color: var(--danger); }
+    .admin-panel { display: none; }
+    .admin-panel.active { display: block; }
+    /* 抽屉 overlay 层 — 不挤压主内容 */
+    .drawer-overlay {
+      position: fixed; inset: 0; background: rgba(15,23,42,0.35); z-index: 500;
+      opacity: 0; pointer-events: none; transition: opacity 0.25s;
+    }
+    .drawer-overlay.open { opacity: 1; pointer-events: auto; }
+    .drawer {
+      position: fixed; top: 0; right: 0; bottom: 0; width: var(--drawer-w); z-index: 501;
+      background: rgba(255,255,255,0.98); backdrop-filter: blur(12px);
+      box-shadow: -8px 0 40px rgba(30,40,60,0.18);
+      transform: translateX(100%); transition: transform 0.28s ease;
+      display: flex; flex-direction: column;
+    }
+    .drawer.open { transform: translateX(0); }
+    .drawer-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+    .drawer-header h2 { font-size: 15px; font-weight: 700; }
+    .drawer-close { width: 28px; height: 28px; border: none; background: #f1f5f9; border-radius: 6px; cursor: pointer; font-size: 16px; }
+    .drawer-nav { display: flex; gap: 4px; padding: 10px 16px; border-bottom: 1px solid var(--border); overflow-x: auto; flex-shrink: 0; }
+    .drawer-nav button { padding: 4px 10px; font-size: 11px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); cursor: pointer; white-space: nowrap; }
+    .rule-tab-bar {
+      display: flex; gap: 0; padding: 0 16px; border-bottom: 1px solid var(--border); flex-shrink: 0;
+    }
+    .rule-tab-bar button {
+      padding: 10px 18px; border: none; background: none; cursor: pointer;
+      font-size: 13px; color: var(--text-secondary); border-bottom: 2px solid transparent; margin-bottom: -1px;
+    }
+    .rule-tab-bar button.active { color: var(--primary); font-weight: 600; border-bottom-color: var(--primary); }
+    .rule-panel { display: none; }
+    .rule-panel.active { display: block; }
+    .drawer-body { flex: 1; overflow-y: auto; padding: 16px 20px 32px; }
+    .rule-section { margin-bottom: 22px; scroll-margin-top: 12px; }
+    .rule-section h3 { font-size: 14px; font-weight: 700; color: var(--accent-rule); margin-bottom: 8px; }
+    .rule-section h3 span {
+      display: inline-flex; width: 22px; height: 22px; align-items: center; justify-content: center;
+      background: #ecfeff; color: var(--accent-rule); border-radius: 6px; font-size: 12px; margin-right: 8px;
+    }
+    .rule-content { font-size: 13px; color: var(--text-secondary); line-height: 1.65; }
+    .rule-content ul { padding-left: 18px; margin-top: 6px; }
+    .rule-content li { margin-bottom: 5px; }
+    .rule-content code { font-family: ui-monospace, monospace; font-size: 12px; background: #f1f5f9; padding: 1px 5px; border-radius: 4px; }
+    .flow-steps { padding: 10px 12px; background: #f8fafc; border-radius: var(--radius-sm); border: 1px solid var(--border); font-size: 12px; line-height: 1.7; }
+    .detail-table { min-width: 680px; }
+    /* 业务流程 Tab */
+    .flow-page { padding: 0; }
+    .flow-page-intro { padding: 16px 18px 0; font-size: 12px; color: var(--text-muted); line-height: 1.55; }
+    .flow-tab-bar {
+      display: flex; gap: 4px; padding: 12px 16px 0; border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+    }
+    .flow-tab-bar button {
+      padding: 8px 16px; border: none; background: none; cursor: pointer; white-space: nowrap;
+      font-size: 13px; color: var(--text-secondary); border-bottom: 2px solid transparent; margin-bottom: -1px;
+    }
+    .flow-tab-bar button.active { color: var(--primary); font-weight: 600; border-bottom-color: var(--primary); }
+    .flow-panel-body { padding: 16px 18px 24px; display: none; }
+    .flow-panel-body.active { display: block; }
+    .flow-panel-desc { font-size: 12px; color: var(--text-secondary); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .flow-panel-desc .tag-flow { font-size: 11px; font-weight: 600; color: var(--primary); background: var(--primary-light); padding: 2px 8px; border-radius: 999px; }
+    .flow-svg-wrap { overflow: auto; padding: 8px 0; min-height: 480px; max-height: 72vh; }
+    .flow-svg-wrap svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+    .flow-edges line, .flow-edges polyline { stroke: #94a3b8; stroke-width: 1.5; fill: none; }
+    .flow-nodes rect, .flow-nodes polygon { stroke-width: 1.5; }
+    .flow-nodes text { font-family: inherit; }
+    .flow-legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px; font-size: 11px; color: var(--text-muted); }
+    .flow-legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 4px; vertical-align: -2px; }
+    .admin-metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; padding: 16px; border-bottom: 1px solid var(--border); }
+    @media (max-width: 900px) { .admin-metrics { grid-template-columns: repeat(2, 1fr); } }
+    .admin-metric { background: rgba(248,250,252,.9); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px 16px; }
+    .admin-metric label { display: block; font-size: 11px; color: var(--text-muted); font-weight: 600; margin-bottom: 8px; }
+    .admin-metric strong { display: block; font-size: 22px; font-weight: 700; color: var(--text-primary); }
+    .admin-metric span { display: inline-block; margin-top: 6px; font-size: 11px; color: var(--success); }
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: #1e293b; color: #fff; padding: 10px 18px; border-radius: 999px; font-size: 13px;
+      opacity: 0; transition: all 0.25s; z-index: 600; pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand">
+        <div class="brand-icon">迭</div>
+        <div>
+          <div class="brand-text">右豹迭代需求记录</div>
+          <div class="brand-sub">PRD Demo · 产品交付研发</div>
+        </div>
+      </div>
+      <span class="sprint-pill">YBDD2.0 · 迭代 v1</span>
+    </div>
+    <div class="sidebar-scroll" data-iteration-sidebar></div>
+    <div class="sidebar-foot">FR-002 · 页内 Tab<br />前端交互 / 管理后台 / 业务流程</div>
+  </aside>
+
+  <main class="main" id="main">
+    <nav class="breadcrumb">
+      <a href="framework-shell.html">Sprint 概览</a>
+      <span> / OPC协作结算 / 代发收益</span>
+    </nav>
+
+    <header class="page-header">
+      <div>
+        <h1>
+          代发收益
+          <span class="badge badge-fr">FR-002</span>
+          <span class="badge badge-version">v1 当前</span>
+        </h1>
+        <p class="page-desc">主子用户协议确认 + 三方发布帐号授权 + 关键词出单分配。分配引擎与 FR-001 代发分配一致；差异在于 1:N 主子关系、协议邀请流、三方授权对接。</p>
+      </div>
+      <div class="page-header-actions">
+        <button class="btn btn-rule" id="toggleRuleDrawer" type="button">📋 需求规则</button>
+      </div>
+    </header>
+
+    <div class="page-tab-bar" role="tablist">
+      <button type="button" class="active" data-page="view-fe" role="tab">前端交互</button>
+      <button type="button" data-page="view-admin" role="tab">管理后台</button>
+      <button type="button" data-page="view-flow" role="tab">业务流程</button>
+    </div>
+
+    <!-- 前端交互 -->
+    <div id="view-fe" class="page-view active">
+      <div class="demo-layout">
+        <div class="glass-card scene-panel">
+          <h2>场景切换</h2>
+          <div class="scene-list">
+            <button class="scene-btn active" type="button" data-screen="screen-main-home">
+              <div class="scene-title">图1 · 代发收益管理（主用户）</div>
+              <div class="scene-desc">累计已分配 + 子用户数/关键词数/授权帐号；分配 record-card；子用户信息头像卡片</div>
+            </button>
+            <button class="scene-btn" type="button" data-screen="screen-main-alloc-list">
+              <div class="scene-title">图1.1 · 分配信息详情（主用户）</div>
+              <div class="scene-desc">统计区 + 关键词卡片：灰色信息域仅用户昵称/帐号昵称/账号ID</div>
+            </button>
+            <button class="scene-btn" type="button" data-screen="screen-main-sub-detail">
+              <div class="scene-title">图1.2 · 子用户详情（主用户）</div>
+              <div class="scene-desc">头像信息卡 + Tab：分配明细 / 授权帐号（只读，无编辑）</div>
+            </button>
+            <button class="scene-btn" type="button" data-screen="screen-main-invite">
+              <div class="scene-title">图2 · 发起协议（主用户）</div>
+              <div class="scene-desc">填写邀请 + 分配信息 + 协议内容（对齐子用户确认页）</div>
+            </button>
+            <button class="scene-btn" type="button" data-screen="screen-sub-agreement">
+              <div class="scene-title">图3 · 协议确认（子用户）</div>
+              <div class="scene-desc">系统通知进入；同意/拒绝协议</div>
+            </button>
+            <button class="scene-btn" type="button" data-screen="screen-sub-auth">
+              <div class="scene-title">图4 · 三方授权（子用户）</div>
+              <div class="scene-desc">顶部提示文案（后台说明内容配置）+ 发布帐号列表，无编辑/无授权按钮</div>
+            </button>
+            <button class="scene-btn" type="button" data-screen="screen-sub-alloc">
+              <div class="scene-title">图5 · 分配详情（子用户）</div>
+              <div class="scene-desc">累计已获得 + 授权帐号数；分配 record-card（关键词·金额，无代发标签）</div>
+            </button>
+          </div>
+          <div class="scene-note">协议确认与三方授权为分配前置条件；关键词出单分配口径与 FR-001 一致。</div>
+        </div>
+        <div class="glass-card mockup-panel">
+          <div class="mockup-frame-wrap">
+            <iframe id="mockupFrame" title="代发收益 Mockup" src="about:blank" data-src="daifa-revenue-demo.html"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 管理后台 -->
+    <div id="view-admin" class="page-view">
+      <div class="glass-card">
+        <div class="tab-bar-inline">
+          <button type="button" class="active" data-panel="panel-relations">主子分配关系</button>
+          <button type="button" data-panel="panel-accounts">发布帐号</button>
+          <button type="button" data-panel="panel-keywords">代发关键词</button>
+        </div>
+        <div id="panel-relations" class="admin-panel active">
+          <div class="admin-metrics">
+            <div class="admin-metric"><label>已分配金额</label><strong>¥20,720.00</strong><span>累计已完成</span></div>
+            <div class="admin-metric"><label>待分配金额</label><strong>¥3,280.00</strong><span>待结算出单</span></div>
+            <div class="admin-metric"><label>启用关系</label><strong>2</strong><span>协议已同意</span></div>
+            <div class="admin-metric"><label>待确认协议</label><strong>1</strong><span>站内信待处理</span></div>
+          </div>
+          <div class="filter-bar">
+            <div class="filter-field"><label>关系 ID</label><input type="text" placeholder="R-1001" /></div>
+            <div class="filter-field"><label>主用户 ID</label><input type="text" placeholder="U20260813001" /></div>
+            <div class="filter-field"><label>子用户 ID</label><input type="text" placeholder="U20260813088" /></div>
+            <div class="filter-field"><label>协议状态</label><select><option>全部</option><option>待确认</option><option>已同意</option><option>已拒绝</option></select></div>
+            <div class="filter-field"><label>分配状态</label><select><option>全部</option><option>启用</option><option>禁用</option></select></div>
+            <div class="filter-actions">
+              <button class="btn-ghost-sm" type="button" onclick="showToast('Demo：已重置筛选')">重置</button>
+              <button class="btn btn-primary" type="button" onclick="showToast('Demo：筛选仅影响 Mock 展示')">查询</button>
+              <button class="btn btn-primary" type="button" onclick="showToast('Demo：新增关系')">新增关系</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th><th>主用户ID</th><th>子用户ID</th><th>分配比例</th>
+                  <th>协议状态</th><th>分配状态</th><th>发布帐号数</th><th>已分配金额</th><th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>R-1001</td><td>U20260813001</td><td>U20260813088</td><td>40%</td>
+                  <td><span class="tag tag-ok">已同意</span></td><td><span class="tag tag-ok">启用</span></td>
+                  <td>2</td><td>12,400.00</td>
+                  <td><a class="link" onclick="showToast('Demo：详情')">详情</a><a class="link" onclick="showToast('Demo：编辑')">编辑</a><a class="link" onclick="showToast('Demo：重发协议')">重发协议</a></td>
+                </tr>
+                <tr>
+                  <td>R-1002</td><td>U20260813001</td><td>U20260813099</td><td>35%</td>
+                  <td><span class="tag tag-ok">已同意</span></td><td><span class="tag tag-ok">启用</span></td>
+                  <td>1</td><td>8,320.00</td>
+                  <td><a class="link">详情</a><a class="link">编辑</a><a class="link">重发协议</a></td>
+                </tr>
+                <tr>
+                  <td>R-1003</td><td>U20260813001</td><td>U20260813102</td><td>25%</td>
+                  <td><span class="tag" style="background:#fffbeb;color:#d97706;border:1px solid #fde68a">待确认</span></td><td><span class="tag tag-ok">启用</span></td>
+                  <td>0</td><td>0.00</td>
+                  <td><a class="link">详情</a><a class="link">编辑</a><a class="link">重发协议</a></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div id="panel-accounts" class="admin-panel">
+          <div class="filter-bar">
+            <div class="filter-field"><label>发布帐号 ID</label><input type="text" placeholder="PA-10021" /></div>
+            <div class="filter-field"><label>帐号昵称</label><input type="text" placeholder="豹豹1号" /></div>
+            <div class="filter-field"><label>帐号 ID（平台唯一）</label><input type="text" placeholder="dy_8829103" /></div>
+            <div class="filter-field"><label>主用户 ID</label><input type="text" placeholder="U20260813001" /></div>
+            <div class="filter-field"><label>子用户 ID</label><input type="text" placeholder="U20260813088" /></div>
+            <div class="filter-field"><label>三方授权状态</label><select><option>全部</option><option>已授权</option><option>已失效</option><option>未授权</option></select></div>
+            <div class="filter-field"><label>帐号平台</label><select><option>全部</option><option>抖音</option><option>快手</option><option>TK</option></select></div>
+            <div class="filter-field"><label>状态</label><select><option>全部</option><option>正常</option><option>已删除</option></select></div>
+            <div class="filter-field"><label>添加时间起</label><input type="date" /></div>
+            <div class="filter-field"><label>添加时间止</label><input type="date" /></div>
+            <div class="filter-actions">
+              <button class="btn-ghost-sm" type="button" onclick="showToast('Demo：已重置筛选')">重置</button>
+              <button class="btn btn-primary" type="button" onclick="showToast('Demo：筛选仅影响 Mock 展示')">查询</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th><th>帐号昵称</th><th>帐号ID</th><th>主页链接</th>
+                  <th>子用户</th><th>授权主用户</th><th>三方授权</th><th>帐号平台</th><th>状态</th><th>授权时间</th><th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>PA-20021</td><td>豹豹1号</td><td>dy_8829103</td>
+                  <td><a class="link" href="#">打开</a></td>
+                  <td><div>U20260813088</div></td>
+                  <td><div>U20260813001</div></td>
+                  <td><span class="tag tag-ok">已授权</span></td>
+                  <td>抖音</td><td><span class="tag tag-ok">正常</span></td><td>2026.08.10 09:20</td>
+                  <td><a class="link" onclick="showToast('Demo：日志')">日志</a></td>
+                </tr>
+                <tr>
+                  <td>PA-20022</td><td>豹豹2号</td><td>ks_6610238</td>
+                  <td><a class="link" href="#">打开</a></td>
+                  <td><div>U20260813088</div></td>
+                  <td><div>U20260813001</div></td>
+                  <td><span class="tag tag-ok">已授权</span></td>
+                  <td>快手</td><td><span class="tag tag-ok">正常</span></td><td>2026.08.12 14:05</td>
+                  <td><a class="link">日志</a></td>
+                </tr>
+                <tr>
+                  <td>PA-20023</td><td>leopard_en</td><td>tk_9900122</td>
+                  <td><a class="link" href="#">打开</a></td>
+                  <td><div>U20260813099</div></td>
+                  <td><div>U20260813001</div></td>
+                  <td><span class="tag" style="background:#fffbeb;color:#d97706;border:1px solid #fde68a">已失效</span></td>
+                  <td>TK</td><td><span class="tag tag-del">已删除</span></td><td>2026.08.15 11:30</td>
+                  <td><a class="link">日志</a></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div id="panel-keywords" class="admin-panel">
+          <div class="filter-bar">
+            <div class="filter-field"><label>关键词</label><input type="text" placeholder="右豹代发教程" /></div>
+            <div class="filter-field"><label>项目方</label><input type="text" placeholder="右豹官方" /></div>
+            <div class="filter-field"><label>主用户 ID</label><input type="text" placeholder="U20260813001" /></div>
+            <div class="filter-field"><label>子用户 ID</label><input type="text" placeholder="U20260813088" /></div>
+            <div class="filter-field"><label>发布帐号 ID</label><input type="text" placeholder="dy_8829103" /></div>
+            <div class="filter-field"><label>发布帐号昵称</label><input type="text" placeholder="豹豹1号" /></div>
+            <div class="filter-field"><label>所属子用户 ID</label><input type="text" placeholder="U20260813088" /></div>
+            <div class="filter-field"><label>更新时间起</label><input type="date" /></div>
+            <div class="filter-field"><label>更新时间止</label><input type="date" /></div>
+            <div class="filter-actions">
+              <button class="btn-ghost-sm" type="button" onclick="showToast('Demo：已重置筛选')">重置</button>
+              <button class="btn btn-primary" type="button" onclick="showToast('Demo：筛选仅影响 Mock 展示')">查询</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>关键词</th><th>项目方</th><th>主用户</th><th>发布帐号</th><th>所属子用户</th>
+                  <th>累计产生收益</th><th>累计分配</th><th>数据更新时间</th><th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>右豹代发教程</td><td>右豹官方</td>
+                  <td><div>U20260813001</div></td>
+                  <td><div>豹豹1号</div><div class="cell-sub">dy_8829103</div></td>
+                  <td><div>U20260813088</div></td>
+                  <td>680.00</td><td>520.00</td><td>2023.12.24 13:00</td>
+                  <td><a class="link" onclick="openKeywordDetail('右豹代发教程')">详情</a></td>
+                </tr>
+                <tr>
+                  <td>关键词推广A</td><td>番茄小说</td>
+                  <td><div>U20260813001</div></td>
+                  <td><div>豹豹2号</div><div class="cell-sub">ks_6610238</div></td>
+                  <td><div>U20260813088</div></td>
+                  <td>450.00</td><td>380.50</td><td>2023.12.24 13:00</td>
+                  <td><a class="link" onclick="openKeywordDetail('关键词推广A')">详情</a></td>
+                </tr>
+                <tr>
+                  <td>TIK出海词</td><td>出海项目</td>
+                  <td><div>U20260813001</div></td>
+                  <td><div>leopard_en</div><div class="cell-sub">tk_9900122</div></td>
+                  <td><div>U20260813099</div></td>
+                  <td>1100.00</td><td>890.00</td><td>2023.12.23 09:30</td>
+                  <td><a class="link" onclick="openKeywordDetail('TIK出海词')">详情</a></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 业务流程 -->
+    <div id="view-flow" class="page-view">
+      <div class="glass-card flow-page">
+        <p class="flow-page-intro">前后端交互与校验逻辑流程图（研发对照用）。菱形节点为校验/分支；蓝色为前端，绿色为后端，橙色为异步任务。</p>
+
+        <div class="flow-tab-bar" role="tablist">
+          <button type="button" class="active" data-flow="flow-1" role="tab">流程1 · 协议邀请确认</button>
+          <button type="button" data-flow="flow-2" role="tab">流程2 · 三方发布帐号授权</button>
+          <button type="button" data-flow="flow-3" role="tab">流程3 · 关键词出单分配</button>
+        </div>
+
+        <div id="flow-1" class="flow-panel-body active">
+          <div class="flow-panel-desc">流程 1 · 协议邀请确认 <span class="tag-flow">主/子 C 端</span></div>
+          <div class="flow-svg-wrap">
+            <svg viewBox="0 0 880 420" width="880" height="420" xmlns="http://www.w3.org/2000/svg">
+              <defs><marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8"/></marker></defs>
+              <g class="flow-edges">
+                <line x1="440" y1="52" x2="440" y2="76" marker-end="url(#arr)"/>
+                <line x1="440" y1="116" x2="440" y2="140" marker-end="url(#arr)"/>
+                <line x1="440" y1="180" x2="440" y2="204" marker-end="url(#arr)"/>
+                <line x1="340" y1="244" x2="180" y2="244" marker-end="url(#arr)"/>
+                <line x1="540" y1="244" x2="700" y2="244" marker-end="url(#arr)"/>
+                <line x1="780" y1="266" x2="780" y2="300" marker-end="url(#arr)"/>
+                <line x1="780" y1="344" x2="780" y2="348"/>
+                <line x1="780" y1="348" x2="440" y2="348"/>
+                <line x1="440" y1="348" x2="440" y2="352" marker-end="url(#arr)"/>
+              </g>
+              <g class="flow-nodes">
+                <rect x="320" y="12" width="240" height="40" rx="8" fill="#eff6ff" stroke="#2563eb"/>
+                <text x="440" y="38" text-anchor="middle" font-size="12" fill="#18222f">主用户填写子用户ID + 分配比例</text>
+                <rect x="300" y="76" width="280" height="40" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
+                <text x="440" y="102" text-anchor="middle" font-size="12" fill="#18222f">后端写入关系；协议状态=待确认</text>
+                <rect x="280" y="140" width="320" height="40" rx="8" fill="#fff7ed" stroke="#ea580c"/>
+                <text x="440" y="166" text-anchor="middle" font-size="12" fill="#18222f">推送系统通知「代发收益邀请」给子用户</text>
+                <rect x="340" y="204" width="200" height="40" rx="8" fill="#eff6ff" stroke="#2563eb"/>
+                <text x="440" y="230" text-anchor="middle" font-size="12" fill="#18222f">子用户进入协议页查看内容</text>
+                <polygon points="440,244 540,282 440,320 340,282" fill="#fffbeb" stroke="#d97706"/>
+                <text x="440" y="280" text-anchor="middle" font-size="11" fill="#92400e">子用户同意?</text>
+                <text x="250" y="274" font-size="11" fill="#dc2626">拒绝</text>
+                <rect x="40" y="260" width="140" height="48" rx="8" fill="#fef2f2" stroke="#dc2626"/>
+                <text x="110" y="282" text-anchor="middle" font-size="11" fill="#991b1b">协议状态=已拒绝</text>
+                <text x="110" y="296" text-anchor="middle" font-size="10" fill="#991b1b">主用户可重发</text>
+                <text x="620" y="274" font-size="11" fill="#16a34a">同意</text>
+                <rect x="700" y="260" width="160" height="40" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
+                <text x="780" y="286" text-anchor="middle" font-size="11" fill="#18222f">协议状态=已同意</text>
+                <rect x="660" y="300" width="240" height="48" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
+                <text x="780" y="322" text-anchor="middle" font-size="11" fill="#18222f">分配关系可进入授权/分配</text>
+                <text x="780" y="338" text-anchor="middle" font-size="10" fill="#64748b">分配状态=启用时生效</text>
+                <rect x="300" y="352" width="280" height="44" rx="8" fill="#eff6ff" stroke="#2563eb"/>
+                <text x="440" y="380" text-anchor="middle" font-size="12" fill="#18222f">C端：主用户列表展示协议状态</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+
+        <div id="flow-2" class="flow-panel-body">
+          <div class="flow-panel-desc">流程 2 · 三方发布帐号授权 <span class="tag-flow">子用户 C 端 + 三方 API</span></div>
+          <div class="flow-svg-wrap">
+            <svg viewBox="0 0 880 380" width="880" height="380" xmlns="http://www.w3.org/2000/svg">
+              <defs><marker id="arr2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8"/></marker></defs>
+              <g class="flow-edges">
+                <line x1="440" y1="52" x2="440" y2="76" marker-end="url(#arr2)"/>
+                <line x1="440" y1="116" x2="440" y2="140" marker-end="url(#arr2)"/>
+                <line x1="340" y1="178" x2="180" y2="178" marker-end="url(#arr2)"/>
+                <line x1="540" y1="178" x2="700" y2="178" marker-end="url(#arr2)"/>
+                <line x1="780" y1="200" x2="780" y2="240" marker-end="url(#arr2)"/>
+                <line x1="780" y1="288" x2="780" y2="296"/>
+                <line x1="780" y1="296" x2="440" y2="296"/>
+                <line x1="440" y1="296" x2="440" y2="300" marker-end="url(#arr2)"/>
+              </g>
+              <g class="flow-nodes">
+                <rect x="340" y="12" width="200" height="40" rx="8" fill="#eff6ff" stroke="#2563eb"/>
+                <text x="440" y="38" text-anchor="middle" font-size="12" fill="#18222f">子用户进入「发布帐号授权」</text>
+                <rect x="320" y="76" width="240" height="40" rx="8" fill="#eff6ff" stroke="#2563eb"/>
+                <text x="440" y="102" text-anchor="middle" font-size="12" fill="#18222f">跳转三方授权页（对接三方 API）</text>
+                <polygon points="440,140 540,178 440,216 340,178" fill="#fffbeb" stroke="#d97706"/>
+                <text x="440" y="176" text-anchor="middle" font-size="11" fill="#92400e">平台帐号ID唯一?</text>
+                <text x="250" y="170" font-size="11" fill="#dc2626">否/重复</text>
+                <rect x="40" y="156" width="140" height="44" rx="8" fill="#fef2f2" stroke="#dc2626"/>
+                <text x="110" y="184" text-anchor="middle" font-size="11" fill="#991b1b">Toast：帐号已存在</text>
+                <text x="620" y="170" font-size="11" fill="#16a34a">是</text>
+                <rect x="700" y="156" width="160" height="44" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
+                <text x="780" y="184" text-anchor="middle" font-size="11" fill="#18222f">写入发布帐号表</text>
+                <rect x="660" y="240" width="240" height="48" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
+                <text x="780" y="262" text-anchor="middle" font-size="11" fill="#18222f">关联子用户ID+授权主用户ID</text>
+                <text x="780" y="278" text-anchor="middle" font-size="10" fill="#64748b">三方授权状态=已授权</text>
+                <rect x="300" y="300" width="280" height="44" rx="8" fill="#eff6ff" stroke="#2563eb"/>
+                <text x="440" y="328" text-anchor="middle" font-size="12" fill="#18222f">C 端刷新已授权列表</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+
+        <div id="flow-3" class="flow-panel-body">
+          <div class="flow-panel-desc">流程 3 · 关键词出单→结算→分配明细 <span class="tag-flow">前后端</span></div>
+          <div class="flow-svg-wrap">
+            <svg viewBox="0 0 960 600" width="960" height="600" xmlns="http://www.w3.org/2000/svg">
+              <defs><marker id="arr3" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8"/></marker></defs>
+              <g class="flow-edges">
+                <line x1="132" y1="50" x2="148" y2="50" marker-end="url(#arr3)"/>
+                <line x1="296" y1="50" x2="302" y2="50" marker-end="url(#arr3)"/>
+                <line x1="378" y1="50" x2="392" y2="50" marker-end="url(#arr3)"/>
+                <line x1="340" y1="72" x2="340" y2="92" marker-end="url(#arr3)"/>
+                <line x1="446" y1="72" x2="446" y2="132"/>
+                <line x1="446" y1="132" x2="480" y2="132"/>
+                <line x1="480" y1="132" x2="480" y2="148" marker-end="url(#arr3)"/>
+                <line x1="480" y1="218" x2="480" y2="232"/>
+                <line x1="480" y1="232" x2="150" y2="232"/>
+                <line x1="150" y1="232" x2="150" y2="248" marker-end="url(#arr3)"/>
+                <line x1="480" y1="232" x2="810" y2="232"/>
+                <line x1="810" y1="232" x2="810" y2="248" marker-end="url(#arr3)"/>
+                <line x1="150" y1="320" x2="150" y2="348" marker-end="url(#arr3)"/>
+                <line x1="150" y1="420" x2="150" y2="468"/>
+                <line x1="150" y1="468" x2="442" y2="468"/>
+                <line x1="442" y1="468" x2="442" y2="488" marker-end="url(#arr3)"/>
+                <line x1="810" y1="320" x2="810" y2="468"/>
+                <line x1="810" y1="468" x2="518" y2="468"/>
+                <line x1="518" y1="468" x2="518" y2="488" marker-end="url(#arr3)"/>
+                <line x1="442" y1="510" x2="130" y2="510"/>
+                <line x1="130" y1="510" x2="130" y2="548" marker-end="url(#arr3)"/>
+                <line x1="518" y1="510" x2="840" y2="510"/>
+                <line x1="840" y1="510" x2="840" y2="548" marker-end="url(#arr3)"/>
+              </g>
+              <g class="flow-nodes">
+                <rect x="24" y="28" width="108" height="44" rx="8" fill="#fff7ed" stroke="#ea580c"/>
+                <text x="78" y="48" text-anchor="middle" font-size="11" fill="#18222f">
+                  <tspan x="78" dy="0">出单事件</tspan><tspan x="78" dy="13">入队</tspan>
+                </text>
+                <rect x="148" y="28" width="148" height="44" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
+                <text x="222" y="48" text-anchor="middle" font-size="10" fill="#18222f">
+                  <tspan x="222" dy="0">更新关键词</tspan><tspan x="222" dy="13">累计产生收益</tspan>
+                </text>
+                <polygon points="340,28 378,50 340,72 302,50" fill="#fffbeb" stroke="#d97706"/>
+                <text x="340" y="54" text-anchor="middle" font-size="10" fill="#92400e">收益已结算?</text>
+                <text x="384" y="42" font-size="10" fill="#16a34a">是</text>
+                <rect x="392" y="28" width="108" height="44" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
+                <text x="446" y="54" text-anchor="middle" font-size="10" fill="#18222f">触发代发分配</text>
+                <text x="348" y="86" font-size="10" fill="#dc2626">否</text>
+                <rect x="268" y="92" width="144" height="36" rx="8" fill="#f8fafc" stroke="#94a3b8"/>
+                <text x="340" y="114" text-anchor="middle" font-size="10" fill="#64748b">等待结算回调</text>
+                <rect x="360" y="148" width="240" height="70" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
+                <text x="480" y="172" text-anchor="middle" font-size="11" fill="#18222f">
+                  <tspan x="480" dy="0">写入分配明细</tspan><tspan x="480" dy="14">+ 累计分配</tspan>
+                </text>
+                <text x="480" y="206" text-anchor="middle" font-size="10" fill="#64748b">更新数据更新时间</text>
+                <rect x="40" y="248" width="220" height="72" rx="8" fill="#eff6ff" stroke="#2563eb"/>
+                <text x="150" y="274" text-anchor="middle" font-size="11" fill="#18222f">
+                  <tspan x="150" dy="0">主用户 C 端</tspan><tspan x="150" dy="14">分配详情 / 导出</tspan>
+                </text>
+                <text x="150" y="306" text-anchor="middle" font-size="10" fill="#64748b">含分配时间字段</text>
+                <rect x="40" y="348" width="220" height="72" rx="8" fill="#eff6ff" stroke="#2563eb"/>
+                <text x="150" y="374" text-anchor="middle" font-size="11" fill="#18222f">
+                  <tspan x="150" dy="0">子用户 C 端</tspan><tspan x="150" dy="14">分配详情页</tspan>
+                </text>
+                <text x="150" y="406" text-anchor="middle" font-size="10" fill="#64748b">仅代发累计收益</text>
+                <rect x="700" y="248" width="220" height="72" rx="8" fill="#eff6ff" stroke="#2563eb"/>
+                <text x="810" y="274" text-anchor="middle" font-size="11" fill="#18222f">
+                  <tspan x="810" dy="0">管理后台</tspan><tspan x="810" dy="14">关键词详情 list</tspan>
+                </text>
+                <text x="810" y="306" text-anchor="middle" font-size="10" fill="#64748b">6 列合并明细</text>
+                <polygon points="480,488 518,510 480,532 442,510" fill="#fffbeb" stroke="#d97706"/>
+                <polygon points="480,488 518,510 480,532 442,510" fill="#fffbeb" stroke="#d97706"/>
+                <text x="480" y="514" text-anchor="middle" font-size="11" fill="#92400e">协议+授权有效?</text>
+                <rect x="40" y="548" width="220" height="44" rx="8" fill="#fef2f2" stroke="#dc2626"/>
+                <text x="150" y="568" text-anchor="middle" font-size="10" fill="#991b1b">代发分配记录不可撤回</text>
+                <rect x="700" y="548" width="220" height="44" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
+                <text x="810" y="568" text-anchor="middle" font-size="10" fill="#18222f">分配行为=系统自动</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+
+        <div class="flow-legend">
+          <span><i style="background:#eff6ff;border:1px solid #2563eb"></i>前端 / C 端</span>
+          <span><i style="background:#f0fdf4;border:1px solid #16a34a"></i>后端 / 数据写入</span>
+          <span><i style="background:#fff7ed;border:1px solid #ea580c"></i>异步 / 任务</span>
+          <span><i style="background:#fffbeb;border:1px solid #d97706"></i>校验 / 分支</span>
+          <span><i style="background:#fef2f2;border:1px solid #dc2626"></i>拒绝 / 阻断</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 关键词详情抽屉 overlay -->
+  <div class="drawer-overlay" id="detailOverlay" onclick="closeDetailDrawer()"></div>
+  <aside class="drawer" id="detailDrawer">
+    <div class="drawer-header">
+      <h2 id="detailTitle">关键词详情</h2>
+      <button class="drawer-close" type="button" onclick="closeDetailDrawer()">×</button>
+    </div>
+    <div class="drawer-body">
+      <div class="table-wrap">
+        <table class="detail-table">
+          <thead>
+            <tr>
+              <th>收益金额</th><th>收益产生时间</th><th>收益结算时间</th>
+              <th>分配金额</th><th>分配时间</th><th>分配批次</th>
+            </tr>
+          </thead>
+          <tbody id="keywordDetailList"></tbody>
+        </table>
+      </div>
+    </div>
+  </aside>
+
+  <!-- 需求规则抽屉 overlay -->
+  <div class="drawer-overlay" id="ruleOverlay" onclick="setRuleDrawer(false)"></div>
+  <aside class="drawer" id="ruleDrawer" role="dialog">
+    <div class="drawer-header">
+      <h2>FR-002 · 需求规则 · v1</h2>
+      <button class="drawer-close" type="button" onclick="setRuleDrawer(false)">×</button>
+    </div>
+    <div class="rule-tab-bar" role="tablist">
+      <button type="button" class="active" data-rule="rule-fe" role="tab">前端需求</button>
+      <button type="button" data-rule="rule-admin" role="tab">后台需求</button>
+    </div>
+    <div class="drawer-body">
+      <!-- 前端需求 -->
+      <div id="rule-fe" class="rule-panel active">
+        <div class="rule-section" id="rule-fe-1">
+          <h3><span>1</span>业务目标</h3>
+          <div class="rule-content">
+            <p>在主子用户关系下增加「代发收益」能力：主用户可绑定<strong>多个子用户</strong>，经协议确认与子用户三方授权发布帐号后，关键词出单按「关键词→发布帐号→分配比例」<strong>自动分配</strong>。分配引擎口径与 FR-001 代发分配一致。</p>
+          </div>
+        </div>
+        <div class="rule-section" id="rule-fe-2">
+          <h3><span>2</span>页面与入口</h3>
+          <div class="rule-content">
+            <ul>
+              <li><strong>代发收益管理（主用户）</strong>：个人中心入口「代发收益」；顶部统计区：<strong>累计已分配</strong>（主大字）+ 子用户数、关键词数、授权帐号；右上角<strong>规则 icon</strong> + <strong>「添加」</strong>按钮；列表区 Tab 切换「分配信息 / 子用户信息」。</li>
+              <li><strong>分配信息 Tab</strong>：按<strong>日</strong> record-card 展示；标题「分配金额·xxx」+ 查看详情；三列统计：<strong>总金额</strong>、<strong>分配用户数</strong>、<strong>关键词数</strong>；底部分配时间。<strong>不展示</strong>「代发」标签与「系统自动分配，不可撤回」文案。顶部筛选<strong>仅保留时间</strong>（去掉状态选择）。点击下钻当日<strong>分配详情</strong>：顶部统计区 + 明细 list（每条 = 关键词卡片）。</li>
+              <li><strong>分配详情 · 明细卡片</strong>：标题 = <code>{关键词} · {分配金额}</code>；灰色信息域<strong>仅</strong>展示用户昵称、帐号昵称、账号ID。<strong>不展示</strong>发布平台标签、编辑入口、粉丝量、主页链接。</li>
+              <li><strong>子用户详情 · 分配明细</strong>：卡片标题 = <code>{关键词} · {分配金额}</code>（非「分配金额·xxx」）；三列统计：出单金额、发布帐号、分配时间。</li>
+              <li><strong>子用户详情 · 授权帐号</strong>：发布帐号卡片（平台徽章 + 昵称 + 灰色信息域：账号ID、粉丝量、主页链接 + 创建时间），<strong>无编辑操作</strong>。</li>
+              <li><strong>子用户发布帐号授权</strong>：顶部提示文案通过后台<strong>「说明内容」</strong>功能配置；下方展示发布帐号列表（样式同子用户详情「授权帐号」Tab），<strong>无编辑操作、无底部授权按钮</strong>（三方授权流程不在本页触发）。</li>
+              <li><strong>子用户信息 Tab</strong>：头像卡片列表（昵称/ID + 协议状态 + 协议/邀请时间）；底部三列：<strong>已分配金额</strong>、<strong>授权帐号</strong>、<strong>分配比例</strong>；点击进入子用户详情（头像信息卡 + Tab 分配明细 / 授权帐号）。</li>
+              <li><strong>我的代发收益（子用户首页）</strong>：顶部统计区：<strong>累计已获得</strong>（主大字）+ 授权帐号数（底栏左右分布）；分配 record-card 标题「分配金额·xxx」；三列：关键词、发布帐号、分配时间；<strong>不展示</strong>「代发」标签与「系统自动分配，不可撤回」文案。</li>
+              <li><strong>发起协议（主用户）</strong>：上方填写子用户 ID + 比例；下方展示<strong>分配信息</strong>与<strong>协议内容</strong>（布局参考子用户协议确认页）；底部「发送协议邀请」。</li>
+              <li><strong>协议确认（子用户）</strong>：协议正文读取现有说明内容（<code>rev_share_agreement</code>）。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section" id="rule-fe-3">
+          <h3><span>3</span>交互规则</h3>
+          <div class="rule-content">
+            <ul>
+              <li>一个主用户可绑定<strong>多个子用户</strong>；每条主子关系独立维护协议状态与分配比例。</li>
+              <li>分配前置条件：<strong>协议已同意</strong> + <strong>发布帐号三方授权有效</strong> + 分配状态启用。</li>
+              <li>代发收益首页分配 record-card <strong>不展示</strong>「代发」标签与「不可撤回」说明；与 FR-001 代发分配 C 端展示区分。</li>
+              <li>发布帐号授权走<strong>三方 API 对接</strong>，本 FR 不重定义三方授权步骤，仅展示授权结果。</li>
+              <li>子用户「累计已获得」仅汇总本模块代发分配明细。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section" id="rule-fe-4">
+          <h3><span>4</span>边界规则</h3>
+          <div class="rule-content">
+            <ul>
+              <li>代发收益分配记录<strong>不可撤回</strong>。</li>
+              <li>协议「已拒绝」时不可参与分配；主用户可重发协议邀请。</li>
+              <li>三方授权失效后，该发布帐号新出单不参与分配；历史分配记录保留。</li>
+              <li>分配明细须包含<strong>分配时间</strong>字段（主/子/export 同步）。</li>
+              <li>与 FR-001 代发分配：<strong>分配引擎复用</strong>，关系模型与授权方式独立，同一发布帐号不建议同时参与两套代发（互斥规则待技术确认）。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section" id="rule-fe-5">
+          <h3><span>5</span>业务流程</h3>
+          <div class="rule-content">
+            <p>前后端交互与校验逻辑见页内 Tab <strong>「业务流程」</strong>（流程图，含校验节点）。</p>
+            <p style="margin-top:8px;font-size:12px;color:var(--text-muted);">涉及：协议邀请确认、三方发布帐号授权、关键词出单→分配明细。</p>
+          </div>
+        </div>
+      </div>
+      <!-- 后台需求 -->
+      <div id="rule-admin" class="rule-panel">
+        <div class="rule-section" id="rule-admin-1">
+          <h3><span>1</span>业务目标</h3>
+          <div class="rule-content">
+            <p>为代发收益提供运营/研发可查的数据面：主子分配关系、三方授权发布帐号、代发关键词收益与分配明细，支撑问题排查与对账。</p>
+          </div>
+        </div>
+        <div class="rule-section" id="rule-admin-2">
+          <h3><span>2</span>数据表与字段</h3>
+          <div class="rule-content">
+            <p><strong>主子分配关系表</strong>：ID、主用户ID、子用户ID、分配比例、协议状态、分配状态、<strong>发布帐号数</strong>、已分配金额、创建/更新时间；操作：详情、编辑、重发协议。</p>
+            <p style="margin-top:8px;"><strong>列表顶统计区</strong>：已分配金额、待分配金额、启用关系、待确认协议（仅 Demo 展示，口径由后端定义）。</p>
+            <p style="margin-top:8px;"><strong>协议内容</strong>：复用现有说明内容配置（<code>rev_share_agreement</code>），本 FR 不单独设计协议配置页。</p>
+            <p style="margin-top:8px;"><strong>发布帐号表</strong>：ID、帐号昵称、帐号ID、主页链接、子用户ID、授权主用户ID、三方授权状态、帐号平台、状态、授权时间；操作：日志。</p>
+            <p style="margin-top:8px;"><strong>代发关键词表</strong>：关键词、项目方、主用户、发布帐号、所属子用户、累计产生收益、累计分配、数据更新时间；操作：详情。</p>
+            <p style="margin-top:8px;"><strong>关键词详情 list（详情抽屉 · 合并 6 列）</strong>：收益金额、收益产生时间、收益结算时间、分配金额、分配时间、分配批次。</p>
+            <p style="margin-top:8px;"><strong>分配记录表（扩展字段 · 本需求仅定规则）</strong>：<code>分配行为</code> = 系统自动；<code>业务来源</code> = 代发收益。</p>
+          </div>
+        </div>
+        <div class="rule-section" id="rule-admin-3">
+          <h3><span>3</span>列表与筛选</h3>
+          <div class="rule-content">
+            <p><strong>主子分配关系</strong>筛选：关系 ID、主用户 ID、子用户 ID、协议状态、分配状态。</p>
+            <p style="margin-top:8px;"><strong>发布帐号</strong>筛选：发布帐号 ID、帐号昵称、帐号 ID（平台唯一）、子用户 ID、主用户 ID、三方授权状态、帐号平台、状态、授权时间范围。</p>
+            <p style="margin-top:8px;"><strong>代发关键词</strong>筛选：关键词、项目方、主用户 ID、子用户 ID、发布帐号 ID/昵称、更新时间范围。</p>
+            <p style="margin-top:8px;">关键词「详情」以 overlay 抽屉展示合并 list，不挤压列表页宽度。</p>
+          </div>
+        </div>
+        <div class="rule-section" id="rule-admin-4">
+          <h3><span>4</span>边界规则</h3>
+          <div class="rule-content">
+            <ul>
+              <li>已删除/失效发布帐号保留历史记录，状态分别标记为已删除/授权失效。</li>
+              <li>关键词累计产生收益、累计分配以<strong>数据更新时间</strong>为准展示。</li>
+              <li>代发收益分配写入时 <code>分配行为=系统自动</code>，<code>业务来源=代发收益</code>。</li>
+              <li>三方授权回调失败或超时时，C 端展示授权中/失败状态，不写入有效授权记录。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const keywordDetails = {
+      '右豹代发教程': [
+        { revenueAmount: '680.00', revenueTime: '2023.12.24 12:58', settleTime: '2023.12.24 13:00', allocAmount: '520.00', allocTime: '2023.12.24 13:00', batch: '代发批次 20231224' },
+        { revenueAmount: '320.00', revenueTime: '2023.12.20 10:12', settleTime: '2023.12.20 11:00', allocAmount: '257.28', allocTime: '2023.12.20 11:15', batch: '代发批次 20231220' },
+      ],
+      '关键词推广A': [
+        { revenueAmount: '450.00', revenueTime: '2023.12.24 12:50', settleTime: '2023.12.24 13:00', allocAmount: '380.50', allocTime: '2023.12.24 13:00', batch: '代发批次 20231224' },
+      ],
+      'TIK出海词': [
+        { revenueAmount: '1100.00', revenueTime: '2023.12.23 09:28', settleTime: '2023.12.23 09:30', allocAmount: '890.00', allocTime: '2023.12.23 09:30', batch: '代发批次 20231223' },
+      ],
+    };
+
+    function getActiveScene() {
+      return document.querySelector('.scene-btn.active')?.dataset.screen || 'screen-main-home';
+    }
+
+    function buildMockupSrc(screen) {
+      return `daifa-revenue-demo.html?embed=1&screen=${encodeURIComponent(screen)}`;
+    }
+
+    function loadMockupFrame(forceReload) {
+      const frame = document.getElementById('mockupFrame');
+      if (!frame) return;
+      const src = buildMockupSrc(getActiveScene());
+      const current = frame.getAttribute('src') || '';
+      if (forceReload || current === 'about:blank' || !current.includes('daifa-revenue-demo.html')) {
+        frame.src = src;
+        return;
+      }
+      try {
+        frame.contentWindow?.postMessage({ type: 'goToScreen', screen: getActiveScene() }, '*');
+      } catch (_) {
+        frame.src = src;
+      }
+    }
+
+    function switchPageTab(pageId, btn) {
+      document.querySelectorAll('.page-tab-bar button').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.page-view').forEach(v => v.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(pageId).classList.add('active');
+      if (pageId === 'view-fe') {
+        requestAnimationFrame(() => loadMockupFrame(false));
+      }
+      const tabMap = { 'view-fe': 'fe', 'view-admin': 'admin', 'view-flow': 'flow' };
+      const params = new URLSearchParams();
+      params.set('tab', tabMap[pageId] || 'fe');
+      if (pageId === 'view-flow') {
+        const activeFlow = document.querySelector('.flow-tab-bar button.active')?.dataset.flow || 'flow-1';
+        params.set('flow', activeFlow.replace('flow-', ''));
+      }
+      history.replaceState(null, '', '?' + params.toString());
+    }
+
+    function switchFlowTab(flowId, btn) {
+      document.querySelectorAll('.flow-tab-bar button').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.flow-panel-body').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(flowId).classList.add('active');
+      const params = new URLSearchParams(location.search);
+      params.set('tab', 'flow');
+      params.set('flow', flowId.replace('flow-', ''));
+      history.replaceState(null, '', '?' + params.toString());
+    }
+
+    document.querySelectorAll('.flow-tab-bar button').forEach(btn => {
+      btn.addEventListener('click', () => switchFlowTab(btn.dataset.flow, btn));
+    });
+
+    document.querySelectorAll('.page-tab-bar button').forEach(btn => {
+      btn.addEventListener('click', () => switchPageTab(btn.dataset.page, btn));
+    });
+
+    document.querySelectorAll('.scene-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.scene-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const frame = document.getElementById('mockupFrame');
+        const currentSrc = frame?.getAttribute('src') || '';
+        if (currentSrc.includes('daifa-revenue-demo.html') && frame.contentWindow) {
+          frame.contentWindow.postMessage({ type: 'goToScreen', screen: btn.dataset.screen }, '*');
+        } else {
+          loadMockupFrame(true);
+        }
+      });
+    });
+
+    document.querySelectorAll('.tab-bar-inline button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-bar-inline button').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.panel).classList.add('active');
+      });
+    });
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2500);
+    }
+
+    function openKeywordDetail(keyword) {
+      const rows = keywordDetails[keyword] || [];
+      document.getElementById('detailTitle').textContent = '关键词详情 · ' + keyword;
+      document.getElementById('keywordDetailList').innerHTML = rows.map(r =>
+        `<tr><td>${r.revenueAmount}</td><td>${r.revenueTime}</td><td>${r.settleTime}</td><td>${r.allocAmount}</td><td>${r.allocTime}</td><td>${r.batch}</td></tr>`
+      ).join('');
+      document.getElementById('detailOverlay').classList.add('open');
+      document.getElementById('detailDrawer').classList.add('open');
+    }
+
+    function closeDetailDrawer() {
+      document.getElementById('detailOverlay').classList.remove('open');
+      document.getElementById('detailDrawer').classList.remove('open');
+    }
+
+    const ruleDrawer = document.getElementById('ruleDrawer');
+    const toggleRuleBtn = document.getElementById('toggleRuleDrawer');
+
+    function switchRuleTab(ruleId, btn) {
+      document.querySelectorAll('.rule-tab-bar button').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.rule-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(ruleId).classList.add('active');
+      document.querySelector('.drawer-body').scrollTop = 0;
+    }
+
+    document.querySelectorAll('.rule-tab-bar button').forEach(btn => {
+      btn.addEventListener('click', () => switchRuleTab(btn.dataset.rule, btn));
+    });
+
+    function syncRuleTabToPage() {
+      const activePage = document.querySelector('.page-view.active')?.id;
+      const ruleId = activePage === 'view-admin' ? 'rule-admin' : 'rule-fe';
+      const btn = document.querySelector('.rule-tab-bar button[data-rule="' + ruleId + '"]');
+      if (btn) switchRuleTab(ruleId, btn);
+    }
+
+    function setRuleDrawer(open) {
+      ruleDrawer.classList.toggle('open', open);
+      document.getElementById('ruleOverlay').classList.toggle('open', open);
+      toggleRuleBtn.classList.toggle('active', open);
+      if (open) syncRuleTabToPage();
+    }
+
+    toggleRuleBtn.onclick = () => setRuleDrawer(!ruleDrawer.classList.contains('open'));
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') { closeDetailDrawer(); setRuleDrawer(false); }
+    });
+
+    const tab = new URLSearchParams(location.search).get('tab');
+    const tabPageMap = { admin: 'view-admin', flow: 'view-flow', fe: 'view-fe' };
+    if (tab && tabPageMap[tab]) {
+      const btn = document.querySelector('[data-page="' + tabPageMap[tab] + '"]');
+      if (btn) switchPageTab(tabPageMap[tab], btn);
+    }
+    const flowParam = new URLSearchParams(location.search).get('flow');
+    if (flowParam) {
+      const flowId = flowParam.startsWith('flow-') ? flowParam : 'flow-' + flowParam;
+      const flowBtn = document.querySelector('.flow-tab-bar button[data-flow="' + flowId + '"]');
+      if (flowBtn) switchFlowTab(flowId, flowBtn);
+    }
+
+    if (document.querySelector('.page-view.active')?.id === 'view-fe') {
+      loadMockupFrame(true);
+    }
+  </script>
+  <script src="fe-copy-html.js"></script>
+  <script src="sidebar-nav.js"></script>
+</body>
+</html>

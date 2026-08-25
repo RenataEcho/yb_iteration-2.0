@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>预估数据 · C 端数据查询 Demo</title>
+  <style>
+    :root {
+      --orange-start: #ff8a75;
+      --orange-end: #f07167;
+      --text-primary: #18222f;
+      --text-muted: #9aa5b4;
+      --border: #e8edf3;
+      --bg: #eef1f5;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+      font-size: 13px; color: var(--text-primary);
+      background: var(--bg); min-height: 100vh;
+    }
+    .demo-header {
+      padding: 16px; text-align: center;
+      background: #fff; border-bottom: 1px solid var(--border);
+    }
+    .demo-header h1 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+    .demo-header p { font-size: 11px; color: var(--text-muted); line-height: 1.45; }
+    .demo-nav {
+      display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-top: 10px;
+    }
+    .demo-nav button {
+      padding: 6px 10px; border: 1px solid var(--border); border-radius: 6px;
+      background: #fff; font-size: 11px; cursor: pointer; color: #64748b;
+    }
+    .demo-nav button.active {
+      background: #ffe8e3; border-color: #fecaca; color: #e65100; font-weight: 600;
+    }
+    .screen { display: none; padding: 14px 12px 16px; min-height: calc(100vh - 80px); }
+    .screen.active { display: block; }
+    .fe-label { font-size: 10px; letter-spacing: 0.08em; color: #9aa5b4; font-weight: 600; margin-bottom: 4px; }
+    .fe-title { font-size: 22px; font-weight: 800; color: #18222f; line-height: 1.2; margin-bottom: 6px; }
+    .fe-disclaimer { font-size: 11px; color: #9aa5b4; line-height: 1.45; margin-bottom: 12px; }
+    .fe-project-card {
+      display: flex; align-items: center; gap: 10px; background: #fff; border-radius: 16px;
+      padding: 12px; margin-bottom: 14px; box-shadow: 0 2px 8px rgba(30,40,80,0.06);
+      cursor: pointer; border: none; width: 100%; text-align: left;
+    }
+    .fe-project-card:active { background: #fafafa; }
+    .fe-project-icon {
+      width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: #fff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .fe-project-meta { flex: 1; min-width: 0; }
+    .fe-project-meta .sub { font-size: 10px; color: #9aa5b4; margin-bottom: 2px; }
+    .fe-project-meta .name { font-size: 13px; font-weight: 700; color: #18222f; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .fe-chevron { color: #cbd5e1; font-size: 18px; line-height: 1; flex-shrink: 0; }
+    .fe-project-picker-overlay {
+      position: fixed; inset: 0; background: rgba(15,23,42,0.45); z-index: 300;
+      display: none; align-items: flex-end; justify-content: center;
+    }
+    .fe-project-picker-overlay.open { display: flex; }
+    .fe-project-picker-sheet {
+      width: 100%; max-width: 420px; max-height: 72vh; background: #fff;
+      border-radius: 16px 16px 0 0; overflow: hidden; display: flex; flex-direction: column;
+    }
+    .fe-project-picker-head {
+      padding: 14px 16px 10px; font-size: 14px; font-weight: 700; color: #18222f;
+      border-bottom: 1px solid #e8edf3; flex-shrink: 0;
+    }
+    .fe-project-picker-list { overflow-y: auto; padding: 6px 0 12px; }
+    .fe-project-picker-item {
+      display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px 16px;
+      border: none; background: none; cursor: pointer; text-align: left;
+    }
+    .fe-project-picker-item:hover { background: #f8fafc; }
+    .fe-project-picker-item.active { background: #fff4eb; }
+    .fe-project-picker-item .icon {
+      width: 36px; height: 36px; border-radius: 9px; background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: #fff; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .fe-project-picker-item .label { font-size: 13px; font-weight: 600; color: #18222f; flex: 1; min-width: 0; }
+    .fe-project-picker-item .check { font-size: 14px; color: #f07167; font-weight: 700; flex-shrink: 0; }
+    .fe-section { margin-bottom: 12px; }
+    .fe-section-head {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 0 2px;
+    }
+    .fe-section-title { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: #18222f; }
+    .fe-section-num {
+      width: 22px; height: 22px; border-radius: 6px; background: #ffe8e3; color: #f07167;
+      font-size: 11px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center;
+    }
+    .fe-section-actions { font-size: 11px; color: #9aa5b4; display: flex; align-items: center; gap: 8px; }
+    .fe-section-actions button {
+      border: none; background: none; color: #9aa5b4; font-size: 11px; cursor: pointer; padding: 0;
+    }
+    .fe-card {
+      background: #fff; border-radius: 18px; padding: 14px; box-shadow: 0 2px 10px rgba(30,40,80,0.06);
+    }
+    .fe-card.fe-query-collapsed .fe-query-body { display: none; }
+    .fe-query-collapsed-hint {
+      display: none; font-size: 11px; color: #64748b; line-height: 1.45; padding: 2px 2px 0;
+    }
+    .fe-card.fe-query-collapsed .fe-query-collapsed-hint { display: block; }
+    .fe-field { margin-bottom: 12px; }
+    .fe-field:last-child { margin-bottom: 0; }
+    .fe-field-label {
+      display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; color: #18222f; margin-bottom: 6px;
+    }
+    .fe-field-label i { width: 6px; height: 6px; border-radius: 50%; background: #f07167; display: inline-block; }
+    .fe-input-row { display: flex; align-items: center; gap: 8px; }
+    .fe-input {
+      flex: 1; height: 36px; border: 1px solid #e8edf3; border-radius: 10px; background: #f8fafc;
+      padding: 0 10px; font-size: 12px; color: #64748b;
+    }
+    .fe-input-full { width: 100%; height: 36px; border: 1px solid #e8edf3; border-radius: 10px; background: #f8fafc; padding: 0 10px; font-size: 12px; color: #64748b; }
+    .fe-sep { font-size: 12px; color: #9aa5b4; flex-shrink: 0; }
+    .fe-btn-query {
+      width: 100%; height: 42px; margin-top: 14px; border: none; border-radius: 12px;
+      background: linear-gradient(135deg, var(--orange-start), var(--orange-end)); color: #fff;
+      font-size: 14px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 14px rgba(240,113,103,0.35);
+    }
+    .fe-stat-hero {
+      position: relative; background: #fff; border-radius: 16px; padding: 14px; margin-bottom: 10px;
+      box-shadow: 0 2px 8px rgba(30,40,80,0.06); min-height: 88px;
+    }
+    .fe-stat-hero .name { font-size: 12px; color: #64748b; margin-bottom: 8px; }
+    .fe-stat-hero .val { font-size: 28px; font-weight: 800; color: #18222f; line-height: 1; }
+    .fe-stat-hero .chart-icon {
+      position: absolute; right: 12px; bottom: 10px; width: 36px; height: 28px;
+      display: flex; align-items: flex-end; gap: 3px; opacity: 0.35;
+    }
+    .fe-stat-hero .chart-icon span { width: 5px; background: #f07167; border-radius: 2px; }
+    .fe-stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .fe-stat-mini {
+      position: relative; background: #fff; border-radius: 14px; padding: 12px 10px 14px;
+      box-shadow: 0 2px 8px rgba(30,40,80,0.05); min-height: 78px;
+    }
+    .fe-stat-mini .name { font-size: 11px; color: #64748b; margin-bottom: 10px; padding-right: 28px; line-height: 1.3; }
+    .fe-stat-mini .val { font-size: 22px; font-weight: 800; color: #18222f; }
+    .fe-stat-badge {
+      position: absolute; top: 8px; right: 8px; font-size: 9px; font-weight: 700;
+      padding: 2px 6px; border-radius: 6px; background: #f1f5f9; color: #64748b;
+    }
+    .fe-detail-card {
+      background: #fff; border-radius: 16px; padding: 14px; margin-bottom: 10px;
+      box-shadow: 0 2px 8px rgba(30,40,80,0.06);
+    }
+    .fe-detail-card:last-child { margin-bottom: 0; }
+    .fe-detail-title {
+      font-size: 15px; font-weight: 700; color: #18222f; line-height: 1.35; margin-bottom: 10px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .fe-detail-data {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+      background: #f5f6f8; border-radius: 10px; padding: 12px 10px; margin-bottom: 8px;
+    }
+    .fe-detail-data .cell-label { font-size: 10px; color: #9aa5b4; margin-bottom: 4px; }
+    .fe-detail-data .cell-value { font-size: 12px; font-weight: 700; color: #18222f; word-break: break-all; line-height: 1.35; }
+    .fe-detail-data .cell-value.link { color: #2563eb; font-weight: 600; }
+    .fe-detail-data .cell-sub { font-size: 10px; color: #9aa5b4; margin-top: 2px; font-weight: 400; }
+    .fe-detail-foot { font-size: 10px; color: #9aa5b4; }
+    .fe-detail-empty {
+      padding: 20px 12px; text-align: center; font-size: 11px; color: #9aa5b4;
+      background: #fff; border-radius: 14px;
+    }
+    .fe-footer-note {
+      margin-top: 12px; font-size: 10px; color: #9aa5b4; text-align: center; line-height: 1.45;
+    }
+    .toast {
+      position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(12px);
+      background: #18233f; color: #fff; border-radius: 999px; padding: 10px 16px; font-size: 12px;
+      opacity: 0; pointer-events: none; transition: .22s; z-index: 200; max-width: 90vw; text-align: center;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    body.embed-mode .demo-header { display: none !important; }
+    body.embed-mode .screen { min-height: 100vh; }
+  </style>
+</head>
+<body>
+  <div class="demo-header">
+    <h1>预估数据 · C 端「数据查询」Demo</h1>
+    <p>查询条件固定为时间范围 + 关键词 · 数据统计三列网格 · 数据明细卡片</p>
+    <div class="demo-nav">
+      <button type="button" class="active" data-screen="screen-data-query">数据查询 · 默认态</button>
+      <button type="button" data-screen="screen-query-expanded">查询条件展开</button>
+      <button type="button" data-screen="screen-empty-result">无明细空态</button>
+    </div>
+  </div>
+
+  <div id="screen-data-query" class="screen active"></div>
+  <div id="screen-query-expanded" class="screen"></div>
+  <div id="screen-empty-result" class="screen"></div>
+
+  <div class="fe-project-picker-overlay" id="projectPickerOverlay" onclick="closeProjectPicker()">
+    <div class="fe-project-picker-sheet" onclick="event.stopPropagation()">
+      <div class="fe-project-picker-head">选择项目</div>
+      <div class="fe-project-picker-list" id="projectPickerList"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const listFields = [
+      { label: '关键词', key: 'keyword' },
+      { label: '预估曝光量', key: 'est_exposure' },
+      { label: '预估转化量', key: 'est_conversion' },
+      { label: '用户信息', key: 'user_id', relKey: 'user_nickname' },
+    ];
+    const queryFields = [
+      { label: '关键词', key: 'keyword' },
+    ];
+    const statFields = [
+      { label: '预估曝光合计', key: 'sum_est_exposure', value: '1,280,500', badge: 'T1' },
+      { label: '预估转化合计', key: 'sum_est_conversion', value: '32,680', badge: 'T2' },
+      { label: '关键词数', key: 'keyword_count', value: '156', badge: 'T3' },
+      { label: '数据条数', key: 'row_count', value: '3', badge: 'CT' },
+    ];
+    const ALL_ROWS = [
+      { id: 'd1', keyword: 'Summer推广词', est_exposure: '520,000', est_conversion: '12,800', user_id: 'U-10086', user_nickname: '张三', dataDate: '2026.08.23', updated: '2026.08.23 14:30' },
+      { id: 'd2', keyword: '秋季新品词', est_exposure: '380,500', est_conversion: '9,200', user_id: 'U-10201', user_nickname: '李四', dataDate: '2026.08.22', updated: '2026.08.22 10:00' },
+      { id: 'd3', keyword: '达人种草词', est_exposure: '280,000', est_conversion: '6,680', user_id: 'U-10388', user_nickname: '王五', dataDate: '2026.08.21', updated: '2026.08.21 16:45' },
+    ];
+
+    const MOCK_PROJECTS = [
+      '番茄小说', '知乎故事', '番茄畅听', '红果短剧APP-短剧', '红果漫剧APP', '迅雷网盘',
+      '书旗短篇', '最右', 'UC故事会', '起点', 'QQ阅读', '飞卢小说', '七猫小说',
+      '掌阅长篇', '书旗长篇', '盐言星图', '盐言聚星', '悟空网文',
+    ];
+
+    let queryCollapsed = true;
+    let detailRows = ALL_ROWS.slice();
+    let selectedProject = MOCK_PROJECTS[0];
+    let projectPickerOpen = false;
+
+    function projectIconAbbr(name) {
+      return String(name).slice(0, 2);
+    }
+
+    function renderProjectPickerList() {
+      const list = document.getElementById('projectPickerList');
+      if (!list) return;
+      list.innerHTML = MOCK_PROJECTS.map(name => `
+        <button type="button" class="fe-project-picker-item${name === selectedProject ? ' active' : ''}" onclick="selectProject('${name.replace(/'/g, "\\'")}')">
+          <span class="icon">${esc(projectIconAbbr(name))}</span>
+          <span class="label">${esc(name)}</span>
+          ${name === selectedProject ? '<span class="check">✓</span>' : ''}
+        </button>
+      `).join('');
+    }
+
+    function openProjectPicker() {
+      projectPickerOpen = true;
+      renderProjectPickerList();
+      document.getElementById('projectPickerOverlay')?.classList.add('open');
+    }
+
+    function closeProjectPicker() {
+      projectPickerOpen = false;
+      document.getElementById('projectPickerOverlay')?.classList.remove('open');
+    }
+
+    function selectProject(name) {
+      if (!MOCK_PROJECTS.includes(name)) return;
+      selectedProject = name;
+      closeProjectPicker();
+      renderPage('screen-data-query');
+      showToast('已切换项目：' + name);
+    }
+
+    function renderProjectCard(interactive) {
+      const openAttr = interactive ? ' onclick="openProjectPicker()"' : '';
+      return `
+        <button type="button" class="fe-project-card"${openAttr}>
+          <div class="fe-project-icon">${esc(projectIconAbbr(selectedProject))}</div>
+          <div class="fe-project-meta">
+            <div class="sub">当前项目</div>
+            <div class="name">${esc(selectedProject)}</div>
+          </div>
+          <span class="fe-chevron">⌄</span>
+        </button>`;
+    }
+
+    function esc(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+    }
+
+    function getRowFieldValue(row, field) {
+      if (field.relKey) {
+        const main = row[field.key] ?? '—';
+        const sub = row[field.relKey] ?? '';
+        return { main: String(main), sub: sub ? String(sub) : '' };
+      }
+      const val = row[field.key];
+      return { main: val != null && val !== '' ? String(val) : '—', sub: '' };
+    }
+
+    function renderDetailCards(rows) {
+      if (!rows.length) return '<div class="fe-detail-empty">暂无数据，请调整查询条件</div>';
+      const titleField = listFields[0];
+      const bodyFields = listFields.slice(1);
+      return rows.map(row => {
+        const titleVal = getRowFieldValue(row, titleField);
+        return `
+          <div class="fe-detail-card">
+            <div class="fe-detail-title">${esc(titleVal.main)}</div>
+            <div class="fe-detail-data">
+              ${bodyFields.map(f => {
+                const { main, sub } = getRowFieldValue(row, f);
+                return `<div><div class="cell-label">${esc(f.label)}</div><div class="cell-value">${esc(main)}</div>${sub ? `<div class="cell-sub">${esc(sub)}</div>` : ''}</div>`;
+              }).join('')}
+            </div>
+            <div class="fe-detail-foot">数据日期·${esc(row.dataDate || '—')}</div>
+          </div>`;
+      }).join('');
+    }
+
+    function querySummary() {
+      return '时间范围 · 关键词';
+    }
+
+    function renderPage(containerId, opts = {}) {
+      const collapsed = opts.collapsed !== undefined ? opts.collapsed : queryCollapsed;
+      const rows = opts.rows !== undefined ? opts.rows : detailRows;
+      const interactive = opts.interactive !== false;
+      const el = document.getElementById(containerId);
+      if (!el) return;
+
+      const queryHtml = `
+        <div class="fe-field">
+          <div class="fe-field-label"><i></i>时间范围</div>
+          <div class="fe-input-row">
+            <input class="fe-input" type="text" placeholder="开始时间" ${interactive ? '' : 'readonly'} />
+            <span class="fe-sep">至</span>
+            <input class="fe-input" type="text" placeholder="结束时间" ${interactive ? '' : 'readonly'} />
+          </div>
+        </div>
+        ${queryFields.map(f => `
+          <div class="fe-field">
+            <div class="fe-field-label"><i></i>${esc(f.label)}</div>
+            <input class="fe-input-full" type="text" placeholder="输入${esc(f.label)}" ${interactive ? '' : 'readonly'} />
+          </div>
+        `).join('')}`;
+
+      const hero = statFields[0];
+      const grid = statFields.slice(1);
+      const toggleLabel = collapsed ? '展开 ⌄' : '收起 ⌃';
+      const toggleBtn = interactive
+        ? `<button type="button" onclick="toggleQuery()">${toggleLabel}</button>`
+        : `<button type="button">${toggleLabel}</button>`;
+      const queryBtn = interactive
+        ? `<button class="fe-btn-query" type="button" onclick="runQuery()">立即查询</button>`
+        : `<button class="fe-btn-query" type="button">立即查询</button>`;
+      const refreshBtn = interactive
+        ? `<button type="button" onclick="runQuery()">刷新 ↻</button>`
+        : `<button type="button">刷新 ↻</button>`;
+
+      el.innerHTML = `
+        <div class="fe-label">DATA EXPLORER</div>
+        <div class="fe-title">数据查询</div>
+        <div class="fe-disclaimer">查询数据仅供参考，实际以结算数据为准</div>
+        ${renderProjectCard(interactive)}
+        <div class="fe-section">
+          <div class="fe-section-head">
+            <div class="fe-section-title"><span class="fe-section-num">01</span>查询条件</div>
+            <div class="fe-section-actions">${toggleBtn}</div>
+          </div>
+          <div class="fe-card${collapsed ? ' fe-query-collapsed' : ''}">
+            <div class="fe-query-collapsed-hint">${esc(querySummary())}</div>
+            <div class="fe-query-body">
+              ${queryHtml}
+              ${queryBtn}
+            </div>
+          </div>
+        </div>
+        <div class="fe-section">
+          <div class="fe-section-head">
+            <div class="fe-section-title"><span class="fe-section-num">02</span>数据统计</div>
+            <div class="fe-section-actions">
+              <button type="button">隐藏</button>
+              ${refreshBtn}
+            </div>
+          </div>
+          <div class="fe-stat-hero">
+            <div class="name">${esc(hero.label)}</div>
+            <div class="val">${esc(hero.value)}</div>
+            <div class="chart-icon"><span style="height:10px"></span><span style="height:16px"></span><span style="height:22px"></span><span style="height:14px"></span></div>
+          </div>
+          <div class="fe-stat-grid">
+            ${grid.map(f => `
+              <div class="fe-stat-mini">
+                <span class="fe-stat-badge">${esc(f.badge)}</span>
+                <div class="name">${esc(f.label)}</div>
+                <div class="val">${esc(f.value)}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+        <div class="fe-section">
+          <div class="fe-section-head">
+            <div class="fe-section-title"><span class="fe-section-num">03</span>数据明细</div>
+          </div>
+          ${renderDetailCards(rows)}
+        </div>
+        <div class="fe-footer-note">查询数据仅供参考，实际以结算数据为准</div>
+      `;
+    }
+
+    function toggleQuery() {
+      queryCollapsed = !queryCollapsed;
+      renderPage('screen-data-query');
+      if (projectPickerOpen) document.getElementById('projectPickerOverlay')?.classList.add('open');
+    }
+
+    function runQuery() {
+      queryCollapsed = true;
+      detailRows = ALL_ROWS.slice();
+      renderPage('screen-data-query');
+      showToast('Demo：已查询「' + selectedProject + '」（Mock）');
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2500);
+    }
+
+    const screens = ['screen-data-query', 'screen-query-expanded', 'screen-empty-result'];
+
+    function goToScreen(id) {
+      screens.forEach(s => {
+        document.getElementById(s).classList.toggle('active', s === id);
+      });
+      document.querySelectorAll('.demo-nav button').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.screen === id);
+      });
+    }
+
+    document.querySelectorAll('.demo-nav button').forEach(btn => {
+      btn.addEventListener('click', () => goToScreen(btn.dataset.screen));
+    });
+
+    window.addEventListener('message', e => {
+      if (e.data?.type === 'goToScreen' && screens.includes(e.data.screen)) {
+        goToScreen(e.data.screen);
+      }
+    });
+
+    if (new URLSearchParams(location.search).get('embed') === '1') {
+      document.body.classList.add('embed-mode');
+    }
+
+    const screenParam = new URLSearchParams(location.search).get('screen');
+    renderPage('screen-data-query', { interactive: true, collapsed: true, rows: ALL_ROWS });
+    renderPage('screen-query-expanded', { interactive: false, collapsed: false, rows: ALL_ROWS });
+    renderPage('screen-empty-result', { interactive: false, collapsed: true, rows: [] });
+    renderProjectPickerList();
+
+    if (screenParam && screens.includes(screenParam)) goToScreen(screenParam);
+  </script>
+</body>
+</html>
