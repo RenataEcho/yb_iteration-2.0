@@ -327,8 +327,8 @@
         <button data-screen="screen-main-sub-detail">主 · 子用户详情</button>
         <button data-screen="screen-main-invite">主 · 发起协议</button>
         <button data-screen="screen-sub-agreement">子 · 协议确认</button>
-        <button data-screen="screen-sub-auth">子 · 三方授权</button>
-        <button data-screen="screen-sub-alloc">子 · 分配详情</button>
+        <button data-screen="screen-sub-alloc">子 · 我的代发收益</button>
+        <button data-screen="screen-sub-auth">子 · 发布帐号授权</button>
       </div>
     </div>
 
@@ -661,16 +661,16 @@
           </div>
         </div>
         <div class="sticky-bar">
-          <button class="btn-primary" onclick="toast('协议已同意');goTo('screen-sub-auth')">我已阅读并同意协议</button>
+          <button class="btn-primary" onclick="toast('协议已同意');goTo('screen-sub-alloc')">我已阅读并同意协议</button>
           <button class="btn-secondary" onclick="toast('你已拒绝该协议')">拒绝</button>
         </div>
       </div>
 
-      <!-- 子 · 三方授权 -->
+      <!-- 子 · 发布帐号授权 -->
       <div id="screen-sub-auth" class="screen">
         <div class="status-bar"><span>9:41</span><span>●●●</span></div>
         <div class="nav-bar">
-          <button class="back" onclick="goTo('screen-sub-agreement')">‹</button>
+          <button class="back" onclick="goTo('screen-sub-alloc')">‹</button>
           <span class="title">发布帐号授权</span>
           <span style="width:32px"></span>
         </div>
@@ -709,13 +709,13 @@
         </div>
       </div>
 
-      <!-- 子 · 分配详情 -->
+      <!-- 子 · 我的代发收益 -->
       <div id="screen-sub-alloc" class="screen">
         <div class="status-bar"><span>9:41</span><span>●●●</span></div>
         <div class="nav-bar">
           <button class="back">‹</button>
           <span class="title">我的代发收益</span>
-          <span style="width:32px"></span>
+          <button class="action" type="button" onclick="goTo('screen-sub-auth')">查看帐号</button>
         </div>
         <div class="scroll-content">
           <div class="hero-card">

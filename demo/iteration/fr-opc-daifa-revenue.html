@@ -296,15 +296,15 @@
             </button>
             <button class="scene-btn" type="button" data-screen="screen-sub-agreement">
               <div class="scene-title">图3 · 协议确认（子用户）</div>
-              <div class="scene-desc">系统通知进入；同意/拒绝协议</div>
-            </button>
-            <button class="scene-btn" type="button" data-screen="screen-sub-auth">
-              <div class="scene-title">图4 · 三方授权（子用户）</div>
-              <div class="scene-desc">顶部提示文案（后台说明内容配置）+ 发布帐号列表，无编辑/无授权按钮</div>
+              <div class="scene-desc">系统通知进入；同意/拒绝协议；同意后进入「我的代发收益」</div>
             </button>
             <button class="scene-btn" type="button" data-screen="screen-sub-alloc">
-              <div class="scene-title">图5 · 分配详情（子用户）</div>
-              <div class="scene-desc">累计已获得 + 授权帐号数；分配 record-card（关键词·金额，无代发标签）</div>
+              <div class="scene-title">图4 · 我的代发收益（子用户）</div>
+              <div class="scene-desc">累计已获得 + 授权帐号数；分配 record-card；右上角「查看帐号」入口</div>
+            </button>
+            <button class="scene-btn" type="button" data-screen="screen-sub-auth">
+              <div class="scene-title">图5 · 发布帐号授权（子用户）</div>
+              <div class="scene-desc">从「我的代发收益」右上角进入；顶部提示文案 + 发布帐号列表，无编辑/无授权按钮</div>
             </button>
           </div>
           <div class="scene-note">协议确认与三方授权为分配前置条件；关键词出单分配口径与 FR-001 一致。</div>
@@ -534,7 +534,7 @@
                 <rect x="700" y="260" width="160" height="40" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
                 <text x="780" y="286" text-anchor="middle" font-size="11" fill="#18222f">协议状态=已同意</text>
                 <rect x="660" y="300" width="240" height="48" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
-                <text x="780" y="322" text-anchor="middle" font-size="11" fill="#18222f">分配关系可进入授权/分配</text>
+                <text x="780" y="322" text-anchor="middle" font-size="11" fill="#18222f">子用户进入「我的代发收益」</text>
                 <text x="780" y="338" text-anchor="middle" font-size="10" fill="#64748b">分配状态=启用时生效</text>
                 <rect x="300" y="352" width="280" height="44" rx="8" fill="#eff6ff" stroke="#2563eb"/>
                 <text x="440" y="380" text-anchor="middle" font-size="12" fill="#18222f">C端：主用户列表展示协议状态</text>
@@ -559,8 +559,8 @@
                 <line x1="440" y1="296" x2="440" y2="300" marker-end="url(#arr2)"/>
               </g>
               <g class="flow-nodes">
-                <rect x="340" y="12" width="200" height="40" rx="8" fill="#eff6ff" stroke="#2563eb"/>
-                <text x="440" y="38" text-anchor="middle" font-size="12" fill="#18222f">子用户进入「发布帐号授权」</text>
+                <rect x="280" y="12" width="320" height="40" rx="8" fill="#eff6ff" stroke="#2563eb"/>
+                <text x="440" y="38" text-anchor="middle" font-size="12" fill="#18222f">「我的代发收益」右上角「查看帐号」</text>
                 <rect x="320" y="76" width="240" height="40" rx="8" fill="#eff6ff" stroke="#2563eb"/>
                 <text x="440" y="102" text-anchor="middle" font-size="12" fill="#18222f">跳转三方授权页（对接三方 API）</text>
                 <polygon points="440,140 540,178 440,216 340,178" fill="#fffbeb" stroke="#d97706"/>
@@ -640,7 +640,7 @@
                 <text x="150" y="306" text-anchor="middle" font-size="10" fill="#64748b">含分配时间字段</text>
                 <rect x="40" y="348" width="220" height="72" rx="8" fill="#eff6ff" stroke="#2563eb"/>
                 <text x="150" y="374" text-anchor="middle" font-size="11" fill="#18222f">
-                  <tspan x="150" dy="0">子用户 C 端</tspan><tspan x="150" dy="14">分配详情页</tspan>
+                  <tspan x="150" dy="0">子用户 C 端</tspan><tspan x="150" dy="14">我的代发收益</tspan>
                 </text>
                 <text x="150" y="406" text-anchor="middle" font-size="10" fill="#64748b">仅代发累计收益</text>
                 <rect x="700" y="248" width="220" height="72" rx="8" fill="#eff6ff" stroke="#2563eb"/>
@@ -722,11 +722,11 @@
               <li><strong>分配详情 · 明细卡片</strong>：标题 = <code>{关键词} · {分配金额}</code>；灰色信息域<strong>仅</strong>展示用户昵称、帐号昵称、账号ID。<strong>不展示</strong>发布平台标签、编辑入口、粉丝量、主页链接。</li>
               <li><strong>子用户详情 · 分配明细</strong>：卡片标题 = <code>{关键词} · {分配金额}</code>（非「分配金额·xxx」）；三列统计：出单金额、发布帐号、分配时间。</li>
               <li><strong>子用户详情 · 授权帐号</strong>：发布帐号卡片（平台徽章 + 昵称 + 灰色信息域：账号ID、粉丝量、主页链接 + 创建时间），<strong>无编辑操作</strong>。</li>
-              <li><strong>子用户发布帐号授权</strong>：顶部提示文案通过后台<strong>「说明内容」</strong>功能配置；下方展示发布帐号列表（样式同子用户详情「授权帐号」Tab），<strong>无编辑操作、无底部授权按钮</strong>（三方授权流程不在本页触发）。</li>
+              <li><strong>我的代发收益（子用户首页）</strong>：接受邀请并同意协议后<strong>默认进入本页</strong>；顶部统计区：<strong>累计已获得</strong>（主大字）+ 授权帐号数（底栏左右分布）；右上角<strong>「查看帐号」</strong>入口，点击进入「发布帐号授权」页；分配 record-card 标题「分配金额·xxx」；三列：关键词、发布帐号、分配时间；<strong>不展示</strong>「代发」标签与「系统自动分配，不可撤回」文案。</li>
+              <li><strong>子用户发布帐号授权</strong>：从「我的代发收益」右上角「查看帐号」进入；顶部提示文案通过后台<strong>「说明内容」</strong>功能配置；下方展示发布帐号列表（样式同子用户详情「授权帐号」Tab），<strong>无编辑操作、无底部授权按钮</strong>（三方授权流程不在本页触发）。</li>
               <li><strong>子用户信息 Tab</strong>：头像卡片列表（昵称/ID + 协议状态 + 协议/邀请时间）；底部三列：<strong>已分配金额</strong>、<strong>授权帐号</strong>、<strong>分配比例</strong>；点击进入子用户详情（头像信息卡 + Tab 分配明细 / 授权帐号）。</li>
-              <li><strong>我的代发收益（子用户首页）</strong>：顶部统计区：<strong>累计已获得</strong>（主大字）+ 授权帐号数（底栏左右分布）；分配 record-card 标题「分配金额·xxx」；三列：关键词、发布帐号、分配时间；<strong>不展示</strong>「代发」标签与「系统自动分配，不可撤回」文案。</li>
               <li><strong>发起协议（主用户）</strong>：上方填写子用户 ID + 比例；下方展示<strong>分配信息</strong>与<strong>协议内容</strong>（布局参考子用户协议确认页）；底部「发送协议邀请」。</li>
-              <li><strong>协议确认（子用户）</strong>：协议正文读取现有说明内容（<code>rev_share_agreement</code>）。</li>
+              <li><strong>协议确认（子用户）</strong>：协议正文读取现有说明内容（<code>rev_share_agreement</code>）；同意后跳转「我的代发收益」。</li>
             </ul>
           </div>
         </div>
@@ -734,6 +734,7 @@
           <h3><span>3</span>交互规则</h3>
           <div class="rule-content">
             <ul>
+              <li>子用户视角闭环：<strong>接受邀请 → 同意协议 → 进入「我的代发收益」→ 右上角「查看帐号」→「发布帐号授权」</strong>。</li>
               <li>一个主用户可绑定<strong>多个子用户</strong>；每条主子关系独立维护协议状态与分配比例。</li>
               <li>分配前置条件：<strong>协议已同意</strong> + <strong>发布帐号三方授权有效</strong> + 分配状态启用。</li>
               <li>代发收益首页分配 record-card <strong>不展示</strong>「代发」标签与「不可撤回」说明；与 FR-001 代发分配 C 端展示区分。</li>
