@@ -128,10 +128,32 @@
     .stat-item .value.danger { color: var(--danger); }
     .stat-item .value.ok { color: var(--success); }
     .table-toolbar {
-      display: flex; justify-content: space-between; align-items: center;
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
       padding: 12px 16px; border-bottom: 1px solid var(--border);
     }
     .table-toolbar h3 { font-size: 14px; font-weight: 700; }
+    .toolbar-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .batch-bar {
+      display: none; align-items: center; gap: 12px; flex-wrap: wrap;
+      padding: 10px 16px; background: var(--primary-light); border-bottom: 1px solid var(--primary-border);
+      font-size: 12px;
+    }
+    .batch-bar.show { display: flex; }
+    .batch-bar .batch-info { color: var(--primary); font-weight: 600; }
+    .batch-bar .batch-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-left: auto; }
+    .btn-sm { height: 32px; padding: 0 12px; font-size: 12px; }
+    .btn-success-ghost { background: var(--success-bg); color: var(--success); border: 1px solid #bbf7d0; }
+    .btn-success-ghost:hover { background: #dcfce7; }
+    .btn-danger-ghost { background: var(--danger-bg); color: var(--danger); border: 1px solid #fecaca; }
+    .btn-danger-ghost:hover { background: #fee2e2; }
+    .btn-warn-ghost { background: var(--warning-bg); color: var(--warning); border: 1px solid #fde68a; }
+    .btn-warn-ghost:hover { background: #fef3c7; }
+    th.col-check, td.col-check { width: 40px; text-align: center; padding-left: 16px; }
+    th.col-check input, td.col-check input { cursor: pointer; width: 15px; height: 15px; }
+    .link-disabled { color: var(--text-muted); cursor: not-allowed; pointer-events: none; margin-right: 10px; font-size: 12px; }
+    .confirm-summary { margin-top: 10px; padding: 10px 12px; border-radius: var(--radius-sm); background: #f8fafc; border: 1px solid var(--border); font-size: 13px; line-height: 1.6; }
+    .import-note { font-size: 12px; color: var(--text-muted); line-height: 1.55; margin-bottom: 12px; }
+    .import-note code { font-family: ui-monospace, monospace; font-size: 11px; background: #f1f5f9; padding: 1px 5px; border-radius: 4px; }
     .filter-bar { display: flex; flex-wrap: wrap; gap: 10px; padding: 14px 16px; align-items: flex-end; border-bottom: 1px solid var(--border); }
     .filter-field { display: flex; flex-direction: column; gap: 4px; }
     .filter-field label { font-size: 11px; color: var(--text-muted); font-weight: 500; }
@@ -249,9 +271,9 @@
         <h1>
           品牌退款
           <span class="badge badge-fr">FR-003</span>
-          <span class="badge badge-version">v1 当前</span>
+          <span class="badge badge-version">v2 当前</span>
         </h1>
-        <p class="page-desc">针对品牌项目支持退款：财务后台录入/审核退款记录，审核通过并完成扣回后，同步写入 C 端订单列表与钱包收益明细（卡片级展示）。</p>
+        <p class="page-desc">针对品牌项目支持退款：财务后台录入/批量导入/审核，扣回成功后（状态=已扣回）同步写入 C 端订单列表与钱包收益明细（卡片级展示）。</p>
       </div>
       <div class="page-header-actions">
         <button class="btn btn-rule" id="toggleRuleDrawer" type="button">📋 需求规则</button>
@@ -295,29 +317,41 @@
         <div class="stats-bar">
           <div class="stat-item">
             <div class="label">退款总笔数</div>
-            <div class="value">128</div>
+            <div class="value" id="statTotalCount">128</div>
           </div>
           <div class="stat-item">
             <div class="label">退款总金额(元)</div>
-            <div class="value danger">86,420.50</div>
+            <div class="value danger" id="statTotalAmount">86,420.50</div>
+          </div>
+          <div class="stat-item">
+            <div class="label">已扣回金额(元)</div>
+            <div class="value ok" id="statDeductedAmount">13,888.50</div>
+          </div>
+          <div class="stat-item">
+            <div class="label">待扣回金额(元)</div>
+            <div class="value warn" id="statPendingAmount">560.00</div>
           </div>
           <div class="stat-item">
             <div class="label">待审核</div>
-            <div class="value warn">12</div>
-          </div>
-          <div class="stat-item">
-            <div class="label">待扣回</div>
-            <div class="value warn">8</div>
-          </div>
-          <div class="stat-item">
-            <div class="label">已扣回笔数</div>
-            <div class="value ok">108</div>
+            <div class="value warn" id="statPendingAudit">12</div>
           </div>
         </div>
 
         <div class="table-toolbar">
           <h3>品牌退款</h3>
-          <button class="btn btn-primary" type="button" onclick="openEditModal()">新增退款</button>
+          <div class="toolbar-actions">
+            <button class="btn btn-ghost btn-sm" type="button" onclick="openImportModal()">批量导入</button>
+            <button class="btn btn-primary btn-sm" type="button" onclick="openEditModal()">新增退款</button>
+          </div>
+        </div>
+
+        <div class="batch-bar" id="batchBar">
+          <span class="batch-info" id="batchInfo">已选 0 条 · 累计退款金额 0.00 元</span>
+          <div class="batch-btns">
+            <button class="btn btn-success-ghost btn-sm" type="button" onclick="openBatchConfirm('approve')">批量审核通过</button>
+            <button class="btn btn-warn-ghost btn-sm" type="button" onclick="openBatchConfirm('reject')">批量审核驳回</button>
+            <button class="btn btn-danger-ghost btn-sm" type="button" onclick="openBatchConfirm('delete')">批量删除</button>
+          </div>
         </div>
 
         <div class="filter-bar">
@@ -338,6 +372,7 @@
           <table>
             <thead>
               <tr>
+                <th class="col-check"><input type="checkbox" id="checkAll" title="全选可操作项" onchange="toggleCheckAll(this)" /></th>
                 <th>用户ID</th>
                 <th>关键词</th>
                 <th>项目信息</th>
@@ -349,64 +384,7 @@
                 <th>操作</th>
               </tr>
             </thead>
-            <tbody>
-              <tr>
-                <td>U-10086</td>
-                <td>Summer推广词</td>
-                <td><div>右豹品牌合作</div><div class="cell-sub">项目ID P-8801</div></td>
-                <td>2026.08.20 14:30</td>
-                <td>128.50</td>
-                <td>项目方核实后发起退款，关键词数据异常</td>
-                <td><span class="tag tag-ok">已通过</span></td>
-                <td><span class="tag tag-ok">已扣回</span></td>
-                <td>
-                  <button class="link" type="button" onclick="openEditModal('U-10086')">编辑</button>
-                  <button class="link link-danger" type="button" onclick="confirmDelete()">删除</button>
-                </td>
-              </tr>
-              <tr>
-                <td>U-10201</td>
-                <td>秋季新品词</td>
-                <td><div>某品牌联名</div><div class="cell-sub">项目ID P-8805</div></td>
-                <td>2026.08.22 10:00</td>
-                <td>560.00</td>
-                <td>重复结算，需退回多余收益</td>
-                <td><span class="tag tag-ok">已通过</span></td>
-                <td><span class="tag tag-warn">待扣回</span></td>
-                <td>
-                  <button class="link" type="button" onclick="openEditModal('U-10201')">编辑</button>
-                  <button class="link link-danger" type="button" onclick="confirmDelete()">删除</button>
-                </td>
-              </tr>
-              <tr>
-                <td>U-10388</td>
-                <td>达人种草词</td>
-                <td><div>美妆品牌A</div><div class="cell-sub">项目ID P-8812</div></td>
-                <td>2026.08.23 16:45</td>
-                <td>89.00</td>
-                <td>视频未达标，品牌方要求退款</td>
-                <td><span class="tag tag-warn">待审核</span></td>
-                <td><span class="tag tag-muted">—</span></td>
-                <td>
-                  <button class="link" type="button" onclick="openEditModal('U-10388')">编辑</button>
-                  <button class="link link-danger" type="button" onclick="confirmDelete()">删除</button>
-                </td>
-              </tr>
-              <tr>
-                <td>U-10456</td>
-                <td>618大促词</td>
-                <td><div>电商品牌B</div><div class="cell-sub">项目ID P-8820</div></td>
-                <td>2026.08.18 09:20</td>
-                <td>320.00</td>
-                <td>订单归属争议，协商退款</td>
-                <td><span class="tag tag-del">已驳回</span></td>
-                <td><span class="tag tag-muted">—</span></td>
-                <td>
-                  <button class="link" type="button" onclick="openEditModal('U-10456')">编辑</button>
-                  <button class="link link-danger" type="button" onclick="confirmDelete()">删除</button>
-                </td>
-              </tr>
-            </tbody>
+            <tbody id="refundTableBody"></tbody>
           </table>
         </div>
       </div>
@@ -485,6 +463,39 @@
     </div>
   </main>
 
+  <!-- 批量导入 -->
+  <div class="modal-overlay" id="importOverlay" onclick="closeImportModal()">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">批量导入 · Excel</div>
+      <div class="modal-body">
+        <p class="import-note">Excel 列顺序：<code>关键词</code>、<code>项目ID</code>、<code>退款金额</code>、<code>退款原因</code>。导入后默认审核状态为「待审核」。</p>
+        <div class="form-field">
+          <label>选择文件</label>
+          <input type="file" accept=".xlsx,.xls,.csv" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" type="button" onclick="closeImportModal()">取消</button>
+        <button class="btn btn-primary" type="button" onclick="submitImport()">开始导入</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 批量操作确认 -->
+  <div class="modal-overlay" id="batchConfirmOverlay" onclick="closeBatchConfirm()">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header" id="batchConfirmTitle">批量操作确认</div>
+      <div class="modal-body">
+        <p id="batchConfirmDesc"></p>
+        <div class="confirm-summary" id="batchConfirmSummary"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" type="button" onclick="closeBatchConfirm()">取消</button>
+        <button class="btn btn-primary" type="button" id="batchConfirmBtn" onclick="submitBatchConfirm()">确认</button>
+      </div>
+    </div>
+  </div>
+
   <!-- 编辑弹窗 -->
   <div class="modal-overlay" id="editOverlay" onclick="closeEditModal()">
     <div class="modal" onclick="event.stopPropagation()">
@@ -513,7 +524,7 @@
   <div class="drawer-overlay" id="ruleOverlay" onclick="setRuleDrawer(false)"></div>
   <aside class="drawer" id="ruleDrawer" role="dialog">
     <div class="drawer-header">
-      <h2>FR-003 · 需求规则 · v1</h2>
+      <h2>FR-003 · 需求规则 · v2</h2>
       <button class="drawer-close" type="button" onclick="setRuleDrawer(false)">×</button>
     </div>
     <div class="rule-tab-bar" role="tablist">
@@ -553,7 +564,7 @@
           <h3><span>3</span>交互规则</h3>
           <div class="rule-content">
             <ul>
-              <li>待审核、已驳回、已通过但未扣回的记录<strong>不在 C 端展示</strong>。</li>
+              <li>待审核、已驳回、已通过但未扣回的记录<strong>不在 C 端展示</strong>；仅<strong>扣回状态=已扣回</strong>时展示。</li>
               <li>订单列表与收益明细为既有页面新增记录类型，沿用现有列表卡片样式。</li>
               <li>金额为扣减方向，使用负号或红色样式（沿用现有扣减展示规范）。</li>
             </ul>
@@ -607,11 +618,16 @@
             <p style="margin-top:8px;"><strong>数据明细卡片</strong>：统计区下方，列表字段第 1 位（用户 ID）为卡片标题；Tag 展示审核状态；其余字段入内嵌灰色三列/四列区。</p>
             <p style="margin-top:8px;"><strong>表头基础统计</strong>（随筛选结果联动）：</p>
             <ul>
-              <li>退款总笔数</li>
-              <li>退款总金额</li>
+              <li>退款总笔数、退款总金额</li>
+              <li><strong>已扣回金额</strong> — 仅统计扣回状态=已扣回的记录；删除已扣回记录时相应减少</li>
+              <li><strong>待扣回金额</strong> — 审核已通过但未扣回的金额合计</li>
               <li>待审核笔数</li>
-              <li>待扣回笔数</li>
-              <li>已扣回笔数</li>
+            </ul>
+            <p style="margin-top:8px;"><strong>批量操作</strong>：</p>
+            <ul>
+              <li>批量导入 Excel 字段：关键词、项目 ID、退款金额、退款原因</li>
+              <li>批量审核通过 / 驳回 / 删除：勾选后展示批量操作栏；确认弹窗展示<strong>已选数量 + 累计退款金额</strong></li>
+              <li><strong>已扣回</strong>记录：不可勾选、不可编辑/删除，不参与批量审核与批量删除</li>
             </ul>
           </div>
         </div>
@@ -633,6 +649,182 @@
   <div class="toast" id="toast"></div>
 
   <script>
+    var refundRows = [
+      { id: 'r1', userId: 'U-10086', keyword: 'Summer推广词', projectName: '右豹品牌合作', projectId: 'P-8801', orderDate: '2026.08.20 14:30', amount: 128.50, reason: '项目方核实后发起退款，关键词数据异常', audit: 'passed', deduct: 'done' },
+      { id: 'r2', userId: 'U-10201', keyword: '秋季新品词', projectName: '某品牌联名', projectId: 'P-8805', orderDate: '2026.08.22 10:00', amount: 560.00, reason: '重复结算，需退回多余收益', audit: 'passed', deduct: 'pending' },
+      { id: 'r3', userId: 'U-10388', keyword: '达人种草词', projectName: '美妆品牌A', projectId: 'P-8812', orderDate: '2026.08.23 16:45', amount: 89.00, reason: '视频未达标，品牌方要求退款', audit: 'pending', deduct: 'none' },
+      { id: 'r4', userId: 'U-10456', keyword: '618大促词', projectName: '电商品牌B', projectId: 'P-8820', orderDate: '2026.08.18 09:20', amount: 320.00, reason: '订单归属争议，协商退款', audit: 'rejected', deduct: 'none' }
+    ];
+    var batchConfirmAction = null;
+
+    function isRowLocked(row) {
+      return row.deduct === 'done';
+    }
+
+    function auditLabel(audit) {
+      if (audit === 'passed') return '<span class="tag tag-ok">已通过</span>';
+      if (audit === 'pending') return '<span class="tag tag-warn">待审核</span>';
+      if (audit === 'rejected') return '<span class="tag tag-del">已驳回</span>';
+      return '<span class="tag tag-muted">—</span>';
+    }
+
+    function deductLabel(deduct) {
+      if (deduct === 'done') return '<span class="tag tag-ok">已扣回</span>';
+      if (deduct === 'pending') return '<span class="tag tag-warn">待扣回</span>';
+      return '<span class="tag tag-muted">—</span>';
+    }
+
+    function formatAmount(n) {
+      return Number(n).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function refreshStats() {
+      var totalAmount = refundRows.reduce(function (s, r) { return s + r.amount; }, 0);
+      var deductedAmount = refundRows.filter(function (r) { return r.deduct === 'done'; }).reduce(function (s, r) { return s + r.amount; }, 0);
+      var pendingAmount = refundRows.filter(function (r) { return r.audit === 'passed' && r.deduct === 'pending'; }).reduce(function (s, r) { return s + r.amount; }, 0);
+      var pendingAudit = refundRows.filter(function (r) { return r.audit === 'pending'; }).length;
+      document.getElementById('statTotalCount').textContent = String(refundRows.length);
+      document.getElementById('statTotalAmount').textContent = formatAmount(totalAmount);
+      document.getElementById('statDeductedAmount').textContent = formatAmount(deductedAmount);
+      document.getElementById('statPendingAmount').textContent = formatAmount(pendingAmount);
+      document.getElementById('statPendingAudit').textContent = String(pendingAudit);
+    }
+
+    function renderRefundTable() {
+      var tbody = document.getElementById('refundTableBody');
+      tbody.innerHTML = refundRows.map(function (row) {
+        var locked = isRowLocked(row);
+        var checkCell = locked
+          ? '<td class="col-check"><input type="checkbox" disabled title="已扣回不可批量操作" /></td>'
+          : '<td class="col-check"><input type="checkbox" class="row-check" data-id="' + row.id + '" onchange="updateBatchBar()" /></td>';
+        var actions = locked
+          ? '<span class="link-disabled">编辑</span><span class="link-disabled">删除</span>'
+          : '<button class="link" type="button" onclick="openEditModal(\'' + row.userId + '\')">编辑</button>'
+            + '<button class="link link-danger" type="button" onclick="confirmDelete(\'' + row.id + '\')">删除</button>';
+        return '<tr data-id="' + row.id + '" data-amount="' + row.amount + '">'
+          + checkCell
+          + '<td>' + row.userId + '</td>'
+          + '<td>' + row.keyword + '</td>'
+          + '<td><div>' + row.projectName + '</div><div class="cell-sub">项目ID ' + row.projectId + '</div></td>'
+          + '<td>' + row.orderDate + '</td>'
+          + '<td>' + formatAmount(row.amount) + '</td>'
+          + '<td>' + row.reason + '</td>'
+          + '<td>' + auditLabel(row.audit) + '</td>'
+          + '<td>' + deductLabel(row.deduct) + '</td>'
+          + '<td>' + actions + '</td>'
+          + '</tr>';
+      }).join('');
+      document.getElementById('checkAll').checked = false;
+      updateBatchBar();
+      refreshStats();
+    }
+
+    function getSelectedRows() {
+      return [...document.querySelectorAll('.row-check:checked')].map(function (cb) {
+        return refundRows.find(function (r) { return r.id === cb.dataset.id; });
+      }).filter(Boolean);
+    }
+
+    function updateBatchBar() {
+      var selected = getSelectedRows();
+      var n = selected.length;
+      var sum = selected.reduce(function (s, r) { return s + r.amount; }, 0);
+      document.getElementById('batchInfo').textContent = '已选 ' + n + ' 条 · 累计退款金额 ' + formatAmount(sum) + ' 元';
+      document.getElementById('batchBar').classList.toggle('show', n > 0);
+      var selectable = document.querySelectorAll('.row-check:not(:disabled)').length;
+      var checked = document.querySelectorAll('.row-check:checked').length;
+      document.getElementById('checkAll').checked = selectable > 0 && checked === selectable;
+    }
+
+    function toggleCheckAll(el) {
+      document.querySelectorAll('.row-check:not(:disabled)').forEach(function (cb) {
+        cb.checked = el.checked;
+      });
+      updateBatchBar();
+    }
+
+    function openImportModal() {
+      document.getElementById('importOverlay').classList.add('open');
+    }
+
+    function closeImportModal() {
+      document.getElementById('importOverlay').classList.remove('open');
+    }
+
+    function submitImport() {
+      closeImportModal();
+      refundRows.push(
+        { id: 'r' + Date.now(), userId: 'U-10999', keyword: '批量导入词A', projectName: '导入项目A', projectId: 'P-9901', orderDate: '2026.08.26 10:00', amount: 99.00, reason: 'Excel 批量导入 Demo', audit: 'pending', deduct: 'none' },
+        { id: 'r' + (Date.now() + 1), userId: 'U-10998', keyword: '批量导入词B', projectName: '导入项目B', projectId: 'P-9902', orderDate: '2026.08.26 10:01', amount: 150.00, reason: 'Excel 批量导入 Demo', audit: 'pending', deduct: 'none' }
+      );
+      renderRefundTable();
+      showToast('批量导入完成（Demo Mock）');
+    }
+
+    function openBatchConfirm(action) {
+      var selected = getSelectedRows();
+      if (!selected.length) {
+        showToast('请先勾选可操作记录');
+        return;
+      }
+      batchConfirmAction = action;
+      var n = selected.length;
+      var sum = selected.reduce(function (s, r) { return s + r.amount; }, 0);
+      var title = document.getElementById('batchConfirmTitle');
+      var desc = document.getElementById('batchConfirmDesc');
+      var summary = document.getElementById('batchConfirmSummary');
+      var btn = document.getElementById('batchConfirmBtn');
+      if (action === 'approve') {
+        title.textContent = '批量审核通过确认';
+        desc.textContent = '通过后记录进入扣回流程（Demo 仅更新审核状态）。';
+        btn.className = 'btn btn-primary';
+        btn.textContent = '确认通过';
+      } else if (action === 'reject') {
+        title.textContent = '批量审核驳回确认';
+        desc.textContent = '驳回后记录不参与扣回。';
+        btn.className = 'btn btn-warn-ghost';
+        btn.textContent = '确认驳回';
+      } else {
+        title.textContent = '批量删除确认';
+        desc.textContent = '删除后不可恢复，表头统计将重新计算。';
+        btn.className = 'btn btn-danger-ghost';
+        btn.textContent = '确认删除';
+      }
+      summary.innerHTML = '已选 <strong>' + n + '</strong> 条 · 累计退款金额 <strong>' + formatAmount(sum) + '</strong> 元';
+      document.getElementById('batchConfirmOverlay').classList.add('open');
+    }
+
+    function closeBatchConfirm() {
+      document.getElementById('batchConfirmOverlay').classList.remove('open');
+      batchConfirmAction = null;
+    }
+
+    function submitBatchConfirm() {
+      var ids = getSelectedRows().map(function (r) { return r.id; });
+      if (batchConfirmAction === 'approve') {
+        refundRows.forEach(function (r) {
+          if (ids.indexOf(r.id) >= 0 && !isRowLocked(r)) {
+            r.audit = 'passed';
+            if (r.deduct === 'none') r.deduct = 'pending';
+          }
+        });
+        showToast('已批量审核通过 ' + ids.length + ' 条（Demo）');
+      } else if (batchConfirmAction === 'reject') {
+        refundRows.forEach(function (r) {
+          if (ids.indexOf(r.id) >= 0 && !isRowLocked(r)) {
+            r.audit = 'rejected';
+            r.deduct = 'none';
+          }
+        });
+        showToast('已批量驳回 ' + ids.length + ' 条（Demo）');
+      } else if (batchConfirmAction === 'delete') {
+        refundRows = refundRows.filter(function (r) { return ids.indexOf(r.id) < 0; });
+        showToast('已批量删除 ' + ids.length + ' 条（Demo）');
+      }
+      closeBatchConfirm();
+      renderRefundTable();
+    }
+
     function toggleAdminFilter() {
       document.getElementById('adminFilterToggle').classList.toggle('open');
       document.getElementById('adminFilterBar').classList.toggle('collapsed');
@@ -697,8 +889,12 @@
       closeEditModal();
       showToast('Demo 已保存（Mock，不写入后端）');
     }
-    function confirmDelete() {
-      if (confirm('确认删除该退款记录？（Demo）')) showToast('Demo：已删除');
+    function confirmDelete(rowId) {
+      if (confirm('确认删除该退款记录？（Demo）')) {
+        if (rowId) refundRows = refundRows.filter(function (r) { return r.id !== rowId; });
+        renderRefundTable();
+        showToast('Demo：已删除');
+      }
     }
     const ruleDrawer = document.getElementById('ruleDrawer');
     const toggleRuleBtn = document.getElementById('toggleRuleDrawer');
@@ -726,8 +922,9 @@
     }
     toggleRuleBtn.onclick = () => setRuleDrawer(!ruleDrawer.classList.contains('open'));
     document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') { closeEditModal(); setRuleDrawer(false); }
+      if (e.key === 'Escape') { closeEditModal(); closeImportModal(); closeBatchConfirm(); setRuleDrawer(false); }
     });
+    renderRefundTable();
     const tab = new URLSearchParams(location.search).get('tab');
     const tabPageMap = { admin: 'view-admin', flow: 'view-flow', fe: 'view-fe' };
     if (tab && tabPageMap[tab]) {
