@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>活动中心 · 前端交互 Demo</title>
+  <style>
+    :root {
+      --orange: #ff5722;
+      --orange-start: #ff8a4c;
+      --orange-light: #fff3eb;
+      --orange-border: #ffd4b8;
+      --purple-start: #7c3aed;
+      --purple-end: #5b21b6;
+      --bg: #f5f6f8;
+      --surface: #fff;
+      --inner-bg: #f3f4f6;
+      --text-primary: #1a2332;
+      --text-secondary: #6b7280;
+      --text-muted: #9ca3af;
+      --border: #ececec;
+      --radius: 12px;
+      --phone-w: 375px;
+      --phone-h: 812px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: #e8eaed; min-height: 100vh; color: var(--text-primary);
+    }
+    .demo-shell { display: flex; flex-direction: column; align-items: center; padding: 20px 16px 40px; gap: 16px; }
+    .demo-header { width: 100%; max-width: 960px; background: #fff; border-radius: 12px; padding: 16px 20px; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
+    .demo-header h1 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+    .demo-header p { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+    .demo-nav { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .demo-nav button {
+      padding: 6px 12px; border-radius: 999px; border: 1px solid var(--border);
+      background: #fff; font-size: 12px; cursor: pointer; color: var(--text-secondary);
+    }
+    .demo-nav button.active, .demo-nav button:hover {
+      background: var(--orange-light); border-color: var(--orange-border); color: var(--orange); font-weight: 600;
+    }
+    .phone-frame {
+      width: var(--phone-w); height: var(--phone-h); background: var(--bg);
+      border-radius: 36px; overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,.18), inset 0 0 0 8px #1a1a1a; position: relative;
+    }
+    .phone-notch {
+      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      width: 120px; height: 28px; background: #1a1a1a; border-radius: 0 0 16px 16px; z-index: 100;
+    }
+    .screen { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
+    .nav-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 48px 16px 12px; background: var(--bg); flex-shrink: 0;
+    }
+    .nav-bar .back { width: 32px; height: 32px; border: none; background: none; font-size: 22px; cursor: pointer; color: var(--text-primary); }
+    .nav-bar .title { font-size: 17px; font-weight: 700; flex: 1; text-align: center; margin-right: 32px; }
+    .nav-bar .capsule {
+      position: absolute; right: 16px; top: 48px;
+      display: flex; align-items: center; gap: 6px; padding: 4px 8px;
+      border: 1px solid rgba(0,0,0,.08); border-radius: 999px; background: rgba(255,255,255,.6);
+    }
+    .nav-bar .capsule span { width: 4px; height: 4px; border-radius: 50%; background: #333; }
+    .scroll-content { flex: 1; overflow-y: auto; padding: 0 16px 24px; }
+    .pinned-banner {
+      position: relative; border-radius: 14px; overflow: hidden; margin-bottom: 14px;
+      background: linear-gradient(135deg, var(--purple-start) 0%, var(--purple-end) 100%);
+      padding: 16px; color: #fff; min-height: 132px;
+    }
+    .pinned-banner .banner-label {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 11px; font-weight: 600; opacity: .92; margin-bottom: 8px;
+    }
+    .pinned-banner .banner-title { font-size: 17px; font-weight: 800; line-height: 1.35; margin-bottom: 6px; padding-right: 72px; }
+    .pinned-banner .banner-sub { font-size: 12px; opacity: .88; line-height: 1.5; margin-bottom: 10px; padding-right: 72px; }
+    .pinned-banner .banner-meta { font-size: 11px; opacity: .78; margin-bottom: 12px; }
+    .pinned-banner .banner-enroll { font-size: 11px; opacity: .92; margin-bottom: 12px; }
+    .pinned-banner .banner-thumb {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      width: 64px; height: 80px; border-radius: 8px; background: rgba(255,255,255,.15);
+      display: flex; align-items: center; justify-content: center; overflow: hidden;
+    }
+    .pinned-banner .banner-thumb svg { width: 44px; height: 44px; opacity: .9; }
+    .pinned-banner .btn-banner {
+      display: inline-flex; align-items: center; justify-content: center;
+      border: none; border-radius: 999px; padding: 9px 20px;
+      font-size: 13px; font-weight: 700; cursor: pointer; color: var(--orange);
+      background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.12);
+    }
+    .filter-tabs {
+      display: flex; gap: 8px; margin-bottom: 14px; overflow-x: auto; padding-bottom: 2px;
+    }
+    .filter-tabs button {
+      flex-shrink: 0; border: none; background: var(--surface); color: var(--text-secondary);
+      padding: 7px 16px; border-radius: 999px; font-size: 13px; font-weight: 600; cursor: pointer;
+      box-shadow: 0 1px 3px rgba(0,0,0,.04);
+    }
+    .filter-tabs button.active { background: #2d3748; color: #fff; }
+    .list-meta {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 10px; font-size: 13px;
+    }
+    .list-meta .label { font-weight: 700; color: var(--text-primary); }
+    .list-meta .count { color: var(--text-muted); font-size: 12px; }
+    .activity-card {
+      background: var(--surface); border-radius: var(--radius); padding: 14px;
+      margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.04);
+    }
+    .card-top { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }
+    .card-top .project-label { font-size: 13px; color: var(--text-primary); }
+    .card-top .project-label em { font-style: normal; color: var(--orange); font-weight: 600; }
+    .card-body {
+      display: flex; gap: 12px; background: var(--inner-bg); border-radius: 10px; padding: 12px;
+    }
+    .card-icon-wrap { position: relative; flex-shrink: 0; }
+    .card-icon {
+      width: 72px; height: 72px; border-radius: 10px; background: #fff;
+      display: flex; align-items: center; justify-content: center; overflow: hidden;
+    }
+    .card-icon svg { width: 52px; height: 52px; }
+    .status-badge {
+      position: absolute; top: -4px; left: -4px; z-index: 2;
+      font-size: 10px; font-weight: 700; color: var(--orange);
+      background: #fff; border: 1px solid var(--orange-border);
+      padding: 2px 6px; border-radius: 4px; white-space: nowrap;
+    }
+    .status-badge.ended { color: var(--text-muted); border-color: var(--border); }
+    .status-badge.upcoming { color: #2563eb; border-color: #bfdbfe; background: #eff6ff; }
+    .card-text { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; }
+    .card-title { font-size: 15px; font-weight: 700; line-height: 1.4; margin-bottom: 4px; }
+    .card-subtitle { font-size: 12px; color: var(--text-muted); line-height: 1.45; }
+    .card-footer {
+      display: flex; align-items: flex-end; justify-content: space-between;
+      margin-top: 12px; gap: 10px;
+    }
+    .card-footer-left { flex: 1; min-width: 0; }
+    .card-time { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
+    .enroll-count { font-size: 12px; color: var(--text-secondary); }
+    .btn-action {
+      flex-shrink: 0; border: none; border-radius: 999px; padding: 8px 18px;
+      font-size: 13px; font-weight: 700; cursor: pointer; color: #fff;
+      background: linear-gradient(135deg, var(--orange-start), var(--orange));
+    }
+    .empty-state {
+      text-align: center; padding: 48px 20px; color: var(--text-muted); font-size: 13px;
+    }
+    .toast {
+      position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px);
+      background: rgba(0,0,0,.78); color: #fff; padding: 10px 18px; border-radius: 999px;
+      font-size: 13px; opacity: 0; pointer-events: none; transition: all .25s; z-index: 200;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    body.embed-mode { background: var(--bg); margin: 0; }
+    body.embed-mode .demo-header { display: none !important; }
+    body.embed-mode .demo-nav { display: none !important; }
+    body.embed-mode .demo-shell { padding: 0; min-height: 100vh; }
+    body.embed-mode .phone-frame { width: 100%; max-width: 100%; height: 100vh; border-radius: 0; box-shadow: none; border: none; }
+    body.embed-mode .phone-notch { display: none; }
+    body.embed-mode .nav-bar { padding-top: 12px; }
+    body.embed-mode .nav-bar .capsule { top: 12px; }
+  </style>
+</head>
+<body>
+  <div class="demo-shell">
+    <div class="demo-header">
+      <h1>活动中心 · 前端交互 Demo</h1>
+      <p>保留图1卡片布局；顶部 Banner 展示置顶活动；状态为待开始/进行中/已结束；报名类活动展示「x人已参加」。</p>
+      <div class="demo-nav" id="screenNav">
+        <button type="button" class="active" data-filter="all">全部活动</button>
+        <button type="button" data-filter="ongoing">进行中</button>
+        <button type="button" data-filter="ended">已结束</button>
+        <button type="button" data-filter="registration">报名类活动</button>
+      </div>
+    </div>
+    <div class="phone-frame">
+      <div class="phone-notch"></div>
+      <div class="screen" id="screen-activity-center">
+        <div class="nav-bar">
+          <button class="back" type="button" aria-label="返回">‹</button>
+          <div class="title">活动中心</div>
+          <div class="capsule" aria-hidden="true"><span></span><span></span><span></span></div>
+        </div>
+        <div class="scroll-content">
+          <div id="pinnedBanner"></div>
+          <div class="filter-tabs" id="filterTabs">
+            <button type="button" class="active" data-filter="all">全部</button>
+            <button type="button" data-filter="ongoing">进行中</button>
+            <button type="button" data-filter="ended">已结束</button>
+          </div>
+          <div class="list-meta">
+            <span class="label">全部活动</span>
+            <span class="count" id="listCount">共 0 条</span>
+          </div>
+          <div id="activityList"></div>
+          <div class="empty-state" id="emptyState" hidden>暂无符合条件的活动</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const ICON_SVG = '<svg viewBox="0 0 64 64" fill="none"><rect width="64" height="64" rx="12" fill="#fff"/><path d="M32 10c8 6 14 14 14 24 0 8-6 14-14 16-8-2-14-8-14-16C18 24 24 16 32 10z" fill="#ff5722"/><circle cx="38" cy="28" r="4" fill="#fff"/></svg>';
+
+    const STATUS_LABEL = { ongoing: '进行中', ended: '已结束', upcoming: '待开始' };
+    const STATUS_CLASS = { ongoing: '', ended: 'ended', upcoming: 'upcoming' };
+
+    const PINNED = {
+      id: 'pinned', type: 'registration', status: 'ongoing',
+      label: '右豹官方公益计划', title: '3天右豹生态公益培训营',
+      subtitle: '3天学会选赛道·做项目', timeRange: '2026.08.22-2026.08.25', enrolled: 164
+    };
+
+    const ACTIVITIES = [
+      {
+        id: 'a2', type: 'registration', status: 'ongoing',
+        project: '小说推文', title: '小说推文免费培训第 1 期', subtitle: '从选书到发布，官方免费带教',
+        timeRange: '2026.08.22-2026.08.29', enrolled: 164
+      },
+      {
+        id: 'a3', type: 'registration', status: 'ongoing',
+        project: '漫剧推广', title: '漫剧推广实战营第 2 期', subtitle: '官方社群答疑 + 实操带练',
+        timeRange: '2026.08.10-2026.08.20', enrolled: 200
+      },
+      {
+        id: 'a4', type: 'normal', status: 'upcoming',
+        project: '右豹平台', title: '右豹创作者成长计划', subtitle: '官方扶持优质创作者',
+        timeRange: '2026.09.01-2026.09.30'
+      },
+      {
+        id: 'a5', type: 'normal', status: 'ended',
+        project: '右豹平台', title: '右豹新人入门指引', subtitle: '快速了解平台核心功能',
+        timeRange: '2026.07.01-2026.07.31'
+      },
+      {
+        id: 'a6', type: 'normal', status: 'ended',
+        project: '右豹平台', title: '3天右豹生态公益培训营', subtitle: '3天学会选赛道·做项目',
+        timeRange: '2026.07.22-2026.08.22'
+      }
+    ];
+
+    let currentFilter = 'all';
+
+    function matchFilter(item, filter) {
+      if (filter === 'all') return true;
+      if (filter === 'ongoing') return item.status === 'ongoing';
+      if (filter === 'ended') return item.status === 'ended';
+      if (filter === 'registration') return item.type === 'registration';
+      return true;
+    }
+
+    function renderBanner() {
+      const el = document.getElementById('pinnedBanner');
+      if (!matchFilter(PINNED, currentFilter)) {
+        el.innerHTML = '';
+        return;
+      }
+      const enrollLine = PINNED.type === 'registration'
+        ? `<div class="banner-enroll">${PINNED.enrolled}人已参加</div>` : '';
+      el.innerHTML = `
+        <div class="pinned-banner">
+          <div class="banner-label">🎓 ${PINNED.label}</div>
+          <div class="banner-title">${PINNED.title}</div>
+          <div class="banner-sub">${PINNED.subtitle}</div>
+          <div class="banner-meta">活动时间·${PINNED.timeRange}</div>
+          ${enrollLine}
+          <button class="btn-banner" type="button" onclick="handleAction('${PINNED.id}')">查看</button>
+          <div class="banner-thumb">${ICON_SVG}</div>
+        </div>`;
+    }
+
+    function renderCard(a) {
+      const statusCls = STATUS_CLASS[a.status] || '';
+      const enrollBlock = a.type === 'registration'
+        ? `<div class="enroll-count">${a.enrolled}人已参加</div>` : '';
+      return `
+        <article class="activity-card" data-id="${a.id}">
+          <div class="card-top">
+            <span class="project-label">项目·<em>${a.project}</em></span>
+          </div>
+          <div class="card-body">
+            <div class="card-icon-wrap">
+              <span class="status-badge ${statusCls}">${STATUS_LABEL[a.status]}</span>
+              <div class="card-icon">${ICON_SVG}</div>
+            </div>
+            <div class="card-text">
+              <div class="card-title">${a.title}</div>
+              <div class="card-subtitle">${a.subtitle}</div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <div class="card-footer-left">
+              <div class="card-time">活动时间·${a.timeRange}</div>
+              ${enrollBlock}
+            </div>
+            <button class="btn-action" type="button" onclick="handleAction('${a.id}')">查看</button>
+          </div>
+        </article>`;
+    }
+
+    function renderList() {
+      renderBanner();
+      const list = ACTIVITIES.filter(a => matchFilter(a, currentFilter));
+      document.getElementById('activityList').innerHTML = list.map(renderCard).join('');
+      const hasBanner = matchFilter(PINNED, currentFilter);
+      document.getElementById('emptyState').hidden = list.length > 0 || hasBanner;
+      const filterLabels = { all: '全部活动', ongoing: '进行中', ended: '已结束', registration: '报名类活动' };
+      document.querySelector('.list-meta .label').textContent = filterLabels[currentFilter] || '全部活动';
+      document.getElementById('listCount').textContent = `共 ${list.length} 条`;
+    }
+
+    function setFilter(filter) {
+      currentFilter = filter;
+      document.querySelectorAll('#filterTabs button').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.filter === filter || (filter === 'registration' && btn.dataset.filter === 'all'));
+      });
+      document.querySelectorAll('#screenNav button').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.filter === filter);
+      });
+      renderList();
+    }
+
+    function handleAction(id) {
+      const item = id === 'pinned' ? PINNED : ACTIVITIES.find(x => x.id === id);
+      if (!item) return;
+      toast(`查看「${item.title}」（Demo）`);
+    }
+
+    function toast(msg) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 1800);
+    }
+
+    document.querySelectorAll('#filterTabs button').forEach(btn => {
+      btn.addEventListener('click', () => setFilter(btn.dataset.filter));
+    });
+    document.querySelectorAll('#screenNav button').forEach(btn => {
+      btn.addEventListener('click', () => setFilter(btn.dataset.filter));
+    });
+
+    const urlParams = new URLSearchParams(location.search);
+    if (urlParams.get('embed') === '1') document.body.classList.add('embed-mode');
+    const initFilter = urlParams.get('filter');
+    if (initFilter && ['all', 'ongoing', 'ended', 'registration'].includes(initFilter)) {
+      setFilter(initFilter);
+    } else {
+      renderList();
+    }
+
+    window.addEventListener('message', e => {
+      if (e.data?.type === 'setFilter' && ['all', 'ongoing', 'ended', 'registration'].includes(e.data.filter)) {
+        setFilter(e.data.filter);
+      }
+    });
+  </script>
+</body>
+</html>

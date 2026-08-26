@@ -66,6 +66,27 @@
       padding-top: 12px; border-top: 1px solid rgba(255,255,255,.25);
     }
     .hero-stats.cols-1 { grid-template-columns: 1fr; max-width: 140px; margin: 0 auto; }
+    .hero-stats.cols-1-direct { grid-template-columns: 1fr; max-width: 160px; margin: 0 auto; }
+    .sub-user-card-stats.cols-2 { grid-template-columns: repeat(2, 1fr); }
+    .record-grid.cols-4 { grid-template-columns: repeat(2, 1fr); }
+    .record-field-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+      background: #f5f6f8; border-radius: 10px; padding: 12px 10px;
+    }
+    .record-field-grid .cell-label { font-size: 11px; color: var(--text-muted); margin-bottom: 6px; }
+    .record-field-grid .cell-value { font-size: 13px; font-weight: 700; color: var(--text-primary); word-break: break-all; }
+    .record-field-grid .cell-value.orange { color: var(--orange-text); }
+    .record-field-grid .field-span-2 { grid-column: span 2; }
+    .record-field-grid .field-time { font-size: 12px; font-weight: 600; }
+    body.mode-direct .home-alloc-card { cursor: default; }
+    body.mode-direct .home-alloc-card:active { background: var(--surface); }
+    body.mode-direct .sub-user-card { cursor: default; }
+    body.mode-direct .sub-user-card:active { background: var(--surface); }
+    .nav-screen-direct-hidden { display: none !important; }
+    .stats-row.cols-2 { grid-template-columns: repeat(2, 1fr); }
+    .publish-account-data.cols-1 { grid-template-columns: 1fr; }
+    body.mode-direct .mode-account-only { display: none !important; }
+    body.mode-account .mode-direct-only { display: none !important; }
     .hero-stats.sub-home {
       display: flex; justify-content: space-between; align-items: center;
       grid-template-columns: unset;
@@ -311,29 +332,56 @@
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
     body.embed-mode { background: var(--bg); margin: 0; }
     body.embed-mode .demo-header { display: none !important; }
+    body.embed-mode #allocTypeNav { display: none !important; }
     body.embed-mode .demo-shell { padding: 0; min-height: 100vh; }
-    body.embed-mode .phone-frame { width: 100%; max-width: 100%; height: 100vh; border-radius: 0; box-shadow: none; border: none; }
+    body.embed-mode .phone-frame {
+      width: 100%; max-width: 100%; height: 100vh; border-radius: 0; box-shadow: none; border: none;
+      display: flex; flex-direction: column;
+    }
+    body.embed-mode .phone-frame > .screen.active { flex: 1; min-height: 0; height: auto; }
     body.embed-mode .phone-notch { display: none; }
+    .embed-only { display: none; }
+    body.embed-mode .embed-only { display: block; }
+    .fe-revision-bar {
+      flex-shrink: 0; padding: 6px 12px; font-size: 10px; line-height: 1.45; text-align: center;
+      color: #9a3412; background: #fff7ed; border-bottom: 1px solid #fed7aa;
+    }
+    .demo-page-notice {
+      margin-bottom: 10px; padding: 8px 10px; border-radius: 8px; font-size: 11px; line-height: 1.5;
+      color: #1d4ed8; background: #eff6ff; border: 1px solid #bfdbfe;
+    }
+    .reuse-page-placeholder {
+      display: flex; align-items: center; justify-content: center;
+      min-height: calc(100vh - 180px); padding: 32px 24px; text-align: center;
+    }
+    body.embed-mode .reuse-page-placeholder { min-height: calc(100vh - 120px); }
+    .reuse-page-placeholder .reuse-text {
+      font-size: 16px; font-weight: 600; line-height: 1.7; color: var(--text-secondary);
+      max-width: 280px;
+    }
   </style>
 </head>
 <body>
   <div class="demo-shell">
     <div class="demo-header">
       <h1>代发收益 · 前端交互 Demo</h1>
-      <p>主用户：按日分配 list · 右上角添加 · 发起协议含协议内容</p>
-      <div class="demo-nav">
+      <p>主用户：无顶部统计；子用户仅协议确认页；发起/接受协议复用已实现页面</p>
+      <div class="demo-nav" id="screenNav">
         <button class="active" data-screen="screen-main-home">主 · 代发收益管理</button>
-        <button data-screen="screen-main-alloc-list">主 · 分配信息详情</button>
-        <button data-screen="screen-main-sub-detail">主 · 子用户详情</button>
+        <button data-screen="screen-main-alloc-list" data-hide-in-direct>主 · 分配信息详情</button>
+        <button data-screen="screen-main-sub-detail" data-hide-in-direct>主 · 子用户详情</button>
         <button data-screen="screen-main-invite">主 · 发起协议</button>
         <button data-screen="screen-sub-agreement">子 · 协议确认</button>
-        <button data-screen="screen-sub-alloc">子 · 我的代发收益</button>
-        <button data-screen="screen-sub-auth">子 · 发布帐号授权</button>
+      </div>
+      <div class="demo-nav" id="allocTypeNav" style="margin-top:8px">
+        <button type="button" class="active" data-alloc-mode="account">分配类型 · 发布帐号归因</button>
+        <button type="button" data-alloc-mode="direct">分配类型 · 右豹ID直接分配</button>
       </div>
     </div>
 
     <div class="phone-frame">
       <div class="phone-notch"></div>
+      <div class="fe-revision-bar embed-only">FR-002 · 首页统一五字段 · 发布帐号归因可下钻详情</div>
 
       <!-- 主 · 代发收益管理 -->
       <div id="screen-main-home" class="screen active">
@@ -347,15 +395,6 @@
           </div>
         </div>
         <div class="scroll-content">
-          <div class="hero-card">
-            <div class="label">累计已分配(元)</div>
-            <div class="amount">28,640.00</div>
-            <div class="hero-stats">
-              <div><div class="hero-stat-label">子用户数</div><div class="hero-stat-value">3</div></div>
-              <div><div class="hero-stat-label">关键词数</div><div class="hero-stat-value">128</div></div>
-              <div><div class="hero-stat-label">授权帐号</div><div class="hero-stat-value">5</div></div>
-            </div>
-          </div>
           <div class="page-tabs" role="tablist">
             <button type="button" class="active" data-home-tab="alloc-info" onclick="switchHomeTab('alloc-info', this)">分配信息</button>
             <button type="button" data-home-tab="sub-users" onclick="switchHomeTab('sub-users', this)">子用户信息</button>
@@ -367,98 +406,118 @@
                 <select class="filter-select"><option>全部时间</option><option>近7天</option><option>近30天</option></select>
               </div>
             </div>
-            <div class="record-card" onclick="goTo('screen-main-alloc-list')">
+
+            <div class="record-card home-alloc-card" onclick="handleHomeAllocClick()">
               <div class="record-card-header">
-                <div class="record-title">
-                  分配金额·<span class="amount-highlight">1910.00</span>
-                </div>
-                <span class="link-detail">查看详情 ›</span>
+                <div class="record-title">分配金额·<span class="amount-highlight">520.00</span></div>
+                <span class="link-detail mode-account-only">查看详情 ›</span>
               </div>
-              <div class="record-grid">
-                <div><div class="col-label">总金额</div><div class="col-value orange">3820.00</div></div>
-                <div><div class="col-label">分配用户数</div><div class="col-value">2</div></div>
-                <div><div class="col-label">关键词数</div><div class="col-value">5</div></div>
-              </div>
-              <div class="record-footer">
-                <span>分配时间·2026.08.13 00:03:21</span>
+              <div class="record-field-grid">
+                <div><div class="cell-label">分配金额</div><div class="cell-value orange">520.00</div></div>
+                <div><div class="cell-label">总金额</div><div class="cell-value orange">680.00</div></div>
+                <div><div class="cell-label">分配比例</div><div class="cell-value">40%</div></div>
+                <div class="field-span-2"><div class="cell-label">分配用户</div><div class="cell-value">豹豹子用户</div></div>
+                <div><div class="cell-label">分配时间</div><div class="cell-value field-time">2026.08.13 00:03:21</div></div>
               </div>
             </div>
-            <div class="record-card" onclick="goTo('screen-main-alloc-list')">
+
+            <div class="record-card home-alloc-card" onclick="handleHomeAllocClick()">
               <div class="record-card-header">
-                <div class="record-title">
-                  分配金额·<span class="amount-highlight">2280.00</span>
-                </div>
-                <span class="link-detail">查看详情 ›</span>
+                <div class="record-title">分配金额·<span class="amount-highlight">380.50</span></div>
+                <span class="link-detail mode-account-only">查看详情 ›</span>
               </div>
-              <div class="record-grid">
-                <div><div class="col-label">总金额</div><div class="col-value orange">4560.00</div></div>
-                <div><div class="col-label">分配用户数</div><div class="col-value">2</div></div>
-                <div><div class="col-label">关键词数</div><div class="col-value">4</div></div>
-              </div>
-              <div class="record-footer">
-                <span>分配时间·2026.08.12 00:03:18</span>
+              <div class="record-field-grid">
+                <div><div class="cell-label">分配金额</div><div class="cell-value orange">380.50</div></div>
+                <div><div class="cell-label">总金额</div><div class="cell-value orange">450.00</div></div>
+                <div><div class="cell-label">分配比例</div><div class="cell-value">40%</div></div>
+                <div class="field-span-2"><div class="cell-label">分配用户</div><div class="cell-value">豹豹子用户</div></div>
+                <div><div class="cell-label">分配时间</div><div class="cell-value field-time">2026.08.13 00:03:21</div></div>
               </div>
             </div>
-            <div class="record-card" onclick="goTo('screen-main-alloc-list')">
+
+            <div class="record-card home-alloc-card" onclick="handleHomeAllocClick()">
               <div class="record-card-header">
-                <div class="record-title">
-                  分配金额·<span class="amount-highlight">1450.00</span>
-                </div>
-                <span class="link-detail">查看详情 ›</span>
+                <div class="record-title">分配金额·<span class="amount-highlight">890.00</span></div>
+                <span class="link-detail mode-account-only">查看详情 ›</span>
               </div>
-              <div class="record-grid">
-                <div><div class="col-label">总金额</div><div class="col-value orange">2900.00</div></div>
-                <div><div class="col-label">分配用户数</div><div class="col-value">1</div></div>
-                <div><div class="col-label">关键词数</div><div class="col-value">3</div></div>
+              <div class="record-field-grid">
+                <div><div class="cell-label">分配金额</div><div class="cell-value orange">890.00</div></div>
+                <div><div class="cell-label">总金额</div><div class="cell-value orange">1100.00</div></div>
+                <div><div class="cell-label">分配比例</div><div class="cell-value">35%</div></div>
+                <div class="field-span-2"><div class="cell-label">分配用户</div><div class="cell-value">英文发布号</div></div>
+                <div><div class="cell-label">分配时间</div><div class="cell-value field-time">2026.08.13 00:03:21</div></div>
               </div>
-              <div class="record-footer">
-                <span>分配时间·2026.08.11 00:03:15</span>
+            </div>
+
+            <div class="record-card home-alloc-card" onclick="handleHomeAllocClick()">
+              <div class="record-card-header">
+                <div class="record-title">分配金额·<span class="amount-highlight">119.50</span></div>
+                <span class="link-detail mode-account-only">查看详情 ›</span>
+              </div>
+              <div class="record-field-grid">
+                <div><div class="cell-label">分配金额</div><div class="cell-value orange">119.50</div></div>
+                <div><div class="cell-label">总金额</div><div class="cell-value orange">149.38</div></div>
+                <div><div class="cell-label">分配比例</div><div class="cell-value">40%</div></div>
+                <div class="field-span-2"><div class="cell-label">分配用户</div><div class="cell-value">豹豹子用户</div></div>
+                <div><div class="cell-label">分配时间</div><div class="cell-value field-time">2026.08.12 00:03:18</div></div>
               </div>
             </div>
           </div>
           <div id="home-tab-sub-users" class="tab-panel">
-            <div class="sub-user-card" onclick="goTo('screen-main-sub-detail')">
+            <div class="sub-user-card" onclick="handleSubUserCardClick('detail')">
               <div class="sub-user-card-header">
                 <div class="avatar"></div>
                 <div class="sub-user-info">
                   <div class="sub-user-name">豹豹子用户 <span class="pill green">已同意</span></div>
                   <div class="sub-user-bind">协议于 · 2026.08.01 10:00:23（协议12天）</div>
                 </div>
-                <span class="chevron">›</span>
+                <span class="chevron mode-account-only">›</span>
               </div>
-              <div class="sub-user-card-stats">
+              <div class="sub-user-card-stats mode-account-only">
                 <div><div class="col-label">已分配金额</div><div class="col-value orange">12400.00</div></div>
                 <div><div class="col-label">授权帐号</div><div class="col-value">2</div></div>
                 <div><div class="col-label">分配比例</div><div class="col-value">40%</div></div>
               </div>
+              <div class="sub-user-card-stats cols-2 mode-direct-only">
+                <div><div class="col-label">已分配金额</div><div class="col-value orange">12400.00</div></div>
+                <div><div class="col-label">分配比例</div><div class="col-value">40%</div></div>
+              </div>
             </div>
-            <div class="sub-user-card" onclick="goTo('screen-main-sub-detail')">
+            <div class="sub-user-card" onclick="handleSubUserCardClick('detail')">
               <div class="sub-user-card-header">
                 <div class="avatar"></div>
                 <div class="sub-user-info">
                   <div class="sub-user-name">英文发布号 <span class="pill green">已同意</span></div>
                   <div class="sub-user-bind">协议于 · 2026.07.15 09:30:11（协议29天）</div>
                 </div>
-                <span class="chevron">›</span>
+                <span class="chevron mode-account-only">›</span>
               </div>
-              <div class="sub-user-card-stats">
+              <div class="sub-user-card-stats mode-account-only">
                 <div><div class="col-label">已分配金额</div><div class="col-value orange">8320.00</div></div>
                 <div><div class="col-label">授权帐号</div><div class="col-value">1</div></div>
                 <div><div class="col-label">分配比例</div><div class="col-value">35%</div></div>
               </div>
+              <div class="sub-user-card-stats cols-2 mode-direct-only">
+                <div><div class="col-label">已分配金额</div><div class="col-value orange">8320.00</div></div>
+                <div><div class="col-label">分配比例</div><div class="col-value">35%</div></div>
+              </div>
             </div>
-            <div class="sub-user-card" onclick="goTo('screen-main-invite')">
+            <div class="sub-user-card" onclick="handleSubUserCardClick('invite')">
               <div class="sub-user-card-header">
                 <div class="avatar"></div>
                 <div class="sub-user-info">
                   <div class="sub-user-name">U20260813102 <span class="pill orange">待确认</span></div>
                   <div class="sub-user-bind">邀请于 · 2026.08.20 14:22:05（待子用户确认协议）</div>
                 </div>
-                <span class="chevron">›</span>
+                <span class="chevron mode-account-only">›</span>
               </div>
-              <div class="sub-user-card-stats">
+              <div class="sub-user-card-stats mode-account-only">
                 <div><div class="col-label">已分配金额</div><div class="col-value">—</div></div>
                 <div><div class="col-label">授权帐号</div><div class="col-value">—</div></div>
+                <div><div class="col-label">分配比例</div><div class="col-value">25%</div></div>
+              </div>
+              <div class="sub-user-card-stats cols-2 mode-direct-only">
+                <div><div class="col-label">已分配金额</div><div class="col-value">—</div></div>
                 <div><div class="col-label">分配比例</div><div class="col-value">25%</div></div>
               </div>
             </div>
@@ -468,8 +527,9 @@
         <div class="rules-sheet" id="rulesSheet">
           <h3>分配规则</h3>
           <div class="step"><div class="dot"></div><div><strong>发起协议</strong><p class="desc" style="margin-top:4px">主用户添加子用户并约定分配比例，子用户确认后关系生效。</p></div></div>
-          <div class="step"><div class="dot"></div><div><strong>授权发布帐号</strong><p class="desc" style="margin-top:4px">子用户通过三方接口将发布帐号授权给主用户。</p></div></div>
-          <div class="step"><div class="dot"></div><div><strong>关键词出单分配</strong><p class="desc" style="margin-top:4px">出单后按关键词→发布帐号→比例自动分配，不可撤回。</p></div></div>
+          <div class="step mode-account-only"><div class="dot"></div><div><strong>授权发布帐号</strong><p class="desc" style="margin-top:4px">子用户通过三方接口将发布帐号授权给主用户。</p></div></div>
+          <div class="step mode-account-only"><div class="dot"></div><div><strong>关键词出单分配</strong><p class="desc" style="margin-top:4px">出单后按关键词→发布帐号→比例自动分配，不可撤回。</p></div></div>
+          <div class="step mode-direct-only"><div class="dot"></div><div><strong>收益直接分配</strong><p class="desc" style="margin-top:4px">出单后按约定比例自动分配至子用户项目收益钱包，不可撤回。</p></div></div>
           <button class="btn-secondary" style="margin-top:14px" onclick="closeRules()">我知道了</button>
         </div>
       </div>
@@ -480,48 +540,42 @@
         <div class="nav-bar">
           <button class="back" onclick="goTo('screen-main-home')">‹</button>
           <span class="title">2026-08-13 分配详情</span>
-          <button class="action" onclick="toast('已导出 CSV')">导出</button>
+          <button class="action" onclick="exportAllocDetail()">导出</button>
         </div>
         <div class="scroll-content">
-          <div class="stats-row">
-            <div class="stat-card"><div class="label">分配总额</div><div class="value">1910.00</div></div>
-            <div class="stat-card"><div class="label">子用户数</div><div class="value">2</div></div>
-            <div class="stat-card"><div class="label">关键词数</div><div class="value">5</div></div>
-          </div>
-
           <div class="alloc-detail-card">
-            <div class="alloc-detail-title"><span class="kw">右豹代发教程</span> · <span class="amt">520.00</span></div>
+            <div class="alloc-detail-title"><span class="kw">右豹代发教程</span></div>
             <div class="publish-account-data alloc-detail-data">
-              <div><div class="cell-label">用户昵称</div><div class="cell-value">豹豹子用户</div></div>
-              <div><div class="cell-label">帐号昵称</div><div class="cell-value">豹豹1号</div></div>
-              <div><div class="cell-label">账号ID</div><div class="cell-value">118717767</div></div>
+              <div><div class="cell-label">分配金额</div><div class="cell-value orange">520.00</div></div>
+              <div><div class="cell-label">分配比例</div><div class="cell-value">40%</div></div>
+              <div><div class="cell-label">发布帐号ID</div><div class="cell-value">118717767</div></div>
             </div>
           </div>
 
           <div class="alloc-detail-card">
-            <div class="alloc-detail-title"><span class="kw">关键词推广A</span> · <span class="amt">380.50</span></div>
+            <div class="alloc-detail-title"><span class="kw">关键词推广A</span></div>
             <div class="publish-account-data alloc-detail-data">
-              <div><div class="cell-label">用户昵称</div><div class="cell-value">豹豹子用户</div></div>
-              <div><div class="cell-label">帐号昵称</div><div class="cell-value">豹豹2号</div></div>
-              <div><div class="cell-label">账号ID</div><div class="cell-value">6610238</div></div>
+              <div><div class="cell-label">分配金额</div><div class="cell-value orange">380.50</div></div>
+              <div><div class="cell-label">分配比例</div><div class="cell-value">40%</div></div>
+              <div><div class="cell-label">发布帐号ID</div><div class="cell-value">6610238</div></div>
             </div>
           </div>
 
           <div class="alloc-detail-card">
-            <div class="alloc-detail-title"><span class="kw">TIK出海词</span> · <span class="amt">890.00</span></div>
+            <div class="alloc-detail-title"><span class="kw">TIK出海词</span></div>
             <div class="publish-account-data alloc-detail-data">
-              <div><div class="cell-label">用户昵称</div><div class="cell-value">英文发布号</div></div>
-              <div><div class="cell-label">帐号昵称</div><div class="cell-value">leopard_en</div></div>
-              <div><div class="cell-label">账号ID</div><div class="cell-value">8829103</div></div>
+              <div><div class="cell-label">分配金额</div><div class="cell-value orange">890.00</div></div>
+              <div><div class="cell-label">分配比例</div><div class="cell-value">35%</div></div>
+              <div><div class="cell-label">发布帐号ID</div><div class="cell-value">8829103</div></div>
             </div>
           </div>
 
           <div class="alloc-detail-card">
-            <div class="alloc-detail-title"><span class="kw">右豹代发教程</span> · <span class="amt">119.50</span></div>
+            <div class="alloc-detail-title"><span class="kw">右豹代发教程</span></div>
             <div class="publish-account-data alloc-detail-data">
-              <div><div class="cell-label">用户昵称</div><div class="cell-value">豹豹子用户</div></div>
-              <div><div class="cell-label">帐号昵称</div><div class="cell-value">豹豹1号</div></div>
-              <div><div class="cell-label">账号ID</div><div class="cell-value">118717767</div></div>
+              <div><div class="cell-label">分配金额</div><div class="cell-value orange">119.50</div></div>
+              <div><div class="cell-label">分配比例</div><div class="cell-value">40%</div></div>
+              <div><div class="cell-label">发布帐号ID</div><div class="cell-value">118717767</div></div>
             </div>
           </div>
         </div>
@@ -541,33 +595,7 @@
             <div class="profile-name">豹豹子用户 <span class="pill green">已同意</span></div>
             <div class="profile-meta">U20260813088 · 分配比例 40%<br>协议于 2026.08.01 · 已分配 ¥12,400 · 授权帐号 2</div>
           </div>
-          <div class="detail-tabs">
-            <button type="button" class="active" onclick="switchSubDetailTab('alloc', this)">分配明细</button>
-            <button type="button" onclick="switchSubDetailTab('accounts', this)">授权帐号</button>
-          </div>
-          <div id="sub-detail-alloc" class="detail-panel active">
-            <div class="record-card" style="cursor:default">
-              <div class="record-card-header">
-                <div class="record-title">右豹代发教程 · <span class="amount-highlight">520.00</span></div>
-              </div>
-              <div class="record-grid">
-                <div><div class="col-label">出单金额</div><div class="col-value orange">680.00</div></div>
-                <div><div class="col-label">发布帐号</div><div class="col-value" style="font-size:14px">豹豹1号</div></div>
-                <div><div class="col-label">分配时间</div><div class="col-value" style="font-size:13px">08.13</div></div>
-              </div>
-            </div>
-            <div class="record-card" style="cursor:default">
-              <div class="record-card-header">
-                <div class="record-title">关键词推广A · <span class="amount-highlight">380.50</span></div>
-              </div>
-              <div class="record-grid">
-                <div><div class="col-label">出单金额</div><div class="col-value orange">450.00</div></div>
-                <div><div class="col-label">发布帐号</div><div class="col-value" style="font-size:14px">豹豹2号</div></div>
-                <div><div class="col-label">分配时间</div><div class="col-value" style="font-size:13px">08.12</div></div>
-              </div>
-            </div>
-          </div>
-          <div id="sub-detail-accounts" class="detail-panel">
+          <div id="sub-detail-accounts" class="detail-panel active">
             <div class="publish-account-card">
               <div class="publish-account-head">
                 <div class="publish-account-head-left">
@@ -609,6 +637,7 @@
           <span style="width:32px"></span>
         </div>
         <div class="scroll-content">
+          <div class="demo-page-notice embed-only">本页复用<strong>已实现的发起协议页</strong>（图2）：填写邀请 + 分配信息 + 协议内容 + 发送协议邀请</div>
           <div class="card">
             <div class="card-head"><div class="card-title">填写邀请信息</div></div>
             <p class="desc" style="margin-bottom:12px">一个主用户可绑定多个子用户。提交后向子用户推送「代发收益协议邀请」系统通知。</p>
@@ -621,16 +650,23 @@
           </div>
           <div class="card">
             <div class="card-head"><div class="card-title">分配信息</div></div>
-            <table class="info-table">
+            <table class="info-table mode-account-only">
               <tr><td>主用户 ID</td><td>U20260813001</td></tr>
               <tr><td>子用户 ID</td><td>U20260813102</td></tr>
               <tr><td>分配比例</td><td>主 75% / 子 25%</td></tr>
-              <tr><td>生效条件</td><td>子用户同意协议 + 授权发布帐号</td></tr>
+              <tr><td>生效条件</td><td>子用户同意协议（发布帐号授权走三方接口，非子用户 C 端页面）</td></tr>
+            </table>
+            <table class="info-table mode-direct-only">
+              <tr><td>主用户 ID</td><td>U20260813200</td></tr>
+              <tr><td>子用户 ID</td><td>U20260813201</td></tr>
+              <tr><td>分配比例</td><td>主 70% / 子 30%</td></tr>
+              <tr><td>生效条件</td><td>子用户同意协议</td></tr>
             </table>
           </div>
           <div class="card">
             <div class="card-head"><div class="card-title">协议内容</div></div>
-            <p class="desc">读取现有说明内容（rev_share_agreement）。主账号与子账号按约定比例参与代发收益分配。子用户须通过三方接口将发布帐号授权给主用户。关键词出单后，系统按关键词→发布帐号→分配比例自动结算，分配记录不可撤回。</p>
+            <p class="desc mode-account-only">读取现有说明内容（rev_share_agreement）。主账号与子账号按约定比例参与代发收益分配。发布帐号数据由三方接口同步；关键词出单后，系统按关键词→发布帐号→分配比例自动结算，分配记录不可撤回。</p>
+            <p class="desc mode-direct-only">读取现有说明内容（rev_share_agreement）。主账号与子账号按约定比例参与代发收益分配，收益按约定比例打入子用户项目收益钱包，不需要关键词归因，分配记录不可撤回。</p>
           </div>
         </div>
         <div class="sticky-bar">
@@ -647,105 +683,24 @@
           <span style="width:32px"></span>
         </div>
         <div class="scroll-content">
+          <div class="demo-page-notice embed-only">本页复用<strong>已实现的接受协议页</strong>（图3）：子用户<strong>仅此一页</strong>，同意/拒绝后流程结束</div>
           <div class="card">
             <div class="card-head"><div class="card-title">分配信息</div><span class="pill orange">待确认</span></div>
             <table class="info-table">
               <tr><td>主用户 ID</td><td>U20260813001</td></tr>
               <tr><td>分配比例</td><td>主 75% / 子 25%</td></tr>
-              <tr><td>生效条件</td><td>同意协议 + 授权发布帐号</td></tr>
+              <tr><td>生效条件</td><td>子用户同意协议</td></tr>
             </table>
           </div>
           <div class="card">
             <div class="card-head"><div class="card-title">协议内容</div></div>
-            <p class="desc">读取现有说明内容（rev_share_agreement）。主账号与子账号按约定比例参与代发收益分配。</p>
+            <p class="desc mode-account-only">读取现有说明内容（rev_share_agreement）。主账号与子账号按约定比例参与代发收益分配。同意后流程结束，子用户无其他代发收益 C 端页面。</p>
+            <p class="desc mode-direct-only">读取现有说明内容（rev_share_agreement）。主账号与子账号按约定比例参与代发收益分配，收益按约定比例打入子用户项目收益钱包。同意后流程结束，子用户无其他代发收益 C 端页面。</p>
           </div>
         </div>
         <div class="sticky-bar">
-          <button class="btn-primary" onclick="toast('协议已同意');goTo('screen-sub-alloc')">我已阅读并同意协议</button>
+          <button class="btn-primary" onclick="agreeProtocol()">我已阅读并同意协议</button>
           <button class="btn-secondary" onclick="toast('你已拒绝该协议')">拒绝</button>
-        </div>
-      </div>
-
-      <!-- 子 · 发布帐号授权 -->
-      <div id="screen-sub-auth" class="screen">
-        <div class="status-bar"><span>9:41</span><span>●●●</span></div>
-        <div class="nav-bar">
-          <button class="back" onclick="goTo('screen-sub-alloc')">‹</button>
-          <span class="title">发布帐号授权</span>
-          <span style="width:32px"></span>
-        </div>
-        <div class="scroll-content">
-          <div class="card">
-            <p class="desc">请确认以下发布帐号已授权给主用户 <strong>U20260813001</strong>，授权完成后主用户方可按约定比例参与代发收益分配。</p>
-          </div>
-          <div class="publish-account-card">
-            <div class="publish-account-head">
-              <div class="publish-account-head-left">
-                <span class="platform-badge">抖音</span>
-                <span class="publish-account-name">豹豹1号</span>
-              </div>
-            </div>
-            <div class="publish-account-data">
-              <div><div class="cell-label">账号ID</div><div class="cell-value">118717767</div></div>
-              <div><div class="cell-label">粉丝量</div><div class="cell-value">584</div></div>
-              <div><div class="cell-label">主页链接</div><div class="cell-value link">https://v.douyin.com/…</div></div>
-            </div>
-            <div class="publish-account-foot">创建时间·2026-07-31 15:19:33</div>
-          </div>
-          <div class="publish-account-card">
-            <div class="publish-account-head">
-              <div class="publish-account-head-left">
-                <span class="platform-badge">快手</span>
-                <span class="publish-account-name">豹豹2号</span>
-              </div>
-            </div>
-            <div class="publish-account-data">
-              <div><div class="cell-label">账号ID</div><div class="cell-value">6610238</div></div>
-              <div><div class="cell-label">粉丝量</div><div class="cell-value">1.2k</div></div>
-              <div><div class="cell-label">主页链接</div><div class="cell-value link">https://v.kuaishou.com/…</div></div>
-            </div>
-            <div class="publish-account-foot">创建时间·2026-07-28 09:12:08</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 子 · 我的代发收益 -->
-      <div id="screen-sub-alloc" class="screen">
-        <div class="status-bar"><span>9:41</span><span>●●●</span></div>
-        <div class="nav-bar">
-          <button class="back">‹</button>
-          <span class="title">我的代发收益</span>
-          <button class="action" type="button" onclick="goTo('screen-sub-auth')">查看帐号</button>
-        </div>
-        <div class="scroll-content">
-          <div class="hero-card">
-            <div class="label">累计已获得(元)</div>
-            <div class="amount">12,400.00</div>
-            <div class="hero-stats sub-home">
-              <div class="hero-stat-label">授权帐号数</div>
-              <div class="hero-stat-value">2</div>
-            </div>
-          </div>
-          <div class="record-card" style="cursor:default">
-            <div class="record-card-header">
-              <div class="record-title">分配金额·<span class="amount-highlight">520.00</span></div>
-            </div>
-            <div class="record-grid">
-              <div><div class="col-label">关键词</div><div class="col-value" style="font-size:13px">右豹代发教程</div></div>
-              <div><div class="col-label">发布帐号</div><div class="col-value" style="font-size:14px">豹豹1号</div></div>
-              <div><div class="col-label">分配时间</div><div class="col-value" style="font-size:13px">08.13</div></div>
-            </div>
-          </div>
-          <div class="record-card" style="cursor:default">
-            <div class="record-card-header">
-              <div class="record-title">分配金额·<span class="amount-highlight">380.50</span></div>
-            </div>
-            <div class="record-grid">
-              <div><div class="col-label">关键词</div><div class="col-value" style="font-size:13px">关键词推广A</div></div>
-              <div><div class="col-label">发布帐号</div><div class="col-value" style="font-size:14px">豹豹2号</div></div>
-              <div><div class="col-label">分配时间</div><div class="col-value" style="font-size:13px">08.12</div></div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -754,11 +709,47 @@
   <div class="toast" id="toast"></div>
 
   <script>
+    let allocMode = 'account';
+
+    const DIRECT_HIDDEN_SCREENS = ['screen-main-alloc-list', 'screen-main-sub-detail'];
+
+    function setAllocMode(mode) {
+      allocMode = mode === 'direct' ? 'direct' : 'account';
+      document.body.classList.remove('mode-account', 'mode-direct');
+      document.body.classList.add(allocMode === 'direct' ? 'mode-direct' : 'mode-account');
+      document.querySelectorAll('#allocTypeNav button').forEach(b =>
+        b.classList.toggle('active', b.dataset.allocMode === allocMode)
+      );
+      document.querySelectorAll('#screenNav button[data-hide-in-direct]').forEach(btn => {
+        btn.classList.toggle('nav-screen-direct-hidden', allocMode === 'direct');
+      });
+      const activeScreen = document.querySelector('.screen.active')?.id;
+      if (allocMode === 'direct' && DIRECT_HIDDEN_SCREENS.includes(activeScreen)) {
+        goTo('screen-main-home');
+      }
+    }
+
+    function handleHomeAllocClick() {
+      if (allocMode === 'direct') return;
+      goTo('screen-main-alloc-list');
+    }
+
+    function handleSubUserCardClick(action) {
+      if (allocMode === 'direct') return;
+      if (action === 'detail') goTo('screen-main-sub-detail');
+      if (action === 'invite') goTo('screen-main-invite');
+    }
+
+    function agreeProtocol() {
+      toast('协议已同意');
+    }
+
     function goTo(id) {
+      if (allocMode === 'direct' && DIRECT_HIDDEN_SCREENS.includes(id)) return;
       closeRules();
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.getElementById(id).classList.add('active');
-      document.querySelectorAll('.demo-nav button').forEach(b => b.classList.toggle('active', b.dataset.screen === id));
+      document.querySelectorAll('#screenNav button').forEach(b => b.classList.toggle('active', b.dataset.screen === id));
     }
     function switchHomeTab(tabId, btn) {
       document.querySelectorAll('#screen-main-home .page-tabs button').forEach(b => b.classList.remove('active'));
@@ -786,13 +777,47 @@
       el.classList.add('show');
       setTimeout(() => el.classList.remove('show'), 1800);
     }
-    document.querySelectorAll('.demo-nav button').forEach(btn => btn.addEventListener('click', () => goTo(btn.dataset.screen)));
+
+    const allocDetailExportAccount = [
+      { keyword: '右豹代发教程', amount: '520.00', ratio: '40%', accountId: '118717767' },
+      { keyword: '关键词推广A', amount: '380.50', ratio: '40%', accountId: '6610238' },
+      { keyword: 'TIK出海词', amount: '890.00', ratio: '35%', accountId: '8829103' },
+      { keyword: '右豹代发教程', amount: '119.50', ratio: '40%', accountId: '118717767' },
+    ];
+
+    function exportAllocDetail() {
+      const esc = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
+      const header = '关键词,分配金额,分配比例,发布帐号ID\n';
+      const rows = allocDetailExportAccount.map(r =>
+        [r.keyword, r.amount, r.ratio, r.accountId].map(esc).join(',')
+      );
+      const blob = new Blob(['\ufeff' + header + rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = '2026-08-13_分配详情.csv';
+      link.click();
+      URL.revokeObjectURL(link.href);
+      toast('已导出 CSV');
+    }
+    document.querySelectorAll('#screenNav button').forEach(btn => btn.addEventListener('click', () => goTo(btn.dataset.screen)));
+    document.querySelectorAll('#allocTypeNav button').forEach(btn => btn.addEventListener('click', () => setAllocMode(btn.dataset.allocMode)));
     const urlParams = new URLSearchParams(location.search);
     if (urlParams.get('embed') === '1') document.body.classList.add('embed-mode');
     const init = urlParams.get('screen');
-    if (init && document.getElementById(init)) goTo(init);
+    setAllocMode(urlParams.get('allocType') === 'direct' ? 'direct' : 'account');
+    if (init && document.getElementById(init)) {
+      if (allocMode === 'direct' && DIRECT_HIDDEN_SCREENS.includes(init)) {
+        goTo('screen-main-home');
+      } else {
+        goTo(init);
+      }
+    }
     window.addEventListener('message', e => {
-      if (e.data?.type === 'goToScreen' && document.getElementById(e.data.screen)) goTo(e.data.screen);
+      if (e.data?.type === 'setAllocMode') setAllocMode(e.data.mode);
+      if (e.data?.type === 'goToScreen' && document.getElementById(e.data.screen)) {
+        if (e.data.allocType) setAllocMode(e.data.allocType);
+        goTo(e.data.screen);
+      }
     });
   </script>
 </body>

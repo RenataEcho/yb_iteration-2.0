@@ -164,7 +164,41 @@
       display: flex; flex-direction: column;
     }
     .drawer.open { transform: translateX(0); }
-    .drawer-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+    .drawer.drawer-wide { width: 720px; max-width: 92vw; }
+    .drawer-tab-bar {
+      display: flex; gap: 0; padding: 0 16px; border-bottom: 1px solid var(--border); flex-shrink: 0;
+    }
+    .drawer-tab-bar button {
+      padding: 10px 18px; border: none; background: none; cursor: pointer;
+      font-size: 13px; color: var(--text-secondary); border-bottom: 2px solid transparent; margin-bottom: -1px;
+    }
+    .drawer-tab-bar button.active { color: var(--primary); font-weight: 600; border-bottom-color: var(--primary); }
+    .relation-detail-panel { display: none; }
+    .relation-detail-panel.active { display: block; }
+    .detail-table.relation-alloc-table { min-width: 620px; table-layout: fixed; width: 100%; }
+    .detail-table.relation-alloc-table th,
+    .detail-table.relation-alloc-table td { padding: 5px 7px; font-size: 11px; line-height: 1.35; }
+    .detail-table.relation-alloc-table th { font-size: 10px; padding-top: 6px; padding-bottom: 6px; }
+    .detail-table.relation-alloc-table .col-date { width: 88px; white-space: nowrap; }
+    .detail-table.relation-alloc-table .col-money { width: 72px; white-space: nowrap; text-align: right; }
+    .detail-table.relation-alloc-table .col-time { width: 118px; white-space: nowrap; font-size: 10px; }
+    .detail-table.relation-alloc-table .col-attrib { width: auto; min-width: 140px; }
+    .detail-table.relation-alloc-table th.col-money { text-align: right; }
+    .attrib-cell .cell-main { font-weight: 600; font-size: 11px; }
+    .attrib-cell .cell-sub { font-size: 10px; color: var(--text-muted); margin-top: 1px; line-height: 1.3; }
+    .relation-alloc-toolbar {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      margin-bottom: 10px; flex-wrap: wrap;
+    }
+    .relation-alloc-toolbar .meta { font-size: 11px; color: var(--text-muted); }
+    .admin-panel-hint {
+      margin: 0 16px 12px; padding: 10px 12px; border-radius: var(--radius-sm);
+      background: #eff6ff; border: 1px solid #bfdbfe; font-size: 12px; color: #1e40af; line-height: 1.55;
+    }
+    .drawer-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 16px; border-bottom: 1px solid var(--border); flex-shrink: 0;
+    }
     .drawer-header h2 { font-size: 15px; font-weight: 700; }
     .drawer-close { width: 28px; height: 28px; border: none; background: #f1f5f9; border-radius: 6px; cursor: pointer; font-size: 16px; }
     .drawer-nav { display: flex; gap: 4px; padding: 10px 16px; border-bottom: 1px solid var(--border); overflow-x: auto; flex-shrink: 0; }
@@ -263,6 +297,11 @@
     .log-item:last-child { border-bottom: none; }
     .log-item time { display: block; color: var(--text-muted); font-size: 11px; margin-bottom: 4px; }
     .empty-hint { padding: 24px; text-align: center; color: var(--text-muted); font-size: 13px; }
+    .form-hint {
+      margin-top: 10px; padding: 10px 12px; border-radius: var(--radius-sm);
+      background: #f8fafc; border: 1px solid var(--border); font-size: 12px; color: var(--text-secondary); line-height: 1.6;
+    }
+    .form-hint.warn { background: #fffbeb; border-color: #fde68a; color: #92400e; }
   </style>
 </head>
 <body>
@@ -295,7 +334,7 @@
           <span class="badge badge-fr">FR-002</span>
           <span class="badge badge-version">v1 当前</span>
         </h1>
-        <p class="page-desc">主子用户协议确认 + 三方发布帐号授权 + 关键词出单分配。分配引擎与 FR-001 代发分配一致；差异在于 1:N 主子关系、协议邀请流、三方授权对接。</p>
+        <p class="page-desc">主子用户协议确认 + 收益自动分配。后台新增<strong>分配类型</strong>：右豹ID直接分配（按比例打入子用户项目收益钱包）/ 以发布帐号归因分配（关键词→发布帐号归因）；同一主用户不可混用两种类型。</p>
       </div>
       <div class="page-header-actions">
         <button class="btn btn-rule" id="toggleRuleDrawer" type="button">📋 需求规则</button>
@@ -314,32 +353,32 @@
         <div class="glass-card scene-panel">
           <h2>场景切换</h2>
           <div class="scene-list">
-            <button class="scene-btn active" type="button" data-screen="screen-main-home">
-              <div class="scene-title">图1 · 代发收益管理（主用户）</div>
-              <div class="scene-desc">累计已分配 + 子用户数/关键词数/授权帐号；分配 record-card；子用户信息头像卡片</div>
+            <button class="scene-btn active" type="button" data-screen="screen-main-home" data-alloc-type="account">
+              <div class="scene-title">图1 · 代发收益管理（主用户 · 发布帐号归因）</div>
+              <div class="scene-desc">首页统一：分配金额/总金额/分配比例/分配用户（子用户昵称）/分配时间；含查看详情入口</div>
             </button>
-            <button class="scene-btn" type="button" data-screen="screen-main-alloc-list">
-              <div class="scene-title">图1.1 · 分配信息详情（主用户）</div>
-              <div class="scene-desc">统计区 + 关键词卡片：灰色信息域仅用户昵称/帐号昵称/账号ID</div>
+            <button class="scene-btn" type="button" data-screen="screen-main-home" data-alloc-type="direct">
+              <div class="scene-title">图1 · 代发收益管理（主用户 · 右豹ID直接分配）</div>
+              <div class="scene-desc">分配信息与子用户信息 Tab 字段一致；子用户信息 Tab 无授权帐号、无查看详情入口</div>
             </button>
-            <button class="scene-btn" type="button" data-screen="screen-main-sub-detail">
+            <button class="scene-btn" type="button" data-screen="screen-main-alloc-list" data-alloc-type="account">
+              <div class="scene-title">图1.1 · 分配信息详情（发布帐号归因）</div>
+              <div class="scene-desc">关键词标题 + 灰底域：分配金额/分配比例/发布帐号ID；支持导出</div>
+            </button>
+            <button class="scene-btn" type="button" data-screen="screen-main-sub-detail" data-alloc-type="account">
               <div class="scene-title">图1.2 · 子用户详情（主用户）</div>
-              <div class="scene-desc">头像信息卡 + Tab：分配明细 / 授权帐号（只读，无编辑）</div>
+              <div class="scene-desc">头像信息卡 + 授权帐号列表（只读，无编辑）；无分配明细 Tab</div>
             </button>
             <button class="scene-btn" type="button" data-screen="screen-main-invite">
-              <div class="scene-title">图2 · 发起协议（主用户）</div>
-              <div class="scene-desc">填写邀请 + 分配信息 + 协议内容（对齐子用户确认页）</div>
+              <div class="scene-title">图2 · 发起协议 / 添加子用户（主用户）</div>
+              <div class="scene-desc">占位页：使用现在已经实现的发送邀请页面</div>
             </button>
             <button class="scene-btn" type="button" data-screen="screen-sub-agreement">
               <div class="scene-title">图3 · 协议确认（子用户）</div>
-              <div class="scene-desc">系统通知进入；同意/拒绝协议（子用户仅此一页）；同意后进入「我的代发收益」</div>
-            </button>
-            <button class="scene-btn" type="button" data-screen="screen-sub-alloc">
-              <div class="scene-title">图4 · 我的代发收益（子用户）</div>
-              <div class="scene-desc">累计已获得 + 授权帐号数；分配 record-card；三方授权在平台外部完成</div>
+              <div class="scene-desc">占位页：使用现在已经实现的接受邀请页面；子用户仅此一页</div>
             </button>
           </div>
-          <div class="scene-note">子用户协议确认仅一页；三方发布帐号授权走平台外部 API，不在 C 端单独展示授权页。</div>
+          <div class="scene-note">主用户 C 端<strong>所有页面均无顶部数据统计</strong>。子用户<strong>仅协议确认页</strong>（图3）。添加子用户、接受协议分别复用已实现的发送邀请/接受邀请页面，本 Demo 不重做表单与按钮。<br><strong>管理后台</strong>见页内 Tab「管理后台」→ 主子分配关系 → 操作「详情」→ Tab「分配详情」。</div>
         </div>
         <div class="glass-card mockup-panel">
           <div class="mockup-frame-wrap">
@@ -358,6 +397,7 @@
           <button type="button" data-panel="panel-keywords">代发关键词</button>
         </div>
         <div id="panel-relations" class="admin-panel active">
+          <div class="admin-panel-hint">列表操作「<strong>详情</strong>」打开抽屉，Tab 切换「<strong>关系详情</strong> / <strong>分配详情</strong>」；分配详情含日期、主/子帐号金额、分配时间与分配归因（项目 / 关键词 / 发布帐号），支持导出 CSV。</div>
           <div class="admin-metrics">
             <div class="admin-metric"><label>已分配金额</label><strong>¥20,720.00</strong><span>累计已完成</span></div>
             <div class="admin-metric"><label>待分配金额</label><strong>¥3,280.00</strong><span>待结算出单</span></div>
@@ -370,6 +410,7 @@
             <div class="filter-field"><label>子用户 ID</label><input type="text" id="filterSubUser" placeholder="U20260813088" /></div>
             <div class="filter-field"><label>协议状态</label><select id="filterAgreement"><option value="">全部</option><option>待确认</option><option>已同意</option><option>已拒绝</option></select></div>
             <div class="filter-field"><label>分配状态</label><select id="filterAllocStatus"><option value="">全部</option><option>启用</option><option>禁用</option></select></div>
+            <div class="filter-field"><label>分配类型</label><select id="filterAllocType"><option value="">全部</option><option>右豹ID直接分配</option><option>以发布帐号归因分配</option></select></div>
             <div class="filter-actions">
               <button class="btn-ghost-sm" type="button" onclick="resetRelationsFilter()">重置</button>
               <button class="btn btn-primary" type="button" onclick="queryRelations()">查询</button>
@@ -380,7 +421,7 @@
             <table>
               <thead>
                 <tr>
-                  <th>ID</th><th>主用户ID</th><th>子用户ID</th><th>分配比例</th>
+                  <th>ID</th><th>主用户ID</th><th>子用户ID</th><th>分配比例</th><th>分配类型</th>
                   <th>协议状态</th><th>分配状态</th><th>发布帐号数</th><th>已分配金额</th><th>操作</th>
                 </tr>
               </thead>
@@ -494,7 +535,7 @@
                 <rect x="700" y="260" width="160" height="40" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
                 <text x="780" y="286" text-anchor="middle" font-size="11" fill="#18222f">协议状态=已同意</text>
                 <rect x="660" y="300" width="240" height="48" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
-                <text x="780" y="322" text-anchor="middle" font-size="11" fill="#18222f">子用户进入「我的代发收益」</text>
+                <text x="780" y="322" text-anchor="middle" font-size="11" fill="#18222f">协议状态=已同意，流程结束</text>
                 <text x="780" y="338" text-anchor="middle" font-size="10" fill="#64748b">分配状态=启用时生效</text>
                 <rect x="300" y="352" width="280" height="44" rx="8" fill="#eff6ff" stroke="#2563eb"/>
                 <text x="440" y="380" text-anchor="middle" font-size="12" fill="#18222f">C端：主用户列表展示协议状态</text>
@@ -504,7 +545,7 @@
         </div>
 
         <div id="flow-2" class="flow-panel-body">
-          <div class="flow-panel-desc">流程 2 · 三方发布帐号授权 <span class="tag-flow">子用户 C 端 + 三方 API</span></div>
+          <div class="flow-panel-desc">流程 2 · 三方发布帐号授权 <span class="tag-flow">三方 API</span> · 子用户 C 端无独立授权页，数据由三方接口同步至发布帐号表</div>
           <div class="flow-svg-wrap">
             <svg viewBox="0 0 880 380" width="880" height="380" xmlns="http://www.w3.org/2000/svg">
               <defs><marker id="arr2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8"/></marker></defs>
@@ -542,7 +583,7 @@
         </div>
 
         <div id="flow-3" class="flow-panel-body">
-          <div class="flow-panel-desc">流程 3 · 关键词出单→结算→分配明细 <span class="tag-flow">前后端</span></div>
+          <div class="flow-panel-desc">流程 3 · 关键词出单→结算→分配明细 <span class="tag-flow">前后端</span> · 按分配类型分支：<strong>右豹ID直接分配</strong> 跳过关键词/发布帐号归因；<strong>以发布帐号归因分配</strong> 走关键词→发布帐号链路</div>
           <div class="flow-svg-wrap">
             <svg viewBox="0 0 960 600" width="960" height="600" xmlns="http://www.w3.org/2000/svg">
               <defs><marker id="arr3" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8"/></marker></defs>
@@ -600,9 +641,9 @@
                 <text x="150" y="306" text-anchor="middle" font-size="10" fill="#64748b">含分配时间字段</text>
                 <rect x="40" y="348" width="220" height="72" rx="8" fill="#eff6ff" stroke="#2563eb"/>
                 <text x="150" y="374" text-anchor="middle" font-size="11" fill="#18222f">
-                  <tspan x="150" dy="0">子用户 C 端</tspan><tspan x="150" dy="14">我的代发收益</tspan>
+                  <tspan x="150" dy="0">子用户 C 端</tspan><tspan x="150" dy="14">协议确认（仅此一页）</tspan>
                 </text>
-                <text x="150" y="406" text-anchor="middle" font-size="10" fill="#64748b">仅代发累计收益</text>
+                <text x="150" y="406" text-anchor="middle" font-size="10" fill="#64748b">同意后流程结束</text>
                 <rect x="700" y="248" width="220" height="72" rx="8" fill="#eff6ff" stroke="#2563eb"/>
                 <text x="810" y="274" text-anchor="middle" font-size="11" fill="#18222f">
                   <tspan x="810" dy="0">管理后台</tspan><tspan x="810" dy="14">关键词详情 list</tspan>
@@ -610,7 +651,7 @@
                 <text x="810" y="306" text-anchor="middle" font-size="10" fill="#64748b">6 列合并明细</text>
                 <polygon points="480,488 518,510 480,532 442,510" fill="#fffbeb" stroke="#d97706"/>
                 <polygon points="480,488 518,510 480,532 442,510" fill="#fffbeb" stroke="#d97706"/>
-                <text x="480" y="514" text-anchor="middle" font-size="11" fill="#92400e">协议+授权有效?</text>
+                <text x="480" y="514" text-anchor="middle" font-size="11" fill="#92400e">协议有效+类型校验</text>
                 <rect x="40" y="548" width="220" height="44" rx="8" fill="#fef2f2" stroke="#dc2626"/>
                 <text x="150" y="568" text-anchor="middle" font-size="10" fill="#991b1b">代发分配记录不可撤回</text>
                 <rect x="700" y="548" width="220" height="44" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
@@ -655,12 +696,19 @@
 
   <!-- 主子关系详情抽屉 -->
   <div class="drawer-overlay" id="relationDetailOverlay" onclick="closeRelationDetail()"></div>
-  <aside class="drawer" id="relationDetailDrawer">
+  <aside class="drawer drawer-wide" id="relationDetailDrawer">
     <div class="drawer-header">
-      <h2 id="relationDetailTitle">关系详情</h2>
+      <h2 id="relationDetailTitle">分配关系详情</h2>
       <button class="drawer-close" type="button" onclick="closeRelationDetail()">×</button>
     </div>
-    <div class="drawer-body" id="relationDetailBody"></div>
+    <div class="drawer-tab-bar" id="relationDetailTabs">
+      <button type="button" class="active" data-rel-tab="info" onclick="switchRelationDetailTab('info', this)">关系详情</button>
+      <button type="button" data-rel-tab="alloc" onclick="switchRelationDetailTab('alloc', this)">分配详情</button>
+    </div>
+    <div class="drawer-body">
+      <div id="relation-detail-info" class="relation-detail-panel active"></div>
+      <div id="relation-detail-alloc" class="relation-detail-panel"></div>
+    </div>
   </aside>
 
   <!-- 发布帐号日志抽屉 -->
@@ -678,12 +726,20 @@
     <div class="modal modal-md" onclick="event.stopPropagation()">
       <div class="modal-header">
         <h3 id="relationFormTitle">新增关系</h3>
-        <p>填写主子用户与分配比例，保存后向子用户推送协议邀请。</p>
+        <p>填写主子用户、分配比例与分配类型；保存后向子用户推送协议邀请。</p>
       </div>
       <div class="modal-body">
         <div class="form-row">
-          <div class="form-field"><label>主用户 ID</label><input type="text" id="formMainUser" placeholder="U20260813001" /></div>
+          <div class="form-field"><label>主用户 ID</label><input type="text" id="formMainUser" placeholder="U20260813001" oninput="updateAllocTypeHint()" /></div>
           <div class="form-field"><label>子用户 ID</label><input type="text" id="formSubUser" placeholder="U20260813102" /></div>
+        </div>
+        <div class="form-field">
+          <label>分配类型</label>
+          <select id="formAllocType" onchange="updateAllocTypeHint()">
+            <option value="以发布帐号归因分配">以发布帐号归因分配</option>
+            <option value="右豹ID直接分配">右豹ID直接分配</option>
+          </select>
+          <div class="form-hint" id="allocTypeHint">按关键词找到发布帐号进行收益分配归因；需三方发布帐号授权有效。</div>
         </div>
         <div class="form-row">
           <div class="form-field"><label>分配比例 (%)</label><input type="number" id="formRatio" min="1" max="99" placeholder="25" /></div>
@@ -731,22 +787,23 @@
         <div class="rule-section" id="rule-fe-1">
           <h3><span>1</span>业务目标</h3>
           <div class="rule-content">
-            <p>在主子用户关系下增加「代发收益」能力：主用户可绑定<strong>多个子用户</strong>，经协议确认与子用户三方授权发布帐号后，关键词出单按「关键词→发布帐号→分配比例」<strong>自动分配</strong>。分配引擎口径与 FR-001 代发分配一致。</p>
+            <p>在主子用户关系下增加「代发收益」能力：主用户可绑定<strong>多个子用户</strong>，经协议确认后按<strong>分配类型</strong>自动分配收益——「右豹ID直接分配」按比例打入子用户项目收益钱包；「以发布帐号归因分配」按关键词→发布帐号→比例归因（口径与 FR-001 一致）。</p>
           </div>
         </div>
         <div class="rule-section" id="rule-fe-2">
           <h3><span>2</span>页面与入口</h3>
           <div class="rule-content">
             <ul>
-              <li><strong>代发收益管理（主用户）</strong>：个人中心入口「代发收益」；顶部统计区：<strong>累计已分配</strong>（主大字）+ 子用户数、关键词数、授权帐号；右上角<strong>规则 icon</strong> + <strong>「添加」</strong>按钮；列表区 Tab 切换「分配信息 / 子用户信息」。</li>
-              <li><strong>分配信息 Tab</strong>：按<strong>日</strong> record-card 展示；标题「分配金额·xxx」+ 查看详情；三列统计：<strong>总金额</strong>、<strong>分配用户数</strong>、<strong>关键词数</strong>；底部分配时间。<strong>不展示</strong>「代发」标签与「系统自动分配，不可撤回」文案。顶部筛选<strong>仅保留时间</strong>（去掉状态选择）。点击下钻当日<strong>分配详情</strong>：顶部统计区 + 明细 list（每条 = 关键词卡片）。</li>
-              <li><strong>分配详情 · 明细卡片</strong>：标题 = <code>{关键词} · {分配金额}</code>；灰色信息域<strong>仅</strong>展示用户昵称、帐号昵称、账号ID。<strong>不展示</strong>发布平台标签、编辑入口、粉丝量、主页链接。</li>
-              <li><strong>子用户详情 · 分配明细</strong>：卡片标题 = <code>{关键词} · {分配金额}</code>（非「分配金额·xxx」）；三列统计：出单金额、发布帐号、分配时间。</li>
-              <li><strong>子用户详情 · 授权帐号</strong>：发布帐号卡片（平台徽章 + 昵称 + 灰色信息域：账号ID、粉丝量、主页链接 + 创建时间），<strong>无编辑操作</strong>。</li>
-              <li><strong>我的代发收益（子用户首页）</strong>：接受邀请并同意协议后<strong>默认进入本页</strong>；顶部统计区：<strong>累计已获得</strong>（主大字）+ 授权帐号数（底栏左右分布）；分配 record-card 标题「分配金额·xxx」；三列：关键词、发布帐号、分配时间；<strong>不展示</strong>「代发」标签与「系统自动分配，不可撤回」文案。</li>
-              <li><strong>子用户信息 Tab</strong>：头像卡片列表（昵称/ID + 协议状态 + 协议/邀请时间）；底部三列：<strong>已分配金额</strong>、<strong>授权帐号</strong>、<strong>分配比例</strong>；点击进入子用户详情（头像信息卡 + Tab 分配明细 / 授权帐号）。</li>
-              <li><strong>发起协议（主用户）</strong>：上方填写子用户 ID + 比例；下方展示<strong>分配信息</strong>与<strong>协议内容</strong>（布局参考子用户协议确认页）；底部「发送协议邀请」。</li>
-              <li><strong>协议确认（子用户 · 唯一接受页）</strong>：系统通知进入；展示分配信息与协议正文（<code>rev_share_agreement</code>）；同意/拒绝后分别跳转「我的代发收益」或返回；<strong>无额外 C 端授权页</strong>，三方发布帐号授权在平台外部完成。</li>
+              <li><strong>代发收益管理（主用户 · 通用）</strong>：个人中心入口「代发收益」；<strong>不展示顶部数据统计</strong>（无累计已分配/子用户数/关键词数/授权帐号等 hero 区，两种分配类型一致）；右上角规则 icon +「添加」；Tab = 分配信息 / 子用户信息。</li>
+              <li><strong>分配信息 Tab（两种分配类型 · 首页一致）</strong>：record-card 标题「分配金额·xxx」+ 灰底字段域，五列 = <strong>分配金额、总金额、分配比例、分配用户</strong>（子用户右豹昵称）、<strong>分配时间</strong>。</li>
+              <li><strong>分配信息 Tab · 发布帐号归因</strong>：首页字段同上；卡片含「查看详情」入口，下钻至分配详情页。</li>
+              <li><strong>分配信息 Tab · 右豹ID直接分配</strong>：首页字段同上；无查看详情、不可下钻。</li>
+              <li><strong>分配详情 · 发布帐号归因</strong>：关键词作卡片标题；灰底字段域 = 分配金额、分配比例、发布帐号ID；支持导出。</li>
+              <li><strong>子用户信息 Tab · 发布帐号归因</strong>：头像卡片 + 协议状态/时间；三列 = 已分配金额、授权帐号、分配比例；可进入子用户详情。</li>
+              <li><strong>子用户信息 Tab · 右豹ID直接分配</strong>：头像卡片 + 协议状态/时间；两列 = 已分配金额、分配比例；<strong>不展示授权帐号</strong>；<strong>无查看详情入口</strong>，不可下钻子用户详情页。</li>
+              <li><strong>子用户详情</strong>（仅发布帐号归因 · 从子用户 Tab 下钻）：头像信息卡 + <strong>授权帐号</strong>列表（只读）；<strong>不提供分配明细 Tab</strong>。</li>
+              <li><strong>发起协议 / 添加子用户（主用户 · 图2）</strong>：复用<strong>已实现的发送邀请页面</strong>；本 FR Demo 仅展示占位提示，不重做该页布局与表单。</li>
+              <li><strong>协议确认（子用户 · 图3）</strong>：复用<strong>已实现的接受邀请页面</strong>；本 FR Demo 仅展示占位提示；<strong>所有分配类型下子用户仅此一页</strong>，同意后流程结束，<strong>不进入</strong>代发收益子页。</li>
             </ul>
           </div>
         </div>
@@ -754,12 +811,16 @@
           <h3><span>3</span>交互规则</h3>
           <div class="rule-content">
             <ul>
-              <li>子用户视角闭环：<strong>接受邀请 → 同意协议（仅此一页）→ 进入「我的代发收益」</strong>；三方发布帐号授权在平台外部 API 完成，不在 C 端单独展示授权页。</li>
-              <li>一个主用户可绑定<strong>多个子用户</strong>；每条主子关系独立维护协议状态与分配比例。</li>
-              <li>分配前置条件：<strong>协议已同意</strong> + <strong>发布帐号三方授权有效</strong> + 分配状态启用。</li>
+              <li>主用户 C 端<strong>所有页面均不展示顶部数据统计</strong>（含代发收益首页、分配详情下钻页；无 hero 区、无汇总 stat 条）。</li>
+              <li>子用户视角（<strong>所有分配类型</strong>）：系统通知 → 接受协议页（图3）→ 同意/拒绝 → <strong>流程结束</strong>，无子用户代发收益首页。</li>
+              <li>主用户添加子用户：跳转/复用<strong>发起协议页</strong>（图2），与接受协议页（图3）成对，布局与文案以 Demo 已实现页面为准。</li>
+              <li>一个主用户可绑定<strong>多个子用户</strong>；每条主子关系独立维护协议状态与分配比例；<strong>同一主用户下所有关系须共用一种分配类型</strong>。</li>
+              <li><strong>右豹ID直接分配</strong>：协议已同意 + 分配状态启用即可参与分配；按约定比例将收益打入子用户<strong>项目收益钱包</strong>，<strong>不需要关键词归因</strong>，不依赖发布帐号授权。</li>
+              <li><strong>以发布帐号归因分配</strong>：协议已同意 + <strong>发布帐号三方授权有效</strong> + 分配状态启用；出单后按关键词→发布帐号→比例归因分配。</li>
+              <li><strong>右豹ID直接分配 · 子用户信息 Tab</strong>：列表仅展示已分配金额与分配比例；不展示授权帐号；卡片不可点击、无 › 查看详情入口。</li>
               <li>代发收益首页分配 record-card <strong>不展示</strong>「代发」标签与「不可撤回」说明；与 FR-001 代发分配 C 端展示区分。</li>
               <li>发布帐号授权走<strong>三方 API 对接</strong>，本 FR 不重定义三方授权步骤，仅展示授权结果。</li>
-              <li>子用户「累计已获得」仅汇总本模块代发分配明细。</li>
+              <li>子用户 C 端<strong>不提供</strong>「我的代发收益」页；收益在项目收益钱包等既有入口查看（本 FR 不重定义）。</li>
             </ul>
           </div>
         </div>
@@ -794,11 +855,24 @@
         <div class="rule-section" id="rule-admin-2">
           <h3><span>2</span>数据表与字段</h3>
           <div class="rule-content">
-            <p><strong>主子分配关系表</strong>：ID、主用户ID、子用户ID、分配比例、协议状态、分配状态、<strong>发布帐号数</strong>、已分配金额、创建/更新时间；操作：详情、编辑、重发协议。</p>
+            <p><strong>主子分配关系表</strong>：ID、主用户ID、子用户ID、分配比例、<strong>分配类型</strong>（右豹ID直接分配 / 以发布帐号归因分配）、协议状态、分配状态、<strong>发布帐号数</strong>、已分配金额、创建/更新时间；操作：详情、编辑、重发协议。</p>
+            <p style="margin-top:8px;"><strong>分配类型说明</strong>：</p>
+            <ul style="margin-top:6px;padding-left:18px;">
+              <li><strong>右豹ID直接分配</strong>：按约定比例自动将收益分配至子用户<strong>项目收益钱包</strong>，<strong>不需要关键词归因</strong>。</li>
+              <li><strong>以发布帐号归因分配</strong>：根据关键词找到发布帐号，再按约定比例进行收益分配归因。</li>
+            </ul>
+            <p style="margin-top:8px;"><strong>分配类型约束</strong>：同一主用户<strong>不能同时存在两种分配类型</strong>；新增/编辑时若与已有关系类型冲突，须拦截并提示。</p>
             <p style="margin-top:8px;"><strong>列表顶统计区</strong>：已分配金额、待分配金额、启用关系、待确认协议（仅 Demo 展示，口径由后端定义）。</p>
             <p style="margin-top:8px;"><strong>协议内容</strong>：复用现有说明内容配置（<code>rev_share_agreement</code>），本 FR 不单独设计协议配置页。</p>
+            <p style="margin-top:8px;"><strong>主子分配关系 · 详情抽屉</strong>：Tab 切换「<strong>关系详情</strong>」「<strong>分配详情</strong>」。</p>
+            <ul style="margin-top:6px;padding-left:18px;">
+              <li><strong>关系详情</strong>：关系 ID、主/子用户 ID、分配比例、分配类型、协议状态、分配状态、发布帐号数、已分配金额、创建/更新时间。</li>
+              <li><strong>分配详情</strong>（list）：日期、主帐号收益、子帐号分配金额、分配时间、<strong>分配归因</strong>（项目、关键词、发布帐号三行展示）；列宽紧凑；支持<strong>导出 CSV</strong>（字段与 list 一致）。「右豹ID直接分配」无关键词/发布帐号归因时，对应字段展示「—」。</li>
+            </ul>
             <p style="margin-top:8px;"><strong>发布帐号表</strong>：ID、帐号昵称、帐号ID、主页链接、子用户ID、授权主用户ID、三方授权状态、帐号平台、状态、授权时间；操作：日志。</p>
+            <p style="margin-top:8px;font-size:12px;color:var(--text-muted);"><strong>发布帐号数据来源</strong>：与<strong>三方工具对接接口</strong>同步，由三方提供该右豹子帐号下的发布帐号信息数据；本 FR 仅展示与对账，不重定义三方同步协议。</p>
             <p style="margin-top:8px;"><strong>代发关键词表</strong>：关键词、项目方、主用户、发布帐号、所属子用户、累计产生收益、累计分配、数据更新时间；操作：详情。</p>
+            <p style="margin-top:8px;font-size:12px;color:var(--text-muted);"><strong>代发关键词统计口径</strong>：汇总<strong>以关键词归因</strong>的相关分配数据（出单→关键词→发布帐号→分配明细）；「右豹ID直接分配」关系不参与本表统计。</p>
             <p style="margin-top:8px;"><strong>关键词详情 list（详情抽屉 · 合并 6 列）</strong>：收益金额、收益产生时间、收益结算时间、分配金额、分配时间、分配批次。</p>
             <p style="margin-top:8px;"><strong>分配记录表（扩展字段 · 本需求仅定规则）</strong>：<code>分配行为</code> = 系统自动；<code>业务来源</code> = 代发收益。</p>
           </div>
@@ -806,17 +880,18 @@
         <div class="rule-section" id="rule-admin-3">
           <h3><span>3</span>列表与筛选</h3>
           <div class="rule-content">
-            <p><strong>主子分配关系</strong>筛选：关系 ID、主用户 ID、子用户 ID、协议状态、分配状态。</p>
+            <p><strong>主子分配关系</strong>筛选：关系 ID、主用户 ID、子用户 ID、协议状态、分配状态、<strong>分配类型</strong>。</p>
             <p style="margin-top:8px;"><strong>发布帐号</strong>筛选：发布帐号 ID、帐号昵称、帐号 ID（平台唯一）、子用户 ID、主用户 ID、三方授权状态、帐号平台、状态、授权时间范围。</p>
             <p style="margin-top:8px;"><strong>代发关键词</strong>筛选：关键词、项目方、主用户 ID、子用户 ID、发布帐号 ID/昵称、更新时间范围。</p>
-            <p style="margin-top:8px;">关键词「详情」以 overlay 抽屉展示合并 list，不挤压列表页宽度。</p>
+            <p style="margin-top:8px;">主子关系「详情」抽屉内 Tab 切换；分配详情 list 不挤压列表页宽度，横向滚动展示。</p>
           </div>
         </div>
         <div class="rule-section" id="rule-admin-4">
           <h3><span>4</span>边界规则</h3>
           <div class="rule-content">
             <ul>
-              <li>已删除/失效发布帐号保留历史记录，状态分别标记为已删除/授权失效。</li>
+              <li>同一主用户下所有主子关系的<strong>分配类型必须一致</strong>；后台新增/编辑时校验，冲突则拒绝保存。</li>
+              <li>「右豹ID直接分配」关系<strong>不要求</strong>发布帐号三方授权；「以发布帐号归因分配」关系须授权有效方可分配。</li>
               <li>关键词累计产生收益、累计分配以<strong>数据更新时间</strong>为准展示。</li>
               <li>代发收益分配写入时 <code>分配行为=系统自动</code>，<code>业务来源=代发收益</code>。</li>
               <li>三方授权回调失败或超时时，C 端展示授权中/失败状态，不写入有效授权记录。</li>
@@ -843,25 +918,497 @@
       ],
     };
 
-    function getActiveScene() {
-      return document.querySelector('.scene-btn.active')?.dataset.screen || 'screen-main-home';
+    const ALLOC_TYPE_DIRECT = '右豹ID直接分配';
+    const ALLOC_TYPE_ACCOUNT = '以发布帐号归因分配';
+    const ALLOC_TYPE_HINTS = {
+      [ALLOC_TYPE_DIRECT]: '按约定比例自动将收益分配至子用户项目收益钱包，不需要关键词归因，不依赖发布帐号授权。',
+      [ALLOC_TYPE_ACCOUNT]: '根据关键词找到发布帐号进行收益分配归因；须三方发布帐号授权有效。',
+    };
+
+    let relationsData = [
+      { id: 'R-1001', mainUserId: 'U20260813001', subUserId: 'U20260813088', ratio: 40, allocType: ALLOC_TYPE_ACCOUNT, agreementStatus: '已同意', allocStatus: '启用', accountCount: 2, allocatedAmount: 12400, createdAt: '2026.08.01 10:00:23', updatedAt: '2026.08.13 00:03:21' },
+      { id: 'R-1002', mainUserId: 'U20260813001', subUserId: 'U20260813099', ratio: 35, allocType: ALLOC_TYPE_ACCOUNT, agreementStatus: '已同意', allocStatus: '启用', accountCount: 1, allocatedAmount: 8320, createdAt: '2026.07.15 09:30:11', updatedAt: '2026.08.12 00:03:18' },
+      { id: 'R-1003', mainUserId: 'U20260813001', subUserId: 'U20260813102', ratio: 25, allocType: ALLOC_TYPE_ACCOUNT, agreementStatus: '待确认', allocStatus: '启用', accountCount: 0, allocatedAmount: 0, createdAt: '2026.08.20 14:22:05', updatedAt: '2026.08.20 14:22:05' },
+      { id: 'R-1004', mainUserId: 'U20260813200', subUserId: 'U20260813201', ratio: 30, allocType: ALLOC_TYPE_DIRECT, agreementStatus: '已同意', allocStatus: '启用', accountCount: 0, allocatedAmount: 5600, createdAt: '2026.08.05 11:20:00', updatedAt: '2026.08.11 00:03:10' },
+    ];
+
+    const relationAllocDetails = {
+      'R-1001': [
+        { date: '2026-08-13', mainRevenue: '680.00', subAlloc: '520.00', allocTime: '2026.08.13 00:03:21', project: '右豹官方', keyword: '右豹代发教程', account: '豹豹1号' },
+        { date: '2026-08-12', mainRevenue: '450.00', subAlloc: '380.50', allocTime: '2026.08.12 00:03:18', project: '番茄小说', keyword: '关键词推广A', account: '豹豹2号' },
+        { date: '2026-08-11', mainRevenue: '290.00', subAlloc: '116.00', allocTime: '2026.08.11 00:03:15', project: '右豹官方', keyword: '右豹代发教程', account: '豹豹1号' },
+      ],
+      'R-1002': [
+        { date: '2026-08-13', mainRevenue: '1100.00', subAlloc: '890.00', allocTime: '2026.08.13 00:03:21', project: '出海项目', keyword: 'TIK出海词', account: 'leopard_en' },
+        { date: '2026-08-10', mainRevenue: '820.00', subAlloc: '287.00', allocTime: '2026.08.10 00:03:12', project: '出海项目', keyword: 'TIK出海词', account: 'leopard_en' },
+      ],
+      'R-1003': [],
+      'R-1004': [
+        { date: '2026-08-11', mainRevenue: '1200.00', subAlloc: '360.00', allocTime: '2026.08.11 00:03:10', project: '番茄小说', keyword: '—', account: '—' },
+        { date: '2026-08-08', mainRevenue: '980.00', subAlloc: '294.00', allocTime: '2026.08.08 00:03:08', project: '右豹官方', keyword: '—', account: '—' },
+      ],
+    };
+
+    let currentRelationDetailId = null;
+
+    let accountsData = [
+      { id: 'PA-20021', name: '豹豹1号', platformId: 'dy_8829103', link: 'https://v.douyin.com/example', subUserId: 'U20260813088', mainUserId: 'U20260813001', authStatus: '已授权', platform: '抖音', status: '正常', authTime: '2026.08.10 09:20', authDate: '2026-08-10' },
+      { id: 'PA-20022', name: '豹豹2号', platformId: 'ks_6610238', link: 'https://v.kuaishou.com/example', subUserId: 'U20260813088', mainUserId: 'U20260813001', authStatus: '已授权', platform: '快手', status: '正常', authTime: '2026.08.12 14:05', authDate: '2026-08-12' },
+      { id: 'PA-20023', name: 'leopard_en', platformId: 'tk_9900122', link: 'https://tiktok.com/example', subUserId: 'U20260813099', mainUserId: 'U20260813001', authStatus: '已失效', platform: 'TK', status: '已删除', authTime: '2026.08.15 11:30', authDate: '2026-08-15' },
+    ];
+
+    const accountLogs = {
+      'PA-20021': [
+        { time: '2026.08.10 09:20:15', text: '三方授权回调成功，状态更新为「已授权」' },
+        { time: '2026.08.10 09:18:02', text: '子用户 U20260813088 发起三方授权请求' },
+      ],
+      'PA-20022': [
+        { time: '2026.08.12 14:05:33', text: '三方授权回调成功，状态更新为「已授权」' },
+      ],
+      'PA-20023': [
+        { time: '2026.08.15 11:30:00', text: '三方授权 token 过期，状态更新为「已失效」' },
+        { time: '2026.08.01 10:12:08', text: '三方授权回调成功，状态更新为「已授权」' },
+      ],
+    };
+
+    let keywordsData = [
+      { keyword: '右豹代发教程', project: '右豹官方', mainUserId: 'U20260813001', accountName: '豹豹1号', accountId: 'dy_8829103', subUserId: 'U20260813088', revenue: 680, allocated: 520, updatedAt: '2023.12.24 13:00', updateDate: '2023-12-24' },
+      { keyword: '关键词推广A', project: '番茄小说', mainUserId: 'U20260813001', accountName: '豹豹2号', accountId: 'ks_6610238', subUserId: 'U20260813088', revenue: 450, allocated: 380.5, updatedAt: '2023.12.24 13:00', updateDate: '2023-12-24' },
+      { keyword: 'TIK出海词', project: '出海项目', mainUserId: 'U20260813001', accountName: 'leopard_en', accountId: 'tk_9900122', subUserId: 'U20260813099', revenue: 1100, allocated: 890, updatedAt: '2023.12.23 09:30', updateDate: '2023-12-23' },
+    ];
+
+    let filteredRelations = [...relationsData];
+    let filteredAccounts = [...accountsData];
+    let filteredKeywords = [...keywordsData];
+    let editingRelationId = null;
+    let confirmCallback = null;
+
+    function agreementTag(status) {
+      if (status === '已同意') return '<span class="tag tag-ok">已同意</span>';
+      if (status === '已拒绝') return '<span class="tag tag-del">已拒绝</span>';
+      return '<span class="tag" style="background:#fffbeb;color:#d97706;border:1px solid #fde68a">待确认</span>';
     }
 
-    function buildMockupSrc(screen) {
-      return `daifa-revenue-demo.html?embed=1&screen=${encodeURIComponent(screen)}`;
+    function statusTag(status, okVal) {
+      return status === okVal ? '<span class="tag tag-ok">' + status + '</span>' : '<span class="tag tag-del">' + status + '</span>';
+    }
+
+    function authTag(status) {
+      if (status === '已授权') return '<span class="tag tag-ok">已授权</span>';
+      if (status === '已失效') return '<span class="tag" style="background:#fffbeb;color:#d97706;border:1px solid #fde68a">已失效</span>';
+      return '<span class="tag tag-del">未授权</span>';
+    }
+
+    function allocTypeTag(type) {
+      const isDirect = type === ALLOC_TYPE_DIRECT;
+      const bg = isDirect ? '#eff6ff' : '#f0fdf4';
+      const color = isDirect ? '#2563eb' : '#16a34a';
+      const border = isDirect ? '#bfdbfe' : '#bbf7d0';
+      const label = isDirect ? '右豹ID直接' : '发布帐号归因';
+      return `<span class="tag" style="background:${bg};color:${color};border:1px solid ${border}" title="${type}">${label}</span>`;
+    }
+
+    function getMainUserLockedAllocType(mainUserId, excludeId) {
+      const existing = relationsData.find(r => r.mainUserId === mainUserId && r.id !== excludeId);
+      return existing?.allocType || null;
+    }
+
+    function updateAllocTypeHint() {
+      const mainUserId = document.getElementById('formMainUser')?.value.trim();
+      const allocType = document.getElementById('formAllocType')?.value;
+      const hintEl = document.getElementById('allocTypeHint');
+      const typeEl = document.getElementById('formAllocType');
+      if (!hintEl || !typeEl) return;
+      const locked = mainUserId ? getMainUserLockedAllocType(mainUserId, editingRelationId) : null;
+      if (locked) {
+        typeEl.value = locked;
+        typeEl.disabled = true;
+        hintEl.className = 'form-hint warn';
+        hintEl.textContent = '该主用户已有关系使用「' + locked + '」，分配类型已锁定，不可混用两种类型。';
+      } else {
+        typeEl.disabled = false;
+        hintEl.className = 'form-hint';
+        hintEl.textContent = ALLOC_TYPE_HINTS[allocType] || '';
+      }
+    }
+
+    function validateAllocType(mainUserId, allocType, excludeId) {
+      const locked = getMainUserLockedAllocType(mainUserId, excludeId);
+      if (locked && locked !== allocType) {
+        return '主用户 ' + mainUserId + ' 已使用「' + locked + '」，不能同时存在两种分配类型';
+      }
+      return null;
+    }
+
+    function renderRelationsTable() {
+      const tbody = document.getElementById('relationsTableBody');
+      if (!tbody) return;
+      if (!filteredRelations.length) {
+        tbody.innerHTML = '<tr><td colspan="10" class="empty-hint">暂无匹配数据，请调整筛选条件</td></tr>';
+        return;
+      }
+      tbody.innerHTML = filteredRelations.map(r => `
+        <tr>
+          <td>${r.id}</td><td>${r.mainUserId}</td><td>${r.subUserId}</td><td>${r.ratio}%</td>
+          <td>${allocTypeTag(r.allocType)}</td>
+          <td>${agreementTag(r.agreementStatus)}</td><td>${statusTag(r.allocStatus, '启用')}</td>
+          <td>${r.accountCount}</td><td>${r.allocatedAmount.toLocaleString('zh-CN', { minimumFractionDigits: 2 })}</td>
+          <td>
+            <button class="link" type="button" onclick="openRelationDetail('${r.id}')">详情</button>
+            <button class="link" type="button" onclick="openRelationForm('${r.id}')">编辑</button>
+            <button class="link" type="button" onclick="confirmResendAgreement('${r.id}')">重发协议</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function renderAccountsTable() {
+      const tbody = document.getElementById('accountsTableBody');
+      if (!tbody) return;
+      if (!filteredAccounts.length) {
+        tbody.innerHTML = '<tr><td colspan="11" class="empty-hint">暂无匹配数据，请调整筛选条件</td></tr>';
+        return;
+      }
+      tbody.innerHTML = filteredAccounts.map(a => `
+        <tr>
+          <td>${a.id}</td><td>${a.name}</td><td>${a.platformId}</td>
+          <td><a class="link" href="${a.link}" target="_blank" rel="noopener">打开</a></td>
+          <td><div>${a.subUserId}</div></td>
+          <td><div>${a.mainUserId}</div></td>
+          <td>${authTag(a.authStatus)}</td>
+          <td>${a.platform}</td><td>${statusTag(a.status, '正常')}</td><td>${a.authTime}</td>
+          <td><button class="link" type="button" onclick="openAccountLog('${a.id}')">日志</button></td>
+        </tr>
+      `).join('');
+    }
+
+    function renderKeywordsTable() {
+      const tbody = document.getElementById('keywordsTableBody');
+      if (!tbody) return;
+      if (!filteredKeywords.length) {
+        tbody.innerHTML = '<tr><td colspan="9" class="empty-hint">暂无匹配数据，请调整筛选条件</td></tr>';
+        return;
+      }
+      tbody.innerHTML = filteredKeywords.map(k => `
+        <tr>
+          <td>${k.keyword}</td><td>${k.project}</td>
+          <td><div>${k.mainUserId}</div></td>
+          <td><div>${k.accountName}</div><div class="cell-sub">${k.accountId}</div></td>
+          <td><div>${k.subUserId}</div></td>
+          <td>${k.revenue.toFixed(2)}</td><td>${k.allocated.toFixed(2)}</td><td>${k.updatedAt}</td>
+          <td><button class="link" type="button" onclick="openKeywordDetail('${k.keyword}')">详情</button></td>
+        </tr>
+      `).join('');
+    }
+
+    function includes(val, keyword) {
+      return !keyword || String(val).toLowerCase().includes(keyword.trim().toLowerCase());
+    }
+
+    function queryRelations() {
+      const relId = document.getElementById('filterRelId')?.value || '';
+      const mainUser = document.getElementById('filterMainUser')?.value || '';
+      const subUser = document.getElementById('filterSubUser')?.value || '';
+      const agreement = document.getElementById('filterAgreement')?.value || '';
+      const allocStatus = document.getElementById('filterAllocStatus')?.value || '';
+      const allocType = document.getElementById('filterAllocType')?.value || '';
+      filteredRelations = relationsData.filter(r =>
+        includes(r.id, relId) && includes(r.mainUserId, mainUser) && includes(r.subUserId, subUser) &&
+        (!agreement || r.agreementStatus === agreement) && (!allocStatus || r.allocStatus === allocStatus) &&
+        (!allocType || r.allocType === allocType)
+      );
+      renderRelationsTable();
+      showToast('筛选完成，共 ' + filteredRelations.length + ' 条（Mock）');
+    }
+
+    function resetRelationsFilter() {
+      ['filterRelId', 'filterMainUser', 'filterSubUser'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+      ['filterAgreement', 'filterAllocStatus', 'filterAllocType'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+      filteredRelations = [...relationsData];
+      renderRelationsTable();
+      showToast('已重置筛选');
+    }
+
+    function queryAccounts() {
+      const id = document.getElementById('filterAccountId')?.value || '';
+      const name = document.getElementById('filterAccountName')?.value || '';
+      const platformId = document.getElementById('filterPlatformId')?.value || '';
+      const mainUser = document.getElementById('filterAccMainUser')?.value || '';
+      const subUser = document.getElementById('filterAccSubUser')?.value || '';
+      const authStatus = document.getElementById('filterAuthStatus')?.value || '';
+      const platform = document.getElementById('filterPlatform')?.value || '';
+      const status = document.getElementById('filterAccountStatus')?.value || '';
+      const dateFrom = document.getElementById('filterAccDateFrom')?.value || '';
+      const dateTo = document.getElementById('filterAccDateTo')?.value || '';
+      filteredAccounts = accountsData.filter(a =>
+        includes(a.id, id) && includes(a.name, name) && includes(a.platformId, platformId) &&
+        includes(a.mainUserId, mainUser) && includes(a.subUserId, subUser) &&
+        (!authStatus || a.authStatus === authStatus) && (!platform || a.platform === platform) &&
+        (!status || a.status === status) &&
+        (!dateFrom || a.authDate >= dateFrom) && (!dateTo || a.authDate <= dateTo)
+      );
+      renderAccountsTable();
+      showToast('筛选完成，共 ' + filteredAccounts.length + ' 条（Mock）');
+    }
+
+    function resetAccountsFilter() {
+      document.querySelectorAll('#accountsFilterBar input, #accountsFilterBar select').forEach(el => { el.value = ''; });
+      filteredAccounts = [...accountsData];
+      renderAccountsTable();
+      showToast('已重置筛选');
+    }
+
+    function queryKeywords() {
+      const keyword = document.getElementById('filterKeyword')?.value || '';
+      const project = document.getElementById('filterProject')?.value || '';
+      const mainUser = document.getElementById('filterKwMainUser')?.value || '';
+      const subUser = document.getElementById('filterKwSubUser')?.value || '';
+      const accountId = document.getElementById('filterKwAccountId')?.value || '';
+      const accountName = document.getElementById('filterKwAccountName')?.value || '';
+      const ownerSub = document.getElementById('filterKwOwnerSub')?.value || '';
+      const dateFrom = document.getElementById('filterKwDateFrom')?.value || '';
+      const dateTo = document.getElementById('filterKwDateTo')?.value || '';
+      filteredKeywords = keywordsData.filter(k =>
+        includes(k.keyword, keyword) && includes(k.project, project) &&
+        includes(k.mainUserId, mainUser) && includes(k.subUserId, subUser) &&
+        includes(k.accountId, accountId) && includes(k.accountName, accountName) &&
+        includes(k.subUserId, ownerSub) &&
+        (!dateFrom || k.updateDate >= dateFrom) && (!dateTo || k.updateDate <= dateTo)
+      );
+      renderKeywordsTable();
+      showToast('筛选完成，共 ' + filteredKeywords.length + ' 条（Mock）');
+    }
+
+    function resetKeywordsFilter() {
+      document.querySelectorAll('#keywordsFilterBar input, #keywordsFilterBar select').forEach(el => { el.value = ''; });
+      filteredKeywords = [...keywordsData];
+      renderKeywordsTable();
+      showToast('已重置筛选');
+    }
+
+    function renderRelationInfoPanel(r) {
+      return `
+        <dl class="detail-kv">
+          <dt>关系 ID</dt><dd>${r.id}</dd>
+          <dt>主用户 ID</dt><dd>${r.mainUserId}</dd>
+          <dt>子用户 ID</dt><dd>${r.subUserId}</dd>
+          <dt>分配比例</dt><dd>${r.ratio}%</dd>
+          <dt>分配类型</dt><dd>${r.allocType}</dd>
+          <dt>协议状态</dt><dd>${r.agreementStatus}</dd>
+          <dt>分配状态</dt><dd>${r.allocStatus}</dd>
+          <dt>发布帐号数</dt><dd>${r.accountCount}</dd>
+          <dt>已分配金额</dt><dd>¥${r.allocatedAmount.toLocaleString('zh-CN', { minimumFractionDigits: 2 })}</dd>
+          <dt>创建时间</dt><dd>${r.createdAt}</dd>
+          <dt>更新时间</dt><dd>${r.updatedAt}</dd>
+        </dl>
+      `;
+    }
+
+    function renderRelationAllocPanel(relationId) {
+      const rows = relationAllocDetails[relationId] || [];
+      if (!rows.length) {
+        return '<div class="empty-hint">暂无分配明细</div>';
+      }
+      const body = rows.map(row => `
+        <tr>
+          <td class="col-date">${row.date}</td>
+          <td class="col-money">${row.mainRevenue}</td>
+          <td class="col-money">${row.subAlloc}</td>
+          <td class="col-time">${row.allocTime}</td>
+          <td class="col-attrib attrib-cell">
+            <div class="cell-main">${row.project}</div>
+            <div class="cell-sub">${row.keyword}</div>
+            <div class="cell-sub">${row.account}</div>
+          </td>
+        </tr>
+      `).join('');
+      return `
+        <div class="relation-alloc-toolbar">
+          <span class="meta">共 ${rows.length} 条 · 分配归因列自上而下：项目 / 关键词 / 发布帐号</span>
+          <button class="btn-ghost-sm" type="button" onclick="exportRelationAllocDetail()">导出 CSV</button>
+        </div>
+        <div class="table-wrap">
+          <table class="detail-table relation-alloc-table">
+            <thead>
+              <tr>
+                <th class="col-date">日期</th><th class="col-money">主帐号收益</th><th class="col-money">子帐号分配金额</th><th class="col-time">分配时间</th><th class="col-attrib">分配归因</th>
+              </tr>
+            </thead>
+            <tbody>${body}</tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function exportRelationAllocDetail() {
+      const relationId = currentRelationDetailId;
+      if (!relationId) return;
+      const rows = relationAllocDetails[relationId] || [];
+      if (!rows.length) {
+        showToast('暂无分配明细可导出');
+        return;
+      }
+      const esc = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
+      const header = '日期,主帐号收益,子帐号分配金额,分配时间,项目,关键词,发布帐号\n';
+      const csv = header + rows.map(r =>
+        [r.date, r.mainRevenue, r.subAlloc, r.allocTime, r.project, r.keyword, r.account].map(esc).join(',')
+      ).join('\n');
+      const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `${relationId}_分配详情.csv`;
+      link.click();
+      URL.revokeObjectURL(link.href);
+      showToast('已导出 CSV（Mock）');
+    }
+
+    function switchRelationDetailTab(tabId, btn) {
+      document.querySelectorAll('#relationDetailTabs button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.relation-detail-panel').forEach(p => p.classList.remove('active'));
+      document.getElementById('relation-detail-' + tabId).classList.add('active');
+    }
+
+    function openRelationDetail(id) {
+      const r = relationsData.find(x => x.id === id);
+      if (!r) return;
+      currentRelationDetailId = id;
+      document.getElementById('relationDetailTitle').textContent = '分配关系详情 · ' + r.id;
+      document.getElementById('relation-detail-info').innerHTML = renderRelationInfoPanel(r);
+      document.getElementById('relation-detail-alloc').innerHTML = renderRelationAllocPanel(id);
+      const infoBtn = document.querySelector('#relationDetailTabs button[data-rel-tab="info"]');
+      if (infoBtn) switchRelationDetailTab('info', infoBtn);
+      document.getElementById('relationDetailOverlay').classList.add('open');
+      document.getElementById('relationDetailDrawer').classList.add('open');
+    }
+
+    function closeRelationDetail() {
+      document.getElementById('relationDetailOverlay').classList.remove('open');
+      document.getElementById('relationDetailDrawer').classList.remove('open');
+      currentRelationDetailId = null;
+    }
+
+    function openRelationForm(id) {
+      editingRelationId = id || null;
+      const r = id ? relationsData.find(x => x.id === id) : null;
+      document.getElementById('relationFormTitle').textContent = r ? '编辑关系 · ' + r.id : '新增关系';
+      document.getElementById('formMainUser').value = r?.mainUserId || 'U20260813001';
+      document.getElementById('formSubUser').value = r?.subUserId || '';
+      document.getElementById('formRatio').value = r?.ratio || '';
+      document.getElementById('formAllocStatus').value = r?.allocStatus || '启用';
+      document.getElementById('formAllocType').value = r?.allocType || ALLOC_TYPE_ACCOUNT;
+      document.getElementById('formAllocType').disabled = false;
+      updateAllocTypeHint();
+      document.getElementById('relationFormOverlay').classList.add('open');
+    }
+
+    function closeRelationForm() {
+      document.getElementById('relationFormOverlay').classList.remove('open');
+      document.getElementById('formAllocType').disabled = false;
+      editingRelationId = null;
+    }
+
+    function submitRelationForm() {
+      const mainUserId = document.getElementById('formMainUser').value.trim();
+      const subUserId = document.getElementById('formSubUser').value.trim();
+      const ratio = Number(document.getElementById('formRatio').value);
+      const allocStatus = document.getElementById('formAllocStatus').value;
+      const allocType = document.getElementById('formAllocType').value;
+      if (!mainUserId || !subUserId || !ratio || ratio <= 0 || ratio >= 100) {
+        showToast('请填写有效的主/子用户 ID 与分配比例（1-99）');
+        return;
+      }
+      const typeError = validateAllocType(mainUserId, allocType, editingRelationId);
+      if (typeError) {
+        showToast(typeError);
+        return;
+      }
+      const now = '2026.08.25 18:00:00';
+      if (editingRelationId) {
+        const idx = relationsData.findIndex(x => x.id === editingRelationId);
+        if (idx >= 0) {
+          relationsData[idx] = { ...relationsData[idx], mainUserId, subUserId, ratio, allocType, allocStatus, updatedAt: now };
+          showToast('关系 ' + editingRelationId + ' 已更新（Mock）');
+        }
+      } else {
+        const newId = 'R-' + (1000 + relationsData.length + 1);
+        relationsData.push({ id: newId, mainUserId, subUserId, ratio, allocType, agreementStatus: '待确认', allocStatus, accountCount: 0, allocatedAmount: 0, createdAt: now, updatedAt: now });
+        showToast('已新增关系 ' + newId + '（' + allocType + '），协议邀请已推送（Mock）');
+      }
+      closeRelationForm();
+      filteredRelations = [...relationsData];
+      renderRelationsTable();
+    }
+
+    function confirmResendAgreement(id) {
+      const r = relationsData.find(x => x.id === id);
+      if (!r) return;
+      document.getElementById('confirmTitle').textContent = '重发协议邀请';
+      document.getElementById('confirmDesc').textContent = '将向子用户重新推送代发收益协议邀请。';
+      document.getElementById('confirmSummary').innerHTML = `关系 <strong>${r.id}</strong><br>主用户 ${r.mainUserId} → 子用户 ${r.subUserId}<br>分配类型：${r.allocType}<br>当前协议状态：${r.agreementStatus}`;
+      confirmCallback = () => {
+        r.agreementStatus = '待确认';
+        r.updatedAt = '2026.08.25 18:00:00';
+        filteredRelations = [...relationsData];
+        renderRelationsTable();
+        showToast('已向 ' + r.subUserId + ' 重发协议邀请（Mock）');
+      };
+      document.getElementById('confirmOverlay').classList.add('open');
+    }
+
+    function openAccountLog(id) {
+      const a = accountsData.find(x => x.id === id);
+      const logs = accountLogs[id] || [];
+      document.getElementById('accountLogTitle').textContent = '授权日志 · ' + (a?.name || id);
+      document.getElementById('accountLogBody').innerHTML = logs.length
+        ? logs.map(l => `<div class="log-item"><time>${l.time}</time>${l.text}</div>`).join('')
+        : '<div class="empty-hint">暂无日志记录</div>';
+      document.getElementById('accountLogOverlay').classList.add('open');
+      document.getElementById('accountLogDrawer').classList.add('open');
+    }
+
+    function closeAccountLog() {
+      document.getElementById('accountLogOverlay').classList.remove('open');
+      document.getElementById('accountLogDrawer').classList.remove('open');
+    }
+
+    function closeConfirmModal() {
+      document.getElementById('confirmOverlay').classList.remove('open');
+      confirmCallback = null;
+    }
+
+    function submitConfirm() {
+      if (confirmCallback) confirmCallback();
+      closeConfirmModal();
+    }
+
+    function getActiveScene() {
+      const btn = document.querySelector('.scene-btn.active');
+      return {
+        screen: btn?.dataset.screen || 'screen-main-home',
+        allocType: btn?.dataset.allocType || 'account',
+      };
+    }
+
+    const MOCKUP_VER = '20260826d';
+
+    function buildMockupSrc(screen, allocType) {
+      const params = new URLSearchParams({ embed: '1', screen, allocType: allocType || 'account', v: MOCKUP_VER });
+      return `daifa-revenue-demo.html?${params.toString()}`;
     }
 
     function loadMockupFrame(forceReload) {
       const frame = document.getElementById('mockupFrame');
       if (!frame) return;
-      const src = buildMockupSrc(getActiveScene());
+      const { screen, allocType } = getActiveScene();
+      const src = buildMockupSrc(screen, allocType);
       const current = frame.getAttribute('src') || '';
-      if (forceReload || current === 'about:blank' || !current.includes('daifa-revenue-demo.html')) {
+      if (forceReload || current === 'about:blank' || !current.includes('daifa-revenue-demo.html') || !current.includes('v=' + MOCKUP_VER)) {
         frame.src = src;
         return;
       }
       try {
-        frame.contentWindow?.postMessage({ type: 'goToScreen', screen: getActiveScene() }, '*');
+        frame.contentWindow?.postMessage({ type: 'goToScreen', screen, allocType }, '*');
       } catch (_) {
         frame.src = src;
       }
@@ -908,13 +1455,9 @@
       btn.addEventListener('click', () => {
         document.querySelectorAll('.scene-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
+        const { screen, allocType } = getActiveScene();
         const frame = document.getElementById('mockupFrame');
-        const currentSrc = frame?.getAttribute('src') || '';
-        if (currentSrc.includes('daifa-revenue-demo.html') && frame.contentWindow) {
-          frame.contentWindow.postMessage({ type: 'goToScreen', screen: btn.dataset.screen }, '*');
-        } else {
-          loadMockupFrame(true);
-        }
+        if (frame) frame.src = buildMockupSrc(screen, allocType);
       });
     });
 
@@ -981,7 +1524,14 @@
     toggleRuleBtn.onclick = () => setRuleDrawer(!ruleDrawer.classList.contains('open'));
 
     document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') { closeDetailDrawer(); setRuleDrawer(false); }
+      if (e.key === 'Escape') {
+        closeDetailDrawer();
+        closeRelationDetail();
+        closeAccountLog();
+        closeRelationForm();
+        closeConfirmModal();
+        setRuleDrawer(false);
+      }
     });
 
     const tab = new URLSearchParams(location.search).get('tab');
@@ -1000,6 +1550,10 @@
     if (document.querySelector('.page-view.active')?.id === 'view-fe') {
       loadMockupFrame(true);
     }
+
+    renderRelationsTable();
+    renderAccountsTable();
+    renderKeywordsTable();
   </script>
   <script src="fe-copy-html.js"></script>
   <script src="sidebar-nav.js"></script>

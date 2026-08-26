@@ -1,10 +1,10 @@
-# YBDD2.0
-右豹 2.0 迭代需求 Demo（FR-002 ~ FR-005）
+# youbao2.0
+右豹 2.0 迭代需求 Demo（FR-002 ~ FR-006）
 
 ## 预览入口
 
 - **Sprint 总览**：[`demo/iteration/framework-shell.html`](demo/iteration/framework-shell.html)
-- **GitHub Pages**：https://renataecho.github.io/YBDD2.0/demo/iteration/framework-shell.html
+- **GitHub Pages**：https://renataecho.github.io/youbao2.0/demo/iteration/framework-shell.html
 
 ## 迭代需求
 
@@ -14,6 +14,7 @@
 | FR-003 | 品牌退款 | `demo/iteration/fr-finance-brand-refund.html` |
 | FR-004 | 预估数据 | `demo/iteration/fr-project-estimated-data.html` |
 | FR-005 | 订单优化 | `demo/iteration/fr-project-order-optimize.html` |
+| FR-006 | 活动中心 | `demo/iteration/fr-activity-center.html` |
 
 ## 废纸篓
 

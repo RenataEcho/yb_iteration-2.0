@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FR-006 · 活动中心 · 右豹迭代需求记录</title>
+  <style>
+    :root {
+      --primary: #2563eb; --primary-hover: #1d4ed8; --primary-light: #eff6ff; --primary-border: #bfdbfe;
+      --accent-rule: #0891b2; --accent-version: #7c3aed; --accent-fr: #d97706;
+      --success: #16a34a; --success-bg: #f0fdf4; --warning: #d97706; --warning-bg: #fffbeb;
+      --danger: #dc2626; --danger-bg: #fef2f2;
+      --surface: #fff; --surface-glass: rgba(255,255,255,0.72); --surface-hover: #f8fafc; --border: #e8edf3;
+      --text-primary: #18222f; --text-secondary: #4a5568; --text-muted: #9aa5b4;
+      --sidebar-w: 240px; --drawer-w: 480px; --radius-sm: 7px; --radius-lg: 14px;
+      --shadow: 0 8px 32px rgba(30,40,80,0.10);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 13px;
+      color: var(--text-primary);
+      background: linear-gradient(135deg, #e0e7ff 0%, #f0f4f8 40%, #e0f2fe 100%);
+      background-attachment: fixed; min-height: 100vh;
+    }
+    .sidebar {
+      position: fixed; inset: 0 auto 0 0; width: var(--sidebar-w); z-index: 200;
+      display: flex; flex-direction: column;
+      background: rgba(240,244,255,0.95); backdrop-filter: blur(20px);
+      border-right: 1px solid rgba(148,163,196,0.22);
+    }
+    .sidebar-brand { padding: 16px 14px 12px; border-bottom: 1px solid rgba(148,163,196,0.22); }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: linear-gradient(135deg, #2563eb, #7c3aed); color: #fff;
+      display: flex; align-items: center; justify-content: center; font-weight: 700;
+    }
+    .brand-text { font-size: 14px; font-weight: 700; }
+    .brand-sub { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+    .sprint-pill {
+      display: inline-block; margin-top: 10px; font-size: 11px; font-weight: 600;
+      padding: 3px 8px; border-radius: 999px; background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0;
+    }
+    .sidebar-scroll { flex: 1; overflow-y: auto; padding: 8px 0 16px; }
+    .sidebar-foot { padding: 10px 14px 14px; border-top: 1px solid rgba(148,163,196,0.22); font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+    .main { margin-left: var(--sidebar-w); padding: 16px 20px 40px; min-height: 100vh; }
+    .breadcrumb { padding: 4px 0 12px; font-size: 12px; color: var(--text-muted); }
+    .breadcrumb a { color: var(--primary); text-decoration: none; }
+    .page-header { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; }
+    .page-header h1 { font-size: 19px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .page-desc { font-size: 12px; color: var(--text-muted); max-width: 720px; line-height: 1.55; }
+    .badge { display: inline-flex; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: var(--radius-sm); }
+    .badge-fr { background: #fffbeb; color: var(--accent-fr); border: 1px solid #fde68a; }
+    .badge-version { background: #f5f3ff; color: var(--accent-version); border: 1px solid #ddd6fe; }
+    .page-tab-bar {
+      display: flex; gap: 0; margin-bottom: 16px;
+      background: var(--surface-glass); backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.55); border-radius: var(--radius-lg);
+      padding: 4px; box-shadow: var(--shadow); width: fit-content;
+    }
+    .page-tab-bar button {
+      padding: 8px 20px; border: none; background: transparent; cursor: pointer;
+      font-size: 13px; font-weight: 500; color: var(--text-secondary); border-radius: 10px;
+    }
+    .page-tab-bar button.active { background: var(--primary); color: #fff; font-weight: 600; }
+    .page-view { display: none; }
+    .page-view.active { display: block; }
+    .btn {
+      display: inline-flex; align-items: center; height: 34px; padding: 0 14px;
+      border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid transparent;
+    }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-rule { background: var(--primary-light); color: var(--primary); border-color: var(--primary-border); }
+    .btn-rule.active { background: var(--primary); color: #fff; }
+    .btn-ghost { background: var(--surface); color: var(--text-secondary); border-color: var(--border); }
+    .btn-ghost-sm { background: var(--surface); color: var(--text-secondary); border: 1px solid var(--border); height: 32px; padding: 0 12px; border-radius: var(--radius-sm); cursor: pointer; font-size: 12px; }
+    .glass-card {
+      background: var(--surface-glass); backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.55); border-radius: var(--radius-lg);
+      box-shadow: var(--shadow); overflow: hidden;
+    }
+    .demo-layout { display: grid; grid-template-columns: minmax(280px, 5fr) minmax(360px, 7fr); gap: 16px; }
+    @media (max-width: 1024px) { .demo-layout { grid-template-columns: 1fr; } }
+    .scene-panel { padding: 16px 18px; }
+    .scene-panel h2 { font-size: 14px; font-weight: 700; margin-bottom: 10px; }
+    .scene-list { display: flex; flex-direction: column; gap: 6px; }
+    .scene-btn {
+      text-align: left; padding: 10px 12px; border-radius: var(--radius-sm);
+      border: 1px solid var(--border); background: rgba(255,255,255,0.6); cursor: pointer;
+    }
+    .scene-btn.active { border-color: var(--primary-border); background: var(--primary-light); color: var(--primary); font-weight: 600; }
+    .scene-btn .scene-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+    .scene-btn .scene-desc { font-size: 11px; color: var(--text-muted); line-height: 1.45; }
+    .scene-btn.active .scene-desc { color: #3b82f6; }
+    .scene-note { margin-top: 14px; padding: 10px 12px; border-radius: var(--radius-sm); background: #fffbeb; border: 1px solid #fde68a; font-size: 12px; color: #92400e; line-height: 1.55; }
+    .mockup-panel { padding: 16px; display: flex; justify-content: center; min-height: 520px; }
+    .mockup-frame-wrap {
+      width: 100%; max-width: 375px; border-radius: 28px; overflow: hidden;
+      background: #1e293b; box-shadow: 0 16px 48px rgba(0,0,0,0.18); aspect-ratio: 375 / 812;
+    }
+    .mockup-frame-wrap iframe { width: 100%; height: 100%; border: none; display: block; background: #f5f6f8; }
+    .table-toolbar { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+    .table-toolbar h3 { font-size: 14px; font-weight: 700; }
+    .filter-bar { display: flex; flex-wrap: wrap; gap: 10px; padding: 14px 16px; align-items: flex-end; border-bottom: 1px solid var(--border); }
+    .filter-field { display: flex; flex-direction: column; gap: 4px; }
+    .filter-field label { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+    .filter-field input, .filter-field select { height: 32px; padding: 0 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 12px; min-width: 130px; }
+    .filter-actions { display: flex; gap: 8px; margin-left: auto; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 980px; }
+    th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); font-size: 12px; vertical-align: top; }
+    th { font-size: 11px; font-weight: 600; color: var(--text-muted); background: rgba(248,250,252,0.9); white-space: nowrap; }
+    tr:hover td { background: var(--surface-hover); }
+    .link { color: var(--primary); cursor: pointer; text-decoration: none; margin-right: 10px; font-size: 12px; font-weight: 500; background: none; border: none; padding: 0; }
+    .tag { display: inline-flex; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+    .tag-ok { background: var(--success-bg); color: var(--success); }
+    .tag-warn { background: var(--warning-bg); color: var(--warning); }
+    .tag-muted { background: #f1f5f9; color: var(--text-muted); }
+    .drawer-overlay, .modal-overlay {
+      position: fixed; inset: 0; background: rgba(15,23,42,0.35); z-index: 500;
+      opacity: 0; pointer-events: none; transition: opacity 0.25s;
+    }
+    .drawer-overlay.open, .modal-overlay.open { opacity: 1; pointer-events: auto; }
+    .drawer {
+      position: fixed; top: 0; right: 0; bottom: 0; width: var(--drawer-w); z-index: 501;
+      background: rgba(255,255,255,0.98); backdrop-filter: blur(12px);
+      box-shadow: -8px 0 40px rgba(30,40,60,0.18);
+      transform: translateX(100%); transition: transform 0.28s ease;
+      display: flex; flex-direction: column;
+    }
+    .drawer.open { transform: translateX(0); }
+    .drawer-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .drawer-header h2 { font-size: 15px; font-weight: 700; }
+    .drawer-close { width: 28px; height: 28px; border: none; background: #f1f5f9; border-radius: 6px; cursor: pointer; font-size: 16px; }
+    .rule-tab-bar { display: flex; gap: 0; padding: 0 16px; border-bottom: 1px solid var(--border); }
+    .rule-tab-bar button {
+      padding: 10px 18px; border: none; background: none; cursor: pointer;
+      font-size: 13px; color: var(--text-secondary); border-bottom: 2px solid transparent; margin-bottom: -1px;
+    }
+    .rule-tab-bar button.active { color: var(--primary); font-weight: 600; border-bottom-color: var(--primary); }
+    .drawer-body { flex: 1; overflow-y: auto; padding: 16px 20px 32px; }
+    .rule-panel { display: none; }
+    .rule-panel.active { display: block; }
+    .rule-section { margin-bottom: 22px; }
+    .rule-section h3 { font-size: 14px; font-weight: 700; color: var(--accent-rule); margin-bottom: 8px; }
+    .rule-section h3 span {
+      display: inline-flex; width: 22px; height: 22px; align-items: center; justify-content: center;
+      background: #ecfeff; color: var(--accent-rule); border-radius: 6px; font-size: 12px; margin-right: 8px;
+    }
+    .rule-content { font-size: 13px; color: var(--text-secondary); line-height: 1.65; }
+    .rule-content ul { padding-left: 18px; margin-top: 6px; }
+    .rule-content li { margin-bottom: 5px; }
+    .rule-content code { font-family: ui-monospace, monospace; font-size: 12px; background: #f1f5f9; padding: 1px 5px; border-radius: 4px; }
+    .modal {
+      position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.95);
+      width: 480px; max-width: calc(100vw - 32px); z-index: 501;
+      background: #fff; border-radius: var(--radius-lg); box-shadow: 0 16px 48px rgba(30,40,60,0.2);
+      opacity: 0; pointer-events: none; transition: all 0.2s;
+    }
+    .modal-overlay.open .modal { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
+    .modal-header { padding: 16px 20px; border-bottom: 1px solid var(--border); font-size: 15px; font-weight: 700; }
+    .modal-body { padding: 16px 20px; }
+    .form-field { margin-bottom: 12px; }
+    .form-field label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
+    .form-field input, .form-field select, .form-field textarea {
+      width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px;
+    }
+    .modal-footer { padding: 12px 20px 16px; display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid var(--border); }
+    .flow-page-intro { padding: 16px 18px 0; font-size: 12px; color: var(--text-muted); line-height: 1.55; }
+    .flow-svg-wrap { overflow: auto; padding: 16px 18px 24px; max-height: 72vh; }
+    .flow-svg-wrap svg { display: block; margin: 0 auto; max-width: 100%; }
+    .flow-edges line, .flow-edges polyline { stroke: #94a3b8; stroke-width: 1.5; fill: none; }
+    .flow-legend { display: flex; flex-wrap: wrap; gap: 12px; padding: 0 18px 20px; font-size: 11px; color: var(--text-muted); }
+    .flow-legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 4px; vertical-align: -2px; }
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: #1e293b; color: #fff; padding: 10px 18px; border-radius: 999px; font-size: 13px;
+      opacity: 0; transition: all 0.25s; z-index: 600; pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand">
+        <div class="brand-icon">迭</div>
+        <div>
+          <div class="brand-text">右豹迭代需求记录</div>
+          <div class="brand-sub">PRD Demo · 产品交付研发</div>
+        </div>
+      </div>
+      <span class="sprint-pill">YBDD2.0 · 迭代 v1</span>
+    </div>
+    <div class="sidebar-scroll" data-iteration-sidebar></div>
+    <div class="sidebar-foot">FR-006 · 页内 Tab<br />前端交互 / 管理后台 / 业务流程</div>
+  </aside>
+
+  <main class="main">
+    <nav class="breadcrumb">
+      <a href="framework-shell.html">Sprint 概览</a>
+      <span> / 运营 / 活动中心</span>
+    </nav>
+
+    <header class="page-header">
+      <div>
+        <h1>
+          活动中心
+          <span class="badge badge-fr">FR-006</span>
+          <span class="badge badge-version">v1 当前</span>
+        </h1>
+        <p class="page-desc">改造现有活动中心：保留图1卡片布局；顶部 Banner 展示置顶活动；支持全部/进行中/已结束筛选；活动状态为待开始/进行中/已结束；报名类活动展示「x人已参加」，按钮统一为「查看」。</p>
+      </div>
+      <div class="page-header-actions">
+        <button class="btn btn-rule" id="toggleRuleDrawer" type="button">📋 需求规则</button>
+      </div>
+    </header>
+
+    <div class="page-tab-bar" role="tablist">
+      <button type="button" class="active" data-page="view-fe" role="tab">前端交互</button>
+      <button type="button" data-page="view-admin" role="tab">管理后台</button>
+      <button type="button" data-page="view-flow" role="tab">业务流程</button>
+    </div>
+
+    <div id="view-fe" class="page-view active">
+      <div class="demo-layout">
+        <div class="glass-card scene-panel">
+          <h2>场景切换</h2>
+          <div class="scene-list">
+            <button class="scene-btn active" type="button" data-filter="all">
+              <div class="scene-title">图1 · 活动中心 · 全部</div>
+              <div class="scene-desc">顶部 Banner 置顶 + 筛选 Tab + 图1卡片列表；状态角标为待开始/进行中/已结束</div>
+            </button>
+            <button class="scene-btn" type="button" data-filter="ongoing">
+              <div class="scene-title">筛选 · 进行中</div>
+              <div class="scene-desc">仅展示进行中活动；置顶 Banner 若处于进行中则仍展示在顶部</div>
+            </button>
+            <button class="scene-btn" type="button" data-filter="ended">
+              <div class="scene-title">筛选 · 已结束</div>
+              <div class="scene-desc">仅展示已结束活动；所有按钮均为「查看」</div>
+            </button>
+            <button class="scene-btn" type="button" data-filter="registration">
+              <div class="scene-title">报名类活动 · 人数展示</div>
+              <div class="scene-desc">后台配置为报名类时，卡片底部展示「x人已参加」；非报名类不展示人数</div>
+            </button>
+          </div>
+          <div class="scene-note">置顶活动以<strong>顶部 Banner</strong>形式展示，不在列表卡片中重复出现。列表卡片结构沿用图1：<strong>项目标签 → 灰色内容区（状态角标 + 图标 + 标题/副标题）→ 底部信息 +「查看」按钮</strong>。</div>
+        </div>
+        <div class="glass-card mockup-panel">
+          <div class="mockup-frame-wrap">
+            <iframe id="mockupFrame" title="活动中心 Mockup" src="about:blank" data-src="activity-center-demo.html"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="view-admin" class="page-view">
+      <div class="glass-card">
+        <div class="table-toolbar">
+          <h3>活动管理</h3>
+          <button class="btn btn-primary" type="button" onclick="openActivityModal()">新增活动</button>
+        </div>
+        <div class="filter-bar">
+          <div class="filter-field"><label>活动 ID</label><input type="text" placeholder="ACT-001" /></div>
+          <div class="filter-field"><label>活动名称</label><input type="text" placeholder="培训营" /></div>
+          <div class="filter-field"><label>活动类型</label><select><option>全部</option><option>普通活动</option><option>报名类活动</option></select></div>
+          <div class="filter-field"><label>活动状态</label><select><option>全部</option><option>待开始</option><option>进行中</option><option>已结束</option></select></div>
+          <div class="filter-field"><label>是否置顶</label><select><option>全部</option><option>是</option><option>否</option></select></div>
+          <div class="filter-actions">
+            <button class="btn-ghost-sm" type="button" onclick="showToast('Demo：已重置筛选')">重置</button>
+            <button class="btn btn-primary" type="button" onclick="showToast('Demo：筛选仅影响 Mock 展示')">查询</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th><th>活动名称</th><th>类型</th><th>所属项目</th><th>状态</th>
+                <th>置顶</th><th>已参加</th><th>活动时间</th><th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="activityTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="view-flow" class="page-view">
+      <div class="glass-card flow-page">
+        <p class="flow-page-intro">活动中心列表加载与报名类活动交互流程（研发对照用）。</p>
+        <div class="flow-svg-wrap">
+          <svg width="920" height="520" viewBox="0 0 920 520">
+            <g class="flow-edges">
+              <polyline points="160,60 160,100 160,100 320,100 320,130" />
+              <polyline points="320,190 320,220 320,220 160,220 160,250" />
+              <polyline points="320,190 320,220 320,220 480,220 480,250" />
+              <polyline points="320,190 320,220 320,220 640,220 640,250" />
+              <polyline points="480,310 480,340 480,340 640,340 640,370" />
+              <polyline points="480,310 480,340 480,340 320,340 320,370" />
+              <polyline points="640,430 640,460 640,460 480,460 480,490" />
+            </g>
+            <g class="flow-nodes">
+              <rect x="80" y="20" width="160" height="40" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="160" y="45" text-anchor="middle" font-size="12" fill="#1e40af">进入活动中心</text>
+              <rect x="240" y="130" width="160" height="60" rx="6" fill="#dcfce7" stroke="#16a34a" />
+              <text x="320" y="155" text-anchor="middle" font-size="11" fill="#166534">拉取活动列表</text>
+              <text x="320" y="175" text-anchor="middle" font-size="10" fill="#64748b">含置顶 + 筛选参数</text>
+              <rect x="80" y="250" width="160" height="50" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="160" y="280" text-anchor="middle" font-size="11" fill="#1e40af">渲染置顶 Banner</text>
+              <rect x="400" y="250" width="160" height="60" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="480" y="275" text-anchor="middle" font-size="11" fill="#1e40af">渲染活动卡片列表</text>
+              <text x="480" y="295" text-anchor="middle" font-size="10" fill="#64748b">保留图1卡片结构</text>
+              <rect x="560" y="250" width="160" height="50" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="640" y="280" text-anchor="middle" font-size="11" fill="#1e40af">切换筛选 Tab</text>
+              <polygon points="480,370 520,410 440,410" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="480" y="395" text-anchor="middle" font-size="10" fill="#854d0e">报名类?</text>
+              <rect x="240" y="370" width="160" height="50" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="320" y="400" text-anchor="middle" font-size="11" fill="#1e40af">普通活动 · 查看详情</text>
+              <rect x="560" y="370" width="160" height="60" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="640" y="395" text-anchor="middle" font-size="11" fill="#1e40af">展示 x人已参加</text>
+              <text x="640" y="415" text-anchor="middle" font-size="10" fill="#64748b">仅报名类活动</text>
+              <rect x="400" y="490" width="160" height="40" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="480" y="515" text-anchor="middle" font-size="11" fill="#1e40af">点击查看 · 跳转详情</text>
+            </g>
+          </svg>
+        </div>
+        <div class="flow-legend">
+          <span><i style="background:#dbeafe;border:1px solid #2563eb"></i>前端</span>
+          <span><i style="background:#dcfce7;border:1px solid #16a34a"></i>后端</span>
+          <span><i style="background:#fef9c3;border:1px solid #ca8a04"></i>校验/分支</span>
+          <span><i style="background:#fed7aa;border:1px solid #ea580c"></i>异步/刷新</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="drawer-overlay" id="ruleOverlay" onclick="setRuleDrawer(false)"></div>
+  <aside class="drawer" id="ruleDrawer" role="dialog">
+    <div class="drawer-header">
+      <h2>FR-006 · 需求规则 · v1</h2>
+      <button class="drawer-close" type="button" onclick="setRuleDrawer(false)">×</button>
+    </div>
+    <div class="rule-tab-bar" role="tablist">
+      <button type="button" class="active" data-rule="rule-fe" role="tab">前端需求</button>
+      <button type="button" data-rule="rule-admin" role="tab">后台需求</button>
+    </div>
+    <div class="drawer-body">
+      <div id="rule-fe" class="rule-panel active">
+        <div class="rule-section">
+          <h3><span>1</span>业务目标</h3>
+          <div class="rule-content">
+            <p>改造现有活动中心，在<strong>不改变图1卡片布局</strong>的前提下，支持更多活动展现形式：顶部 Banner 置顶、状态筛选，以及报名类活动的已参加人数展示。</p>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>2</span>页面与入口</h3>
+          <div class="rule-content">
+            <ul>
+              <li><strong>活动中心列表页</strong>：个人中心/首页等既有入口进入；页头标题「活动中心」。</li>
+              <li><strong>置顶 Banner</strong>：活动中心顶部以 Banner 形式展示后台配置的置顶活动（最多 1 条）；不在下方列表中重复展示。</li>
+              <li><strong>筛选 Tab</strong>：全部 / 进行中 / 已结束；切换后刷新列表，置顶 Banner 若符合当前筛选条件则仍展示在顶部。</li>
+              <li><strong>活动状态</strong>：待开始 / 进行中 / 已结束（角标展示在卡片图标左上角）。</li>
+              <li><strong>活动卡片（沿用图1）</strong>：项目标签 → 灰色内容区（状态角标 + 图标 + 标题/副标题）→ 底部信息区 +「查看」按钮。</li>
+              <li><strong>普通活动</strong>：底部展示「活动时间·起止日期」，不展示人数。</li>
+              <li><strong>报名类活动</strong>：后台配置为报名类时，底部额外展示「x人已参加」。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>3</span>交互规则</h3>
+          <div class="rule-content">
+            <ul>
+              <li>活动状态枚举：<code>待开始</code> / <code>进行中</code> / <code>已结束</code>；筛选「进行中」仅展示状态为进行中的活动。</li>
+              <li>所有活动卡片及置顶 Banner 的操作按钮统一为「查看」，跳转活动详情页（本 FR 不重做详情页）。</li>
+              <li>人数展示：仅当后台配置为<strong>报名类活动</strong>时展示「x人已参加」；普通活动不展示人数。</li>
+              <li>筛选切换时列表区域 loading → 刷新；置顶 Banner 不参与列表分页，固定在最上方。</li>
+              <li>列表卡片布局沿用图1；置顶 Banner 参考图2 Banner 形态，色彩沿用 C 端体系。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>4</span>边界规则</h3>
+          <div class="rule-content">
+            <ul>
+              <li>同时仅允许 1 条置顶活动；后台取消置顶后 Banner 立即移除。</li>
+              <li>已参加人数以后端实时统计为准；前端不做本地累加；非报名类活动不返回人数字段。</li>
+              <li>活动状态由后台配置的活动时间驱动（待开始 → 进行中 → 已结束）。</li>
+              <li>无活动时展示空态文案「暂无符合条件的活动」。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>5</span>业务流程</h3>
+          <div class="rule-content">
+            <p>前后端交互与校验逻辑见页内 Tab <strong>「业务流程」</strong>。</p>
+          </div>
+        </div>
+      </div>
+      <div id="rule-admin" class="rule-panel">
+        <div class="rule-section">
+          <h3><span>1</span>业务目标</h3>
+          <div class="rule-content">
+            <p>运营可在后台配置活动类型（是否报名类）、活动时间、置顶 Banner，并查看已参加人数。</p>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>2</span>数据表与字段</h3>
+          <div class="rule-content">
+            <ul>
+              <li>活动表字段：ID、名称、副标题、所属项目、是否报名类、状态（待开始/进行中/已结束）、是否置顶 Banner、Banner 封面/图标、活动时间起止、已参加人数（报名类只读统计）、创建/更新时间。</li>
+              <li>置顶 Banner 额外字段：Banner 标题、Banner 副文案（可与列表卡片字段复用或独立配置）。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>3</span>列表与筛选</h3>
+          <div class="rule-content">
+            <ul>
+              <li>筛选项：活动 ID、名称、类型、状态、是否置顶。</li>
+              <li>操作列：编辑 / 上下架 / 取消置顶。</li>
+              <li>新增/编辑表单：勾选「报名类活动」时展示已参加人数（只读）；勾选「置顶 Banner」时展示 Banner 配置项。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>4</span>边界规则</h3>
+          <div class="rule-content">
+            <ul>
+              <li>置顶活动必须处于上架状态；下架后自动取消置顶。</li>
+              <li>已参加人数不可手动编辑，仅报名类活动展示。</li>
+              <li>活动状态根据配置的活动时间自动流转（待开始 → 进行中 → 已结束），运营可手动提前结束。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="modal-overlay" id="activityModalOverlay" onclick="closeActivityModal()">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">新增活动</div>
+      <div class="modal-body">
+        <div class="form-field"><label>活动名称</label><input type="text" placeholder="3天右豹生态公益培训营" /></div>
+        <div class="form-field"><label>活动类型</label><select><option>普通活动</option><option selected>报名类活动</option></select></div>
+        <div class="form-field"><label>置顶 Banner</label><select><option>否</option><option>是</option></select></div>
+        <div class="form-field"><label>活动时间</label><input type="text" placeholder="2026.08.22-2026.08.25" /></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" type="button" onclick="closeActivityModal()">取消</button>
+        <button class="btn btn-primary" type="button" onclick="submitActivity()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const ACTIVITY_ROWS = [
+      { id: 'ACT-001', name: '3天右豹生态公益培训营', type: '报名类', project: '右豹平台', status: '进行中', pinned: 'Banner', enrolled: 164, time: '2026.08.22-08.25' },
+      { id: 'ACT-002', name: '小说推文免费培训第1期', type: '报名类', project: '小说推文', status: '进行中', pinned: '否', enrolled: 164, time: '2026.08.22-08.29' },
+      { id: 'ACT-003', name: '漫剧推广实战营第2期', type: '报名类', project: '漫剧推广', status: '进行中', pinned: '否', enrolled: 200, time: '2026.08.10-08.20' },
+      { id: 'ACT-004', name: '右豹创作者成长计划', type: '普通', project: '右豹平台', status: '待开始', pinned: '否', enrolled: '-', time: '2026.09.01-09.30' },
+      { id: 'ACT-005', name: '右豹新人入门指引', type: '普通', project: '右豹平台', status: '已结束', pinned: '否', enrolled: '-', time: '2026.07.01-07.31' }
+    ];
+
+    function statusTag(s) {
+      if (s === '进行中') return '<span class="tag tag-ok">进行中</span>';
+      if (s === '待开始') return '<span class="tag tag-warn">待开始</span>';
+      return '<span class="tag tag-muted">已结束</span>';
+    }
+
+    function renderActivityTable() {
+      document.getElementById('activityTableBody').innerHTML = ACTIVITY_ROWS.map(r => `
+        <tr>
+          <td>${r.id}</td><td>${r.name}</td><td>${r.type}</td><td>${r.project}</td>
+          <td>${statusTag(r.status)}</td><td>${r.pinned}</td><td>${r.enrolled}</td><td>${r.time}</td>
+          <td><button class="link" type="button" onclick="showToast('Demo：编辑 ${r.id}')">编辑</button></td>
+        </tr>`).join('');
+    }
+
+    function getActiveFilter() {
+      return document.querySelector('.scene-btn.active')?.dataset.filter || 'all';
+    }
+
+    function buildMockupSrc(filter) {
+      return `activity-center-demo.html?embed=1&filter=${filter}`;
+    }
+
+    function loadMockupFrame(forceReload) {
+      const frame = document.getElementById('mockupFrame');
+      if (!frame) return;
+      const filter = getActiveFilter();
+      const src = buildMockupSrc(filter);
+      if (forceReload || frame.getAttribute('src') === 'about:blank') {
+        frame.src = src;
+        return;
+      }
+      try {
+        frame.contentWindow?.postMessage({ type: 'setFilter', filter }, '*');
+      } catch (_) {
+        frame.src = src;
+      }
+    }
+
+    document.querySelectorAll('.scene-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.scene-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        loadMockupFrame(false);
+      });
+    });
+
+    document.querySelectorAll('.page-tab-bar button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.page-tab-bar button').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.page-view').forEach(v => v.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.page).classList.add('active');
+        if (btn.dataset.page === 'view-fe') loadMockupFrame(true);
+        const tabMap = { 'view-fe': 'fe', 'view-admin': 'admin', 'view-flow': 'flow' };
+        history.replaceState(null, '', '?tab=' + (tabMap[btn.dataset.page] || 'fe'));
+        syncRuleTabToPage();
+      });
+    });
+
+    const ruleDrawer = document.getElementById('ruleDrawer');
+    const toggleRuleBtn = document.getElementById('toggleRuleDrawer');
+
+    function switchRuleTab(ruleId, btn) {
+      document.querySelectorAll('.rule-tab-bar button').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.rule-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(ruleId).classList.add('active');
+    }
+
+    document.querySelectorAll('.rule-tab-bar button').forEach(btn => {
+      btn.addEventListener('click', () => switchRuleTab(btn.dataset.rule, btn));
+    });
+
+    function syncRuleTabToPage() {
+      const activePage = document.querySelector('.page-view.active')?.id;
+      const ruleId = activePage === 'view-admin' ? 'rule-admin' : 'rule-fe';
+      const btn = document.querySelector('.rule-tab-bar button[data-rule="' + ruleId + '"]');
+      if (btn) switchRuleTab(ruleId, btn);
+    }
+
+    function setRuleDrawer(open) {
+      ruleDrawer.classList.toggle('open', open);
+      document.getElementById('ruleOverlay').classList.toggle('open', open);
+      toggleRuleBtn.classList.toggle('active', open);
+      if (open) syncRuleTabToPage();
+    }
+
+    toggleRuleBtn.onclick = () => setRuleDrawer(!ruleDrawer.classList.contains('open'));
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2500);
+    }
+
+    function openActivityModal() { document.getElementById('activityModalOverlay').classList.add('open'); }
+    function closeActivityModal() { document.getElementById('activityModalOverlay').classList.remove('open'); }
+    function submitActivity() { closeActivityModal(); showToast('Demo 已保存（Mock，不写入后端）'); }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') { setRuleDrawer(false); closeActivityModal(); }
+    });
+
+    const tab = new URLSearchParams(location.search).get('tab');
+    const tabPageMap = { admin: 'view-admin', flow: 'view-flow', fe: 'view-fe' };
+    if (tab && tabPageMap[tab]) {
+      const btn = document.querySelector('[data-page="' + tabPageMap[tab] + '"]');
+      if (btn) btn.click();
+    }
+
+    renderActivityTable();
+    if (document.querySelector('.page-view.active')?.id === 'view-fe') loadMockupFrame(true);
+  </script>
+  <script src="sidebar-nav.js"></script>
+</body>
+</html>
