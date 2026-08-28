@@ -152,17 +152,171 @@
     }
     .detail-row .label { color: var(--text-muted); flex-shrink: 0; }
     .detail-row .value { font-weight: 600; text-align: right; }
-    .drawer.wide { width: 640px; }
-    .drawer-footer {
-      padding: 12px 20px 16px; border-top: 1px solid var(--border);
-      display: flex; justify-content: flex-end; gap: 8px; flex-shrink: 0;
+    /* —— 宽抽屉（复杂配置表单）· 对齐 component-spec + admin-ui-spec —— */
+    .drawer.wide { width: 720px; }
+    .drawer.wide .drawer-header {
+      padding: 16px 20px; align-items: center;
     }
+    .drawer.wide .drawer-header h2 { font-size: 15px; font-weight: 700; line-height: 1.35; }
+    .drawer.wide .drawer-header p { font-size: 12px; margin-top: 4px; line-height: 1.5; }
+    .drawer.wide .drawer-close { width: 28px; height: 28px; font-size: 16px; }
+    .drawer.wide .drawer-body { padding: 0 24px 24px; }
+    .drawer.wide .drawer-footer { padding: 14px 20px 16px; }
+
+    #strategyEditDrawer .config-board,
+    #strategyDetailDrawer .config-board { padding: 0; max-width: none; }
+    #strategyEditDrawer .drawer-field-top,
+    #strategyDetailDrawer .drawer-field-top {
+      padding: 20px 0; border-bottom: 1px solid var(--border);
+    }
+    #strategyEditDrawer .config-block,
+    #strategyDetailDrawer .config-block {
+      padding: 20px 0; border-bottom: 1px solid var(--border);
+    }
+    #strategyEditDrawer .config-block:last-child,
+    #strategyDetailDrawer .config-block:last-child { border-bottom: none; padding-bottom: 8px; }
+    #strategyEditDrawer .config-block-inline .spec-inline {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 16px 24px;
+    }
+    #strategyEditDrawer .config-block-inline .spec-inline .form-field {
+      flex-direction: row; align-items: center; gap: 10px; margin-bottom: 0;
+    }
+    #strategyEditDrawer .config-block-inline .spec-inline .form-field label { white-space: nowrap; margin: 0; }
+    #strategyEditDrawer .config-block-head,
+    #strategyDetailDrawer .config-block-head {
+      display: flex; justify-content: space-between; gap: 12px;
+      margin-bottom: 12px; flex-wrap: wrap; align-items: flex-start;
+    }
+    #strategyEditDrawer .config-block-head h3,
+    #strategyDetailDrawer .config-block-head h3 {
+      font-size: 14px; font-weight: 700; margin-bottom: 4px; line-height: 1.4;
+    }
+    #strategyEditDrawer .config-block-head p,
+    #strategyDetailDrawer .config-block-head p {
+      font-size: 12px; color: var(--text-muted); line-height: 1.5;
+    }
+    #strategyEditDrawer .field-ratio-note,
+    #strategyDetailDrawer .field-ratio-note {
+      font-size: 12px; color: var(--text-secondary); line-height: 1.55;
+      padding: 10px 12px; margin-bottom: 12px;
+      background: #eff6ff; border: 1px solid var(--primary-border); border-radius: var(--radius-sm);
+    }
+    #strategyEditDrawer .form-field { gap: 6px; margin-bottom: 0; }
+    #strategyEditDrawer .form-field label { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+    #strategyEditDrawer .form-input,
+    #strategyEditDrawer .form-field input[type="text"],
+    #strategyEditDrawer .form-field input[type="number"] {
+      width: 100%; height: 34px; padding: 0 10px;
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      font-size: 13px; color: var(--text-primary); background: #fff;
+    }
+    #strategyEditDrawer .input-narrow { width: 120px; }
+    #strategyEditDrawer .checkbox-group { gap: 16px 20px; padding: 2px 0; }
+    #strategyEditDrawer .checkbox-item { font-size: 13px; gap: 8px; }
+    #strategyEditDrawer .multi-select-trigger { height: 34px; font-size: 13px; }
+
+    #strategyEditDrawer .strategy-table,
+    #strategyDetailDrawer .strategy-table {
+      width: 100%; min-width: 0; table-layout: fixed; border-collapse: collapse;
+    }
+    #strategyEditDrawer .strategy-table th,
+    #strategyEditDrawer .strategy-table td,
+    #strategyDetailDrawer .strategy-table th,
+    #strategyDetailDrawer .strategy-table td {
+      padding: 10px 12px; font-size: 12px; text-align: left;
+      border-bottom: 1px solid var(--border); vertical-align: middle;
+    }
+    #strategyEditDrawer .strategy-table thead th,
+    #strategyDetailDrawer .strategy-table thead th {
+      font-size: 11px; font-weight: 600; color: var(--text-muted);
+      background: rgba(248,250,252,0.95);
+    }
+    #strategyEditDrawer .strategy-table tbody tr:hover td { background: var(--surface-hover); }
+    #strategyEditDrawer .field-config-table col.col-field { width: 52%; }
+    #strategyEditDrawer .field-config-table col.col-ratio { width: 24%; }
+    #strategyEditDrawer .field-config-table col.col-skip { width: 24%; }
+    #strategyEditDrawer .field-cell { line-height: 1.45; }
+    #strategyEditDrawer .field-cell .field-label {
+      display: block; font-size: 12px; font-weight: 500; color: var(--text-primary);
+    }
+    #strategyEditDrawer .field-key {
+      display: block; margin-top: 2px; font-size: 11px; color: var(--text-muted);
+    }
+    #strategyEditDrawer .field-key code {
+      font-size: 11px; font-family: ui-monospace, monospace;
+      background: #f1f5f9; padding: 1px 4px; border-radius: 3px;
+    }
+    #strategyEditDrawer .field-ratio-input,
+    #strategyEditDrawer .field-skip-input,
+    #strategyEditDrawer .inline-cell-input {
+      width: 100%; max-width: 96px; height: 32px; padding: 0 8px;
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      font-size: 12px; background: #fff;
+    }
+    #strategyEditDrawer .inline-cell-input { max-width: none; }
+    #strategyEditDrawer .inline-cell-input.num { max-width: 96px; }
+    #strategyEditDrawer .id-ratio-table col.col-match { width: 28%; }
+    #strategyEditDrawer .id-ratio-table col.col-val { width: 36%; }
+    #strategyEditDrawer .id-ratio-table col.col-ratio { width: 24%; }
+    #strategyEditDrawer .id-ratio-table col.col-act { width: 12%; text-align: center; }
+    #strategyEditDrawer .id-ratio-table td:last-child { text-align: center; }
+    #strategyEditDrawer .btn-inline-add {
+      height: 28px; padding: 0 10px; font-size: 12px; font-weight: 500;
+      border: 1px dashed var(--primary-border); background: var(--primary-light);
+      color: var(--primary); border-radius: var(--radius-sm); cursor: pointer;
+    }
+    #strategyEditDrawer .btn-inline-add:hover { background: #dbeafe; }
+    #strategyEditDrawer .link { font-size: 12px; margin-right: 0; }
+    #strategyEditDrawer .project-checkbox-grid {
+      display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 12px;
+    }
+
+    #strategyDetailDrawer .detail-grid { gap: 8px; margin-bottom: 0; }
+    #strategyDetailDrawer .detail-row { padding: 10px 12px; font-size: 13px; }
+    #strategyDetailDrawer .field-key {
+      display: inline; margin-left: 6px; font-size: 11px; color: var(--text-muted);
+    }
+    #strategyDetailDrawer .field-key code {
+      font-size: 11px; font-family: ui-monospace, monospace;
+      background: #f1f5f9; padding: 1px 4px; border-radius: 3px;
+    }
+    #strategyDetailDrawer .config-block:first-child { padding-top: 16px; }
+    #strategyDetailDrawer .section-subtitle {
+      font-size: 14px; font-weight: 700; margin: 0 0 10px; line-height: 1.4;
+    }
+    #strategyDetailDrawer .field-config-table col.col-field { width: 52%; }
+    #strategyDetailDrawer .field-config-table col.col-ratio { width: 24%; }
+    #strategyDetailDrawer .field-config-table col.col-skip { width: 24%; }
+    .flow-edges line, .flow-edges polyline, .flow-edges path { stroke: #64748b; stroke-width: 2; fill: none; }
+    .flow-edges.edge-skip line, .flow-edges.edge-skip polyline, .flow-edges.edge-skip path { stroke: #dc2626; stroke-width: 2; stroke-dasharray: none; }
+    .flow-edges.edge-loop line { stroke: #64748b; stroke-width: 2; stroke-dasharray: 6 4; }
+    #strategyEditDrawer .table-wrap,
+    #strategyDetailDrawer .table-wrap { margin: 0; }
+    #strategyEditDrawer .multi-select-panel { padding: 8px 10px; max-height: 240px; }
     .checkbox-group { display: flex; flex-wrap: wrap; gap: 16px; padding: 4px 0; }
     .checkbox-item {
       display: inline-flex; align-items: center; gap: 8px; font-size: 13px;
       color: var(--text-secondary); cursor: pointer; user-select: none;
     }
     .checkbox-item input { width: 16px; height: 16px; cursor: pointer; accent-color: var(--primary); }
+    .multi-select { position: relative; }
+    .multi-select-trigger {
+      width: 100%; height: 34px; padding: 0 10px; text-align: left;
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      background: #fff; font-size: 13px; cursor: pointer; color: var(--text-primary);
+    }
+    .multi-select-panel {
+      display: none; position: absolute; left: 0; right: 0; top: calc(100% + 4px);
+      max-height: 240px; overflow-y: auto; z-index: 20;
+      background: #fff; border: 1px solid var(--border); border-radius: var(--radius-sm);
+      box-shadow: var(--shadow); padding: 8px 10px;
+    }
+    .multi-select-panel.open { display: block; }
+    .project-checkbox-grid { display: flex; flex-direction: column; gap: 6px; }
+    .field-ratio-input {
+      width: 72px; height: 28px; padding: 0 6px; border: 1px solid var(--border);
+      border-radius: 4px; font-size: 12px;
+    }
     .import-hint {
       padding: 10px 12px; background: #f8fafc; border: 1px solid var(--border);
       border-radius: var(--radius-sm); font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-top: 8px;
@@ -184,11 +338,12 @@
       pointer-events: none; visibility: hidden;
     }
     .drawer.open { transform: translateX(0); pointer-events: auto; visibility: visible; }
-    .drawer-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
-    .drawer-header h2 { font-size: 15px; font-weight: 700; }
-    .drawer-header p { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
-    .drawer-close { width: 28px; height: 28px; border: none; background: #f1f5f9; border-radius: 6px; cursor: pointer; font-size: 16px; flex-shrink: 0; }
-    .drawer-body { flex: 1; overflow-y: auto; padding: 16px 20px 32px; }
+    .drawer-header { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+    .drawer-header h2 { font-size: 14px; font-weight: 700; }
+    .drawer-header p { font-size: 11px; color: var(--text-muted); margin-top: 2px; line-height: 1.35; }
+    .drawer-close { width: 26px; height: 26px; border: none; background: #f1f5f9; border-radius: 6px; cursor: pointer; font-size: 15px; flex-shrink: 0; }
+    .drawer-body { flex: 1; overflow-y: auto; padding: 10px 14px 16px; }
+    .drawer-footer { padding: 10px 16px 12px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; flex-shrink: 0; }
     .compare-summary {
       display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px;
     }
@@ -233,7 +388,6 @@
     .flow-page-intro { padding: 16px 18px 0; font-size: 12px; color: var(--text-muted); line-height: 1.55; }
     .flow-svg-wrap { overflow: auto; padding: 16px 18px 24px; max-height: 72vh; border-top: 1px solid var(--border); }
     .flow-svg-wrap svg { display: block; margin: 0 auto; min-width: 920px; }
-    .flow-edges line, .flow-edges polyline { stroke: #94a3b8; stroke-width: 1.5; fill: none; }
     .flow-legend { display: flex; flex-wrap: wrap; gap: 12px; padding: 0 18px 20px; font-size: 11px; color: var(--text-muted); }
     .flow-legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 4px; vertical-align: -2px; }
     .toast {
@@ -301,7 +455,7 @@
           <div class="table-toolbar">
             <div>
               <h3>优化策略</h3>
-              <p class="cell-sub" style="margin-top:4px;">每条策略含默认比例、ID 差异化比例、前几名豁免、字段级豁免等配置项，<strong>共存生效</strong>。执行优化时在记录中选择具体策略。</p>
+              <p class="cell-sub" style="margin-top:4px;">每条策略绑定<strong>优化项目</strong>（多选）与<strong>结算字段比例</strong>，并含 ID 差异化比例、前几名豁免、字段级豁免等配置，<strong>共存生效</strong>。</p>
             </div>
             <button class="btn btn-primary btn-sm" type="button" onclick="openNewStrategyModal()">新增策略</button>
           </div>
@@ -310,7 +464,7 @@
               <thead>
                 <tr>
                   <th>策略名称</th>
-                  <th>默认比例</th>
+                  <th>优化项目</th>
                   <th>白名单隔离</th>
                   <th>前几名豁免</th>
                   <th>ID 规则数</th>
@@ -370,7 +524,7 @@
             </div>
           </div>
           <div class="filter-bar">
-            <div class="form-field"><label>所属项目</label><input type="text" id="filterKwProject" placeholder="番茄小说合作" /></div>
+            <div class="form-field"><label>所属项目</label><input type="text" id="filterKwProject" placeholder="番茄小说" /></div>
             <div class="form-field"><label>关键词</label><input type="text" id="filterKeyword" placeholder="免优化词" /></div>
             <div class="form-field">
               <label>状态</label>
@@ -401,7 +555,7 @@
             <button class="btn btn-primary btn-sm" type="button" onclick="openImportModal()">导入原始数据并优化</button>
           </div>
           <div class="filter-bar">
-            <div class="form-field"><label>项目名称</label><input type="text" id="filterProject" placeholder="番茄小说合作" /></div>
+            <div class="form-field"><label>项目名称</label><input type="text" id="filterProject" placeholder="番茄小说" /></div>
             <div class="filter-actions">
               <button class="btn-ghost-sm" type="button" onclick="document.getElementById('filterProject').value='';renderRecordsTable()">重置</button>
               <button class="btn btn-primary btn-sm" type="button" onclick="renderRecordsTable()">查询</button>
@@ -431,63 +585,140 @@
     <!-- 业务流程 -->
     <div id="view-flow" class="page-view">
       <div class="glass-card">
-        <p class="flow-page-intro">导入原始订单 → 读取项目策略配置（含白名单）→ 批次排名与逐单逐字段优化 → 写入优化记录 → 运营下载优化后 Excel / 查看对比。无 C 端展示环节。</p>
+        <p class="flow-page-intro">导入原始订单 → 加载策略与白名单 → 批次预排 Top N → 逐单校验（①→⑤）→ 单订单完成 → 有下一单则回到 ①，全部完成后批次汇总写入优化记录。无 C 端展示。</p>
         <div class="flow-svg-wrap">
-          <svg width="960" height="480" viewBox="0 0 960 480" xmlns="http://www.w3.org/2000/svg">
-            <g class="flow-edges">
-              <polyline points="480,52 480,88" />
-              <polyline points="480,128 480,164" />
-              <polyline points="480,204 480,240" />
-              <polyline points="480,280 300,316" />
-              <polyline points="480,280 660,316" />
-              <polyline points="300,356 300,392" />
-              <polyline points="660,356 660,392" />
-              <polyline points="300,432 480,448" />
-              <polyline points="660,432 480,448" />
+          <svg width="980" height="760" viewBox="0 0 980 760" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <marker id="flow-arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+                <path d="M0,0 L10,5 L0,10 Z" fill="#64748b"/>
+              </marker>
+              <marker id="flow-arrow-skip" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+                <path d="M0,0 L10,5 L0,10 Z" fill="#dc2626"/>
+              </marker>
+            </defs>
+
+            <!-- 主流程 -->
+            <g class="flow-edges" marker-end="url(#flow-arrow)">
+              <line x1="480" y1="52" x2="480" y2="62"/>
+              <line x1="480" y1="110" x2="480" y2="120"/>
+              <line x1="480" y1="172" x2="480" y2="182"/>
+              <line x1="480" y1="206" x2="480" y2="220"/>
+              <line x1="480" y1="260" x2="480" y2="300"/>
+              <line x1="480" y1="340" x2="480" y2="380"/>
+              <line x1="480" y1="420" x2="480" y2="434"/>
+              <line x1="480" y1="526" x2="480" y2="534"/>
+              <line x1="480" y1="572" x2="480" y2="588"/>
+              <line x1="480" y1="632" x2="480" y2="652"/>
+              <line x1="480" y1="692" x2="480" y2="706"/>
             </g>
+
+            <!-- 逐单循环回指（左侧通道，不与旁路重叠） -->
+            <g class="flow-edges edge-loop" marker-end="url(#flow-arrow)">
+              <line x1="448" y1="610" x2="130" y2="610"/>
+              <line x1="130" y1="610" x2="130" y2="240"/>
+              <line x1="130" y1="240" x2="438" y2="240"/>
+            </g>
+
+            <!-- 整单豁免旁路（①②③） -->
+            <g class="flow-edges edge-skip" marker-end="url(#flow-arrow-skip)">
+              <line x1="520" y1="240" x2="870" y2="240"/>
+              <line x1="520" y1="320" x2="870" y2="320"/>
+              <line x1="520" y1="400" x2="870" y2="400"/>
+              <line x1="870" y1="240" x2="870" y2="400"/>
+              <line x1="870" y1="400" x2="870" y2="412"/>
+              <line x1="870" y1="456" x2="870" y2="582"/>
+              <line x1="870" y1="582" x2="480" y2="582"/>
+            </g>
+
             <g font-family="Inter, PingFang SC, sans-serif">
-              <rect x="360" y="16" width="240" height="36" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
-              <text x="480" y="38" text-anchor="middle" font-size="12" fill="#18222f">导入原始订单 Excel</text>
-              <rect x="320" y="88" width="320" height="40" rx="8" fill="#eff6ff" stroke="#2563eb"/>
-              <text x="480" y="106" text-anchor="middle" font-size="12" fill="#18222f">加载策略配置 + 白名单</text>
-              <text x="480" y="120" text-anchor="middle" font-size="10" fill="#64748b">各配置项共存生效</text>
-              <polygon points="480,164 520,204 480,244 440,204" fill="#fffbeb" stroke="#d97706"/>
-              <text x="480" y="200" text-anchor="middle" font-size="11" fill="#18222f">计算批次 Top N</text>
-              <rect x="340" y="240" width="280" height="40" rx="8" fill="#eff6ff" stroke="#2563eb"/>
-              <text x="480" y="264" text-anchor="middle" font-size="12" fill="#18222f">逐单逐字段优化引擎</text>
-              <polygon points="300,316 340,356 300,396 260,356" fill="#fffbeb" stroke="#d97706"/>
-              <text x="300" y="352" text-anchor="middle" font-size="10" fill="#18222f">用户/关键词/TopN</text>
-              <text x="300" y="366" text-anchor="middle" font-size="10" fill="#18222f">整单豁免?</text>
-              <polygon points="660,316 700,356 660,396 620,356" fill="#fffbeb" stroke="#d97706"/>
-              <text x="660" y="352" text-anchor="middle" font-size="10" fill="#18222f">字段豁免 + 比例</text>
-              <text x="660" y="366" text-anchor="middle" font-size="10" fill="#18222f">floor(原值×%)</text>
-              <rect x="200" y="392" width="200" height="40" rx="8" fill="#fef2f2" stroke="#dc2626"/>
-              <text x="300" y="416" text-anchor="middle" font-size="11" fill="#18222f">原样写入</text>
-              <rect x="560" y="392" width="200" height="40" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
-              <text x="660" y="416" text-anchor="middle" font-size="11" fill="#18222f">优化后写入</text>
-              <rect x="340" y="432" width="280" height="40" rx="8" fill="#eff6ff" stroke="#2563eb"/>
-              <text x="480" y="450" text-anchor="middle" font-size="12" fill="#18222f">生成优化记录 · 可下载 / 对比</text>
-              <text x="480" y="464" text-anchor="middle" font-size="10" fill="#64748b">原始表保留 · 无 C 端</text>
+              <rect x="340" y="16" width="280" height="36" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
+              <text x="480" y="39" text-anchor="middle" font-size="12" font-weight="600" fill="#18222f">导入原始订单 Excel</text>
+
+              <rect x="300" y="62" width="360" height="48" rx="8" fill="#eff6ff" stroke="#2563eb"/>
+              <text x="480" y="82" text-anchor="middle" font-size="12" font-weight="600" fill="#18222f">加载策略 + 白名单</text>
+              <text x="480" y="98" text-anchor="middle" font-size="10" fill="#64748b">优化项目 · 结算字段比例/豁免权值 · ID 规则 · Top N</text>
+
+              <rect x="280" y="120" width="400" height="52" rx="8" fill="#eff6ff" stroke="#2563eb"/>
+              <text x="480" y="140" text-anchor="middle" font-size="12" font-weight="600" fill="#18222f">批次 Top N 预排名（一次）</text>
+              <text x="480" y="156" text-anchor="middle" font-size="10" fill="#64748b">在未被 ①② 整单豁免的订单池内按收益降序取 Top N · N=0 跳过</text>
+
+              <rect x="360" y="182" width="240" height="24" rx="6" fill="#f8fafc" stroke="#94a3b8"/>
+              <text x="480" y="198" text-anchor="middle" font-size="11" fill="#475569">逐单循环 · 每笔订单独立走下列校验链</text>
+
+              <polygon points="480,220 520,240 480,260 440,240" fill="#fffbeb" stroke="#d97706"/>
+              <text x="480" y="236" text-anchor="middle" font-size="10" font-weight="600" fill="#18222f">① 用户白名单</text>
+              <text x="480" y="252" text-anchor="middle" font-size="9" fill="#64748b">否 ↓ · 策略须勾选「用户」</text>
+              <text x="528" y="238" font-size="9" fill="#dc2626" font-weight="600">是 →</text>
+              <text x="118" y="244" font-size="9" fill="#64748b">← 下一单</text>
+
+              <polygon points="480,300 520,320 480,340 440,320" fill="#fffbeb" stroke="#d97706"/>
+              <text x="480" y="316" text-anchor="middle" font-size="10" font-weight="600" fill="#18222f">② 关键词白名单</text>
+              <text x="480" y="332" text-anchor="middle" font-size="9" fill="#64748b">否 ↓ · 策略须勾选「关键词」</text>
+              <text x="528" y="318" font-size="9" fill="#dc2626" font-weight="600">是 →</text>
+
+              <polygon points="480,380 520,400 480,420 440,400" fill="#fffbeb" stroke="#d97706"/>
+              <text x="480" y="396" text-anchor="middle" font-size="10" font-weight="600" fill="#18222f">③ 前几名 Top N</text>
+              <text x="480" y="412" text-anchor="middle" font-size="9" fill="#64748b">否 ↓ · 命中预排名集合</text>
+              <text x="528" y="398" font-size="9" fill="#dc2626" font-weight="600">是 →</text>
+
+              <rect x="790" y="412" width="160" height="44" rx="8" fill="#fef2f2" stroke="#dc2626"/>
+              <text x="870" y="432" text-anchor="middle" font-size="11" font-weight="600" fill="#18222f">整单原样</text>
+              <text x="870" y="448" text-anchor="middle" font-size="9" fill="#64748b">① / ② / ③ 命中</text>
+
+              <rect x="250" y="434" width="460" height="92" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
+              <text x="480" y="454" text-anchor="middle" font-size="11" font-weight="600" fill="#18222f">逐字段处理（④ → ⑤，字段互不影响）</text>
+              <text x="480" y="472" text-anchor="middle" font-size="10" fill="#18222f">④ 特定单量：配置了豁免权值且原值=豁免权值 → 仅该字段原样</text>
+              <text x="480" y="488" text-anchor="middle" font-size="10" fill="#18222f">⑤ 否则：书籍ID/短剧ID 命中 → 专属比例；未命中 → 结算字段比例</text>
+              <text x="480" y="504" text-anchor="middle" font-size="9" fill="#64748b">计算 floor(原值 × 比例%) · 各字段独立截断</text>
+              <text x="480" y="518" text-anchor="middle" font-size="9" fill="#64748b">未配置豁免权值的字段跳过 ④，直接进入 ⑤</text>
+
+              <rect x="350" y="534" width="260" height="38" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
+              <text x="480" y="551" text-anchor="middle" font-size="11" font-weight="600" fill="#18222f">该单结果写入</text>
+              <text x="480" y="565" text-anchor="middle" font-size="9" fill="#64748b">整单原样 或 部分/全部字段优化</text>
+
+              <circle cx="480" cy="582" r="4" fill="#64748b"/>
+
+              <polygon points="480,588 510,610 480,632 450,610" fill="#fffbeb" stroke="#d97706"/>
+              <text x="480" y="606" text-anchor="middle" font-size="10" font-weight="600" fill="#18222f">还有下一单？</text>
+              <text x="480" y="620" text-anchor="middle" font-size="9" fill="#64748b">是 ← 回到 ① · 否 ↓</text>
+              <text x="418" y="606" font-size="9" fill="#64748b" font-weight="600">是</text>
+              <text x="492" y="628" font-size="9" fill="#64748b" font-weight="600">否</text>
+
+              <rect x="320" y="652" width="320" height="40" rx="8" fill="#eff6ff" stroke="#2563eb"/>
+              <text x="480" y="670" text-anchor="middle" font-size="11" font-weight="600" fill="#18222f">批次汇总 · 生成优化记录</text>
+              <text x="480" y="684" text-anchor="middle" font-size="9" fill="#64748b">优化前/后订单量与累计金额</text>
+
+              <rect x="300" y="706" width="360" height="36" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
+              <text x="480" y="724" text-anchor="middle" font-size="11" font-weight="600" fill="#18222f">运营交付 · 本批次结束</text>
+              <text x="480" y="738" text-anchor="middle" font-size="9" fill="#64748b">下载优化后 Excel · 查看对比 · 无 C 端</text>
+              <circle cx="480" cy="748" r="5" fill="none" stroke="#16a34a" stroke-width="2"/>
+
+              <text x="900" y="240" font-size="9" fill="#dc2626">①</text>
+              <text x="900" y="320" font-size="9" fill="#dc2626">②</text>
+              <text x="900" y="400" font-size="9" fill="#dc2626">③</text>
+              <text x="692" y="578" font-size="9" fill="#dc2626">旁路汇合</text>
+              <text x="108" y="430" font-size="9" fill="#64748b">逐单回环</text>
             </g>
           </svg>
         </div>
         <div class="flow-legend">
-          <span><i style="background:#eff6ff;border:1px solid #2563eb"></i>数据处理</span>
-          <span><i style="background:#fffbeb;border:1px solid #d97706"></i>校验 / 分支</span>
-          <span><i style="background:#f0fdf4;border:1px solid #16a34a"></i>优化计算</span>
-          <span><i style="background:#fef2f2;border:1px solid #dc2626"></i>整单跳过</span>
+          <span><i style="background:#eff6ff;border:1px solid #2563eb"></i>批次 / 汇总</span>
+          <span><i style="background:#fffbeb;border:1px solid #d97706"></i>整单级校验 / 分支</span>
+          <span><i style="background:#f0fdf4;border:1px solid #16a34a"></i>字段级 ④⑤ / 结束</span>
+          <span><i style="background:#f8fafc;border:1px dashed #64748b"></i>逐单回环</span>
+          <span><i style="background:#fef2f2;border:1px solid #dc2626"></i>整单原样旁路</span>
         </div>
       </div>
     </div>
   </main>
 
-  <!-- 弹窗 -->
+  <!-- 弹窗：策略 / 白名单 / 导入 -->
   <div class="modal-overlay" id="newStrategyOverlay" onclick="closeNewStrategyModal()">
     <div class="modal" onclick="event.stopPropagation()">
       <div class="modal-header">新增优化策略</div>
       <div class="modal-body">
         <div class="form-field"><label>策略名称 *</label><input type="text" id="newStrategyName" placeholder="如：番茄默认策略" /></div>
-        <p style="font-size:12px;color:var(--text-muted);line-height:1.55;margin-top:4px;">创建后可继续编辑默认比例、ID 规则、前几名豁免等详细配置。</p>
+        <p style="font-size:12px;color:var(--text-muted);line-height:1.55;margin-top:4px;">创建后可继续编辑优化项目、结算字段比例、ID 规则、前几名豁免等详细配置。</p>
       </div>
       <div class="modal-footer">
         <button class="btn btn-ghost" type="button" onclick="closeNewStrategyModal()">取消</button>
@@ -496,44 +727,6 @@
     </div>
   </div>
 
-  <div class="modal-overlay" id="idRatioOverlay" onclick="closeIdRatioModal()">
-    <div class="modal" onclick="event.stopPropagation()">
-      <div class="modal-header">新增 ID 比例规则</div>
-      <div class="modal-body">
-        <div class="form-field">
-          <label>匹配字段 *</label>
-          <select id="idMatchField"><option value="bookId">书籍ID</option><option value="dramaId">短剧ID</option></select>
-        </div>
-        <div class="form-field"><label>匹配值 *</label><input type="text" id="idMatchValue" placeholder="1" /></div>
-        <div class="form-field"><label>结算比例 (%) *</label><input type="number" id="idMatchRatio" value="120" min="1" max="500" /></div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-ghost" type="button" onclick="closeIdRatioModal()">取消</button>
-        <button class="btn btn-primary" type="button" onclick="saveIdRatio()">保存</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal-overlay" id="volumeSkipOverlay" onclick="closeVolumeSkipModal()">
-    <div class="modal" onclick="event.stopPropagation()">
-      <div class="modal-header">新增字段豁免</div>
-      <div class="modal-body">
-        <div class="form-field">
-          <label>结算字段 *</label>
-          <select id="volumeSkipField">
-            <option value="newCount">拉新量</option>
-            <option value="oldCount">拉旧量</option>
-            <option value="settleAmount">结算金额</option>
-          </select>
-        </div>
-        <div class="form-field"><label>豁免值 *</label><input type="number" id="volumeSkipValue" placeholder="5" /></div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-ghost" type="button" onclick="closeVolumeSkipModal()">取消</button>
-        <button class="btn btn-primary" type="button" onclick="saveVolumeSkip()">保存</button>
-      </div>
-    </div>
-  </div>
 
   <div class="modal-overlay" id="userWhitelistOverlay" onclick="closeUserWhitelistModal()">
     <div class="modal" onclick="event.stopPropagation()">
@@ -558,11 +751,7 @@
       <div class="modal-body">
         <div class="form-field">
           <label>所属项目 *</label>
-          <select id="wlKwProject">
-            <option value="番茄小说合作">番茄小说合作</option>
-            <option value="知乎故事合作">知乎故事合作</option>
-            <option value="全部项目">全部项目</option>
-          </select>
+          <select id="wlKwProject"></select>
         </div>
         <div class="form-field"><label>关键词 *</label><input type="text" id="wlKeyword" placeholder="免优化词" /></div>
         <div class="form-field">
@@ -604,7 +793,7 @@
         </div>
         <div class="form-field">
           <label>项目名称 *</label>
-          <input type="text" id="importProject" placeholder="番茄小说合作" value="番茄小说合作" />
+          <select id="importProject"></select>
         </div>
         <div class="form-field">
           <label>原始订单 Excel</label>
@@ -653,49 +842,60 @@
     <div class="drawer-header">
       <div>
         <h2 id="strategyEditTitle">编辑策略</h2>
-        <p id="strategyEditSub">各配置项同时生效、共同开启，非互斥选项。</p>
+        <p id="strategyEditSub">各配置项共存生效，非互斥。</p>
       </div>
       <button class="drawer-close" type="button" onclick="closeStrategyEditDrawer()">×</button>
     </div>
     <div class="drawer-body">
-      <div class="config-board" style="padding:0;max-width:none;">
-        <div class="form-field" style="margin-bottom:16px;">
-          <label style="font-size:12px;color:var(--text-muted);">策略名称 *</label>
-          <input type="text" id="editStrategyName" style="width:100%;height:34px;padding:0 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;" />
+      <div class="config-board">
+        <div class="drawer-field-top">
+          <div class="form-field">
+            <label for="editStrategyName">策略名称 *</label>
+            <input type="text" id="editStrategyName" class="form-input" placeholder="如：番茄默认策略" />
+          </div>
         </div>
         <div class="config-block">
-          <div class="config-block-head">
-            <div>
-              <h3>白名单隔离</h3>
-              <p>勾选后，该策略执行优化时将启用对应白名单整单豁免；可多选，未勾选则不生效。</p>
+          <div class="config-block-head"><div><h3>优化项目</h3><p>多选，仅对选中项目生效。</p></div></div>
+          <div class="multi-select" id="editOptimizeProjectsWrap">
+            <button type="button" class="multi-select-trigger" id="editProjectsTrigger" onclick="toggleProjectDropdown(event)">
+              <span id="editProjectsSummary">请选择优化项目</span>
+            </button>
+            <div class="multi-select-panel" id="editOptimizeProjectsPanel"></div>
+          </div>
+        </div>
+        <div class="config-block">
+          <div class="config-block-head"><div><h3>结算字段比例 · 特定单量豁免</h3></div></div>
+          <p class="field-ratio-note">选中优化项目后展示全部 9 个结算字段。可设比例与<strong>豁免权值</strong>：订单该字段原值=豁免权值时保持原样；<strong>留空表示不启用豁免</strong>。</p>
+          <div class="table-wrap">
+            <table class="strategy-table field-config-table">
+              <colgroup><col class="col-field" /><col class="col-ratio" /><col class="col-skip" /></colgroup>
+              <thead><tr><th>结算字段</th><th>比例(%)</th><th>豁免权值</th></tr></thead>
+              <tbody id="fieldRatioBody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="config-block config-block-inline">
+          <div class="config-block-head"><div><h3>白名单隔离</h3><p>勾选后对应白名单规则参与整单级校验。</p></div></div>
+          <div class="spec-inline checkbox-group">
+            <label class="checkbox-item"><input type="checkbox" id="wlIsoUser" value="user" />用户</label>
+            <label class="checkbox-item"><input type="checkbox" id="wlIsoKeyword" value="keyword" />关键词</label>
+          </div>
+        </div>
+        <div class="config-block config-block-inline">
+          <div class="config-block-head"><div><h3>前几名不优化</h3><p>在未被 ①② 豁免的订单池内按收益取 Top N，整单原样。</p></div></div>
+          <div class="spec-inline">
+            <div class="form-field">
+              <label for="editTopN">前 N 名（0=关）</label>
+              <input type="number" id="editTopN" class="input-narrow" min="0" max="100" />
             </div>
           </div>
-          <div class="checkbox-group">
-            <label class="checkbox-item"><input type="checkbox" id="wlIsoUser" value="user" />用户白名单</label>
-            <label class="checkbox-item"><input type="checkbox" id="wlIsoKeyword" value="keyword" />关键词白名单</label>
-          </div>
-        </div>
-        <div class="config-block">
-          <div class="config-block-head"><div><h3>默认结算比例</h3><p>参与结算的每个字段独立计算：<code>floor(原始值 × 比例%)</code>，截断取整，不四舍五入。</p></div></div>
-          <div class="form-inline"><div class="form-field"><label>默认比例 (%)</label><input type="number" id="editDefaultRatio" min="1" max="500" /></div></div>
         </div>
         <div class="config-block">
           <div class="config-block-head">
-            <div><h3>书籍 / 短剧 ID 差异化比例</h3><p>命中匹配值时使用专属比例；未命中仍用默认比例。</p></div>
-            <button class="btn btn-primary btn-sm" type="button" onclick="openIdRatioModal()">新增规则</button>
+            <div><h3>书籍 / 短剧 ID 差异化比例</h3><p>命中书籍 ID 或短剧 ID 时使用专属比例，未命中则走结算字段比例。</p></div>
+            <button class="btn-inline-add" type="button" onclick="addIdRatioRow()">+ 新增</button>
           </div>
-          <div class="table-wrap"><table><thead><tr><th>匹配字段</th><th>匹配值</th><th>结算比例</th><th>操作</th></tr></thead><tbody id="idRatioBody"></tbody></table></div>
-        </div>
-        <div class="config-block">
-          <div class="config-block-head"><div><h3>前几名不优化</h3><p>本批次按收益降序排名，前 N 名订单整单不优化。</p></div></div>
-          <div class="form-inline"><div class="form-field"><label>前 N 名（0=关闭）</label><input type="number" id="editTopN" min="0" max="100" /></div></div>
-        </div>
-        <div class="config-block">
-          <div class="config-block-head">
-            <div><h3>特定单量 · 字段级豁免</h3><p>某结算字段原始值等于配置值时，<strong>仅该字段</strong>不优化。</p></div>
-            <button class="btn btn-primary btn-sm" type="button" onclick="openVolumeSkipModal()">新增豁免</button>
-          </div>
-          <div class="table-wrap"><table><thead><tr><th>结算字段</th><th>字段标识</th><th>豁免值</th><th>操作</th></tr></thead><tbody id="volumeSkipBody"></tbody></table></div>
+          <div class="table-wrap"><table class="strategy-table id-ratio-table"><colgroup><col class="col-match" /><col class="col-val" /><col class="col-ratio" /><col class="col-act" /></colgroup><thead><tr><th>匹配</th><th>值</th><th>比例(%)</th><th></th></tr></thead><tbody id="idRatioBody"></tbody></table></div>
         </div>
       </div>
     </div>
@@ -721,7 +921,7 @@
         <table>
           <thead>
             <tr>
-              <th>用户ID</th><th>关键词</th><th>拉新量</th><th>拉旧量</th><th>结算金额</th><th>说明</th>
+              <th>用户ID</th><th>关键词</th><th>拉新量</th><th>拉旧量</th><th>会员量</th><th>说明</th>
             </tr>
           </thead>
           <tbody id="compareBody"></tbody>
@@ -748,7 +948,7 @@
         <h3><span>2</span>后台 Tab</h3>
         <div class="rule-content">
           <ul>
-            <li><strong>优化策略</strong>：策略列表，可新增；每条策略含名称及默认比例、ID 比例、前几名、字段豁免等<strong>共存生效</strong>的配置；支持查看详情、编辑。</li>
+            <li><strong>优化策略</strong>：策略列表，可新增；每条策略含名称、<strong>优化项目</strong>（多选）、<strong>结算字段比例与豁免权值</strong>、白名单隔离、ID 比例、前几名等<strong>共存生效</strong>的配置；支持查看详情、编辑。</li>
             <li><strong>用户白名单</strong>：独立 Tab；字段含用户 ID、状态、添加时间（<strong>无所属项目</strong>）；支持新增、编辑、删除、批量导入。</li>
             <li><strong>关键词白名单</strong>：独立 Tab；字段含所属项目、关键词、状态、添加时间；支持新增、编辑、删除、批量导入。</li>
             <li><strong>优化记录</strong>：导入时选择优化策略 → 执行优化 → 列表展示汇总指标；支持下载、删除、查看对比。</li>
@@ -768,10 +968,12 @@
         <h3><span>4</span>策略口径</h3>
         <div class="rule-content">
           <ul>
-            <li>比例：<code>floor(原始值 × 比例%)</code>，字段级独立计算。</li>
-            <li>整单豁免：用户白名单 / 关键词白名单 / Top N 前几名。</li>
-            <li>字段豁免：特定结算字段=配置值时不优化该字段。</li>
-            <li>ID 比例：书籍ID/短剧ID 命中时使用专属比例，可 &gt;100%。</li>
+            <li><strong>优化校验顺序</strong>：整单级 ①→②→③ 顺序判定、命中即跳过后续整单校验；通过整单校验后进入逐字段 ④→⑤，④ 仅豁免当前字段、其余字段继续。</li>
+            <li>① 用户白名单：策略勾选且用户 ID 命中 → 整单原样，不优化。</li>
+            <li>② 关键词白名单：策略勾选且关键词命中 → 整单原样，不优化。</li>
+            <li>③ 前几名不优化：在<strong>未被 ①② 整单豁免的订单池</strong>内按收益降序取 Top N → 整单原样，不优化。</li>
+            <li>④ 特定单量：结算字段配置了<strong>豁免权值</strong>且订单该字段原值=豁免权值 → 该字段原样；未配置豁免权值则跳过此校验。</li>
+            <li>⑤ 书籍ID：书籍ID/短剧ID 命中时使用专属比例（可 &gt;100%），未命中用<strong>结算字段比例</strong>；计算 <code>floor(原始值 × 比例%)</code>，字段级独立截断取整。</li>
           </ul>
         </div>
       </div>
@@ -785,20 +987,72 @@
   <div class="toast" id="toast"></div>
   <script src="sidebar-nav.js"></script>
   <script>
-    var FIELD_LABELS = { newCount: '拉新量', oldCount: '拉旧量', settleAmount: '结算金额' };
-    var FIELD_KEYS = ['newCount', 'oldCount', 'settleAmount'];
+    var PROJECT_LIST = [
+      '番茄小说', '知乎故事', '番茄畅听', '红果短剧APP-短剧', '红果漫剧APP', '迅雷网盘', '书旗短篇', '最右',
+      'UC故事会', '起点', 'QQ阅读', '飞卢小说', '七猫小说', '掌阅长篇', '书旗长篇', '盐言星图', '盐言聚星', '悟空网文'
+    ];
+
+    var SETTLEMENT_FIELDS = [
+      { key: 'registration_num', label: '拉新量' },
+      { key: 'pc_registration_num', label: 'PC拉新量' },
+      { key: 'overseas_registration_num', label: '海外拉新量' },
+      { key: 'reinstall_num', label: '拉旧量（拉失活量）' },
+      { key: 'overseas_reinstall_num', label: '海外拉失活量' },
+      { key: 'file_transfer_num', label: '转存量' },
+      { key: 'pc_file_transfer_num', label: 'PC转存量' },
+      { key: 'overseas_file_transfer_num', label: '海外转存量' },
+      { key: 'member_num', label: '会员量' }
+    ];
+
+    // 全部结算字段（选中优化项目后统一展示）
+    function getMergedFieldsForProjects(projects) {
+      if (!projects || !projects.length) return [];
+      return SETTLEMENT_FIELDS.slice();
+    }
+
+    var SETTLEMENT_FIELD_KEYS = SETTLEMENT_FIELDS.map(function (f) { return f.key; });
+    var FIELD_LABELS = SETTLEMENT_FIELDS.reduce(function (acc, f) {
+      acc[f.key] = f.label;
+      return acc;
+    }, {});
+
+    var WL_ISOLATION_OPTIONS = [
+      { value: 'user', label: '用户白名单' },
+      { value: 'keyword', label: '关键词白名单' }
+    ];
+
+    function buildFieldSelectOptions(fields, selected) {
+      return fields.map(function (f) {
+        return '<option value="' + f.key + '"' + (selected === f.key ? ' selected' : '') + '>' + f.label + '</option>';
+      }).join('');
+    }
+
+    function defaultFieldRatios() {
+      var ratios = {};
+      SETTLEMENT_FIELDS.forEach(function (f) { ratios[f.key] = 80; });
+      return ratios;
+    }
 
     var strategies = [
       {
-        id: 'STR-001', name: '番茄默认策略', defaultRatio: 80, topN: 1, updatedAt: '2026-08-24 10:00',
-        idRatioRules: [{ id: 1, matchField: 'bookId', matchLabel: '书籍ID', matchValue: '1', ratio: 120 }],
-        volumeSkipRules: [{ id: 1, field: 'newCount', label: '拉新量', value: 5 }]
+        id: 'STR-001', name: '番茄默认策略', topN: 1, updatedAt: '2026-08-24 10:00',
+        optimizeProjects: ['番茄小说', '番茄畅听'],
+        fieldRatios: Object.assign(defaultFieldRatios(), { member_num: 90 }),
+        fieldSkipValues: { registration_num: 5 },
+        whitelistIsolation: ['user', 'keyword'],
+        idRatioRules: [{ id: 1, matchField: 'bookId', matchLabel: '书籍ID', matchValue: '1', ratio: 120 }]
       },
       {
-        id: 'STR-002', name: '知乎高比例策略', defaultRatio: 90, topN: 0, updatedAt: '2026-08-22 16:30',
-        idRatioRules: [], volumeSkipRules: []
+        id: 'STR-002', name: '知乎高比例策略', topN: 0, updatedAt: '2026-08-22 16:30',
+        optimizeProjects: ['知乎故事'],
+        fieldRatios: Object.assign(defaultFieldRatios(), { registration_num: 90, reinstall_num: 90 }),
+        fieldSkipValues: {},
+        whitelistIsolation: ['user'],
+        idRatioRules: []
       }
     ];
+
+    strategies.forEach(normalizeStrategy);
 
     var editingStrategyId = null;
     var viewingStrategyId = null;
@@ -809,8 +1063,8 @@
     ];
 
     var keywordWhitelist = [
-      { id: 1, projectName: '番茄小说合作', keyword: '免优化词', status: 'enabled', createdAt: '2026-08-19 11:20' },
-      { id: 2, projectName: '知乎故事合作', keyword: 'VIP专属词', status: 'disabled', createdAt: '2026-08-22 09:00' }
+      { id: 1, projectName: '番茄小说', keyword: '免优化词', status: 'enabled', createdAt: '2026-08-19 11:20' },
+      { id: 2, projectName: '知乎故事', keyword: 'VIP专属词', status: 'disabled', createdAt: '2026-08-22 09:00' }
     ];
 
     var editingUserWlId = null;
@@ -818,11 +1072,11 @@
     var wlImportType = 'user';
 
     var rawOrders = [
-      { id: 'O-001', userId: 'U-10001', keyword: 'Summer推广词', bookId: '2', revenue: 180, newCount: 4, oldCount: 2, settleAmount: 36 },
-      { id: 'O-002', userId: 'U-10002', keyword: '秋季词', bookId: '1', revenue: 320, newCount: 5, oldCount: 1, settleAmount: 50 },
-      { id: 'O-003', userId: 'U-10003', keyword: 'VIP专属词', bookId: '1', revenue: 450, newCount: 8, oldCount: 3, settleAmount: 120 },
-      { id: 'O-004', userId: 'U-99999', keyword: '普通推广词', bookId: '2', revenue: 200, newCount: 10, oldCount: 0, settleAmount: 200 },
-      { id: 'O-005', userId: 'U-10005', keyword: '免优化词', bookId: '3', revenue: 150, newCount: 6, oldCount: 1, settleAmount: 80 }
+      { id: 'O-001', userId: 'U-10001', keyword: 'Summer推广词', bookId: '2', revenue: 180, registration_num: 4, reinstall_num: 2, member_num: 36 },
+      { id: 'O-002', userId: 'U-10002', keyword: '秋季词', bookId: '1', revenue: 320, registration_num: 5, reinstall_num: 1, member_num: 50 },
+      { id: 'O-003', userId: 'U-10003', keyword: 'VIP专属词', bookId: '1', revenue: 450, registration_num: 8, reinstall_num: 3, member_num: 120 },
+      { id: 'O-004', userId: 'U-99999', keyword: '普通推广词', bookId: '2', revenue: 200, registration_num: 10, reinstall_num: 0, member_num: 200 },
+      { id: 'O-005', userId: 'U-10005', keyword: '免优化词', bookId: '3', revenue: 150, registration_num: 6, reinstall_num: 1, member_num: 80 }
     ];
 
     var optimizeRecords = [];
@@ -830,20 +1084,105 @@
     var pendingDeleteId = null;
 
     function getStrategy(id) {
-      return strategies.find(function (s) { return s.id === id; });
+      var s = strategies.find(function (x) { return x.id === id; });
+      return s ? normalizeStrategy(s) : null;
     }
 
     function getEditingStrategy() {
       return editingStrategyId ? getStrategy(editingStrategyId) : null;
     }
 
+    function normalizeStrategy(s) {
+      if (!s.fieldSkipValues) s.fieldSkipValues = {};
+      if (s.volumeSkipRules && s.volumeSkipRules.length) {
+        s.volumeSkipRules.forEach(function (r) {
+          if (r.field != null && r.value != null && r.value !== '') s.fieldSkipValues[r.field] = r.value;
+        });
+        delete s.volumeSkipRules;
+      }
+      return s;
+    }
+
+    function countFieldSkipValues(strategy) {
+      var map = strategy.fieldSkipValues || {};
+      return Object.keys(map).filter(function (k) {
+        return map[k] !== null && map[k] !== undefined && String(map[k]).trim() !== '';
+      }).length;
+    }
+
+    function getFieldSkipValue(strategy, fieldKey) {
+      if (!strategy.fieldSkipValues) return null;
+      var v = strategy.fieldSkipValues[fieldKey];
+      if (v === null || v === undefined || String(v).trim() === '') return null;
+      return v;
+    }
+
     function cloneStrategyConfig(s) {
+      normalizeStrategy(s);
       return {
-        defaultRatio: s.defaultRatio,
+        optimizeProjects: (s.optimizeProjects || []).slice(),
+        fieldRatios: Object.assign(defaultFieldRatios(), s.fieldRatios || {}),
+        fieldSkipValues: Object.assign({}, s.fieldSkipValues || {}),
         topN: s.topN,
-        idRatioRules: s.idRatioRules.slice(),
-        volumeSkipRules: s.volumeSkipRules.slice()
+        idRatioRules: s.idRatioRules.slice()
       };
+    }
+
+    function formatOptimizeProjects(arr) {
+      if (!arr || !arr.length) return '未配置';
+      if (arr.length <= 2) return arr.join('、');
+      return arr.slice(0, 2).join('、') + ' 等 ' + arr.length + ' 个';
+    }
+
+    function orderSettleTotal(order) {
+      var sum = 0;
+      SETTLEMENT_FIELD_KEYS.forEach(function (k) {
+        if (order[k] != null && !isNaN(order[k])) sum += Number(order[k]);
+      });
+      return sum;
+    }
+
+    function getStrategyFieldKeys(strategy) {
+      return getMergedFieldsForProjects(strategy.optimizeProjects || []).map(function (f) { return f.key; });
+    }
+
+    function getOrderFieldKeys(order, strategy) {
+      var keys = strategy ? getStrategyFieldKeys(strategy) : SETTLEMENT_FIELD_KEYS;
+      return keys.filter(function (k) { return order[k] != null; });
+    }
+
+    function strategyAppliesToProject(strategy, projectName) {
+      if (!strategy.optimizeProjects || !strategy.optimizeProjects.length) return true;
+      return strategy.optimizeProjects.indexOf(projectName) >= 0;
+    }
+
+    function formatWhitelistIsolation(arr) {
+      if (!arr || !arr.length) return '未启用';
+      return arr.map(function (v) {
+        var opt = WL_ISOLATION_OPTIONS.find(function (o) { return o.value === v; });
+        return opt ? opt.label : v;
+      }).join('、');
+    }
+
+    function strategyUsesUserWhitelist(strategy) {
+      return strategy.whitelistIsolation && strategy.whitelistIsolation.indexOf('user') >= 0;
+    }
+
+    function strategyUsesKeywordWhitelist(strategy) {
+      return strategy.whitelistIsolation && strategy.whitelistIsolation.indexOf('keyword') >= 0;
+    }
+
+    function readWhitelistIsolationFromForm() {
+      var result = [];
+      if (document.getElementById('wlIsoUser').checked) result.push('user');
+      if (document.getElementById('wlIsoKeyword').checked) result.push('keyword');
+      return result;
+    }
+
+    function setWhitelistIsolationForm(arr) {
+      var list = arr || [];
+      document.getElementById('wlIsoUser').checked = list.indexOf('user') >= 0;
+      document.getElementById('wlIsoKeyword').checked = list.indexOf('keyword') >= 0;
     }
 
     function nowStr() {
@@ -876,59 +1215,91 @@
       return Math.floor(Number(val) * Number(ratio) / 100);
     }
 
-    function getRatioForOrder(order, strategy) {
+    function getIdOverrideRatio(order, strategy) {
       for (var i = 0; i < strategy.idRatioRules.length; i++) {
         var r = strategy.idRatioRules[i];
         if (String(order[r.matchField]) === String(r.matchValue)) return r.ratio;
       }
-      return Number(strategy.defaultRatio);
+      return null;
     }
 
-    function computeTopNSet(orders, n) {
+    function getFieldRatio(order, strategy, fieldKey) {
+      var idRatio = getIdOverrideRatio(order, strategy);
+      if (idRatio !== null) return idRatio;
+      return Number((strategy.fieldRatios && strategy.fieldRatios[fieldKey]) != null
+        ? strategy.fieldRatios[fieldKey]
+        : 80);
+    }
+
+    function orderExemptByUserWhitelist(order, strategy, uidWl) {
+      return strategyUsesUserWhitelist(strategy) && uidWl.indexOf(order.userId) >= 0;
+    }
+
+    function orderExemptByKeywordWhitelist(order, strategy, project) {
+      return strategyUsesKeywordWhitelist(strategy) && matchKeywordWhitelist(order, project);
+    }
+
+    function computeTopNSet(orders, n, strategy, batchProject) {
       if (!n || n <= 0) return new Set();
-      var sorted = orders.slice().sort(function (a, b) { return b.revenue - a.revenue; });
+      var project = batchProject || '番茄小说';
+      var uidWl = getActiveUserIds();
+      // Top N 仅在通过 ①② 的订单池内排名，避免白名单订单占用名次
+      var eligible = orders.filter(function (order) {
+        return !orderExemptByUserWhitelist(order, strategy, uidWl)
+          && !orderExemptByKeywordWhitelist(order, strategy, project);
+      });
+      var sorted = eligible.slice().sort(function (a, b) { return b.revenue - a.revenue; });
       return new Set(sorted.slice(0, n).map(function (o) { return o.id; }));
     }
 
     function optimizeBatch(orders, batchProject, strategy) {
       if (!strategy) return [];
-      var project = batchProject || '番茄小说合作';
-      var topNSet = computeTopNSet(orders, strategy.topN);
+      var project = batchProject || '番茄小说';
+      var topNSet = computeTopNSet(orders, strategy.topN, strategy, project);
       var uidWl = getActiveUserIds();
       return orders.map(function (order) {
-        if (uidWl.indexOf(order.userId) >= 0) {
+        // ① 用户白名单（整单豁免，优先级最高）
+        if (orderExemptByUserWhitelist(order, strategy, uidWl)) {
           return { raw: order, display: Object.assign({}, order), reason: '用户ID白名单', skipAll: true };
         }
-        if (matchKeywordWhitelist(order, project)) {
+        // ② 关键词白名单（整单豁免）
+        if (orderExemptByKeywordWhitelist(order, strategy, project)) {
           return { raw: order, display: Object.assign({}, order), reason: '关键词白名单', skipAll: true };
         }
+        // ③ 前几名不优化（整单豁免）
         if (topNSet.has(order.id)) {
           return { raw: order, display: Object.assign({}, order), reason: '前几名 Top' + strategy.topN, skipAll: true };
         }
-        var ratio = getRatioForOrder(order, strategy);
+        // ④ 特定单量（字段级豁免）→ ⑤ 书籍ID / 默认比例
         var display = Object.assign({}, order);
         var notes = [];
-        FIELD_KEYS.forEach(function (key) {
-          var skip = strategy.volumeSkipRules.find(function (r) {
-            return r.field === key && Number(r.value) === Number(order[key]);
-          });
-          if (skip) {
+        var idOverride = null;
+        var optimizedAny = false;
+        var fieldKeys = getOrderFieldKeys(order, strategy);
+        fieldKeys.forEach(function (key) {
+          var skipVal = getFieldSkipValue(strategy, key);
+          if (skipVal !== null && Number(order[key]) === Number(skipVal)) {
             display[key] = order[key];
-            notes.push(FIELD_LABELS[key] + '=' + order[key] + ' 字段豁免');
+            notes.push(FIELD_LABELS[key] + '=' + order[key] + ' 豁免权值');
           } else {
+            var ratio = getFieldRatio(order, strategy, key);
+            if (idOverride === null) idOverride = getIdOverrideRatio(order, strategy);
             display[key] = floorRatio(order[key], ratio);
+            optimizedAny = true;
           }
         });
-        var ratioNote = ratio !== strategy.defaultRatio ? 'ID比例 ' + ratio + '%' : '默认 ' + ratio + '%';
-        return { raw: order, display: display, reason: notes.length ? notes.join('；') : ratioNote, skipAll: false };
+        var ratioNote = idOverride !== null ? '书籍ID比例 ' + idOverride + '%' : '结算字段比例';
+        var reason = notes.length ? notes.join('；') : ratioNote;
+        if (notes.length && optimizedAny) reason += '；' + ratioNote;
+        return { raw: order, display: display, reason: reason, skipAll: false };
       });
     }
 
     function summarizeBatch(results) {
       var beforeAmount = 0, afterAmount = 0;
       results.forEach(function (r) {
-        beforeAmount += Number(r.raw.settleAmount);
-        afterAmount += Number(r.display.settleAmount);
+        beforeAmount += orderSettleTotal(r.raw);
+        afterAmount += orderSettleTotal(r.display);
       });
       return {
         beforeCount: results.length,
@@ -942,11 +1313,132 @@
     function renderAll() {
       renderStrategyList();
       renderIdRatioTable();
-      renderVolumeSkipTable();
+      renderFieldRatioTable();
       renderUserWhitelistTable();
       renderKeywordWhitelistTable();
       renderRecordsTable();
       refreshImportStrategySelect();
+      refreshProjectSelects();
+    }
+
+    function refreshProjectSelects() {
+      var importSel = document.getElementById('importProject');
+      if (importSel) {
+        importSel.innerHTML = PROJECT_LIST.map(function (p, i) {
+          return '<option value="' + p + '"' + (i === 0 ? ' selected' : '') + '>' + p + '</option>';
+        }).join('');
+      }
+      var kwSel = document.getElementById('wlKwProject');
+      if (kwSel && !kwSel.dataset.ready) {
+        kwSel.innerHTML = ['<option value="全部项目">全部项目</option>'].concat(
+          PROJECT_LIST.map(function (p) { return '<option value="' + p + '">' + p + '</option>'; })
+        ).join('');
+        kwSel.dataset.ready = '1';
+      }
+    }
+
+    function initOptimizeProjectsPanel() {
+      var panel = document.getElementById('editOptimizeProjectsPanel');
+      if (!panel || panel.dataset.ready) return;
+      panel.innerHTML = '<div class="project-checkbox-grid">' + PROJECT_LIST.map(function (p) {
+        return '<label class="checkbox-item"><input type="checkbox" name="optProject" value="' + p + '" onchange="onOptimizeProjectChange()" />' + p + '</label>';
+      }).join('') + '</div>';
+      panel.dataset.ready = '1';
+    }
+
+    function toggleProjectDropdown(e) {
+      e.stopPropagation();
+      var panel = document.getElementById('editOptimizeProjectsPanel');
+      panel.classList.toggle('open');
+    }
+
+    function closeProjectDropdown() {
+      var panel = document.getElementById('editOptimizeProjectsPanel');
+      if (panel) panel.classList.remove('open');
+    }
+
+    function setOptimizeProjectsForm(arr) {
+      initOptimizeProjectsPanel();
+      var selected = arr || [];
+      document.querySelectorAll('#editOptimizeProjectsPanel input[name="optProject"]').forEach(function (cb) {
+        cb.checked = selected.indexOf(cb.value) >= 0;
+      });
+      updateProjectsSummary(selected);
+    }
+
+    function readOptimizeProjectsFromForm() {
+      var result = [];
+      document.querySelectorAll('#editOptimizeProjectsPanel input[name="optProject"]:checked').forEach(function (cb) {
+        result.push(cb.value);
+      });
+      return result;
+    }
+
+    function updateProjectsSummary(projects) {
+      var el = document.getElementById('editProjectsSummary');
+      if (!el) return;
+      if (!projects || !projects.length) el.textContent = '请选择优化项目';
+      else if (projects.length <= 2) el.textContent = projects.join('、');
+      else el.textContent = '已选 ' + projects.length + ' 个项目';
+    }
+
+    function onOptimizeProjectChange() {
+      var s = getEditingStrategy();
+      if (s) {
+        syncInlineRulesFromForm();
+        var configs = readFieldConfigsFromForm();
+        s.fieldRatios = configs.fieldRatios;
+        s.fieldSkipValues = configs.fieldSkipValues;
+        s.optimizeProjects = readOptimizeProjectsFromForm();
+      }
+      updateProjectsSummary(s ? s.optimizeProjects : []);
+      renderFieldRatioTable();
+    }
+
+    function renderFieldRatioTable() {
+      var s = getEditingStrategy();
+      var body = document.getElementById('fieldRatioBody');
+      if (!body) return;
+      if (!s) { body.innerHTML = ''; return; }
+      normalizeStrategy(s);
+      var projects = s.optimizeProjects || [];
+      if (!projects.length) {
+        body.innerHTML = '<tr><td colspan="3" style="color:var(--text-muted);padding:12px;">请先选择优化项目</td></tr>';
+        return;
+      }
+      var fields = getMergedFieldsForProjects(projects);
+      if (!fields.length) {
+        body.innerHTML = '<tr><td colspan="3" style="color:var(--text-muted);padding:12px;">所选项目无可用结算字段</td></tr>';
+        return;
+      }
+      body.innerHTML = fields.map(function (f) {
+        var ratio = (s.fieldRatios && s.fieldRatios[f.key] != null) ? s.fieldRatios[f.key] : 80;
+        var skipVal = getFieldSkipValue(s, f.key);
+        var skipAttr = skipVal !== null ? ' value="' + skipVal + '"' : '';
+        return '<tr data-field-key="' + f.key + '">' +
+          '<td class="field-cell"><span class="field-label">' + f.label + '</span><span class="field-key"><code>' + f.key + '</code></span></td>' +
+          '<td class="num-cell"><input type="number" class="field-ratio-input" value="' + ratio + '" min="1" max="500" /></td>' +
+          '<td class="num-cell"><input type="number" class="field-skip-input" placeholder="—"' + skipAttr + ' /></td></tr>';
+      }).join('');
+    }
+
+    function readFieldConfigsFromForm() {
+      var fieldRatios = defaultFieldRatios();
+      var fieldSkipValues = {};
+      document.querySelectorAll('#fieldRatioBody tr[data-field-key]').forEach(function (tr) {
+        var key = tr.getAttribute('data-field-key');
+        var ratioInp = tr.querySelector('.field-ratio-input');
+        var skipInp = tr.querySelector('.field-skip-input');
+        if (!key || !ratioInp) return;
+        fieldRatios[key] = Number(ratioInp.value) || 80;
+        var skipRaw = skipInp ? String(skipInp.value).trim() : '';
+        if (skipRaw !== '') fieldSkipValues[key] = Number(skipRaw);
+      });
+      return { fieldRatios: fieldRatios, fieldSkipValues: fieldSkipValues };
+    }
+
+    function readFieldRatiosFromForm() {
+      return readFieldConfigsFromForm().fieldRatios;
     }
 
     function renderStrategyList() {
@@ -955,10 +1447,11 @@
       body.innerHTML = strategies.map(function (s) {
         return '<tr>' +
           '<td><div>' + s.name + '</div><div class="cell-sub">' + s.id + '</div></td>' +
-          '<td>' + s.defaultRatio + '%</td>' +
+          '<td>' + formatOptimizeProjects(s.optimizeProjects) + '</td>' +
+          '<td>' + formatWhitelistIsolation(s.whitelistIsolation) + '</td>' +
           '<td>' + (s.topN > 0 ? '前 ' + s.topN + ' 名' : '关闭') + '</td>' +
           '<td>' + s.idRatioRules.length + '</td>' +
-          '<td>' + s.volumeSkipRules.length + '</td>' +
+          '<td>' + countFieldSkipValues(s) + '</td>' +
           '<td>' + s.updatedAt + '</td>' +
           '<td>' +
             '<button class="link" type="button" onclick="openStrategyDetailDrawer(\'' + s.id + '\')">查看详情</button>' +
@@ -979,20 +1472,44 @@
       var s = getEditingStrategy();
       var body = document.getElementById('idRatioBody');
       if (!body || !s) { if (body) body.innerHTML = ''; return; }
+      if (!s.idRatioRules.length) {
+        body.innerHTML = '<tr><td colspan="4" style="color:var(--text-muted);padding:12px;">暂无规则，点击「+ 新增」添加</td></tr>';
+        return;
+      }
       body.innerHTML = s.idRatioRules.map(function (r) {
-        return '<tr><td>' + r.matchLabel + '</td><td>' + r.matchValue + '</td><td>' + r.ratio + '%</td>' +
-          '<td><button class="link link-danger" type="button" onclick="removeIdRatio(' + r.id + ')">删除</button></td></tr>';
+        return '<tr data-rule-id="' + r.id + '">' +
+          '<td><select class="inline-cell-input id-ratio-field" data-id="' + r.id + '">' +
+            '<option value="bookId"' + (r.matchField === 'bookId' ? ' selected' : '') + '>书籍ID</option>' +
+            '<option value="dramaId"' + (r.matchField === 'dramaId' ? ' selected' : '') + '>短剧ID</option>' +
+          '</select></td>' +
+          '<td><input class="inline-cell-input id-ratio-value" data-id="' + r.id + '" value="' + (r.matchValue || '') + '" placeholder="1" /></td>' +
+          '<td><input type="number" class="inline-cell-input num id-ratio-ratio" data-id="' + r.id + '" value="' + r.ratio + '" min="1" max="500" /></td>' +
+          '<td><button class="link link-danger" type="button" onclick="removeIdRatio(' + r.id + ')">删</button></td></tr>';
       }).join('');
     }
 
-    function renderVolumeSkipTable() {
+    function syncInlineRulesFromForm() {
       var s = getEditingStrategy();
-      var body = document.getElementById('volumeSkipBody');
-      if (!body || !s) { if (body) body.innerHTML = ''; return; }
-      body.innerHTML = s.volumeSkipRules.map(function (r) {
-        return '<tr><td>' + r.label + '</td><td><code>' + r.field + '</code></td><td>' + r.value + '</td>' +
-          '<td><button class="link link-danger" type="button" onclick="removeVolumeSkip(' + r.id + ')">删除</button></td></tr>';
-      }).join('');
+      if (!s) return;
+      document.querySelectorAll('#idRatioBody tr[data-rule-id]').forEach(function (tr) {
+        var id = Number(tr.getAttribute('data-rule-id'));
+        var rule = s.idRatioRules.find(function (r) { return r.id === id; });
+        if (!rule) return;
+        var fieldEl = tr.querySelector('.id-ratio-field');
+        rule.matchField = fieldEl.value;
+        rule.matchLabel = fieldEl.value === 'bookId' ? '书籍ID' : '短剧ID';
+        rule.matchValue = tr.querySelector('.id-ratio-value').value;
+        rule.ratio = Number(tr.querySelector('.id-ratio-ratio').value) || 120;
+      });
+    }
+
+    function addIdRatioRow() {
+      var s = getEditingStrategy();
+      if (!s) return showToast('请先打开策略编辑');
+      s.idRatioRules.push({
+        id: Date.now(), matchField: 'bookId', matchLabel: '书籍ID', matchValue: '', ratio: 120
+      });
+      renderIdRatioTable();
     }
 
     function renderUserWhitelistTable() {
@@ -1079,8 +1596,11 @@
       if (!name) return showToast('请填写策略名称');
       var id = 'STR-' + String(Date.now()).slice(-6);
       strategies.unshift({
-        id: id, name: name, defaultRatio: 80, topN: 0, updatedAt: nowStr(),
-        idRatioRules: [], volumeSkipRules: []
+        id: id, name: name, topN: 0, updatedAt: nowStr(),
+        optimizeProjects: [],
+        fieldRatios: defaultFieldRatios(),
+        whitelistIsolation: ['user', 'keyword'],
+        idRatioRules: [], fieldSkipValues: {}
       });
       closeNewStrategyModal();
       renderStrategyList();
@@ -1090,24 +1610,36 @@
     }
 
     function buildStrategyDetailHtml(s) {
+      normalizeStrategy(s);
       var idRows = s.idRatioRules.length
         ? s.idRatioRules.map(function (r) {
             return '<tr><td>' + r.matchLabel + '</td><td>' + r.matchValue + '</td><td>' + r.ratio + '%</td></tr>';
           }).join('')
-        : '<tr><td colspan="3" style="color:var(--text-muted);">暂无 ID 差异化规则</td></tr>';
-      var volRows = s.volumeSkipRules.length
-        ? s.volumeSkipRules.map(function (r) {
-            return '<tr><td>' + r.label + '</td><td><code>' + r.field + '</code></td><td>' + r.value + '</td></tr>';
-          }).join('')
-        : '<tr><td colspan="3" style="color:var(--text-muted);">暂无字段豁免规则</td></tr>';
-      return '<div class="detail-grid">' +
-        '<div class="detail-row"><span class="label">默认比例</span><span class="value">' + s.defaultRatio + '%</span></div>' +
-        '<div class="detail-row"><span class="label">前几名豁免</span><span class="value">' + (s.topN > 0 ? '前 ' + s.topN + ' 名' : '关闭') + '</span></div>' +
+        : '<tr><td colspan="3" style="color:var(--text-muted);">暂无 ID 规则</td></tr>';
+      var fieldRows = getMergedFieldsForProjects(s.optimizeProjects || []).map(function (f) {
+        var ratio = (s.fieldRatios && s.fieldRatios[f.key] != null) ? s.fieldRatios[f.key] : 80;
+        var skipVal = getFieldSkipValue(s, f.key);
+        var skipDisplay = skipVal !== null ? skipVal : '—';
+        return '<tr><td>' + f.label + '<span class="field-key"><code>' + f.key + '</code></span></td><td>' + ratio + '%</td><td>' + skipDisplay + '</td></tr>';
+      }).join('');
+      if (!fieldRows) fieldRows = '<tr><td colspan="3" style="color:var(--text-muted);">未配置优化项目</td></tr>';
+      return '<div class="config-board">' +
+        '<div class="config-block">' +
+          '<div class="detail-grid">' +
+            '<div class="detail-row"><span class="label">优化项目</span><span class="value">' + formatOptimizeProjects(s.optimizeProjects) + '</span></div>' +
+            '<div class="detail-row"><span class="label">白名单隔离</span><span class="value">' + formatWhitelistIsolation(s.whitelistIsolation) + '</span></div>' +
+            '<div class="detail-row"><span class="label">前几名豁免</span><span class="value">' + (s.topN > 0 ? '前 ' + s.topN + ' 名' : '关闭') + '</span></div>' +
+          '</div>' +
         '</div>' +
-        '<h4 style="font-size:13px;font-weight:700;margin-bottom:8px;">ID 差异化比例</h4>' +
-        '<div class="table-wrap" style="margin-bottom:16px;"><table><thead><tr><th>匹配字段</th><th>匹配值</th><th>比例</th></tr></thead><tbody>' + idRows + '</tbody></table></div>' +
-        '<h4 style="font-size:13px;font-weight:700;margin-bottom:8px;">字段级豁免</h4>' +
-        '<div class="table-wrap"><table><thead><tr><th>结算字段</th><th>标识</th><th>豁免值</th></tr></thead><tbody>' + volRows + '</tbody></table></div>';
+        '<div class="config-block">' +
+          '<h3 class="section-subtitle">结算字段比例 · 特定单量豁免</h3>' +
+          '<p class="field-ratio-note">选中优化项目后展示全部结算字段；豁免权值留空表示不启用。</p>' +
+          '<div class="table-wrap"><table class="strategy-table field-config-table"><colgroup><col class="col-field" /><col class="col-ratio" /><col class="col-skip" /></colgroup><thead><tr><th>结算字段</th><th>比例(%)</th><th>豁免权值</th></tr></thead><tbody>' + fieldRows + '</tbody></table></div>' +
+        '</div>' +
+        '<div class="config-block">' +
+          '<h3 class="section-subtitle">书籍 / 短剧 ID 差异化比例</h3>' +
+          '<div class="table-wrap"><table class="strategy-table id-ratio-table"><thead><tr><th>匹配</th><th>值</th><th>比例(%)</th></tr></thead><tbody>' + idRows + '</tbody></table></div>' +
+        '</div></div>';
     }
 
     function openStrategyDetailDrawer(id) {
@@ -1136,10 +1668,13 @@
       editingStrategyId = id;
       document.getElementById('strategyEditTitle').textContent = '编辑策略 · ' + s.name;
       document.getElementById('editStrategyName').value = s.name;
-      document.getElementById('editDefaultRatio').value = s.defaultRatio;
+      setWhitelistIsolationForm(s.whitelistIsolation);
+      if (!s.fieldRatios) s.fieldRatios = defaultFieldRatios();
+      if (!s.optimizeProjects) s.optimizeProjects = [];
+      setOptimizeProjectsForm(s.optimizeProjects);
       document.getElementById('editTopN').value = s.topN;
       renderIdRatioTable();
-      renderVolumeSkipTable();
+      renderFieldRatioTable();
       document.getElementById('strategyEditOverlay').classList.add('open');
       document.getElementById('strategyEditDrawer').classList.add('open');
     }
@@ -1147,16 +1682,24 @@
       document.getElementById('strategyEditOverlay').classList.remove('open');
       document.getElementById('strategyEditDrawer').classList.remove('open');
       editingStrategyId = null;
+      closeProjectDropdown();
       renderIdRatioTable();
-      renderVolumeSkipTable();
+      renderFieldRatioTable();
     }
     function saveStrategyEdit() {
       var s = getEditingStrategy();
       if (!s) return;
       var name = document.getElementById('editStrategyName').value.trim();
       if (!name) return showToast('请填写策略名称');
+      var projects = readOptimizeProjectsFromForm();
+      if (!projects.length) return showToast('请至少选择一个优化项目');
+      syncInlineRulesFromForm();
+      var configs = readFieldConfigsFromForm();
       s.name = name;
-      s.defaultRatio = Number(document.getElementById('editDefaultRatio').value) || 80;
+      s.optimizeProjects = projects;
+      s.whitelistIsolation = readWhitelistIsolationFromForm();
+      s.fieldRatios = configs.fieldRatios;
+      s.fieldSkipValues = configs.fieldSkipValues;
       s.topN = Number(document.getElementById('editTopN').value) || 0;
       s.updatedAt = nowStr();
       closeStrategyEditDrawer();
@@ -1165,53 +1708,11 @@
       showToast('策略已保存');
     }
 
-    function openIdRatioModal() {
-      if (!editingStrategyId) return showToast('请先打开策略编辑');
-      document.getElementById('idRatioOverlay').classList.add('open');
-    }
-    function closeIdRatioModal() { document.getElementById('idRatioOverlay').classList.remove('open'); }
-    function saveIdRatio() {
-      var s = getEditingStrategy();
-      if (!s) return;
-      var field = document.getElementById('idMatchField').value;
-      s.idRatioRules.push({
-        id: Date.now(), matchField: field, matchLabel: field === 'bookId' ? '书籍ID' : '短剧ID',
-        matchValue: document.getElementById('idMatchValue').value,
-        ratio: Number(document.getElementById('idMatchRatio').value)
-      });
-      closeIdRatioModal();
-      renderIdRatioTable();
-      showToast('已添加 ID 比例规则');
-    }
     function removeIdRatio(id) {
       var s = getEditingStrategy();
       if (!s) return;
       s.idRatioRules = s.idRatioRules.filter(function (r) { return r.id !== id; });
       renderIdRatioTable();
-    }
-
-    function openVolumeSkipModal() {
-      if (!editingStrategyId) return showToast('请先打开策略编辑');
-      document.getElementById('volumeSkipOverlay').classList.add('open');
-    }
-    function closeVolumeSkipModal() { document.getElementById('volumeSkipOverlay').classList.remove('open'); }
-    function saveVolumeSkip() {
-      var s = getEditingStrategy();
-      if (!s) return;
-      var field = document.getElementById('volumeSkipField').value;
-      s.volumeSkipRules.push({
-        id: Date.now(), field: field, label: FIELD_LABELS[field],
-        value: Number(document.getElementById('volumeSkipValue').value)
-      });
-      closeVolumeSkipModal();
-      renderVolumeSkipTable();
-      showToast('已添加字段豁免');
-    }
-    function removeVolumeSkip(id) {
-      var s = getEditingStrategy();
-      if (!s) return;
-      s.volumeSkipRules = s.volumeSkipRules.filter(function (r) { return r.id !== id; });
-      renderVolumeSkipTable();
     }
 
     function openUserWhitelistModal(editId) {
@@ -1261,7 +1762,8 @@
       editingKeywordWlId = editId || null;
       var item = editId ? keywordWhitelist.find(function (k) { return k.id === editId; }) : null;
       document.getElementById('keywordWlModalTitle').textContent = item ? '编辑关键词白名单' : '新增关键词白名单';
-      document.getElementById('wlKwProject').value = item ? item.projectName : '番茄小说合作';
+      refreshProjectSelects();
+      document.getElementById('wlKwProject').value = item ? item.projectName : '番茄小说';
       document.getElementById('wlKeyword').value = item ? item.keyword : '';
       document.getElementById('wlKwStatus').value = item ? item.status : 'enabled';
       document.getElementById('keywordWhitelistOverlay').classList.add('open');
@@ -1321,7 +1823,7 @@
         renderUserWhitelistTable();
       } else {
         keywordWhitelist.push(
-          { id: Date.now(), projectName: '番茄小说合作', keyword: '批量导入词A', status: 'enabled', createdAt: nowStr() },
+          { id: Date.now(), projectName: '番茄小说', keyword: '批量导入词A', status: 'enabled', createdAt: nowStr() },
           { id: Date.now() + 1, projectName: '全部项目', keyword: '批量导入词B', status: 'disabled', createdAt: nowStr() }
         );
         renderKeywordWhitelistTable();
@@ -1332,6 +1834,7 @@
 
     function openImportModal() {
       refreshImportStrategySelect();
+      refreshProjectSelects();
       document.getElementById('importOverlay').classList.add('open');
     }
     function closeImportModal() { document.getElementById('importOverlay').classList.remove('open'); }
@@ -1340,7 +1843,11 @@
       var strategyId = document.getElementById('importStrategy').value;
       var strategy = getStrategy(strategyId);
       if (!strategy) return showToast('请选择优化策略');
-      var project = document.getElementById('importProject').value.trim() || '未命名项目';
+      var project = document.getElementById('importProject').value.trim();
+      if (!project) return showToast('请选择项目名称');
+      if (!strategyAppliesToProject(strategy, project)) {
+        return showToast('该策略未绑定项目「' + project + '」，请更换策略或编辑策略优化项目');
+      }
       var results = optimizeBatch(rawOrders, project, strategy);
       var summary = summarizeBatch(results);
       optimizeRecords.unshift({
@@ -1387,7 +1894,7 @@
           return '<span style="color:#9aa5b4;text-decoration:line-through">' + o[k] + '</span> → <strong>' + d[k] + '</strong>';
         }
         return '<tr><td>' + o.userId + '</td><td>' + o.keyword + '</td>' +
-          '<td>' + cell('newCount') + '</td><td>' + cell('oldCount') + '</td><td>' + cell('settleAmount') + '</td>' +
+          '<td>' + cell('registration_num') + '</td><td>' + cell('reinstall_num') + '</td><td>' + cell('member_num') + '</td>' +
           '<td><span class="tag tag-muted">' + item.reason + '</span></td></tr>';
       }).join('');
       document.getElementById('compareOverlay').classList.add('open');
@@ -1459,18 +1966,18 @@
 
     function seedDemoRecords() {
       var strat = strategies[0];
-      var results = optimizeBatch(rawOrders, '番茄小说合作', strat);
+      var results = optimizeBatch(rawOrders, '番茄小说', strat);
       var summary = summarizeBatch(results);
       optimizeRecords = [
         {
-          id: 'REC-001', projectName: '番茄小说合作',
+          id: 'REC-001', projectName: '番茄小说',
           strategyId: strat.id, strategyName: strat.name,
           beforeCount: summary.beforeCount, afterCount: summary.afterCount,
           beforeAmount: summary.beforeAmount, afterAmount: summary.afterAmount,
           createdAt: '2026-08-24 14:30', details: results
         },
         {
-          id: 'REC-002', projectName: '知乎故事合作',
+          id: 'REC-002', projectName: '知乎故事',
           strategyId: strategies[1] ? strategies[1].id : strat.id,
           strategyName: strategies[1] ? strategies[1].name : strat.name,
           beforeCount: 860, afterCount: 860,
@@ -1481,6 +1988,13 @@
     }
 
     function initPage() {
+      initOptimizeProjectsPanel();
+      refreshProjectSelects();
+      document.addEventListener('click', function (e) {
+        var wrap = document.getElementById('editOptimizeProjectsWrap');
+        if (wrap && !wrap.contains(e.target)) closeProjectDropdown();
+      });
+
       document.getElementById('toggleRuleDrawer').addEventListener('click', function () {
         setRuleDrawer(!document.getElementById('ruleDrawer').classList.contains('open'));
       });

@@ -1,7 +1,7 @@
 ---
 name: 右豹迭代需求记录后台
 status: draft
-updated: 2026-08-23
+updated: 2026-08-27
 sources:
   - conversation: 迭代需求框架封板（Sprint、FR 版本链、三模板）
   - https://renataecho.github.io/yb_iteration-2.0/
@@ -162,6 +162,56 @@ sources:
 → [`demo/iteration/ITERATION-FR-GUIDE.md`](../../../../demo/iteration/ITERATION-FR-GUIDE.md)（2026-08-23 确认，参考 FR-001）
 
 交互组件 live Demo：[`demo/iteration/component-spec-demo.html`](../../../../demo/iteration/component-spec-demo.html)
+
+### FR-005 订单优化 · 策略配置抽屉
+
+| 抽屉 | 入口 | 模式 | 行为 |
+|------|------|------|------|
+| 策略详情 | 列表「查看详情」 | Wide Config · 只读 | 摘要 `detail-row` + 结算字段表 + ID 规则表；Footer「编辑策略」跳转编辑抽屉 |
+| 策略编辑 | 列表「编辑策略」/ 详情 Footer | Wide Config · 可编辑 | 6 个 `{config-block}` 分组；保存 → toast + 列表刷新 |
+
+**编辑抽屉分组顺序（固定）**
+
+1. **策略名称**（`.drawer-field-top`）
+2. **优化项目** — 多选下拉，变更后刷新结算字段表
+3. **结算字段比例 · 特定单量豁免** — 9 行内嵌表 + `.field-ratio-note` 说明条
+4. **白名单隔离** — 行内 checkbox（用户 / 关键词）
+5. **前几名不优化** — 行内数字输入（0=关）
+6. **书籍 / 短剧 ID 差异化比例** — 可增删行内嵌表
+
+**交互要点**
+
+- 各配置项**共存生效**，副标题「各配置项共存生效，非互斥」保留在 Header。
+- 优化项目未选时，结算字段表展示空态文案「请先选择优化项目」。
+- 详情 ↔ 编辑：详情关闭后打开编辑，避免双层抽屉叠加。
+- Esc / 遮罩 / 关闭钮 / Footer 取消：均关闭且不保存（编辑态）。
+
+→ Live mock：[`demo/iteration/fr-project-order-optimize.html`](../../../../demo/iteration/fr-project-order-optimize.html)
+
+### FR-005 策略配置抽屉（Wide Config Drawer）
+
+| 抽屉 | 入口 | 行为 |
+|------|------|------|
+| 策略详情 | 策略列表「查看详情」 | 只读；`.config-block` 分组展示摘要 + 结算字段表 + ID 规则表；Footer「编辑策略」跳转编辑抽屉 |
+| 策略编辑 | 列表「编辑策略」或详情 Footer | 可编辑；6 个配置分组（名称 → 优化项目 → 结算字段表 → 白名单 → 前几名 → ID 规则）；保存 → toast + 列表刷新 |
+
+**编辑抽屉分组顺序（固定）**：
+
+1. **策略名称** — 顶栏 `.drawer-field-top`，必填
+2. **优化项目** — 多选下拉；变更后重算结算字段表行
+3. **结算字段比例 · 特定单量豁免** — 9 行内嵌表 + info 说明条
+4. **白名单隔离** — 行内 checkbox（用户 / 关键词）
+5. **前几名不优化** — 行内数字输入（0=关）
+6. **书籍/短剧 ID 差异化比例** — 可增删行内嵌表
+
+**交互原则**：
+
+- 各配置项**共存生效**，副标题明示「非互斥」
+- 详情 ↔ 编辑：关闭详情再开编辑，避免双层 wide 抽屉叠压
+- 表格空态：12px padding 居中提示，勿用 6px 微行高
+- 视觉 token 见 `DESIGN.md` → Wide Config Drawer；**禁止**回退紧凑 override（10px 标题 / 26px 输入）
+
+→ Live：`demo/iteration/fr-project-order-optimize.html`
 
 ### 业务流程图呈现（FR Demo · 业务流程 Tab）
 

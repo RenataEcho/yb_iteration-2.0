@@ -2,7 +2,7 @@
 name: 右豹迭代需求记录后台
 description: 产品侧迭代需求 Demo 与规则交付台；玻璃拟态 B 端风格，继承右豹管理后台原型视觉语言。
 status: draft
-updated: 2026-08-23
+updated: 2026-08-27
 colors:
   primary: '#2563eb'
   primary-hover: '#1d4ed8'
@@ -82,6 +82,8 @@ spacing:
   sidebar-w: 220px
   sidebar-collapsed-w: 56px
   drawer-w: 420px
+  drawer-w-wide: 720px
+  drawer-section-gap: 20px
   page-gutter: 20px
 components:
   topnav:
@@ -113,6 +115,14 @@ components:
     width: '{spacing.drawer-w}'
     background: '{colors.drawer-bg}'
     shadow: '0 16px 48px rgba(30,40,60,0.14)'
+  drawer-wide:
+    width: '{spacing.drawer-w-wide}'
+    header-padding: '16px 20px'
+    body-padding: '0 24px 24px'
+    footer-padding: '14px 20px 16px'
+    title-size: 15px
+    section-title-size: 14px
+    form-input-height: 34px
   version-badge:
     background: '#f5f3ff'
     foreground: '{colors.accent-version}'
@@ -196,8 +206,28 @@ components:
 - **文字链**：`.link` 详情/编辑；`.link-muted` 日志；`.link-danger` 删除（须配合确认弹窗）。
 - **Confirm Modal**：居中 400px；Footer = Ghost 取消 + Primary/Danger 确认。
 - **Edit Modal**：居中 480px；含表单 + Footer 取消/保存。
-- **Detail Drawer**：右侧 480px overlay；关键词详情、规则抽屉同类模式。
+- **Detail Drawer**：右侧 `{spacing.drawer-w}` overlay；关键词详情、规则抽屉同类模式。
+- **Wide Config Drawer**：复杂编辑/详情（多分组 + 内嵌表格）用 `{components.drawer-wide}`，宽 `{spacing.drawer-w-wide}`（720px）；见下节。
 - **Toast**：底部深色胶囊，Mock 反馈 2.5s。
+
+### Wide Config Drawer（复杂配置 · FR-005 策略编辑/详情）
+
+→ Live mock：[`demo/iteration/fr-project-order-optimize.html`](../../../../demo/iteration/fr-project-order-optimize.html)（`#strategyEditDrawer` / `#strategyDetailDrawer`）
+
+| 区域 | 规格 |
+|------|------|
+| 宽度 | `{spacing.drawer-w-wide}` = 720px；类名 `.drawer.wide` |
+| Header | padding `{components.drawer-wide.header-padding}`；标题 15px/700；副标题 12px muted |
+| Body | padding `{components.drawer-wide.body-padding}`；区内独立滚动 |
+| Footer | Ghost 取消 + Primary 保存；padding `{components.drawer-wide.footer-padding}` |
+| 顶栏字段 | `.drawer-field-top`：单字段（如策略名称），上下 20px + 底部分割线 |
+| 配置分组 | `.config-block`：上下 `{spacing.drawer-section-gap}` + 1px 分割线；`.config-block-head` 用 `{typography.rule-heading}` + caption 说明；head 与控件间距 12px |
+| 行内配置 | `.config-block-inline`：白名单勾选、前几名 N 等单行控件，gap 16–24px |
+| 说明条 | `.field-ratio-note`：info 浅蓝底，10×12px padding，12px 正文 |
+| 内嵌表格 | `.strategy-table`：th/td 10×12px padding，12px 字；表内 input 高 32px，全宽布局 |
+| 表格列比 | 结算字段 52% / 24% / 24%；ID 规则 28% / 36% / 24% / 12% |
+
+**Don't**：不要用 10px 区段标题、26px 表单控件、2px 单元格 padding 压缩复杂配置抽屉；宽抽屉内表格应 `width:100%`，勿固定窄宽（如 392px）导致二次拥挤。
 
 ### 需求规则抽屉
 
