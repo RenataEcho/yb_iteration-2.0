@@ -25,33 +25,9 @@
       font-size: 12px; color: var(--text-muted); text-align: center;
       margin-bottom: 12px; line-height: 1.5;
     }
-    .screen { display: none; }
-    .screen.active { display: block; }
+    .screen { display: block; }
     .section-label {
       font-size: 12px; color: var(--text-muted); margin-bottom: 8px; padding-left: 4px;
-    }
-    /* 订单列表卡片 */
-    .order-card {
-      background: #fff; border-radius: 12px; padding: 14px 16px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-bottom: 12px;
-    }
-    .order-card .title {
-      font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 4px;
-    }
-    .order-card .subtitle {
-      font-size: 13px; color: var(--text-muted); margin-bottom: 10px;
-    }
-    .order-card .meta {
-      display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted);
-      margin-bottom: 4px;
-    }
-    .order-card .amount-row {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);
-    }
-    .order-card .amount-label { font-size: 13px; color: var(--text-muted); }
-    .order-card .amount-value {
-      font-size: 16px; font-weight: 700; color: var(--danger);
     }
     /* 收益明细卡片 */
     .income-card {
@@ -85,27 +61,8 @@
 </head>
 <body>
 
-  <p class="demo-note">本 Demo 仅展示退款记录在 C 端的<strong>卡片信息</strong>，不重做完整页面。</p>
+  <p class="demo-note">本 Demo 仅展示退款记录在 C 端钱包收益明细中的<strong>卡片信息</strong>，不重做完整页面。</p>
 
-  <!-- 场景1：订单列表 -->
-  <div id="screen-order-list" class="screen active">
-    <div class="section-label">订单列表 · 退款记录卡片</div>
-    <div class="order-card">
-      <div class="title">品牌退款</div>
-      <div class="subtitle">项目方核实后发起退款，关键词数据异常</div>
-      <div class="meta"><span>订单产生日期</span><span>2026.08.20 14:30</span></div>
-      <div class="meta"><span>订单更新日期</span><span>2026.08.22 09:15</span></div>
-      <div class="amount-row">
-        <span class="amount-label">扣减金额</span>
-        <span class="amount-value">-128.50</span>
-      </div>
-    </div>
-    <div class="hint-box">
-      标题固定为「品牌退款」；副标题展示<strong>退款原因</strong>；金额为负向扣减；审核通过且完成扣回后出现在订单列表。
-    </div>
-  </div>
-
-  <!-- 场景2：钱包收益明细 -->
   <div id="screen-wallet-income" class="screen">
     <div class="section-label">钱包 · 收益明细 · 退款记录卡片</div>
     <div class="income-card">
@@ -118,12 +75,12 @@
       <span class="status">已扣减</span>
     </div>
     <div class="hint-box">
-      标题格式：<strong>项目名称「关键词」产生退款</strong>；副标题为退款原因；状态固定「已扣减」；金额为负向。
+      标题格式：<strong>项目名称「关键词」产生退款</strong>；副标题为退款原因；时间为扣回完成时间；状态固定「已扣减」；金额为负向。
     </div>
   </div>
 
   <script>
-    const screens = ['screen-order-list', 'screen-wallet-income'];
+    const screens = ['screen-wallet-income'];
     function goToScreen(name) {
       screens.forEach(id => {
         document.getElementById(id).classList.toggle('active', id === name);

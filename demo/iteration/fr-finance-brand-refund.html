@@ -165,6 +165,10 @@
     th { font-size: 11px; font-weight: 600; color: var(--text-muted); background: rgba(248,250,252,0.9); white-space: nowrap; }
     tr:hover td { background: var(--surface-hover); }
     .cell-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .cell-stack { font-size: 12px; line-height: 1.55; }
+    .cell-stack .tag { margin-bottom: 4px; }
+    .cell-stack-line { color: var(--text-secondary); }
+    .cell-stack-line .muted { color: var(--text-muted); }
     .link { color: var(--primary); cursor: pointer; text-decoration: none; margin-right: 10px; font-size: 12px; font-weight: 500; background: none; border: none; padding: 0; }
     .link-danger { color: var(--danger); margin-right: 0; }
     .tag { display: inline-flex; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; }
@@ -273,7 +277,7 @@
           <span class="badge badge-fr">FR-003</span>
           <span class="badge badge-version">v2 当前</span>
         </h1>
-        <p class="page-desc">针对品牌项目支持退款：财务后台录入/批量导入/审核，扣回成功后（状态=已扣回）同步写入 C 端订单列表与钱包收益明细（卡片级展示）。</p>
+        <p class="page-desc">针对品牌项目支持退款：财务后台批量导入/审核，扣回成功后（状态=已扣回）同步写入 C 端钱包收益明细（卡片级展示）。退款订单日期随导入写入，仅日期无时分秒。</p>
       </div>
       <div class="page-header-actions">
         <button class="btn btn-rule" id="toggleRuleDrawer" type="button">📋 需求规则</button>
@@ -290,18 +294,14 @@
     <div id="view-fe" class="page-view active">
       <div class="demo-layout">
         <div class="glass-card scene-panel">
-          <h2>场景切换</h2>
+          <h2>C 端展示场景</h2>
           <div class="scene-list">
-            <button class="scene-btn active" type="button" data-screen="screen-order-list">
-              <div class="scene-title">订单列表 · 退款卡片</div>
-              <div class="scene-desc">标题、副标题(退款原因)、产生/更新日期、扣减金额</div>
-            </button>
-            <button class="scene-btn" type="button" data-screen="screen-wallet-income">
+            <button class="scene-btn active" type="button" data-screen="screen-wallet-income">
               <div class="scene-title">钱包 · 收益明细 · 退款卡片</div>
-              <div class="scene-desc">项目名称「关键词」产生退款、退款原因、时间、金额、已扣减</div>
+              <div class="scene-desc">项目名称「关键词」产生退款、退款原因、扣回时间、金额、已扣减</div>
             </button>
           </div>
-          <div class="scene-note">本 FR <strong>不重做 C 端完整页面</strong>，仅展示退款记录在订单列表与收益明细中的卡片信息形态。</div>
+          <div class="scene-note">本 FR <strong>不重做 C 端完整页面</strong>，仅展示退款记录在钱包收益明细中的卡片信息形态。</div>
         </div>
         <div class="glass-card mockup-panel">
           <div class="mockup-frame-wrap">
@@ -376,11 +376,11 @@
                 <th>用户ID</th>
                 <th>关键词</th>
                 <th>项目信息</th>
-                <th>退款订单日期</th>
                 <th>退款金额</th>
                 <th>退款原因</th>
-                <th>审核状态</th>
-                <th>扣回状态</th>
+                <th>导入信息</th>
+                <th>审核</th>
+                <th>扣回</th>
                 <th>操作</th>
               </tr>
             </thead>
@@ -393,7 +393,7 @@
     <!-- 业务流程 -->
     <div id="view-flow" class="page-view">
       <div class="glass-card flow-page">
-        <p class="flow-page-intro">品牌退款从后台录入到 C 端展示的完整链路。菱形为校验/分支；蓝色前端、绿色后端、橙色异步。</p>
+        <p class="flow-page-intro">品牌退款从后台导入/审核到 C 端钱包收益明细展示的完整链路。菱形为校验/分支；蓝色前端、绿色后端、橙色异步。</p>
         <p class="flow-scroll-hint">流程图超出可视区域时，可在此面板内上下或左右滚动查看。</p>
         <div class="flow-svg-wrap">
           <svg viewBox="0 0 920 640" width="920" height="640" xmlns="http://www.w3.org/2000/svg">
@@ -401,52 +401,46 @@
             <g class="flow-edges">
               <!-- 主链 -->
               <line x1="460" y1="52" x2="460" y2="76" marker-end="url(#arr)"/>
-              <line x1="460" y1="120" x2="460" y2="144" marker-end="url(#arr)"/>
+              <line x1="460" y1="128" x2="460" y2="144" marker-end="url(#arr)"/>
               <!-- 审核分支 -->
               <line x1="360" y1="184" x2="200" y2="184" marker-end="url(#arr)"/>
               <line x1="560" y1="184" x2="720" y2="184" marker-end="url(#arr)"/>
               <!-- 扣回链 -->
-              <line x1="800" y1="206" x2="800" y2="240" marker-end="url(#arr)"/>
+              <line x1="800" y1="214" x2="800" y2="240" marker-end="url(#arr)"/>
               <line x1="800" y1="284" x2="800" y2="308" marker-end="url(#arr)"/>
               <line x1="800" y1="356" x2="800" y2="368"/>
               <line x1="800" y1="368" x2="460" y2="368"/>
               <line x1="460" y1="368" x2="460" y2="380" marker-end="url(#arr)"/>
-              <!-- 展示分支 -->
-              <line x1="460" y1="420" x2="460" y2="428" marker-end="url(#arr)"/>
-              <polyline points="360,460 120,460 120,520" fill="none" marker-end="url(#arr)"/>
-              <polyline points="560,460 800,460 800,520" fill="none" marker-end="url(#arr)"/>
-              <line x1="460" y1="492" x2="460" y2="580" marker-end="url(#arr)"/>
+              <!-- 展示 -->
+              <line x1="460" y1="420" x2="460" y2="460" marker-end="url(#arr)"/>
+              <line x1="460" y1="520" x2="460" y2="580" marker-end="url(#arr)"/>
             </g>
             <g class="flow-nodes">
               <rect x="340" y="12" width="240" height="40" rx="8" fill="#eff6ff" stroke="#2563eb"/>
-              <text x="460" y="38" text-anchor="middle" font-size="12" fill="#18222f">财务后台 · 新增/编辑品牌退款</text>
-              <rect x="320" y="76" width="280" height="44" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
-              <text x="460" y="104" text-anchor="middle" font-size="12" fill="#18222f">写入退款记录 · 审核状态=待审核</text>
+              <text x="460" y="38" text-anchor="middle" font-size="12" fill="#18222f">财务后台 · 批量导入/新增品牌退款</text>
+              <rect x="320" y="76" width="280" height="52" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
+              <text x="460" y="98" text-anchor="middle" font-size="12" fill="#18222f">写入退款记录 · 导入人员/时间</text>
+              <text x="460" y="112" text-anchor="middle" font-size="10" fill="#64748b">退款订单日期(仅日期) · 审核=待审核</text>
               <polygon points="460,144 560,184 460,224 360,184" fill="#fffbeb" stroke="#d97706"/>
               <text x="460" y="182" text-anchor="middle" font-size="11" fill="#92400e">审核通过?</text>
               <text x="250" y="176" font-size="11" fill="#dc2626">驳回</text>
               <rect x="60" y="162" width="140" height="44" rx="8" fill="#fef2f2" stroke="#dc2626"/>
               <text x="130" y="190" text-anchor="middle" font-size="11" fill="#991b1b">流程终止</text>
               <text x="640" y="176" font-size="11" fill="#16a34a">通过</text>
-              <rect x="720" y="162" width="160" height="44" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
-              <text x="800" y="190" text-anchor="middle" font-size="11" fill="#18222f">审核状态=已通过</text>
+              <rect x="720" y="162" width="160" height="52" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
+              <text x="800" y="188" text-anchor="middle" font-size="11" fill="#18222f">审核状态=已通过</text>
+              <text x="800" y="204" text-anchor="middle" font-size="10" fill="#64748b">写入审核时间</text>
               <rect x="680" y="240" width="240" height="44" rx="8" fill="#fff7ed" stroke="#ea580c"/>
               <text x="800" y="268" text-anchor="middle" font-size="11" fill="#18222f">异步任务 · 扣减用户钱包余额</text>
               <rect x="680" y="308" width="240" height="48" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
               <text x="800" y="330" text-anchor="middle" font-size="11" fill="#18222f">扣回状态=已扣回</text>
-              <text x="800" y="346" text-anchor="middle" font-size="10" fill="#64748b">更新订单更新日期</text>
+              <text x="800" y="346" text-anchor="middle" font-size="10" fill="#64748b">写入扣回时间</text>
               <rect x="340" y="380" width="240" height="40" rx="8" fill="#eff6ff" stroke="#2563eb"/>
-              <text x="460" y="406" text-anchor="middle" font-size="12" fill="#18222f">同步写入 C 端展示层</text>
-              <polygon points="460,428 560,460 460,492 360,460" fill="#fffbeb" stroke="#d97706"/>
-              <text x="460" y="458" text-anchor="middle" font-size="11" fill="#92400e">展示入口</text>
-              <text x="120" y="512" font-size="10" fill="#2563eb">订单列表</text>
-              <rect x="40" y="520" width="160" height="44" rx="8" fill="#eff6ff" stroke="#2563eb"/>
-              <text x="120" y="540" text-anchor="middle" font-size="10" fill="#18222f">标题=品牌退款</text>
-              <text x="120" y="554" text-anchor="middle" font-size="10" fill="#64748b">副标题=退款原因</text>
-              <text x="800" y="512" font-size="10" fill="#2563eb">收益明细</text>
-              <rect x="720" y="520" width="160" height="44" rx="8" fill="#eff6ff" stroke="#2563eb"/>
-              <text x="800" y="540" text-anchor="middle" font-size="10" fill="#18222f">标题=项目「词」退款</text>
-              <text x="800" y="554" text-anchor="middle" font-size="10" fill="#64748b">状态=已扣减</text>
+              <text x="460" y="406" text-anchor="middle" font-size="12" fill="#18222f">同步写入 C 端 · 钱包收益明细</text>
+              <rect x="340" y="460" width="240" height="60" rx="8" fill="#eff6ff" stroke="#2563eb"/>
+              <text x="460" y="484" text-anchor="middle" font-size="11" fill="#18222f">标题=项目「词」产生退款</text>
+              <text x="460" y="500" text-anchor="middle" font-size="10" fill="#64748b">副标题=退款原因 · 时间=扣回时间</text>
+              <text x="460" y="514" text-anchor="middle" font-size="10" fill="#64748b">状态=已扣减 · 金额负向</text>
               <rect x="340" y="580" width="240" height="44" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
               <text x="460" y="608" text-anchor="middle" font-size="11" fill="#18222f">表头统计随退款记录变更刷新</text>
             </g>
@@ -468,7 +462,7 @@
     <div class="modal" onclick="event.stopPropagation()">
       <div class="modal-header">批量导入 · Excel</div>
       <div class="modal-body">
-        <p class="import-note">Excel 列顺序：<code>关键词</code>、<code>项目ID</code>、<code>退款金额</code>、<code>退款原因</code>。导入后默认审核状态为「待审核」。</p>
+        <p class="import-note">Excel 列顺序：<code>关键词</code>、<code>项目ID</code>、<code>退款订单日期</code>、<code>退款金额</code>、<code>退款原因</code>。日期列仅填日期（如 <code>2026-08-20</code>），不含时分秒。导入后写入导入人员、导入时间，默认审核状态为「待审核」。</p>
         <div class="form-field">
           <label>选择文件</label>
           <input type="file" accept=".xlsx,.xls,.csv" />
@@ -505,7 +499,6 @@
         <div class="form-field"><label>关键词 *</label><input type="text" placeholder="Summer推广词" /></div>
         <div class="form-field"><label>项目 ID *</label><input type="text" placeholder="P-8801" /></div>
         <div class="form-field"><label>项目名称 *</label><input type="text" placeholder="右豹品牌合作" /></div>
-        <div class="form-field"><label>退款订单日期 *</label><input type="datetime-local" /></div>
         <div class="form-field"><label>退款金额(元) *</label><input type="number" step="0.01" placeholder="128.50" /></div>
         <div class="form-field"><label>退款原因 *</label><textarea placeholder="项目方核实后发起退款，关键词数据异常"></textarea></div>
         <div class="form-field">
@@ -536,21 +529,13 @@
         <div class="rule-section">
           <h3><span>1</span>业务目标</h3>
           <div class="rule-content">
-            <p>品牌项目发生退款时，用户在 C 端<strong>订单列表</strong>与<strong>钱包收益明细</strong>中可看到对应扣减记录。本迭代仅定义卡片信息展示，不重做完整页面。</p>
+            <p>品牌项目发生退款时，用户在 C 端<strong>钱包收益明细</strong>中可看到对应扣减记录。本迭代仅定义卡片信息展示，不重做完整页面。</p>
           </div>
         </div>
         <div class="rule-section">
           <h3><span>2</span>展示入口与字段</h3>
           <div class="rule-content">
-            <p><strong>订单列表</strong>（审核通过且已扣回后展示）：</p>
-            <ul>
-              <li><strong>标题</strong>：固定「品牌退款」</li>
-              <li><strong>副标题</strong>：退款原因</li>
-              <li><strong>订单产生日期</strong>：退款订单日期</li>
-              <li><strong>订单更新日期</strong>：扣回完成时间（未扣回时不展示该条）</li>
-              <li><strong>扣减金额</strong>：负向展示，如 <code>-128.50</code></li>
-            </ul>
-            <p style="margin-top:10px;"><strong>钱包 · 收益明细</strong>（审核通过且已扣回后展示）：</p>
+            <p><strong>钱包 · 收益明细</strong>（审核通过且已扣回后展示）：</p>
             <ul>
               <li><strong>标题</strong>：<code>{项目名称}「{关键词}」产生退款</code></li>
               <li><strong>副标题</strong>：退款原因</li>
@@ -565,7 +550,7 @@
           <div class="rule-content">
             <ul>
               <li>待审核、已驳回、已通过但未扣回的记录<strong>不在 C 端展示</strong>；仅<strong>扣回状态=已扣回</strong>时展示。</li>
-              <li>订单列表与收益明细为既有页面新增记录类型，沿用现有列表卡片样式。</li>
+              <li>收益明细为既有页面新增记录类型，沿用现有列表卡片样式。</li>
               <li>金额为扣减方向，使用负号或红色样式（沿用现有扣减展示规范）。</li>
             </ul>
           </div>
@@ -602,13 +587,17 @@
               <li>用户 ID</li>
               <li>关键词</li>
               <li>项目信息：项目 ID、项目名称</li>
-              <li>退款订单日期</li>
+              <li>退款订单日期（<strong>仅日期</strong>，无时分秒；<strong>批量导入写入</strong>，新增/编辑不可改）</li>
               <li>退款金额</li>
               <li>退款原因</li>
+              <li>导入人员、导入时间（导入/新增时系统自动写入）</li>
+              <li>审核时间（审核通过时写入）</li>
+              <li>扣回时间（扣回成功时写入）</li>
               <li>审核状态：待审核 / 已通过 / 已驳回</li>
               <li>扣回状态：已扣回 / 待扣回（审核未通过时为空）</li>
               <li>操作：编辑、删除</li>
             </ul>
+            <p style="margin-top:8px;">列表按业务阶段分三列聚合：<strong>导入信息</strong>（导入人员、导入时间、退款订单日期）、<strong>审核</strong>（审核状态 + 审核时间）、<strong>扣回</strong>（扣回状态 + 扣回时间）。</p>
           </div>
         </div>
         <div class="rule-section">
@@ -625,7 +614,7 @@
             </ul>
             <p style="margin-top:8px;"><strong>批量操作</strong>：</p>
             <ul>
-              <li>批量导入 Excel 字段：关键词、项目 ID、退款金额、退款原因</li>
+              <li>批量导入 Excel 字段：关键词、项目 ID、<strong>退款订单日期</strong>、退款金额、退款原因</li>
               <li>批量审核通过 / 驳回 / 删除：勾选后展示批量操作栏；确认弹窗展示<strong>已选数量 + 累计退款金额</strong></li>
               <li><strong>已扣回</strong>记录：不可勾选、不可编辑/删除，不参与批量审核与批量删除</li>
             </ul>
@@ -650,10 +639,10 @@
 
   <script>
     var refundRows = [
-      { id: 'r1', userId: 'U-10086', keyword: 'Summer推广词', projectName: '右豹品牌合作', projectId: 'P-8801', orderDate: '2026.08.20 14:30', amount: 128.50, reason: '项目方核实后发起退款，关键词数据异常', audit: 'passed', deduct: 'done' },
-      { id: 'r2', userId: 'U-10201', keyword: '秋季新品词', projectName: '某品牌联名', projectId: 'P-8805', orderDate: '2026.08.22 10:00', amount: 560.00, reason: '重复结算，需退回多余收益', audit: 'passed', deduct: 'pending' },
-      { id: 'r3', userId: 'U-10388', keyword: '达人种草词', projectName: '美妆品牌A', projectId: 'P-8812', orderDate: '2026.08.23 16:45', amount: 89.00, reason: '视频未达标，品牌方要求退款', audit: 'pending', deduct: 'none' },
-      { id: 'r4', userId: 'U-10456', keyword: '618大促词', projectName: '电商品牌B', projectId: 'P-8820', orderDate: '2026.08.18 09:20', amount: 320.00, reason: '订单归属争议，协商退款', audit: 'rejected', deduct: 'none' }
+      { id: 'r1', userId: 'U-10086', keyword: 'Summer推广词', projectName: '右豹品牌合作', projectId: 'P-8801', orderDate: '2026.08.20', amount: 128.50, reason: '项目方核实后发起退款，关键词数据异常', importBy: '李财务', importTime: '2026.08.20 09:15', auditTime: '2026.08.21 11:30', deductTime: '2026.08.22 09:15', audit: 'passed', deduct: 'done' },
+      { id: 'r2', userId: 'U-10201', keyword: '秋季新品词', projectName: '某品牌联名', projectId: 'P-8805', orderDate: '2026.08.22', amount: 560.00, reason: '重复结算，需退回多余收益', importBy: '王运营', importTime: '2026.08.22 10:00', auditTime: '2026.08.23 14:20', deductTime: null, audit: 'passed', deduct: 'pending' },
+      { id: 'r3', userId: 'U-10388', keyword: '达人种草词', projectName: '美妆品牌A', projectId: 'P-8812', orderDate: '2026.08.23', amount: 89.00, reason: '视频未达标，品牌方要求退款', importBy: '张导入', importTime: '2026.08.23 16:45', auditTime: null, deductTime: null, audit: 'pending', deduct: 'none' },
+      { id: 'r4', userId: 'U-10456', keyword: '618大促词', projectName: '电商品牌B', projectId: 'P-8820', orderDate: '2026.08.18', amount: 320.00, reason: '订单归属争议，协商退款', importBy: '李财务', importTime: '2026.08.18 09:20', auditTime: '2026.08.19 17:00', deductTime: null, audit: 'rejected', deduct: 'none' }
     ];
     var batchConfirmAction = null;
 
@@ -672,6 +661,32 @@
       if (deduct === 'done') return '<span class="tag tag-ok">已扣回</span>';
       if (deduct === 'pending') return '<span class="tag tag-warn">待扣回</span>';
       return '<span class="tag tag-muted">—</span>';
+    }
+
+    function formatFlowCell(value) {
+      return value ? value : '<span class="muted">—</span>';
+    }
+
+    function renderImportCell(row) {
+      return '<div class="cell-stack">'
+        + '<div class="cell-stack-line">' + row.importBy + '</div>'
+        + '<div class="cell-sub">' + formatFlowCell(row.importTime) + '</div>'
+        + '<div class="cell-sub">退款订单日期 ' + row.orderDate + '</div>'
+        + '</div>';
+    }
+
+    function renderAuditCell(row) {
+      return '<div class="cell-stack">'
+        + auditLabel(row.audit)
+        + '<div class="cell-sub">' + formatFlowCell(row.auditTime) + '</div>'
+        + '</div>';
+    }
+
+    function renderDeductCell(row) {
+      return '<div class="cell-stack">'
+        + deductLabel(row.deduct)
+        + '<div class="cell-sub">' + formatFlowCell(row.deductTime) + '</div>'
+        + '</div>';
     }
 
     function formatAmount(n) {
@@ -706,11 +721,11 @@
           + '<td>' + row.userId + '</td>'
           + '<td>' + row.keyword + '</td>'
           + '<td><div>' + row.projectName + '</div><div class="cell-sub">项目ID ' + row.projectId + '</div></td>'
-          + '<td>' + row.orderDate + '</td>'
           + '<td>' + formatAmount(row.amount) + '</td>'
           + '<td>' + row.reason + '</td>'
-          + '<td>' + auditLabel(row.audit) + '</td>'
-          + '<td>' + deductLabel(row.deduct) + '</td>'
+          + '<td>' + renderImportCell(row) + '</td>'
+          + '<td>' + renderAuditCell(row) + '</td>'
+          + '<td>' + renderDeductCell(row) + '</td>'
           + '<td>' + actions + '</td>'
           + '</tr>';
       }).join('');
@@ -754,8 +769,8 @@
     function submitImport() {
       closeImportModal();
       refundRows.push(
-        { id: 'r' + Date.now(), userId: 'U-10999', keyword: '批量导入词A', projectName: '导入项目A', projectId: 'P-9901', orderDate: '2026.08.26 10:00', amount: 99.00, reason: 'Excel 批量导入 Demo', audit: 'pending', deduct: 'none' },
-        { id: 'r' + (Date.now() + 1), userId: 'U-10998', keyword: '批量导入词B', projectName: '导入项目B', projectId: 'P-9902', orderDate: '2026.08.26 10:01', amount: 150.00, reason: 'Excel 批量导入 Demo', audit: 'pending', deduct: 'none' }
+        { id: 'r' + Date.now(), userId: 'U-10999', keyword: '批量导入词A', projectName: '导入项目A', projectId: 'P-9901', orderDate: '2026.08.26', amount: 99.00, reason: 'Excel 批量导入 Demo', importBy: '当前登录用户', importTime: '2026.08.26 10:00', auditTime: null, deductTime: null, audit: 'pending', deduct: 'none' },
+        { id: 'r' + (Date.now() + 1), userId: 'U-10998', keyword: '批量导入词B', projectName: '导入项目B', projectId: 'P-9902', orderDate: '2026.08.26', amount: 150.00, reason: 'Excel 批量导入 Demo', importBy: '当前登录用户', importTime: '2026.08.26 10:01', auditTime: null, deductTime: null, audit: 'pending', deduct: 'none' }
       );
       renderRefundTable();
       showToast('批量导入完成（Demo Mock）');
@@ -805,6 +820,7 @@
         refundRows.forEach(function (r) {
           if (ids.indexOf(r.id) >= 0 && !isRowLocked(r)) {
             r.audit = 'passed';
+            r.auditTime = '2026.08.28 10:00';
             if (r.deduct === 'none') r.deduct = 'pending';
           }
         });
@@ -836,7 +852,7 @@
       document.getElementById('adminTableView').classList.toggle('hidden', view !== 'table');
     }
     function getActiveScene() {
-      return document.querySelector('.scene-btn.active')?.dataset.screen || 'screen-order-list';
+      return document.querySelector('.scene-btn.active')?.dataset.screen || 'screen-wallet-income';
     }
     function loadMockupFrame(forceReload) {
       const frame = document.getElementById('mockupFrame');

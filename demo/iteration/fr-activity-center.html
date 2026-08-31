@@ -235,11 +235,11 @@
             </button>
             <button class="scene-btn" type="button" data-filter="ongoing">
               <div class="scene-title">筛选 · 进行中</div>
-              <div class="scene-desc">仅展示进行中活动；置顶 Banner 若处于进行中则仍展示在顶部</div>
+              <div class="scene-desc">仅展示进行中活动；置顶 Banner 固定展示在顶部，不随筛选隐藏</div>
             </button>
             <button class="scene-btn" type="button" data-filter="ended">
               <div class="scene-title">筛选 · 已结束</div>
-              <div class="scene-desc">仅展示已结束活动；所有按钮均为「查看」</div>
+              <div class="scene-desc">仅展示已结束活动；置顶 Banner 仍固定展示在顶部</div>
             </button>
             <button class="scene-btn" type="button" data-filter="registration">
               <div class="scene-title">报名类活动 · 人数展示</div>
@@ -360,7 +360,7 @@
             <ul>
               <li><strong>活动中心列表页</strong>：个人中心/首页等既有入口进入；页头标题「活动中心」。</li>
               <li><strong>置顶 Banner</strong>：活动中心顶部以 Banner 形式展示后台配置的置顶活动（最多 1 条）；不在下方列表中重复展示。</li>
-              <li><strong>筛选 Tab</strong>：全部 / 进行中 / 已结束；切换后刷新列表，置顶 Banner 若符合当前筛选条件则仍展示在顶部。</li>
+              <li><strong>筛选 Tab</strong>：全部 / 进行中 / 已结束；切换后刷新列表；置顶 Banner 固定在最上方，<strong>不随筛选 Tab 隐藏</strong>。</li>
               <li><strong>活动状态</strong>：待开始 / 进行中 / 已结束（角标展示在卡片图标左上角）。</li>
               <li><strong>活动卡片（沿用图1）</strong>：项目标签 → 灰色内容区（状态角标 + 图标 + 标题/副标题）→ 底部信息区 +「查看」按钮。</li>
               <li><strong>普通活动</strong>：底部展示「活动时间·起止日期」，不展示人数。</li>
@@ -373,9 +373,9 @@
           <div class="rule-content">
             <ul>
               <li>活动状态枚举：<code>待开始</code> / <code>进行中</code> / <code>已结束</code>；筛选「进行中」仅展示状态为进行中的活动。</li>
-              <li>所有活动卡片及置顶 Banner 的操作按钮统一为「查看」，跳转活动详情页（本 FR 不重做详情页）。</li>
+              <li>所有活动卡片及置顶 Banner 的操作按钮统一为「查看」；点击后<strong>跳转详情页或者配置的跳转地址</strong>（本 FR 不重做详情页）。</li>
               <li>人数展示：仅当后台配置为<strong>报名类活动</strong>时展示「x人已参加」；普通活动不展示人数。</li>
-              <li>筛选切换时列表区域 loading → 刷新；置顶 Banner 不参与列表分页，固定在最上方。</li>
+              <li>筛选切换时列表区域 loading → 刷新；置顶 Banner 不参与列表分页，固定在最上方，不随筛选隐藏。</li>
               <li>列表卡片布局沿用图1；置顶 Banner 参考图2 Banner 形态，色彩沿用 C 端体系。</li>
             </ul>
           </div>

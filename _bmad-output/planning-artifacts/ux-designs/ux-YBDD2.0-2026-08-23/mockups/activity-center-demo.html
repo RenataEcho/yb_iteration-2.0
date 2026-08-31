@@ -49,7 +49,7 @@
       position: absolute; top: 0; left: 50%; transform: translateX(-50%);
       width: 120px; height: 28px; background: #1a1a1a; border-radius: 0 0 16px 16px; z-index: 100;
     }
-    .screen { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
+    .screen { display: flex; flex-direction: column; height: 100%; overflow: hidden; position: relative; }
     .nav-bar {
       display: flex; align-items: center; justify-content: space-between;
       padding: 48px 16px 12px; background: var(--bg); flex-shrink: 0;
@@ -151,6 +151,25 @@
       font-size: 13px; opacity: 0; pointer-events: none; transition: all .25s; z-index: 200;
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .rule-overlay {
+      position: absolute; inset: 0; background: rgba(0,0,0,.45);
+      opacity: 0; pointer-events: none; transition: opacity .25s; z-index: 80;
+    }
+    .rule-overlay.show { opacity: 1; pointer-events: auto; }
+    .rule-sheet {
+      position: absolute; left: 0; right: 0; bottom: 0; z-index: 90;
+      background: var(--surface); border-radius: 16px 16px 0 0;
+      padding: 20px 20px 28px; transform: translateY(100%);
+      transition: transform .28s ease;
+    }
+    .rule-sheet.show { transform: translateY(0); }
+    .rule-sheet h3 { font-size: 16px; font-weight: 700; margin-bottom: 10px; }
+    .rule-sheet p { font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
+    .rule-sheet .btn-close {
+      width: 100%; margin-top: 18px; border: none; border-radius: 999px;
+      padding: 11px; font-size: 14px; font-weight: 700; cursor: pointer;
+      background: linear-gradient(135deg, var(--orange-start), var(--orange)); color: #fff;
+    }
     body.embed-mode { background: var(--bg); margin: 0; }
     body.embed-mode .demo-header { display: none !important; }
     body.embed-mode .demo-nav { display: none !important; }
@@ -194,6 +213,12 @@
           </div>
           <div id="activityList"></div>
           <div class="empty-state" id="emptyState" hidden>暂无符合条件的活动</div>
+        </div>
+        <div class="rule-overlay" id="ruleOverlay" onclick="closeViewRule()"></div>
+        <div class="rule-sheet" id="ruleSheet">
+          <h3>跳转规则</h3>
+          <p>跳转详情页或者配置的跳转地址</p>
+          <button class="btn-close" type="button" onclick="closeViewRule()">我知道了</button>
         </div>
       </div>
     </div>
@@ -252,10 +277,6 @@
 
     function renderBanner() {
       const el = document.getElementById('pinnedBanner');
-      if (!matchFilter(PINNED, currentFilter)) {
-        el.innerHTML = '';
-        return;
-      }
       const enrollLine = PINNED.type === 'registration'
         ? `<div class="banner-enroll">${PINNED.enrolled}人已参加</div>` : '';
       el.innerHTML = `
@@ -303,8 +324,7 @@
       renderBanner();
       const list = ACTIVITIES.filter(a => matchFilter(a, currentFilter));
       document.getElementById('activityList').innerHTML = list.map(renderCard).join('');
-      const hasBanner = matchFilter(PINNED, currentFilter);
-      document.getElementById('emptyState').hidden = list.length > 0 || hasBanner;
+      document.getElementById('emptyState').hidden = list.length > 0 || !!PINNED;
       const filterLabels = { all: '全部活动', ongoing: '进行中', ended: '已结束', registration: '报名类活动' };
       document.querySelector('.list-meta .label').textContent = filterLabels[currentFilter] || '全部活动';
       document.getElementById('listCount').textContent = `共 ${list.length} 条`;
@@ -324,7 +344,17 @@
     function handleAction(id) {
       const item = id === 'pinned' ? PINNED : ACTIVITIES.find(x => x.id === id);
       if (!item) return;
-      toast(`查看「${item.title}」（Demo）`);
+      openViewRule();
+    }
+
+    function openViewRule() {
+      document.getElementById('ruleOverlay').classList.add('show');
+      document.getElementById('ruleSheet').classList.add('show');
+    }
+
+    function closeViewRule() {
+      document.getElementById('ruleOverlay').classList.remove('show');
+      document.getElementById('ruleSheet').classList.remove('show');
     }
 
     function toast(msg) {
