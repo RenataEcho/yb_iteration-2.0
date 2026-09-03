@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FR-008 · 礼品中心 · 右豹迭代需求记录</title>
+  <style>
+    :root {
+      --primary: #2563eb; --primary-hover: #1d4ed8; --primary-light: #eff6ff; --primary-border: #bfdbfe;
+      --accent-rule: #0891b2; --accent-version: #7c3aed; --accent-fr: #d97706;
+      --success: #16a34a; --success-bg: #f0fdf4; --warning: #d97706; --warning-bg: #fffbeb;
+      --danger: #dc2626; --danger-bg: #fef2f2;
+      --surface: #fff; --surface-glass: rgba(255,255,255,0.72); --surface-hover: #f8fafc; --border: #e8edf3;
+      --text-primary: #18222f; --text-secondary: #4a5568; --text-muted: #9aa5b4;
+      --sidebar-w: 240px; --drawer-w: 480px; --radius-sm: 7px; --radius-lg: 14px;
+      --shadow: 0 8px 32px rgba(30,40,80,0.10);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 13px;
+      color: var(--text-primary);
+      background: linear-gradient(135deg, #e0e7ff 0%, #f0f4f8 40%, #e0f2fe 100%);
+      background-attachment: fixed; min-height: 100vh;
+    }
+    .sidebar {
+      position: fixed; inset: 0 auto 0 0; width: var(--sidebar-w); z-index: 200;
+      display: flex; flex-direction: column;
+      background: rgba(240,244,255,0.95); backdrop-filter: blur(20px);
+      border-right: 1px solid rgba(148,163,196,0.22);
+    }
+    .sidebar-brand { padding: 16px 14px 12px; border-bottom: 1px solid rgba(148,163,196,0.22); }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: linear-gradient(135deg, #2563eb, #7c3aed); color: #fff;
+      display: flex; align-items: center; justify-content: center; font-weight: 700;
+    }
+    .brand-text { font-size: 14px; font-weight: 700; }
+    .brand-sub { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+    .sprint-pill {
+      display: inline-block; margin-top: 10px; font-size: 11px; font-weight: 600;
+      padding: 3px 8px; border-radius: 999px; background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0;
+    }
+    .sidebar-scroll { flex: 1; overflow-y: auto; padding: 8px 0 16px; }
+    .sidebar-foot { padding: 10px 14px 14px; border-top: 1px solid rgba(148,163,196,0.22); font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+    .main { margin-left: var(--sidebar-w); padding: 16px 20px 40px; min-height: 100vh; }
+    .breadcrumb { padding: 4px 0 12px; font-size: 12px; color: var(--text-muted); }
+    .breadcrumb a { color: var(--primary); text-decoration: none; }
+    .page-header { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; }
+    .page-header h1 { font-size: 19px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .page-desc { font-size: 12px; color: var(--text-muted); max-width: 760px; line-height: 1.55; }
+    .badge { display: inline-flex; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: var(--radius-sm); }
+    .badge-fr { background: #fffbeb; color: var(--accent-fr); border: 1px solid #fde68a; }
+    .badge-version { background: #f5f3ff; color: var(--accent-version); border: 1px solid #ddd6fe; }
+    .page-tab-bar, .admin-tab-bar {
+      display: flex; gap: 0; margin-bottom: 16px;
+      background: var(--surface-glass); backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.55); border-radius: var(--radius-lg);
+      padding: 4px; box-shadow: var(--shadow); width: fit-content;
+    }
+    .admin-tab-bar { margin: 12px 16px 0; }
+    .page-tab-bar button, .admin-tab-bar button {
+      padding: 8px 20px; border: none; background: transparent; cursor: pointer;
+      font-size: 13px; font-weight: 500; color: var(--text-secondary); border-radius: 10px;
+    }
+    .page-tab-bar button.active, .admin-tab-bar button.active { background: var(--primary); color: #fff; font-weight: 600; }
+    .page-view, .admin-pane { display: none; }
+    .page-view.active, .admin-pane.active { display: block; }
+    .btn {
+      display: inline-flex; align-items: center; height: 34px; padding: 0 14px;
+      border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid transparent;
+    }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-rule { background: var(--primary-light); color: var(--primary); border-color: var(--primary-border); }
+    .btn-rule.active { background: var(--primary); color: #fff; }
+    .btn-ghost { background: var(--surface); color: var(--text-secondary); border-color: var(--border); }
+    .btn-ghost-sm { background: var(--surface); color: var(--text-secondary); border: 1px solid var(--border); height: 32px; padding: 0 12px; border-radius: var(--radius-sm); cursor: pointer; font-size: 12px; }
+    .glass-card {
+      background: var(--surface-glass); backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.55); border-radius: var(--radius-lg);
+      box-shadow: var(--shadow); overflow: hidden;
+    }
+    .demo-layout { display: grid; grid-template-columns: minmax(280px, 5fr) minmax(360px, 7fr); gap: 16px; }
+    @media (max-width: 1024px) { .demo-layout { grid-template-columns: 1fr; } }
+    .scene-panel { padding: 16px 18px; }
+    .scene-panel h2 { font-size: 14px; font-weight: 700; margin-bottom: 10px; }
+    .scene-list { display: flex; flex-direction: column; gap: 6px; }
+    .scene-btn {
+      text-align: left; padding: 10px 12px; border-radius: var(--radius-sm);
+      border: 1px solid var(--border); background: rgba(255,255,255,0.6); cursor: pointer;
+    }
+    .scene-btn.active { border-color: var(--primary-border); background: var(--primary-light); color: var(--primary); font-weight: 600; }
+    .scene-btn .scene-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+    .scene-btn .scene-desc { font-size: 11px; color: var(--text-muted); line-height: 1.45; }
+    .scene-btn.active .scene-desc { color: #3b82f6; }
+    .scene-note { margin-top: 14px; padding: 10px 12px; border-radius: var(--radius-sm); background: #fffbeb; border: 1px solid #fde68a; font-size: 12px; color: #92400e; line-height: 1.55; }
+    .mockup-panel { padding: 16px; display: flex; justify-content: center; min-height: 520px; }
+    .mockup-frame-wrap {
+      width: 100%; max-width: 375px; border-radius: 28px; overflow: hidden;
+      background: #1e293b; box-shadow: 0 16px 48px rgba(0,0,0,0.18); aspect-ratio: 375 / 812;
+    }
+    .mockup-frame-wrap iframe { width: 100%; height: 100%; border: none; display: block; background: #f5f6f8; }
+    .table-toolbar { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--border); gap: 10px; flex-wrap: wrap; }
+    .table-toolbar h3 { font-size: 14px; font-weight: 700; }
+    .toolbar-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .filter-bar { display: flex; flex-wrap: wrap; gap: 10px; padding: 14px 16px; align-items: flex-end; border-bottom: 1px solid var(--border); }
+    .filter-field { display: flex; flex-direction: column; gap: 4px; }
+    .filter-field label { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+    .filter-field input, .filter-field select { height: 32px; padding: 0 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 12px; min-width: 130px; }
+    .filter-actions { display: flex; gap: 8px; margin-left: auto; align-items: center; flex-wrap: wrap; }
+    .filter-split { width: 1px; height: 22px; background: var(--border); margin: 0 4px; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 980px; }
+    th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); font-size: 12px; vertical-align: top; }
+    th { font-size: 11px; font-weight: 600; color: var(--text-muted); background: rgba(248,250,252,0.9); white-space: nowrap; }
+    tr:hover td { background: var(--surface-hover); }
+    .link { color: var(--primary); cursor: pointer; text-decoration: none; margin-right: 10px; font-size: 12px; font-weight: 500; background: none; border: none; padding: 0; }
+    .tag { display: inline-flex; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+    .tag-ok { background: var(--success-bg); color: var(--success); }
+    .tag-warn { background: var(--warning-bg); color: var(--warning); }
+    .tag-muted { background: #f1f5f9; color: var(--text-muted); }
+    .cell-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .import-note { font-size: 12px; color: var(--text-muted); line-height: 1.55; margin-bottom: 12px; }
+    .import-note code { font-family: ui-monospace, monospace; font-size: 11px; background: #f1f5f9; padding: 1px 5px; border-radius: 4px; }
+    .drawer-overlay, .modal-overlay {
+      position: fixed; inset: 0; background: rgba(15,23,42,0.35); z-index: 500;
+      opacity: 0; pointer-events: none; transition: opacity 0.25s;
+    }
+    .drawer-overlay.open, .modal-overlay.open { opacity: 1; pointer-events: auto; }
+    .drawer {
+      position: fixed; top: 0; right: 0; bottom: 0; width: var(--drawer-w); z-index: 501;
+      background: rgba(255,255,255,0.98); backdrop-filter: blur(12px);
+      box-shadow: -8px 0 40px rgba(30,40,60,0.18);
+      transform: translateX(100%); transition: transform 0.28s ease;
+      display: flex; flex-direction: column;
+    }
+    .drawer.open { transform: translateX(0); }
+    .drawer-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .drawer-header h2 { font-size: 15px; font-weight: 700; }
+    .drawer-close { width: 28px; height: 28px; border: none; background: #f1f5f9; border-radius: 6px; cursor: pointer; font-size: 16px; }
+    .rule-tab-bar { display: flex; gap: 0; padding: 0 16px; border-bottom: 1px solid var(--border); }
+    .rule-tab-bar button {
+      padding: 10px 18px; border: none; background: none; cursor: pointer;
+      font-size: 13px; color: var(--text-secondary); border-bottom: 2px solid transparent; margin-bottom: -1px;
+    }
+    .rule-tab-bar button.active { color: var(--primary); font-weight: 600; border-bottom-color: var(--primary); }
+    .drawer-body { flex: 1; overflow-y: auto; padding: 16px 20px 32px; }
+    .rule-panel { display: none; }
+    .rule-panel.active { display: block; }
+    .rule-section { margin-bottom: 22px; }
+    .rule-section h3 { font-size: 14px; font-weight: 700; color: var(--accent-rule); margin-bottom: 8px; }
+    .rule-section h3 span {
+      display: inline-flex; width: 22px; height: 22px; align-items: center; justify-content: center;
+      background: #ecfeff; color: var(--accent-rule); border-radius: 6px; font-size: 12px; margin-right: 8px;
+    }
+    .rule-content { font-size: 13px; color: var(--text-secondary); line-height: 1.65; }
+    .rule-content ul { padding-left: 18px; margin-top: 6px; }
+    .rule-content li { margin-bottom: 5px; }
+    .rule-content code { font-family: ui-monospace, monospace; font-size: 12px; background: #f1f5f9; padding: 1px 5px; border-radius: 4px; }
+    .modal {
+      position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.95);
+      width: 480px; max-width: calc(100vw - 32px); max-height: calc(100vh - 48px);
+      z-index: 501; background: #fff; border-radius: var(--radius-lg);
+      box-shadow: 0 16px 48px rgba(30,40,60,0.2);
+      opacity: 0; pointer-events: none; transition: all 0.2s;
+      display: flex; flex-direction: column;
+    }
+    .modal.modal-md { width: 560px; }
+    .modal-overlay.open .modal { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
+    .modal-header { padding: 16px 20px; border-bottom: 1px solid var(--border); font-size: 15px; font-weight: 700; flex-shrink: 0; }
+    .modal-body { padding: 16px 20px; overflow-y: auto; }
+    .form-field { margin-bottom: 12px; }
+    .form-field label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
+    .form-field input:not([type="checkbox"]):not([type="file"]),
+    .form-field select, .form-field textarea {
+      width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px;
+    }
+    .form-field textarea { min-height: 64px; resize: vertical; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .form-row-3 { grid-template-columns: 1fr 1fr 1fr; }
+    .check-pills { display: flex; align-items: center; gap: 8px; }
+    .check-pills .check-pill {
+      display: inline-flex; align-items: center; justify-content: center;
+      height: 32px; min-width: 88px; padding: 0 14px; margin: 0;
+      border: 1px solid var(--border); border-radius: 999px;
+      background: #fff; color: var(--text-secondary);
+      font: 500 13px/1 Inter, "PingFang SC", "Microsoft YaHei", sans-serif;
+      white-space: nowrap; cursor: pointer;
+    }
+    .check-pills .check-pill.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+    .field-hint { margin-top: 4px; font-size: 11px; color: var(--text-muted); line-height: 1.45; }
+    .tag-editor {
+      display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+      min-height: 38px; padding: 6px 8px; border: 1px solid var(--border);
+      border-radius: var(--radius-sm); background: #fff;
+    }
+    .tag-chip {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 8px; border-radius: 999px; background: var(--primary-light);
+      color: var(--primary); font-size: 12px; font-weight: 600;
+    }
+    .tag-chip button {
+      width: 14px; height: 14px; border: none; background: none; color: inherit;
+      cursor: pointer; font-size: 12px; line-height: 1; padding: 0;
+    }
+    .tag-editor input {
+      flex: 1; min-width: 140px; border: none; outline: none; padding: 4px 2px; font-size: 13px;
+    }
+    .tag-list { display: flex; flex-wrap: wrap; gap: 4px; }
+    .tag-editor .tag-list { display: contents; }
+    .tag-list .tag { background: #f1f5f9; color: var(--text-secondary); }
+    .attach-box {
+      min-height: 88px; border: 1px dashed var(--border); border-radius: var(--radius-sm);
+      background: #f8fafc; overflow: hidden;
+    }
+    .attach-empty {
+      width: 100%; min-height: 88px; border: none; background: none; cursor: pointer;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+      color: var(--text-secondary); font-size: 12px;
+    }
+    .attach-empty:hover { color: var(--primary); background: var(--primary-light); }
+    .attach-empty strong { font-size: 13px; font-weight: 600; }
+    .attach-empty span { color: var(--text-muted); font-size: 11px; }
+    .attach-file {
+      display: flex; align-items: center; gap: 10px; padding: 10px 12px; min-height: 88px;
+    }
+    .attach-thumb {
+      width: 56px; height: 56px; border-radius: 8px; background: #fff; border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      color: var(--primary); font-size: 11px; font-weight: 700;
+    }
+    .attach-meta { flex: 1; min-width: 0; }
+    .attach-meta b { display: block; font-size: 12px; font-weight: 600; word-break: break-all; }
+    .attach-meta i { display: block; font-style: normal; font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .attach-del {
+      width: 24px; height: 24px; border: none; border-radius: 6px; background: #f1f5f9;
+      color: var(--text-secondary); cursor: pointer; font-size: 14px;
+    }
+    .cond-block { display: none; margin-top: 8px; padding: 10px 12px; border: 1px dashed var(--border); border-radius: var(--radius-sm); background: #f8fafc; }
+    .cond-block.show { display: block; }
+    .roster-back { margin-right: 8px; }
+    .stat-row {
+      display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px;
+      padding: 12px 16px; background: rgba(248,250,252,.7); border-bottom: 1px solid var(--border);
+    }
+    .stat-chip {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      padding: 8px 12px; border-radius: 8px; background: #fff; border: 1px solid var(--border);
+      font-size: 12px; color: var(--text-secondary);
+    }
+    .stat-chip strong { font-size: 18px; font-weight: 700; color: var(--text-primary); line-height: 1; }
+    .stat-chip.warn { background: var(--warning-bg); border-color: #fde68a; }
+    .stat-chip.warn strong { color: var(--warning); }
+    .link.off, .link:disabled { color: var(--text-muted); cursor: not-allowed; font-weight: 400; }
+    .tag-info { background: var(--primary-light); color: var(--primary); }
+    .inbox-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+    .op-stack { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+    .op-stack .link { margin-right: 0; }
+    .addr-cell { max-width: 168px; line-height: 1.45; }
+    #admin-roster table { min-width: 1080px; }
+    #admin-roster .table-toolbar { border-bottom: none; padding-bottom: 8px; }
+    .modal-footer { padding: 12px 20px 16px; display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid var(--border); flex-shrink: 0; }
+    .flow-page-intro { padding: 16px 18px 0; font-size: 12px; color: var(--text-muted); line-height: 1.55; }
+    .flow-svg-wrap { overflow: auto; padding: 16px 18px 24px; max-height: 72vh; }
+    .flow-svg-wrap svg { display: block; margin: 0 auto; }
+    .flow-edges line, .flow-edges polyline { stroke: #94a3b8; stroke-width: 1.5; fill: none; }
+    .flow-legend { display: flex; flex-wrap: wrap; gap: 12px; padding: 0 18px 20px; font-size: 11px; color: var(--text-muted); }
+    .flow-legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 4px; vertical-align: -2px; }
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: #1e293b; color: #fff; padding: 10px 18px; border-radius: 999px; font-size: 13px;
+      opacity: 0; transition: all 0.25s; z-index: 600; pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .req { color: var(--danger); margin-left: 2px; }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand">
+        <div class="brand-icon">迭</div>
+        <div>
+          <div class="brand-text">右豹迭代需求记录</div>
+          <div class="brand-sub">PRD Demo · 产品交付研发</div>
+        </div>
+      </div>
+      <span class="sprint-pill">YBDD2.0 · 迭代 v1</span>
+    </div>
+    <div class="sidebar-scroll" data-iteration-sidebar></div>
+    <div class="sidebar-foot">FR-008 · 页内 Tab<br />前端交互 / 管理后台 / 业务流程</div>
+  </aside>
+
+  <main class="main">
+    <nav class="breadcrumb">
+      <a href="framework-shell.html">Sprint 概览</a>
+      <span> / 运营 / 礼品中心</span>
+    </nav>
+    <header class="page-header">
+      <div>
+        <h1>
+          礼品中心
+          <span class="badge badge-fr">FR-008</span>
+          <span class="badge badge-version">v1 当前</span>
+        </h1>
+        <p class="page-desc">节假日实物礼。C 端节日列表 + 详情弹窗：收益礼看达标进度与获得/错失，指定用户礼为定制礼品。后台按 C 端字段配置标题、描述、介绍、标签、展示图、弹窗海报与发放规则；仅状态为「显示」的礼品才出现在 C 端。发放名单可发入选/发货站内信（已发跳过），并统计未发与缺地址。</p>
+      </div>
+      <div class="page-header-actions">
+        <button class="btn btn-rule" id="toggleRuleDrawer" type="button">📋 需求规则</button>
+      </div>
+    </header>
+
+    <div class="page-tab-bar" role="tablist">
+      <button type="button" class="active" data-page="view-fe" role="tab">前端交互</button>
+      <button type="button" data-page="view-admin" role="tab">管理后台</button>
+      <button type="button" data-page="view-flow" role="tab">业务流程</button>
+    </div>
+
+    <div id="view-fe" class="page-view active">
+      <div class="demo-layout">
+        <div class="glass-card scene-panel">
+          <h2>场景切换</h2>
+          <div class="scene-list">
+            <button class="scene-btn" type="button" data-screen="inbox">
+              <div class="scene-title">站内信点入</div>
+              <div class="scene-desc">入选 / 发货各一条；点击都进礼品中心列表</div>
+            </button>
+            <button class="scene-btn active" type="button" data-screen="list">
+              <div class="scene-title">列表</div>
+              <div class="scene-desc">进度条看收益是否达标；卡片状态：恭喜获得 / 遗憾错失</div>
+            </button>
+            <button class="scene-btn" type="button" data-screen="detail">
+              <div class="scene-title">详情弹窗</div>
+              <div class="scene-desc">进度条=当前累计 / 达标；详情展示收益统计日期；灰区只显示物流</div>
+            </button>
+            <button class="scene-btn" type="button" data-screen="shipped">
+              <div class="scene-title">已发货</div>
+              <div class="scene-desc">灰区物流改为已发货 + 单号，进度条仍是收益达标</div>
+            </button>
+            <button class="scene-btn" type="button" data-screen="signed">
+              <div class="scene-title">自动签收</div>
+              <div class="scene-desc">灰区物流改为自动签收，进度条仍是收益达标</div>
+            </button>
+            <button class="scene-btn" type="button" data-screen="missing-address">
+              <div class="scene-title">缺地址</div>
+              <div class="scene-desc">灰区待发货（缺地址）+ 补全地址弹窗</div>
+            </button>
+            <button class="scene-btn" type="button" data-screen="missed">
+              <div class="scene-title">遗憾错失</div>
+              <div class="scene-desc">中秋需达 8 万，当前 5.2 万未达标；灰区未发放</div>
+            </button>
+            <button class="scene-btn" type="button" data-screen="custom">
+              <div class="scene-title">定制礼品</div>
+              <div class="scene-desc">专属卡片，无收益进度；文案让用户感到被特别看见</div>
+            </button>
+          </div>
+          <div class="scene-note">收益礼：进度显示当前累计 / 达标，不用「门槛」；详情补收益统计日期。指定用户礼：定制礼品卡片，无进度条。灰区只展示物流。</div>
+        </div>
+        <div class="glass-card mockup-panel">
+          <div class="mockup-frame-wrap">
+            <iframe id="mockupFrame" title="礼品中心 Mockup" src="about:blank" data-src="gift-center-demo.html"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="view-admin" class="page-view">
+      <div class="glass-card">
+        <div id="admin-gifts" class="admin-pane active">
+          <div class="table-toolbar">
+            <h3>礼品信息</h3>
+            <button class="btn btn-primary" type="button" onclick="openGiftModal()">新增礼品</button>
+          </div>
+          <div class="filter-bar">
+            <div class="filter-field"><label>礼品标题</label><input id="giftQ" placeholder="春节" /></div>
+            <div class="filter-field">
+              <label>状态</label>
+              <select id="giftVisQ">
+                <option value="">全部</option>
+                <option value="show">显示</option>
+                <option value="hide">隐藏</option>
+              </select>
+            </div>
+            <div class="filter-actions">
+              <button class="btn-ghost-sm" type="button" onclick="resetGiftFilter()">重置</button>
+              <button class="btn btn-primary" type="button" onclick="renderGifts()">查询</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th><th>标题</th><th>标签</th><th>发放人员</th><th>发放名单</th><th>状态</th><th>创建人</th><th>创建时间</th><th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="giftBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="admin-roster" class="admin-pane">
+          <div class="table-toolbar">
+            <h3>
+              <button class="btn btn-ghost btn-sm roster-back" type="button" onclick="closeRoster()">‹ 返回礼品</button>
+              发放人员 · <span id="rosterGiftTitle">春节创作者答谢礼</span>
+              <span class="cell-sub" id="rosterCount" style="margin-left:8px;font-weight:500"></span>
+            </h3>
+          </div>
+          <div class="stat-row" id="rosterStats"></div>
+          <div class="filter-bar">
+            <div class="filter-field"><label>用户ID</label><input id="userQ" placeholder="U-10086" /></div>
+            <div class="filter-field">
+              <label>当前状态</label>
+              <select id="statusQ">
+                <option value="">全部</option>
+                <option>已获得</option>
+                <option>已发货</option>
+                <option>自动签收</option>
+              </select>
+            </div>
+            <div class="filter-actions">
+              <button class="btn-ghost-sm" type="button" onclick="resetUserFilter()">重置</button>
+              <button class="btn btn-primary" type="button" onclick="renderRoster()">查询</button>
+              <span class="filter-split" aria-hidden="true"></span>
+              <button class="btn-ghost-sm" type="button" onclick="sendInbox('grant')">发送入选站内信</button>
+              <button class="btn-ghost-sm" type="button" onclick="sendInbox('ship')">发送发货站内信</button>
+              <button class="btn-ghost-sm" type="button" onclick="openImportModal()">导入物流单号</button>
+              <button class="btn-ghost-sm" type="button" onclick="openMakeupModal()">补礼品名单</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>用户ID</th><th>入选方式</th><th>收获地址</th><th>物流平台</th><th>物流单号</th><th>当前状态</th><th>站内信</th><th>更新时间</th><th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="rosterBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="view-flow" class="page-view">
+      <div class="glass-card flow-page">
+        <p class="flow-page-intro">一张图看完判断：圈人单选（指定用户或收益达标）→ 是否已中 → 有无地址 → 导单号 / 补地址 → 站内信只打未发 → 满 7 天自动签收。</p>
+        <div class="flow-svg-wrap">
+          <svg width="1080" height="380" viewBox="0 0 1080 380">
+            <defs>
+              <marker id="flow-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                <path d="M0,0 L8,4 L0,8 Z" fill="#94a3b8" />
+              </marker>
+            </defs>
+            <g class="flow-edges" marker-end="url(#flow-arrow)">
+              <polyline points="140,50 160,50" />
+              <polyline points="308,50 310,50" />
+              <polyline points="360,80 360,118" />
+              <polyline points="410,50 430,50" />
+              <polyline points="580,50 600,50" />
+              <polyline points="505,78 505,170" />
+              <polyline points="455,210 350,210" />
+              <polyline points="275,230 275,270" />
+              <polyline points="350,290 600,290 600,230" />
+              <polyline points="555,210 600,210" />
+              <polyline points="750,210 780,210" />
+              <polyline points="860,236 860,268" />
+            </g>
+            <g class="flow-nodes">
+              <rect x="20" y="30" width="120" height="40" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="80" y="55" text-anchor="middle" font-size="12" fill="#1e40af">运营新建礼品</text>
+
+              <rect x="160" y="22" width="148" height="56" rx="6" fill="#dcfce7" stroke="#16a34a" />
+              <text x="234" y="45" text-anchor="middle" font-size="12" fill="#166534">发放人员单选</text>
+              <text x="234" y="63" text-anchor="middle" font-size="10" fill="#64748b">指定用户 或 收益达标</text>
+
+              <polygon points="360,20 410,50 360,80 310,50" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="360" y="47" text-anchor="middle" font-size="11" fill="#854d0e">已中过?</text>
+              <text x="372" y="108" text-anchor="start" font-size="10" fill="#94a3b8">是</text>
+              <rect x="300" y="118" width="120" height="32" rx="6" fill="#f1f5f9" stroke="#94a3b8" />
+              <text x="360" y="139" text-anchor="middle" font-size="11" fill="#475569">跳过 · 一人一次</text>
+              <text x="418" y="42" text-anchor="start" font-size="10" fill="#94a3b8">否</text>
+
+              <rect x="430" y="22" width="150" height="56" rx="6" fill="#dcfce7" stroke="#16a34a" />
+              <text x="505" y="45" text-anchor="middle" font-size="12" fill="#166534">写入发放名单</text>
+              <text x="505" y="63" text-anchor="middle" font-size="10" fill="#64748b">占名额</text>
+
+              <rect x="600" y="30" width="168" height="40" rx="6" fill="#ffedd5" stroke="#ea580c" />
+              <text x="684" y="55" text-anchor="middle" font-size="12" fill="#9a3412">入选站内信 · 仅未发</text>
+
+              <polygon points="505,170 555,210 505,250 455,210" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="505" y="214" text-anchor="middle" font-size="11" fill="#854d0e">有地址?</text>
+              <text x="448" y="200" text-anchor="end" font-size="10" fill="#94a3b8">否</text>
+              <text x="562" y="200" text-anchor="start" font-size="10" fill="#94a3b8">是</text>
+
+              <rect x="200" y="190" width="150" height="40" rx="6" fill="#fecaca" stroke="#dc2626" />
+              <text x="275" y="215" text-anchor="middle" font-size="12" fill="#991b1b">缺地址 · 不寄</text>
+              <rect x="200" y="270" width="150" height="40" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="275" y="295" text-anchor="middle" font-size="12" fill="#1e40af">补收获地址后可寄</text>
+
+              <rect x="600" y="190" width="150" height="40" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="675" y="215" text-anchor="middle" font-size="12" fill="#1e40af">导入物流单号</text>
+              <rect x="780" y="184" width="160" height="52" rx="6" fill="#dcfce7" stroke="#16a34a" />
+              <text x="860" y="205" text-anchor="middle" font-size="12" fill="#166534">状态 = 已发货</text>
+              <text x="860" y="223" text-anchor="middle" font-size="10" fill="#64748b">发货站内信 · 仅未发</text>
+              <rect x="780" y="268" width="160" height="40" rx="6" fill="#ffedd5" stroke="#ea580c" />
+              <text x="860" y="293" text-anchor="middle" font-size="12" fill="#9a3412">满 7 天自动签收</text>
+            </g>
+          </svg>
+        </div>
+        <div class="flow-legend">
+          <span><i style="background:#dbeafe;border:1px solid #2563eb"></i>前端</span>
+          <span><i style="background:#dcfce7;border:1px solid #16a34a"></i>后端</span>
+          <span><i style="background:#ffedd5;border:1px solid #ea580c"></i>异步 / 站内信</span>
+          <span><i style="background:#fef9c3;border:1px solid #ca8a04"></i>校验</span>
+          <span><i style="background:#fecaca;border:1px solid #dc2626"></i>阻断</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="drawer-overlay" id="ruleOverlay" onclick="setRuleDrawer(false)"></div>
+  <aside class="drawer" id="ruleDrawer" role="dialog" aria-labelledby="ruleTitle">
+    <div class="drawer-header">
+      <h2 id="ruleTitle">FR-008 · v1 需求规则</h2>
+      <button class="drawer-close" type="button" onclick="setRuleDrawer(false)">×</button>
+    </div>
+    <div class="rule-tab-bar">
+      <button type="button" class="active" data-rule="rule-fe">前端需求</button>
+      <button type="button" data-rule="rule-admin">后台需求</button>
+    </div>
+    <div class="drawer-body">
+      <div id="rule-fe" class="rule-panel active">
+        <div class="rule-section">
+          <h3><span>1</span>业务目标</h3>
+          <div class="rule-content">
+            <p>节假日实物礼要让入选用户<strong>打开就被看见</strong>，再确认快递走到哪一步。不是物流查询页。</p>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>2</span>页面与入口</h3>
+          <div class="rule-content">
+            <ul>
+              <li><strong>礼品中心</strong>：个人中心下独立入口，不并入活动中心。仅列表，不提供宫格。</li>
+              <li><strong>节日列表</strong>：封面节日图 + 统一礼物角标、标题、描述、标签、收益达标进度、状态（恭喜获得 / 遗憾错失）、底部时间；点卡片出详情。指定用户礼为「定制礼品」卡片，不展示收益进度。</li>
+              <li><strong>卡片字段</strong>：封面 + 礼物角标、标题、描述、标签。收益礼：进度条（当前累计 vs 达标，标明已达标 / 未达标），文案不用「门槛」。定制礼：无进度条。无查看详情按钮；点卡片即出详情。</li>
+              <li><strong>详情</strong>：点卡片弹出详情弹窗（不跳转新页）；弹窗海报、介绍文案、物流单号、缺地址 CTA 在弹窗内。</li>
+              <li><strong>不做荣誉通知</strong>：无自动弹层、无荣誉徽、无再看荣誉。</li>
+              <li><strong>列表范围</strong>：仅展示后台状态为「显示」的礼品；状态=隐藏时 C 端不展示。礼品不下架。C 端不展示未获得标签。</li>
+              <li><strong>站内信</strong>：入选一条、发货一条；点击均进入礼品中心。文案后台可配。</li>
+              <li><strong>地址</strong>：缺地址时详情点「去补全收货地址」→ 弹窗提示「规则：跳转至现在的收获地址页面」，跳转既有地址页，本 FR 不重做表单。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>3</span>交互规则</h3>
+          <div class="rule-content">
+            <ul>
+              <li>点整张卡片打开详情，无「查看详情」按钮。</li>
+              <li><strong>进度条</strong>（收益礼，列表与详情相同）：展示当前累计收益相对达标额，并标明是否达标。文案不用「门槛」。例：达标 5 万、当前 5.2 万 → 已达标。详情额外展示收益统计日期。</li>
+              <li><strong>定制礼品</strong>：发放方式为指定用户时，C 端以专属卡片呈现、不展示收益进度；文案强调「特别为你」，不告知圈选规则。</li>
+              <li><strong>外层状态</strong>：恭喜获得（已达发放条件）、遗憾错失（活动年已结束且未达标）。当年尚未结束则为待达标。</li>
+              <li><strong>详情灰区</strong>：只展示物流（待发货 / 已发货+单号 / 自动签收 / 未发放 / 待发放）。不把收益进度放进灰区。</li>
+              <li>无地址仍可看列表与详情弹窗；点补全地址只出跳转规则弹窗，不在礼品中心内填地址。</li>
+              <li>视觉：沿用 C 端橙色浅底（与活动中心同色板）；列表静态，无 3D/悬浮动效。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>4</span>边界规则</h3>
+          <div class="rule-content">
+            <ul>
+              <li>同一礼品每人最多中一次。</li>
+              <li>礼品不会下架；往期礼品只要状态=显示，仍留在 C 端列表。</li>
+              <li>不做拒绝、转赠、积分商城打通。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>5</span>业务流程</h3>
+          <div class="rule-content"><p>见页内 Tab <strong>「业务流程」</strong>：圈人、地址、导单号、站内信合在一张判断图。</p></div>
+        </div>
+      </div>
+      <div id="rule-admin" class="rule-panel">
+        <div class="rule-section">
+          <h3><span>1</span>业务目标</h3>
+          <div class="rule-content">
+            <p>运营配置礼品与发放人员规则，查看命中名单，导入物流单号或补礼品；缺地址先不寄。</p>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>2</span>数据表与字段</h3>
+          <div class="rule-content">
+            <ul>
+              <li><strong>礼品</strong>：标题、描述、介绍（对应C端弹窗详情文案）、礼物标签（可配多个，C 端卡片展示）、展示图、详情图、礼品弹窗海报（附件上传，不用 URL）、状态（显示 / 隐藏）、创建人、创建时间；入选/发货站内信文案（可配）。</li>
+              <li><strong>状态与前端展示</strong>：仅当状态=「显示」时，该礼品才出现在 C 端列表与详情；状态=「隐藏」时前端不展示。礼品仍不下架，名单与物流继续可操作。</li>
+              <li><strong>发放人员</strong>（新增/编辑单选，必选其一）：指定用户 或 收益达标。指定用户填用户ID，C 端呈现为「定制礼品」、不展示收益进度。收益达标填累计收益达标额 + 收益统计区间，C 端展示当前累计 / 达标，并按是否达标计算恭喜获得 / 遗憾错失。</li>
+              <li><strong>发放名单</strong>：列表与表单均显示命中人数，点击进入明细。</li>
+              <li><strong>发放人员明细</strong>：用户ID、入选方式（指定用户 / 收益达标·具体收益值 / 补礼品）、收获地址、物流平台、物流单号、当前状态（已获得 / 已发货 / 自动签收）、站内信（未发 / 入选站内信已发 / 发货站内信已发）、更新时间。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>3</span>列表与操作</h3>
+          <div class="rule-content">
+            <ul>
+              <li>礼品信息：按标题、状态查；新增/编辑用 Modal；发放名单列点人数进详情。</li>
+              <li>发放名单顶部统计：入选站内信未发、发货站内信未发、缺地址（按全量名单计，不受筛选影响）。</li>
+              <li>名单操作放在筛选区「查询」后：<strong>发送入选站内信</strong>、<strong>发送发货站内信</strong>、<strong>导入物流单号</strong>（Excel：<code>用户ID</code>、<code>物流平台</code>、<code>物流单号</code>）；<strong>补礼品名单</strong>（弹窗批量输入用户ID + 备注）。行内可对单人发送。</li>
+              <li>明细筛选：用户ID、当前状态。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>4</span>边界规则</h3>
+          <div class="rule-content">
+            <ul>
+              <li>无地址：占名额、收获地址显示「缺地址」、不寄。</li>
+              <li>导入单号后状态改为已发货，满 7 天系统自动签收。</li>
+              <li>已在本礼名单中的用户再次命中或补录，跳过。</li>
+              <li><strong>站内信只对未发送用户触发</strong>：入选 / 发货各自独立；已发该条的用户不再发送，未发才写入。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="modal-overlay" id="giftOverlay">
+    <div class="modal modal-md" role="dialog">
+      <div class="modal-header" id="giftModalTitle">新增礼品</div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-field"><label>礼品标题<span class="req">*</span></label><input id="gTitle" maxlength="32" placeholder="春节创作者答谢礼" /></div>
+          <div class="form-field">
+            <label>状态<span class="req">*</span></label>
+            <select id="gVisible">
+              <option value="show">显示</option>
+              <option value="hide">隐藏</option>
+            </select>
+            <div class="field-hint">仅状态=显示时，C 端才展示该礼品</div>
+          </div>
+        </div>
+        <div class="form-field"><label>描述</label><textarea id="gDesc" placeholder="列表卡片一句话描述，如：右豹定制保温壶，致敬持续创作。"></textarea></div>
+        <div class="form-field">
+          <label>介绍</label>
+          <textarea id="gIntro" placeholder="详情弹窗介绍文案"></textarea>
+          <div class="field-hint">对应C端弹窗详情文案</div>
+        </div>
+        <div class="form-field">
+          <label>礼物标签</label>
+          <div class="tag-editor" id="gTagEditor">
+            <div class="tag-list" id="gTagChips"></div>
+            <input id="gTagInput" maxlength="12" placeholder="输入后回车添加，可配多个" />
+          </div>
+          <div class="field-hint">C 端卡片展示全部标签。建议 1～4 个，如「实物礼 / 春节 / 需达5万」或「定制礼品 / 特别为你」。</div>
+        </div>
+        <div class="form-row form-row-3">
+          <div class="form-field">
+            <label>展示图</label>
+            <div class="attach-box" id="attachCover"></div>
+            <input type="file" id="gCoverFile" accept="image/png,image/jpeg,image/webp" hidden />
+          </div>
+          <div class="form-field">
+            <label>详情图</label>
+            <div class="attach-box" id="attachDetail"></div>
+            <input type="file" id="gDetailFile" accept="image/png,image/jpeg,image/webp" hidden />
+          </div>
+          <div class="form-field">
+            <label>礼品弹窗海报</label>
+            <div class="attach-box" id="attachPoster"></div>
+            <input type="file" id="gPosterFile" accept="image/png,image/jpeg,image/webp" hidden />
+            <div class="field-hint">对应 C 端详情弹窗顶部海报</div>
+          </div>
+        </div>
+        <div class="form-field">
+          <label>发放人员<span class="req">*</span></label>
+          <div class="check-pills" role="radiogroup" aria-label="发放人员">
+            <button type="button" class="check-pill" id="pillNamed" onclick="selectGrant('named')">指定用户</button>
+            <button type="button" class="check-pill" id="pillRevenue" onclick="selectGrant('revenue')">收益达标</button>
+            <input type="radio" name="gGrant" id="gNamed" hidden />
+            <input type="radio" name="gGrant" id="gRevenue" hidden />
+          </div>
+          <div class="field-hint">只能选一种。指定用户 → C 端定制礼品卡，无进度条；收益达标 → C 端展示当前累计 / 达标。</div>
+          <div class="cond-block" id="blockNamed">
+            <div class="form-field" style="margin:0">
+              <label>指定用户ID<span class="req">*</span></label>
+              <textarea id="gNamedUids" placeholder="每行一个用户ID，或用逗号分隔"></textarea>
+            </div>
+          </div>
+          <div class="cond-block" id="blockRevenue">
+            <div class="form-row">
+              <div class="form-field" style="margin:0"><label>累计收益达标额（元）<span class="req">*</span></label><input id="gThreshold" type="number" placeholder="50000" /></div>
+              <div class="form-field" style="margin:0"><label>收益统计区间<span class="req">*</span></label><input id="gRange" placeholder="2025-01-01 至 2026-01-31" /></div>
+            </div>
+          </div>
+        </div>
+        <div class="form-field">
+          <label>发放名单</label>
+          <div id="gRosterField"></div>
+        </div>
+        <div class="form-field"><label>入选站内信</label><textarea id="gMsgGrant">小周，平台因你的累计收益送出春节礼，点开领取这份看见。</textarea></div>
+        <div class="form-field"><label>发货站内信</label><textarea id="gMsgShip">你的礼品已交寄，可在礼品中心查看物流单号。</textarea></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" type="button" onclick="closeModal('giftOverlay')">取消</button>
+        <button class="btn btn-primary" type="button" onclick="saveGift()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="importOverlay">
+    <div class="modal" role="dialog">
+      <div class="modal-header">导入物流单号</div>
+      <div class="modal-body">
+        <p class="import-note">Excel 列：<code>用户ID</code>、<code>物流平台</code>、<code>物流单号</code>。仅匹配本礼发放名单；缺地址行跳过且不改状态。</p>
+        <div class="form-field"><label>选择文件</label><input type="file" accept=".xlsx,.xls,.csv" /></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" type="button" onclick="closeModal('importOverlay')">取消</button>
+        <button class="btn btn-primary" type="button" onclick="submitImport()">开始导入</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="makeupOverlay">
+    <div class="modal" role="dialog">
+      <div class="modal-header">补礼品名单</div>
+      <div class="modal-body">
+        <p class="import-note">批量补录未命中规则但需发放的用户。入选方式记为「补礼品」。已在本礼名单中的用户跳过。</p>
+        <div class="form-field">
+          <label>用户ID<span class="req">*</span></label>
+          <textarea id="makeupUids" placeholder="每行一个用户ID，或用逗号分隔"></textarea>
+        </div>
+        <div class="form-field">
+          <label>备注<span class="req">*</span></label>
+          <textarea id="makeupRemark" placeholder="补发原因，如：客服特批 / 活动补偿"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" type="button" onclick="closeModal('makeupOverlay')">取消</button>
+        <button class="btn btn-primary" type="button" onclick="submitMakeup()">确认添加</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    let gifts = [
+      {
+        id: 'G-008', title: '春节创作者答谢礼',
+        desc: '右豹定制保温壶，致敬持续创作。',
+        intro: '右豹定制保温壶，致敬这一年持续创作的你。\n累计收益达到 5 万即可获得，进度见下方收益统计。\n请保持收获地址有效，缺地址将占名额但暂不寄出。\n物流信息见下方灰色区域，发货满 7 天自动签收。',
+        methods: ['revenue'], namedUids: '', threshold: '50000', range: '2025-01-01 至 2026-01-31',
+        tags: ['实物礼', '春节', '需达5万'],
+        visible: true, creator: '运营小陈', created: '2026-08-20 11:06',
+        coverImg: { name: 'spring-cover.png', size: '186 KB' },
+        detailImg: { name: 'spring-detail.png', size: '412 KB' },
+        posterImg: { name: 'spring-poster.png', size: '628 KB' }
+      },
+      {
+        id: 'G-009', title: '创作者专属礼',
+        desc: '一份只写给你的看见。',
+        intro: '小周，这一份是平台特别为你准备的。\n不必和别人比进度，这是只属于你的看见。\n请保持收获地址有效，我们会尽快寄到你手里。\n物流信息见下方灰色区域，发货满 7 天自动签收。',
+        methods: ['named'], namedUids: 'U-10221', threshold: '', range: '',
+        tags: ['定制礼品', '特别为你'],
+        visible: true, creator: '运营小陈', created: '2026-08-20 11:00',
+        coverImg: { name: 'custom-cover.png', size: '142 KB' },
+        detailImg: { name: 'custom-detail.png', size: '288 KB' },
+        posterImg: { name: 'custom-poster.png', size: '356 KB' }
+      },
+      {
+        id: 'G-007', title: '中秋共庆礼',
+        desc: '官方月饼礼盒，月圆人未散。',
+        intro: '官方中秋月饼礼盒，和平台一起过个团圆节。\n累计收益需达到 8 万。活动已结束，未达标即遗憾错失。\n本礼每人最多一次，错失后不再补发。\n物流信息见下方灰色区域。',
+        methods: ['revenue'], namedUids: '', threshold: '80000', range: '2026-01-01 至 2026-09-17',
+        tags: ['实物礼', '中秋', '需达8万'],
+        visible: false, creator: '运营阿凯', created: '2026-08-01 09:00',
+        coverImg: null, detailImg: null, posterImg: null
+      }
+    ];
+    let rosters = {
+      'G-008': [
+        { uid: 'U-10086', qualify: 'revenue', revenue: '¥52,000', addr: '广东省深圳市南山区科技园路 8 号', carrier: '-', track: '-', status: '已获得', updated: '2026-09-02 10:12', remark: '', inboxGrant: true, inboxShip: false },
+        { uid: 'U-10880', qualify: 'revenue', revenue: '¥52,000', addr: '缺地址', carrier: '-', track: '-', status: '已获得', updated: '2026-09-02 10:12', remark: '', inboxGrant: false, inboxShip: false }
+      ],
+      'G-009': [
+        { uid: 'U-10221', qualify: 'named', revenue: '-', addr: '浙江省杭州市西湖区文三路 12 号', carrier: '京东', track: 'JD6688 2201', status: '已发货', updated: '2026-08-20 11:00', remark: '', inboxGrant: true, inboxShip: true }
+      ],
+      'G-007': []
+    };
+    let currentRosterId = '';
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2500);
+    }
+    function openModal(id) { document.getElementById(id).classList.add('open'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+    function nowStamp() {
+      const d = new Date();
+      const p = n => String(n).padStart(2, '0');
+      return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+    }
+    function rosterOf(id) { return rosters[id] || (rosters[id] = []); }
+    function methodLabel(g) {
+      const map = { named: '指定用户', revenue: '收益达标' };
+      return (g.methods || []).map(m => map[m]).filter(Boolean).join('、') || '—';
+    }
+    function tagsHtml(g) {
+      const tags = g.tags || [];
+      if (!tags.length) return '—';
+      return '<div class="tag-list">' + tags.map(t => '<span class="tag">' + t + '</span>').join('') + '</div>';
+    }
+    function qualifyLabel(u) {
+      if (u.qualify === 'named') return '指定用户';
+      if (u.qualify === 'makeup') return '补礼品';
+      return '收益达标 · ' + (u.revenue || '—');
+    }
+    function statusTag(status) {
+      if (status === '已发货') return 'tag-ok';
+      if (status === '自动签收') return 'tag-ok';
+      return 'tag-muted';
+    }
+
+    function inboxHtml(u) {
+      if (!u.inboxGrant && !u.inboxShip) return '<span class="tag tag-muted">未发</span>';
+      const bits = [];
+      if (u.inboxGrant) bits.push('<span class="tag tag-info">入选已发</span>');
+      if (u.inboxShip) bits.push('<span class="tag tag-ok">发货已发</span>');
+      return '<div class="inbox-tags">' + bits.join('') + '</div>';
+    }
+
+    function rosterStats() {
+      const list = rosterOf(currentRosterId);
+      return {
+        grantPending: list.filter(u => !u.inboxGrant).length,
+        shipPending: list.filter(u => !u.inboxShip).length,
+        missing: list.filter(u => u.addr === '缺地址').length
+      };
+    }
+
+    function renderRosterStats() {
+      const s = rosterStats();
+      const total = rosterOf(currentRosterId).length;
+      document.getElementById('rosterCount').textContent = '共 ' + total + ' 人';
+      document.getElementById('rosterStats').innerHTML = `
+        <span class="stat-chip${s.grantPending ? ' warn' : ''}"><span>入选站内信未发</span><strong>${s.grantPending}</strong></span>
+        <span class="stat-chip${s.shipPending ? ' warn' : ''}"><span>发货站内信未发</span><strong>${s.shipPending}</strong></span>
+        <span class="stat-chip${s.missing ? ' warn' : ''}"><span>缺地址</span><strong>${s.missing}</strong></span>`;
+    }
+
+    function resetGiftFilter() {
+      document.getElementById('giftQ').value = '';
+      document.getElementById('giftVisQ').value = '';
+      renderGifts();
+    }
+
+    function renderGifts() {
+      const q = (document.getElementById('giftQ').value || '').trim();
+      const vis = document.getElementById('giftVisQ').value;
+      const rows = gifts.filter(g => {
+        if (q && !g.title.includes(q) && !g.id.includes(q)) return false;
+        if (vis === 'show' && !g.visible) return false;
+        if (vis === 'hide' && g.visible) return false;
+        return true;
+      });
+      document.getElementById('giftBody').innerHTML = rows.map(g => {
+        const n = rosterOf(g.id).length;
+        return `
+        <tr>
+          <td>${g.id}</td>
+          <td>${g.title}</td>
+          <td>${tagsHtml(g)}</td>
+          <td>${methodLabel(g)}</td>
+          <td><button class="link" type="button" onclick="openRoster('${g.id}')">${n} 人</button></td>
+          <td><span class="tag ${g.visible ? 'tag-ok' : 'tag-muted'}">${g.visible ? '显示' : '隐藏'}</span></td>
+          <td>${g.creator || '—'}</td>
+          <td>${g.created || '—'}</td>
+          <td><button class="link" type="button" onclick="openGiftModal('${g.id}')">编辑</button></td>
+        </tr>`;
+      }).join('');
+    }
+
+    function showAdminPane(id) {
+      document.querySelectorAll('#view-admin .admin-pane').forEach(p => p.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+
+    function openRoster(giftId) {
+      currentRosterId = giftId;
+      const g = gifts.find(x => x.id === giftId);
+      document.getElementById('rosterGiftTitle').textContent = g ? g.title : giftId;
+      document.getElementById('userQ').value = '';
+      document.getElementById('statusQ').value = '';
+      showAdminPane('admin-roster');
+      renderRoster();
+      history.replaceState(null, '', '?tab=admin&roster=' + encodeURIComponent(giftId));
+    }
+
+    function closeRoster() {
+      currentRosterId = '';
+      showAdminPane('admin-gifts');
+      renderGifts();
+      history.replaceState(null, '', '?tab=admin');
+    }
+
+    function renderRoster() {
+      const q = (document.getElementById('userQ').value || '').trim();
+      const st = document.getElementById('statusQ').value;
+      const rows = rosterOf(currentRosterId).filter(u => {
+        if (q && !u.uid.includes(q)) return false;
+        if (st && u.status !== st) return false;
+        return true;
+      });
+      document.getElementById('rosterBody').innerHTML = rows.length ? rows.map(u => `
+        <tr>
+          <td>${u.uid}</td>
+          <td>${qualifyLabel(u)}${u.remark ? '<div class="cell-sub">' + u.remark + '</div>' : ''}</td>
+          <td class="addr-cell">${u.addr === '缺地址' ? '<span class="tag tag-warn">缺地址</span>' : u.addr}</td>
+          <td>${u.carrier}</td>
+          <td>${u.track}</td>
+          <td><span class="tag ${statusTag(u.status)}">${u.status}</span></td>
+          <td>${inboxHtml(u)}</td>
+          <td>${u.updated}</td>
+          <td>
+            <div class="op-stack">
+              ${u.inboxGrant
+                ? '<span class="link off">入选已发</span>'
+                : `<button class="link" type="button" onclick="sendInbox('grant','${u.uid}')">发入选信</button>`}
+              ${u.inboxShip
+                ? '<span class="link off">发货已发</span>'
+                : `<button class="link" type="button" onclick="sendInbox('ship','${u.uid}')">发发货信</button>`}
+            </div>
+          </td>
+        </tr>`).join('') : '<tr><td colspan="9" style="color:var(--text-muted);text-align:center;padding:28px 12px">暂无命中人员</td></tr>';
+      renderRosterStats();
+    }
+
+    function resetUserFilter() {
+      document.getElementById('userQ').value = '';
+      document.getElementById('statusQ').value = '';
+      renderRoster();
+    }
+
+    function selectGrant(kind) {
+      document.getElementById('gNamed').checked = kind === 'named';
+      document.getElementById('gRevenue').checked = kind === 'revenue';
+      syncGrantPills();
+    }
+    function syncGrantPills() {
+      const named = document.getElementById('gNamed').checked;
+      const revenue = document.getElementById('gRevenue').checked;
+      document.getElementById('pillNamed').classList.toggle('active', named);
+      document.getElementById('pillRevenue').classList.toggle('active', revenue);
+      document.getElementById('blockNamed').classList.toggle('show', named);
+      document.getElementById('blockRevenue').classList.toggle('show', revenue);
+    }
+
+    const ATTACH = {
+      coverImg: { box: 'attachCover', input: 'gCoverFile', label: '展示图' },
+      detailImg: { box: 'attachDetail', input: 'gDetailFile', label: '详情图' },
+      posterImg: { box: 'attachPoster', input: 'gPosterFile', label: '弹窗海报' }
+    };
+    let draftImages = { coverImg: null, detailImg: null, posterImg: null };
+    let draftTags = [];
+
+    function renderTagChips() {
+      document.getElementById('gTagChips').innerHTML = draftTags.map((t, i) =>
+        `<span class="tag-chip">${t}<button type="button" aria-label="移除 ${t}" onclick="removeTag(${i})">×</button></span>`
+      ).join('');
+    }
+    function addTag(raw) {
+      const t = (raw || '').trim().replace(/[,，]/g, '');
+      if (!t) return;
+      if (draftTags.includes(t)) { showToast('标签已存在'); return; }
+      if (draftTags.length >= 8) { showToast('最多配置 8 个标签'); return; }
+      draftTags.push(t);
+      renderTagChips();
+    }
+    function removeTag(i) {
+      draftTags.splice(i, 1);
+      renderTagChips();
+    }
+    function bindTagInput() {
+      const input = document.getElementById('gTagInput');
+      if (input.dataset.bound) return;
+      input.dataset.bound = '1';
+      input.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ',') {
+          e.preventDefault();
+          addTag(input.value);
+          input.value = '';
+        } else if (e.key === 'Backspace' && !input.value && draftTags.length) {
+          draftTags.pop();
+          renderTagChips();
+        }
+      });
+      input.addEventListener('blur', () => {
+        if (!input.value.trim()) return;
+        addTag(input.value);
+        input.value = '';
+      });
+    }
+
+    function renderAttach(kind) {
+      const meta = ATTACH[kind];
+      const file = draftImages[kind];
+      const box = document.getElementById(meta.box);
+      if (!file) {
+        box.innerHTML = `<button type="button" class="attach-empty" onclick="pickAttach('${kind}')"><strong>点击上传${meta.label}</strong><span>jpg / png / webp，不超过 5MB</span></button>`;
+        return;
+      }
+      box.innerHTML = `<div class="attach-file">
+        <div class="attach-thumb">IMG</div>
+        <div class="attach-meta"><b>${file.name}</b><i>${file.size}</i></div>
+        <button type="button" class="attach-del" title="移除" onclick="clearAttach('${kind}')">×</button>
+      </div>`;
+    }
+
+    function pickAttach(kind) {
+      const input = document.getElementById(ATTACH[kind].input);
+      input.onchange = () => {
+        const f = input.files && input.files[0];
+        if (!f) return;
+        draftImages[kind] = { name: f.name, size: (f.size / 1024).toFixed(0) + ' KB' };
+        renderAttach(kind);
+        input.value = '';
+      };
+      input.click();
+    }
+
+    function clearAttach(kind) {
+      draftImages[kind] = null;
+      renderAttach(kind);
+    }
+
+    function renderGiftRosterField(id) {
+      const box = document.getElementById('gRosterField');
+      const n = id ? rosterOf(id).length : 0;
+      if (!id) {
+        box.innerHTML = '<span class="cell-sub">保存后按发放人员规则计算命中人数</span>';
+        return;
+      }
+      box.innerHTML = '<button class="link" type="button" onclick="openRosterFromForm()">' + n + ' 人</button><span class="cell-sub"> 点击查看命中人员明细</span>';
+    }
+
+    function openRosterFromForm() {
+      const id = document.getElementById('giftOverlay').dataset.id;
+      if (!id) return;
+      closeModal('giftOverlay');
+      openRoster(id);
+    }
+
+    function openGiftModal(id) {
+      const g = gifts.find(x => x.id === id);
+      document.getElementById('giftModalTitle').textContent = g ? '编辑礼品' : '新增礼品';
+      document.getElementById('gTitle').value = g ? g.title : '';
+      document.getElementById('gDesc').value = g ? (g.desc || '') : '';
+      document.getElementById('gIntro').value = g ? (g.intro || '') : '';
+      document.getElementById('gNamed').checked = g ? g.methods.includes('named') : false;
+      document.getElementById('gRevenue').checked = g ? g.methods.includes('revenue') : false;
+      document.getElementById('gNamedUids').value = g ? (g.namedUids || '') : '';
+      document.getElementById('gThreshold').value = g ? (g.threshold || '') : '';
+      document.getElementById('gRange').value = g ? (g.range || '') : '';
+      document.getElementById('gVisible').value = g ? (g.visible ? 'show' : 'hide') : 'show';
+      document.getElementById('giftOverlay').dataset.id = id || '';
+      draftTags = g ? (g.tags || []).slice() : [];
+      document.getElementById('gTagInput').value = '';
+      renderTagChips();
+      bindTagInput();
+      draftImages.coverImg = g && g.coverImg ? Object.assign({}, g.coverImg) : null;
+      draftImages.detailImg = g && g.detailImg ? Object.assign({}, g.detailImg) : null;
+      draftImages.posterImg = g && g.posterImg ? Object.assign({}, g.posterImg) : null;
+      renderAttach('coverImg');
+      renderAttach('detailImg');
+      renderAttach('posterImg');
+      syncGrantPills();
+      renderGiftRosterField(id || '');
+      openModal('giftOverlay');
+    }
+
+    function saveGift() {
+      const title = document.getElementById('gTitle').value.trim();
+      const named = document.getElementById('gNamed').checked;
+      const revenue = document.getElementById('gRevenue').checked;
+      if (!title) { showToast('请填写礼品标题'); return; }
+      if (named === revenue) { showToast('发放人员请单选指定用户或收益达标'); return; }
+      if (named && !document.getElementById('gNamedUids').value.trim()) { showToast('请填写指定用户ID'); return; }
+      if (revenue && !document.getElementById('gThreshold').value.trim()) { showToast('请填写累计收益达标额'); return; }
+      if (revenue && !document.getElementById('gRange').value.trim()) { showToast('请填写收益统计区间'); return; }
+      const tagInput = document.getElementById('gTagInput').value.trim();
+      if (tagInput) addTag(tagInput);
+      document.getElementById('gTagInput').value = '';
+      const methods = named ? ['named'] : ['revenue'];
+      const payload = {
+        title,
+        desc: document.getElementById('gDesc').value.trim(),
+        intro: document.getElementById('gIntro').value.trim(),
+        tags: draftTags.slice(),
+        methods,
+        namedUids: named ? document.getElementById('gNamedUids').value.trim() : '',
+        threshold: revenue ? document.getElementById('gThreshold').value.trim() : '',
+        range: revenue ? document.getElementById('gRange').value.trim() : '',
+        visible: document.getElementById('gVisible').value !== 'hide',
+        coverImg: draftImages.coverImg,
+        detailImg: draftImages.detailImg,
+        posterImg: draftImages.posterImg
+      };
+      const id = document.getElementById('giftOverlay').dataset.id;
+      if (id) {
+        const g = gifts.find(x => x.id === id);
+        if (g) Object.assign(g, payload);
+      } else {
+        const nid = 'G-00' + (gifts.length + 9);
+        gifts.unshift(Object.assign({ id: nid, creator: '当前运营', created: nowStamp() }, payload));
+        rosterOf(nid);
+      }
+      closeModal('giftOverlay');
+      renderGifts();
+      showToast('Demo 已保存（Mock，不写入后端）');
+    }
+
+    function openImportModal() { openModal('importOverlay'); }
+
+    function submitImport() {
+      closeModal('importOverlay');
+      const list = rosterOf(currentRosterId);
+      const n = list.find(u => u.addr !== '缺地址' && u.status === '已获得');
+      if (n) {
+        n.carrier = '圆通';
+        n.track = 'YT8888 1001';
+        n.status = '已发货';
+        n.updated = nowStamp();
+      }
+      renderRoster();
+      renderGifts();
+      showToast('Demo 已保存（Mock，不写入后端）');
+    }
+
+    function openMakeupModal() {
+      document.getElementById('makeupUids').value = '';
+      document.getElementById('makeupRemark').value = '';
+      openModal('makeupOverlay');
+    }
+
+    function parseUids(raw) {
+      return raw.split(/[\s,，;；]+/).map(s => s.trim()).filter(Boolean);
+    }
+
+    function sendInbox(kind, uid) {
+      const list = rosterOf(currentRosterId);
+      const key = kind === 'ship' ? 'inboxShip' : 'inboxGrant';
+      const label = kind === 'ship' ? '发货站内信' : '入选站内信';
+      const targets = uid ? list.filter(u => u.uid === uid) : list;
+      let sent = 0;
+      let skipped = 0;
+      targets.forEach(u => {
+        if (u[key]) { skipped += 1; return; }
+        u[key] = true;
+        u.updated = nowStamp();
+        sent += 1;
+      });
+      renderRoster();
+      if (!sent) {
+        showToast(uid ? '该用户' + label + '已发，不再发送' : '没有未发送用户，已发的不再发送');
+        return;
+      }
+      showToast('已向 ' + sent + ' 名未发送用户发送' + label + (skipped ? '；已发 ' + skipped + ' 人已跳过' : ''));
+    }
+
+    function submitMakeup() {
+      const uids = parseUids(document.getElementById('makeupUids').value);
+      const remark = document.getElementById('makeupRemark').value.trim();
+      if (!uids.length) { showToast('请输入用户ID'); return; }
+      if (!remark) { showToast('请填写备注'); return; }
+      const list = rosterOf(currentRosterId);
+      const exist = new Set(list.map(u => u.uid));
+      let added = 0;
+      uids.forEach(uid => {
+        if (exist.has(uid)) return;
+        exist.add(uid);
+        list.push({ uid, qualify: 'makeup', revenue: '-', addr: '缺地址', carrier: '-', track: '-', status: '已获得', updated: nowStamp(), remark, inboxGrant: false, inboxShip: false });
+        added += 1;
+      });
+      closeModal('makeupOverlay');
+      renderRoster();
+      renderGifts();
+      showToast(added ? '已补录 ' + added + ' 人（Mock）' : '用户已在本礼名单中，已跳过');
+    }
+
+    function getActiveScreen() {
+      return document.querySelector('.scene-list .scene-btn.active')?.dataset.screen || 'list';
+    }
+    function currentTabKey() {
+      const id = document.querySelector('.page-view.active')?.id;
+      return { 'view-fe': 'fe', 'view-admin': 'admin', 'view-flow': 'flow' }[id] || 'fe';
+    }
+    function syncPageUrl() {
+      const params = new URLSearchParams();
+      params.set('tab', currentTabKey());
+      history.replaceState(null, '', '?' + params.toString());
+    }
+    function buildMockupSrc(screen) {
+      return 'gift-center-demo.html?embed=1&v=rev7&screen=' + screen;
+    }
+    function loadMockupFrame() {
+      document.getElementById('mockupFrame').src = buildMockupSrc(getActiveScreen());
+    }
+
+    document.querySelectorAll('.scene-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.scene-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        syncPageUrl();
+        loadMockupFrame();
+      });
+    });
+    document.querySelectorAll('.page-tab-bar button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.page-tab-bar button').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.page-view').forEach(v => v.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.page).classList.add('active');
+        if (btn.dataset.page === 'view-fe') loadMockupFrame(true);
+        syncPageUrl();
+        syncRuleTabToPage();
+      });
+    });
+    function switchRuleTab(ruleId, btn) {
+      document.querySelectorAll('.rule-tab-bar button').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.rule-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(ruleId).classList.add('active');
+    }
+    document.querySelectorAll('.rule-tab-bar button').forEach(btn => {
+      btn.addEventListener('click', () => switchRuleTab(btn.dataset.rule, btn));
+    });
+    function syncRuleTabToPage() {
+      const activePage = document.querySelector('.page-view.active')?.id;
+      const ruleId = activePage === 'view-admin' ? 'rule-admin' : 'rule-fe';
+      const btn = document.querySelector('.rule-tab-bar button[data-rule="' + ruleId + '"]');
+      if (btn) switchRuleTab(ruleId, btn);
+    }
+    const ruleDrawer = document.getElementById('ruleDrawer');
+    const toggleRuleBtn = document.getElementById('toggleRuleDrawer');
+    function setRuleDrawer(open) {
+      ruleDrawer.classList.toggle('open', open);
+      document.getElementById('ruleOverlay').classList.toggle('open', open);
+      toggleRuleBtn.classList.toggle('active', open);
+      if (open) syncRuleTabToPage();
+    }
+    toggleRuleBtn.onclick = () => setRuleDrawer(!ruleDrawer.classList.contains('open'));
+
+    document.addEventListener('keydown', e => {
+      if (e.key !== 'Escape') return;
+      if (document.querySelector('.modal-overlay.open')) {
+        document.querySelectorAll('.modal-overlay.open').forEach(el => el.classList.remove('open'));
+        return;
+      }
+      setRuleDrawer(false);
+    });
+
+    const params = new URLSearchParams(location.search);
+    const tab = params.get('tab');
+    const tabPageMap = { admin: 'view-admin', flow: 'view-flow', fe: 'view-fe' };
+    if (tab && tabPageMap[tab]) {
+      const btn = document.querySelector('[data-page="' + tabPageMap[tab] + '"]');
+      if (btn) btn.click();
+    }
+    renderGifts();
+    if (params.get('roster')) {
+      const rb = document.querySelector('[data-page="view-admin"]');
+      if (rb && !document.getElementById('view-admin').classList.contains('active')) rb.click();
+      openRoster(params.get('roster'));
+    }
+    if (document.querySelector('.page-view.active')?.id === 'view-fe') loadMockupFrame(true);
+  </script>
+  <script src="sidebar-nav.js"></script>
+</body>
+</html>

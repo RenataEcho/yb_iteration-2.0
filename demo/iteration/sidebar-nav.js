@@ -18,7 +18,9 @@
         { id: 'fr-finance-brand-refund', label: '品牌退款', href: 'fr-finance-brand-refund.html' },
         { id: 'fr-project-estimated-data', label: '预估数据', href: 'fr-project-estimated-data.html' },
         { id: 'fr-project-order-optimize', label: '订单优化', href: 'fr-project-order-optimize.html' },
-        { id: 'fr-activity-center', label: '活动中心', href: 'fr-activity-center.html' }
+        { id: 'fr-activity-center', label: '活动中心', href: 'fr-activity-center.html' },
+        { id: 'fr-project-order-distribute', label: '订单分发', href: 'fr-project-order-distribute.html' },
+        { id: 'fr-gift-center', label: '礼品中心', href: 'fr-gift-center.html' }
       ]
     },
     {

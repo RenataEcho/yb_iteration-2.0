@@ -74,8 +74,7 @@
     }
     .pinned-banner .banner-title { font-size: 17px; font-weight: 800; line-height: 1.35; margin-bottom: 6px; padding-right: 72px; }
     .pinned-banner .banner-sub { font-size: 12px; opacity: .88; line-height: 1.5; margin-bottom: 10px; padding-right: 72px; }
-    .pinned-banner .banner-meta { font-size: 11px; opacity: .78; margin-bottom: 12px; }
-    .pinned-banner .banner-enroll { font-size: 11px; opacity: .92; margin-bottom: 12px; }
+    .pinned-banner .banner-meta { font-size: 11px; opacity: .78; margin-bottom: 8px; }
     .pinned-banner .banner-thumb {
       position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
       width: 64px; height: 80px; border-radius: 8px; background: rgba(255,255,255,.15);
@@ -136,7 +135,12 @@
     }
     .card-footer-left { flex: 1; min-width: 0; }
     .card-time { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
-    .enroll-count { font-size: 12px; color: var(--text-secondary); }
+    .card-stats { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+    .view-count, .enroll-count { font-size: 12px; color: var(--text-secondary); display: inline-flex; align-items: center; gap: 6px; }
+    .enroll-after-img { width: 54px; height: 20px; object-fit: contain; flex-shrink: 0; }
+    .banner-stats { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-bottom: 12px; }
+    .banner-views, .banner-enroll { font-size: 11px; opacity: .92; display: inline-flex; align-items: center; gap: 6px; }
+    .banner-enroll .enroll-after-img { filter: drop-shadow(0 0 2px rgba(0,0,0,.2)); }
     .btn-action {
       flex-shrink: 0; border: none; border-radius: 999px; padding: 8px 18px;
       font-size: 13px; font-weight: 700; cursor: pointer; color: #fff;
@@ -184,7 +188,7 @@
   <div class="demo-shell">
     <div class="demo-header">
       <h1>活动中心 · 前端交互 Demo</h1>
-      <p>保留图1卡片布局；顶部 Banner 展示置顶活动；状态为待开始/进行中/已结束；报名类活动展示「x人已参加」。</p>
+      <p>保留图1卡片布局；卡片展示浏览人数；参加人数由后台虚拟配置，未配置不展示；参加人数后图未配置则不展示。</p>
       <div class="demo-nav" id="screenNav">
         <button type="button" class="active" data-filter="all">全部活动</button>
         <button type="button" data-filter="ongoing">进行中</button>
@@ -217,7 +221,7 @@
         <div class="rule-overlay" id="ruleOverlay" onclick="closeViewRule()"></div>
         <div class="rule-sheet" id="ruleSheet">
           <h3>跳转规则</h3>
-          <p>跳转详情页或者配置的跳转地址</p>
+          <p>配置了跳转链接则跳转配置地址；未配置则进入活动详情页。本需求不重做详情页。</p>
           <button class="btn-close" type="button" onclick="closeViewRule()">我知道了</button>
         </div>
       </div>
@@ -227,6 +231,7 @@
 
   <script>
     const ICON_SVG = '<svg viewBox="0 0 64 64" fill="none"><rect width="64" height="64" rx="12" fill="#fff"/><path d="M32 10c8 6 14 14 14 24 0 8-6 14-14 16-8-2-14-8-14-16C18 24 24 16 32 10z" fill="#ff5722"/><circle cx="38" cy="28" r="4" fill="#fff"/></svg>';
+    const ENROLL_IMG = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="54" height="20" viewBox="0 0 54 20"><circle cx="10" cy="10" r="8" fill="#f59e0b" stroke="#fff" stroke-width="2"/><circle cx="22" cy="10" r="8" fill="#fb7185" stroke="#fff" stroke-width="2"/><circle cx="34" cy="10" r="8" fill="#60a5fa" stroke="#fff" stroke-width="2"/><circle cx="46" cy="10" r="8" fill="#34d399" stroke="#fff" stroke-width="2"/></svg>');
 
     const STATUS_LABEL = { ongoing: '进行中', ended: '已结束', upcoming: '待开始' };
     const STATUS_CLASS = { ongoing: '', ended: 'ended', upcoming: 'upcoming' };
@@ -234,34 +239,35 @@
     const PINNED = {
       id: 'pinned', type: 'registration', status: 'ongoing',
       label: '右豹官方公益计划', title: '3天右豹生态公益培训营',
-      subtitle: '3天学会选赛道·做项目', timeRange: '2026.08.22-2026.08.25', enrolled: 164
+      subtitle: '3天学会选赛道·做项目', timeRange: '2026.08.22-2026.08.25',
+      views: 1280, enrolled: 164, enrollImage: ENROLL_IMG
     };
 
     const ACTIVITIES = [
       {
         id: 'a2', type: 'registration', status: 'ongoing',
         project: '小说推文', title: '小说推文免费培训第 1 期', subtitle: '从选书到发布，官方免费带教',
-        timeRange: '2026.08.22-2026.08.29', enrolled: 164
+        timeRange: '2026.08.22-2026.08.29', views: 860, enrolled: 164, enrollImage: ENROLL_IMG
       },
       {
         id: 'a3', type: 'registration', status: 'ongoing',
         project: '漫剧推广', title: '漫剧推广实战营第 2 期', subtitle: '官方社群答疑 + 实操带练',
-        timeRange: '2026.08.10-2026.08.20', enrolled: 200
+        timeRange: '2026.08.10-2026.08.20', views: 640, enrolled: 200
       },
       {
         id: 'a4', type: 'normal', status: 'upcoming',
         project: '右豹平台', title: '右豹创作者成长计划', subtitle: '官方扶持优质创作者',
-        timeRange: '2026.09.01-2026.09.30'
+        timeRange: '2026.09.01-2026.09.30', views: 0
       },
       {
         id: 'a5', type: 'normal', status: 'ended',
         project: '右豹平台', title: '右豹新人入门指引', subtitle: '快速了解平台核心功能',
-        timeRange: '2026.07.01-2026.07.31'
+        timeRange: '2026.07.01-2026.07.31', views: 320
       },
       {
         id: 'a6', type: 'normal', status: 'ended',
         project: '右豹平台', title: '3天右豹生态公益培训营', subtitle: '3天学会选赛道·做项目',
-        timeRange: '2026.07.22-2026.08.22'
+        timeRange: '2026.07.22-2026.08.22', views: 210, enrolled: 88, enrollImage: ENROLL_IMG
       }
     ];
 
@@ -275,17 +281,30 @@
       return true;
     }
 
+    function hasEnrolled(item) {
+      return item.enrolled !== null && item.enrolled !== undefined && item.enrolled !== '';
+    }
+
+    function enrollAfterImg(item) {
+      return item.enrollImage
+        ? `<img class="enroll-after-img" src="${item.enrollImage}" alt="" />`
+        : '';
+    }
+
     function renderBanner() {
       const el = document.getElementById('pinnedBanner');
-      const enrollLine = PINNED.type === 'registration'
-        ? `<div class="banner-enroll">${PINNED.enrolled}人已参加</div>` : '';
+      const enrollLine = hasEnrolled(PINNED)
+        ? `<span class="banner-enroll">${PINNED.enrolled}人已参加${enrollAfterImg(PINNED)}</span>` : '';
       el.innerHTML = `
         <div class="pinned-banner">
           <div class="banner-label">🎓 ${PINNED.label}</div>
           <div class="banner-title">${PINNED.title}</div>
           <div class="banner-sub">${PINNED.subtitle}</div>
           <div class="banner-meta">活动时间·${PINNED.timeRange}</div>
-          ${enrollLine}
+          <div class="banner-stats">
+            <span class="banner-views">${PINNED.views ?? 0}人浏览</span>
+            ${enrollLine}
+          </div>
           <button class="btn-banner" type="button" onclick="handleAction('${PINNED.id}')">查看</button>
           <div class="banner-thumb">${ICON_SVG}</div>
         </div>`;
@@ -293,8 +312,8 @@
 
     function renderCard(a) {
       const statusCls = STATUS_CLASS[a.status] || '';
-      const enrollBlock = a.type === 'registration'
-        ? `<div class="enroll-count">${a.enrolled}人已参加</div>` : '';
+      const enrollBlock = hasEnrolled(a)
+        ? `<span class="enroll-count">${a.enrolled}人已参加${enrollAfterImg(a)}</span>` : '';
       return `
         <article class="activity-card" data-id="${a.id}">
           <div class="card-top">
@@ -313,7 +332,10 @@
           <div class="card-footer">
             <div class="card-footer-left">
               <div class="card-time">活动时间·${a.timeRange}</div>
-              ${enrollBlock}
+              <div class="card-stats">
+                <span class="view-count">${a.views ?? 0}人浏览</span>
+                ${enrollBlock}
+              </div>
             </div>
             <button class="btn-action" type="button" onclick="handleAction('${a.id}')">查看</button>
           </div>

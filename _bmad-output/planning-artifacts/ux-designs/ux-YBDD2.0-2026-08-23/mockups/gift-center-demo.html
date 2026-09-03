@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>礼品中心 · 前端交互 Demo</title>
+  <style>
+    :root {
+      --orange: #ff5722;
+      --orange-start: #ff8a4c;
+      --orange-light: #fff3eb;
+      --orange-border: #ffd4b8;
+      --bg: #f5f6f8;
+      --surface: #fff;
+      --inner-bg: #f3f4f6;
+      --text: #1a2332;
+      --muted: #6b7280;
+      --text-muted: #9ca3af;
+      --border: #ececec;
+      --phone-w: 375px;
+      --phone-h: 812px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: #e8eaed; min-height: 100vh; color: var(--text);
+    }
+    .demo-shell { display: flex; flex-direction: column; align-items: center; padding: 20px 16px 40px; gap: 16px; }
+    .demo-header { width: 100%; max-width: 960px; background: #fff; border-radius: 12px; padding: 16px 20px; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
+    .demo-header h1 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+    .demo-header p { font-size: 13px; color: var(--muted); line-height: 1.5; }
+    .demo-nav { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .demo-nav button {
+      padding: 6px 12px; border-radius: 999px; border: 1px solid var(--border);
+      background: #fff; font-size: 12px; cursor: pointer; color: var(--muted);
+    }
+    .demo-nav button.active, .demo-nav button:hover {
+      background: var(--orange-light); border-color: var(--orange-border); color: var(--orange); font-weight: 600;
+    }
+    .phone-frame {
+      width: var(--phone-w); height: var(--phone-h);
+      border-radius: 36px; overflow: hidden; position: relative;
+      box-shadow: 0 20px 60px rgba(0,0,0,.18), inset 0 0 0 8px #1a1a1a;
+      background: var(--bg);
+    }
+    .phone-notch {
+      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      width: 120px; height: 28px; background: #1a1a1a; border-radius: 0 0 16px 16px; z-index: 120;
+    }
+    .screen { display: none; flex-direction: column; height: 100%; overflow: hidden; position: relative; }
+    .screen.active { display: flex; }
+    .nav-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 48px 16px 10px; flex-shrink: 0; position: relative; z-index: 2;
+    }
+    .nav-bar .back {
+      width: 32px; height: 32px; border: none; background: none; font-size: 22px; cursor: pointer; color: var(--text);
+    }
+    .nav-bar .title { font-size: 17px; font-weight: 700; flex: 1; text-align: center; margin-right: 32px; }
+    .nav-bar .capsule {
+      position: absolute; right: 16px; top: 48px;
+      display: flex; align-items: center; gap: 6px; padding: 4px 8px;
+      border: 1px solid rgba(0,0,0,.08); border-radius: 999px; background: rgba(255,255,255,.7);
+    }
+    .nav-bar .capsule span { width: 4px; height: 4px; border-radius: 50%; background: #333; }
+    .page-hero {
+      position: relative; margin: -4px 0 14px; padding: 8px 4px 6px;
+      overflow: hidden; pointer-events: none;
+    }
+    .page-hero h2 { font-size: 26px; font-weight: 800; letter-spacing: .02em; line-height: 1.2; }
+    .page-hero p { margin-top: 4px; font-size: 12px; color: var(--muted); }
+    .page-hero .wm {
+      position: absolute; right: -6px; top: -8px; font-size: 52px; font-weight: 800;
+      color: rgba(255,87,34,.08); letter-spacing: .08em; line-height: 1;
+    }
+    .scroll { flex: 1; overflow-y: auto; padding: 0 16px 24px; position: relative; z-index: 1; }
+    #screen-list { background: linear-gradient(180deg, #fff3eb 0%, var(--bg) 120px); position: relative; }
+    .gift-list { display: flex; flex-direction: column; gap: 12px; }
+    .gift-card {
+      border-radius: 14px; background: var(--surface);
+      box-shadow: 0 2px 10px rgba(0,0,0,.04); cursor: pointer; overflow: hidden;
+    }
+    .card-banner {
+      padding: 7px 12px; font-size: 12px; font-weight: 800; letter-spacing: .04em;
+    }
+    .card-banner.won { background: #ff5722; color: #fff; }
+    .card-banner.miss { background: #e5e7eb; color: #6b7280; }
+    .card-banner.pend { background: #fff7ed; color: #d97706; }
+    .card-body { display: flex; gap: 12px; padding: 12px 12px 8px; }
+    .cover-wrap { position: relative; flex-shrink: 0; width: 88px; height: 88px; }
+    .cover {
+      width: 88px; height: 88px; border-radius: 10px; overflow: hidden;
+      background: var(--inner-bg);
+    }
+    .cover svg { width: 100%; height: 100%; display: block; }
+    .gift-mark {
+      position: absolute; top: -4px; left: -4px; z-index: 2;
+      width: 24px; height: 24px; border-radius: 7px;
+      background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.08);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .gift-mark svg { width: 16px; height: 16px; }
+    .card-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+    .card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 4px; }
+    .card-title { font-size: 15px; font-weight: 700; line-height: 1.35; margin-bottom: 4px; }
+    .card-head .card-title { margin-bottom: 0; flex: 1; min-width: 0; }
+    .outcome {
+      flex-shrink: 0; font-size: 10px; font-weight: 700; line-height: 1.4;
+      padding: 1px 6px; border-radius: 4px; white-space: nowrap;
+    }
+    .outcome.won { background: #fff3eb; color: #ff5722; }
+    .outcome.miss { background: #f3f4f6; color: #9ca3af; }
+    .outcome.pend { background: #fff7ed; color: #d97706; }
+    .card-desc { font-size: 12px; color: var(--text-muted); line-height: 1.45; margin-bottom: 6px; }
+    .card-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+    .card-tag {
+      font-size: 10px; color: #6b7280; border: 1px solid #e5e7eb; background: #fafafa;
+      border-radius: 4px; padding: 1px 6px; line-height: 1.5;
+    }
+    .card-time { margin-top: 4px; font-size: 11px; color: var(--text-muted); }
+    .progress-track { height: 5px; border-radius: 99px; background: #f3e6dc; overflow: hidden; margin-bottom: 6px; }
+    .progress-bar {
+      height: 100%; width: 0; border-radius: inherit;
+      background: linear-gradient(90deg, var(--orange-start), var(--orange));
+    }
+    .progress-bar.wait { background: linear-gradient(90deg, #ffcc80, #f59e0b); }
+    .rev-progress {
+      margin: 0 12px 12px; padding: 8px 10px; border-radius: 10px;
+      background: #fff6ee; border: 1px solid #ffd4b8;
+    }
+    .rev-progress .rev-label {
+      font-size: 10px; font-weight: 800; color: #c2410c; letter-spacing: .06em; margin-bottom: 4px;
+    }
+    .rev-row {
+      display: flex; justify-content: space-between; gap: 8px;
+      font-size: 11px; color: var(--text-muted); margin-bottom: 5px;
+    }
+    .rev-row b { color: var(--text); font-weight: 700; }
+    .rev-flag { font-size: 12px; font-weight: 800; }
+    .rev-flag.won { color: var(--orange); }
+    .rev-flag.miss { color: #9ca3af; }
+    .rev-progress.compact {
+      margin: 6px 0 0; padding: 6px 8px; background: rgba(255,255,255,.7);
+    }
+    .rev-progress.compact .rev-label { display: none; }
+    .rev-progress.compact .rev-row { margin-bottom: 3px; font-size: 10px; }
+    .rev-progress.compact .progress-track { height: 4px; margin-bottom: 3px; }
+    .rev-progress.compact .rev-flag { font-size: 10px; }
+    .gift-card.miss { opacity: .92; }
+    .gift-card.miss .rev-progress { background: #f3f4f6; border-color: #e5e7eb; }
+    .sheet .rev-progress { margin: 0 0 12px; }
+    .rev-range { margin-top: 6px; font-size: 11px; color: var(--muted); }
+    .custom-note {
+      margin: 0 12px 12px; padding: 10px 12px; border-radius: 10px;
+      background: #fff8ee; border: 1px dashed #ffd4b8;
+      font-size: 12px; color: #9a5b20; line-height: 1.5;
+    }
+    .sheet .custom-note { margin: 0 0 12px; }
+    .card-banner.named { background: linear-gradient(90deg, #ff8a4c, #ff5722); color: #fff; }
+    .gift-card.named { box-shadow: 0 2px 12px rgba(255,87,34,.08); }
+    .ms-rev { margin-top: 6px; }
+    .ms.miss { --c: #c4c9d1; }
+    .inbox-item {
+      padding: 14px; border-radius: 12px; margin-bottom: 10px; cursor: pointer;
+      background: var(--surface); box-shadow: 0 1px 4px rgba(0,0,0,.04);
+    }
+    .inbox-item .from { font-size: 11px; color: var(--orange); font-weight: 700; margin-bottom: 4px; }
+    .inbox-item h3 { font-size: 15px; margin-bottom: 6px; }
+    .inbox-item p { font-size: 12px; color: var(--muted); line-height: 1.5; }
+    .overlay {
+      position: absolute; inset: 0; z-index: 80; display: none;
+      align-items: flex-end; justify-content: center;
+      background: rgba(26,35,50,.35);
+    }
+    .overlay.show { display: flex; }
+    .overlay.center { align-items: center; }
+    .sheet {
+      width: 100%; max-height: 78%; overflow-y: auto;
+      background: var(--surface); border-radius: 16px 16px 0 0; padding: 16px 16px 28px;
+    }
+    .dialog {
+      width: min(300px, calc(100% - 40px));
+      background: var(--surface); border-radius: 14px; padding: 20px 18px 16px;
+    }
+    .sheet-top, .dialog-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .sheet-top h3, .dialog-top h3 { font-size: 16px; font-weight: 700; }
+    .sheet-close, .dialog-close {
+      width: 28px; height: 28px; border: none; border-radius: 6px; background: var(--inner-bg);
+      cursor: pointer; font-size: 16px; color: var(--muted);
+    }
+    .detail-cover-wrap { position: relative; margin-bottom: 12px; }
+    .detail-cover {
+      height: 148px; border-radius: 12px; overflow: hidden; background: var(--inner-bg);
+    }
+    .detail-cover svg { width: 100%; height: 100%; display: block; }
+    .detail-cover-wrap .gift-mark { top: 8px; left: 8px; width: 28px; height: 28px; }
+    .detail-cover-wrap .gift-mark svg { width: 18px; height: 18px; }
+    .detail-title { font-size: 18px; font-weight: 800; margin-bottom: 8px; }
+    .sheet .outcome { display: inline-flex; margin-bottom: 10px; }
+    .detail-copy { font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: 14px; }
+    .detail-copy p + p { margin-top: 2px; }
+    .track-box {
+      margin-top: 12px; padding: 12px; border-radius: 10px; background: var(--inner-bg);
+      font-size: 12px; color: var(--muted); line-height: 1.55;
+    }
+    .addr-cta, .rule-ok {
+      width: 100%; margin-top: 14px; border: none; border-radius: 999px; padding: 12px;
+      font-size: 14px; font-weight: 700; cursor: pointer; color: #fff;
+      background: linear-gradient(135deg, var(--orange-start), var(--orange));
+    }
+    .rule-copy { font-size: 14px; color: var(--text); line-height: 1.65; }
+    .rule-copy strong { color: var(--orange); }
+    .toast {
+      position: absolute; left: 50%; bottom: 36px; transform: translateX(-50%) translateY(12px);
+      background: rgba(0,0,0,.78); color: #fff; padding: 10px 16px; border-radius: 999px;
+      font-size: 13px; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 200;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    body.embed-mode { background: var(--bg); margin: 0; }
+    body.embed-mode .demo-header, body.embed-mode .demo-nav { display: none !important; }
+    body.embed-mode .demo-shell { padding: 0; min-height: 100vh; }
+    body.embed-mode .phone-frame { width: 100%; max-width: 100%; height: 100vh; border-radius: 0; box-shadow: none; }
+    body.embed-mode .phone-notch { display: none; }
+    body.embed-mode .nav-bar { padding-top: 12px; }
+    body.embed-mode .nav-bar .capsule { top: 12px; }
+  </style>
+</head>
+<body>
+  <div class="demo-shell">
+    <div class="demo-header">
+      <h1>礼品中心 · 前端交互 Demo</h1>
+      <p>节日礼品列表 + 详情弹窗。收益礼看达标进度与获得/错失；指定用户礼为定制礼品卡片。</p>
+      <div class="demo-nav" id="screenNav"></div>
+    </div>
+    <div class="phone-frame">
+      <div class="phone-notch"></div>
+
+      <div class="screen" id="screen-inbox">
+        <div class="nav-bar">
+          <button class="back" type="button" aria-label="返回">‹</button>
+          <div class="title">站内信</div>
+          <div class="capsule" aria-hidden="true"><span></span><span></span><span></span></div>
+        </div>
+        <div class="scroll">
+          <article class="inbox-item" onclick="setScreen('list')">
+            <div class="from">右豹官方</div>
+            <h3>春节答谢礼已发放</h3>
+            <p>小周，平台因你的累计收益送出春节礼，点开礼品中心查看。</p>
+          </article>
+          <article class="inbox-item" onclick="setScreen('shipped')">
+            <div class="from">右豹官方</div>
+            <h3>春节礼已发货</h3>
+            <p>可在礼品中心查看进度与物流单号。</p>
+          </article>
+        </div>
+      </div>
+
+      <div class="screen" id="screen-list">
+        <div class="nav-bar">
+          <button class="back" type="button" aria-label="返回">‹</button>
+          <div class="title">礼品中心</div>
+          <div class="capsule" aria-hidden="true"><span></span><span></span><span></span></div>
+        </div>
+        <div class="scroll">
+          <div class="page-hero">
+            <div class="wm" aria-hidden="true">GIFT</div>
+            <h2>礼品中心</h2>
+            <p>收益达标进度 · 恭喜获得 / 遗憾错失</p>
+          </div>
+          <div class="gift-list" id="giftList"></div>
+        </div>
+      </div>
+
+      <div class="overlay" id="detailOverlay" onclick="if(event.target===this) closeDetail()">
+        <div class="sheet" role="dialog" aria-labelledby="detailTitle">
+          <div class="sheet-top">
+            <h3>礼品详情</h3>
+            <button class="sheet-close" type="button" onclick="closeDetail()">×</button>
+          </div>
+          <div id="detailBody"></div>
+        </div>
+      </div>
+
+      <div class="overlay center" id="ruleOverlay" onclick="if(event.target===this) closeRule()">
+        <div class="dialog" role="dialog" aria-labelledby="ruleTitle">
+          <div class="dialog-top">
+            <h3 id="ruleTitle">跳转提示</h3>
+            <button class="dialog-close" type="button" onclick="closeRule()">×</button>
+          </div>
+          <p class="rule-copy">规则：跳转至现在的<strong>收获地址</strong>页面</p>
+          <button class="rule-ok" type="button" onclick="confirmAddressJump()">我知道了</button>
+        </div>
+      </div>
+
+      <div class="toast" id="toast"></div>
+    </div>
+  </div>
+
+  <script>
+    const GIFT_MARK = '<svg viewBox="0 0 32 32" fill="none"><rect x="6" y="13" width="20" height="14" rx="2" fill="#ff5722"/><rect x="5" y="9" width="22" height="6" rx="1.5" fill="#ff8a4c"/><rect x="14.5" y="9" width="3" height="18" fill="#fff3eb"/><path d="M16 9c-3.2-5-8-4-8 0 4 0 6 3 8 4 2-1 4-4 8-4 0-4-4.8-5-8 0z" fill="#ffcc80"/></svg>';
+    const COVER = {
+      spring: '<svg viewBox="0 0 88 88" fill="none"><rect width="88" height="88" rx="10" fill="#fff1e8"/><path d="M0 62c18-8 28 6 44 2 16-4 24-14 44-8v32H0V62z" fill="#ffcc80"/><rect x="36" y="18" width="6" height="22" rx="3" fill="#c2410c"/><path d="M18 38c0-12 10-18 21-16 2 8-4 16-12 20-5 2-9 1-9-4z" fill="#ff5722"/><path d="M70 38c0-12-10-18-21-16-2 8 4 16 12 20 5 2 9 1 9-4z" fill="#e64a19"/><circle cx="28" cy="40" r="9" fill="#ff8a4c"/><circle cx="60" cy="40" r="9" fill="#ff7043"/><circle cx="39" cy="16" r="3" fill="#ffcc80"/><text x="44" y="74" text-anchor="middle" font-size="11" font-weight="700" fill="#c2410c">春节</text></svg>',
+      autumn: '<svg viewBox="0 0 88 88" fill="none"><rect width="88" height="88" rx="10" fill="#fff6e8"/><circle cx="58" cy="28" r="16" fill="#ffcc80"/><circle cx="62" cy="26" r="10" fill="#ffe0b2"/><ellipse cx="30" cy="58" rx="16" ry="8" fill="#e8c27a"/><path d="M18 56c4-10 20-10 24 0 2 6-4 12-12 12s-14-6-12-12z" fill="#d4a017"/><circle cx="30" cy="54" r="3" fill="#fff3eb"/><path d="M8 70c16-6 28 4 40 0 14-4 22-10 40-4v22H8V70z" fill="#ffd4b8"/><text x="44" y="78" text-anchor="middle" font-size="11" font-weight="700" fill="#b45309">中秋</text></svg>',
+      dragon: '<svg viewBox="0 0 88 88" fill="none"><rect width="88" height="88" rx="10" fill="#fff8ee"/><path d="M0 58c20-10 32 4 48-2 14-6 22-16 40-8v40H0V58z" fill="#e8f5c8"/><path d="M32 24l12 22H20L32 24z" fill="#7cb342"/><path d="M32 28l8 16H24L32 28z" fill="#9ccc65"/><path d="M44 32l12 22H32L44 32z" fill="#558b2f"/><path d="M44 36l8 16H36L44 36z" fill="#8bc34a"/><path d="M12 50c10-8 22-6 28 2" stroke="#ff8a4c" stroke-width="3" fill="none"/><circle cx="64" cy="22" r="5" fill="#ffcc80"/><text x="44" y="76" text-anchor="middle" font-size="11" font-weight="700" fill="#558b2f">端午</text></svg>',
+      newyear: '<svg viewBox="0 0 88 88" fill="none"><rect width="88" height="88" rx="10" fill="#fff3eb"/><circle cx="22" cy="20" r="2" fill="#ff8a4c"/><circle cx="70" cy="16" r="1.6" fill="#ffcc80"/><path d="M44 10l3 8 8 2-6 6 2 8-7-5-7 5 2-8-6-6 8-2 3-8z" fill="#ff5722"/><rect x="24" y="40" width="40" height="30" rx="6" fill="#fff" stroke="#ff5722" stroke-width="2"/><path d="M24 50h40" stroke="#ffd4b8" stroke-width="2"/><text x="44" y="64" text-anchor="middle" font-size="12" font-weight="800" fill="#ff5722">2026</text><text x="44" y="80" text-anchor="middle" font-size="11" font-weight="700" fill="#c2410c">元旦</text></svg>',
+      custom: '<svg viewBox="0 0 88 88" fill="none"><rect width="88" height="88" rx="10" fill="#fff4ea"/><circle cx="44" cy="38" r="18" fill="#ffcc80"/><path d="M32 38h24v22a6 6 0 01-6 6H38a6 6 0 01-6-6V38z" fill="#ff5722"/><rect x="41" y="38" width="6" height="28" fill="#fff3eb"/><path d="M44 28c-4-6-10-5-10 0 5 0 8 4 10 5 2-1 5-5 10-5 0-5-6-6-10 0z" fill="#ff8a4c"/><text x="44" y="78" text-anchor="middle" font-size="11" font-weight="700" fill="#c2410c">定制</text></svg>'
+    };
+
+    const SCREENS = [
+      { id: 'inbox', label: '站内信点入' },
+      { id: 'list', label: '列表' },
+      { id: 'detail', label: '详情弹窗' },
+      { id: 'shipped', label: '已发货' },
+      { id: 'signed', label: '自动签收' },
+      { id: 'missing-address', label: '缺地址' },
+      { id: 'missed', label: '遗憾错失' },
+      { id: 'custom', label: '定制礼品' }
+    ];
+    const USER_REV = 5.2;
+    let currentScene = 'list';
+
+    function fmtWan(n) {
+      const v = Math.round(n * 10) / 10;
+      return (Number.isInteger(v) ? String(v) : v.toFixed(1)) + '万';
+    }
+
+    function outcomeLabel(outcome) {
+      return outcome === 'won' ? '恭喜获得' : outcome === 'miss' ? '遗憾错失' : '待达标';
+    }
+
+    function outcomeBadge(outcome) {
+      return `<span class="outcome ${outcome}">${outcomeLabel(outcome)}</span>`;
+    }
+
+    function revenueProgressHtml(g, compact, showRange) {
+      const pct = g.need <= 0 ? 0 : Math.min(100, Math.round((g.current / g.need) * 100));
+      const reached = g.current >= g.need;
+      const range = showRange && g.range ? `<div class="rev-range">收益统计 ${g.range}</div>` : '';
+      return `<div class="rev-progress${compact ? ' compact' : ''}" aria-label="收益达标进度">
+        <div class="rev-label">收益达标</div>
+        <div class="rev-row"><span>当前累计 <b>${fmtWan(g.current)}</b></span><span>达标 ${fmtWan(g.need)}</span></div>
+        <div class="progress-track"><div class="progress-bar${reached ? '' : ' wait'}" style="width:${pct}%"></div></div>
+        <div class="rev-flag ${reached ? 'won' : 'miss'}">${reached ? '已达标' : '未达标'} · ${fmtWan(g.current)} / ${fmtWan(g.need)}</div>
+        ${range}
+      </div>`;
+    }
+
+    function customNoteHtml() {
+      return `<div class="custom-note">特别为你准备的一份礼，只属于此刻的你</div>`;
+    }
+
+    function logisticsBox(g) {
+      if (g.missing) {
+        return `<div class="track-box">物流状态 · <strong>待发货</strong><br/>收获地址缺失，暂不寄出</div>
+          <button class="addr-cta" type="button" onclick="openAddressRule()">去补全收货地址</button>`;
+      }
+      if (g.outcome === 'miss') {
+        return `<div class="track-box">物流状态 · <strong>未发放</strong><br/>收益尚未达到发放条件，本礼不再寄出</div>`;
+      }
+      if (g.outcome === 'pend') {
+        return `<div class="track-box">物流状态 · <strong>待发放</strong><br/>达标后由平台统一寄出</div>`;
+      }
+      if (g.ship === 'signed' && g.track) {
+        return `<div class="track-box">物流状态 · <strong>已自动签收</strong><br/>单号 ${g.track}</div>`;
+      }
+      if (g.ship === 'shipped' && g.track) {
+        return `<div class="track-box">物流状态 · <strong>已发货</strong><br/>单号 ${g.track}</div>`;
+      }
+      return `<div class="track-box">物流状态 · <strong>待发货</strong><br/>已达标，平台准备寄出</div>`;
+    }
+
+    function giftsForScene(scene) {
+      const current = USER_REV;
+      const springShip = scene === 'signed' ? 'signed' : scene === 'shipped' ? 'shipped' : 'got';
+      const springMissing = scene === 'missing-address';
+      return [
+        {
+          id: 'spring', title: '春节创作者答谢礼', desc: '右豹定制保温壶，致敬持续创作。',
+          cover: COVER.spring, grant: 'revenue', need: 5, current, outcome: 'won',
+          range: '2025-01-01 至 2026-01-31',
+          ship: springShip, missing: springMissing,
+          track: springShip === 'got' || springMissing ? '' : '顺丰 SF1368 2281 9001',
+          tags: ['实物礼', '春节', '需达5万'], updated: scene === 'signed' ? '2026-09-09 10:00' : scene === 'shipped' ? '2026-09-02 14:30' : '2026-02-08 09:12',
+          lines: ['右豹定制保温壶，致敬这一年持续创作的你。', '累计收益达到 5 万即可获得，进度见下方收益统计。', '请保持收获地址有效，缺地址将占名额但暂不寄出。', '物流信息见下方灰色区域，发货满 7 天自动签收。']
+        },
+        {
+          id: 'custom', title: '创作者专属礼', desc: '一份只写给你的看见。',
+          cover: COVER.custom, grant: 'named', outcome: 'won',
+          ship: 'shipped', missing: false, track: '京东 JD6688 2201',
+          tags: ['定制礼品', '特别为你'], updated: '2026-08-20 11:00',
+          lines: ['小周，这一份是平台特别为你准备的。', '不必和别人比进度，这是只属于你的看见。', '请保持收获地址有效，我们会尽快寄到你手里。', '物流信息见下方灰色区域，发货满 7 天自动签收。']
+        },
+        {
+          id: 'dragon', title: '端午安康礼', desc: '箬叶香囊礼盒，端午安康。',
+          cover: COVER.dragon, grant: 'revenue', need: 5, current, outcome: 'won',
+          range: '2026-01-01 至 2026-06-10',
+          ship: 'shipped', missing: false, track: '中通 ZT6621 8800',
+          tags: ['实物礼', '端午', '需达5万'], updated: '2026-06-02 16:40',
+          lines: ['端午安康礼盒，内含箬叶香囊与定制茶食。', '累计收益达到 5 万即可获得。', '已交寄后可在灰色区域查看物流平台与单号。', '签收以满 7 天自动签收或后台状态为准。']
+        },
+        {
+          id: 'autumn', title: '中秋共庆礼', desc: '官方月饼礼盒，月圆人未散。',
+          cover: COVER.autumn, grant: 'revenue', need: 8, current, outcome: 'miss',
+          range: '2026-01-01 至 2026-09-17',
+          ship: 'none', missing: false, track: '',
+          tags: ['实物礼', '中秋', '需达8万'], updated: '2026-09-17 10:00',
+          lines: ['官方中秋月饼礼盒，和平台一起过个团圆节。', '累计收益需达到 8 万。活动已结束，未达标即遗憾错失。', '本礼每人最多一次，错失后不再补发。', '物流信息见下方灰色区域。']
+        },
+        {
+          id: 'newyear', title: '元旦开门礼', desc: '桌面金属日历，往期礼品不下架。',
+          cover: COVER.newyear, grant: 'revenue', need: 1, current, outcome: 'won',
+          range: '2025-01-01 至 2026-01-01',
+          ship: 'signed', missing: false, track: 'YT8888 1001',
+          tags: ['实物礼', '元旦', '需达1万'], updated: '2026-01-08 11:20',
+          lines: ['桌面金属日历，把新的一年摆在手边。', '累计收益达到 1 万即可获得，往期礼品保留在列表。', '已自动签收后仍可在灰色区域核对物流。', '如需改地址，请前往既有收获地址页处理。']
+        }
+      ];
+    }
+
+    function coverHtml(g, wrapClass, coverClass) {
+      return `<div class="${wrapClass}"><span class="gift-mark" aria-hidden="true">${GIFT_MARK}</span><div class="${coverClass}">${g.cover}</div></div>`;
+    }
+
+    function renderList() {
+      document.getElementById('giftList').innerHTML = giftsForScene(currentScene).map(g => `
+        <article class="gift-card ${g.outcome} ${g.grant === 'named' ? 'named' : ''}" data-id="${g.id}">
+          <div class="card-banner ${g.grant === 'named' ? 'named' : g.outcome}">${g.grant === 'named' ? '定制礼品' : outcomeLabel(g.outcome)}</div>
+          <div class="card-body">
+            ${coverHtml(g, 'cover-wrap', 'cover')}
+            <div class="card-main">
+              <div class="card-title">${g.title}</div>
+              <div class="card-desc">${g.desc}</div>
+              <div class="card-tags">${g.tags.map(t => '<span class="card-tag">' + t + '</span>').join('')}</div>
+              <div class="card-time">${g.updated}</div>
+            </div>
+          </div>
+          ${g.grant === 'named' ? customNoteHtml() : revenueProgressHtml(g, false)}
+        </article>`).join('');
+      document.querySelectorAll('#giftList .gift-card').forEach(el => {
+        el.addEventListener('click', () => openDetail(el.dataset.id));
+      });
+    }
+
+    function renderDetail(id) {
+      const g = giftsForScene(currentScene).find(x => x.id === id) || giftsForScene(currentScene)[0];
+      document.getElementById('detailBody').innerHTML = `
+        ${coverHtml(g, 'detail-cover-wrap', 'detail-cover')}
+        <div class="detail-title cert-title" id="detailTitle">${g.title}</div>
+        ${g.grant === 'named' ? '<span class="outcome won">定制礼品</span>' : outcomeBadge(g.outcome)}
+        <div class="detail-copy">${g.lines.map(l => '<p>' + l + '</p>').join('')}</div>
+        ${g.grant === 'named' ? customNoteHtml() : revenueProgressHtml(g, false, true)}
+        ${logisticsBox(g)}`;
+    }
+
+    function openDetail(id) {
+      renderDetail(id);
+      document.getElementById('detailOverlay').classList.add('show');
+    }
+
+    function closeDetail() {
+      document.getElementById('detailOverlay').classList.remove('show');
+    }
+
+    function openAddressRule() {
+      document.getElementById('ruleOverlay').classList.add('show');
+    }
+
+    function closeRule() {
+      document.getElementById('ruleOverlay').classList.remove('show');
+    }
+
+    function confirmAddressJump() {
+      closeRule();
+      toast('规则：跳转至现在的收获地址页面');
+    }
+
+    function showPane(name) {
+      document.getElementById('screen-inbox').classList.toggle('active', name === 'inbox');
+      document.getElementById('screen-list').classList.toggle('active', name === 'list');
+    }
+
+    function setScreen(id) {
+      currentScene = id;
+      closeDetail();
+      closeRule();
+      if (id === 'inbox') {
+        showPane('inbox');
+      } else {
+        showPane('list');
+        renderList();
+        if (id === 'detail' || id === 'shipped' || id === 'signed' || id === 'missing-address') openDetail('spring');
+        if (id === 'missed') openDetail('autumn');
+        if (id === 'custom') openDetail('custom');
+      }
+      document.querySelectorAll('#screenNav button').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.screen === id);
+      });
+      if (window.parent !== window) window.parent.postMessage({ type: 'giftScreen', screen: id }, '*');
+    }
+
+    function toast(msg) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 1800);
+    }
+
+    document.getElementById('screenNav').innerHTML = SCREENS.map(s =>
+      `<button type="button" data-screen="${s.id}">${s.label}</button>`
+    ).join('');
+    document.querySelectorAll('#screenNav button').forEach(btn => {
+      btn.addEventListener('click', () => setScreen(btn.dataset.screen));
+    });
+
+    const params = new URLSearchParams(location.search);
+    if (params.get('embed') === '1') document.body.classList.add('embed-mode');
+    const init = params.get('screen') || 'list';
+    setScreen(SCREENS.some(s => s.id === init) ? init : 'list');
+
+    window.addEventListener('message', e => {
+      if (e.data?.type === 'setScreen' && SCREENS.some(s => s.id === e.data.screen)) setScreen(e.data.screen);
+    });
+  </script>
+</body>
+</html>

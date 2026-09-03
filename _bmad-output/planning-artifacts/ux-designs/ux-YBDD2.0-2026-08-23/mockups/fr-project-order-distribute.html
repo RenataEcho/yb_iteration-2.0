@@ -1,0 +1,1311 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FR-007 · 订单分发 · 右豹迭代需求记录</title>
+  <style>
+    :root {
+      --primary: #2563eb; --primary-hover: #1d4ed8; --primary-light: #eff6ff; --primary-border: #bfdbfe;
+      --accent-rule: #0891b2; --accent-version: #7c3aed; --accent-fr: #d97706;
+      --success: #16a34a; --success-bg: #f0fdf4; --danger: #dc2626; --danger-bg: #fef2f2;
+      --warning: #d97706; --warning-bg: #fffbeb;
+      --info: #0891b2; --info-bg: #ecfeff;
+      --surface: #fff; --surface-glass: rgba(255,255,255,0.72); --surface-hover: #f8fafc; --border: #e8edf3;
+      --text-primary: #18222f; --text-secondary: #4a5568; --text-muted: #9aa5b4;
+      --sidebar-w: 240px; --drawer-w: 560px; --radius-sm: 7px; --radius-lg: 14px;
+      --shadow: 0 8px 32px rgba(30,40,80,0.10);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 13px;
+      color: var(--text-primary);
+      background: linear-gradient(135deg, #e0e7ff 0%, #f0f4f8 40%, #e0f2fe 100%);
+      background-attachment: fixed; min-height: 100vh;
+    }
+    .sidebar {
+      position: fixed; inset: 0 auto 0 0; width: var(--sidebar-w); z-index: 200;
+      display: flex; flex-direction: column;
+      background: rgba(240,244,255,0.95); backdrop-filter: blur(20px);
+      border-right: 1px solid rgba(148,163,196,0.22);
+    }
+    .sidebar-brand { padding: 16px 14px 12px; border-bottom: 1px solid rgba(148,163,196,0.22); }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: linear-gradient(135deg, #2563eb, #7c3aed); color: #fff;
+      display: flex; align-items: center; justify-content: center; font-weight: 700;
+    }
+    .brand-text { font-size: 14px; font-weight: 700; }
+    .brand-sub { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+    .sprint-pill {
+      display: inline-block; margin-top: 10px; font-size: 11px; font-weight: 600;
+      padding: 3px 8px; border-radius: 999px; background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0;
+    }
+    .sidebar-scroll { flex: 1; overflow-y: auto; padding: 8px 0 16px; }
+    .sidebar-foot { padding: 10px 14px 14px; border-top: 1px solid rgba(148,163,196,0.22); font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+    .main { margin-left: var(--sidebar-w); padding: 16px 20px 40px; min-height: 100vh; }
+    .breadcrumb { padding: 4px 0 12px; font-size: 12px; color: var(--text-muted); }
+    .breadcrumb a { color: var(--primary); text-decoration: none; }
+    .page-header { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; }
+    .page-header-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-start; }
+    .page-header h1 { font-size: 19px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .page-desc { font-size: 12px; color: var(--text-muted); max-width: 780px; line-height: 1.55; }
+    .badge { display: inline-flex; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: var(--radius-sm); }
+    .badge-fr { background: #fffbeb; color: var(--accent-fr); border: 1px solid #fde68a; }
+    .badge-version { background: #f5f3ff; color: var(--accent-version); border: 1px solid #ddd6fe; }
+    .page-tab-bar {
+      display: flex; gap: 0; margin-bottom: 16px;
+      background: var(--surface-glass); backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.55); border-radius: var(--radius-lg);
+      padding: 4px; box-shadow: var(--shadow); width: fit-content;
+    }
+    .page-tab-bar button {
+      padding: 8px 20px; border: none; background: transparent; cursor: pointer;
+      font-size: 13px; font-weight: 500; color: var(--text-secondary); border-radius: 10px;
+    }
+    .page-tab-bar button.active { background: var(--primary); color: #fff; font-weight: 600; }
+    .page-view { display: none; }
+    .page-view.active { display: block; }
+    .btn {
+      display: inline-flex; align-items: center; height: 34px; padding: 0 14px;
+      border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid transparent;
+    }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-rule { background: var(--primary-light); color: var(--primary); border-color: var(--primary-border); }
+    .btn-rule.active { background: var(--primary); color: #fff; }
+    .btn-ghost { background: var(--surface); color: var(--text-secondary); border-color: var(--border); }
+    .btn-ghost:hover { background: var(--surface-hover); }
+    .btn-ghost-sm { background: var(--surface); color: var(--text-secondary); border: 1px solid var(--border); height: 32px; padding: 0 12px; border-radius: var(--radius-sm); cursor: pointer; font-size: 12px; }
+    .btn-sm { height: 32px; padding: 0 12px; font-size: 12px; }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .glass-card {
+      background: var(--surface-glass); backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.55); border-radius: var(--radius-lg);
+      box-shadow: var(--shadow); overflow: hidden;
+    }
+    .tab-bar-inline { display: flex; gap: 4px; padding: 12px 16px 0; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+    .tab-bar-inline button {
+      padding: 8px 14px; border: none; background: none; cursor: pointer;
+      font-size: 13px; color: var(--text-secondary); border-bottom: 2px solid transparent; margin-bottom: -1px;
+    }
+    .tab-bar-inline button.active { color: var(--primary); font-weight: 600; border-bottom-color: var(--primary); }
+    .admin-panel { display: none; }
+    .admin-panel.active { display: block; }
+    .rule-note {
+      padding: 10px 12px; border-radius: var(--radius-sm); background: #eff6ff;
+      border: 1px solid var(--primary-border); font-size: 12px; color: #1e40af; line-height: 1.55;
+    }
+    .stats-bar {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 0;
+      border-bottom: 1px solid var(--border); background: rgba(248,250,252,0.85);
+    }
+    .stat-item { padding: 14px 16px; border-right: 1px solid var(--border); }
+    .stat-item:last-child { border-right: none; }
+    .stat-item .label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+    .stat-item .value { font-size: 18px; font-weight: 700; }
+    .table-toolbar { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 8px; }
+    .table-toolbar h3 { font-size: 14px; font-weight: 700; }
+    .toolbar-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .filter-bar { display: flex; flex-wrap: wrap; gap: 10px; padding: 14px 16px; align-items: flex-end; border-bottom: 1px solid var(--border); }
+    .form-field { display: flex; flex-direction: column; gap: 4px; }
+    .form-field > label { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+    .form-field > input[type="text"],
+    .form-field > input[type="file"],
+    .form-field > select {
+      height: 32px; padding: 0 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 12px; min-width: 140px;
+    }
+    .filter-actions { display: flex; gap: 8px; margin-left: auto; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 880px; }
+    table.records-table { min-width: 1180px; }
+    th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); font-size: 12px; vertical-align: top; }
+    th { font-size: 11px; font-weight: 600; color: var(--text-muted); background: rgba(248,250,252,0.9); white-space: nowrap; }
+    tr:hover td { background: var(--surface-hover); }
+    .cell-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .link { color: var(--primary); cursor: pointer; background: none; border: none; padding: 0; font-size: 12px; font-weight: 500; margin-right: 10px; }
+    .link-muted { color: var(--text-muted); }
+    .link-danger { color: var(--danger); margin-right: 0; }
+    .tag { display: inline-flex; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; width: fit-content; white-space: nowrap; }
+    .tag-ok { background: var(--success-bg); color: var(--success); }
+    .tag-warn { background: var(--warning-bg); color: var(--warning); }
+    .tag-danger { background: var(--danger-bg); color: var(--danger); }
+    .tag-info { background: var(--info-bg); color: var(--info); }
+    .tag-muted { background: #f1f5f9; color: var(--text-muted); }
+    .tag-purple { background: #faf5ff; color: #7c3aed; }
+    .empty-hint { padding: 28px 16px; text-align: center; font-size: 12px; color: var(--text-muted); }
+    table.groups-table { min-width: 720px; }
+    td.wrap-cell, th.wrap-cell { white-space: normal; }
+    .agg-cell { white-space: normal; line-height: 1.55; min-width: 200px; }
+    .agg-line { font-size: 12px; color: var(--text-primary); }
+    .agg-line + .agg-line { margin-top: 4px; }
+    .checkbox-item {
+      display: inline-flex; align-items: center; gap: 8px; font-size: 13px;
+      color: var(--text-secondary); cursor: pointer; user-select: none;
+    }
+    .checkbox-item input[type="checkbox"] {
+      width: 16px; height: 16px; margin: 0; padding: 0;
+      flex-shrink: 0; cursor: pointer; accent-color: var(--primary);
+      border: none; min-width: 16px;
+    }
+    .checkbox-item input[type="checkbox"]:disabled { cursor: not-allowed; }
+    .checkbox-item:has(input:disabled) { opacity: 0.45; cursor: not-allowed; }
+    .multi-select { position: relative; width: 100%; }
+    .multi-select-trigger {
+      width: 100%; height: 34px; padding: 0 10px; text-align: left;
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      background: #fff; font-size: 13px; cursor: pointer; color: var(--text-primary);
+    }
+    .multi-select-panel {
+      display: none; position: absolute; left: 0; right: 0; top: calc(100% + 4px);
+      max-height: 240px; overflow-y: auto; z-index: 40;
+      background: #fff; border: 1px solid var(--border); border-radius: var(--radius-sm);
+      box-shadow: var(--shadow); padding: 8px 10px;
+    }
+    .multi-select-panel.open { display: block; }
+    .project-checkbox-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 12px; }
+    .filter-bar .form-field.project-field { min-width: 240px; }
+    #groupOverlay .modal, #importOverlay .modal { width: 720px; overflow: visible; }
+    #groupOverlay .modal-body, #importOverlay .modal-body { overflow: visible; }
+    .modal-body .form-field > label {
+      display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 4px;
+    }
+    .modal-body .multi-select .checkbox-item,
+    .filter-bar .multi-select .checkbox-item {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 13px; color: var(--text-secondary); margin-bottom: 0; font-weight: 400;
+    }
+    .modal-body .multi-select .checkbox-item input[type="checkbox"],
+    .filter-bar .multi-select .checkbox-item input[type="checkbox"] {
+      width: 16px; height: 16px; min-width: 16px; padding: 0; margin: 0; border: none;
+    }
+    .detail-grid { display: grid; gap: 8px; margin-bottom: 16px; }
+    .detail-row {
+      display: flex; justify-content: space-between; gap: 12px; padding: 10px 12px;
+      border-radius: var(--radius-sm); background: #f8fafc; border: 1px solid var(--border); font-size: 12px;
+    }
+    .detail-row .label { color: var(--text-muted); flex-shrink: 0; }
+    .detail-row .value { font-weight: 600; text-align: right; }
+    .import-hint {
+      padding: 10px 12px; background: #f8fafc; border: 1px solid var(--border);
+      border-radius: var(--radius-sm); font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px;
+    }
+    .import-hint code { background: #f1f5f9; padding: 1px 5px; border-radius: 4px; font-size: 11px; }
+    .project-list-box {
+      min-height: 42px; padding: 8px 10px; border: 1px solid var(--border);
+      border-radius: var(--radius-sm); background: #f8fafc; line-height: 1.6;
+      font-size: 12px; color: var(--text-secondary);
+    }
+    .project-chip {
+      display: inline-flex; align-items: center; margin: 2px 6px 2px 0; padding: 3px 8px;
+      border-radius: 999px; background: var(--primary-light); color: var(--primary);
+      border: 1px solid var(--primary-border); font-size: 12px; font-weight: 600;
+    }
+    .checkbox-group { display: flex; flex-wrap: wrap; gap: 16px; padding: 4px 0; }
+    .drawer-overlay, .modal-overlay {
+      position: fixed; inset: 0; background: rgba(15,23,42,0.35); z-index: 500;
+      opacity: 0; pointer-events: none; transition: opacity 0.25s;
+    }
+    .drawer-overlay.open, .modal-overlay.open { opacity: 1; pointer-events: auto; }
+    .drawer {
+      position: fixed; top: 0; right: 0; bottom: 0; width: var(--drawer-w); z-index: 501;
+      background: rgba(255,255,255,0.98); backdrop-filter: blur(12px);
+      box-shadow: -8px 0 40px rgba(30,40,60,0.18);
+      transform: translateX(100%); transition: transform 0.28s ease;
+      display: flex; flex-direction: column;
+      pointer-events: none; visibility: hidden;
+    }
+    .drawer.open { transform: translateX(0); pointer-events: auto; visibility: visible; }
+    .drawer-header { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+    .drawer-header h2 { font-size: 14px; font-weight: 700; }
+    .drawer-header p { font-size: 11px; color: var(--text-muted); margin-top: 2px; line-height: 1.35; }
+    .drawer-close { width: 26px; height: 26px; border: none; background: #f1f5f9; border-radius: 6px; cursor: pointer; font-size: 15px; flex-shrink: 0; }
+    .drawer-body { flex: 1; overflow-y: auto; padding: 10px 14px 16px; }
+    .drawer-footer { padding: 10px 16px 12px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; flex-shrink: 0; }
+    .rule-section { margin-bottom: 22px; }
+    .rule-section h3 { font-size: 14px; font-weight: 700; color: var(--accent-rule); margin-bottom: 8px; }
+    .rule-section h3 span {
+      display: inline-flex; width: 22px; height: 22px; align-items: center; justify-content: center;
+      background: #ecfeff; color: var(--accent-rule); border-radius: 6px; font-size: 12px; margin-right: 8px;
+    }
+    .rule-content { font-size: 13px; color: var(--text-secondary); line-height: 1.65; }
+    .rule-content ul, .rule-content ol { padding-left: 18px; margin-top: 6px; }
+    .rule-content li { margin-bottom: 5px; }
+    .rule-content code { font-family: ui-monospace, monospace; font-size: 12px; background: #f1f5f9; padding: 1px 5px; border-radius: 4px; }
+    .modal {
+      position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.95);
+      width: 480px; max-width: calc(100vw - 32px); z-index: 501;
+      background: #fff; border-radius: var(--radius-lg); box-shadow: 0 16px 48px rgba(30,40,60,0.2);
+      opacity: 0; pointer-events: none; transition: all 0.2s;
+    }
+    .modal-overlay.open .modal { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
+    .modal-header { padding: 16px 20px; border-bottom: 1px solid var(--border); font-size: 15px; font-weight: 700; }
+    .modal-header p { font-size: 12px; color: var(--text-muted); font-weight: 400; margin-top: 4px; }
+    .modal-body { padding: 16px 20px; }
+    .modal-body .form-field { margin-bottom: 12px; }
+    .modal-body .form-field > input[type="text"],
+    .modal-body .form-field > input[type="file"],
+    .modal-body .form-field > select {
+      width: 100%; height: 34px; padding: 0 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; min-width: 0;
+    }
+    .modal-footer { padding: 12px 20px 16px; display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid var(--border); }
+    .flow-page-intro { padding: 16px 18px 0; font-size: 12px; color: var(--text-muted); line-height: 1.55; }
+    .flow-svg-wrap { overflow: auto; padding: 16px 18px 24px; max-height: 72vh; border-top: 1px solid var(--border); }
+    .flow-svg-wrap svg { display: block; margin: 0 auto; min-width: 920px; }
+    .flow-edges line, .flow-edges polyline { stroke: #64748b; stroke-width: 2; fill: none; }
+    .flow-edges.edge-loop line { stroke-dasharray: 6 4; }
+    .flow-legend { display: flex; flex-wrap: wrap; gap: 12px; padding: 0 18px 20px; font-size: 11px; color: var(--text-muted); }
+    .flow-legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 4px; vertical-align: -2px; }
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: #1e293b; color: #fff; padding: 10px 18px; border-radius: 999px; font-size: 13px;
+      opacity: 0; transition: all 0.25s; z-index: 600; pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand">
+        <div class="brand-icon">迭</div>
+        <div>
+          <div class="brand-text">右豹迭代需求记录</div>
+          <div class="brand-sub">PRD Demo · 产品交付研发</div>
+        </div>
+      </div>
+      <span class="sprint-pill">YBDD2.0 · 迭代 v1</span>
+    </div>
+    <div class="sidebar-scroll" data-iteration-sidebar></div>
+    <div class="sidebar-foot">FR-007 · 页内 Tab<br />管理后台 / 业务流程</div>
+  </aside>
+
+  <main class="main">
+    <nav class="breadcrumb">
+      <a href="framework-shell.html">Sprint 概览</a>
+      <span> / 项目管理 / 订单分发</span>
+    </nav>
+
+    <header class="page-header">
+      <div>
+        <h1>
+          订单分发
+          <span class="badge badge-fr">FR-007</span>
+          <span class="badge badge-version">v1 当前</span>
+        </h1>
+        <p class="page-desc">纯管理后台能力：对同组项目<strong>合并上传</strong>官方订单，按订单关键词查询右豹关键词库所属项目，自动分发到对应项目订单。<strong>无 C 端呈现</strong>；官方关键词库共享、不区分体裁。<strong>不支持重新分发</strong>，未匹配单仅可导出。</p>
+      </div>
+      <div class="page-header-actions">
+        <button class="btn btn-rule" id="toggleRuleDrawer" type="button">📋 需求规则</button>
+      </div>
+    </header>
+
+    <div class="page-tab-bar" role="tablist">
+      <button type="button" class="active" data-page="view-admin" role="tab">管理后台</button>
+      <button type="button" data-page="view-flow" role="tab">业务流程</button>
+    </div>
+
+    <div id="view-admin" class="page-view active">
+      <div class="glass-card">
+        <div class="tab-bar-inline" role="tablist" id="adminSubTabs">
+          <button type="button" class="active" data-panel="panel-groups">项目分组</button>
+          <button type="button" data-panel="panel-records">分发记录</button>
+        </div>
+
+        <div id="panel-groups" class="admin-panel active">
+          <div class="table-toolbar">
+            <div>
+              <h3>订单项目分组</h3>
+              <p class="cell-sub" style="margin-top:4px;">仅<strong>同一分组</strong>内的项目可互相分发。一个项目最多属于一组。</p>
+            </div>
+            <button class="btn btn-primary btn-sm" type="button" onclick="openGroupModal()">新增分组</button>
+          </div>
+          <div style="padding:14px 16px 0;">
+            <div class="rule-note">官方侧（如番茄小说）关键词库不区分漫剧/短剧/网文；右豹侧已拆项目。分发时以<strong>右豹关键词库的所属项目</strong>为准，不读取官方体裁。</div>
+          </div>
+          <div class="table-wrap">
+            <table class="groups-table">
+              <colgroup>
+                <col style="width:180px" />
+                <col />
+                <col style="width:80px" />
+                <col style="width:120px" />
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>分组名称</th>
+                  <th>项目成员</th>
+                  <th>项目数</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="groupTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="panel-records" class="admin-panel">
+          <div class="stats-bar" id="recordStats"></div>
+          <div class="table-toolbar">
+            <div>
+              <h3>分发记录</h3>
+              <p class="cell-sub" style="margin-top:4px;">合并上传订单后，系统按关键词自动分发到同组右豹项目，并留下批次结果。</p>
+            </div>
+            <div class="toolbar-actions">
+              <button class="btn btn-primary btn-sm" type="button" onclick="openImportModal()">合并上传并分发</button>
+            </div>
+          </div>
+          <div class="filter-bar">
+            <div class="form-field">
+              <label>所属分组</label>
+              <select id="filterGroup"></select>
+            </div>
+            <div class="form-field">
+              <label>状态</label>
+              <select id="filterStatus">
+                <option value="">全部</option>
+                <option value="done">已完成</option>
+                <option value="partial">部分未匹配</option>
+              </select>
+            </div>
+            <div class="filter-actions">
+              <button class="btn-ghost-sm" type="button" onclick="resetRecordFilter()">重置</button>
+              <button class="btn btn-primary btn-sm" type="button" onclick="renderRecordsTable()">查询</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="records-table">
+              <colgroup>
+                <col style="width:100px" />
+                <col style="width:180px" />
+                <col style="width:80px" />
+                <col style="width:280px" />
+                <col style="width:160px" />
+                <col style="width:140px" />
+                <col style="width:90px" />
+                <col style="width:220px" />
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>批次号</th>
+                  <th>所属分组</th>
+                  <th>上传量</th>
+                  <th class="wrap-cell">已分发</th>
+                  <th class="wrap-cell">未匹配</th>
+                  <th>分发时间</th>
+                  <th>状态</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="recordsBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="view-flow" class="page-view">
+      <div class="glass-card">
+        <p class="flow-page-intro">选择所属分组并合并上传订单 → 加载组内项目与右豹关键词库 → 逐单按关键词查所属项目 → 命中且在组内则写入目标项目订单，未命中记未匹配。无 C 端展示。</p>
+        <div class="flow-svg-wrap">
+          <svg width="980" height="860" viewBox="0 0 980 860" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <marker id="flow-arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+                <path d="M0,0 L10,5 L0,10 Z" fill="#64748b"/>
+              </marker>
+              <marker id="flow-arrow-skip" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+                <path d="M0,0 L10,5 L0,10 Z" fill="#dc2626"/>
+              </marker>
+            </defs>
+
+            <g class="flow-edges" marker-end="url(#flow-arrow)">
+              <line x1="490" y1="52" x2="490" y2="68"/>
+              <line x1="490" y1="116" x2="490" y2="132"/>
+              <line x1="490" y1="212" x2="490" y2="236"/>
+              <line x1="490" y1="276" x2="490" y2="300"/>
+              <line x1="490" y1="324" x2="490" y2="348"/>
+              <line x1="490" y1="396" x2="490" y2="412"/>
+              <line x1="490" y1="492" x2="490" y2="508"/>
+              <line x1="490" y1="588" x2="490" y2="612"/>
+              <line x1="490" y1="652" x2="490" y2="668"/>
+              <line x1="490" y1="748" x2="490" y2="764"/>
+            </g>
+
+            <g class="flow-edges" marker-end="url(#flow-arrow-skip)">
+              <line x1="410" y1="172" x2="180" y2="172"/>
+              <line x1="180" y1="172" x2="180" y2="196"/>
+              <line x1="570" y1="452" x2="800" y2="452"/>
+              <line x1="800" y1="452" x2="800" y2="476"/>
+              <line x1="570" y1="548" x2="800" y2="548"/>
+              <line x1="800" y1="548" x2="800" y2="572"/>
+            </g>
+
+            <g class="flow-edges edge-loop" marker-end="url(#flow-arrow)">
+              <line x1="420" y1="708" x2="90" y2="708"/>
+              <line x1="90" y1="708" x2="90" y2="312"/>
+              <line x1="90" y1="312" x2="360" y2="312"/>
+            </g>
+
+            <g font-family="Inter, PingFang SC, sans-serif">
+              <rect x="330" y="16" width="320" height="36" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
+              <text x="490" y="39" text-anchor="middle" font-size="12" font-weight="600" fill="#18222f">选择所属分组 + 导入合并订单</text>
+
+              <rect x="310" y="68" width="360" height="48" rx="8" fill="#eff6ff" stroke="#2563eb"/>
+              <text x="490" y="88" text-anchor="middle" font-size="12" font-weight="600" fill="#18222f">校验项目是否已入组</text>
+              <text x="490" y="104" text-anchor="middle" font-size="10" fill="#64748b">未入组项目不可发起分发</text>
+
+              <polygon points="490,132 570,172 490,212 410,172" fill="#fffbeb" stroke="#d97706"/>
+              <text x="490" y="176" text-anchor="middle" font-size="11" font-weight="600" fill="#92400e">已入组?</text>
+              <text x="300" y="168" font-size="10" fill="#dc2626">否</text>
+              <text x="580" y="168" font-size="10" fill="#16a34a">是</text>
+
+              <rect x="60" y="196" width="240" height="40" rx="8" fill="#fef2f2" stroke="#dc2626"/>
+              <text x="180" y="221" text-anchor="middle" font-size="11" fill="#991b1b">阻断 · 提示先加入分组</text>
+
+              <rect x="300" y="236" width="380" height="40" rx="8" fill="#eff6ff" stroke="#2563eb"/>
+              <text x="490" y="261" text-anchor="middle" font-size="12" fill="#18222f">加载同组项目 + 右豹关键词库</text>
+
+              <rect x="360" y="300" width="260" height="24" rx="6" fill="#f8fafc" stroke="#94a3b8"/>
+              <text x="490" y="317" text-anchor="middle" font-size="11" fill="#475569">逐单循环 · 每笔订单独立判定</text>
+
+              <rect x="310" y="348" width="360" height="48" rx="8" fill="#eff6ff" stroke="#2563eb"/>
+              <text x="490" y="368" text-anchor="middle" font-size="12" font-weight="600" fill="#18222f">取订单关键词</text>
+              <text x="490" y="384" text-anchor="middle" font-size="10" fill="#64748b">查询右豹关键词库 · 所属项目</text>
+
+              <polygon points="490,412 570,452 490,492 410,452" fill="#fffbeb" stroke="#d97706"/>
+              <text x="490" y="456" text-anchor="middle" font-size="11" font-weight="600" fill="#92400e">命中关键词?</text>
+              <text x="588" y="448" font-size="10" fill="#dc2626">否</text>
+              <text x="500" y="500" font-size="10" fill="#16a34a">是</text>
+
+              <rect x="680" y="476" width="240" height="40" rx="8" fill="#fffbeb" stroke="#d97706"/>
+              <text x="800" y="501" text-anchor="middle" font-size="11" fill="#92400e">未匹配 · 不写入目标项目</text>
+
+              <polygon points="490,508 570,548 490,588 410,548" fill="#fffbeb" stroke="#d97706"/>
+              <text x="490" y="552" text-anchor="middle" font-size="11" font-weight="600" fill="#92400e">目标同组?</text>
+              <text x="588" y="544" font-size="10" fill="#dc2626">否</text>
+              <text x="500" y="596" font-size="10" fill="#16a34a">是</text>
+
+              <rect x="680" y="572" width="240" height="40" rx="8" fill="#fef2f2" stroke="#dc2626"/>
+              <text x="800" y="597" text-anchor="middle" font-size="11" fill="#991b1b">跨组拦截 · 不分发</text>
+
+              <rect x="310" y="612" width="360" height="40" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
+              <text x="490" y="637" text-anchor="middle" font-size="12" fill="#18222f">写入目标项目订单（同项目则保留）</text>
+
+              <polygon points="490,668 560,708 490,748 420,708" fill="#fffbeb" stroke="#d97706"/>
+              <text x="490" y="712" text-anchor="middle" font-size="11" font-weight="600" fill="#92400e">还有下一单?</text>
+              <text x="300" y="704" font-size="10" fill="#64748b">是 · 回逐单</text>
+              <text x="500" y="756" font-size="10" fill="#16a34a">否</text>
+
+              <rect x="310" y="764" width="360" height="48" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
+              <text x="490" y="784" text-anchor="middle" font-size="12" font-weight="600" fill="#18222f">批次汇总写入分发记录</text>
+              <text x="490" y="800" text-anchor="middle" font-size="10" fill="#64748b">已分发 / 未匹配 / 跨组拦截 · 无 C 端</text>
+            </g>
+          </svg>
+        </div>
+        <div class="flow-legend">
+          <span><i style="background:#eff6ff;border:1px solid #2563eb"></i>后端查询 / 写入</span>
+          <span><i style="background:#f0fdf4;border:1px solid #16a34a"></i>上传 / 落库</span>
+          <span><i style="background:#fffbeb;border:1px solid #d97706"></i>校验菱形</span>
+          <span><i style="background:#fef2f2;border:1px solid #dc2626"></i>阻断 / 未匹配 / 跨组</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="modal-overlay" id="groupOverlay">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div>
+          <span id="groupModalTitle">新增分组</span>
+          <p>一个项目只能属于一组；未入组项目不可分发。</p>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="form-field">
+          <label>分组名称 *</label>
+          <input type="text" id="groupNameInput" placeholder="如：番茄小说组" />
+        </div>
+        <div class="form-field">
+          <label>分组成员 *</label>
+          <div class="multi-select" id="editOptimizeProjectsWrap">
+            <button type="button" class="multi-select-trigger" id="editProjectsTrigger" onclick="toggleProjectDropdown('editOptimizeProjectsPanel', event)">
+              <span id="editProjectsSummary">请选择项目</span>
+            </button>
+            <div class="multi-select-panel" id="editOptimizeProjectsPanel"></div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" type="button" onclick="closeGroupModal()">取消</button>
+        <button class="btn btn-primary" type="button" onclick="saveGroup()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="importOverlay">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div>
+          合并上传并分发
+          <p>上传官方合并订单，系统按右豹关键词所属项目自动分发到同组。</p>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="import-hint">模版列：<code>关键词</code>、<code>用户ID</code>、<code>订单金额</code>。Demo 不解析真实文件，确认后按所选分组写入 Mock 订单并分发到组内项目。</div>
+        <div class="form-field">
+          <label>所属分组 *</label>
+          <select id="importGroup"></select>
+        </div>
+        <div class="form-field">
+          <label>组内项目</label>
+          <div class="project-list-box" id="importGroupProjects">请先选择所属分组</div>
+        </div>
+        <div class="form-field">
+          <label>订单 Excel *</label>
+          <input type="file" id="importFile" accept=".xlsx,.xls,.csv" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" type="button" onclick="closeImportModal()">取消</button>
+        <button class="btn btn-primary" type="button" onclick="runImportDistribute()">开始分发</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="confirmOverlay">
+    <div class="modal" style="width:420px;" onclick="event.stopPropagation()">
+      <div class="modal-header" id="confirmTitle">确认删除？</div>
+      <div class="modal-body">
+        <p id="confirmDesc" style="font-size:13px;color:var(--text-secondary);line-height:1.6;"></p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" type="button" onclick="closeConfirmModal()">取消</button>
+        <button class="btn btn-danger" type="button" id="confirmBtn">确认删除</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="drawer-overlay" id="detailOverlay" onclick="closeDetailDrawer()"></div>
+  <aside class="drawer" id="detailDrawer">
+    <div class="drawer-header">
+      <div>
+        <h2 id="detailTitle">分发详情</h2>
+        <p id="detailSub"></p>
+      </div>
+      <button class="drawer-close" type="button" onclick="closeDetailDrawer()">×</button>
+    </div>
+    <div class="drawer-body">
+      <div class="detail-grid" id="detailSummary"></div>
+      <div class="table-wrap">
+        <table style="min-width:480px;">
+          <thead>
+            <tr>
+              <th>关键词</th>
+              <th>右豹所属项目</th>
+              <th>分发结果</th>
+              <th>说明</th>
+            </tr>
+          </thead>
+          <tbody id="detailBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </aside>
+
+  <div class="drawer-overlay" id="ruleOverlay" onclick="setRuleDrawer(false)"></div>
+  <aside class="drawer" id="ruleDrawer" style="width:480px;">
+    <div class="drawer-header">
+      <h2>FR-007 · 需求规则 · v1</h2>
+      <button class="drawer-close" type="button" onclick="setRuleDrawer(false)">×</button>
+    </div>
+    <div class="drawer-body">
+      <div class="rule-section">
+        <h3><span>1</span>业务目标</h3>
+        <div class="rule-content">
+          <p>部分项目在右豹侧已按体裁拆分，但官方未区分，官方关键词库共享。订单在右豹侧仍需按体裁给到对应用户。运营手工筛词分单人效过低，故对部分项目支持<strong>合并上传 + 自动分发</strong>。<strong>无 C 端呈现</strong>。</p>
+        </div>
+      </div>
+      <div class="rule-section">
+        <h3><span>2</span>后台 Tab</h3>
+        <div class="rule-content">
+          <ul>
+            <li><strong>项目分组</strong>：表格展示分组名称与项目成员；新增/编辑用项目多选（交互同订单优化「优化项目」）；仅同组可分发；一个项目最多属于一组。</li>
+            <li><strong>分发记录</strong>：合并上传订单并触发分发；列表看批次结果；详情逐单展示关键词命中与去向。</li>
+          </ul>
+        </div>
+      </div>
+      <div class="rule-section">
+        <h3><span>3</span>项目分组（当前）</h3>
+        <div class="rule-content">
+          <ul>
+            <li>第一组：番茄小说、番茄小说-漫剧、番茄小说-短剧</li>
+            <li>第二组：番茄畅听、番茄畅听-漫剧、番茄畅听-短剧</li>
+            <li>第三组：悟空短剧、悟空网文、悟空漫剧</li>
+            <li>第四组：红果短剧APP-短剧、红果短剧APP-漫剧、红果短剧APP-网文</li>
+          </ul>
+          <p style="margin-top:8px;">未列入以上分组的项目不参与本能力。分组可增删改，但历史分发记录保留当时的分组快照。</p>
+        </div>
+      </div>
+      <div class="rule-section">
+        <h3><span>4</span>分发逻辑</h3>
+        <div class="rule-content">
+          <ul>
+            <li>合并上传时选择<strong>所属分组</strong>，系统展示该组项目 list；以订单关键词查询右豹关键词库所属项目后写入对应项目订单。</li>
+            <li>目标项目必须属于所选分组，否则跨组拦截、不分发。</li>
+            <li>关键词未命中右豹库：记<strong>未匹配</strong>（只汇总笔数与金额），不写入任何目标项目；可导出未匹配单，<strong>不支持重新分发</strong>。</li>
+            <li>本 FR <strong>不新建关键词表</strong>，复用右豹现有关键词库的所属项目字段。</li>
+          </ul>
+        </div>
+      </div>
+      <div class="rule-section">
+        <h3><span>5</span>分发记录字段</h3>
+        <div class="rule-content">
+          <ul>
+            <li>批次号、所属分组、上传订单量、已分发、未匹配、分发时间、状态。不展示上传项目。</li>
+            <li><strong>已分发</strong>按组内项目聚合：<code>项目名：xx笔订单；xxx元</code>。<strong>未匹配</strong>只展示总笔数与金额，不按项目拆分。</li>
+            <li>状态：全部命中且无拦截为「已完成」；存在未匹配或跨组为「部分未匹配」。</li>
+            <li>操作：详情、下载源文件、下载未匹配、删除（需确认）。<strong>不提供重新分发</strong>。</li>
+          </ul>
+        </div>
+      </div>
+      <div class="rule-section">
+        <h3><span>6</span>边界规则</h3>
+        <div class="rule-content">
+          <ul>
+            <li>无 C 端入口、无用户侧交互；仅管理后台导入与结果查询。</li>
+            <li>已写入目标项目的订单不自动回滚；删除记录不影响已落入各项目订单表的数据。</li>
+            <li>批次一旦分发即定稿：已分发与未匹配均不可在本页再次分发；未匹配只能下载后由运营另作处理。</li>
+            <li>官方关键词库共享，不在本能力中按体裁拆官方词库。</li>
+          </ul>
+        </div>
+      </div>
+      <div class="rule-section">
+        <h3><span>7</span>业务流程</h3>
+        <div class="rule-content"><p>见页内「业务流程」Tab。</p></div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="toast" id="toast"></div>
+  <script src="sidebar-nav.js"></script>
+  <script>
+    var PROJECT_LIST = [
+      '番茄小说', '番茄小说-漫剧', '番茄小说-短剧',
+      '知乎故事',
+      '番茄畅听', '番茄畅听-漫剧', '番茄畅听-短剧',
+      '红果短剧APP-短剧', '红果短剧APP-漫剧', '红果短剧APP-网文', '红果漫剧APP',
+      '迅雷网盘', '书旗短篇', '最右',
+      'UC故事会', '起点', 'QQ阅读', '飞卢小说', '七猫小说',
+      '掌阅长篇', '书旗长篇', '盐言星图', '盐言聚星',
+      '悟空网文', '悟空短剧', '悟空漫剧'
+    ];
+
+    var groups = [
+      { id: 'G1', name: '第一组 · 番茄小说', members: ['番茄小说', '番茄小说-漫剧', '番茄小说-短剧'] },
+      { id: 'G2', name: '第二组 · 番茄畅听', members: ['番茄畅听', '番茄畅听-漫剧', '番茄畅听-短剧'] },
+      { id: 'G3', name: '第三组 · 悟空', members: ['悟空短剧', '悟空网文', '悟空漫剧'] },
+      { id: 'G4', name: '第四组 · 红果短剧APP', members: ['红果短剧APP-短剧', '红果短剧APP-漫剧', '红果短剧APP-网文'] }
+    ];
+
+    var keywordLibrary = {
+      '都市修仙': '番茄小说',
+      '玄幻爽文': '番茄小说',
+      '热血漫剧': '番茄小说-漫剧',
+      '古风漫剧': '番茄小说-漫剧',
+      '甜宠短剧': '番茄小说-短剧',
+      '逆袭短剧': '番茄小说-短剧',
+      '有声都市': '番茄畅听',
+      '漫剧电台': '番茄畅听-漫剧',
+      '短剧电台': '番茄畅听-短剧',
+      '悟空热播短剧': '悟空短剧',
+      '悟空网文推荐': '悟空网文',
+      '悟空漫剧精选': '悟空漫剧',
+      '红果热播': '红果短剧APP-短剧',
+      '红果漫剧词': '红果短剧APP-漫剧',
+      '红果网文词': '红果短剧APP-网文'
+    };
+
+    var sampleOrdersByProject = {
+      '番茄小说': [
+        { keyword: '都市修仙', userId: 'U-10001', amount: 128 },
+        { keyword: '热血漫剧', userId: 'U-10002', amount: 86 },
+        { keyword: '甜宠短剧', userId: 'U-10003', amount: 210 },
+        { keyword: '古风漫剧', userId: 'U-10004', amount: 64 },
+        { keyword: '官方未入库词', userId: 'U-10005', amount: 40 },
+        { keyword: '悟空热播短剧', userId: 'U-10006', amount: 33 }
+      ],
+      '番茄畅听': [
+        { keyword: '有声都市', userId: 'U-20001', amount: 72 },
+        { keyword: '漫剧电台', userId: 'U-20002', amount: 55 },
+        { keyword: '短剧电台', userId: 'U-20003', amount: 90 }
+      ],
+      '悟空短剧': [
+        { keyword: '悟空热播短剧', userId: 'U-30001', amount: 150 },
+        { keyword: '悟空网文推荐', userId: 'U-30002', amount: 88 },
+        { keyword: '悟空漫剧精选', userId: 'U-30003', amount: 76 }
+      ],
+      '红果短剧APP-短剧': [
+        { keyword: '红果热播', userId: 'U-40001', amount: 99 },
+        { keyword: '红果漫剧词', userId: 'U-40002', amount: 61 },
+        { keyword: '红果网文词', userId: 'U-40003', amount: 44 },
+        { keyword: '红果未登记词', userId: 'U-40004', amount: 30 }
+      ]
+    };
+
+    var records = [];
+    var editingGroupId = null;
+    var pendingDelete = null;
+
+    function findGroupByProject(project) {
+      return groups.find(function (g) { return g.members.indexOf(project) !== -1; }) || null;
+    }
+
+    function findGroupByName(name) {
+      return groups.find(function (g) { return g.name === name; }) || null;
+    }
+
+    function findGroupById(id) {
+      return groups.find(function (g) { return g.id === id; }) || null;
+    }
+
+    function groupedProjects() {
+      var list = [];
+      groups.forEach(function (g) {
+        g.members.forEach(function (p) { list.push(p); });
+      });
+      return list;
+    }
+
+    function statusMeta(status) {
+      if (status === 'done') return { label: '已完成', cls: 'tag-ok' };
+      return { label: '部分未匹配', cls: 'tag-warn' };
+    }
+
+    function resultMeta(result) {
+      if (result === 'distributed') return { label: '已分发', cls: 'tag-ok' };
+      if (result === 'kept') return { label: '保留源项目', cls: 'tag-info' };
+      if (result === 'blocked') return { label: '跨组拦截', cls: 'tag-danger' };
+      return { label: '未匹配', cls: 'tag-warn' };
+    }
+
+    function distributeOrders(group, orders) {
+      if (!group) return { error: '请选择所属分组' };
+      var details = orders.map(function (order) {
+        var target = keywordLibrary[order.keyword] || null;
+        if (!target) {
+          return { keyword: order.keyword, userId: order.userId, amount: order.amount, target: '—', result: 'unmatched', reason: '右豹关键词库未命中' };
+        }
+        if (group.members.indexOf(target) === -1) {
+          return { keyword: order.keyword, userId: order.userId, amount: order.amount, target: target, result: 'blocked', reason: '所属项目不在所选分组' };
+        }
+        return { keyword: order.keyword, userId: order.userId, amount: order.amount, target: target, result: 'distributed', reason: '写入「' + target + '」订单' };
+      });
+      var distributed = details.filter(function (d) { return d.result === 'distributed'; }).length;
+      var unmatched = details.filter(function (d) { return d.result === 'unmatched' || d.result === 'blocked'; }).length;
+      return {
+        group: group,
+        details: details,
+        uploaded: details.length,
+        distributed: distributed,
+        unmatched: unmatched,
+        status: unmatched ? 'partial' : 'done'
+      };
+    }
+
+    function nowStamp() {
+      var d = new Date();
+      var p = function (n) { return String(n).padStart(2, '0'); };
+      return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+    }
+
+    function formatProjects(arr) {
+      if (!arr || !arr.length) return '未配置';
+      return arr.join('、');
+    }
+
+    function fmtYuan(n) {
+      var val = Math.round((n || 0) * 100) / 100;
+      return (val % 1 === 0 ? String(val) : val.toFixed(2)) + '元';
+    }
+
+    function aggregateDistributed(details, memberOrder) {
+      var map = {};
+      (details || []).forEach(function (d) {
+        if (d.result !== 'distributed' && d.result !== 'kept') return;
+        var key = d.target && d.target !== '—' ? d.target : '未指定项目';
+        if (!map[key]) map[key] = { count: 0, amount: 0 };
+        map[key].count += 1;
+        map[key].amount += d.amount || 0;
+      });
+      var keys = Object.keys(map);
+      if (!keys.length) return '';
+      keys.sort(function (a, b) {
+        var ia = memberOrder ? memberOrder.indexOf(a) : -1;
+        var ib = memberOrder ? memberOrder.indexOf(b) : -1;
+        if (ia === -1) ia = 999;
+        if (ib === -1) ib = 999;
+        return ia - ib;
+      });
+      return keys.map(function (name) {
+        return '<div class="agg-line">' + name + '：' + map[name].count + '笔订单；' + fmtYuan(map[name].amount) + '</div>';
+      }).join('');
+    }
+
+    function formatUnmatchedSummary(details) {
+      var items = (details || []).filter(function (d) { return d.result === 'unmatched' || d.result === 'blocked'; });
+      if (!items.length) return '—';
+      var amount = items.reduce(function (s, d) { return s + (d.amount || 0); }, 0);
+      return items.length + '笔订单；' + fmtYuan(amount);
+    }
+
+    function ordersForGroup(group) {
+      if (!group) return [];
+      var seen = {};
+      var list = [];
+      group.members.forEach(function (project) {
+        (sampleOrdersByProject[project] || []).forEach(function (order) {
+          var key = order.keyword + '|' + order.userId;
+          if (seen[key]) return;
+          seen[key] = true;
+          list.push(order);
+        });
+      });
+      return list.length ? list : [{ keyword: '官方未入库词', userId: 'U-90001', amount: 20 }];
+    }
+
+    function fillGroupSelect(selectId, includeAll) {
+      var sel = document.getElementById(selectId);
+      if (!sel) return;
+      var current = sel.value;
+      var html = includeAll ? '<option value="">全部分组</option>' : '<option value="">请选择分组</option>';
+      html += groups.map(function (g) {
+        return '<option value="' + g.id + '">' + g.name + '</option>';
+      }).join('');
+      sel.innerHTML = html;
+      if (current && groups.some(function (g) { return g.id === current; })) sel.value = current;
+    }
+
+    function renderGroups() {
+      var html = groups.map(function (g) {
+        return '<tr>' +
+          '<td>' + g.name + '</td>' +
+          '<td class="wrap-cell">' + formatProjects(g.members) + '</td>' +
+          '<td>' + g.members.length + '</td>' +
+          '<td>' +
+            '<button class="link" type="button" onclick="openGroupModal(\'' + g.id + '\')">编辑</button>' +
+            '<button class="link link-danger" type="button" onclick="confirmDeleteGroup(\'' + g.id + '\')">删除</button>' +
+          '</td>' +
+        '</tr>';
+      }).join('');
+      document.getElementById('groupTableBody').innerHTML = html || '<tr><td colspan="4" class="empty-hint">暂无分组，请先新增</td></tr>';
+    }
+
+    function renderRecordStats() {
+      var uploaded = records.reduce(function (s, r) { return s + r.uploaded; }, 0);
+      var distributed = records.reduce(function (s, r) { return s + r.distributed; }, 0);
+      var unmatched = records.reduce(function (s, r) { return s + r.unmatched; }, 0);
+      document.getElementById('recordStats').innerHTML =
+        '<div class="stat-item"><div class="label">分发批次</div><div class="value">' + records.length + '</div></div>' +
+        '<div class="stat-item"><div class="label">上传订单</div><div class="value">' + uploaded + '</div></div>' +
+        '<div class="stat-item"><div class="label">已分发 / 已归属</div><div class="value">' + distributed + '</div></div>' +
+        '<div class="stat-item"><div class="label">未匹配 / 拦截</div><div class="value">' + unmatched + '</div></div>';
+    }
+
+    function renderRecordsTable() {
+      var groupId = document.getElementById('filterGroup').value;
+      var status = document.getElementById('filterStatus').value;
+      var rows = records.filter(function (r) {
+        if (groupId && r.groupId !== groupId) return false;
+        if (status && r.status !== status) return false;
+        return true;
+      });
+      document.getElementById('recordsBody').innerHTML = rows.map(function (r) {
+        var st = statusMeta(r.status);
+        var memberOrder = (findGroupById(r.groupId) || findGroupByName(r.groupName) || {}).members || [];
+        var distHtml = aggregateDistributed(r.details, memberOrder) || '—';
+        var missHtml = formatUnmatchedSummary(r.details);
+        var downloadMiss = r.unmatched
+          ? '<button class="link" type="button" onclick="downloadUnmatched(\'' + r.id + '\')">下载未匹配</button>'
+          : '';
+        return '<tr>' +
+          '<td>' + r.id + '</td>' +
+          '<td>' + r.groupName + '</td>' +
+          '<td>' + r.uploaded + '</td>' +
+          '<td class="agg-cell">' + distHtml + '</td>' +
+          '<td>' + missHtml + '</td>' +
+          '<td>' + r.createdAt + '</td>' +
+          '<td><span class="tag ' + st.cls + '">' + st.label + '</span></td>' +
+          '<td>' +
+            '<button class="link" type="button" onclick="openDetailDrawer(\'' + r.id + '\')">详情</button>' +
+            '<button class="link" type="button" onclick="downloadSourceFile(\'' + r.id + '\')">下载源文件</button>' +
+            downloadMiss +
+            '<button class="link link-danger" type="button" onclick="confirmDeleteRecord(\'' + r.id + '\')">删除</button>' +
+          '</td>' +
+        '</tr>';
+      }).join('') || '<tr><td colspan="8" class="empty-hint">暂无符合条件的分发记录</td></tr>';
+      renderRecordStats();
+    }
+
+    function resetRecordFilter() {
+      document.getElementById('filterGroup').value = '';
+      document.getElementById('filterStatus').value = '';
+      showToast('筛选条件已重置');
+    }
+
+    function toggleProjectDropdown(panelId, e) {
+      e.stopPropagation();
+      document.querySelectorAll('.multi-select-panel').forEach(function (panel) {
+        if (panel.id !== panelId) panel.classList.remove('open');
+      });
+      document.getElementById(panelId).classList.toggle('open');
+    }
+
+    function closeProjectDropdown(panelId) {
+      var panel = document.getElementById(panelId);
+      if (panel) panel.classList.remove('open');
+    }
+
+    function closeAllProjectDropdowns() {
+      document.querySelectorAll('.multi-select-panel').forEach(function (panel) {
+        panel.classList.remove('open');
+      });
+    }
+
+    function updateProjectsSummary(elId, projects, emptyText) {
+      var el = document.getElementById(elId);
+      if (!el) return;
+      if (!projects || !projects.length) el.textContent = emptyText || '请选择项目';
+      else if (projects.length <= 2) el.textContent = projects.join('、');
+      else el.textContent = '已选 ' + projects.length + ' 个项目';
+    }
+
+    function readProjectsFromPanel(panelId, name) {
+      var result = [];
+      document.querySelectorAll('#' + panelId + ' input[name="' + name + '"]:checked').forEach(function (cb) {
+        result.push(cb.value);
+      });
+      return result;
+    }
+
+    function setProjectsOnPanel(panelId, name, selected) {
+      document.querySelectorAll('#' + panelId + ' input[name="' + name + '"]').forEach(function (cb) {
+        cb.checked = (selected || []).indexOf(cb.value) >= 0;
+      });
+    }
+
+    function buildProjectCheckboxGrid(name, onchange, disabledMap) {
+      return '<div class="project-checkbox-grid">' + PROJECT_LIST.map(function (p) {
+        var taken = disabledMap && disabledMap[p];
+        return '<label class="checkbox-item"' + (taken ? ' title="' + taken + '"' : '') + '>' +
+          '<input type="checkbox" name="' + name + '" value="' + p + '"' +
+          (taken ? ' disabled' : '') +
+          ' onchange="' + onchange + '" />' + p +
+        '</label>';
+      }).join('') + '</div>';
+    }
+
+    function onOptimizeProjectChange() {
+      updateProjectsSummary('editProjectsSummary', readProjectsFromPanel('editOptimizeProjectsPanel', 'optProject'), '请选择项目');
+    }
+
+    function renderGroupProjectPanel() {
+      var group = editingGroupId ? groups.find(function (g) { return g.id === editingGroupId; }) : null;
+      var used = {};
+      groups.forEach(function (g) {
+        if (group && g.id === group.id) return;
+        g.members.forEach(function (p) { used[p] = '已在' + g.name; });
+      });
+      document.getElementById('editOptimizeProjectsPanel').innerHTML = buildProjectCheckboxGrid('optProject', 'onOptimizeProjectChange()', used);
+      setProjectsOnPanel('editOptimizeProjectsPanel', 'optProject', group ? group.members : []);
+      updateProjectsSummary('editProjectsSummary', group ? group.members.slice() : [], '请选择项目');
+      closeProjectDropdown('editOptimizeProjectsPanel');
+    }
+
+    function openGroupModal(id) {
+      editingGroupId = id || null;
+      var group = id ? groups.find(function (g) { return g.id === id; }) : null;
+      document.getElementById('groupModalTitle').textContent = group ? '编辑分组' : '新增分组';
+      document.getElementById('groupNameInput').value = group ? group.name : '';
+      renderGroupProjectPanel();
+      document.getElementById('groupOverlay').classList.add('open');
+    }
+
+    function closeGroupModal() {
+      closeAllProjectDropdowns();
+      document.getElementById('groupOverlay').classList.remove('open');
+      editingGroupId = null;
+    }
+
+    function saveGroup() {
+      var name = (document.getElementById('groupNameInput').value || '').trim();
+      var members = readProjectsFromPanel('editOptimizeProjectsPanel', 'optProject');
+      if (!name) return showToast('请填写分组名称');
+      if (members.length < 2) return showToast('同组至少选择 2 个项目才可分发');
+      if (editingGroupId) {
+        var g = groups.find(function (x) { return x.id === editingGroupId; });
+        if (g) { g.name = name; g.members = members; }
+        showToast('分组已更新');
+      } else {
+        groups.push({ id: 'G' + Date.now().toString().slice(-4), name: name, members: members });
+        showToast('分组已新增');
+      }
+      closeGroupModal();
+      renderGroups();
+      refreshGroupSelects();
+    }
+
+    function confirmDeleteGroup(id) {
+      var g = groups.find(function (x) { return x.id === id; });
+      if (!g) return;
+      pendingDelete = { type: 'group', id: id };
+      document.getElementById('confirmTitle').textContent = '确认删除？';
+      document.getElementById('confirmDesc').textContent = '即将删除分组「' + g.name + '」，组内项目将无法继续分发。历史分发记录保留。此操作不可撤销。';
+      document.getElementById('confirmBtn').textContent = '确认删除';
+      document.getElementById('confirmOverlay').classList.add('open');
+    }
+
+    function refreshGroupSelects() {
+      fillGroupSelect('filterGroup', true);
+      fillGroupSelect('importGroup', false);
+      updateImportGroupProjects();
+    }
+
+    function updateImportGroupProjects() {
+      var box = document.getElementById('importGroupProjects');
+      var group = findGroupById(document.getElementById('importGroup').value);
+      if (!group) {
+        box.textContent = '请先选择所属分组';
+        return;
+      }
+      box.innerHTML = group.members.map(function (p) {
+        return '<span class="project-chip">' + p + '</span>';
+      }).join('') || '该分组暂无项目';
+    }
+
+    function openImportModal() {
+      refreshGroupSelects();
+      document.getElementById('importFile').value = '';
+      document.getElementById('importOverlay').classList.add('open');
+    }
+
+    function closeImportModal() {
+      closeAllProjectDropdowns();
+      document.getElementById('importOverlay').classList.remove('open');
+    }
+
+    function runImportDistribute() {
+      var group = findGroupById(document.getElementById('importGroup').value);
+      if (!group) return showToast('请选择所属分组');
+      var fileInput = document.getElementById('importFile');
+      var fileName = fileInput && fileInput.files && fileInput.files[0]
+        ? fileInput.files[0].name
+        : (group.name + '_合并订单.xlsx');
+      var result = distributeOrders(group, ordersForGroup(group));
+      if (result.error) return showToast(result.error);
+      records.unshift({
+        id: 'DF-' + String(Date.now()).slice(-6),
+        groupId: group.id,
+        groupName: group.name,
+        uploaded: result.uploaded,
+        distributed: result.distributed,
+        unmatched: result.unmatched,
+        status: result.status,
+        createdAt: nowStamp(),
+        sourceFile: fileName,
+        details: result.details
+      });
+      closeImportModal();
+      var recordsBtn = document.querySelector('#adminSubTabs [data-panel="panel-records"]');
+      if (recordsBtn) switchAdminPanel('panel-records', recordsBtn);
+      renderRecordsTable();
+      showToast('已完成分发，生成批次记录');
+    }
+
+    function openDetailDrawer(id) {
+      var rec = records.find(function (r) { return r.id === id; });
+      if (!rec) return;
+      document.getElementById('detailTitle').textContent = rec.groupName + ' · 分发详情';
+      document.getElementById('detailSub').textContent = rec.id + ' · ' + rec.createdAt;
+      document.getElementById('detailSummary').innerHTML =
+        '<div class="detail-row"><span class="label">上传订单量</span><span class="value">' + rec.uploaded + '</span></div>' +
+        '<div class="detail-row"><span class="label">已分发 / 已归属</span><span class="value">' + rec.distributed + '</span></div>' +
+        '<div class="detail-row"><span class="label">未匹配 / 拦截</span><span class="value">' + rec.unmatched + '</span></div>';
+      document.getElementById('detailBody').innerHTML = rec.details.map(function (d) {
+        var meta = resultMeta(d.result);
+        return '<tr><td>' + d.keyword + '<div class="cell-sub">' + d.userId + '</div></td><td>' + d.target + '</td>' +
+          '<td><span class="tag ' + meta.cls + '">' + meta.label + '</span></td><td>' + d.reason + '</td></tr>';
+      }).join('');
+      document.getElementById('detailOverlay').classList.add('open');
+      document.getElementById('detailDrawer').classList.add('open');
+    }
+
+    function closeDetailDrawer() {
+      document.getElementById('detailOverlay').classList.remove('open');
+      document.getElementById('detailDrawer').classList.remove('open');
+    }
+
+    function downloadSourceFile(id) {
+      var rec = records.find(function (r) { return r.id === id; });
+      showToast(rec ? ('Demo：已开始下载源文件 ' + (rec.sourceFile || rec.id + '_源文件.xlsx')) : '记录不存在');
+    }
+
+    function downloadUnmatched(id) {
+      var rec = records.find(function (r) { return r.id === id; });
+      showToast(rec ? ('Demo：已开始下载 ' + rec.id + ' 未匹配订单') : '记录不存在');
+    }
+
+    function confirmDeleteRecord(id) {
+      var rec = records.find(function (r) { return r.id === id; });
+      if (!rec) return;
+      pendingDelete = { type: 'record', id: id };
+      document.getElementById('confirmTitle').textContent = '确认删除？';
+      document.getElementById('confirmDesc').textContent = '即将删除批次「' + rec.id + '」记录。已写入各项目订单表的数据不回滚。此操作不可撤销。';
+      document.getElementById('confirmBtn').textContent = '确认删除';
+      document.getElementById('confirmOverlay').classList.add('open');
+    }
+
+    function closeConfirmModal() {
+      document.getElementById('confirmOverlay').classList.remove('open');
+      pendingDelete = null;
+    }
+
+    function applyConfirm() {
+      if (!pendingDelete) return;
+      if (pendingDelete.type === 'group') {
+        groups = groups.filter(function (g) { return g.id !== pendingDelete.id; });
+        renderGroups();
+        refreshGroupSelects();
+        showToast('已删除分组');
+      } else if (pendingDelete.type === 'record') {
+        records = records.filter(function (r) { return r.id !== pendingDelete.id; });
+        renderRecordsTable();
+        showToast('已删除分发记录');
+      }
+      closeConfirmModal();
+    }
+
+    function showToast(msg) {
+      var t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(function () { t.classList.remove('show'); }, 2200);
+    }
+
+    function setRuleDrawer(open) {
+      document.getElementById('ruleOverlay').classList.toggle('open', open);
+      document.getElementById('ruleDrawer').classList.toggle('open', open);
+      document.getElementById('toggleRuleDrawer').classList.toggle('active', open);
+    }
+
+    function switchPageTab(pageId, btn) {
+      document.querySelectorAll('.page-tab-bar button').forEach(function (b) { b.classList.remove('active'); });
+      document.querySelectorAll('.page-view').forEach(function (v) { v.classList.remove('active'); });
+      btn.classList.add('active');
+      document.getElementById(pageId).classList.add('active');
+      var tabMap = { 'view-admin': 'admin', 'view-flow': 'flow' };
+      var params = new URLSearchParams(location.search);
+      params.set('tab', tabMap[pageId] || 'admin');
+      history.replaceState(null, '', '?' + params.toString());
+    }
+
+    function switchAdminPanel(panelId, btn) {
+      document.querySelectorAll('#adminSubTabs button').forEach(function (b) { b.classList.remove('active'); });
+      document.querySelectorAll('#view-admin .admin-panel').forEach(function (p) { p.classList.remove('active'); });
+      btn.classList.add('active');
+      var panel = document.getElementById(panelId);
+      if (panel) panel.classList.add('active');
+      var subMap = { 'panel-groups': 'groups', 'panel-records': 'records' };
+      var params = new URLSearchParams(location.search);
+      params.set('tab', 'admin');
+      if (subMap[panelId]) params.set('sub', subMap[panelId]);
+      history.replaceState(null, '', '?' + params.toString());
+    }
+
+    function seedRecords() {
+      ['G1', 'G3', 'G4'].forEach(function (groupId, idx) {
+        var group = findGroupById(groupId);
+        var result = distributeOrders(group, ordersForGroup(group));
+        records.push({
+          id: 'DF-00' + (idx + 1),
+          groupId: group.id,
+          groupName: group.name,
+          uploaded: result.uploaded,
+          distributed: result.distributed,
+          unmatched: result.unmatched,
+          status: result.status,
+          createdAt: ['2026-09-01 14:20', '2026-09-01 11:05', '2026-08-31 16:40'][idx],
+          sourceFile: group.name + '_合并订单.xlsx',
+          details: result.details
+        });
+      });
+    }
+
+    function closeTopLayer() {
+      if (document.getElementById('confirmOverlay').classList.contains('open')) return closeConfirmModal();
+      if (document.getElementById('importOverlay').classList.contains('open')) return closeImportModal();
+      if (document.getElementById('groupOverlay').classList.contains('open')) return closeGroupModal();
+      if (document.getElementById('detailDrawer').classList.contains('open')) return closeDetailDrawer();
+      if (document.getElementById('ruleDrawer').classList.contains('open')) return setRuleDrawer(false);
+    }
+
+    function initPage() {
+      document.getElementById('toggleRuleDrawer').addEventListener('click', function () {
+        setRuleDrawer(!document.getElementById('ruleDrawer').classList.contains('open'));
+      });
+      document.querySelectorAll('.page-tab-bar button').forEach(function (btn) {
+        btn.addEventListener('click', function () { switchPageTab(btn.dataset.page, btn); });
+      });
+      document.querySelectorAll('#adminSubTabs [data-panel]').forEach(function (btn) {
+        btn.addEventListener('click', function () { switchAdminPanel(btn.dataset.panel, btn); });
+      });
+      document.getElementById('confirmBtn').addEventListener('click', applyConfirm);
+      document.addEventListener('click', function (e) {
+        if (e.target.closest && e.target.closest('.multi-select')) return;
+        closeAllProjectDropdowns();
+      });
+      document.getElementById('groupOverlay').addEventListener('click', function (e) {
+        if (e.target === this) closeGroupModal();
+      });
+      document.getElementById('importOverlay').addEventListener('click', function (e) {
+        if (e.target === this) closeImportModal();
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeTopLayer();
+      });
+
+      refreshGroupSelects();
+      document.getElementById('importGroup').addEventListener('change', updateImportGroupProjects);
+      seedRecords();
+      renderGroups();
+      renderRecordsTable();
+
+      var params = new URLSearchParams(location.search);
+      var tabPageMap = { admin: 'view-admin', flow: 'view-flow' };
+      var tab = params.get('tab') || 'admin';
+      var pageBtn = document.querySelector('[data-page="' + (tabPageMap[tab] || 'view-admin') + '"]');
+      if (pageBtn) switchPageTab(tabPageMap[tab] || 'view-admin', pageBtn);
+      var subPanelMap = { groups: 'panel-groups', records: 'panel-records' };
+      var sub = params.get('sub');
+      if (sub && subPanelMap[sub]) {
+        var subBtn = document.querySelector('#adminSubTabs [data-panel="' + subPanelMap[sub] + '"]');
+        if (subBtn) switchAdminPanel(subPanelMap[sub], subBtn);
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initPage);
+    } else {
+      initPage();
+    }
+  </script>
+</body>
+</html>

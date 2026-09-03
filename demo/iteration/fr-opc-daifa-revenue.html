@@ -353,7 +353,11 @@
         <div class="glass-card scene-panel">
           <h2>场景切换</h2>
           <div class="scene-list">
-            <button class="scene-btn active" type="button" data-screen="screen-main-home" data-alloc-type="account">
+            <button class="scene-btn active" type="button" data-screen="screen-main-home-empty">
+              <div class="scene-title">图1 · 代发收益管理（主用户 · 缺省空态）</div>
+              <div class="scene-desc">分配信息与子用户信息均不存在时展示；引导添加子用户，不展示 Tab</div>
+            </button>
+            <button class="scene-btn" type="button" data-screen="screen-main-home" data-alloc-type="account">
               <div class="scene-title">图1 · 代发收益管理（主用户 · 发布帐号归因）</div>
               <div class="scene-desc">首页统一：分配金额/总金额/分配比例/分配用户（子用户昵称）/分配时间；含查看详情入口</div>
             </button>
@@ -377,8 +381,16 @@
               <div class="scene-title">图3 · 协议确认（子用户）</div>
               <div class="scene-desc">占位页：使用现在已经实现的接受邀请页面；子用户仅此一页</div>
             </button>
+            <button class="scene-btn" type="button" data-screen="screen-income-main">
+              <div class="scene-title">图4 · 项目收益明细（主用户）</div>
+              <div class="scene-desc">既有页新增记录：标题「收益自动分配」；金额为负；状态「收益分配」；描述含前往分配页入口</div>
+            </button>
+            <button class="scene-btn" type="button" data-screen="screen-income-sub">
+              <div class="scene-title">图4.1 · 项目收益明细（子用户）</div>
+              <div class="scene-desc">既有页新增记录：标题「收益自动分配」；金额为正；状态「收益分配」；描述不含跳转</div>
+            </button>
           </div>
-          <div class="scene-note">主用户 C 端<strong>所有页面均无顶部数据统计</strong>。子用户<strong>仅协议确认页</strong>（图3）。添加子用户、接受协议分别复用已实现的发送邀请/接受邀请页面，本 Demo 不重做表单与按钮。<br><strong>管理后台</strong>见页内 Tab「管理后台」→ 主子分配关系 → 操作「详情」→ Tab「分配详情」。</div>
+          <div class="scene-note">主用户 C 端<strong>所有代发收益页均无顶部数据统计</strong>。分配信息与子用户均不存在时展示<strong>缺省空态</strong>（图1 空态）。子用户<strong>无代发收益子页</strong>，协议确认后在既有<strong>项目收益明细</strong>查看分配入账。<br><strong>管理后台</strong>见页内 Tab「管理后台」→ 主子分配关系 → 操作「详情」→ Tab「分配详情」。</div>
         </div>
         <div class="glass-card mockup-panel">
           <div class="mockup-frame-wrap">
@@ -636,14 +648,14 @@
                 <text x="480" y="206" text-anchor="middle" font-size="10" fill="#64748b">更新数据更新时间</text>
                 <rect x="40" y="248" width="220" height="72" rx="8" fill="#eff6ff" stroke="#2563eb"/>
                 <text x="150" y="274" text-anchor="middle" font-size="11" fill="#18222f">
-                  <tspan x="150" dy="0">主用户 C 端</tspan><tspan x="150" dy="14">分配详情 / 导出</tspan>
+                  <tspan x="150" dy="0">主用户 C 端</tspan><tspan x="150" dy="14">分配信息 + 项目收益明细</tspan>
                 </text>
-                <text x="150" y="306" text-anchor="middle" font-size="10" fill="#64748b">含分配时间字段</text>
+                <text x="150" y="306" text-anchor="middle" font-size="10" fill="#64748b">明细金额为负 · 收益分配</text>
                 <rect x="40" y="348" width="220" height="72" rx="8" fill="#eff6ff" stroke="#2563eb"/>
                 <text x="150" y="374" text-anchor="middle" font-size="11" fill="#18222f">
-                  <tspan x="150" dy="0">子用户 C 端</tspan><tspan x="150" dy="14">协议确认（仅此一页）</tspan>
+                  <tspan x="150" dy="0">子用户 C 端</tspan><tspan x="150" dy="14">项目收益明细 +xx.xx</tspan>
                 </text>
-                <text x="150" y="406" text-anchor="middle" font-size="10" fill="#64748b">同意后流程结束</text>
+                <text x="150" y="406" text-anchor="middle" font-size="10" fill="#64748b">状态「收益分配」</text>
                 <rect x="700" y="248" width="220" height="72" rx="8" fill="#eff6ff" stroke="#2563eb"/>
                 <text x="810" y="274" text-anchor="middle" font-size="11" fill="#18222f">
                   <tspan x="810" dy="0">管理后台</tspan><tspan x="810" dy="14">关键词详情 list</tspan>
@@ -795,6 +807,10 @@
           <div class="rule-content">
             <ul>
               <li><strong>代发收益管理（主用户 · 通用）</strong>：个人中心入口「代发收益」；<strong>不展示顶部数据统计</strong>（无累计已分配/子用户数/关键词数/授权帐号等 hero 区，两种分配类型一致）；右上角规则 icon +「添加」；Tab = 分配信息 / 子用户信息。</li>
+              <li><strong>代发收益管理（主用户 · 缺省空态）</strong>：当<strong>分配信息与子用户信息均不存在</strong>时，不展示 Tab，展示缺省页（插画 +「暂无分配信息与子用户」+ 引导添加）；右上角「添加」与主按钮均进入发起协议页。任一 Tab 有数据后恢复正常 Tab 首页。</li>
+              <li><strong>项目收益明细（既有页 · 新增记录）</strong>：分配完成后写入一条「收益自动分配」记录，卡片沿用既有列表样式（标题 / 金额 / 描述 / 状态 / 时间戳）。</li>
+              <li><strong>项目收益明细 · 主用户</strong>：标题「收益自动分配」；描述「y-m-d产生收益自动分配 xx.xx(可前往收益分配页面查看明细)」；时间为收益分配时间戳；<strong>金额为负数</strong>；状态「收益分配」。描述中「可前往收益分配页面查看明细」跳转代发收益管理。</li>
+              <li><strong>项目收益明细 · 子用户</strong>：标题「收益自动分配」；描述「y-m-d产生收益自动分配 xx.xx」；时间为收益分配时间戳；<strong>金额为正数</strong>；状态「收益分配」。</li>
               <li><strong>分配信息 Tab（两种分配类型 · 首页一致）</strong>：record-card 标题「分配金额·xxx」+ 灰底字段域，五列 = <strong>分配金额、总金额、分配比例、分配用户</strong>（子用户右豹昵称）、<strong>分配时间</strong>。</li>
               <li><strong>分配信息 Tab · 发布帐号归因</strong>：首页字段同上；卡片含「查看详情」入口，下钻至分配详情页。</li>
               <li><strong>分配信息 Tab · 右豹ID直接分配</strong>：首页字段同上；无查看详情、不可下钻。</li>
@@ -820,7 +836,8 @@
               <li><strong>右豹ID直接分配 · 子用户信息 Tab</strong>：列表仅展示已分配金额与分配比例；不展示授权帐号；卡片不可点击、无 › 查看详情入口。</li>
               <li>代发收益首页分配 record-card <strong>不展示</strong>「代发」标签与「不可撤回」说明；与 FR-001 代发分配 C 端展示区分。</li>
               <li>发布帐号授权走<strong>三方 API 对接</strong>，本 FR 不重定义三方授权步骤，仅展示授权结果。</li>
-              <li>子用户 C 端<strong>不提供</strong>「我的代发收益」页；收益在项目收益钱包等既有入口查看（本 FR 不重定义）。</li>
+              <li>子用户 C 端<strong>不提供</strong>「我的代发收益」页；收益在既有<strong>项目收益明细</strong>查看，本 FR 仅新增「收益自动分配」记录类型，不重做该页布局。</li>
+              <li>主用户项目收益明细中的分配记录金额为<strong>负向</strong>（转出）；子用户为<strong>正向</strong>（转入）；状态固定「收益分配」。</li>
             </ul>
           </div>
         </div>
@@ -832,6 +849,8 @@
               <li>协议「已拒绝」时不可参与分配；主用户可重发协议邀请。</li>
               <li>三方授权失效后，该发布帐号新出单不参与分配；历史分配记录保留。</li>
               <li>分配明细须包含<strong>分配时间</strong>字段（主/子/export 同步）。</li>
+              <li>分配完成后须同步写入主/子用户<strong>项目收益明细</strong>：「收益自动分配」记录；主负子正；状态「收益分配」；时间戳=分配时间。</li>
+              <li>代发收益管理缺省空态仅在<strong>分配信息与子用户信息同时为空</strong>时展示；仅某一 Tab 为空时仍显示 Tab，对应列表为空即可。</li>
               <li>与 FR-001 代发分配：<strong>分配引擎复用</strong>，关系模型与授权方式独立，同一发布帐号不建议同时参与两套代发（互斥规则待技术确认）。</li>
             </ul>
           </div>
@@ -894,6 +913,7 @@
               <li>「右豹ID直接分配」关系<strong>不要求</strong>发布帐号三方授权；「以发布帐号归因分配」关系须授权有效方可分配。</li>
               <li>关键词累计产生收益、累计分配以<strong>数据更新时间</strong>为准展示。</li>
               <li>代发收益分配写入时 <code>分配行为=系统自动</code>，<code>业务来源=代发收益</code>。</li>
+              <li>分配成功后同步写入主/子 C 端<strong>项目收益明细</strong>（主负子正，状态「收益分配」）。</li>
               <li>三方授权回调失败或超时时，C 端展示授权中/失败状态，不写入有效授权记录。</li>
             </ul>
           </div>
@@ -1385,12 +1405,12 @@
     function getActiveScene() {
       const btn = document.querySelector('.scene-btn.active');
       return {
-        screen: btn?.dataset.screen || 'screen-main-home',
+        screen: btn?.dataset.screen || 'screen-main-home-empty',
         allocType: btn?.dataset.allocType || 'account',
       };
     }
 
-    const MOCKUP_VER = '20260826d';
+    const MOCKUP_VER = '20260903a';
 
     function buildMockupSrc(screen, allocType) {
       const params = new URLSearchParams({ embed: '1', screen, allocType: allocType || 'account', v: MOCKUP_VER });

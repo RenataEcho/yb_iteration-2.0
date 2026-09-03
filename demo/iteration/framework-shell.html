@@ -112,7 +112,7 @@
     .summary-card .label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
     .summary-card .value { font-size: 22px; font-weight: 700; }
     .table-head, .table-row {
-      display: grid; grid-template-columns: 100px 1fr 120px 100px 100px 80px;
+      display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
       gap: 8px; padding: 12px 16px; align-items: center;
     }
     .table-head {
@@ -132,10 +132,59 @@
     .badge-fr { background: #fffbeb; color: var(--accent-fr); border: 1px solid #fde68a; }
     .badge-version { background: #f5f3ff; color: var(--accent-version); border: 1px solid #ddd6fe; }
     .badge-template { background: var(--primary-light); color: var(--primary); border: 1px solid var(--primary-border); }
-    .badge-status { background: var(--success-bg); color: var(--success); border: 1px solid #bbf7d0; }
+    .status-select-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      transition: background 0.16s ease, color 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+    }
+    .status-select-wrap.badge-status-todo { background: #f8fafc; color: #64748b; border-color: #e2e8f0; }
+    .status-select-wrap.badge-status-dev { background: #ecfeff; color: #0891b2; border-color: #a5f3fc; }
+    .status-select-wrap.badge-status-live { background: var(--success-bg); color: var(--success); border-color: #bbf7d0; }
+    .status-select-wrap::after {
+      content: '';
+      position: absolute;
+      right: 7px;
+      top: 50%;
+      width: 5px;
+      height: 5px;
+      border-right: 1.5px solid currentColor;
+      border-bottom: 1.5px solid currentColor;
+      transform: translateY(-70%) rotate(45deg);
+      pointer-events: none;
+      opacity: 0.65;
+    }
+    .status-select-wrap:hover { filter: brightness(0.97); }
+    .status-select-wrap:focus-within { box-shadow: 0 0 0 2px rgba(37,99,235,0.18); }
+    .status-select {
+      appearance: none;
+      -webkit-appearance: none;
+      background: transparent;
+      border: none;
+      color: inherit;
+      font: inherit;
+      font-size: 11px;
+      font-weight: 600;
+      line-height: 1.2;
+      padding: 3px 20px 3px 8px;
+      cursor: pointer;
+      width: fit-content;
+      white-space: nowrap;
+    }
+    .status-select:focus { outline: none; }
     .card-title {
       padding: 14px 16px; font-size: 14px; font-weight: 700;
       border-bottom: 1px solid var(--border);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
     }
   </style>
 </head>
@@ -153,7 +202,7 @@
       <span class="sprint-pill">YBDD2.0 · 迭代 v1</span>
     </div>
     <div class="sidebar-scroll" data-iteration-sidebar></div>
-    <div class="sidebar-foot">迭代需求 FR-002~006 · 废纸篓 FR-001</div>
+    <div class="sidebar-foot">迭代需求 FR-002~008 · 废纸篓 FR-001</div>
   </aside>
 
   <main class="main">
@@ -161,14 +210,14 @@
     <header class="page-header">
       <div class="page-header-left">
         <h1>YBDD2.0 · 迭代需求总览</h1>
-        <p class="page-desc">统一入口：「迭代需求」含代发收益 (FR-002)、品牌退款 (FR-003)、预估数据 (FR-004)、订单优化 (FR-005)、活动中心 (FR-006)；暂不需要的需求归入「废纸篓」，如代发分配 (FR-001)。</p>
+        <p class="page-desc">统一入口：「迭代需求」含代发收益 (FR-002)、品牌退款 (FR-003)、预估数据 (FR-004)、订单优化 (FR-005)、活动中心 (FR-006)、订单分发 (FR-007)、礼品中心 (FR-008)；暂不需要的需求归入「废纸篓」，如代发分配 (FR-001)。</p>
       </div>
     </header>
 
     <div class="summary-grid">
       <div class="summary-card">
         <div class="label">迭代需求 · FR 数</div>
-        <div class="value">5</div>
+        <div class="value">7</div>
       </div>
       <div class="summary-card">
         <div class="label">废纸篓 · FR 数</div>
@@ -176,73 +225,129 @@
       </div>
       <div class="summary-card">
         <div class="label">模板 A · 管理后台</div>
-        <div class="value">4</div>
+        <div class="value">6</div>
       </div>
       <div class="summary-card">
         <div class="label">状态</div>
-        <div class="value" style="font-size:16px;color:#059669;">Demo 待评审</div>
+        <div class="value" id="sprint-status-summary" style="font-size:16px;color:#0891b2;">开发中</div>
       </div>
     </div>
 
     <div class="glass-card">
       <div class="card-title">迭代需求</div>
       <div class="table-head">
-        <span>FR-ID</span><span>需求名称</span><span>业务模块</span><span>模板</span><span>版本</span><span>状态</span>
+        <span>FR-ID</span><span>需求名称</span><span>模板</span><span>版本</span><span>状态</span>
       </div>
       <div class="table-row">
         <span class="badge badge-fr">FR-002</span>
         <span><a href="fr-opc-daifa-revenue.html">代发收益</a></span>
-        <span>OPC协作结算</span>
         <span class="badge badge-template">B + A</span>
         <span class="badge badge-version">v1</span>
-        <span class="badge badge-status">待评审</span>
+        <label class="status-select-wrap badge-status-dev">
+          <select class="status-select" data-fr="FR-002" aria-label="调整 FR-002 状态">
+            <option value="todo">待开始</option>
+            <option value="dev" selected>开发中</option>
+            <option value="live">已上线</option>
+          </select>
+        </label>
       </div>
       <div class="table-row">
         <span class="badge badge-fr">FR-003</span>
         <span><a href="fr-finance-brand-refund.html">品牌退款</a></span>
-        <span>财务</span>
         <span class="badge badge-template">B卡片 + A</span>
         <span class="badge badge-version">v1</span>
-        <span class="badge badge-status">待评审</span>
+        <label class="status-select-wrap badge-status-dev">
+          <select class="status-select" data-fr="FR-003" aria-label="调整 FR-003 状态">
+            <option value="todo">待开始</option>
+            <option value="dev" selected>开发中</option>
+            <option value="live">已上线</option>
+          </select>
+        </label>
       </div>
       <div class="table-row">
         <span class="badge badge-fr">FR-004</span>
         <span><a href="fr-project-estimated-data.html">预估数据</a></span>
-        <span>项目管理</span>
         <span class="badge badge-template">A</span>
         <span class="badge badge-version">v1</span>
-        <span class="badge badge-status">待评审</span>
+        <label class="status-select-wrap badge-status-dev">
+          <select class="status-select" data-fr="FR-004" aria-label="调整 FR-004 状态">
+            <option value="todo">待开始</option>
+            <option value="dev" selected>开发中</option>
+            <option value="live">已上线</option>
+          </select>
+        </label>
       </div>
       <div class="table-row">
         <span class="badge badge-fr">FR-005</span>
         <span><a href="fr-project-order-optimize.html">订单优化</a></span>
-        <span>项目管理</span>
         <span class="badge badge-template">A</span>
         <span class="badge badge-version">v1</span>
-        <span class="badge badge-status">待评审</span>
+        <label class="status-select-wrap badge-status-dev">
+          <select class="status-select" data-fr="FR-005" aria-label="调整 FR-005 状态">
+            <option value="todo">待开始</option>
+            <option value="dev" selected>开发中</option>
+            <option value="live">已上线</option>
+          </select>
+        </label>
       </div>
       <div class="table-row">
         <span class="badge badge-fr">FR-006</span>
         <span><a href="fr-activity-center.html">活动中心</a></span>
-        <span>运营</span>
         <span class="badge badge-template">B + A</span>
         <span class="badge badge-version">v1</span>
-        <span class="badge badge-status">待评审</span>
+        <label class="status-select-wrap badge-status-dev">
+          <select class="status-select" data-fr="FR-006" aria-label="调整 FR-006 状态">
+            <option value="todo">待开始</option>
+            <option value="dev" selected>开发中</option>
+            <option value="live">已上线</option>
+          </select>
+        </label>
+      </div>
+      <div class="table-row">
+        <span class="badge badge-fr">FR-007</span>
+        <span><a href="fr-project-order-distribute.html">订单分发</a></span>
+        <span class="badge badge-template">A</span>
+        <span class="badge badge-version">v1</span>
+        <label class="status-select-wrap badge-status-todo">
+          <select class="status-select" data-fr="FR-007" aria-label="调整 FR-007 状态">
+            <option value="todo" selected>待开始</option>
+            <option value="dev">开发中</option>
+            <option value="live">已上线</option>
+          </select>
+        </label>
+      </div>
+      <div class="table-row">
+        <span class="badge badge-fr">FR-008</span>
+        <span><a href="fr-gift-center.html">礼品中心</a></span>
+        <span class="badge badge-template">B + A</span>
+        <span class="badge badge-version">v1</span>
+        <label class="status-select-wrap badge-status-todo">
+          <select class="status-select" data-fr="FR-008" aria-label="调整 FR-008 状态">
+            <option value="todo" selected>待开始</option>
+            <option value="dev">开发中</option>
+            <option value="live">已上线</option>
+          </select>
+        </label>
       </div>
     </div>
 
     <div class="glass-card">
       <div class="card-title">废纸篓</div>
       <div class="table-head">
-        <span>FR-ID</span><span>需求名称</span><span>业务模块</span><span>模板</span><span>版本</span><span>状态</span>
+        <span>FR-ID</span><span>需求名称</span><span>模板</span><span>版本</span><span>状态</span>
       </div>
       <div class="table-row">
         <span class="badge badge-fr">FR-001</span>
         <span><a href="fr-opc-daifa-allocation.html">代发分配</a></span>
-        <span>OPC协作结算</span>
         <span class="badge badge-template">B + A</span>
         <span class="badge badge-version">v1</span>
-        <span class="badge badge-status" style="background:#f8fafc;color:#64748b;border-color:#e2e8f0;">暂存</span>
+        <label class="status-select-wrap badge-status-todo">
+          <select class="status-select" data-fr="FR-001" data-scope="trash" aria-label="调整 FR-001 状态">
+            <option value="todo" selected>待开始</option>
+            <option value="dev">开发中</option>
+            <option value="live">已上线</option>
+          </select>
+        </label>
       </div>
     </div>
 
@@ -253,5 +358,66 @@
     </div>
   </main>
   <script src="sidebar-nav.js"></script>
+  <script>
+    (function () {
+      var STORAGE_KEY = 'ybdd-sprint-fr-status';
+      var STATUS = {
+        todo: { label: '待开始', cls: 'badge-status-todo', color: '#64748b' },
+        dev: { label: '开发中', cls: 'badge-status-dev', color: '#0891b2' },
+        live: { label: '已上线', cls: 'badge-status-live', color: '#16a34a' }
+      };
+      var CLASS_LIST = ['badge-status-todo', 'badge-status-dev', 'badge-status-live'];
+
+      function load() {
+        try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); }
+        catch (e) { return {}; }
+      }
+      function save(map) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(map));
+      }
+      function applySelect(el, value) {
+        var meta = STATUS[value] || STATUS.todo;
+        el.value = meta === STATUS[value] ? value : 'todo';
+        var wrap = el.closest('.status-select-wrap');
+        if (!wrap) return;
+        wrap.classList.remove.apply(wrap.classList, CLASS_LIST);
+        wrap.classList.add(meta.cls);
+      }
+      function deriveSprintStatus(selects) {
+        var values = [];
+        selects.forEach(function (el) {
+          if (el.getAttribute('data-scope') !== 'trash') values.push(el.value);
+        });
+        if (!values.length) return 'dev';
+        var allLive = values.every(function (v) { return v === 'live'; });
+        var allTodo = values.every(function (v) { return v === 'todo'; });
+        if (allLive) return 'live';
+        if (allTodo) return 'todo';
+        return 'dev';
+      }
+      function updateSummary(selects) {
+        var key = deriveSprintStatus(selects);
+        var el = document.getElementById('sprint-status-summary');
+        if (!el) return;
+        el.textContent = STATUS[key].label;
+        el.style.color = STATUS[key].color;
+      }
+
+      var stored = load();
+      var selects = document.querySelectorAll('.status-select');
+      selects.forEach(function (el) {
+        var fr = el.getAttribute('data-fr');
+        var value = STATUS[stored[fr]] ? stored[fr] : el.value;
+        applySelect(el, value);
+        el.addEventListener('change', function () {
+          stored[fr] = el.value;
+          save(stored);
+          applySelect(el, el.value);
+          updateSummary(selects);
+        });
+      });
+      updateSummary(selects);
+    })();
+  </script>
 </body>
 </html>

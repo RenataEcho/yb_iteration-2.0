@@ -359,19 +359,60 @@
       font-size: 16px; font-weight: 600; line-height: 1.7; color: var(--text-secondary);
       max-width: 280px;
     }
+    .empty-page {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      min-height: calc(100% - 24px); padding: 56px 28px 80px; text-align: center;
+    }
+    .empty-illus {
+      width: 112px; height: 112px; margin-bottom: 18px;
+      border-radius: 50%; background: var(--tag-bg);
+      display: grid; place-items: center;
+    }
+    .empty-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .empty-desc {
+      font-size: 13px; color: var(--text-muted); line-height: 1.65;
+      max-width: 260px; margin-bottom: 24px;
+    }
+    .empty-page .btn-primary { width: auto; min-width: 168px; padding: 0 28px; }
+    .income-summary {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 2px 2px 12px; font-size: 13px;
+    }
+    .income-summary .period { color: #9ca3af; }
+    .income-summary .period-amt { color: var(--orange-text); font-weight: 600; }
+    .income-filter {
+      border: none; background: none; font-size: 13px; color: #6b7280; cursor: pointer;
+    }
+    .income-card {
+      background: #fff; border-radius: 12px; padding: 14px 16px; margin-bottom: 10px;
+    }
+    .income-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+    .income-name { font-size: 15px; font-weight: 700; color: #111; line-height: 1.35; }
+    .income-amt { font-size: 18px; font-weight: 700; color: var(--orange-text); white-space: nowrap; }
+    .income-mid { margin-top: 6px; }
+    .income-desc { font-size: 13px; color: #999; line-height: 1.5; flex: 1; min-width: 0; }
+    .income-status { font-size: 13px; color: #999; flex-shrink: 0; }
+    .income-link {
+      color: var(--orange-text); font-weight: 500; cursor: pointer;
+    }
+    .income-meta { font-size: 12px; color: #bbb; margin-top: 8px; }
+    .income-time { font-size: 12px; color: #bbb; margin-top: 8px; }
   </style>
 </head>
 <body>
   <div class="demo-shell">
     <div class="demo-header">
       <h1>代发收益 · 前端交互 Demo</h1>
-      <p>主用户：无顶部统计；子用户仅协议确认页；发起/接受协议复用已实现页面</p>
+      <p>主用户：无顶部统计；首次进入空态；项目收益明细写入分配记录；子用户仅协议确认 + 收益明细</p>
       <div class="demo-nav" id="screenNav">
-        <button class="active" data-screen="screen-main-home">主 · 代发收益管理</button>
+        <button class="active" data-screen="screen-main-home-empty">主 · 代发收益管理（空态）</button>
+        <button data-screen="screen-main-home">主 · 代发收益管理</button>
         <button data-screen="screen-main-alloc-list" data-hide-in-direct>主 · 分配信息详情</button>
         <button data-screen="screen-main-sub-detail" data-hide-in-direct>主 · 子用户详情</button>
         <button data-screen="screen-main-invite">主 · 发起协议</button>
         <button data-screen="screen-sub-agreement">子 · 协议确认</button>
+        <button data-screen="screen-income-main">主 · 项目收益明细</button>
+        <button data-screen="screen-income-sub">子 · 项目收益明细</button>
       </div>
       <div class="demo-nav" id="allocTypeNav" style="margin-top:8px">
         <button type="button" class="active" data-alloc-mode="account">分配类型 · 发布帐号归因</button>
@@ -381,10 +422,38 @@
 
     <div class="phone-frame">
       <div class="phone-notch"></div>
-      <div class="fe-revision-bar embed-only">FR-002 · 首页统一五字段 · 发布帐号归因可下钻详情</div>
+      <div class="fe-revision-bar embed-only">FR-002 · 空态 + 项目收益明细写入分配记录</div>
+
+      <!-- 主 · 代发收益管理（空态） -->
+      <div id="screen-main-home-empty" class="screen active">
+        <div class="status-bar"><span>9:41</span><span>●●●</span></div>
+        <div class="nav-bar">
+          <button class="back" aria-label="返回">‹</button>
+          <span class="title">代发收益</span>
+          <div class="nav-actions">
+            <button class="rule-icon" type="button" onclick="openRules()" title="分配规则">ⓘ</button>
+            <button class="action" type="button" onclick="goTo('screen-main-invite')">添加</button>
+          </div>
+        </div>
+        <div class="scroll-content">
+          <div class="empty-page">
+            <div class="empty-illus" aria-hidden="true">
+              <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+                <circle cx="20" cy="20" r="8" stroke="#ff5722" stroke-width="2.2"/>
+                <circle cx="36" cy="22" r="7" stroke="#ff8a4c" stroke-width="2.2"/>
+                <path d="M8 42c1.6-7 6.4-10.5 12-10.5S30.4 35 32 42" stroke="#ff5722" stroke-width="2.2" stroke-linecap="round"/>
+                <path d="M32 40.5c1.4-5.2 5.2-8 10-8 4.6 0 8.4 2.6 10 7.5" stroke="#ff8a4c" stroke-width="2.2" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="empty-title">暂无分配信息与子用户</div>
+            <p class="empty-desc">分配记录和子用户都还没有。添加子用户并完成协议后，系统会按约定比例自动分配收益。</p>
+            <button class="btn-primary" type="button" onclick="goTo('screen-main-invite')">添加子用户</button>
+          </div>
+        </div>
+      </div>
 
       <!-- 主 · 代发收益管理 -->
-      <div id="screen-main-home" class="screen active">
+      <div id="screen-main-home" class="screen">
         <div class="status-bar"><span>9:41</span><span>●●●</span></div>
         <div class="nav-bar">
           <button class="back" aria-label="返回">‹</button>
@@ -523,15 +592,6 @@
             </div>
           </div>
         </div>
-        <div class="overlay" id="rulesOverlay" onclick="closeRules()"></div>
-        <div class="rules-sheet" id="rulesSheet">
-          <h3>分配规则</h3>
-          <div class="step"><div class="dot"></div><div><strong>发起协议</strong><p class="desc" style="margin-top:4px">主用户添加子用户并约定分配比例，子用户确认后关系生效。</p></div></div>
-          <div class="step mode-account-only"><div class="dot"></div><div><strong>授权发布帐号</strong><p class="desc" style="margin-top:4px">子用户通过三方接口将发布帐号授权给主用户。</p></div></div>
-          <div class="step mode-account-only"><div class="dot"></div><div><strong>关键词出单分配</strong><p class="desc" style="margin-top:4px">出单后按关键词→发布帐号→比例自动分配，不可撤回。</p></div></div>
-          <div class="step mode-direct-only"><div class="dot"></div><div><strong>收益直接分配</strong><p class="desc" style="margin-top:4px">出单后按约定比例自动分配至子用户项目收益钱包，不可撤回。</p></div></div>
-          <button class="btn-secondary" style="margin-top:14px" onclick="closeRules()">我知道了</button>
-        </div>
       </div>
 
       <!-- 主 · 分配信息详情 -->
@@ -656,6 +716,138 @@
             <p class="reuse-text">使用现在已经实现的<strong>接受邀请</strong>页面</p>
           </div>
         </div>
+      </div>
+
+      <!-- 主 · 项目收益明细 -->
+      <div id="screen-income-main" class="screen">
+        <div class="status-bar"><span>9:41</span><span>●●●</span></div>
+        <div class="nav-bar">
+          <button class="back" aria-label="返回">‹</button>
+          <span class="title">项目收益明细</span>
+          <span style="width:32px"></span>
+        </div>
+        <div class="scroll-content">
+          <div class="income-summary">
+            <div><span class="period">该段收入 · </span><span class="period-amt">8888.88元</span></div>
+            <button class="income-filter" type="button">全部时间 ▾</button>
+          </div>
+          <div class="income-card">
+            <div class="income-row">
+              <div class="income-name">收益自动分配</div>
+              <div class="income-amt">-520.00</div>
+            </div>
+            <div class="income-row income-mid">
+              <div class="income-desc">2026-08-13产生收益自动分配 520.00<span class="income-link" onclick="goTo('screen-main-home')">(可前往收益分配页面查看明细)</span></div>
+              <div class="income-status">收益分配</div>
+            </div>
+            <div class="income-time">2026.08.13 00:03:21</div>
+          </div>
+          <div class="income-card">
+            <div class="income-row">
+              <div class="income-name">标题名称</div>
+              <div class="income-amt">+8.50</div>
+            </div>
+            <div class="income-row income-mid">
+              <div class="income-desc">测试测试测试测试</div>
+              <div class="income-status">已结算</div>
+            </div>
+            <div class="income-time">2023.12.24 13:00:23</div>
+          </div>
+          <div class="income-card">
+            <div class="income-row">
+              <div class="income-name">标题名称</div>
+              <div class="income-amt">+8.50</div>
+            </div>
+            <div class="income-row income-mid">
+              <div class="income-desc">测试测试测试测试</div>
+              <div class="income-status">已结算</div>
+            </div>
+            <div class="income-meta">视频ID·29129103104010410</div>
+            <div class="income-time">2023.12.24 13:00:23</div>
+          </div>
+          <div class="income-card">
+            <div class="income-row">
+              <div class="income-name">啥啥项目</div>
+              <div class="income-amt">+29999.50</div>
+            </div>
+            <div class="income-row income-mid">
+              <div class="income-desc">收益追回</div>
+              <div class="income-status">已结算</div>
+            </div>
+            <div class="income-time">2023.12.24 13:00:23</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 子 · 项目收益明细 -->
+      <div id="screen-income-sub" class="screen">
+        <div class="status-bar"><span>9:41</span><span>●●●</span></div>
+        <div class="nav-bar">
+          <button class="back" aria-label="返回">‹</button>
+          <span class="title">项目收益明细</span>
+          <span style="width:32px"></span>
+        </div>
+        <div class="scroll-content">
+          <div class="income-summary">
+            <div><span class="period">该段收入 · </span><span class="period-amt">8888.88元</span></div>
+            <button class="income-filter" type="button">全部时间 ▾</button>
+          </div>
+          <div class="income-card">
+            <div class="income-row">
+              <div class="income-name">收益自动分配</div>
+              <div class="income-amt">+520.00</div>
+            </div>
+            <div class="income-row income-mid">
+              <div class="income-desc">2026-08-13产生收益自动分配 520.00</div>
+              <div class="income-status">收益分配</div>
+            </div>
+            <div class="income-time">2026.08.13 00:03:21</div>
+          </div>
+          <div class="income-card">
+            <div class="income-row">
+              <div class="income-name">标题名称</div>
+              <div class="income-amt">+8.50</div>
+            </div>
+            <div class="income-row income-mid">
+              <div class="income-desc">测试测试测试测试</div>
+              <div class="income-status">已结算</div>
+            </div>
+            <div class="income-time">2023.12.24 13:00:23</div>
+          </div>
+          <div class="income-card">
+            <div class="income-row">
+              <div class="income-name">标题名称</div>
+              <div class="income-amt">+8.50</div>
+            </div>
+            <div class="income-row income-mid">
+              <div class="income-desc">测试测试测试测试</div>
+              <div class="income-status">已结算</div>
+            </div>
+            <div class="income-meta">视频ID·29129103104010410</div>
+            <div class="income-time">2023.12.24 13:00:23</div>
+          </div>
+          <div class="income-card">
+            <div class="income-row">
+              <div class="income-name">啥啥项目</div>
+              <div class="income-amt">+29999.50</div>
+            </div>
+            <div class="income-row income-mid">
+              <div class="income-desc">收益追回</div>
+              <div class="income-status">已结算</div>
+            </div>
+            <div class="income-time">2023.12.24 13:00:23</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="overlay" id="rulesOverlay" onclick="closeRules()"></div>
+      <div class="rules-sheet" id="rulesSheet">
+        <h3>分配规则</h3>
+        <div class="step"><div class="dot"></div><div><strong>发起协议</strong><p class="desc" style="margin-top:4px">主用户添加子用户并约定分配比例，子用户确认后关系生效。</p></div></div>
+        <div class="step mode-account-only"><div class="dot"></div><div><strong>授权发布帐号</strong><p class="desc" style="margin-top:4px">子用户通过三方接口将发布帐号授权给主用户。</p></div></div>
+        <div class="step mode-account-only"><div class="dot"></div><div><strong>关键词出单分配</strong><p class="desc" style="margin-top:4px">出单后按关键词→发布帐号→比例自动分配，不可撤回。</p></div></div>
+        <div class="step mode-direct-only"><div class="dot"></div><div><strong>收益直接分配</strong><p class="desc" style="margin-top:4px">出单后按约定比例自动分配至子用户项目收益钱包，不可撤回。</p></div></div>
+        <button class="btn-secondary" style="margin-top:14px" onclick="closeRules()">我知道了</button>
       </div>
     </div>
   </div>

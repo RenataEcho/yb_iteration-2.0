@@ -1,5 +1,5 @@
 # youbao2.0
-右豹 2.0 迭代需求 Demo（FR-002 ~ FR-006）
+右豹 2.0 迭代需求 Demo（FR-002 ~ FR-008）
 
 ## 预览入口
 
@@ -15,6 +15,8 @@
 | FR-004 | 预估数据 | `demo/iteration/fr-project-estimated-data.html` |
 | FR-005 | 订单优化 | `demo/iteration/fr-project-order-optimize.html` |
 | FR-006 | 活动中心 | `demo/iteration/fr-activity-center.html` |
+| FR-007 | 订单分发 | `demo/iteration/fr-project-order-distribute.html` |
+| FR-008 | 礼品中心 | `demo/iteration/fr-gift-center.html` |
 
 ## 废纸篓
 
