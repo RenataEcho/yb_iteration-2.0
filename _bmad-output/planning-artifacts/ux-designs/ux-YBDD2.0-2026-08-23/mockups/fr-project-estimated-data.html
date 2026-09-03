@@ -248,24 +248,45 @@
       background: #eef1f5; min-height: 560px; max-height: 720px; overflow-y: auto;
       padding: 14px 12px 16px; font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
     }
-    .fe-label { font-size: 10px; letter-spacing: 0.08em; color: #9aa5b4; font-weight: 600; margin-bottom: 4px; }
-    .fe-title { font-size: 22px; font-weight: 800; color: #18222f; line-height: 1.2; margin-bottom: 6px; }
-    .fe-disclaimer { font-size: 11px; color: #9aa5b4; line-height: 1.45; margin-bottom: 12px; }
-    .fe-project-card {
-      display: flex; align-items: center; gap: 10px; background: #fff; border-radius: 16px;
-      padding: 12px; margin-bottom: 14px; box-shadow: 0 2px 8px rgba(30,40,80,0.06);
-      cursor: pointer; border: none; width: 100%; text-align: left;
+    .fe-header { margin-bottom: 16px; }
+    .fe-back-btn {
+      width: 32px; height: 32px; border: none; background: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; color: #18222f;
+      border-radius: 8px; flex-shrink: 0; margin-bottom: 10px; padding: 0;
     }
-    .fe-project-card:active { background: #fafafa; }
+    .fe-back-btn:active { background: rgba(0,0,0,0.05); }
+    .fe-back-btn svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .fe-header-main {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    }
+    .fe-filter-btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+      flex-shrink: 0; height: 36px; padding: 0 14px;
+      border: 1px solid #e8edf3; border-radius: 10px; background: #fff; cursor: pointer;
+      font-size: 13px; font-weight: 600; color: #18222f;
+      box-shadow: 0 1px 4px rgba(30,40,80,0.06);
+    }
+    .fe-filter-btn:active { background: #fafafa; }
+    .fe-filter-btn .chev { font-size: 10px; color: #9aa5b4; transition: transform .2s; }
+    .fe-filter-btn.open .chev { transform: rotate(180deg); }
+    .fe-project-row {
+      display: flex; align-items: center; gap: 10px;
+      border: none; background: none; cursor: pointer; text-align: left;
+      flex: 1; min-width: 0; padding: 0;
+    }
+    .fe-project-row:active { opacity: 0.75; }
     .fe-project-icon {
-      width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, #6366f1, #8b5cf6);
-      color: #fff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center;
+      width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: #fff; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center;
       flex-shrink: 0;
     }
     .fe-project-meta { flex: 1; min-width: 0; }
-    .fe-project-meta .sub { font-size: 10px; color: #9aa5b4; margin-bottom: 2px; }
-    .fe-project-meta .name { font-size: 13px; font-weight: 700; color: #18222f; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .fe-chevron { color: #cbd5e1; font-size: 18px; line-height: 1; flex-shrink: 0; }
+    .fe-project-meta .sub { font-size: 11px; color: #9aa5b4; margin-bottom: 2px; }
+    .fe-project-meta .name {
+      font-size: 17px; font-weight: 800; color: #18222f;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .fe-project-meta .name .chev { font-size: 14px; color: #cbd5e1; font-weight: 400; }
     .fe-project-picker-overlay {
       position: absolute; inset: 0; background: rgba(15,23,42,0.45); z-index: 20;
       display: none; align-items: flex-end; justify-content: center;
@@ -293,70 +314,73 @@
     }
     .fe-project-picker-item .label { font-size: 12px; font-weight: 600; color: #18222f; flex: 1; min-width: 0; }
     .fe-project-picker-item .check { font-size: 13px; color: #f07167; font-weight: 700; flex-shrink: 0; }
-    .fe-section { margin-bottom: 12px; }
-    .fe-section-head {
-      display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 0 2px;
+    .fe-stat-hero {
+      background: #fff; border-radius: 16px; padding: 16px 14px 14px; margin-bottom: 10px;
+      box-shadow: 0 2px 8px rgba(30,40,80,0.06); text-align: center;
     }
-    .fe-section-title { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: #18222f; }
-    .fe-section-num {
-      width: 22px; height: 22px; border-radius: 6px; background: #ffe8e3; color: #f07167;
-      font-size: 11px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center;
+    .fe-stat-hero .label { font-size: 12px; color: #64748b; line-height: 1.45; margin-bottom: 10px; }
+    .fe-stat-hero .val { font-size: 32px; font-weight: 800; color: #18222f; line-height: 1; margin-bottom: 10px; }
+    .fe-stat-hero .hint { font-size: 10px; color: #9aa5b4; line-height: 1.45; }
+    .fe-stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
+    .fe-stat-mini {
+      background: #fff; border-radius: 14px; padding: 12px 8px 14px;
+      box-shadow: 0 2px 8px rgba(30,40,80,0.05); text-align: center;
     }
-    .fe-section-actions { font-size: 11px; color: #9aa5b4; display: flex; align-items: center; gap: 8px; }
-    .fe-section-actions button {
-      border: none; background: none; color: #9aa5b4; font-size: 11px; cursor: pointer; padding: 0;
+    .fe-stat-mini .val { font-size: 20px; font-weight: 800; color: #18222f; line-height: 1.2; margin-bottom: 6px; }
+    .fe-stat-mini .name { font-size: 10px; color: #64748b; line-height: 1.35; }
+    .fe-detail-section-title {
+      font-size: 14px; font-weight: 700; color: #18222f; margin-bottom: 10px; padding: 0 2px;
     }
-    .fe-card {
-      background: #fff; border-radius: 18px; padding: 14px; box-shadow: 0 2px 10px rgba(30,40,80,0.06);
-    }
-    .fe-field { margin-bottom: 12px; }
-    .fe-field:last-child { margin-bottom: 0; }
+    .fe-field { margin-bottom: 16px; }
     .fe-field-label {
-      display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; color: #18222f; margin-bottom: 6px;
+      display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 600; color: #18222f; margin-bottom: 8px;
     }
     .fe-field-label i { width: 6px; height: 6px; border-radius: 50%; background: #f07167; display: inline-block; }
-    .fe-input-row { display: flex; align-items: center; gap: 8px; }
+    .fe-select-wrap { position: relative; }
+    .fe-select {
+      width: 100%; height: 42px; border: 1px solid #e8edf3; border-radius: 12px;
+      background: #f8fafc; padding: 0 36px 0 12px; font-size: 13px; color: #18222f;
+      appearance: none; cursor: pointer;
+    }
+    .fe-select-wrap::after {
+      content: '⌄'; position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      color: #9aa5b4; pointer-events: none; font-size: 14px;
+    }
+    .fe-input-row { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
     .fe-input {
-      flex: 1; height: 36px; border: 1px solid #e8edf3; border-radius: 10px; background: #f8fafc;
-      padding: 0 10px; font-size: 12px; color: #64748b;
+      flex: 1; height: 42px; border: 1px solid #e8edf3; border-radius: 12px; background: #f8fafc;
+      padding: 0 12px; font-size: 13px; color: #18222f;
     }
-    .fe-input-full { width: 100%; height: 36px; border: 1px solid #e8edf3; border-radius: 10px; background: #f8fafc; padding: 0 10px; font-size: 12px; color: #64748b; }
-    .fe-sep { font-size: 12px; color: #9aa5b4; flex-shrink: 0; }
+    .fe-input-full {
+      width: 100%; height: 42px; border: 1px solid #e8edf3; border-radius: 12px; background: #f8fafc;
+      padding: 0 12px; font-size: 13px; color: #18222f;
+    }
+    .fe-sep { font-size: 13px; color: #9aa5b4; flex-shrink: 0; }
     .fe-btn-query {
-      width: 100%; height: 42px; margin-top: 14px; border: none; border-radius: 12px;
+      width: 100%; height: 46px; margin-top: 8px; border: none; border-radius: 14px;
       background: linear-gradient(135deg, #ff8a75, #f07167); color: #fff;
-      font-size: 14px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 14px rgba(240,113,103,0.35);
+      font-size: 15px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 14px rgba(240,113,103,0.35);
     }
-    .fe-stat-hero {
-      position: relative; background: #fff; border-radius: 16px; padding: 14px; margin-bottom: 10px;
-      box-shadow: 0 2px 8px rgba(30,40,80,0.06); min-height: 88px;
+    .fe-custom-range { display: none; }
+    .fe-custom-range.show { display: block; }
+    .fe-filter-overlay {
+      position: absolute; inset: 0; background: rgba(15,23,42,0.45); z-index: 25;
+      display: none; align-items: flex-end; justify-content: center;
     }
-    .fe-stat-hero .name { font-size: 12px; color: #64748b; margin-bottom: 8px; }
-    .fe-stat-hero .val { font-size: 28px; font-weight: 800; color: #18222f; line-height: 1; }
-    .fe-stat-hero .chart-icon {
-      position: absolute; right: 12px; bottom: 10px; width: 36px; height: 28px;
-      display: flex; align-items: flex-end; gap: 3px; opacity: 0.35;
+    .fe-filter-overlay.open { display: flex; }
+    .fe-filter-sheet {
+      width: 100%; background: #fff; border-radius: 20px 20px 0 0; padding: 0 16px 24px;
+      max-height: 85%; overflow-y: auto;
     }
-    .fe-stat-hero .chart-icon span { width: 5px; background: #f07167; border-radius: 2px; }
-    .fe-stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-    .fe-stat-mini {
-      position: relative; background: #fff; border-radius: 14px; padding: 12px 10px 14px;
-      box-shadow: 0 2px 8px rgba(30,40,80,0.05); min-height: 78px;
+    .fe-filter-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 0 14px; border-bottom: 1px solid #e8edf3; margin-bottom: 16px;
     }
-    .fe-stat-mini .name { font-size: 11px; color: #64748b; margin-bottom: 10px; padding-right: 28px; line-height: 1.3; }
-    .fe-stat-mini .val { font-size: 22px; font-weight: 800; color: #18222f; }
-    .fe-stat-badge {
-      position: absolute; top: 8px; right: 8px; font-size: 9px; font-weight: 700;
-      padding: 2px 6px; border-radius: 6px; background: #f1f5f9; color: #64748b;
+    .fe-filter-head h3 { font-size: 16px; font-weight: 700; }
+    .fe-filter-close {
+      width: 28px; height: 28px; border: none; background: none; cursor: pointer;
+      font-size: 20px; color: #9aa5b4; line-height: 1;
     }
-    .fe-footer-note {
-      margin-top: 12px; font-size: 10px; color: #9aa5b4; text-align: center; line-height: 1.45;
-    }
-    .fe-card.fe-query-collapsed .fe-query-body { display: none; }
-    .fe-query-collapsed-hint {
-      display: none; font-size: 11px; color: #64748b; line-height: 1.45; padding: 2px 2px 0;
-    }
-    .fe-card.fe-query-collapsed .fe-query-collapsed-hint { display: block; }
     .fe-detail-card {
       background: #fff; border-radius: 16px; padding: 14px; margin-bottom: 10px;
       box-shadow: 0 2px 8px rgba(30,40,80,0.06);
@@ -371,13 +395,13 @@
       display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
       background: #f5f6f8; border-radius: 10px; padding: 12px 10px; margin-bottom: 8px;
     }
-    .fe-detail-data .cell-label { font-size: 10px; color: #9aa5b4; margin-bottom: 4px; }
     .fe-detail-data .cell-value {
-      font-size: 12px; font-weight: 700; color: #18222f; word-break: break-all; line-height: 1.35;
+      font-size: 13px; font-weight: 700; color: #18222f; word-break: break-all; line-height: 1.35; margin-bottom: 4px;
     }
     .fe-detail-data .cell-value.link { color: #2563eb; font-weight: 600; }
-    .fe-detail-data .cell-sub { font-size: 10px; color: #9aa5b4; margin-top: 2px; font-weight: 400; }
-    .fe-detail-foot { font-size: 10px; color: #9aa5b4; }
+    .fe-detail-data .cell-sub { font-size: 10px; color: #9aa5b4; margin-top: -2px; margin-bottom: 4px; font-weight: 400; }
+    .fe-detail-data .cell-label { font-size: 10px; color: #9aa5b4; line-height: 1.3; }
+    .fe-detail-foot { font-size: 11px; color: #9aa5b4; }
     .fe-detail-empty {
       padding: 20px 12px; text-align: center; font-size: 11px; color: #9aa5b4;
       background: #fff; border-radius: 14px;
@@ -526,7 +550,7 @@
           <span class="badge badge-fr">FR-004</span>
           <span class="badge badge-version">v1 当前</span>
         </h1>
-        <p class="page-desc">C 端「数据查询」页（查询条件折叠 + 数据统计 + 数据明细卡片）；管理后台维护展示配置与预估数据表（动态列、批量删除/导入）。项目编辑弹窗「预估数据」开关仅写入需求规则。</p>
+        <p class="page-desc">C 端「数据查询」页（项目切换浮层 + 筛选底部弹窗 + 数据统计 + 数据明细卡片）；管理后台维护展示配置与预估数据表（动态列、批量删除/导入）。项目编辑弹窗「预估数据」开关仅写入需求规则。</p>
       </div>
       <div class="page-header-actions">
         <button class="btn btn-rule" id="toggleRuleDrawer" type="button" aria-expanded="false">
@@ -550,18 +574,18 @@
           <div class="scene-list">
             <button class="scene-btn active" type="button" data-screen="screen-data-query">
               <div class="scene-title">数据查询 · 默认态</div>
-              <div class="scene-desc">查询条件默认折叠（时间范围 + 关键词）；02 数据统计（首项大卡 + 三列网格）；03 数据明细卡片</div>
+              <div class="scene-desc">顶栏返回 + 项目切换 + 筛选入口；统计首项大卡 + 三列小卡；明细卡片列表</div>
             </button>
-            <button class="scene-btn" type="button" data-screen="screen-query-expanded">
-              <div class="scene-title">查询条件展开</div>
-              <div class="scene-desc">仅时间范围与关键词；立即查询后折叠并刷新统计与明细</div>
+            <button class="scene-btn" type="button" data-screen="screen-filter-open">
+              <div class="scene-title">筛选弹窗展开</div>
+              <div class="scene-desc">时间范围下拉（含自定义）+ 关键词；查询后弹窗收起并刷新统计与明细</div>
             </button>
             <button class="scene-btn" type="button" data-screen="screen-empty-result">
               <div class="scene-title">无明细空态</div>
-              <div class="scene-desc">查询无匹配结果时，数据明细区展示空态提示</div>
+              <div class="scene-desc">查询无匹配结果时，明细区展示「明细 · 0 条」与空态提示</div>
             </button>
           </div>
-          <div class="scene-note">C 端查询条件固定为「时间范围 + 关键词」；明细卡片底部展示「数据日期」；统计区首项大卡，其余为三列网格小卡。</div>
+          <div class="scene-note">项目名称旁、(或点项目头像/名称)唤起项目选择浮层切换项目；点「筛选」弹出底部筛选弹窗（时间下拉选择 + 关键词输入），查询后弹窗收起；统计区为总数据大卡（后台「数据统计」首项）+ 其余项三列小卡；明细卡标题为列表首字段（关键词），三列信息域值上标签下，底部展示「最近出单：{日期}」。</div>
         </div>
         <div class="glass-card mockup-panel">
           <div class="mockup-frame-wrap">
@@ -643,7 +667,7 @@
               <div class="preview-panel-head">
                 <div>
                   <h3>前端预览</h3>
-                  <p>随左侧配置实时联动 · 查询条件可折叠 · 含数据明细卡片</p>
+                  <p>随左侧配置实时联动 · 筛选底部弹窗 · 含数据明细卡片</p>
                 </div>
                 <span class="preview-sync-tag">实时同步</span>
               </div>
@@ -653,6 +677,39 @@
                   <div class="fe-project-picker-sheet" onclick="event.stopPropagation()">
                     <div class="fe-project-picker-head">选择项目</div>
                     <div class="fe-project-picker-list" id="feProjectPickerList"></div>
+                  </div>
+                </div>
+                <div class="fe-filter-overlay" id="feFilterOverlay" onclick="closeFeFilterSheet()">
+                  <div class="fe-filter-sheet" onclick="event.stopPropagation()">
+                    <div class="fe-filter-head">
+                      <h3>筛选</h3>
+                      <button type="button" class="fe-filter-close" onclick="closeFeFilterSheet()" aria-label="关闭">×</button>
+                    </div>
+                    <div class="fe-field">
+                      <div class="fe-field-label"><i></i>时间范围</div>
+                      <div class="fe-select-wrap">
+                        <select class="fe-select" id="feFilterTimeRange" onchange="onFeTimeRangeChange()">
+                          <option value="today">今日</option>
+                          <option value="7d">近7天</option>
+                          <option value="15d">近15天</option>
+                          <option value="30d" selected>近30天</option>
+                          <option value="month">本月</option>
+                          <option value="custom">自定义</option>
+                        </select>
+                      </div>
+                      <div class="fe-custom-range" id="feCustomRange">
+                        <div class="fe-input-row">
+                          <input class="fe-input" type="text" placeholder="开始日期" />
+                          <span class="fe-sep">至</span>
+                          <input class="fe-input" type="text" placeholder="结束日期" />
+                        </div>
+                      </div>
+                    </div>
+                    <div class="fe-field">
+                      <div class="fe-field-label"><i></i>关键词</div>
+                      <input class="fe-input-full" type="text" id="feFilterKeyword" placeholder="输入关键词" />
+                    </div>
+                    <button class="fe-btn-query" type="button" onclick="runFeQuery()">查询</button>
                   </div>
                 </div>
               </div>
@@ -915,7 +972,6 @@
       <button type="button" data-rule="rule-admin" role="tab">后台需求</button>
     </div>
     <div class="drawer-body">
-      <!-- 前端需求 -->
       <div id="rule-fe" class="rule-panel active">
         <div class="rule-section">
           <h3><span>1</span>业务目标</h3>
@@ -927,13 +983,12 @@
           <h3><span>2</span>页面与入口</h3>
           <div class="rule-content">
             <ul>
-              <li><strong>入口</strong>：项目详情 / 数据工具区「数据查询」（具体入口位置复用既有 C 端项目页，本 FR 不重定义导航层级）。</li>
-              <li><strong>可见条件</strong>：项目「预估数据=显示」且运营已在后台配置展示字段；否则入口不可见。</li>
-              <li><strong>页头</strong>：标题「数据查询」+ 免责声明「查询数据仅供参考，实际以结算数据为准」。</li>
-              <li><strong>当前项目卡片</strong>：展示项目 icon（名称前两字）/ 名称；点击展开<strong>项目选择器</strong>（底部浮层列表），切换后刷新当前项目展示（Demo Mock 18 个项目：番茄小说、知乎故事…悟空网文）。</li>
-              <li><strong>01 查询条件</strong>：固定「时间范围」+「关键词」两项；<strong>默认折叠</strong>，折叠态展示「时间范围 · 关键词」摘要。</li>
-              <li><strong>02 数据统计</strong>：按后台「数据统计」配置渲染；排序第 1 项为大卡，其余为<strong>三列</strong>网格小卡；支持隐藏/刷新。</li>
-              <li><strong>03 数据明细</strong>：卡片列表；<strong>列表展示字段排序第 1 项的值</strong>为卡片标题；其余字段入内嵌灰色三列信息域（关联展示字段合并：主值 + 副值）；底部「数据日期·{日期}」。</li>
+              <li><strong>入口</strong>：项目详情 / 数据工具区「数据查询」（复用既有 C 端项目页，本 FR 不重定义导航）。仅「预估数据=显示」且已配置展示字段时可见。</li>
+              <li><strong>顶栏</strong>：返回按钮 + 右上角「筛选」。</li>
+              <li><strong>当前项目</strong>：项目 icon（名称前两字）/ 名称；点击展开<strong>项目选择器</strong>（底部浮层），切换后刷新本页。</li>
+              <li><strong>筛选弹窗</strong>：底部弹出；固定「时间范围」（今日/近7天/近15天/近30天/本月/自定义，自定义时展示起止日期）+「关键词」；点「查询」后收起并刷新统计与明细。时间范围必填，关键词选填。</li>
+              <li><strong>数据统计</strong>：按后台「数据统计」配置渲染；排序第 1 项为大卡（文案「当前筛选下的总数据 · {统计项名}」），其余为<strong>三列</strong>小卡（值上标签下）。</li>
+              <li><strong>数据明细</strong>：标题「明细 · N 条」；首字段（关键词）为卡片标题；其余入灰色三列信息域（值上标签下，关联字段合并：主值 + 副值）；底部「最近出单：{日期}」。</li>
             </ul>
           </div>
         </div>
@@ -941,12 +996,11 @@
           <h3><span>3</span>交互规则</h3>
           <div class="rule-content">
             <ul>
-              <li>点击「立即查询」→ 请求后端按条件聚合统计 + 返回明细分页列表；查询完成后<strong>查询条件自动折叠</strong>。</li>
-              <li>「刷新 ↻」仅重算当前条件下的统计与明细，不重置已填查询条件。</li>
-              <li>明细卡片为<strong>只读展示</strong>，不提供编辑/删除（数据维护在管理后台）。</li>
-              <li>链接类字段（字段名/标识含 link、url、链接、主页，或值为 http 开头）以链接色展示，点击行为复用 C 端外链打开规范。</li>
-              <li>无匹配数据时，数据明细区展示空态「暂无数据，请调整查询条件」；统计区展示 0 或空值（口径由后端定义）。</li>
-              <li>字段集合、顺序、统计项名称均读取后台展示配置，C 端<strong>不可自定义列</strong>。</li>
+              <li>点筛选「查询」→ 按条件聚合统计 + 返回明细分页；完成后弹窗收起。统计与明细须来自<strong>同一次查询</strong>。</li>
+              <li>明细卡片只读，不提供编辑/删除。</li>
+              <li>链接类字段（字段名/标识含 link、url、链接、主页，或值为 http 开头）以链接色展示，点击复用 C 端外链规范。</li>
+              <li>无匹配：明细空态「暂无数据，请调整查询条件」；统计区 0 或空值（口径由后端定义）。</li>
+              <li>字段集合、顺序、统计项名称均读后台配置，C 端<strong>不可自定义列</strong>。明细建议分页，首屏 N 条由研发约定。</li>
             </ul>
           </div>
         </div>
@@ -954,95 +1008,72 @@
           <h3><span>4</span>边界规则</h3>
           <div class="rule-content">
             <ul>
-              <li>项目「预估数据=隐藏」时，C 端入口不可见；已有数据保留，再次显示后恢复。</li>
-              <li>C 端仅展示当前用户有权限查看的项目预估数据（权限口径与既有项目数据可见性一致）。</li>
-              <li>时间范围为必填（具体校验提示文案由前端统一规范）；其余查询字段选填。</li>
-              <li>统计数据与明细列表须来自<strong>同一次查询</strong>，避免统计与明细口径不一致。</li>
-              <li>明细列表建议分页加载；首屏默认展示 N 条（N 由研发与性能约定，Demo 展示 3 条样例）。</li>
+              <li>项目「预估数据=隐藏」时入口不可见；已有数据保留，再次显示后恢复。</li>
+              <li>C 端仅展示当前用户有权限查看的项目预估数据（口径与既有项目数据可见性一致）。</li>
             </ul>
           </div>
         </div>
         <div class="rule-section">
           <h3><span>5</span>业务流程</h3>
           <div class="rule-content">
-            <p>配置下发 → C 端查询 → 统计聚合 → 明细展示链路见页内 Tab <strong>「业务流程」</strong>流程图。</p>
+            <p>见页内 Tab <strong>「业务流程」</strong>。</p>
           </div>
         </div>
       </div>
-      <!-- 后台需求 -->
       <div id="rule-admin" class="rule-panel">
         <div class="rule-section">
           <h3><span>1</span>业务目标</h3>
           <div class="rule-content">
-            <p>为项目提供可配置的<strong>预估数据</strong>维护与展示能力：运营可在项目维度开启/关闭预估数据入口，并通过展示配置定义列表列与统计指标，在项目下维护预估数据明细，支持 Excel 批量导入与批量删除。</p>
+            <p>为项目提供可配置的<strong>预估数据</strong>维护与展示：运营按项目开关入口，用展示配置定义列与统计指标，并维护明细（Excel 批量导入 / 批量删除）。</p>
           </div>
         </div>
         <div class="rule-section">
           <h3><span>2</span>数据表与字段</h3>
           <div class="rule-content">
-            <p><strong>项目编辑弹窗（扩展现有 · 仅规则，本 FR 不做 UI 设计）</strong>：</p>
-            <ul>
-              <li>新增字段 <strong>预估数据</strong>，枚举：<code>显示</code> / <code>隐藏</code>。</li>
-              <li>默认建议为 <code>隐藏</code>；设为 <code>显示</code> 后，该项目详情/管理后台出现「预估数据」相关入口与 Tab。</li>
-              <li>设为 <code>隐藏</code> 后，预估数据表入口不可见，已有数据保留不物理删除。</li>
-            </ul>
+            <p><strong>项目编辑弹窗（扩展现有 · 仅规则，本 FR 不做 UI）</strong>：新增 <strong>预估数据</strong> = <code>显示</code> / <code>隐藏</code>（建议默认隐藏）。显示后出现预估数据入口与 Tab；隐藏后入口不可见，数据保留不物理删除。</p>
             <div class="rule-note">本字段<strong>仅写入需求规则</strong>，不在本 FR Demo 中设计项目编辑弹窗 UI；研发对照既有项目编辑弹窗扩展。</div>
-            <p style="margin-top:14px;"><strong>预估数据展示配置</strong>（项目级或全局配置域，与具体项目绑定）：</p>
-            <p style="margin-top:8px;"><strong>① 列表展示字段</strong>（可多条、可排序）：</p>
+            <p style="margin-top:14px;"><strong>① 列表展示字段</strong>（项目级，可多条、可排序）：</p>
             <ul>
-              <li><strong>展示字段</strong>：列头展示名称。</li>
-              <li><strong>字段标识</strong>：唯一 key，用于存储、导入列映射、API 字段名。</li>
-              <li><strong>关联展示字段</strong>（可选）：如 <code>user_id</code> 关联展示 <code>user_nickname</code>；列表/C 端合并展示，导入时可由系统反查填充。</li>
-              <li><strong>是否支持导入</strong>：是/否；仅「是」的字段进入 Excel 模版列与导入校验。</li>
-              <li>支持拖拽或序号调整<strong>排序</strong>，决定列表列顺序与导入模版列顺序。</li>
+              <li><strong>展示字段</strong>：列头名称。<strong>字段标识</strong>：唯一 key（存储 / 导入映射 / API）。创建后不建议改，必须改须有迁移。</li>
+              <li><strong>关联展示字段</strong>（可选）：如 <code>user_id</code> 关联 <code>user_nickname</code>；列表/C 端合并展示，导入后系统反查填充。</li>
+              <li><strong>是否支持导入</strong>：仅「是」进入 Excel 模版列与导入校验。排序同时决定列表列序与模版列序。</li>
             </ul>
             <p style="margin-top:8px;"><strong>② 数据统计</strong>（可多条、可排序）：</p>
             <ul>
-              <li><strong>来源字段</strong>：新增时从「列表展示字段」下拉选择；同一列表字段不可重复添加为统计项。</li>
-              <li><strong>统计字段名</strong>：系统根据来源字段自动生成（如「预估曝光量」→「预估曝光合计」）。</li>
-              <li><strong>字段标识</strong>：系统生成（如 <code>sum_est_exposure</code>）；后端按配置聚合（sum / count）。</li>
-              <li>支持排序，决定 C 端统计区展示顺序与后台表头统计区顺序。</li>
-              <li>系统固定项「数据条数」（<code>row_count</code>）可保留，不关联列表字段。</li>
+              <li>来源字段从「列表展示字段」下拉选择，同一列表字段不可重复添加。</li>
+              <li>统计字段名与标识由系统生成（如「预估曝光量」→「预估曝光合计」/<code>sum_est_exposure</code>）；后端按配置聚合（sum / count）。</li>
+              <li>排序决定 C 端统计区与后台表头统计区顺序。系统固定项「数据条数」（<code>row_count</code>）可保留，不关联列表字段。</li>
             </ul>
-            <p style="margin-top:14px;"><strong>预估数据表</strong>（项目维度数据）：</p>
-            <ul>
-              <li>列表列<strong>动态渲染</strong>，与「列表展示字段」配置一致（含关联展示字段合并列）。</li>
-              <li>表头统计区按「数据统计」配置动态渲染，随筛选/导入/删除联动刷新。</li>
-              <li>系统字段（建议）：数据 ID、所属项目 ID、数据更新时间；操作：删除。</li>
-            </ul>
+            <p style="margin-top:14px;"><strong>预估数据表</strong>：列与表头统计均按展示配置动态渲染（含关联字段合并列）。系统字段建议：数据 ID、所属项目 ID、数据更新时间；操作：删除。</p>
           </div>
         </div>
         <div class="rule-section">
           <h3><span>3</span>列表与交互</h3>
           <div class="rule-content">
-            <p><strong>展示配置</strong>：列表展示字段与数据统计均为可增删改表格；排序变更即时影响预估数据表列顺序、C 端明细字段顺序与统计区顺序。右侧「前端预览」与配置实时联动（Demo 用途）。</p>
+            <p><strong>展示配置</strong>：列表字段与统计项可增删改；排序即时影响预估数据表列、C 端明细与统计区。右侧「前端预览」与配置实时联动（Demo 用途）。</p>
             <p style="margin-top:8px;"><strong>预估数据表</strong>：</p>
             <ul>
-              <li><strong>批量删除</strong>：勾选多行 → 确认 → 删除；删除后统计区重算。</li>
-              <li><strong>批量导入</strong>：Excel 列与「列表展示字段」中<strong>支持导入=是</strong>的字段一一对应，列顺序与字段排序一致。</li>
-              <li><strong>下载导入模版</strong>：根据当前展示配置<strong>动态生成</strong> Excel 模版（表头=展示字段名）；配置变更后再次下载应反映最新列集合。</li>
-              <li>导入校验失败行整批或逐行报错策略由研发约定，需反馈失败原因与行号。</li>
-              <li>关联展示字段不参与模版列；导入后由系统根据主字段（如 ID）匹配填充。</li>
+              <li><strong>批量删除</strong>：勾选 → 确认 → 删除后统计区重算。</li>
+              <li><strong>批量导入 / 下载模版</strong>：列与「支持导入=是」的字段一一对应，顺序跟字段排序；模版按当前配置动态生成。配置变更后再次下载须反映最新列。</li>
+              <li>导入失败须反馈原因与行号（整批或逐行由研发约定）。关联展示字段不进模版列。</li>
             </ul>
-            <p style="margin-top:8px;"><strong>筛选项</strong>（Demo 示例）：关键词、用户信息；实际筛选项可与可检索的列表展示字段对齐。</p>
+            <p style="margin-top:8px;"><strong>筛选项</strong>：可与可检索的列表展示字段对齐（Demo：关键词、用户信息）。</p>
           </div>
         </div>
         <div class="rule-section">
           <h3><span>4</span>边界规则</h3>
           <div class="rule-content">
             <ul>
-              <li>项目 <code>预估数据=隐藏</code> 时，C 端/后台预估数据入口均不可见；数据保留，再次设为 <code>显示</code> 后恢复展示。</li>
-              <li>删除列表展示字段前，需确认是否影响已有数据列展示；已存储的扩展字段数据建议保留，仅不再展示。</li>
-              <li>字段标识创建后不建议修改（避免历史数据与导入模版不一致）；若必须修改需有迁移策略。</li>
-              <li>同一项目下预估数据表与展示配置一一绑定；不同项目可独立配置字段集合。</li>
-              <li>导入模版、列表列、导入校验三者必须以同一套「列表展示字段 + 支持导入」配置为单一数据源。</li>
+              <li>删除列表展示字段后，已存储的扩展字段数据建议保留，仅不再展示。</li>
+              <li>同一项目下预估数据表与展示配置一一绑定；不同项目可独立配置。</li>
+              <li>导入模版、列表列、导入校验必须以同一套「列表展示字段 + 支持导入」为单一数据源。</li>
             </ul>
           </div>
         </div>
         <div class="rule-section">
           <h3><span>5</span>业务流程</h3>
           <div class="rule-content">
-            <p>见页内 Tab <strong>「业务流程」</strong>流程图。</p>
+            <p>见页内 Tab <strong>「业务流程」</strong>。</p>
           </div>
         </div>
       </div>
@@ -1063,13 +1094,13 @@
       { id: 'sf1', label: '预估曝光合计', key: 'sum_est_exposure', listFieldId: 'lf2', value: '1,280,500', badge: 'T1' },
       { id: 'sf2', label: '预估转化合计', key: 'sum_est_conversion', listFieldId: 'lf3', value: '32,680', badge: 'T2' },
       { id: 'sf3', label: '关键词数', key: 'keyword_count', listFieldId: 'lf1', value: '156', badge: 'T3' },
-      { id: 'sf4', label: '数据条数', key: 'row_count', listFieldId: null, value: '156', badge: 'CT' },
+      { id: 'sf4', label: '数据条数', key: 'row_count', listFieldId: null, value: '3', badge: 'CT' },
     ];
 
     const ALL_DATA_ROWS = [
-      { id: 'd1', keyword: 'Summer推广词', exposure: '520,000', conversion: '12,800', userName: '张三', userId: 'U-10086', dataDate: '2026.08.23', updated: '2026.08.23 14:30' },
-      { id: 'd2', keyword: '秋季新品词', exposure: '380,500', conversion: '9,200', userName: '李四', userId: 'U-10201', dataDate: '2026.08.22', updated: '2026.08.22 10:00' },
-      { id: 'd3', keyword: '达人种草词', exposure: '280,000', conversion: '6,680', userName: '王五', userId: 'U-10388', dataDate: '2026.08.21', updated: '2026.08.21 16:45' },
+      { id: 'd1', keyword: 'Summer推广词', exposure: '520,000', conversion: '12,800', userName: '张三', userId: 'U-10086', dataDate: '2026.08.23', lastOrderDate: '2026.08.23', updated: '2026.08.23 14:30' },
+      { id: 'd2', keyword: '秋季新品词', exposure: '380,500', conversion: '9,200', userName: '李四', userId: 'U-10201', dataDate: '2026.08.22', lastOrderDate: '2026.08.22', updated: '2026.08.22 10:00' },
+      { id: 'd3', keyword: '达人种草词', exposure: '280,000', conversion: '6,680', userName: '王五', userId: 'U-10388', dataDate: '2026.08.21', lastOrderDate: '2026.08.21', updated: '2026.08.21 16:45' },
     ];
 
     const MOCK_PROJECTS = [
@@ -1084,7 +1115,7 @@
     let statFieldEditId = null;
     let confirmAction = null;
     let confirmTargetId = null;
-    let feQueryCollapsed = true;
+    let feFilterOpen = false;
     let fePreviewRows = ALL_DATA_ROWS.map(r => ({ ...r }));
     let feSelectedProject = MOCK_PROJECTS[0];
 
@@ -1121,16 +1152,45 @@
       showToast('已切换项目：' + name);
     }
 
-    function renderFeProjectCard() {
+    function renderFeProjectRow() {
       return `
-        <button type="button" class="fe-project-card" onclick="openFeProjectPicker()">
+        <button type="button" class="fe-project-row" onclick="openFeProjectPicker()">
           <div class="fe-project-icon">${esc(projectIconAbbr(feSelectedProject))}</div>
           <div class="fe-project-meta">
             <div class="sub">当前项目</div>
-            <div class="name">${esc(feSelectedProject)}</div>
+            <div class="name">${esc(feSelectedProject)}<span class="chev">⌄</span></div>
           </div>
-          <span class="fe-chevron">⌄</span>
         </button>`;
+    }
+
+    function renderFeHeader() {
+      return `
+        <div class="fe-header">
+          <button type="button" class="fe-back-btn" aria-label="返回">
+            <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <div class="fe-header-main">
+            ${renderFeProjectRow()}
+            <button type="button" class="fe-filter-btn${feFilterOpen ? ' open' : ''}" onclick="openFeFilterSheet()">筛选 <span class="chev">⌄</span></button>
+          </div>
+        </div>`;
+    }
+
+    function openFeFilterSheet() {
+      feFilterOpen = true;
+      document.getElementById('feFilterOverlay')?.classList.add('open');
+      renderFePreview();
+    }
+
+    function closeFeFilterSheet() {
+      feFilterOpen = false;
+      document.getElementById('feFilterOverlay')?.classList.remove('open');
+      renderFePreview();
+    }
+
+    function onFeTimeRangeChange() {
+      const val = document.getElementById('feFilterTimeRange')?.value;
+      document.getElementById('feCustomRange')?.classList.toggle('show', val === 'custom');
     }
 
     function getRowFieldValue(row, field) {
@@ -1158,9 +1218,9 @@
       const linkClass = isLinkField(field, main) ? ' link' : '';
       return `
         <div>
-          <div class="cell-label">${esc(field.label)}</div>
           <div class="cell-value${linkClass}">${esc(main)}</div>
           ${sub ? `<div class="cell-sub">${esc(sub)}</div>` : ''}
+          <div class="cell-label">${esc(field.label)}</div>
         </div>`;
     }
 
@@ -1170,12 +1230,15 @@
       }
       const titleField = listFields[0];
       const bodyFields = listFields.slice(1);
+      const count = fePreviewRows.length;
+      const titleHtml = `<div class="fe-detail-section-title">明细 · ${count} 条</div>`;
       if (!fePreviewRows.length) {
-        return '<div class="fe-detail-empty">暂无数据，请调整查询条件</div>';
+        return titleHtml + '<div class="fe-detail-empty">暂无数据，请调整查询条件</div>';
       }
-      return fePreviewRows.map(row => {
+      return titleHtml + fePreviewRows.map(row => {
         const titleVal = getRowFieldValue(row, titleField);
         const gridCols = bodyFields.length <= 2 ? bodyFields.length || 1 : 3;
+        const orderDate = row.lastOrderDate || row.dataDate || '—';
         return `
           <div class="fe-detail-card">
             <div class="fe-detail-head">
@@ -1185,29 +1248,29 @@
               <div class="fe-detail-data" style="grid-template-columns:repeat(${gridCols},1fr)">
                 ${bodyFields.map(f => renderFeDetailCell(f, row)).join('')}
               </div>` : ''}
-            <div class="fe-detail-foot">数据日期·${esc(row.dataDate || '—')}</div>
+            <div class="fe-detail-foot">最近出单：${esc(orderDate)}</div>
           </div>`;
       }).join('');
     }
 
-    function toggleFeQueryCollapse() {
-      feQueryCollapsed = !feQueryCollapsed;
-      renderFePreview();
-    }
-
-    function feQuerySummary() {
-      return '时间范围 · 关键词';
-    }
-
-    function getFeKeywordField() {
-      return listFields.find(f => f.key === 'keyword' || f.label === '关键词') || null;
-    }
-
-    function runFeQuery() {
-      feQueryCollapsed = true;
-      fePreviewRows = dataRows.map(r => ({ ...r }));
-      renderFePreview();
-      showToast('Demo：已查询「' + feSelectedProject + '」（Mock），已刷新统计与数据明细');
+    function renderFeStatsSection() {
+      const hero = statFields[0];
+      const grid = statFields.slice(1);
+      return `
+        ${hero ? `
+          <div class="fe-stat-hero">
+            <div class="label">当前筛选下的总数据 · ${esc(hero.label)}</div>
+            <div class="val">${esc(hero.value)}</div>
+            <div class="hint">统计项由后台「数据统计」配置，查询数据仅供参考</div>
+          </div>` : ''}
+        <div class="fe-stat-grid">
+          ${grid.map(f => `
+            <div class="fe-stat-mini">
+              <div class="val">${esc(f.value)}</div>
+              <div class="name">${esc(f.label)}</div>
+            </div>
+          `).join('')}
+        </div>`;
     }
 
     function esc(s) {
@@ -1261,87 +1324,23 @@
       return (f.key || '').replace(/^sum_/, '').slice(0, 2).toUpperCase() || ('S' + (index + 1));
     }
 
+    function runFeQuery() {
+      const kw = (document.getElementById('feFilterKeyword')?.value || '').trim().toLowerCase();
+      fePreviewRows = kw
+        ? dataRows.filter(r => String(r.keyword || '').toLowerCase().includes(kw)).map(r => ({ ...r }))
+        : dataRows.map(r => ({ ...r }));
+      closeFeFilterSheet();
+      renderFePreview();
+      showToast('Demo：已查询「' + feSelectedProject + '」（Mock），已刷新统计与数据明细');
+    }
+
     function renderFePreview() {
       const el = document.getElementById('fePreview');
       if (!el) return;
-      const keywordField = getFeKeywordField();
-
-      const queryHtml = `
-        <div class="fe-field">
-          <div class="fe-field-label"><i></i>时间范围</div>
-          <div class="fe-input-row">
-            <input class="fe-input" type="text" placeholder="开始时间" readonly />
-            <span class="fe-sep">至</span>
-            <input class="fe-input" type="text" placeholder="结束时间" readonly />
-          </div>
-        </div>
-        ${keywordField ? `
-          <div class="fe-field">
-            <div class="fe-field-label"><i></i>${esc(keywordField.label)}</div>
-            <input class="fe-input-full" type="text" placeholder="输入${esc(keywordField.label)}" readonly />
-          </div>
-        ` : ''}`;
-
-      const hero = statFields[0];
-      const grid = statFields.slice(1);
-      const queryToggleLabel = feQueryCollapsed ? '展开 ⌄' : '收起 ⌃';
-
       el.innerHTML = `
-        <div class="fe-label">DATA EXPLORER</div>
-        <div class="fe-title">数据查询</div>
-        <div class="fe-disclaimer">查询数据仅供参考，实际以结算数据为准</div>
-
-        ${renderFeProjectCard()}
-
-        <div class="fe-section">
-          <div class="fe-section-head">
-            <div class="fe-section-title"><span class="fe-section-num">01</span>查询条件</div>
-            <div class="fe-section-actions">
-              <button type="button" onclick="toggleFeQueryCollapse()">${queryToggleLabel}</button>
-            </div>
-          </div>
-          <div class="fe-card${feQueryCollapsed ? ' fe-query-collapsed' : ''}">
-            <div class="fe-query-collapsed-hint">${esc(feQuerySummary())}</div>
-            <div class="fe-query-body">
-              ${queryHtml}
-              <button class="fe-btn-query" type="button" onclick="runFeQuery()">立即查询</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="fe-section">
-          <div class="fe-section-head">
-            <div class="fe-section-title"><span class="fe-section-num">02</span>数据统计</div>
-            <div class="fe-section-actions">
-              <button type="button">隐藏</button>
-              <button type="button" onclick="runFeQuery()">刷新 ↻</button>
-            </div>
-          </div>
-          ${hero ? `
-            <div class="fe-stat-hero">
-              <div class="name">${esc(hero.label)}</div>
-              <div class="val">${esc(hero.value)}</div>
-              <div class="chart-icon"><span style="height:10px"></span><span style="height:16px"></span><span style="height:22px"></span><span style="height:14px"></span></div>
-            </div>` : ''}
-          <div class="fe-stat-grid">
-            ${grid.map((f, i) => `
-              <div class="fe-stat-mini">
-                <span class="fe-stat-badge">${esc(statBadge(f, i + 1))}</span>
-                <div class="name">${esc(f.label)}</div>
-                <div class="val">${esc(f.value)}</div>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-
-        <div class="fe-section">
-          <div class="fe-section-head">
-            <div class="fe-section-title"><span class="fe-section-num">03</span>数据明细</div>
-          </div>
-          ${renderFeDetailCards()}
-        </div>
-
-        <div class="fe-footer-note">当前为交互演示，查询数据仅供参考，实际以结算数据为准</div>
+        ${renderFeHeader()}
+        ${renderFeStatsSection()}
+        ${renderFeDetailCards()}
       `;
     }
 
@@ -1816,6 +1815,8 @@
     toggleRuleBtn.onclick = () => setRuleDrawer(!ruleDrawer.classList.contains('open'));
 
     function closeAllOverlays() {
+      closeFeProjectPicker();
+      closeFeFilterSheet();
       closeImportModal();
       closeListFieldModal();
       closeStatFieldModal();
@@ -1844,6 +1845,7 @@
     updateStatAddButton();
     fePreviewRows = dataRows.map(r => ({ ...r }));
     renderFeProjectPickerList();
+    onFeTimeRangeChange();
     renderFePreview();
   </script>
   <script src="fe-copy-html.js"></script>

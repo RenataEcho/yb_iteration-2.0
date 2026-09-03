@@ -179,6 +179,14 @@
       padding: 14px 16px; font-size: 14px; font-weight: 700;
       border-bottom: 1px solid var(--border);
     }
+    .table-empty {
+      display: none;
+      padding: 20px 16px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .table-empty.is-visible { display: block; }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
         animation-duration: 0.01ms !important;
@@ -202,7 +210,7 @@
       <span class="sprint-pill">YBDD2.0 · 迭代 v1</span>
     </div>
     <div class="sidebar-scroll" data-iteration-sidebar></div>
-    <div class="sidebar-foot">迭代需求 FR-002~008 · 废纸篓 FR-001</div>
+    <div class="sidebar-foot">迭代需求 · 归档需求 · 废纸篓 FR-001</div>
   </aside>
 
   <main class="main">
@@ -210,22 +218,22 @@
     <header class="page-header">
       <div class="page-header-left">
         <h1>YBDD2.0 · 迭代需求总览</h1>
-        <p class="page-desc">统一入口：「迭代需求」含代发收益 (FR-002)、品牌退款 (FR-003)、预估数据 (FR-004)、订单优化 (FR-005)、活动中心 (FR-006)、订单分发 (FR-007)、礼品中心 (FR-008)；暂不需要的需求归入「废纸篓」，如代发分配 (FR-001)。</p>
+        <p class="page-desc">统一入口：「迭代需求」含进行中的专项；状态改为「已上线」后自动归入「归档需求」。暂不需要的需求归入「废纸篓」，如代发分配 (FR-001)。</p>
       </div>
     </header>
 
     <div class="summary-grid">
       <div class="summary-card">
         <div class="label">迭代需求 · FR 数</div>
-        <div class="value">7</div>
+        <div class="value" id="count-requirements">7</div>
+      </div>
+      <div class="summary-card">
+        <div class="label">归档需求 · FR 数</div>
+        <div class="value" id="count-archived">0</div>
       </div>
       <div class="summary-card">
         <div class="label">废纸篓 · FR 数</div>
         <div class="value">1</div>
-      </div>
-      <div class="summary-card">
-        <div class="label">模板 A · 管理后台</div>
-        <div class="value">6</div>
       </div>
       <div class="summary-card">
         <div class="label">状态</div>
@@ -238,7 +246,8 @@
       <div class="table-head">
         <span>FR-ID</span><span>需求名称</span><span>模板</span><span>版本</span><span>状态</span>
       </div>
-      <div class="table-row">
+      <div id="fr-rows-requirements">
+      <div class="table-row" data-fr-row="FR-002" data-order="2">
         <span class="badge badge-fr">FR-002</span>
         <span><a href="fr-opc-daifa-revenue.html">代发收益</a></span>
         <span class="badge badge-template">B + A</span>
@@ -251,7 +260,7 @@
           </select>
         </label>
       </div>
-      <div class="table-row">
+      <div class="table-row" data-fr-row="FR-003" data-order="3">
         <span class="badge badge-fr">FR-003</span>
         <span><a href="fr-finance-brand-refund.html">品牌退款</a></span>
         <span class="badge badge-template">B卡片 + A</span>
@@ -264,7 +273,7 @@
           </select>
         </label>
       </div>
-      <div class="table-row">
+      <div class="table-row" data-fr-row="FR-004" data-order="4">
         <span class="badge badge-fr">FR-004</span>
         <span><a href="fr-project-estimated-data.html">预估数据</a></span>
         <span class="badge badge-template">A</span>
@@ -277,7 +286,7 @@
           </select>
         </label>
       </div>
-      <div class="table-row">
+      <div class="table-row" data-fr-row="FR-005" data-order="5">
         <span class="badge badge-fr">FR-005</span>
         <span><a href="fr-project-order-optimize.html">订单优化</a></span>
         <span class="badge badge-template">A</span>
@@ -290,7 +299,7 @@
           </select>
         </label>
       </div>
-      <div class="table-row">
+      <div class="table-row" data-fr-row="FR-006" data-order="6">
         <span class="badge badge-fr">FR-006</span>
         <span><a href="fr-activity-center.html">活动中心</a></span>
         <span class="badge badge-template">B + A</span>
@@ -303,7 +312,7 @@
           </select>
         </label>
       </div>
-      <div class="table-row">
+      <div class="table-row" data-fr-row="FR-007" data-order="7">
         <span class="badge badge-fr">FR-007</span>
         <span><a href="fr-project-order-distribute.html">订单分发</a></span>
         <span class="badge badge-template">A</span>
@@ -316,7 +325,7 @@
           </select>
         </label>
       </div>
-      <div class="table-row">
+      <div class="table-row" data-fr-row="FR-008" data-order="8">
         <span class="badge badge-fr">FR-008</span>
         <span><a href="fr-gift-center.html">礼品中心</a></span>
         <span class="badge badge-template">B + A</span>
@@ -329,6 +338,17 @@
           </select>
         </label>
       </div>
+      </div>
+      <div class="table-empty" id="fr-empty-requirements">暂无进行中的迭代需求</div>
+    </div>
+
+    <div class="glass-card">
+      <div class="card-title">归档需求</div>
+      <div class="table-head">
+        <span>FR-ID</span><span>需求名称</span><span>模板</span><span>版本</span><span>状态</span>
+      </div>
+      <div id="fr-rows-archived"></div>
+      <div class="table-empty is-visible" id="fr-empty-archived">暂无已上线归档的需求</div>
     </div>
 
     <div class="glass-card">
@@ -402,6 +422,43 @@
         el.textContent = STATUS[key].label;
         el.style.color = STATUS[key].color;
       }
+      function sortRows(container) {
+        var rows = Array.prototype.slice.call(container.querySelectorAll('.table-row[data-fr-row]'));
+        rows.sort(function (a, b) {
+          return Number(a.getAttribute('data-order')) - Number(b.getAttribute('data-order'));
+        });
+        rows.forEach(function (row) { container.appendChild(row); });
+      }
+      function toggleEmpty(id, container) {
+        var empty = document.getElementById(id);
+        if (!empty) return;
+        empty.classList.toggle('is-visible', !container.querySelector('.table-row[data-fr-row]'));
+      }
+      function syncArchivePlacement() {
+        var reqBody = document.getElementById('fr-rows-requirements');
+        var arcBody = document.getElementById('fr-rows-archived');
+        if (!reqBody || !arcBody) return;
+
+        document.querySelectorAll('.table-row[data-fr-row]').forEach(function (row) {
+          var select = row.querySelector('.status-select');
+          if (!select || select.getAttribute('data-scope') === 'trash') return;
+          var target = select.value === 'live' ? arcBody : reqBody;
+          if (row.parentNode !== target) target.appendChild(row);
+        });
+        sortRows(reqBody);
+        sortRows(arcBody);
+        toggleEmpty('fr-empty-requirements', reqBody);
+        toggleEmpty('fr-empty-archived', arcBody);
+
+        var reqCountEl = document.getElementById('count-requirements');
+        var arcCountEl = document.getElementById('count-archived');
+        if (reqCountEl) reqCountEl.textContent = reqBody.querySelectorAll('.table-row[data-fr-row]').length;
+        if (arcCountEl) arcCountEl.textContent = arcBody.querySelectorAll('.table-row[data-fr-row]').length;
+
+        if (typeof window.refreshIterationSidebar === 'function') {
+          window.refreshIterationSidebar();
+        }
+      }
 
       var stored = load();
       var selects = document.querySelectorAll('.status-select');
@@ -414,9 +471,11 @@
           save(stored);
           applySelect(el, el.value);
           updateSummary(selects);
+          syncArchivePlacement();
         });
       });
       updateSummary(selects);
+      syncArchivePlacement();
     })();
   </script>
 </body>

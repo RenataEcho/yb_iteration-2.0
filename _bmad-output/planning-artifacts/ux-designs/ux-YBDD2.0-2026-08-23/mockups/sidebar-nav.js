@@ -1,5 +1,6 @@
 (function (global) {
   var STORAGE_KEY = 'iteration-sidebar-groups';
+  var STATUS_STORAGE_KEY = 'ybdd-sprint-fr-status';
 
   var NAV_GROUPS = [
     {
@@ -14,14 +15,19 @@
       key: 'requirements',
       label: '迭代需求',
       items: [
-        { id: 'fr-opc-daifa-revenue', label: '代发收益', href: 'fr-opc-daifa-revenue.html' },
-        { id: 'fr-finance-brand-refund', label: '品牌退款', href: 'fr-finance-brand-refund.html' },
-        { id: 'fr-project-estimated-data', label: '预估数据', href: 'fr-project-estimated-data.html' },
-        { id: 'fr-project-order-optimize', label: '订单优化', href: 'fr-project-order-optimize.html' },
-        { id: 'fr-activity-center', label: '活动中心', href: 'fr-activity-center.html' },
-        { id: 'fr-project-order-distribute', label: '订单分发', href: 'fr-project-order-distribute.html' },
-        { id: 'fr-gift-center', label: '礼品中心', href: 'fr-gift-center.html' }
+        { id: 'fr-opc-daifa-revenue', label: '代发收益', href: 'fr-opc-daifa-revenue.html', fr: 'FR-002' },
+        { id: 'fr-finance-brand-refund', label: '品牌退款', href: 'fr-finance-brand-refund.html', fr: 'FR-003' },
+        { id: 'fr-project-estimated-data', label: '预估数据', href: 'fr-project-estimated-data.html', fr: 'FR-004' },
+        { id: 'fr-project-order-optimize', label: '订单优化', href: 'fr-project-order-optimize.html', fr: 'FR-005' },
+        { id: 'fr-activity-center', label: '活动中心', href: 'fr-activity-center.html', fr: 'FR-006' },
+        { id: 'fr-project-order-distribute', label: '订单分发', href: 'fr-project-order-distribute.html', fr: 'FR-007' },
+        { id: 'fr-gift-center', label: '礼品中心', href: 'fr-gift-center.html', fr: 'FR-008' }
       ]
+    },
+    {
+      key: 'archived',
+      label: '归档需求',
+      items: []
     },
     {
       key: 'trash',
@@ -51,9 +57,40 @@
     } catch (_) {}
   }
 
-  function findGroupKeyByActiveId(activeId) {
-    for (var i = 0; i < NAV_GROUPS.length; i++) {
-      var group = NAV_GROUPS[i];
+  function loadFrStatus() {
+    try {
+      return JSON.parse(localStorage.getItem(STATUS_STORAGE_KEY) || '{}') || {};
+    } catch (_) {
+      return {};
+    }
+  }
+
+  function resolveNavGroups() {
+    var statusMap = loadFrStatus();
+    var archivedItems = [];
+
+    return NAV_GROUPS.map(function (group) {
+      if (group.key === 'requirements') {
+        var activeItems = [];
+        group.items.forEach(function (item) {
+          if (item.fr && statusMap[item.fr] === 'live') {
+            archivedItems.push(item);
+          } else {
+            activeItems.push(item);
+          }
+        });
+        return { key: group.key, label: group.label, items: activeItems };
+      }
+      if (group.key === 'archived') {
+        return { key: group.key, label: group.label, items: archivedItems.slice() };
+      }
+      return group;
+    });
+  }
+
+  function findGroupKeyByActiveId(groups, activeId) {
+    for (var i = 0; i < groups.length; i++) {
+      var group = groups[i];
       for (var j = 0; j < group.items.length; j++) {
         if (group.items[j].id === activeId) return group.key;
       }
@@ -61,11 +98,12 @@
     return null;
   }
 
-  function isGroupExpanded(groupKey, activeGroupKey, savedState) {
-    if (groupKey === activeGroupKey) return true;
-    if (Object.prototype.hasOwnProperty.call(savedState, groupKey)) {
-      return !!savedState[groupKey];
+  function isGroupExpanded(group, activeGroupKey, savedState) {
+    if (group.key === activeGroupKey) return true;
+    if (Object.prototype.hasOwnProperty.call(savedState, group.key)) {
+      return !!savedState[group.key];
     }
+    if (group.key === 'archived' && !group.items.length) return false;
     return true;
   }
 
@@ -104,6 +142,10 @@
       '.nav-item.active::before{',
       '  content:"";position:absolute;left:0;top:7px;bottom:7px;',
       '  width:3px;border-radius:0 2px 2px 0;background:var(--primary,#2563eb);',
+      '}',
+      '.nav-empty{',
+      '  margin:2px 16px 8px;padding:6px 8px;font-size:12px;',
+      '  color:var(--text-muted,#9aa5b4);',
       '}'
     ].join('\n');
     document.head.appendChild(style);
@@ -131,12 +173,13 @@
     var active = activeId || container.getAttribute('data-iteration-sidebar') || detectActiveId();
     if (active === 'index') active = 'framework-shell';
 
-    var activeGroupKey = findGroupKeyByActiveId(active);
+    var groups = resolveNavGroups();
+    var activeGroupKey = findGroupKeyByActiveId(groups, active);
     var savedState = loadGroupState();
     var html = [];
 
-    NAV_GROUPS.forEach(function (group) {
-      var expanded = isGroupExpanded(group.key, activeGroupKey, savedState);
+    groups.forEach(function (group) {
+      var expanded = isGroupExpanded(group, activeGroupKey, savedState);
       var collapsedClass = expanded ? '' : ' collapsed';
       var ariaExpanded = expanded ? 'true' : 'false';
 
@@ -149,10 +192,14 @@
         '  <div class="nav-group-items">'
       );
 
-      group.items.forEach(function (item) {
-        var cls = item.id === active ? 'nav-item active' : 'nav-item';
-        html.push('    <a class="' + cls + '" href="' + item.href + '">' + item.label + '</a>');
-      });
+      if (group.items.length) {
+        group.items.forEach(function (item) {
+          var cls = item.id === active ? 'nav-item active' : 'nav-item';
+          html.push('    <a class="' + cls + '" href="' + item.href + '">' + item.label + '</a>');
+        });
+      } else {
+        html.push('    <div class="nav-empty">暂无</div>');
+      }
 
       html.push('  </div>', '</div>');
     });
@@ -168,6 +215,7 @@
   }
 
   global.renderIterationSidebar = renderSidebarNav;
+  global.refreshIterationSidebar = initSidebars;
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initSidebars);

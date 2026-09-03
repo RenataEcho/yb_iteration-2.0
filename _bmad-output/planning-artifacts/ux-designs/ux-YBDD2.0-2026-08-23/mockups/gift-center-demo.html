@@ -203,6 +203,12 @@
       margin-top: 12px; padding: 12px; border-radius: 10px; background: var(--inner-bg);
       font-size: 12px; color: var(--muted); line-height: 1.55;
     }
+    .track-row { display: flex; gap: 8px; align-items: flex-start; }
+    .track-row + .track-row, .track-row + .track-note, .track-note + .track-row { margin-top: 6px; }
+    .track-row span { flex: 0 0 64px; color: var(--text-muted); }
+    .track-row b, .track-row strong { flex: 1; color: var(--text); font-weight: 600; word-break: break-all; }
+    .track-row .warn { color: #d97706; }
+    .track-note { font-size: 12px; }
     .addr-cta, .rule-ok {
       width: 100%; margin-top: 14px; border: none; border-radius: 999px; padding: 12px;
       font-size: 14px; font-weight: 700; cursor: pointer; color: #fff;
@@ -303,6 +309,7 @@
       autumn: '<svg viewBox="0 0 88 88" fill="none"><rect width="88" height="88" rx="10" fill="#fff6e8"/><circle cx="58" cy="28" r="16" fill="#ffcc80"/><circle cx="62" cy="26" r="10" fill="#ffe0b2"/><ellipse cx="30" cy="58" rx="16" ry="8" fill="#e8c27a"/><path d="M18 56c4-10 20-10 24 0 2 6-4 12-12 12s-14-6-12-12z" fill="#d4a017"/><circle cx="30" cy="54" r="3" fill="#fff3eb"/><path d="M8 70c16-6 28 4 40 0 14-4 22-10 40-4v22H8V70z" fill="#ffd4b8"/><text x="44" y="78" text-anchor="middle" font-size="11" font-weight="700" fill="#b45309">中秋</text></svg>',
       dragon: '<svg viewBox="0 0 88 88" fill="none"><rect width="88" height="88" rx="10" fill="#fff8ee"/><path d="M0 58c20-10 32 4 48-2 14-6 22-16 40-8v40H0V58z" fill="#e8f5c8"/><path d="M32 24l12 22H20L32 24z" fill="#7cb342"/><path d="M32 28l8 16H24L32 28z" fill="#9ccc65"/><path d="M44 32l12 22H32L44 32z" fill="#558b2f"/><path d="M44 36l8 16H36L44 36z" fill="#8bc34a"/><path d="M12 50c10-8 22-6 28 2" stroke="#ff8a4c" stroke-width="3" fill="none"/><circle cx="64" cy="22" r="5" fill="#ffcc80"/><text x="44" y="76" text-anchor="middle" font-size="11" font-weight="700" fill="#558b2f">端午</text></svg>',
       newyear: '<svg viewBox="0 0 88 88" fill="none"><rect width="88" height="88" rx="10" fill="#fff3eb"/><circle cx="22" cy="20" r="2" fill="#ff8a4c"/><circle cx="70" cy="16" r="1.6" fill="#ffcc80"/><path d="M44 10l3 8 8 2-6 6 2 8-7-5-7 5 2-8-6-6 8-2 3-8z" fill="#ff5722"/><rect x="24" y="40" width="40" height="30" rx="6" fill="#fff" stroke="#ff5722" stroke-width="2"/><path d="M24 50h40" stroke="#ffd4b8" stroke-width="2"/><text x="44" y="64" text-anchor="middle" font-size="12" font-weight="800" fill="#ff5722">2026</text><text x="44" y="80" text-anchor="middle" font-size="11" font-weight="700" fill="#c2410c">元旦</text></svg>',
+      national: '<svg viewBox="0 0 88 88" fill="none"><rect width="88" height="88" rx="10" fill="#fff1e8"/><rect x="14" y="18" width="28" height="18" rx="2" fill="#ff5722"/><rect x="18" y="22" width="8" height="5" fill="#ffcc80"/><path d="M0 62c16-8 28 4 44-2 16-6 24-14 44-6v34H0V62z" fill="#ffcc80"/><circle cx="62" cy="28" r="10" fill="#ff8a4c"/><text x="44" y="76" text-anchor="middle" font-size="11" font-weight="700" fill="#c2410c">国庆</text></svg>',
       custom: '<svg viewBox="0 0 88 88" fill="none"><rect width="88" height="88" rx="10" fill="#fff4ea"/><circle cx="44" cy="38" r="18" fill="#ffcc80"/><path d="M32 38h24v22a6 6 0 01-6 6H38a6 6 0 01-6-6V38z" fill="#ff5722"/><rect x="41" y="38" width="6" height="28" fill="#fff3eb"/><path d="M44 28c-4-6-10-5-10 0 5 0 8 4 10 5 2-1 5-5 10-5 0-5-6-6-10 0z" fill="#ff8a4c"/><text x="44" y="78" text-anchor="middle" font-size="11" font-weight="700" fill="#c2410c">定制</text></svg>'
     };
 
@@ -313,10 +320,12 @@
       { id: 'shipped', label: '已发货' },
       { id: 'signed', label: '自动签收' },
       { id: 'missing-address', label: '缺地址' },
+      { id: 'pending', label: '待达标' },
       { id: 'missed', label: '遗憾错失' },
       { id: 'custom', label: '定制礼品' }
     ];
     const USER_REV = 5.2;
+    const USER_ADDR = '广东省深圳市南山区科技园路 8 号';
     let currentScene = 'list';
 
     function fmtWan(n) {
@@ -349,24 +358,39 @@
       return `<div class="custom-note">特别为你准备的一份礼，只属于此刻的你</div>`;
     }
 
+    function addressRow(g) {
+      if (g.missing || !g.addr) {
+        return '<div class="track-row"><span>收货地址</span><strong class="warn">缺地址</strong></div>';
+      }
+      return '<div class="track-row"><span>收货地址</span><b>' + g.addr + '</b></div>';
+    }
     function logisticsBox(g) {
+      let status = '待发货';
+      let extra = '<div class="track-note">已达标，平台准备寄出</div>';
       if (g.missing) {
-        return `<div class="track-box">物流状态 · <strong>待发货</strong><br/>收获地址缺失，暂不寄出</div>
-          <button class="addr-cta" type="button" onclick="openAddressRule()">去补全收货地址</button>`;
+        status = '待发货';
+        extra = '<div class="track-note">收获地址缺失，暂不寄出</div>';
+      } else if (g.outcome === 'miss') {
+        status = '未发放';
+        extra = '<div class="track-note">收益尚未达到发放条件，本礼不再寄出</div>';
+      } else if (g.outcome === 'pend') {
+        status = '待发放';
+        extra = '<div class="track-note">达标后由平台统一寄出</div>';
+      } else if (g.ship === 'signed' && g.track) {
+        status = '已自动签收';
+        extra = '<div class="track-row"><span>物流单号</span><b>' + g.track + '</b></div>';
+      } else if (g.ship === 'shipped' && g.track) {
+        status = '已发货';
+        extra = '<div class="track-row"><span>物流单号</span><b>' + g.track + '</b></div>';
       }
-      if (g.outcome === 'miss') {
-        return `<div class="track-box">物流状态 · <strong>未发放</strong><br/>收益尚未达到发放条件，本礼不再寄出</div>`;
-      }
-      if (g.outcome === 'pend') {
-        return `<div class="track-box">物流状态 · <strong>待发放</strong><br/>达标后由平台统一寄出</div>`;
-      }
-      if (g.ship === 'signed' && g.track) {
-        return `<div class="track-box">物流状态 · <strong>已自动签收</strong><br/>单号 ${g.track}</div>`;
-      }
-      if (g.ship === 'shipped' && g.track) {
-        return `<div class="track-box">物流状态 · <strong>已发货</strong><br/>单号 ${g.track}</div>`;
-      }
-      return `<div class="track-box">物流状态 · <strong>待发货</strong><br/>已达标，平台准备寄出</div>`;
+      const cta = g.missing
+        ? '<button class="addr-cta" type="button" onclick="openAddressRule()">去补全收货地址</button>'
+        : '';
+      return '<div class="track-box">'
+        + '<div class="track-row"><span>物流状态</span><strong>' + status + '</strong></div>'
+        + extra
+        + addressRow(g)
+        + '</div>' + cta;
     }
 
     function giftsForScene(scene) {
@@ -378,7 +402,7 @@
           id: 'spring', title: '春节创作者答谢礼', desc: '右豹定制保温壶，致敬持续创作。',
           cover: COVER.spring, grant: 'revenue', need: 5, current, outcome: 'won',
           range: '2025-01-01 至 2026-01-31',
-          ship: springShip, missing: springMissing,
+          ship: springShip, missing: springMissing, addr: springMissing ? '' : USER_ADDR,
           track: springShip === 'got' || springMissing ? '' : '顺丰 SF1368 2281 9001',
           tags: ['实物礼', '春节', '需达5万'], updated: scene === 'signed' ? '2026-09-09 10:00' : scene === 'shipped' ? '2026-09-02 14:30' : '2026-02-08 09:12',
           lines: ['右豹定制保温壶，致敬这一年持续创作的你。', '累计收益达到 5 万即可获得，进度见下方收益统计。', '请保持收获地址有效，缺地址将占名额但暂不寄出。', '物流信息见下方灰色区域，发货满 7 天自动签收。']
@@ -386,7 +410,7 @@
         {
           id: 'custom', title: '创作者专属礼', desc: '一份只写给你的看见。',
           cover: COVER.custom, grant: 'named', outcome: 'won',
-          ship: 'shipped', missing: false, track: '京东 JD6688 2201',
+          ship: 'shipped', missing: false, addr: '浙江省杭州市西湖区文三路 12 号', track: '京东 JD6688 2201',
           tags: ['定制礼品', '特别为你'], updated: '2026-08-20 11:00',
           lines: ['小周，这一份是平台特别为你准备的。', '不必和别人比进度，这是只属于你的看见。', '请保持收获地址有效，我们会尽快寄到你手里。', '物流信息见下方灰色区域，发货满 7 天自动签收。']
         },
@@ -394,7 +418,7 @@
           id: 'dragon', title: '端午安康礼', desc: '箬叶香囊礼盒，端午安康。',
           cover: COVER.dragon, grant: 'revenue', need: 5, current, outcome: 'won',
           range: '2026-01-01 至 2026-06-10',
-          ship: 'shipped', missing: false, track: '中通 ZT6621 8800',
+          ship: 'shipped', missing: false, addr: USER_ADDR, track: '中通 ZT6621 8800',
           tags: ['实物礼', '端午', '需达5万'], updated: '2026-06-02 16:40',
           lines: ['端午安康礼盒，内含箬叶香囊与定制茶食。', '累计收益达到 5 万即可获得。', '已交寄后可在灰色区域查看物流平台与单号。', '签收以满 7 天自动签收或后台状态为准。']
         },
@@ -402,7 +426,7 @@
           id: 'autumn', title: '中秋共庆礼', desc: '官方月饼礼盒，月圆人未散。',
           cover: COVER.autumn, grant: 'revenue', need: 8, current, outcome: 'miss',
           range: '2026-01-01 至 2026-09-17',
-          ship: 'none', missing: false, track: '',
+          ship: 'none', missing: false, addr: USER_ADDR, track: '',
           tags: ['实物礼', '中秋', '需达8万'], updated: '2026-09-17 10:00',
           lines: ['官方中秋月饼礼盒，和平台一起过个团圆节。', '累计收益需达到 8 万。活动已结束，未达标即遗憾错失。', '本礼每人最多一次，错失后不再补发。', '物流信息见下方灰色区域。']
         },
@@ -410,9 +434,17 @@
           id: 'newyear', title: '元旦开门礼', desc: '桌面金属日历，往期礼品不下架。',
           cover: COVER.newyear, grant: 'revenue', need: 1, current, outcome: 'won',
           range: '2025-01-01 至 2026-01-01',
-          ship: 'signed', missing: false, track: 'YT8888 1001',
+          ship: 'signed', missing: false, addr: USER_ADDR, track: 'YT8888 1001',
           tags: ['实物礼', '元旦', '需达1万'], updated: '2026-01-08 11:20',
           lines: ['桌面金属日历，把新的一年摆在手边。', '累计收益达到 1 万即可获得，往期礼品保留在列表。', '已自动签收后仍可在灰色区域核对物流。', '如需改地址，请前往既有收获地址页处理。']
+        },
+        {
+          id: 'national', title: '国庆创作者礼', desc: '国庆限定礼盒，区间未结束前持续判定。',
+          cover: COVER.national, grant: 'revenue', need: 10, current, outcome: 'pend',
+          range: '2026-01-01 至 2026-10-07',
+          ship: 'none', missing: false, addr: USER_ADDR, track: '',
+          tags: ['实物礼', '国庆', '需达10万'], updated: '2026-09-03 09:00',
+          lines: ['国庆创作者礼盒。', '累计收益达到 10 万即可获得。', '统计期尚未结束，未达标仍可继续累计。', '达标后请保持收获地址有效。']
         }
       ];
     }
@@ -489,6 +521,7 @@
         showPane('list');
         renderList();
         if (id === 'detail' || id === 'shipped' || id === 'signed' || id === 'missing-address') openDetail('spring');
+        if (id === 'pending') openDetail('national');
         if (id === 'missed') openDetail('autumn');
         if (id === 'custom') openDetail('custom');
       }

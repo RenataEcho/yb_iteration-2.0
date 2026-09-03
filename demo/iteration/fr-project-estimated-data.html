@@ -972,7 +972,6 @@
       <button type="button" data-rule="rule-admin" role="tab">后台需求</button>
     </div>
     <div class="drawer-body">
-      <!-- 前端需求 -->
       <div id="rule-fe" class="rule-panel active">
         <div class="rule-section">
           <h3><span>1</span>业务目标</h3>
@@ -984,13 +983,12 @@
           <h3><span>2</span>页面与入口</h3>
           <div class="rule-content">
             <ul>
-              <li><strong>入口</strong>：项目详情 / 数据工具区「数据查询」（具体入口位置复用既有 C 端项目页，本 FR 不重定义导航层级）。</li>
-              <li><strong>可见条件</strong>：项目「预估数据=显示」且运营已在后台配置展示字段；否则入口不可见。</li>
-              <li><strong>顶栏</strong>：返回按钮 + 右上角「筛选」入口。</li>
-              <li><strong>当前项目</strong>：展示项目 icon（名称前两字）/ 名称；点击头像或名称展开<strong>项目选择器</strong>（底部浮层列表），切换后刷新当前项目展示（Demo Mock 18 个项目：番茄小说、知乎故事…悟空网文）。</li>
-              <li><strong>筛选弹窗</strong>：点击「筛选」自底部弹出；固定「时间范围」下拉（今日/近7天/近15天/近30天/本月/自定义，自定义时展示起止日期）+「关键词」输入；点击「查询」后弹窗收起并刷新统计与明细。</li>
+              <li><strong>入口</strong>：项目详情 / 数据工具区「数据查询」（复用既有 C 端项目页，本 FR 不重定义导航）。仅「预估数据=显示」且已配置展示字段时可见。</li>
+              <li><strong>顶栏</strong>：返回按钮 + 右上角「筛选」。</li>
+              <li><strong>当前项目</strong>：项目 icon（名称前两字）/ 名称；点击展开<strong>项目选择器</strong>（底部浮层），切换后刷新本页。</li>
+              <li><strong>筛选弹窗</strong>：底部弹出；固定「时间范围」（今日/近7天/近15天/近30天/本月/自定义，自定义时展示起止日期）+「关键词」；点「查询」后收起并刷新统计与明细。时间范围必填，关键词选填。</li>
               <li><strong>数据统计</strong>：按后台「数据统计」配置渲染；排序第 1 项为大卡（文案「当前筛选下的总数据 · {统计项名}」），其余为<strong>三列</strong>小卡（值上标签下）。</li>
-              <li><strong>数据明细</strong>：标题「明细 · N 条」；卡片列表首字段（关键词）为标题；其余字段入内嵌灰色三列信息域（<strong>值上标签下</strong>，关联展示字段合并：主值 + 副值）；底部「最近出单：{日期}」。</li>
+              <li><strong>数据明细</strong>：标题「明细 · N 条」；首字段（关键词）为卡片标题；其余入灰色三列信息域（值上标签下，关联字段合并：主值 + 副值）；底部「最近出单：{日期}」。</li>
             </ul>
           </div>
         </div>
@@ -998,11 +996,11 @@
           <h3><span>3</span>交互规则</h3>
           <div class="rule-content">
             <ul>
-              <li>点击筛选弹窗「查询」→ 请求后端按条件聚合统计 + 返回明细分页列表；查询完成后<strong>筛选弹窗自动收起</strong>。</li>
-              <li>明细卡片为<strong>只读展示</strong>，不提供编辑/删除（数据维护在管理后台）。</li>
-              <li>链接类字段（字段名/标识含 link、url、链接、主页，或值为 http 开头）以链接色展示，点击行为复用 C 端外链打开规范。</li>
-              <li>无匹配数据时，数据明细区展示空态「暂无数据，请调整查询条件」；统计区展示 0 或空值（口径由后端定义）。</li>
-              <li>字段集合、顺序、统计项名称均读取后台展示配置，C 端<strong>不可自定义列</strong>。</li>
+              <li>点筛选「查询」→ 按条件聚合统计 + 返回明细分页；完成后弹窗收起。统计与明细须来自<strong>同一次查询</strong>。</li>
+              <li>明细卡片只读，不提供编辑/删除。</li>
+              <li>链接类字段（字段名/标识含 link、url、链接、主页，或值为 http 开头）以链接色展示，点击复用 C 端外链规范。</li>
+              <li>无匹配：明细空态「暂无数据，请调整查询条件」；统计区 0 或空值（口径由后端定义）。</li>
+              <li>字段集合、顺序、统计项名称均读后台配置，C 端<strong>不可自定义列</strong>。明细建议分页，首屏 N 条由研发约定。</li>
             </ul>
           </div>
         </div>
@@ -1010,95 +1008,72 @@
           <h3><span>4</span>边界规则</h3>
           <div class="rule-content">
             <ul>
-              <li>项目「预估数据=隐藏」时，C 端入口不可见；已有数据保留，再次显示后恢复。</li>
-              <li>C 端仅展示当前用户有权限查看的项目预估数据（权限口径与既有项目数据可见性一致）。</li>
-              <li>时间范围为必填（具体校验提示文案由前端统一规范）；其余查询字段选填。</li>
-              <li>统计数据与明细列表须来自<strong>同一次查询</strong>，避免统计与明细口径不一致。</li>
-              <li>明细列表建议分页加载；首屏默认展示 N 条（N 由研发与性能约定，Demo 展示 3 条样例）。</li>
+              <li>项目「预估数据=隐藏」时入口不可见；已有数据保留，再次显示后恢复。</li>
+              <li>C 端仅展示当前用户有权限查看的项目预估数据（口径与既有项目数据可见性一致）。</li>
             </ul>
           </div>
         </div>
         <div class="rule-section">
           <h3><span>5</span>业务流程</h3>
           <div class="rule-content">
-            <p>配置下发 → C 端查询 → 统计聚合 → 明细展示链路见页内 Tab <strong>「业务流程」</strong>流程图。</p>
+            <p>见页内 Tab <strong>「业务流程」</strong>。</p>
           </div>
         </div>
       </div>
-      <!-- 后台需求 -->
       <div id="rule-admin" class="rule-panel">
         <div class="rule-section">
           <h3><span>1</span>业务目标</h3>
           <div class="rule-content">
-            <p>为项目提供可配置的<strong>预估数据</strong>维护与展示能力：运营可在项目维度开启/关闭预估数据入口，并通过展示配置定义列表列与统计指标，在项目下维护预估数据明细，支持 Excel 批量导入与批量删除。</p>
+            <p>为项目提供可配置的<strong>预估数据</strong>维护与展示：运营按项目开关入口，用展示配置定义列与统计指标，并维护明细（Excel 批量导入 / 批量删除）。</p>
           </div>
         </div>
         <div class="rule-section">
           <h3><span>2</span>数据表与字段</h3>
           <div class="rule-content">
-            <p><strong>项目编辑弹窗（扩展现有 · 仅规则，本 FR 不做 UI 设计）</strong>：</p>
-            <ul>
-              <li>新增字段 <strong>预估数据</strong>，枚举：<code>显示</code> / <code>隐藏</code>。</li>
-              <li>默认建议为 <code>隐藏</code>；设为 <code>显示</code> 后，该项目详情/管理后台出现「预估数据」相关入口与 Tab。</li>
-              <li>设为 <code>隐藏</code> 后，预估数据表入口不可见，已有数据保留不物理删除。</li>
-            </ul>
+            <p><strong>项目编辑弹窗（扩展现有 · 仅规则，本 FR 不做 UI）</strong>：新增 <strong>预估数据</strong> = <code>显示</code> / <code>隐藏</code>（建议默认隐藏）。显示后出现预估数据入口与 Tab；隐藏后入口不可见，数据保留不物理删除。</p>
             <div class="rule-note">本字段<strong>仅写入需求规则</strong>，不在本 FR Demo 中设计项目编辑弹窗 UI；研发对照既有项目编辑弹窗扩展。</div>
-            <p style="margin-top:14px;"><strong>预估数据展示配置</strong>（项目级或全局配置域，与具体项目绑定）：</p>
-            <p style="margin-top:8px;"><strong>① 列表展示字段</strong>（可多条、可排序）：</p>
+            <p style="margin-top:14px;"><strong>① 列表展示字段</strong>（项目级，可多条、可排序）：</p>
             <ul>
-              <li><strong>展示字段</strong>：列头展示名称。</li>
-              <li><strong>字段标识</strong>：唯一 key，用于存储、导入列映射、API 字段名。</li>
-              <li><strong>关联展示字段</strong>（可选）：如 <code>user_id</code> 关联展示 <code>user_nickname</code>；列表/C 端合并展示，导入时可由系统反查填充。</li>
-              <li><strong>是否支持导入</strong>：是/否；仅「是」的字段进入 Excel 模版列与导入校验。</li>
-              <li>支持拖拽或序号调整<strong>排序</strong>，决定列表列顺序与导入模版列顺序。</li>
+              <li><strong>展示字段</strong>：列头名称。<strong>字段标识</strong>：唯一 key（存储 / 导入映射 / API）。创建后不建议改，必须改须有迁移。</li>
+              <li><strong>关联展示字段</strong>（可选）：如 <code>user_id</code> 关联 <code>user_nickname</code>；列表/C 端合并展示，导入后系统反查填充。</li>
+              <li><strong>是否支持导入</strong>：仅「是」进入 Excel 模版列与导入校验。排序同时决定列表列序与模版列序。</li>
             </ul>
             <p style="margin-top:8px;"><strong>② 数据统计</strong>（可多条、可排序）：</p>
             <ul>
-              <li><strong>来源字段</strong>：新增时从「列表展示字段」下拉选择；同一列表字段不可重复添加为统计项。</li>
-              <li><strong>统计字段名</strong>：系统根据来源字段自动生成（如「预估曝光量」→「预估曝光合计」）。</li>
-              <li><strong>字段标识</strong>：系统生成（如 <code>sum_est_exposure</code>）；后端按配置聚合（sum / count）。</li>
-              <li>支持排序，决定 C 端统计区展示顺序与后台表头统计区顺序。</li>
-              <li>系统固定项「数据条数」（<code>row_count</code>）可保留，不关联列表字段。</li>
+              <li>来源字段从「列表展示字段」下拉选择，同一列表字段不可重复添加。</li>
+              <li>统计字段名与标识由系统生成（如「预估曝光量」→「预估曝光合计」/<code>sum_est_exposure</code>）；后端按配置聚合（sum / count）。</li>
+              <li>排序决定 C 端统计区与后台表头统计区顺序。系统固定项「数据条数」（<code>row_count</code>）可保留，不关联列表字段。</li>
             </ul>
-            <p style="margin-top:14px;"><strong>预估数据表</strong>（项目维度数据）：</p>
-            <ul>
-              <li>列表列<strong>动态渲染</strong>，与「列表展示字段」配置一致（含关联展示字段合并列）。</li>
-              <li>表头统计区按「数据统计」配置动态渲染，随筛选/导入/删除联动刷新。</li>
-              <li>系统字段（建议）：数据 ID、所属项目 ID、数据更新时间；操作：删除。</li>
-            </ul>
+            <p style="margin-top:14px;"><strong>预估数据表</strong>：列与表头统计均按展示配置动态渲染（含关联字段合并列）。系统字段建议：数据 ID、所属项目 ID、数据更新时间；操作：删除。</p>
           </div>
         </div>
         <div class="rule-section">
           <h3><span>3</span>列表与交互</h3>
           <div class="rule-content">
-            <p><strong>展示配置</strong>：列表展示字段与数据统计均为可增删改表格；排序变更即时影响预估数据表列顺序、C 端明细字段顺序与统计区顺序。右侧「前端预览」与配置实时联动（Demo 用途）。</p>
+            <p><strong>展示配置</strong>：列表字段与统计项可增删改；排序即时影响预估数据表列、C 端明细与统计区。右侧「前端预览」与配置实时联动（Demo 用途）。</p>
             <p style="margin-top:8px;"><strong>预估数据表</strong>：</p>
             <ul>
-              <li><strong>批量删除</strong>：勾选多行 → 确认 → 删除；删除后统计区重算。</li>
-              <li><strong>批量导入</strong>：Excel 列与「列表展示字段」中<strong>支持导入=是</strong>的字段一一对应，列顺序与字段排序一致。</li>
-              <li><strong>下载导入模版</strong>：根据当前展示配置<strong>动态生成</strong> Excel 模版（表头=展示字段名）；配置变更后再次下载应反映最新列集合。</li>
-              <li>导入校验失败行整批或逐行报错策略由研发约定，需反馈失败原因与行号。</li>
-              <li>关联展示字段不参与模版列；导入后由系统根据主字段（如 ID）匹配填充。</li>
+              <li><strong>批量删除</strong>：勾选 → 确认 → 删除后统计区重算。</li>
+              <li><strong>批量导入 / 下载模版</strong>：列与「支持导入=是」的字段一一对应，顺序跟字段排序；模版按当前配置动态生成。配置变更后再次下载须反映最新列。</li>
+              <li>导入失败须反馈原因与行号（整批或逐行由研发约定）。关联展示字段不进模版列。</li>
             </ul>
-            <p style="margin-top:8px;"><strong>筛选项</strong>（Demo 示例）：关键词、用户信息；实际筛选项可与可检索的列表展示字段对齐。</p>
+            <p style="margin-top:8px;"><strong>筛选项</strong>：可与可检索的列表展示字段对齐（Demo：关键词、用户信息）。</p>
           </div>
         </div>
         <div class="rule-section">
           <h3><span>4</span>边界规则</h3>
           <div class="rule-content">
             <ul>
-              <li>项目 <code>预估数据=隐藏</code> 时，C 端/后台预估数据入口均不可见；数据保留，再次设为 <code>显示</code> 后恢复展示。</li>
-              <li>删除列表展示字段前，需确认是否影响已有数据列展示；已存储的扩展字段数据建议保留，仅不再展示。</li>
-              <li>字段标识创建后不建议修改（避免历史数据与导入模版不一致）；若必须修改需有迁移策略。</li>
-              <li>同一项目下预估数据表与展示配置一一绑定；不同项目可独立配置字段集合。</li>
-              <li>导入模版、列表列、导入校验三者必须以同一套「列表展示字段 + 支持导入」配置为单一数据源。</li>
+              <li>删除列表展示字段后，已存储的扩展字段数据建议保留，仅不再展示。</li>
+              <li>同一项目下预估数据表与展示配置一一绑定；不同项目可独立配置。</li>
+              <li>导入模版、列表列、导入校验必须以同一套「列表展示字段 + 支持导入」为单一数据源。</li>
             </ul>
           </div>
         </div>
         <div class="rule-section">
           <h3><span>5</span>业务流程</h3>
           <div class="rule-content">
-            <p>见页内 Tab <strong>「业务流程」</strong>流程图。</p>
+            <p>见页内 Tab <strong>「业务流程」</strong>。</p>
           </div>
         </div>
       </div>

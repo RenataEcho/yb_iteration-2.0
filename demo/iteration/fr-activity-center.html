@@ -570,22 +570,21 @@
           <div class="rule-content">
             <ul>
               <li><strong>入口</strong>：个人中心 / 首页等既有入口；页头「活动中心」。</li>
-              <li><strong>置顶 Banner</strong>：最多 1 条；不在下方列表重复；<strong>不随筛选 Tab 隐藏</strong>。</li>
-              <li><strong>筛选</strong>：全部 / 进行中 / 已结束；只过滤列表卡片，不撤 Banner。</li>
-              <li><strong>卡片结构（图1）</strong>：项目标签 → 灰色内容区（状态角标 + 图标 + 标题/副标题）→ 底部信息 +「查看」。</li>
+              <li><strong>置顶 Banner</strong>：最多 1 条；不在下方列表重复；<strong>不随筛选 Tab 隐藏</strong>。取消置顶后 Banner 立即消失。</li>
+              <li><strong>筛选</strong>：全部 / 进行中 / 已结束；只过滤列表卡片，不撤 Banner。空则「暂无符合条件的活动」。</li>
+              <li><strong>卡片结构（图1）</strong>：项目标签 → 灰色内容区（状态角标 + 图标 + 标题/副标题）→ 底部信息 +「查看」。按钮文案不因状态改变。</li>
               <li><strong>C 端状态角标</strong>：由系统按活动时间计算 <code>待开始</code> / <code>进行中</code> / <code>已结束</code>，不是后台「显示/隐藏」。</li>
             </ul>
           </div>
         </div>
         <div class="rule-section">
-          <h3><span>3</span>展示判断（对齐流程图）</h3>
+          <h3><span>3</span>展示判断</h3>
           <div class="rule-content">
             <ul>
-              <li><strong>浏览人数</strong>：始终展示「x人浏览」，取后台初始浏览量；前端不累加。</li>
-              <li><strong>参加人数已配置？</strong>是 → 展示「x人已参加」（虚拟值）；否 → 人数与后图整段不展示。</li>
-              <li><strong>后图已配置？</strong>仅在已展示参加人数之后判断；是 → 跟在人数字案后展示图；否 → 只留文案，不放占位图。</li>
-              <li><strong>有跳转链接？</strong>点 Banner/卡片「查看」：是 → 跳转配置地址；否 → 进入后台配置的活动详情页（展示活动内容）。本 FR 不重做详情页样式，复用既有详情页。</li>
-              <li>筛选「进行中 / 已结束」只匹配系统算出的 C 端状态；列表空则「暂无符合条件的活动」。</li>
+              <li><strong>浏览人数</strong>：始终展示「x人浏览」，取后台初始浏览量；前端不累加、不编造。</li>
+              <li><strong>参加人数</strong>：已配置 →「x人已参加」（虚拟值）；未配置 → 人数与后图整段不展示。</li>
+              <li><strong>后图</strong>：仅在已展示参加人数之后判断；已配置则跟在文案后，未配置不放占位图。只配后图、不配人数时仍不展示该图。</li>
+              <li><strong>跳转</strong>：点 Banner/卡片「查看」有链接则跳配置地址，没有则进入既有活动详情页（展示活动内容）。本 FR 不重做详情页样式。</li>
             </ul>
           </div>
         </div>
@@ -593,17 +592,14 @@
           <h3><span>4</span>边界规则</h3>
           <div class="rule-content">
             <ul>
-              <li>后台「隐藏」的活动<strong>不进入 C 端可见池</strong>，列表与 Banner 均不出现。</li>
-              <li>参加人数、后图未下发则前端当未配置，不本地编造、不累加。</li>
-              <li>同时仅 1 条置顶；取消置顶后 Banner 立即消失。</li>
-              <li>按钮文案统一「查看」，不因状态或是否报名而改变。</li>
+              <li>后台「隐藏」的活动不进入 C 端可见池，列表与 Banner 均不出现。</li>
             </ul>
           </div>
         </div>
         <div class="rule-section">
           <h3><span>5</span>业务流程</h3>
           <div class="rule-content">
-            <p>见页内 Tab <strong>「业务流程」</strong>：配置保存 → 显示才下发 → 卡片带浏览人数 → 配了参加人数才展示（有后图才跟图）→ 点查看有链接跳配置地址，没有则进活动详情。</p>
+            <p>见页内 Tab <strong>「业务流程」</strong>。</p>
           </div>
         </div>
       </div>
@@ -619,24 +615,13 @@
           <div class="rule-content">
             <ul>
               <li>三栏页：左基础字段、中富文本、右预览；新增/编辑同一页，编辑回填。</li>
-              <li><strong>必填（不通过则退回表单）</strong>：活动标题（≤64）、开始时间、活动状态（显示/隐藏）。</li>
-              <li><strong>选填</strong>：平台、赛道、项目（先赛道后项目）、简介（≤200）、跳转链接、结束时间（空=长期）、排序（默认 0，越大越前）、初始浏览量（默认 0）、参加人数（虚拟）、参加人数后图、活动内容。</li>
+              <li><strong>必填</strong>：活动标题（≤64）、开始时间、活动状态（显示/隐藏）。不通过则不保存，退回并提示缺失项。</li>
+              <li><strong>选填</strong>：平台、赛道、项目（先赛道后项目）、简介（≤200）、跳转链接、结束时间（空=长期；有值且早于开始则退回）、排序（默认 0，越大越前）、初始浏览量（默认 0）、参加人数（虚拟）、参加人数后图、活动内容。</li>
             </ul>
           </div>
         </div>
         <div class="rule-section">
-          <h3><span>3</span>系统判断（对齐流程图）</h3>
-          <div class="rule-content">
-            <ul>
-              <li><strong>必填通过？</strong>否 → 不保存，退回编辑页并提示缺失项。</li>
-              <li><strong>结束时间合法？</strong>有值且早于开始 → 退回；空表示长期有效。</li>
-              <li><strong>状态=显示？</strong>否 → 写入但<strong>不进入 C 端可见池</strong>；是 → 按时间计算待开始/进行中/已结束。</li>
-              <li><strong>组装下发</strong>：浏览人数必带；参加人数仅填了才下发；后图仅上传了才下发。未下发字段 C 端视为未配置。</li>
-            </ul>
-          </div>
-        </div>
-        <div class="rule-section">
-          <h3><span>4</span>列表与筛选</h3>
+          <h3><span>3</span>列表与筛选</h3>
           <div class="rule-content">
             <ul>
               <li>筛选项：活动标题、所属平台、所属赛道、活动状态（显示/隐藏）。重置只清空条件，不自动查询。</li>
@@ -646,13 +631,13 @@
           </div>
         </div>
         <div class="rule-section">
-          <h3><span>5</span>边界规则</h3>
+          <h3><span>4</span>边界规则</h3>
           <div class="rule-content">
             <ul>
               <li>项目下拉依赖赛道；未选赛道时禁用，占位「请先选择所属赛道」。</li>
-              <li>后图是参加人数的附属展示：C 端先有人数文案，才可能出后图；只配后图、不配人数时 C 端仍不展示该图。</li>
-              <li>跳转链接留空 = C 端点「查看」进入活动详情页，展示后台配置的活动内容。</li>
-              <li>流程图见页内 Tab <strong>「业务流程」</strong>。表单校验（必填、结束时间）留在编辑页，不画进主流程。</li>
+              <li>状态=显示才进入 C 端可见池并按时间计算待开始/进行中/已结束；隐藏则写入但不下发。</li>
+              <li>组装下发：浏览人数必带；参加人数、后图仅配置了才下发。未下发字段 C 端视为未配置。</li>
+              <li>表单校验（必填、结束时间）留在编辑页，不画进主流程。</li>
             </ul>
           </div>
         </div>
