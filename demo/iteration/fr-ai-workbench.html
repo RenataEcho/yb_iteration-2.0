@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FR-009 · AI工作台 · 右豹迭代需求记录</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-light: #eff6ff;
+      --primary-border: #bfdbfe;
+      --accent-rule: #0891b2;
+      --accent-version: #7c3aed;
+      --accent-fr: #d97706;
+      --success: #16a34a;
+      --success-bg: #f0fdf4;
+      --success-border: #bbf7d0;
+      --warning: #d97706;
+      --warning-bg: #fffbeb;
+      --warning-border: #fde68a;
+      --danger: #dc2626;
+      --danger-bg: #fef2f2;
+      --danger-border: #fca5a5;
+      --info: #0891b2;
+      --info-bg: #ecfeff;
+      --info-border: #a5f3fc;
+      --bg: #f0f4f8;
+      --surface: #ffffff;
+      --surface-glass: rgba(255,255,255,0.72);
+      --surface-hover: #f8fafc;
+      --border: #e8edf3;
+      --text-primary: #18222f;
+      --text-secondary: #4a5568;
+      --text-muted: #9aa5b4;
+      --sidebar-w: 240px;
+      --drawer-w: 420px;
+      --radius-sm: 7px;
+      --radius-lg: 14px;
+      --shadow: 0 8px 32px rgba(30,40,80,0.10);
+      --transition: all 0.16s ease;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif;
+      font-size: 13px; color: var(--text-primary);
+      background: linear-gradient(135deg, #e0e7ff 0%, #f0f4f8 40%, #e0f2fe 100%);
+      background-attachment: fixed;
+      position: relative;
+    }
+    body::before, body::after {
+      content: ''; pointer-events: none; position: fixed; border-radius: 50%; z-index: 0;
+    }
+    body::before {
+      width: 420px; height: 420px; top: -80px; right: 8%;
+      background: radial-gradient(circle, rgba(124,58,237,0.16), transparent 62%);
+    }
+    body::after {
+      width: 360px; height: 360px; bottom: -60px; left: 28%;
+      background: radial-gradient(circle, rgba(37,99,235,0.14), transparent 60%);
+    }
+    .sidebar {
+      position: fixed; inset: 0 auto 0 0; width: var(--sidebar-w); z-index: 200;
+      display: flex; flex-direction: column;
+      background: rgba(240,244,255,0.95); backdrop-filter: blur(20px);
+      border-right: 1px solid rgba(148,163,196,0.22);
+    }
+    .sidebar-brand { padding: 16px 14px 12px; border-bottom: 1px solid rgba(148,163,196,0.22); }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: linear-gradient(135deg, #2563eb, #7c3aed); color: #fff;
+      display: flex; align-items: center; justify-content: center; font-weight: 700;
+    }
+    .brand-text { font-size: 14px; font-weight: 700; }
+    .brand-sub { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+    .sprint-pill {
+      display: inline-block; margin-top: 10px; font-size: 11px; font-weight: 600;
+      padding: 3px 8px; border-radius: 999px; background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0;
+    }
+    .sidebar-scroll { flex: 1; overflow-y: auto; padding: 8px 0 16px; }
+    .sidebar-foot { padding: 10px 14px 14px; border-top: 1px solid rgba(148,163,196,0.22); font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+    .main {
+      margin-left: var(--sidebar-w);
+      height: 100vh;
+      display: flex; flex-direction: column;
+      padding: 16px 20px 16px;
+      min-width: 0;
+      position: relative; z-index: 1;
+    }
+    .breadcrumb { padding: 0 0 10px; font-size: 12px; color: var(--text-muted); flex-shrink: 0; }
+    .breadcrumb a { color: var(--primary); text-decoration: none; }
+    .page-header { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; flex-shrink: 0; }
+    .page-header h1 { font-size: 19px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .ai-mark {
+      width: 22px; height: 22px; border-radius: 7px; flex-shrink: 0;
+      background: linear-gradient(135deg, #2563eb 0%, #7c3aed 55%, #06b6d4 100%);
+      box-shadow: 0 0 0 3px rgba(124,58,237,0.12), 0 6px 16px rgba(37,99,235,0.28);
+    }
+    .page-desc { font-size: 12px; color: var(--text-muted); max-width: 720px; line-height: 1.55; }
+    .badge { display: inline-flex; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: var(--radius-sm); }
+    .badge-fr { background: #fffbeb; color: var(--accent-fr); border: 1px solid #fde68a; }
+    .badge-version { background: #f5f3ff; color: var(--accent-version); border: 1px solid #ddd6fe; }
+    .badge-success { background: var(--success-bg); color: var(--success); border: 1px solid var(--success-border); }
+    .badge-warning { background: var(--warning-bg); color: var(--warning); border: 1px solid var(--warning-border); }
+    .badge-info { background: var(--info-bg); color: var(--info); border: 1px solid var(--info-border); }
+    .badge-danger { background: var(--danger-bg); color: var(--danger); border: 1px solid var(--danger-border); }
+    .btn {
+      display: inline-flex; align-items: center; height: 34px; padding: 0 14px;
+      border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid transparent;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #2563eb 0%, #4f46e5 50%, #7c3aed 100%);
+      color: #fff; box-shadow: 0 6px 16px rgba(79,70,229,0.28);
+    }
+    .btn-primary:hover { filter: brightness(1.06); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; filter: none; }
+    .btn-rule { background: var(--primary-light); color: var(--primary); border-color: var(--primary-border); }
+    .btn-text {
+      border: none; background: none; padding: 0; cursor: pointer;
+      font-size: 12px; font-weight: 600; color: #4f46e5; text-decoration: none;
+    }
+    .btn-text:hover { color: #3730a3; text-decoration: underline; }
+    .btn-ghost { background: var(--surface); color: var(--text-secondary); border-color: var(--border); }
+    .workbench {
+      flex: 1; min-height: 0;
+      display: grid; grid-template-columns: minmax(460px, 56%) minmax(280px, 1fr); gap: 12px;
+    }
+    .glass-card {
+      background: var(--surface-glass); backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.55); border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+    }
+    .chat-pane, .result-pane {
+      min-height: 0; display: flex; flex-direction: column; overflow: hidden;
+    }
+    .chat-pane {
+      border: 1px solid rgba(165,180,252,0.45);
+      box-shadow: var(--shadow), 0 0 0 1px rgba(124,58,237,0.06), 0 18px 40px rgba(79,70,229,0.08);
+      background:
+        linear-gradient(180deg, rgba(238,242,255,0.55) 0%, rgba(255,255,255,0.62) 28%, rgba(255,255,255,0.7) 100%);
+    }
+    .result-pane {
+      background: rgba(255,255,255,0.64);
+    }
+    .pane-head {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      padding: 12px 16px; border-bottom: 1px solid var(--border); flex-shrink: 0;
+    }
+    .chat-pane .pane-head {
+      background: linear-gradient(90deg, rgba(37,99,235,0.06), rgba(124,58,237,0.08) 50%, rgba(6,182,212,0.06));
+    }
+    .pane-head h2 { font-size: 13.5px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+    .live-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #22d3ee; box-shadow: 0 0 0 0 rgba(34,211,238,0.55);
+      animation: live 1.6s ease-out infinite;
+    }
+    .pane-meta { font-size: 11px; color: var(--text-muted); }
+    .chat-log {
+      flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 14px;
+    }
+    .bubble { max-width: 94%; line-height: 1.55; }
+    .bubble-user { align-self: flex-end; }
+    .bubble-user .bubble-body {
+      background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+      color: #fff; border-radius: 14px 14px 4px 14px; padding: 10px 13px;
+      box-shadow: 0 8px 18px rgba(37,99,235,0.22);
+    }
+    .bubble-ai { align-self: flex-start; display: flex; gap: 8px; max-width: 96%; }
+    .ai-avatar {
+      width: 28px; height: 28px; border-radius: 9px; flex-shrink: 0; margin-top: 2px;
+      background: linear-gradient(135deg, #2563eb, #7c3aed 60%, #22d3ee);
+      box-shadow: 0 0 0 3px rgba(124,58,237,0.12);
+    }
+    .bubble-ai .bubble-col { min-width: 0; flex: 1; }
+    .bubble-ai .bubble-body {
+      background: rgba(255,255,255,0.92);
+      border: 1px solid rgba(199,210,254,0.8);
+      border-radius: 4px 14px 14px 14px; padding: 10px 13px;
+      color: var(--text-secondary);
+      box-shadow: inset 3px 0 0 #7c3aed;
+    }
+    .bubble-time { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+    .bubble-user .bubble-time { text-align: right; }
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .chip-group { margin-top: 10px; }
+    .chip-label { font-size: 10px; font-weight: 600; color: #7c3aed; letter-spacing: 0.04em; margin-bottom: 5px; }
+    .chip {
+      border: 1px solid rgba(165,180,252,0.9);
+      background: linear-gradient(180deg, #eef2ff, #eff6ff);
+      color: #3730a3;
+      border-radius: 999px; padding: 6px 11px; font-size: 12px; cursor: pointer; text-align: left;
+    }
+    .chip:hover { background: #e0e7ff; }
+    .chat-input-wrap {
+      padding: 10px 14px 14px; border-top: 1px solid rgba(199,210,254,0.7); flex-shrink: 0;
+      background: linear-gradient(180deg, rgba(238,242,255,0.35), rgba(255,255,255,0.55));
+    }
+    .input-toolbar { display: flex; justify-content: flex-start; margin-bottom: 8px; }
+    .input-row { display: flex; gap: 8px; align-items: flex-end; }
+    .chat-input-wrap textarea {
+      flex: 1; min-height: 52px; max-height: 110px; resize: none;
+      border: 1px solid #c7d2fe; border-radius: 10px;
+      padding: 10px 12px; font: inherit; outline: none; background: #fff;
+    }
+    .chat-input-wrap textarea:focus {
+      border-color: #818cf8;
+      box-shadow: 0 0 0 4px rgba(99,102,241,0.16), 0 0 24px rgba(124,58,237,0.12);
+    }
+    .result-body { flex: 1; overflow-y: auto; padding: 16px; }
+    .result-empty {
+      height: 100%; min-height: 280px; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; text-align: center; color: var(--text-muted); gap: 8px;
+    }
+    .result-empty strong { font-size: 14px; color: var(--text-secondary); }
+    .orb {
+      width: 72px; height: 72px; border-radius: 50%; position: relative; margin-bottom: 8px;
+      background: radial-gradient(circle at 35% 30%, #fff, #c7d2fe 42%, #7c3aed 100%);
+      box-shadow: 0 0 0 8px rgba(124,58,237,0.08), 0 12px 28px rgba(79,70,229,0.22);
+      animation: orb 2.8s ease-in-out infinite;
+    }
+    .orb::after {
+      content: ''; position: absolute; inset: 14px; border-radius: 50%;
+      border: 1.5px solid rgba(255,255,255,0.7);
+    }
+    .result-summary {
+      display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+      margin-bottom: 12px; font-size: 12px; color: var(--text-secondary);
+    }
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; margin-bottom: 12px; }
+    .kpi {
+      background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px;
+    }
+    .kpi .k { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+    .kpi .v { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; }
+    .kw-list { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 12px; }
+    .kw {
+      font-size: 12px; padding: 4px 8px; border-radius: 999px;
+      background: #eef2ff; color: #3730a3; border: 1px solid #c7d2fe;
+    }
+    .tfoot { font-weight: 700; background: #f8fafc; }
+    .project-block {
+      background: #fff; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 12px;
+    }
+    .project-head {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      padding: 10px 14px; background: rgba(248,250,252,0.9); border-bottom: 1px solid var(--border);
+      font-weight: 600;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+    th { font-size: 12px; font-weight: 600; color: var(--text-muted); background: #fcfdff; }
+    td { font-size: 13px; }
+    tr:last-child td { border-bottom: none; }
+    .mono { font-family: "SFMono-Regular", Consolas, Monaco, monospace; font-weight: 600; color: var(--primary); }
+    .copy-btn {
+      margin-left: 6px; border: none; background: none; color: var(--text-muted); cursor: pointer; font-size: 11px;
+    }
+    .copy-btn:hover { color: var(--primary); }
+    .empty-cell { color: var(--text-muted); }
+    .rel-card {
+      background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; margin-bottom: 12px;
+    }
+    .rel-title { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+    .rel-desc { color: var(--text-secondary); line-height: 1.6; }
+    .loading {
+      display: flex; flex-direction: column; gap: 10px; color: var(--text-muted); padding: 28px 4px;
+    }
+    .scan {
+      height: 3px; border-radius: 99px; overflow: hidden;
+      background: #e0e7ff;
+    }
+    .scan i {
+      display: block; height: 100%; width: 36%;
+      background: linear-gradient(90deg, transparent, #6366f1, #22d3ee, transparent);
+      animation: scan 1.1s ease-in-out infinite;
+    }
+    .dot {
+      width: 7px; height: 7px; border-radius: 50%; background: #7c3aed; animation: pulse 1s infinite;
+    }
+    .dot:nth-child(2) { animation-delay: 0.15s; }
+    .dot:nth-child(3) { animation-delay: 0.3s; }
+    .loading-row { display: flex; align-items: center; gap: 8px; }
+    @keyframes pulse { 0%, 80%, 100% { opacity: 0.25; } 40% { opacity: 1; } }
+    @keyframes live {
+      0% { box-shadow: 0 0 0 0 rgba(34,211,238,0.5); }
+      70% { box-shadow: 0 0 0 8px rgba(34,211,238,0); }
+      100% { box-shadow: 0 0 0 0 rgba(34,211,238,0); }
+    }
+    @keyframes orb {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+    @keyframes scan { 0% { transform: translateX(-40%); } 100% { transform: translateX(280%); } }
+    .drawer-mask {
+      display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.28); z-index: 300;
+    }
+    .drawer-mask.show { display: block; }
+    .drawer {
+      position: fixed; top: 0; right: 0; bottom: 0; width: var(--drawer-w); z-index: 310;
+      background: rgba(255,255,255,0.96); backdrop-filter: blur(16px);
+      box-shadow: 0 16px 48px rgba(30,40,60,0.14);
+      transform: translateX(100%); transition: transform 0.22s ease;
+      display: flex; flex-direction: column;
+    }
+    .drawer.open { transform: translateX(0); }
+    .drawer-head { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .drawer-head h3 { font-size: 15px; }
+    .drawer-body { padding: 16px 20px 32px; overflow-y: auto; line-height: 1.65; color: var(--text-secondary); }
+    .drawer-body h4 { color: var(--text-primary); margin: 16px 0 8px; font-size: 13px; }
+    .drawer-body ul { padding-left: 18px; }
+    .scene {
+      border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; background: #fff;
+    }
+    .scene b { display: block; font-size: 13px; color: var(--text-primary); margin-bottom: 4px; }
+    .scene p { margin: 0; font-size: 12px; color: var(--text-secondary); line-height: 1.55; }
+    .scene i { font-style: normal; color: var(--text-muted); }
+    .toast {
+      position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(8px);
+      background: #18222f; color: #fff; padding: 8px 14px; border-radius: 8px; font-size: 12px;
+      opacity: 0; pointer-events: none; transition: var(--transition); z-index: 400;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    @media (max-width: 1100px) {
+      .workbench { grid-template-columns: 1fr; }
+      .chat-pane { max-height: 46vh; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand">
+        <div class="brand-icon">迭</div>
+        <div>
+          <div class="brand-text">右豹迭代需求记录</div>
+          <div class="brand-sub">PRD Demo · 产品交付研发</div>
+        </div>
+      </div>
+      <span class="sprint-pill">YBDD2.0 · 迭代 v1</span>
+    </div>
+    <div class="sidebar-scroll" data-iteration-sidebar></div>
+    <div class="sidebar-foot">FR-009 · AI工作台<br />左对话 / 右结果表 · 只读</div>
+  </aside>
+
+  <main class="main">
+    <nav class="breadcrumb">
+      <a href="framework-shell.html">Sprint 概览</a>
+      <span> / 运营 / AI工作台</span>
+    </nav>
+    <header class="page-header">
+      <div>
+        <h1>
+          <span class="ai-mark" aria-hidden="true"></span>
+          AI工作台
+          <span class="badge badge-fr">FR-009</span>
+          <span class="badge badge-version">v1 Demo</span>
+        </h1>
+        <p class="page-desc">运营用一句话查询。三类：项目业务、用户数据、用户关系。问法见对话区「如何使用」；实现口径见页头「需求规则」。</p>
+      </div>
+      <button class="btn btn-rule" id="toggleRuleDrawer" type="button">需求规则</button>
+    </header>
+
+    <section class="workbench">
+      <div class="glass-card chat-pane">
+        <div class="pane-head">
+          <h2><span class="live-dot" aria-hidden="true"></span>对话区</h2>
+          <span class="pane-meta">助手在线 · 只读不代操作</span>
+        </div>
+        <div class="chat-log" id="chatLog"></div>
+        <div class="chat-input-wrap">
+          <div class="input-toolbar">
+            <button class="btn-text" id="howToUse" type="button">如何使用</button>
+          </div>
+          <div class="input-row">
+            <textarea id="chatInput" rows="2" placeholder="用自然语言提问，点「如何使用」查看各场景问法"></textarea>
+            <button class="btn btn-primary" id="sendBtn" type="button">问 AI</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="glass-card result-pane">
+        <div class="pane-head">
+          <h2>结果区</h2>
+          <span class="pane-meta" id="resultMeta">等待提问</span>
+        </div>
+        <div class="result-body" id="resultBody"></div>
+      </div>
+    </section>
+  </main>
+
+  <div class="drawer-mask" id="drawerMask"></div>
+  <aside class="drawer" id="howDrawer">
+    <div class="drawer-head">
+      <h3>如何使用</h3>
+      <button class="btn btn-ghost" data-close-drawer type="button">关闭</button>
+    </div>
+    <div class="drawer-body">
+      <p>把要查的事用一句话说出来，答案在右侧表格。不会写时，照着下面的句子改赛道、项目或用户ID即可。</p>
+      <h4>项目业务</h4>
+      <div class="scene">
+        <b>看某个赛道里，每个项目今天谁题词最多</b>
+        <p>可以这样问：小说赛道下所有项目今日用户题词top3<br />你会看到：每个项目各一张表，有用户ID、昵称、项目名称、题词量</p>
+      </div>
+      <div class="scene">
+        <b>看整个赛道今天谁题词最多（不拆项目）</b>
+        <p>可以这样问：小说赛道今日用户题词top3<br />你会看到：整赛道前三名，同样是用户ID、昵称、项目名称、题词量</p>
+      </div>
+      <div class="scene">
+        <b>看某个赛道今天怎么分红</b>
+        <p>可以这样问：小说赛道今日分红数据<br />你会看到：每个项目的总分成、最高分成比例</p>
+      </div>
+      <div class="scene">
+        <b>看某个项目这几天的订单</b>
+        <p>可以这样问：星河小说按日订单数据<br />你会看到：每天的出单人数、出单关键词数量、订单量、累计收益（看不到具体关键词）</p>
+      </div>
+      <h4>用户数据</h4>
+      <div class="scene">
+        <b>看某个人邀请了多少人</b>
+        <p>可以这样问：用户 1001 邀请数据<br />你会看到：累计邀请、今日邀请、近7日邀请</p>
+      </div>
+      <div class="scene">
+        <b>看今天注册了多少人</b>
+        <p>可以这样问：今日注册人数<br />你会看到：累计注册、自然裂变注册、邀请注册</p>
+      </div>
+      <div class="scene">
+        <b>看今天新升上去的团长</b>
+        <p>可以这样问：今日升级团长数<br />你会看到：V2 多少人、V3 多少人</p>
+      </div>
+      <div class="scene">
+        <b>看现在有多少各等级团长</b>
+        <p>可以这样问：团长身份数据统计<br />你会看到：V1 / V2 / V3 各多少人</p>
+      </div>
+      <div class="scene">
+        <b>看某个人的项目收益</b>
+        <p>可以这样问：用户 1001 近7日项目收益；用户 1001 近30日项目收益；用户 1001 累计项目收益；用户 1001 2026年项目收益<br />你会看到：累计收益；按日会列出每天，按年会列出每月</p>
+      </div>
+      <h4>用户关系</h4>
+      <div class="scene">
+        <b>看两个人是不是一条线上的上下级</b>
+        <p>可以这样问：查询用户 1001 和 2001 的上下级关系<br />你会看到：直属还是间属、谁是谁的上级、团长等级和昵称</p>
+      </div>
+      <div class="scene">
+        <b>看某个人往上分红给了谁</b>
+        <p>可以这样问：用户 1001 向上分红关系数据<br />你会看到：关系类型、上级ID、累计分红</p>
+      </div>
+      <div class="scene">
+        <b>看某个人在指定项目上往上分了多少</b>
+        <p>可以这样问：用户 1001 在星河小说、夜话连载收益向上产生的分红数据<br />你会看到：项目名称、用户ID、关系、上级ID、累计 / 今日 / 昨日分红</p>
+      </div>
+    </div>
+  </aside>
+  <aside class="drawer" id="ruleDrawer">
+    <div class="drawer-head">
+      <h3>需求规则 · FR-009</h3>
+      <button class="btn btn-ghost" data-close-drawer type="button">关闭</button>
+    </div>
+    <div class="drawer-body">
+      <p>给研发对照实现。运营问法见「如何使用」，不要把本节文案直接给使用者。</p>
+      <h4>产品边界</h4>
+      <ul>
+        <li>独立工作台：左对话、右结果表；v1 只读，写指令必须拒绝。</li>
+        <li>只执行已批准意图，禁止开放 NL2SQL / 模型口算排名与关系。</li>
+        <li>缺赛道 / 项目 / 用户ID / 时间范围：先澄清，结果区不出假表。</li>
+        <li>本页 Demo 为 Mock，题词量、赛道、时区未接真库。</li>
+      </ul>
+      <h4>项目业务 · 实现口径</h4>
+      <div class="scene">
+        <b>FR-17 赛道 × 所有项目 × 今日题词 Top 3</b>
+        <p>按项目分组排名。零题词项目仍出组，单元格「暂无数据」。并列第 3 全留。列：用户ID、用户昵称、项目名称、题词量。</p>
+      </div>
+      <div class="scene">
+        <b>FR-18 赛道整榜 × 今日题词 Top 3</b>
+        <p>赛道内跨项目合并后再取 Top 3，不得拆成多张项目表。列同 FR-17。与 FR-17 靠「所有项目」槽位区分。</p>
+      </div>
+      <div class="scene">
+        <b>FR-19 赛道今日分红</b>
+        <p>按项目行：项目名称、总分成、最高分成比例。无分成出「暂无数据」。</p>
+      </div>
+      <div class="scene">
+        <b>FR-20 指定项目按日订单</b>
+        <p>按日一行：项目名称、出单人数、出单关键词数量、订单量、累计收益。关键词只出 count，禁止出词面。</p>
+      </div>
+      <h4>用户数据 · 实现口径</h4>
+      <div class="scene">
+        <b>FR-21 邀请数据</b>
+        <p>一次返回累计 / 今日 / 近7日。用户不存在不编造。</p>
+      </div>
+      <div class="scene">
+        <b>FR-22 今日注册</b>
+        <p>累计注册 = 自然裂变 + 邀请注册。未绑邀请码 = 自然裂变；已绑 = 邀请注册。</p>
+      </div>
+      <div class="scene">
+        <b>FR-23 / FR-24 团长</b>
+        <p>升级团长：仅今日升为 V2、V3 的人数，不含 V1。身份统计：当前存量 V1 / V2 / V3，与升级不是同一查询。</p>
+      </div>
+      <div class="scene">
+        <b>FR-25 项目收益</b>
+        <p>必出用户ID + 累计收益。近7/30/日期范围：按日明细。按年：按月明细。累计：可不出明细。</p>
+      </div>
+      <h4>用户关系 · 实现口径</h4>
+      <div class="scene">
+        <b>两人上下级</b>
+        <p>先判直属（默认上级）/ 间属（链上且隔层）。无关系：分别回退各自默认上级，不铺祖先链。</p>
+      </div>
+      <div class="scene">
+        <b>FR-26 向上分红关系</b>
+        <p>行：用户ID、关系（直属、间属、归级、直属团队、间属团队）、上级ID、累计分红。时间槽：按日 / 累计 / 日期。</p>
+      </div>
+      <div class="scene">
+        <b>FR-27 指定项目向上分红</b>
+        <p>槽位：用户ID + ≥1 项目名。行：项目名称、用户ID、关系、上级ID、累计分红、今日分红、昨日分红。无项目名走澄清，不要回退成 FR-26。</p>
+      </div>
+    </div>
+  </aside>
+  <div class="toast" id="toast"></div>
+
+  <script src="sidebar-nav.js"></script>
+  <script>
+    (function () {
+      var USERS = {
+        '1001': { id: '1001', name: '林小北', level: 'L1 组员', parent: '2001' },
+        '1002': { id: '1002', name: '阿乔', level: 'L1 组员', parent: '2002' },
+        '1003': { id: '1003', name: '夏末', level: 'L1 组员', parent: '2001' },
+        '1004': { id: '1004', name: '顾长', level: 'L1 组员', parent: '2002' },
+        '2001': { id: '2001', name: '周晏', level: 'L3 队长', parent: '3001' },
+        '2002': { id: '2002', name: '裴宁', level: 'L3 队长', parent: '3001' },
+        '3001': { id: '3001', name: '沈川', level: 'L4 团长', parent: '9001' },
+        '9001': { id: '9001', name: '总部节点', level: 'L5 根', parent: null }
+      };
+      var PROJECTS = [
+        { track: '小说', name: '星河小说', rows: [
+          { userId: '1001', count: 128 },
+          { userId: '1002', count: 96 },
+          { userId: '1003', count: 64 },
+          { userId: '1004', count: 64 }
+        ]},
+        { track: '小说', name: '夜话连载', rows: [
+          { userId: '2001', count: 41 },
+          { userId: '1001', count: 38 },
+          { userId: '1002', count: 22 }
+        ]},
+        { track: '小说', name: '短篇工坊', rows: [] },
+        { track: '小说', name: '古言馆', rows: [
+          { userId: '1003', count: 15 },
+          { userId: '1004', count: 9 },
+          { userId: '1001', count: 7 }
+        ]},
+        { track: '短剧', name: '都市短剧', rows: [
+          { userId: '1002', count: 55 },
+          { userId: '2002', count: 31 },
+          { userId: '1004', count: 18 }
+        ]},
+        { track: '短剧', name: '悬疑短剧', rows: [
+          { userId: '1001', count: 27 },
+          { userId: '1003', count: 12 }
+        ]}
+      ];
+      var REG_TODAY = { total: 280, organic: 186, invite: 94 };
+      var INVITES = {
+        '1001': { total: 42, today: 3, week7: 11 },
+        '1002': { total: 18, today: 0, week7: 4 },
+        '1003': { total: 9, today: 1, week7: 2 },
+        '2001': { total: 128, today: 7, week7: 21 }
+      };
+      var UPGRADE_TODAY = { v2: 5, v3: 2 };
+      var LEADER_STOCK = { v1: 860, v2: 214, v3: 47 };
+      var DIVIDENDS = [
+        { track: '小说', name: '星河小说', amount: 12800, maxRate: 28 },
+        { track: '小说', name: '夜话连载', amount: 4160, maxRate: 22 },
+        { track: '小说', name: '短篇工坊', amount: 0, maxRate: 0 },
+        { track: '小说', name: '古言馆', amount: 1980, maxRate: 18 },
+        { track: '短剧', name: '都市短剧', amount: 3520, maxRate: 20 },
+        { track: '短剧', name: '悬疑短剧', amount: 1680, maxRate: 16 }
+      ];
+      function pad(n) { return (n < 10 ? '0' : '') + n; }
+      function ymd(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+      function buildDays(n, seed) {
+        var days = [];
+        var base = new Date(2026, 8, 4);
+        for (var i = n - 1; i >= 0; i--) {
+          var d = new Date(base);
+          d.setDate(base.getDate() - i);
+          var amt = Math.round((seed + ((i * 37) % 90) + (i % 3) * 12) * 100) / 100;
+          days.push({ date: ymd(d), amount: amt });
+        }
+        return days;
+      }
+      function buildOrderDays(seed) {
+        return buildDays(4, seed).map(function (row, i) {
+          return {
+            date: row.date,
+            people: 12 + ((seed + i * 7) % 80),
+            keywords: (seed + i) % 5,
+            orders: 20 + ((seed + i * 11) % 200),
+            revenue: row.amount * 18
+          };
+        });
+      }
+      var ORDER_DAYS = {
+        '星河小说': buildOrderDays(86),
+        '夜话连载': buildOrderDays(41),
+        '短篇工坊': [
+          { date: '2026-09-01', people: 0, keywords: 0, orders: 0, revenue: 0 },
+          { date: '2026-09-02', people: 0, keywords: 0, orders: 0, revenue: 0 },
+          { date: '2026-09-03', people: 0, keywords: 0, orders: 0, revenue: 0 },
+          { date: '2026-09-04', people: 0, keywords: 0, orders: 0, revenue: 0 }
+        ],
+        '古言馆': buildOrderDays(23),
+        '都市短剧': buildOrderDays(55),
+        '悬疑短剧': buildOrderDays(27)
+      };
+      var REVENUE = {
+        '1001': { 7: buildDays(7, 86), 30: buildDays(30, 64), total: 28640, year: [
+          { month: '2026-01', amount: 1820 }, { month: '2026-02', amount: 1640 },
+          { month: '2026-03', amount: 2105 }, { month: '2026-04', amount: 1988 },
+          { month: '2026-05', amount: 2310 }, { month: '2026-06', amount: 2460 },
+          { month: '2026-07', amount: 2688 }, { month: '2026-08', amount: 2890 },
+          { month: '2026-09', amount: 980 }
+        ]},
+        '1002': { 7: buildDays(7, 41), 30: buildDays(30, 28), total: 9640, year: [] },
+        '2001': { 7: buildDays(7, 132), 30: buildDays(30, 98), total: 51220, year: [] }
+      };
+      var UPWARD = {
+        '1001': [
+          { rel: '直属', superior: '2001', amount: 1280 },
+          { rel: '间属', superior: '3001', amount: 640 },
+          { rel: '归级', superior: '2001', amount: 210 },
+          { rel: '直属团队', superior: '2001', amount: 3560 },
+          { rel: '间属团队', superior: '3001', amount: 8920 }
+        ]
+      };
+      var UPWARD_PROJECT = {
+        '1001': [
+          { project: '星河小说', rel: '直属', superior: '2001', total: 1280, today: 86, yesterday: 72 },
+          { project: '星河小说', rel: '间属', superior: '3001', total: 640, today: 40, yesterday: 31 },
+          { project: '星河小说', rel: '直属团队', superior: '2001', total: 3560, today: 190, yesterday: 166 },
+          { project: '夜话连载', rel: '直属', superior: '2001', total: 410, today: 22, yesterday: 18 },
+          { project: '夜话连载', rel: '归级', superior: '2001', total: 96, today: 8, yesterday: 6 },
+          { project: '夜话连载', rel: '间属团队', superior: '3001', total: 1880, today: 74, yesterday: 61 }
+        ]
+      };
+      var PROJECT_NAMES = PROJECTS.map(function (p) { return p.name; });
+      var TRACK_NAMES = ['小说', '短剧'];
+
+      var chatLog = document.getElementById('chatLog');
+      var resultBody = document.getElementById('resultBody');
+      var resultMeta = document.getElementById('resultMeta');
+      var input = document.getElementById('chatInput');
+      var sendBtn = document.getElementById('sendBtn');
+      var toastEl = document.getElementById('toast');
+      var busy = false;
+
+      function nowTime() {
+        var d = new Date();
+        return ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2);
+      }
+      function toast(text) {
+        toastEl.textContent = text;
+        toastEl.classList.add('show');
+        setTimeout(function () { toastEl.classList.remove('show'); }, 1600);
+      }
+      function esc(s) {
+        return String(s).replace(/[&<>"']/g, function (c) {
+          return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
+        });
+      }
+      function userCell(id) {
+        return '<span class="mono">' + esc(id) + '</span><button class="copy-btn" type="button" data-copy="' + esc(id) + '">复制</button>';
+      }
+      function money(n) {
+        return '¥' + Number(n).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
+      function kpiHtml(items) {
+        return '<div class="kpi-grid">' + items.map(function (it) {
+          return '<div class="kpi"><div class="k">' + esc(it.k) + '</div><div class="v">' + it.v + '</div></div>';
+        }).join('') + '</div>';
+      }
+      function summary(badge, text, cls) {
+        return '<div class="result-summary"><span class="badge ' + (cls || 'badge-info') + '">' + badge + '</span><span>' + text + '</span></div>';
+      }
+      function matchProject(text) {
+        for (var i = 0; i < PROJECT_NAMES.length; i++) {
+          if (text.indexOf(PROJECT_NAMES[i]) !== -1) return PROJECT_NAMES[i];
+        }
+        return '';
+      }
+      function matchProjects(text) {
+        return PROJECT_NAMES.filter(function (name) { return text.indexOf(name) !== -1; });
+      }
+      function matchTrack(text) {
+        for (var i = 0; i < TRACK_NAMES.length; i++) {
+          if (text.indexOf(TRACK_NAMES[i]) !== -1) return TRACK_NAMES[i];
+        }
+        return '';
+      }
+      function keepTop3(rows) {
+        var sorted = rows.slice().sort(function (a, b) { return b.count - a.count; });
+        if (!sorted.length) return [];
+        if (sorted.length <= 3) return sorted;
+        return sorted.filter(function (row, i) { return i < 3 || row.count === sorted[2].count; });
+      }
+      function parseRange(text) {
+        var m = text.match(/(\d{4}-\d{2}-\d{2})\s*(?:至|到|-)\s*(\d{4}-\d{2}-\d{2})/);
+        return m ? { from: m[1], to: m[2] } : null;
+      }
+      function addBubble(role, html) {
+        var wrap = document.createElement('div');
+        wrap.className = 'bubble bubble-' + role;
+        if (role === 'ai') {
+          wrap.innerHTML = '<div class="ai-avatar" aria-hidden="true"></div><div class="bubble-col"><div class="bubble-body">' + html + '</div><div class="bubble-time">' + nowTime() + '</div></div>';
+        } else {
+          wrap.innerHTML = '<div class="bubble-body">' + html + '</div><div class="bubble-time">' + nowTime() + '</div>';
+        }
+        chatLog.appendChild(wrap);
+        chatLog.scrollTop = chatLog.scrollHeight;
+      }
+      function setResult(html, meta) {
+        resultBody.innerHTML = html;
+        resultMeta.textContent = meta || '已更新';
+      }
+      function renderEmpty() {
+        setResult(
+          '<div class="result-empty">' +
+            '<div class="orb" aria-hidden="true"></div>' +
+            '<strong>结果会在这里生成</strong>' +
+            '<span>先点对话区的示例，或自己输入一句。完整字段只出在右侧，左侧只说结论。</span>' +
+          '</div>',
+          '等待提问'
+        );
+      }
+      function chainOf(id) {
+        var out = [];
+        var cur = id;
+        var guard = 0;
+        while (cur && USERS[cur] && guard++ < 16) {
+          out.push(cur);
+          cur = USERS[cur].parent;
+        }
+        return out;
+      }
+      function rankTableRows(list) {
+        var html = '<div class="project-block"><table><thead><tr><th>用户ID</th><th>用户昵称</th><th>项目名称</th><th>题词量</th></tr></thead><tbody>';
+        if (!list.length) {
+          html += '<tr><td class="empty-cell" colspan="4">暂无数据</td></tr>';
+        } else {
+          list.forEach(function (row) {
+            var u = USERS[row.userId] || { name: '—' };
+            html += '<tr><td>' + userCell(row.userId) + '</td><td>' + esc(u.name) + '</td><td>' +
+              esc(row.project) + '</td><td>' + row.count + '</td></tr>';
+          });
+        }
+        return html + '</tbody></table></div>';
+      }
+      function renderRankByProject(track) {
+        var groups = PROJECTS.filter(function (p) { return p.track === track; });
+        var html = summary('项目业务', track + '赛道 · 所有项目今日题词 Top 3');
+        groups.forEach(function (p) {
+          var keep = keepTop3(p.rows);
+          html += '<div class="project-block"><div class="project-head"><span>' + esc(p.name) + '</span>';
+          html += keep.length
+            ? '<span class="badge badge-success">' + keep.length + ' 人</span>'
+            : '<span class="badge badge-warning">0 题词</span>';
+          html += '</div><table><thead><tr><th>用户ID</th><th>用户昵称</th><th>项目名称</th><th>题词量</th></tr></thead><tbody>';
+          if (!keep.length) {
+            html += '<tr><td class="empty-cell" colspan="4">暂无数据</td></tr>';
+          } else {
+            keep.forEach(function (row) {
+              var u = USERS[row.userId] || { name: '—' };
+              html += '<tr><td>' + userCell(row.userId) + '</td><td>' + esc(u.name) + '</td><td>' +
+                esc(p.name) + '</td><td>' + row.count + '</td></tr>';
+            });
+          }
+          html += '</tbody></table></div>';
+        });
+        setResult(html, '项目业务 · ' + track + ' · 分项目 Top 3');
+        return track + '赛道已按每个项目列出今日题词 Top 3。零题词项目出暂无数据；并列第 3 全留。';
+      }
+      function renderRankByTrack(track) {
+        var flat = [];
+        PROJECTS.filter(function (p) { return p.track === track; }).forEach(function (p) {
+          p.rows.forEach(function (r) { flat.push({ userId: r.userId, project: p.name, count: r.count }); });
+        });
+        var keep = keepTop3(flat);
+        var html = summary('项目业务', track + '赛道 · 今日用户题词 Top 3（整赛道）') + rankTableRows(keep);
+        setResult(html, '项目业务 · ' + track + ' · 赛道 Top 3');
+        return track + '赛道今日整赛道题词 Top 3 已出表，不是按单个项目拆开。';
+      }
+      function renderRelation(id1, id2) {
+        if (!USERS[id1] || !USERS[id2]) {
+          var miss = !USERS[id1] ? id1 : id2;
+          setResult(
+            '<div class="result-empty"><strong>无法判定关系</strong><span>用户ID ' + esc(miss) + ' 不存在。</span></div>',
+            '查询失败'
+          );
+          return '用户ID ' + miss + ' 在库中不存在，结果区未生成关系结论。';
+        }
+        var c1 = chainOf(id1);
+        var c2 = chainOf(id2);
+        var idxB = c1.indexOf(id2);
+        var idxA = c2.indexOf(id1);
+        var html = '';
+        var talk = '';
+        if (idxB > 0 || idxA > 0) {
+          var junior = idxB > 0 ? id1 : id2;
+          var senior = idxB > 0 ? id2 : id1;
+          var hops = idxB > 0 ? idxB : idxA;
+          var kind = hops === 1 ? '直属' : '间属';
+          html += '<div class="rel-card"><div class="rel-title">' + kind + '</div><div class="rel-desc">' +
+            userCell(senior) + '（' + esc(USERS[senior].name) + '）是 ' +
+            userCell(junior) + '（' + esc(USERS[junior].name) + '）的' + kind + '上级。</div></div>';
+          html += peopleTable([junior, senior]);
+          setResult('<div class="result-summary"><span class="badge badge-success">关系查询</span><span>' + kind + '</span></div>' + html, '关系查询 · ' + kind);
+          talk = USERS[id1].name + ' 与 ' + USERS[id2].name + ' 为' + kind + '。方向与团长等级见右侧。';
+        } else {
+          html += '<div class="rel-card"><div class="rel-title">这两人无上下级关系</div><div class="rel-desc">不在同一条链上。按规则分别回退各自的默认上级，不展开祖先链。</div></div>';
+          html += fallbackTable(id1, id2);
+          setResult('<div class="result-summary"><span class="badge badge-warning">关系查询</span><span>分叉回退默认上级</span></div>' + html, '关系查询 · 无上下级');
+          talk = '这两人构不成直属或间属。右侧已分别给出默认上级：' +
+            id1 + '→' + (USERS[id1].parent || '无') + '，' + id2 + '→' + (USERS[id2].parent || '无') + '。';
+        }
+        return talk;
+      }
+      function peopleTable(ids) {
+        var html = '<div class="project-block"><table><thead><tr><th>用户ID</th><th>用户昵称</th><th>团长等级</th><th>默认上级</th></tr></thead><tbody>';
+        ids.forEach(function (id) {
+          var u = USERS[id];
+          html += '<tr><td>' + userCell(id) + '</td><td>' + esc(u.name) + '</td><td>' + esc(u.level) +
+            '</td><td>' + (u.parent ? userCell(u.parent) : '—') + '</td></tr>';
+        });
+        return html + '</tbody></table></div>';
+      }
+      function fallbackTable(a, b) {
+        var html = '<div class="project-block"><table><thead><tr><th>输入用户</th><th>昵称</th><th>团长等级</th><th>默认上级</th><th>上级昵称</th></tr></thead><tbody>';
+        [a, b].forEach(function (id) {
+          var u = USERS[id];
+          var p = u.parent ? USERS[u.parent] : null;
+          html += '<tr><td>' + userCell(id) + '</td><td>' + esc(u.name) + '</td><td>' + esc(u.level) + '</td><td>' +
+            (p ? userCell(p.id) : '—') + '</td><td>' + (p ? esc(p.name) : '—') + '</td></tr>';
+        });
+        return html + '</tbody></table></div>';
+      }
+      function missingUser(id) {
+        setResult('<div class="result-empty"><strong>用户不存在</strong><span>用户ID ' + esc(id) + ' 不存在。</span></div>', '查询失败');
+        return '用户ID ' + id + ' 不存在。';
+      }
+      function renderInvite(id) {
+        if (!USERS[id]) return missingUser(id);
+        var rec = INVITES[id] || { total: 0, today: 0, week7: 0 };
+        var html = summary('用户数据', USERS[id].name + ' · 邀请数据') +
+          kpiHtml([
+            { k: '用户ID', v: userCell(id) },
+            { k: '累计邀请', v: rec.total },
+            { k: '今日邀请', v: rec.today },
+            { k: '近7日邀请', v: rec.week7 }
+          ]);
+        setResult(html, '用户数据 · 邀请');
+        return USERS[id].name + ' 累计邀请 ' + rec.total + '、今日 ' + rec.today + '、近7日 ' + rec.week7 + '。';
+      }
+      function renderRegister() {
+        var html = summary('用户数据', '今日注册人数') +
+          kpiHtml([
+            { k: '累计注册', v: REG_TODAY.total },
+            { k: '自然裂变注册', v: REG_TODAY.organic },
+            { k: '邀请注册', v: REG_TODAY.invite }
+          ]);
+        html += '<p class="page-desc" style="max-width:none;margin:0;">未绑邀请码 = 自然裂变；绑了邀请码 = 邀请注册。</p>';
+        setResult(html, '用户数据 · 今日注册');
+        return '今日累计注册 ' + REG_TODAY.total + '：自然裂变 ' + REG_TODAY.organic + '，邀请注册 ' + REG_TODAY.invite + '。';
+      }
+      function renderUpgrade() {
+        var html = summary('用户数据', '今日升级团长数') +
+          kpiHtml([
+            { k: 'V2 团长', v: UPGRADE_TODAY.v2 + ' 人' },
+            { k: 'V3 团长', v: UPGRADE_TODAY.v3 + ' 人' }
+          ]);
+        setResult(html, '用户数据 · 今日升级团长');
+        return '今日升级：V2 团长 ' + UPGRADE_TODAY.v2 + ' 人、V3 团长 ' + UPGRADE_TODAY.v3 + ' 人。';
+      }
+      function renderLeaderStock() {
+        var html = summary('用户数据', '团长身份数据统计') +
+          kpiHtml([
+            { k: 'V1 团长', v: LEADER_STOCK.v1 + ' 人' },
+            { k: 'V2 团长', v: LEADER_STOCK.v2 + ' 人' },
+            { k: 'V3 团长', v: LEADER_STOCK.v3 + ' 人' }
+          ]);
+        setResult(html, '用户数据 · 团长身份');
+        return '当前团长身份：V1 ' + LEADER_STOCK.v1 + ' 人、V2 ' + LEADER_STOCK.v2 + ' 人、V3 ' + LEADER_STOCK.v3 + ' 人。';
+      }
+      function renderRevenue(id, mode, extra) {
+        if (!USERS[id]) return missingUser(id);
+        var pack = REVENUE[id] || { 7: [], 30: [], total: 0, year: [] };
+        var title = '项目收益';
+        var series = [];
+        var col = '日期';
+        var total = 0;
+        var showDetail = true;
+        if (mode === 'days') {
+          series = pack[extra] || [];
+          title = '近' + extra + '日项目收益';
+          total = series.reduce(function (s, r) { return s + r.amount; }, 0);
+        } else if (mode === 'range') {
+          series = (pack[30] || []).filter(function (r) { return r.date >= extra.from && r.date <= extra.to; });
+          title = extra.from + ' 至 ' + extra.to + ' 项目收益';
+          total = series.reduce(function (s, r) { return s + r.amount; }, 0);
+        } else if (mode === 'year') {
+          series = pack.year || [];
+          col = '月份';
+          title = extra + '年项目收益';
+          total = series.reduce(function (s, r) { return s + r.amount; }, 0);
+        } else {
+          title = '累计项目收益';
+          total = pack.total || 0;
+          showDetail = false;
+        }
+        var html = summary('用户数据', USERS[id].name + ' · ' + title) +
+          kpiHtml([{ k: '用户ID', v: userCell(id) }, { k: '累计收益', v: money(total) }]);
+        if (showDetail) {
+          html += '<div class="project-block"><table><thead><tr><th>' + col + '</th><th>收益</th></tr></thead><tbody>';
+          if (!series.length) {
+            html += '<tr><td class="empty-cell" colspan="2">暂无数据</td></tr>';
+          } else {
+            series.forEach(function (row) {
+              html += '<tr><td>' + esc(row.date || row.month) + '</td><td>' + money(row.amount) + '</td></tr>';
+            });
+            html += '<tr class="tfoot"><td>累计收益</td><td>' + money(total) + '</td></tr>';
+          }
+          html += '</tbody></table></div>';
+        }
+        setResult(html, '用户数据 · ' + title);
+        return USERS[id].name + ' ' + title + '累计 ' + money(total) + (showDetail ? '，明细在右侧。' : '。');
+      }
+      function renderOrders(name) {
+        var rows = ORDER_DAYS[name] || [];
+        var html = summary('项目业务', name + ' · 按日订单数据');
+        html += '<div class="project-block"><table><thead><tr><th>项目名称</th><th>日期</th><th>出单人数</th><th>出单关键词数量</th><th>订单量</th><th>累计收益</th></tr></thead><tbody>';
+        if (!rows.length) {
+          html += '<tr><td class="empty-cell" colspan="6">暂无数据</td></tr>';
+        } else {
+          rows.forEach(function (row) {
+            html += '<tr><td>' + esc(name) + '</td><td>' + esc(row.date) + '</td><td>' + row.people + '</td><td>' +
+              (row.keywords ? row.keywords : '暂无数据') + '</td><td>' + row.orders + '</td><td>' + money(row.revenue) + '</td></tr>';
+          });
+        }
+        html += '</tbody></table></div>';
+        setResult(html, '项目业务 · 按日订单 · ' + name);
+        return name + ' 按日订单已出表：出单人数、出单关键词数量、订单量、累计收益。关键词只出数值。';
+      }
+      function renderDividend(track) {
+        var rows = DIVIDENDS.filter(function (r) { return r.track === track; });
+        var sum = rows.reduce(function (s, r) { return s + r.amount; }, 0);
+        var html = summary('项目业务', track + '赛道 · 今日分红') +
+          kpiHtml([{ k: '项目数', v: rows.length }, { k: '总分成合计', v: money(sum) }]);
+        html += '<div class="project-block"><table><thead><tr><th>项目名称</th><th>总分成</th><th>最高分成比例</th></tr></thead><tbody>';
+        rows.forEach(function (row) {
+          html += '<tr><td>' + esc(row.name) + '</td><td>' + (row.amount ? money(row.amount) : '暂无数据') +
+            '</td><td>' + (row.maxRate ? row.maxRate + '%' : '暂无数据') + '</td></tr>';
+        });
+        html += '<tr class="tfoot"><td>合计</td><td>' + money(sum) + '</td><td></td></tr></tbody></table></div>';
+        setResult(html, '项目业务 · ' + track + ' · 今日分红');
+        return track + '赛道今日分红已按项目列出，总分成合计 ' + money(sum) + '。';
+      }
+      function renderUpward(id, scopeLabel) {
+        if (!USERS[id]) return missingUser(id);
+        var rows = UPWARD[id] || [];
+        var html = summary('用户关系', USERS[id].name + ' · 向上分红 · ' + scopeLabel);
+        html += '<div class="project-block"><table><thead><tr><th>用户ID</th><th>关系</th><th>上级ID</th><th>累计分红</th></tr></thead><tbody>';
+        if (!rows.length) {
+          html += '<tr><td class="empty-cell" colspan="4">暂无数据</td></tr>';
+        } else {
+          rows.forEach(function (row) {
+            html += '<tr><td>' + userCell(id) + '</td><td>' + esc(row.rel) + '</td><td>' +
+              userCell(row.superior) + '</td><td>' + money(row.amount) + '</td></tr>';
+          });
+        }
+        html += '</tbody></table></div>';
+        setResult(html, '用户关系 · 向上分红 · ' + scopeLabel);
+        return USERS[id].name + ' 向上分红关系已按 ' + scopeLabel + ' 列出：直属、间属、归级、直属团队、间属团队。';
+      }
+      function renderUpwardProject(id, projects) {
+        if (!USERS[id]) return missingUser(id);
+        var all = UPWARD_PROJECT[id] || [];
+        var rows = all.filter(function (row) { return projects.indexOf(row.project) !== -1; });
+        var html = summary('用户关系', USERS[id].name + ' · 指定项目向上分红 · ' + projects.join('、'));
+        html += '<div class="project-block"><table><thead><tr><th>项目名称</th><th>用户ID</th><th>关系</th><th>上级ID</th><th>累计分红</th><th>今日分红</th><th>昨日分红</th></tr></thead><tbody>';
+        if (!rows.length) {
+          html += '<tr><td class="empty-cell" colspan="7">暂无数据</td></tr>';
+        } else {
+          rows.forEach(function (row) {
+            html += '<tr><td>' + esc(row.project) + '</td><td>' + userCell(id) + '</td><td>' + esc(row.rel) +
+              '</td><td>' + userCell(row.superior) + '</td><td>' + money(row.total) + '</td><td>' +
+              money(row.today) + '</td><td>' + money(row.yesterday) + '</td></tr>';
+          });
+        }
+        html += '</tbody></table></div>';
+        setResult(html, '用户关系 · 项目向上分红');
+        return USERS[id].name + ' 在 ' + projects.join('、') + ' 的向上分红已出表：项目、关系、上级、累计/今日/昨日分红。';
+      }
+      function detect(text) {
+        var t = text.replace(/\s+/g, ' ').trim();
+        if (!t) return { kind: 'empty' };
+        if (/改|修改|调整|设为|换成/.test(t) && /上级|团长|关系/.test(t)) return { kind: 'write' };
+        var ids = t.match(/\d{3,}/g) || [];
+        var track = matchTrack(t);
+        var project = matchProject(t);
+        var range = parseRange(t);
+        var projects = matchProjects(t);
+        if (/向上/.test(t) && (/分红/.test(t) || /收益/.test(t))) {
+          if (projects.length) {
+            if (!ids.length) return { kind: 'clarify-user', need: '指定项目向上分红查询' };
+            return { kind: 'upward-project', id: ids[0], projects: projects };
+          }
+          if (/收益向上/.test(t)) return { kind: 'clarify-project' };
+          if (/向上分红|分红关系/.test(t)) {
+            if (!ids.length) return { kind: 'clarify-user', need: '向上分红查询' };
+            var scope = /今日|按日/.test(t) ? '按日' : range ? (range.from + ' 至 ' + range.to) : '累计';
+            return { kind: 'upward', id: ids[0], scope: scope };
+          }
+        }
+        if (/上下级/.test(t)) {
+          if (ids.length < 2) return { kind: 'clarify' };
+          return { kind: 'relation', ids: ids.slice(0, 2) };
+        }
+        if (/题词|提词|top\s*3|前三/i.test(t)) {
+          if (!track) return { kind: 'clarify-track' };
+          return { kind: /所有项目/.test(t) ? 'rank-project' : 'rank-track', track: track };
+        }
+        if (/分红|分成/.test(t)) {
+          if (!track) return { kind: 'clarify-track' };
+          return { kind: 'dividend', track: track };
+        }
+        if (/订单/.test(t)) {
+          if (!project) return { kind: 'clarify-project' };
+          return { kind: 'orders', project: project };
+        }
+        if (/邀请/.test(t)) {
+          if (!ids.length) return { kind: 'clarify-user', need: '邀请查询' };
+          return { kind: 'invite', id: ids[0] };
+        }
+        if (/注册/.test(t)) return { kind: 'register' };
+        if (/升级团长/.test(t)) return { kind: 'upgrade' };
+        if (/团长身份|团长统计/.test(t)) return { kind: 'leader-stock' };
+        if (/收益/.test(t)) {
+          if (!ids.length) return { kind: 'clarify-user', need: '收益查询' };
+          if (/累计/.test(t)) return { kind: 'revenue', id: ids[0], mode: 'total' };
+          if (/年/.test(t)) {
+            var y = t.match(/(\d{4})\s*年/);
+            return { kind: 'revenue', id: ids[0], mode: 'year', extra: y ? y[1] : '2026' };
+          }
+          if (range) return { kind: 'revenue', id: ids[0], mode: 'range', extra: range };
+          if (/30/.test(t)) return { kind: 'revenue', id: ids[0], mode: 'days', extra: 30 };
+          if (/7/.test(t)) return { kind: 'revenue', id: ids[0], mode: 'days', extra: 7 };
+          return { kind: 'clarify-range', id: ids[0] };
+        }
+        if (ids.length >= 2) return { kind: 'relation', ids: ids.slice(0, 2) };
+        return { kind: 'unsupported' };
+      }
+      function run(text) {
+        var intent = detect(text);
+        if (intent.kind === 'empty') return;
+        if (intent.kind === 'write') {
+          setResult('<div class="result-empty"><strong>已拒绝写操作</strong><span>只查不做，不会改任何业务数据。</span></div>', '已拒绝');
+          return '这是写指令。v1 只读，右侧保持拒绝态。';
+        }
+        if (intent.kind === 'clarify') {
+          setResult('<div class="result-empty"><strong>还缺用户ID</strong><span>关系查询需要两个用户ID，例如 1001 和 1002。</span></div>', '待澄清');
+          return '关系查询需要两个用户ID。';
+        }
+        if (intent.kind === 'clarify-user') {
+          setResult('<div class="result-empty"><strong>还缺用户ID</strong><span>' + esc(intent.need) + '需要一个用户ID。</span></div>', '待澄清');
+          return intent.need + '需要用户ID。';
+        }
+        if (intent.kind === 'clarify-project') {
+          setResult('<div class="result-empty"><strong>还缺项目名称</strong><span>可问：星河小说、夜话连载、短篇工坊、古言馆、都市短剧、悬疑短剧。</span></div>', '待澄清');
+          return '订单查询需要项目名称。例如：星河小说按日订单数据。';
+        }
+        if (intent.kind === 'clarify-track') {
+          setResult('<div class="result-empty"><strong>还缺赛道名称</strong><span>可问小说赛道或短剧赛道。</span></div>', '待澄清');
+          return '请补上赛道名称。例如：小说赛道今日用户题词top3。';
+        }
+        if (intent.kind === 'clarify-range') {
+          setResult('<div class="result-empty"><strong>还缺时间范围</strong><span>可指定近7日、近30日、累计、某年，或 2026-08-01 至 2026-08-15。</span></div>', '待澄清');
+          return '收益查询请指定近7日 / 近30日 / 累计 / 某年 / 日期范围。';
+        }
+        if (intent.kind === 'rank-project') return renderRankByProject(intent.track);
+        if (intent.kind === 'rank-track') return renderRankByTrack(intent.track);
+        if (intent.kind === 'dividend') return renderDividend(intent.track);
+        if (intent.kind === 'orders') return renderOrders(intent.project);
+        if (intent.kind === 'invite') return renderInvite(intent.id);
+        if (intent.kind === 'register') return renderRegister();
+        if (intent.kind === 'upgrade') return renderUpgrade();
+        if (intent.kind === 'leader-stock') return renderLeaderStock();
+        if (intent.kind === 'revenue') return renderRevenue(intent.id, intent.mode, intent.extra);
+        if (intent.kind === 'relation') return renderRelation(intent.ids[0], intent.ids[1]);
+        if (intent.kind === 'upward') return renderUpward(intent.id, intent.scope);
+        if (intent.kind === 'upward-project') return renderUpwardProject(intent.id, intent.projects);
+        setResult(
+          '<div class="result-empty"><strong>这句还不在已批准意图里</strong><span>可问项目业务、用户数据、用户关系三类场景，详见需求规则。</span></div>',
+          '意图不支持'
+        );
+        return '这句还不在已批准范围内。点下面的示例，或打开需求规则看场景清单。';
+      }
+      function submit(text) {
+        if (busy) return;
+        var q = (text || input.value).replace(/\s+/g, ' ').trim();
+        if (!q) return;
+        input.value = '';
+        addBubble('user', esc(q));
+        busy = true;
+        sendBtn.disabled = true;
+        setResult('<div class="loading"><div class="scan"><i></i></div><div class="loading-row"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span>正在理解问题并扫描业务库…</span></div></div>', '生成中');
+        setTimeout(function () {
+          var reply = run(q);
+          if (reply) addBubble('ai', esc(reply));
+          busy = false;
+          sendBtn.disabled = false;
+          input.focus();
+        }, 420);
+      }
+
+      addBubble('ai', '我是工作台助手。把问题丢给我，我去扫库，右侧出可核对的表。<br />场景分三类：项目业务、用户数据、用户关系。不知道怎么问时，点输入框旁的「如何使用」。');
+      renderEmpty();
+
+      sendBtn.addEventListener('click', function () { submit(); });
+      input.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          submit();
+        }
+      });
+      resultBody.addEventListener('click', function (e) {
+        var btn = e.target.closest('[data-copy]');
+        if (!btn) return;
+        var id = btn.getAttribute('data-copy');
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(id).then(function () { toast('已复制用户ID ' + id); });
+        } else {
+          toast('用户ID ' + id);
+        }
+      });
+
+      var howDrawer = document.getElementById('howDrawer');
+      var ruleDrawer = document.getElementById('ruleDrawer');
+      var mask = document.getElementById('drawerMask');
+      function closeDrawers() {
+        howDrawer.classList.remove('open');
+        ruleDrawer.classList.remove('open');
+        mask.classList.remove('show');
+      }
+      function openDrawer(el) {
+        closeDrawers();
+        el.classList.add('open');
+        mask.classList.add('show');
+      }
+      document.getElementById('howToUse').addEventListener('click', function () { openDrawer(howDrawer); });
+      document.getElementById('toggleRuleDrawer').addEventListener('click', function () { openDrawer(ruleDrawer); });
+      document.querySelectorAll('[data-close-drawer]').forEach(function (btn) {
+        btn.addEventListener('click', closeDrawers);
+      });
+      mask.addEventListener('click', closeDrawers);
+    })();
+  </script>
+</body>
+</html>
