@@ -2316,7 +2316,9 @@
       font-size: 12px;
     }
 
-    .usage-fields.hidden {
+    .tool-form .usage-fields.hidden,
+    .tool-form .free-usage-fields.hidden,
+    .tool-form .free-limit-fields.hidden {
       display: none;
     }
 
@@ -2326,6 +2328,57 @@
       color: var(--muted);
       font-size: 12px;
       line-height: 1.5;
+    }
+
+    .radio-rule-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      min-height: 40px;
+    }
+
+    .radio-rule-card {
+      min-height: 40px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: #445064;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .radio-rule-card:has(input:checked) {
+      border-color: var(--primary);
+      background: #eef2ff;
+      color: var(--primary);
+    }
+
+    .radio-rule-card input[type="radio"] {
+      width: 14px;
+      height: 14px;
+      min-height: 14px;
+      margin: 0;
+      accent-color: var(--primary);
+    }
+
+    .radio-rule-card input[type="number"] {
+      width: 88px;
+      height: 28px;
+      min-height: 28px;
+      padding: 0 8px;
+      text-align: center;
+    }
+
+    .radio-rule-card input[type="number"]:disabled {
+      color: #9aa4b2;
+      background: #f6f8fb;
     }
 
     .tool-stat-grid {
@@ -3573,6 +3626,7 @@
           <div class="filter-item"><label>名称</label><input id="toolNameFilter" placeholder="请输入工具名称"></div>
           <div class="filter-item"><label>区域</label><select id="toolRegionFilter"><option>全部</option><option>国内工具</option><option>海外工具</option></select></div>
           <div class="filter-item"><label>所属平台</label><select id="toolPlatformFilter"><option>全部</option><option>右豹</option><option>小程序</option></select></div>
+          <div class="filter-item"><label>工具来源</label><select id="toolSourceFilter"><option>全部</option><option>端内自研</option><option>OPC工具</option></select></div>
           <div class="filter-item"><label>赛道</label><select id="toolTrackFilter"><option>全部</option><option>短剧推广</option><option>工具应用</option><option>内容创作</option></select></div>
           <div class="filter-item"><label>状态</label><select id="toolStatusFilter"><option>全部</option><option>上架</option><option>下架</option></select></div>
           <button class="btn primary" data-action="search-tools"><i data-lucide="search"></i>搜索</button>
@@ -3585,7 +3639,7 @@
             <div><h2>工具列表</h2><p>管理工具基础信息、平台、区域、赛道、标签、评分、热度、可见范围和上下架状态。</p></div>
           </div>
           <table>
-            <thead><tr><th>序号</th><th>图标</th><th>名称</th><th>所属平台</th><th>区域</th><th>赛道</th><th>标签</th><th>评分</th><th>热度</th><th>状态</th><th>可见范围</th><th>使用门槛</th><th>排序</th><th>更新时间</th><th>操作</th></tr></thead>
+            <thead><tr><th>序号</th><th>图标</th><th>名称</th><th>所属平台</th><th>工具来源</th><th>区域</th><th>赛道</th><th>标签</th><th>评分</th><th>热度</th><th>状态</th><th>可见范围</th><th>使用门槛</th><th>排序</th><th>更新时间</th><th>操作</th></tr></thead>
             <tbody></tbody>
           </table>
         </div>
@@ -3612,7 +3666,7 @@
       <section class="section" id="frontendInteractionReq">
         <div class="panel">
           <div class="panel-head">
-            <div><h2>工具使用门槛交互原型</h2><p>演示工具完全免费、免费次数、积分消耗、积分不足和充值引导的用户端交互流程。</p></div>
+            <div><h2>工具使用门槛交互原型</h2><p>演示完全免费、免费次数、积分消耗、积分不足和充值引导的用户端交互流程。</p></div>
             <a class="btn" data-tool-demo-link target="_blank" rel="noopener"><i data-lucide="external-link"></i>新窗口打开</a>
           </div>
           <div class="demo-link-row">
@@ -4405,10 +4459,10 @@
       ],
       toolList: [
         { title: "1. 业务目标", items: ["管理右豹工具入口的基础信息、图标、标签、跳转和上下架状态。", "支持运营通过筛选快速定位工具，并对工具进行新增、编辑、删除和状态维护。", "列表字段和操作参考截图，保持紧凑表格形态。"] },
-        { title: "2. 字段规则", items: ["列表字段包含序号、图标、名称、所属平台、区域、赛道、标签、评分、热度、状态、可见范围、使用门槛、排序、更新时间和操作。", "工具名称必填，最多 100 字。", "所属平台、区域、一级赛道、状态、图标为必填。", "区域当前包含国内工具和海外工具。", "状态包含上架和下架。", "可见范围包含全部、团等级、个人等级和指定用户 ID。", "团等级支持 V1、V2、V3 多选；个人等级支持 L1-L7 多选；指定用户 ID 支持录入多个 UID。"] },
-        { title: "3. 新增/编辑规则", items: ["点击新增打开新增推广工具弹窗。", "弹窗调整为基础信息和数据跳转 2 个板块。", "弹窗内文字输入、下拉选择、数字输入等基础组件宽高需保持一致。", "基础信息用于配置所属平台、工具名称、区域、一级赛道、状态、图标、排序和标签。", "标签使用下拉选择组件。", "金句、简介和详情使用横向 Tab 切换配置，每个 Tab 内只展示对应组件，不重复展示字段标题。", "图标为图片上传字段。", "数据跳转包含评分、热度、NEW 角标、开发者、开发者等级、跳转类型、跳转链接、是否可见和使用门槛。", "使用门槛选择完全免费时，必须继续选择免费规则：不限次免费或每日免费x次。", "选择不限次免费时，用户每天可无限次使用该工具，不展示次数限制。", "选择每日免费x次时，必须配置每日免费次数 X；用户当日使用次数达到 X 后，前端需置灰使用按钮并提示今日免费次数已用完，工具不再支持继续使用，次日重置后恢复。", "使用门槛选择积分使用时，需要配置每日可免费次数和单次消耗积分。", "保存后新增工具进入列表并刷新工具数据。", "编辑时回填当前工具字段。"] },
+        { title: "2. 字段规则", items: ["列表字段包含序号、图标、名称、所属平台、工具来源、区域、赛道、标签、评分、热度、状态、可见范围、使用门槛、排序、更新时间和操作。", "工具名称必填，最多 100 字。", "所属平台、工具来源、区域、一级赛道、状态、图标为必填。", "工具来源包含端内自研和 OPC工具，用于区分右豹自研能力和 OPC 接入工具。", "区域当前包含国内工具和海外工具。", "状态包含上架和下架。", "可见范围包含全部、团等级、个人等级和指定用户 ID。", "团等级支持 V1、V2、V3 多选；个人等级支持 L1-L7 多选；指定用户 ID 支持录入多个 UID。"] },
+        { title: "3. 新增/编辑规则", items: ["点击新增打开新增推广工具弹窗。", "弹窗调整为基础信息和数据跳转 2 个板块。", "弹窗内文字输入、下拉选择、数字输入等基础组件宽高需保持一致。", "基础信息用于配置所属平台、工具来源、工具名称、区域、一级赛道、状态、图标、排序和标签。", "工具来源使用下拉选择组件，选项为端内自研和 OPC工具，默认端内自研。", "标签使用下拉选择组件。", "金句、简介和详情使用横向 Tab 切换配置，每个 Tab 内只展示对应组件，不重复展示字段标题。", "图标为图片上传字段。", "数据跳转包含评分、热度、NEW 角标、开发者、开发者等级、跳转类型、跳转链接、是否可见和使用门槛。", "使用门槛选择完全免费时，免费规则直接平铺单选展示“不限次免费”和“每日免费 X 次”，不展示每日可免费次数、单次消耗积分等积分规则字段。", "选择不限次免费时，用户每天可无限次使用该工具，不展示次数限制输入。", "选择每日免费 X 次时，必须配置数字 X；用户当日使用次数达到 X 后，前端需置灰使用按钮并提示今日免费次数已用完，工具不再支持继续使用，次日重置后恢复。", "使用门槛选择积分使用时，仅展示每日可免费次数和单次消耗积分数量，不展示完全免费的免费规则。", "积分使用下每日可免费次数可以配置为 0；当免费次数为 0 时，默认用户每次使用都需要消耗积分。", "保存后新增工具进入列表并刷新工具数据。", "编辑时回填当前工具字段。"] },
         { title: "4. 标签管理规则", items: ["点击标签管理打开标签管理弹窗。", "标签字段包含名称、排序、状态和操作。", "支持新增标签、编辑标签、删除标签。", "启用标签可在工具新增/编辑时选择。"] },
-        { title: "5. 交互规则", items: ["筛选条件包含名称、区域、所属平台、赛道和状态。", "点击搜索按条件过滤当前列表；点击重置恢复全部。", "删除工具需弹窗确认，确认后从列表移除。", "工具数据页按工具名称、图标、今日、近7日和累计维度展示点击量、使用量、累计获得积分和累计变现。"] }
+        { title: "5. 交互规则", items: ["筛选条件包含名称、区域、所属平台、工具来源、赛道和状态。", "点击搜索按条件过滤当前列表；点击重置恢复全部。", "删除工具需弹窗确认，确认后从列表移除。", "工具数据页按工具名称、图标、今日、近7日和累计维度展示点击量、使用量、累计获得积分和累计变现。"] }
       ],
       toolData: [
         { title: "1. 业务目标", items: ["按工具维度查看点击量、使用量、积分收益和变现表现。", "帮助运营判断工具曝光后的访问、实际使用、积分消耗和商业化表现。", "数据页只做统计展示和导出，不承载工具配置。"] },
@@ -4417,8 +4471,9 @@
       ],
       frontendInteractionReq: [
         { title: "1. 页面目标", items: ["作为工具管理下的二级菜单页面，用于展示工具使用门槛的前端交互 demo。", "聚焦文本检测工具页的完整交互流程，便于产品、前端和测试对齐。", "页面以预览为主，不承载后台配置表单。"] },
-        { title: "2. 交互范围", items: ["覆盖完全免费、固定免费次数、积分扣减、积分不足和充值引导五种状态。", "支持示例文本填充、一键演示、重置状态和演示模式切换。", "支持以独立页面或内嵌预览方式打开。"] },
-        { title: "3. 规则说明", items: ["demo 保持原有独立 HTML 交互逻辑，不并入其他后台表单。", "如后续需要扩展工具门槛规则，可在该页面继续迭代。"] }
+        { title: "2. 交互范围", items: ["覆盖完全免费、每日免费 X 次、积分扣减、积分不足和充值引导状态。", "工具免费或积分使用逻辑不区分工具来源，所有工具共用同一套使用门槛判断。", "支持示例文本填充、一键演示、重置状态和演示模式切换。", "支持以独立页面或内嵌预览方式打开。"] },
+        { title: "3. 使用门槛规则", items: ["完全免费且不限次免费时，不展示额度和积分信息，点击主按钮直接执行。", "完全免费且每日免费 X 次时，前端需展示今日剩余次数；次数用完后主按钮置灰并提示今日免费次数已用完。", "积分使用时，前端展示今日免费剩余次数和当前积分余额。", "积分使用下每日可免费次数为 0 时，默认每次使用都需要消耗积分。", "免费次数用完且积分充足时，点击主按钮弹出积分消耗确认；确认后扣减积分并执行工具。", "积分不足时，点击主按钮弹出积分不足提示，引导去充值或完成任务获取积分。"] },
+        { title: "4. 数据交互规则", items: ["进入工具页时前端需请求工具详情接口，获取工具状态、可见范围、跳转配置和使用门槛配置。", "点击主按钮时先调用使用资格校验接口，由后端返回可免费使用、需消耗积分、积分不足、不可见、已下架等结果。", "执行工具成功后需调用使用结果回传接口，记录工具使用状态、消耗积分和免费次数扣减。", "工具来源仅作为后台配置字段，不影响免费或积分使用门槛的前端判断逻辑。"] }
       ],
       trackingOverview: [
         { title: "1. 页面目标", items: ["作为埋点统计一级菜单的默认页，服务运营日常巡盘和数据分析师快速定位趋势变化。", "展示事件触发次数、触发用户数、新用户激活率和埋点成功率。", "提供核心事件趋势、运营关注事件和事件排行。"] },
@@ -4539,11 +4594,11 @@
         { name: "行业神器", sort: 1, status: "启用" }
       ],
       tools: [
-        { iconText: "豹", iconColor: "blue", name: "豹赞数据", platform: "右豹", region: "国内工具", track: "短剧推广", tags: ["AI工具"], score: 5.0, heat: 5, status: "上架", visible: "L2", sort: 1, updated: "2026-08-13 19:50:46", slogan: "短剧推广数据分析", intro: "聚合短剧推广数据，辅助投放复盘。", detail: "支持推广数据查看、转化表现分析和异常数据定位。", developer: "右豹团队", developerLevel: "L3", newTag: true, jumpType: "内链", jumpUrl: "/tools/baozan-data", usageMode: "积分使用", freeMode: "每日免费", freeDaily: 3, costPoints: 20, todayClicks: 286, todayUses: 96, weekClicks: 2140, weekUses: 760, clicks: 12860, uses: 4680, earnedPoints: 93600, monetized: 12880 },
-        { iconText: "T", iconColor: "purple", name: "文字处理", platform: "右豹", region: "国内工具", track: "工具应用", tags: ["文字工具"], score: 0.0, heat: 0, status: "上架", visible: "全部", sort: 0, updated: "2025-09-07 21:22:27", slogan: "批量处理文本", intro: "支持文案整理、格式化和批量替换。", detail: "可用于换行整理、空格清理和批量文案处理。", developer: "工具中台", developerLevel: "L2", newTag: false, jumpType: "内链", jumpUrl: "/tools/text", usageMode: "完全免费", freeMode: "不限次免费", freeDaily: 0, costPoints: 0, todayClicks: 118, todayUses: 44, weekClicks: 830, weekUses: 256, clicks: 3920, uses: 1188, earnedPoints: 0, monetized: 0 },
-        { iconText: "A", iconColor: "orange", name: "文章提取", platform: "右豹", region: "国内工具", track: "工具应用", tags: ["文字工具"], score: 0.0, heat: 0, status: "上架", visible: "全部", sort: 0, updated: "2025-09-07 21:22:02", slogan: "提取文章正文", intro: "从链接中提取文章标题、正文和封面。", detail: "输入文章链接后提取正文结构，便于二次编辑。", developer: "工具中台", developerLevel: "L2", newTag: false, jumpType: "内链", jumpUrl: "/tools/article", usageMode: "积分使用", freeMode: "每日免费", freeDaily: 1, costPoints: 10, todayClicks: 84, todayUses: 30, weekClicks: 620, weekUses: 210, clicks: 2660, uses: 904, earnedPoints: 9040, monetized: 1780 },
-        { iconText: "Q", iconColor: "cyan", name: "违禁词检测", platform: "右豹", region: "国内工具", track: "工具应用", tags: ["文字工具"], score: 0.0, heat: 0, status: "上架", visible: "全部", sort: 0, updated: "2025-09-07 21:22:36", slogan: "检测敏感词", intro: "检测文案中的违禁词和风险表达。", detail: "支持输入文案后标记疑似风险词，并给出替换建议。", developer: "工具中台", developerLevel: "L2", newTag: false, jumpType: "内链", jumpUrl: "/tools/risk-word", usageMode: "完全免费", freeMode: "每日免费", freeDaily: 5, costPoints: 0, todayClicks: 210, todayUses: 148, weekClicks: 1600, weekUses: 980, clicks: 5480, uses: 3312, earnedPoints: 0, monetized: 0 },
-        { iconText: "创", iconColor: "green", name: "爆款标题创作", platform: "右豹", region: "国内工具", track: "内容创作", tags: ["行业神器", "AI工具"], score: 4.8, heat: 4, status: "下架", visible: "团等级", sort: 2, updated: "2025-09-07 21:25:12", slogan: "快速生成标题", intro: "基于行业模板生成短剧推广标题。", detail: "选择行业和风格后生成标题候选，支持复制和收藏。", developer: "增长实验室", developerLevel: "L4", newTag: true, jumpType: "外链", jumpUrl: "https://example.com/title", usageMode: "积分使用", freeMode: "每日免费", freeDaily: 2, costPoints: 30, todayClicks: 24, todayUses: 8, weekClicks: 180, weekUses: 62, clicks: 890, uses: 320, earnedPoints: 9600, monetized: 2360 }
+        { iconText: "豹", iconColor: "blue", name: "豹赞数据", platform: "右豹", source: "端内自研", region: "国内工具", track: "短剧推广", tags: ["AI工具"], score: 5.0, heat: 5, status: "上架", visible: "L2", sort: 1, updated: "2026-08-13 19:50:46", slogan: "短剧推广数据分析", intro: "聚合短剧推广数据，辅助投放复盘。", detail: "支持推广数据查看、转化表现分析和异常数据定位。", developer: "右豹团队", developerLevel: "L3", newTag: true, jumpType: "内链", jumpUrl: "/tools/baozan-data", usageMode: "积分使用", freeMode: "每日免费", freeDaily: 3, costPoints: 20, todayClicks: 286, todayUses: 96, weekClicks: 2140, weekUses: 760, clicks: 12860, uses: 4680, earnedPoints: 93600, monetized: 12880 },
+        { iconText: "T", iconColor: "purple", name: "文字处理", platform: "右豹", source: "端内自研", region: "国内工具", track: "工具应用", tags: ["文字工具"], score: 0.0, heat: 0, status: "上架", visible: "全部", sort: 0, updated: "2025-09-07 21:22:27", slogan: "批量处理文本", intro: "支持文案整理、格式化和批量替换。", detail: "可用于换行整理、空格清理和批量文案处理。", developer: "工具中台", developerLevel: "L2", newTag: false, jumpType: "内链", jumpUrl: "/tools/text", usageMode: "完全免费", freeMode: "不限次免费", freeDaily: 0, costPoints: 0, todayClicks: 118, todayUses: 44, weekClicks: 830, weekUses: 256, clicks: 3920, uses: 1188, earnedPoints: 0, monetized: 0 },
+        { iconText: "A", iconColor: "orange", name: "文章提取", platform: "右豹", source: "OPC工具", region: "国内工具", track: "工具应用", tags: ["文字工具"], score: 0.0, heat: 0, status: "上架", visible: "全部", sort: 0, updated: "2025-09-07 21:22:02", slogan: "提取文章正文", intro: "从链接中提取文章标题、正文和封面。", detail: "输入文章链接后提取正文结构，便于二次编辑。", developer: "工具中台", developerLevel: "L2", newTag: false, jumpType: "内链", jumpUrl: "/tools/article", usageMode: "积分使用", freeMode: "每日免费", freeDaily: 1, costPoints: 10, todayClicks: 84, todayUses: 30, weekClicks: 620, weekUses: 210, clicks: 2660, uses: 904, earnedPoints: 9040, monetized: 1780 },
+        { iconText: "Q", iconColor: "cyan", name: "违禁词检测", platform: "右豹", source: "端内自研", region: "国内工具", track: "工具应用", tags: ["文字工具"], score: 0.0, heat: 0, status: "上架", visible: "全部", sort: 0, updated: "2025-09-07 21:22:36", slogan: "检测敏感词", intro: "检测文案中的违禁词和风险表达。", detail: "支持输入文案后标记疑似风险词，并给出替换建议。", developer: "工具中台", developerLevel: "L2", newTag: false, jumpType: "内链", jumpUrl: "/tools/risk-word", usageMode: "完全免费", freeMode: "每日免费", freeDaily: 5, costPoints: 0, todayClicks: 210, todayUses: 148, weekClicks: 1600, weekUses: 980, clicks: 5480, uses: 3312, earnedPoints: 0, monetized: 0 },
+        { iconText: "创", iconColor: "green", name: "爆款标题创作", platform: "右豹", source: "OPC工具", region: "国内工具", track: "内容创作", tags: ["行业神器", "AI工具"], score: 4.8, heat: 4, status: "下架", visible: "团等级", sort: 2, updated: "2025-09-07 21:25:12", slogan: "快速生成标题", intro: "基于行业模板生成短剧推广标题。", detail: "选择行业和风格后生成标题候选，支持复制和收藏。", developer: "增长实验室", developerLevel: "L4", newTag: true, jumpType: "外链", jumpUrl: "https://example.com/title", usageMode: "积分使用", freeMode: "每日免费", freeDaily: 2, costPoints: 30, todayClicks: 24, todayUses: 8, weekClicks: 180, weekUses: 62, clicks: 890, uses: 320, earnedPoints: 9600, monetized: 2360 }
       ],
       settlementAccounts: [
         {
@@ -5373,6 +5428,7 @@
             <td>${toolIcon(item)}</td>
             <td>${item.name}</td>
             <td>${item.platform}</td>
+            <td>${item.source || "端内自研"}</td>
             <td>${item.region}</td>
             <td>${item.track}</td>
             <td>${item.tags.map((tag) => `<span class="tag-chip">${tag}</span>`).join("") || "-"}</td>
@@ -5655,7 +5711,7 @@
     }
 
     function openToolForm(index) {
-      const item = state.tools[index] || { iconText: "+", iconColor: "blue", name: "", platform: "右豹", region: "国内工具", track: "工具应用", tags: [], score: 0, heat: 0, status: "上架", visible: "全部", sort: 0, updated: "", slogan: "", intro: "", detail: "", developer: "", developerLevel: "", newTag: false, jumpType: "内链", jumpUrl: "", usageMode: "完全免费", freeMode: "不限次免费", freeDaily: 0, costPoints: 0, todayClicks: 0, todayUses: 0, weekClicks: 0, weekUses: 0, clicks: 0, uses: 0 };
+      const item = state.tools[index] || { iconText: "+", iconColor: "blue", name: "", platform: "右豹", source: "端内自研", region: "国内工具", track: "工具应用", tags: [], score: 0, heat: 0, status: "上架", visible: "全部", sort: 0, updated: "", slogan: "", intro: "", detail: "", developer: "", developerLevel: "", newTag: false, jumpType: "内链", jumpUrl: "", usageMode: "完全免费", freeMode: "不限次免费", freeDaily: 0, costPoints: 0, todayClicks: 0, todayUses: 0, weekClicks: 0, weekUses: 0, clicks: 0, uses: 0 };
       const freeMode = getToolFreeMode(item);
       openModal(index == null ? "新增推广工具" : "编辑推广工具", "配置工具基础信息和数据跳转，保存后同步工具列表和工具数据。", `
         <div class="form tool-form" id="toolForm">
@@ -5663,6 +5719,7 @@
             <h4>基础信息</h4>
             <div class="form-section-grid">
               <div class="field"><label>所属平台</label><select><option ${item.platform === "右豹" ? "selected" : ""}>右豹</option><option ${item.platform === "小程序" ? "selected" : ""}>小程序</option></select></div>
+              <div class="field"><label>工具来源</label><select><option ${item.source !== "OPC工具" ? "selected" : ""}>端内自研</option><option ${item.source === "OPC工具" ? "selected" : ""}>OPC工具</option></select></div>
               ${formField("工具名称", item.name || "数据助手")}
               <div class="field"><label>区域</label><select><option ${item.region === "国内工具" ? "selected" : ""}>国内工具</option><option ${item.region === "海外工具" ? "selected" : ""}>海外工具</option></select></div>
               <div class="field"><label>一级赛道</label><select><option ${item.track === "工具应用" ? "selected" : ""}>工具应用</option><option ${item.track === "短剧推广" ? "selected" : ""}>短剧推广</option><option ${item.track === "内容创作" ? "selected" : ""}>内容创作</option></select></div>
@@ -5688,11 +5745,17 @@
               ${formField("跳转链接", item.jumpUrl)}
               ${renderToolVisibleControl(item.visible)}
               <div class="field"><label>使用门槛</label><select id="toolUsageMode"><option ${item.usageMode === "完全免费" ? "selected" : ""}>完全免费</option><option ${item.usageMode === "积分使用" ? "selected" : ""}>积分使用</option></select></div>
-              <div class="field free-usage-fields"><label>免费规则</label><select id="toolFreeMode"><option ${freeMode === "不限次免费" ? "selected" : ""}>不限次免费</option><option ${freeMode === "每日免费" ? "selected" : ""}>每日免费x次</option></select></div>
-              <div class="field free-limit-fields"><label>每日免费次数</label><input id="toolFreeDailyLimit" type="number" min="1" value="${item.usageMode === "完全免费" && freeMode === "每日免费" ? item.freeDaily || 1 : 1}"></div>
-              <div class="field span-2 free-limit-fields"><p class="usage-note">每日免费次数用完后，前端需置灰使用按钮并提示“今日免费次数已用完，明日可继续使用”，该工具不再支持继续使用。</p></div>
-              <div class="field usage-fields"><label>每日可免费次数</label><input type="number" min="0" value="${item.usageMode === "积分使用" ? item.freeDaily || 0 : 0}"></div>
-              <div class="field usage-fields"><label>单次消耗积分</label><input type="number" min="0" value="${item.costPoints || 0}"></div>
+              <div class="field span-2 free-usage-fields">
+                <label>免费规则</label>
+                <div class="radio-rule-row" id="toolFreeModeGroup">
+                  <label class="radio-rule-card"><input type="radio" name="toolFreeMode" value="不限次免费" ${freeMode === "不限次免费" ? "checked" : ""}>不限次免费</label>
+                  <label class="radio-rule-card"><input type="radio" name="toolFreeMode" value="每日免费" ${freeMode === "每日免费" ? "checked" : ""}>每日免费 <input id="toolFreeDailyLimit" type="number" min="1" value="${item.usageMode === "完全免费" && freeMode === "每日免费" ? item.freeDaily || 1 : 1}"> 次</label>
+                </div>
+              </div>
+              <div class="field span-2 free-limit-fields"><p class="usage-note">选择每日免费 X 次时，用户当日使用次数达到 X 后，前端需置灰使用按钮并提示“今日免费次数已用完，明日可继续使用”，该工具不再支持继续使用。</p></div>
+              <div class="field usage-fields"><label>每日可免费次数</label><input id="toolPointFreeDaily" type="number" min="0" value="${item.usageMode === "积分使用" ? item.freeDaily || 0 : 0}"></div>
+              <div class="field usage-fields"><label>单次消耗积分</label><input id="toolPointCost" type="number" min="1" value="${item.usageMode === "积分使用" ? item.costPoints || 1 : 1}"></div>
+              <div class="field span-2 usage-fields"><p class="usage-note">选择积分使用时，仅配置每日可免费次数和单次消耗积分；每日可免费次数为 0 时，默认用户每次使用都需要消耗积分。</p></div>
             </div>
           </section>
         </div>
@@ -5708,8 +5771,12 @@
         if (control.multiple) return [...control.selectedOptions].map((option) => option.value);
         return control.value.trim();
       };
+      const usageMode = get("使用门槛");
+      const freeModeInput = document.querySelector("input[name='toolFreeMode']:checked");
+      const selectedFreeMode = freeModeInput?.value || "不限次免费";
       const item = {
         platform: get("所属平台"),
+        source: get("工具来源") || "端内自研",
         name: get("工具名称") || "未命名工具",
         region: get("区域"),
         track: get("一级赛道"),
@@ -5729,14 +5796,14 @@
         jumpType: get("跳转类型"),
         jumpUrl: get("跳转链接"),
         visible: getToolVisibleValue(),
-        usageMode: get("使用门槛"),
-        freeMode: get("使用门槛") === "完全免费" ? get("免费规则") : "每日免费",
-        freeDaily: get("使用门槛") === "积分使用"
-          ? Number(get("每日可免费次数") || 0)
-          : get("免费规则") === "每日免费x次"
+        usageMode,
+        freeMode: usageMode === "完全免费" ? selectedFreeMode : "每日免费",
+        freeDaily: usageMode === "积分使用"
+          ? Number(document.getElementById("toolPointFreeDaily")?.value || 0)
+          : selectedFreeMode === "每日免费"
             ? Number(document.getElementById("toolFreeDailyLimit")?.value || 0)
             : 0,
-        costPoints: get("使用门槛") === "积分使用" ? Number(get("单次消耗积分") || 0) : 0,
+        costPoints: usageMode === "积分使用" ? Number(document.getElementById("toolPointCost")?.value || 0) : 0,
         updated: "2026-08-17 19:18:00",
         todayClicks: index === "" ? 0 : state.tools[Number(index)].todayClicks,
         todayUses: index === "" ? 0 : state.tools[Number(index)].todayUses,
@@ -5793,12 +5860,14 @@
       const name = document.getElementById("toolNameFilter").value.trim();
       const region = document.getElementById("toolRegionFilter").value;
       const platform = document.getElementById("toolPlatformFilter").value;
+      const source = document.getElementById("toolSourceFilter").value;
       const track = document.getElementById("toolTrackFilter").value;
       const status = document.getElementById("toolStatusFilter").value;
       const rows = state.tools.filter((item) => {
         return (!name || item.name.includes(name))
           && (region === "全部" || item.region === region)
           && (platform === "全部" || item.platform === platform)
+          && (source === "全部" || (item.source || "端内自研") === source)
           && (track === "全部" || item.track === track)
           && (status === "全部" || item.status === status);
       });
@@ -6257,7 +6326,8 @@
     function syncToolUsageFields() {
       const mode = document.getElementById("toolUsageMode");
       if (!mode) return;
-      const freeMode = document.getElementById("toolFreeMode");
+      const freeMode = document.querySelector("input[name='toolFreeMode']:checked");
+      const dailyLimit = document.getElementById("toolFreeDailyLimit");
       const isFree = mode.value === "完全免费";
       const isPoint = mode.value === "积分使用";
       document.querySelectorAll("#toolForm .usage-fields").forEach((field) => {
@@ -6267,8 +6337,9 @@
         field.classList.toggle("hidden", !isFree);
       });
       document.querySelectorAll("#toolForm .free-limit-fields").forEach((field) => {
-        field.classList.toggle("hidden", !isFree || freeMode?.value !== "每日免费x次");
+        field.classList.toggle("hidden", !isFree || freeMode?.value !== "每日免费");
       });
+      if (dailyLimit) dailyLimit.disabled = !isFree || freeMode?.value !== "每日免费";
     }
 
     function syncToolVisibleMode(mode) {
@@ -6562,7 +6633,7 @@
         if (event.target.id === "taskConditionType") syncTaskProjectField();
         if (["codePointsMode", "codeProduct"].includes(event.target.id)) syncCodePointsFields();
         if (event.target.id === "codeLimitEnabled") syncCodeLimitField();
-        if (["toolUsageMode", "toolFreeMode"].includes(event.target.id)) syncToolUsageFields();
+        if (event.target.id === "toolUsageMode" || event.target.name === "toolFreeMode") syncToolUsageFields();
       });
 
       document.getElementById("modalBody").addEventListener("input", (event) => {
