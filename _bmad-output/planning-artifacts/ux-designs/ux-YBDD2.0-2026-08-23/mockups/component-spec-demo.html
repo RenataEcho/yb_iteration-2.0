@@ -217,6 +217,32 @@
       margin-top: 14px; padding: 10px 12px; border-radius: var(--radius-sm);
       background: #fffbeb; border: 1px solid #fde68a; font-size: 12px; color: #92400e; line-height: 1.55;
     }
+    .limit-note {
+      margin-top: 14px; padding: 10px 12px; border-radius: var(--radius-sm);
+      background: #fef2f2; border: 1px solid #fecaca; font-size: 12px; color: #991b1b; line-height: 1.55;
+    }
+    .spec-list { padding-left: 18px; font-size: 12px; color: var(--text-secondary); line-height: 1.7; }
+    .spec-list li { margin-bottom: 6px; }
+    .spec-list code { font-family: ui-monospace, monospace; font-size: 11px; color: var(--accent-rule); background: #f1f5f9; padding: 1px 5px; border-radius: 4px; }
+    .spec-subh { font-size: 13px; font-weight: 700; margin: 18px 0 8px; }
+    .spec-subh:first-child { margin-top: 0; }
+    .flow-page { padding: 0; border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; background: var(--surface); }
+    .flow-page-intro { padding: 12px 14px 0; font-size: 12px; color: var(--text-muted); line-height: 1.55; }
+    .flow-tab-bar {
+      display: flex; gap: 4px; padding: 10px 14px 0; border-bottom: 1px solid var(--border);
+    }
+    .flow-tab-bar span, .flow-tab-bar button {
+      padding: 8px 14px; border: none; background: none; white-space: nowrap;
+      font-size: 13px; color: var(--text-secondary); border-bottom: 2px solid transparent; margin-bottom: -1px;
+    }
+    .flow-tab-bar .active { color: var(--primary); font-weight: 600; border-bottom-color: var(--primary); }
+    .flow-svg-wrap { overflow: auto; padding: 8px 8px 4px; }
+    .flow-svg-wrap svg { display: block; margin: 0 auto; }
+    .flow-edges line, .flow-edges polyline { stroke: #94a3b8; stroke-width: 1.5; fill: none; }
+    .flow-legend { display: flex; flex-wrap: wrap; gap: 12px; padding: 4px 14px 14px; font-size: 11px; color: var(--text-muted); }
+    .flow-legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 4px; vertical-align: -2px; }
+    .swatch { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary); }
+    .swatch b { width: 14px; height: 14px; border-radius: 3px; border: 1px solid; flex-shrink: 0; }
   </style>
 </head>
 <body>
@@ -244,7 +270,7 @@
 
     <header class="page-header">
       <h1>组件规范 <span class="badge badge-spec">Design System</span></h1>
-      <p class="page-desc">迭代需求 Demo 内按钮、文字链、确认弹窗、编辑弹窗、详情抽屉、Toast 的统一规范。所有 FR 页（模板 A / B）须复用以下 class 与交互模式，保证全站一致。</p>
+      <p class="page-desc">迭代需求 Demo 内按钮、文字链、确认弹窗、编辑弹窗、详情抽屉、Toast、业务流程图的统一规范。所有 FR 页须复用以下 class 与交互模式，保证全站一致。</p>
     </header>
 
     <nav class="spec-nav" aria-label="规范章节">
@@ -256,6 +282,7 @@
       <a href="#sec-detail">详情抽屉</a>
       <a href="#sec-toast">Toast</a>
       <a href="#sec-tag">Tag</a>
+      <a href="#sec-flow">业务流程图</a>
     </nav>
 
     <!-- Button -->
@@ -461,6 +488,119 @@
           <span class="tag tag-del">已删除</span>
         </div>
         <div class="spec-meta" style="margin-top:10px;">class：<code class="spec-code">.tag-ok</code> <code class="spec-code">.tag-warn</code> <code class="spec-code">.tag-del</code></div>
+      </div>
+    </section>
+
+    <!-- Flowchart -->
+    <section class="glass-card" id="sec-flow">
+      <div class="spec-section-head">
+        <div>
+          <h2>9 · 业务流程图（SVG Flow）</h2>
+          <p>FR Demo「业务流程」Tab 的研发对照图。默认一张图闭环；拆第二张是例外。手写 SVG，正交折线。参考实现：FR-001 / FR-008 / FR-010。</p>
+        </div>
+      </div>
+      <div class="spec-body">
+        <h3 class="spec-subh">结构与色板</h3>
+        <div class="flow-page" aria-label="流程图结构示例">
+          <p class="flow-page-intro">默认一张图走完：提交 → 写入 → 审核分支，驳回闭环回到起点。能在本图闭环就不要再拆第二张。菱形只问一个是/否。</p>
+          <div class="flow-svg-wrap">
+            <svg width="800" height="300" viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <marker id="spec-arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                  <path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8" />
+                </marker>
+              </defs>
+              <g class="flow-edges" marker-end="url(#spec-arr)">
+                <polyline points="400,48 400,72" />
+                <polyline points="400,108 400,132" />
+                <polyline points="330,168 188,168" />
+                <polyline points="470,168 590,168" />
+                <polyline points="118,190 118,220" />
+                <polyline points="48,238 16,238 16,6 400,6 400,12" />
+              </g>
+              <g class="flow-nodes" font-family="Inter, PingFang SC, sans-serif">
+                <text x="28" y="130" font-size="10" fill="#64748b" transform="rotate(-90 28 130)">重新提交</text>
+                <rect x="300" y="12" width="200" height="36" rx="8" fill="#eff6ff" stroke="#2563eb" />
+                <text x="400" y="35" text-anchor="middle" font-size="12" fill="#18222f">前端：提交资料</text>
+                <rect x="280" y="72" width="240" height="36" rx="8" fill="#f0fdf4" stroke="#16a34a" />
+                <text x="400" y="95" text-anchor="middle" font-size="12" fill="#18222f">后端：写入 · 状态=待审核</text>
+                <polygon points="400,132 470,168 400,204 330,168" fill="#fffbeb" stroke="#d97706" />
+                <text x="400" y="172" text-anchor="middle" font-size="11" fill="#92400e">审核通过?</text>
+                <text x="220" y="160" font-size="11" fill="#dc2626">驳回</text>
+                <rect x="48" y="146" width="140" height="44" rx="8" fill="#fef2f2" stroke="#dc2626" />
+                <text x="118" y="165" text-anchor="middle" font-size="11" fill="#991b1b">状态=已驳回</text>
+                <text x="118" y="181" text-anchor="middle" font-size="10" fill="#64748b">必填原因</text>
+                <rect x="48" y="220" width="140" height="36" rx="8" fill="#eff6ff" stroke="#2563eb" />
+                <text x="118" y="243" text-anchor="middle" font-size="11" fill="#18222f">修订后重提</text>
+                <text x="500" y="160" font-size="11" fill="#16a34a">通过</text>
+                <rect x="590" y="146" width="170" height="44" rx="8" fill="#f0fdf4" stroke="#16a34a" />
+                <text x="675" y="165" text-anchor="middle" font-size="11" fill="#18222f">状态=已通过</text>
+                <text x="675" y="181" text-anchor="middle" font-size="10" fill="#64748b">写入审核时间</text>
+              </g>
+            </svg>
+          </div>
+          <div class="flow-legend">
+            <span><i style="background:#eff6ff;border:1px solid #2563eb"></i>前端 / 操作</span>
+            <span><i style="background:#f0fdf4;border:1px solid #16a34a"></i>后端 / 写入</span>
+            <span><i style="background:#fff7ed;border:1px solid #ea580c"></i>异步 / 任务</span>
+            <span><i style="background:#fffbeb;border:1px solid #d97706"></i>校验 / 分支</span>
+            <span><i style="background:#fef2f2;border:1px solid #dc2626"></i>阻断 / 驳回</span>
+          </div>
+        </div>
+        <div class="spec-meta" style="margin-top:10px;">
+          容器：<code class="spec-code">.flow-page</code>
+          <code class="spec-code">.flow-tab-bar</code>
+          <code class="spec-code">.flow-svg-wrap</code>
+          <code class="spec-code">.flow-edges</code>
+          <code class="spec-code">.flow-nodes</code>
+          <code class="spec-code">.flow-legend</code>
+        </div>
+        <div class="spec-demo" style="margin-top:12px;">
+          <span class="swatch"><b style="background:#eff6ff;border-color:#2563eb"></b>前端 / 操作</span>
+          <span class="swatch"><b style="background:#f0fdf4;border-color:#16a34a"></b>后端 / 写入</span>
+          <span class="swatch"><b style="background:#fff7ed;border-color:#ea580c"></b>异步 / 任务</span>
+          <span class="swatch"><b style="background:#fffbeb;border-color:#d97706"></b>校验菱形</span>
+          <span class="swatch"><b style="background:#fef2f2;border-color:#dc2626"></b>阻断 / 驳回</span>
+          <span class="swatch"><b style="background:#f1f5f9;border-color:#94a3b8"></b>跳过 / 中性</span>
+        </div>
+
+        <h3 class="spec-subh">实现要点</h3>
+        <ol class="spec-list">
+          <li><strong>分层渲染</strong>：先画 <code>flow-edges</code>，再画 <code>flow-nodes</code>。连线层在下，避免折线横穿线框。</li>
+          <li><strong>正交折线</strong>：只用水平 / 垂直 <code>line</code> 或 <code>polyline</code>。分叉与汇聚走节点间隙的专用通道，禁止斜线穿框。</li>
+          <li><strong>端点落边</strong>：折线起止落在节点顶 / 底 / 左 / 右边，悬空端点视为断流。</li>
+          <li><strong>能闭环就只用一张图</strong>：主路径、校验分支、驳回/失败回环能画进同一张 SVG 并接到起点，则只保留一个业务流程，<strong>不要</strong>预置流程 2。只有两条互不汇合的主链（例如收益达标 vs 指定用户），或单图闭环后通道必然打架、线穿框、节点被裁切时，才启用第二张，并用横向 Tab 切换。</li>
+          <li><strong>闭环</strong>：驳回、失败、重提必须接到起点顶边。回环走外侧通道，禁止贴画布边缘停住（看起来像断线）。</li>
+          <li><strong>间距</strong>：相邻节点纵向 ≥24px；菱形与上下节点 ≥30px；左右分支框与菱形顶点 ≥16px。</li>
+          <li><strong>一菱形一问题</strong>：菱形只问一个是 / 否。判定公式、口径、比较符写在菱形内或紧邻副文案，禁止把「收益达标」合成一步。</li>
+          <li><strong>文本</strong>：主文案 11–13px；副文案 10px + muted。超 12 字用 <code>tspan</code> 换行，线框留足内边距。</li>
+          <li><strong>分支标注</strong>：「是 / 通过」贴对应折线旁用绿色；「否 / 驳回」用红色。</li>
+          <li><strong>多图才出 Tab</strong>：仅在按上条拆出第二张时才出现 <code>.flow-tab-bar</code>，单面板只展示一张，禁止纵向堆叠。图例仍放面板底部共用。只有一张图时不要空挂「流程1」。</li>
+          <li><strong>画布可滚</strong>：<code>.flow-svg-wrap { overflow:auto; max-height:72vh }</code>。svg 写死 <code>width</code> + <code>viewBox</code>，窄屏横向滚，不重排。</li>
+          <li><strong>箭头 id 隔离</strong>：每张 SVG 独立 <code>marker id</code>（如 <code>flow-arrow-1</code>），同页复用同一 id 会串箭头。</li>
+          <li><strong>虚线旁路</strong>：可选、汇总、异步旁路用 <code>stroke-dasharray="4 3"</code>。</li>
+          <li><strong>深链</strong>：<code>?tab=flow</code>；仅多图时再加 <code>&amp;flow=1|2|3</code>。</li>
+          <li><strong>规则抽屉只指向</strong>：写「见页内业务流程 Tab」，不在抽屉里复述文字版全流程，也不嵌第二份图。</li>
+        </ol>
+
+        <h3 class="spec-subh">硬限制（做不到 / 不要做）</h3>
+        <ol class="spec-list">
+          <li><strong>手写绝对坐标，无布局引擎</strong>。移动或加高一个节点，必须重算所有相连折线与通道；改一处容易漏改边。</li>
+          <li><strong>无自动避让</strong>。折线不会绕开节点，线穿框是最高频事故。先定节点框，再对端点。</li>
+          <li><strong>菱形是写死 polygon</strong>。改文案不能只改 height，必须重算四个顶点，否则字溢出。</li>
+          <li><strong>SVG 文本不自动折行</strong>。超长必须手写 <code>tspan</code>，不会像 HTML 那样 wrap。</li>
+          <li><strong>viewBox 写死</strong>。加节点必须同步加大 <code>width / height / viewBox</code>，否则节点被裁切。</li>
+          <li><strong>不做响应式重排</strong>。窄屏只横向滚动，不会像 Grid 那样回流节点。</li>
+          <li><strong>静态图，不交互</strong>。节点不能点、不能高亮当前态、不跟 Demo 表数据联动。</li>
+          <li><strong>拆图是例外，不是默认</strong>。优先扩画布、走外侧回环，把同一条业务画闭环。只有确认无法在一张图内闭环（互不汇合的第二条主链，或闭环后必然线穿框 / 通道打架）才拆流程 2。禁止因为「节点有点多」就先拆。</li>
+          <li><strong>不表达并发与时序</strong>。并行、等待、超时只能靠橙色节点或虚线示意，没有泳道 / 甘特。</li>
+          <li><strong>色值写死 hex</strong>。未接 CSS 变量，也没有暗色主题适配。</li>
+          <li><strong>禁用 Mermaid / 流程图库</strong>。颜色、正交通道、分层渲染、图例对不齐，视觉不可控。</li>
+          <li><strong>不进抽屉、不进规则正文</strong>。第二份图会和页内 Tab 漂移。</li>
+          <li><strong>不接真实状态机</strong>。图是研发说明，不驱动后台表状态，也不做权限 / 持久化。</li>
+        </ol>
+        <div class="limit-note">新增或改流程图时：先改节点框，再对折线端点；有驳回 / 失败必须画回环并接到起点边。改完用 <code>?tab=flow</code> 目视检查：无线穿框、无悬空端点、无贴边假断线。</div>
+        <div class="usage-note">新 FR 从本页复制结构与色板，不要另起 Mermaid 或自定义连线样式。完整写入约定见 <code class="spec-code">ITERATION-FR-GUIDE.md</code> 第四节。</div>
       </div>
     </section>
   </main>

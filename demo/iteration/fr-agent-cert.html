@@ -1,0 +1,2376 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FR-010 · 代理迭代V1.0 · 右豹迭代需求记录</title>
+  <style>
+    :root {
+      --primary: #2563eb; --primary-hover: #1d4ed8; --primary-light: #eff6ff; --primary-border: #bfdbfe;
+      --accent-rule: #0891b2; --accent-version: #7c3aed; --accent-fr: #d97706;
+      --success: #16a34a; --success-bg: #f0fdf4; --warning: #d97706; --warning-bg: #fffbeb;
+      --danger: #dc2626; --danger-bg: #fef2f2;
+      --info: #0891b2; --info-bg: #ecfeff;
+      --surface: #fff; --surface-glass: rgba(255,255,255,0.72); --surface-hover: #f8fafc; --border: #e8edf3;
+      --text-primary: #18222f; --text-secondary: #4a5568; --text-muted: #9aa5b4;
+      --sidebar-w: 240px; --drawer-w: 480px; --radius-sm: 7px; --radius-lg: 14px;
+      --shadow: 0 8px 32px rgba(30,40,80,0.10);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 13px;
+      color: var(--text-primary);
+      background: linear-gradient(135deg, #e0e7ff 0%, #f0f4f8 40%, #e0f2fe 100%);
+      background-attachment: fixed; min-height: 100vh;
+    }
+    .sidebar {
+      position: fixed; inset: 0 auto 0 0; width: var(--sidebar-w); z-index: 200;
+      display: flex; flex-direction: column;
+      background: rgba(240,244,255,0.95); backdrop-filter: blur(20px);
+      border-right: 1px solid rgba(148,163,196,0.22);
+    }
+    .sidebar-brand { padding: 16px 14px 12px; border-bottom: 1px solid rgba(148,163,196,0.22); }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: linear-gradient(135deg, #2563eb, #7c3aed); color: #fff;
+      display: flex; align-items: center; justify-content: center; font-weight: 700;
+    }
+    .brand-text { font-size: 14px; font-weight: 700; }
+    .brand-sub { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+    .sprint-pill {
+      display: inline-block; margin-top: 10px; font-size: 11px; font-weight: 600;
+      padding: 3px 8px; border-radius: 999px; background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0;
+    }
+    .sidebar-scroll { flex: 1; overflow-y: auto; padding: 8px 0 16px; }
+    .sidebar-foot { padding: 10px 14px 14px; border-top: 1px solid rgba(148,163,196,0.22); font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+    .main { margin-left: var(--sidebar-w); padding: 16px 20px 40px; min-height: 100vh; }
+    .breadcrumb { padding: 4px 0 12px; font-size: 12px; color: var(--text-muted); }
+    .breadcrumb a { color: var(--primary); text-decoration: none; }
+    .page-header { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; }
+    .page-header h1 { font-size: 19px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .page-desc { font-size: 12px; color: var(--text-muted); max-width: 760px; line-height: 1.55; }
+    .badge { display: inline-flex; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: var(--radius-sm); }
+    .badge-fr { background: #fffbeb; color: var(--accent-fr); border: 1px solid #fde68a; }
+    .badge-version { background: #f5f3ff; color: var(--accent-version); border: 1px solid #ddd6fe; }
+    .page-tab-bar {
+      display: flex; gap: 0; margin-bottom: 12px;
+      background: var(--surface-glass); backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.55); border-radius: var(--radius-lg);
+      padding: 4px; box-shadow: var(--shadow); width: fit-content;
+    }
+    .page-tab-bar button {
+      padding: 8px 20px; border: none; background: transparent; cursor: pointer;
+      font-size: 13px; font-weight: 500; color: var(--text-secondary); border-radius: 10px;
+    }
+    .page-tab-bar button.active { background: var(--primary); color: #fff; font-weight: 600; }
+    .module-tab-bar {
+      display: flex; gap: 0; margin-bottom: 14px; border-bottom: 1px solid var(--border);
+    }
+    .module-tab-bar button {
+      padding: 8px 16px; border: none; background: none; cursor: pointer;
+      font-size: 13px; color: var(--text-secondary); border-bottom: 2px solid transparent; margin-bottom: -1px;
+    }
+    .module-tab-bar button.active { color: var(--primary); font-weight: 600; border-bottom-color: var(--primary); }
+    .page-view, .sub-view { display: none; }
+    .page-view.active, .sub-view.active { display: block; }
+    .btn {
+      display: inline-flex; align-items: center; height: 34px; padding: 0 14px;
+      border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid transparent;
+    }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-rule { background: var(--primary-light); color: var(--primary); border-color: var(--primary-border); }
+    .btn-rule.active { background: var(--primary); color: #fff; }
+    .btn-ghost { background: var(--surface); color: var(--text-secondary); border-color: var(--border); }
+    .btn-ghost-sm { background: var(--surface); color: var(--text-secondary); border: 1px solid var(--border); height: 32px; padding: 0 12px; border-radius: var(--radius-sm); cursor: pointer; font-size: 12px; }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn-danger:hover { background: #b91c1c; }
+    .glass-card {
+      background: var(--surface-glass); backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.55); border-radius: var(--radius-lg);
+      box-shadow: var(--shadow); overflow: hidden;
+    }
+    .stats-bar {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 0;
+      border-bottom: 1px solid var(--border); background: rgba(248,250,252,0.85);
+    }
+    .stat-item { padding: 14px 16px; border-right: 1px solid var(--border); }
+    .stat-item:last-child { border-right: none; }
+    .stat-item .label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+    .stat-item .value { font-size: 18px; font-weight: 700; }
+    .stat-item .value.warn { color: var(--warning); }
+    .stat-item .value.ok { color: var(--success); }
+    .stat-item .value.danger { color: var(--danger); }
+    .stat-item .value.info { color: var(--info); }
+    .stat-item .stat-unit { font-size: 12px; font-weight: 500; margin-left: 4px; }
+    .stat-item .stat-amount { margin-top: 4px; font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--text-secondary); }
+    .table-toolbar {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 16px; border-bottom: 1px solid var(--border);
+    }
+    .table-toolbar h3 { font-size: 14px; font-weight: 700; }
+    .filter-bar { display: flex; flex-wrap: wrap; gap: 10px; padding: 14px 16px; align-items: flex-end; border-bottom: 1px solid var(--border); }
+    .filter-field { display: flex; flex-direction: column; gap: 4px; }
+    .filter-field label { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+    .filter-field input, .filter-field select { height: 32px; padding: 0 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 12px; min-width: 160px; }
+    .filter-actions { display: flex; gap: 8px; margin-left: auto; align-items: center; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+    #certTable { min-width: 1180px; }
+    #wdTable { min-width: 1680px; }
+    #priceTable { min-width: 1280px; }
+    #priceConfigTable { min-width: 760px; table-layout: fixed; }
+    #priceConfigTable td { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); font-size: 12px; vertical-align: top; }
+    th { font-size: 11px; font-weight: 600; color: var(--text-muted); background: rgba(248,250,252,0.9); white-space: nowrap; }
+    tr:hover td { background: var(--surface-hover); }
+    th.col-action, td.col-action {
+      position: sticky; right: 0; background: var(--surface);
+      box-shadow: -2px 0 6px rgba(0,0,0,0.04); white-space: nowrap;
+    }
+    th.col-action { background: rgba(248,250,252,0.96); }
+    tr:hover td.col-action { background: var(--surface-hover); }
+    .link { color: var(--primary); cursor: pointer; text-decoration: none; margin-right: 10px; font-size: 12px; font-weight: 500; background: none; border: none; padding: 0; }
+    .link-danger { color: var(--danger); }
+    .link-muted { color: var(--text-secondary); }
+    .link:disabled, .link.off { color: var(--text-muted); cursor: not-allowed; font-weight: 400; }
+    .detail-head {
+      display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
+      padding: 16px 16px 12px; border-bottom: 1px solid var(--border);
+    }
+    .detail-back {
+      display: inline-flex; align-items: center; gap: 4px; margin-bottom: 6px;
+      color: var(--primary); background: none; border: none; cursor: pointer;
+      font-size: 12px; font-weight: 500; padding: 0;
+    }
+    .detail-head h3 { font-size: 18px; font-weight: 700; }
+    .toolbar-actions { display: flex; align-items: center; gap: 8px; }
+    .check-col { width: 36px; text-align: center; }
+    .num { font-variant-numeric: tabular-nums; }
+    .price-input {
+      width: 100%; height: 30px; padding: 0 8px; border: 1px solid var(--border);
+      border-radius: 6px; font-size: 12px; font-family: inherit; background: #fff;
+    }
+    .price-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.10); }
+    .price-input.is-error { border-color: var(--danger); }
+    .readonly-cell { color: var(--text-secondary); }
+    .log-item { padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 12px; line-height: 1.6; }
+    .log-item:last-child { border-bottom: none; }
+    .log-item time { display: block; color: var(--text-muted); font-size: 11px; margin-bottom: 4px; }
+    .log-item .log-op { font-weight: 600; margin-right: 6px; }
+    .empty-hint { padding: 24px; text-align: center; color: var(--text-muted); font-size: 13px; }
+    .form-field input, .form-field select {
+      width: 100%; height: 34px; padding: 0 10px; border: 1px solid var(--border);
+      border-radius: var(--radius-sm); font-size: 13px; font-family: inherit; background: #fff;
+    }
+    .form-field input:focus, .form-field select:focus {
+      outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.10);
+    }
+    .modal.modal-xl { width: 860px; }
+    .tag { display: inline-flex; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; width: fit-content; white-space: nowrap; }
+    .tag-ok { background: var(--success-bg); color: var(--success); }
+    .tag-warn { background: var(--warning-bg); color: var(--warning); }
+    .tag-del { background: var(--danger-bg); color: var(--danger); }
+    .tag-info { background: var(--info-bg); color: var(--info); }
+    .tag-gray { background: #f1f5f9; color: #64748b; }
+    .cell-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; line-height: 1.45; }
+    .agg-cell { line-height: 1.45; min-width: 168px; }
+    .agg-cell .agg-title { font-weight: 600; }
+    .reject-reason { color: #b91c1c; max-width: 180px; }
+    .op-stack { display: flex; align-items: center; flex-wrap: wrap; gap: 0; white-space: nowrap; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 12px; }
+    .money { font-variant-numeric: tabular-nums; font-weight: 600; }
+    .empty-row { text-align: center; padding: 36px 16px; color: var(--text-muted); }
+    .empty-row strong { display: block; font-size: 14px; color: var(--text-secondary); margin-bottom: 4px; }
+    .file-pick { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .file-pick input { position: absolute; width: 0; height: 0; opacity: 0; }
+    .file-name { font-size: 12px; color: var(--text-secondary); }
+    .file-name.empty { color: var(--text-muted); }
+    .drawer-overlay, .modal-overlay {
+      position: fixed; inset: 0; background: rgba(15,23,42,0.35); z-index: 500;
+      opacity: 0; pointer-events: none; transition: opacity 0.25s;
+    }
+    .drawer-overlay.open, .modal-overlay.open { opacity: 1; pointer-events: auto; }
+    .drawer {
+      position: fixed; top: 0; right: 0; bottom: 0; width: var(--drawer-w); z-index: 501;
+      background: rgba(255,255,255,0.98); backdrop-filter: blur(12px);
+      box-shadow: -8px 0 40px rgba(30,40,60,0.18);
+      transform: translateX(100%); transition: transform 0.28s ease;
+      display: flex; flex-direction: column;
+    }
+    .drawer.open { transform: translateX(0); }
+    .drawer-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .drawer-header h2 { font-size: 15px; font-weight: 700; }
+    .drawer-close { width: 28px; height: 28px; border: none; background: #f1f5f9; border-radius: 6px; cursor: pointer; font-size: 16px; }
+    .rule-tab-bar { display: flex; gap: 0; padding: 0 16px; border-bottom: 1px solid var(--border); }
+    .rule-tab-bar button {
+      padding: 10px 18px; border: none; background: none; cursor: pointer;
+      font-size: 13px; color: var(--text-secondary); border-bottom: 2px solid transparent; margin-bottom: -1px;
+    }
+    .rule-tab-bar button.active { color: var(--primary); font-weight: 600; border-bottom-color: var(--primary); }
+    .drawer-body { flex: 1; overflow-y: auto; padding: 16px 20px 32px; }
+    .rule-panel { display: none; }
+    .rule-panel.active { display: block; }
+    .rule-section { margin-bottom: 22px; }
+    .rule-section h3 { font-size: 14px; font-weight: 700; color: var(--accent-rule); margin-bottom: 8px; }
+    .rule-section h3 span {
+      display: inline-flex; width: 22px; height: 22px; align-items: center; justify-content: center;
+      background: #ecfeff; color: var(--accent-rule); border-radius: 6px; font-size: 12px; margin-right: 8px;
+    }
+    .rule-content { font-size: 13px; color: var(--text-secondary); line-height: 1.65; }
+    .rule-content ul { padding-left: 18px; margin-top: 6px; }
+    .rule-content li { margin-bottom: 5px; }
+    .rule-content code { font-family: ui-monospace, monospace; font-size: 12px; background: #f1f5f9; padding: 1px 5px; border-radius: 4px; }
+    .modal {
+      position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.95);
+      width: 420px; max-width: calc(100vw - 32px); max-height: calc(100vh - 48px);
+      z-index: 501; background: #fff; border-radius: var(--radius-lg);
+      box-shadow: 0 16px 48px rgba(30,40,60,0.2);
+      opacity: 0; pointer-events: none; transition: all 0.2s;
+      display: flex; flex-direction: column;
+    }
+    .modal.modal-md { width: 520px; }
+    .modal-overlay.open .modal { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
+    .modal-header { padding: 16px 20px; border-bottom: 1px solid var(--border); font-size: 15px; font-weight: 700; flex-shrink: 0; }
+    .modal-body { padding: 16px 20px; overflow-y: auto; }
+    .modal-footer { padding: 12px 20px 16px; display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid var(--border); flex-shrink: 0; }
+    .form-field { margin-bottom: 12px; }
+    .form-field:last-child { margin-bottom: 0; }
+    .form-field label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
+    .form-field textarea {
+      width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+      font-size: 13px; min-height: 88px; resize: vertical; font-family: inherit;
+    }
+    .form-field textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.10); }
+    .field-hint { margin-top: 4px; font-size: 11px; color: var(--text-muted); line-height: 1.45; }
+    .req { color: var(--danger); margin-left: 2px; }
+    .confirm-summary {
+      margin-top: 10px; padding: 10px 12px; border-radius: var(--radius-sm);
+      background: #f8fafc; border: 1px solid var(--border); font-size: 12px; line-height: 1.55;
+    }
+    .doc-card {
+      border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px 18px;
+      background: linear-gradient(180deg, #eff6ff 0%, #fff 48%);
+    }
+    .doc-card.license { background: linear-gradient(180deg, #fffbeb 0%, #fff 48%); }
+    .doc-card.invoice { background: linear-gradient(180deg, #f0fdf4 0%, #fff 48%); }
+    .doc-card.receipt { background: linear-gradient(180deg, #ecfeff 0%, #fff 48%); }
+    .doc-card h4 { font-size: 14px; margin-bottom: 10px; }
+    .doc-grid { display: grid; grid-template-columns: 88px 1fr; gap: 6px 10px; font-size: 12px; }
+    .doc-grid dt { color: var(--text-muted); }
+    .license-stamp {
+      margin-top: 14px; width: 72px; height: 72px; border: 2px solid #dc2626; border-radius: 50%;
+      color: #dc2626; display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; opacity: 0.55; transform: rotate(-12deg);
+    }
+    .flow-page-intro { padding: 16px 18px 0; font-size: 12px; color: var(--text-muted); line-height: 1.55; }
+    .flow-svg-wrap { overflow: auto; padding: 16px 18px 8px; max-height: 72vh; }
+    .flow-svg-wrap svg { display: block; margin: 0 auto; min-width: 920px; }
+    .flow-edges line, .flow-edges polyline { stroke: #94a3b8; stroke-width: 1.5; fill: none; }
+    .flow-legend { display: flex; flex-wrap: wrap; gap: 12px; padding: 0 18px 20px; font-size: 11px; color: var(--text-muted); }
+    .flow-legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 4px; vertical-align: -2px; }
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: #1e293b; color: #fff; padding: 10px 18px; border-radius: 999px; font-size: 13px;
+      opacity: 0; transition: all 0.25s; z-index: 600; pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    [hidden] { display: none !important; }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand">
+        <div class="brand-icon">迭</div>
+        <div>
+          <div class="brand-text">右豹迭代需求记录</div>
+          <div class="brand-sub">PRD Demo · 产品交付研发</div>
+        </div>
+      </div>
+      <span class="sprint-pill">YBDD2.0 · 迭代 v1</span>
+    </div>
+    <div class="sidebar-scroll" data-iteration-sidebar></div>
+    <div class="sidebar-foot">FR-010 · 代理迭代V1.0<br />代理认证 / 代理提现 / 代理价格</div>
+  </aside>
+
+  <main class="main">
+    <nav class="breadcrumb">
+      <a href="framework-shell.html">Sprint 概览</a>
+      <span> / 代理 / 代理迭代V1.0</span>
+    </nav>
+    <header class="page-header">
+      <div>
+        <h1>
+          代理迭代V1.0
+          <span class="badge badge-fr">FR-010</span>
+          <span class="badge badge-version">v1 当前</span>
+        </h1>
+        <p class="page-desc">代理板块本轮交付认证审核、提现结算与授权项目价格配置。认证通过后对公账户可用于线上结算；提现需审核通过后再打款；已授权项目可配置代理价格，代理收益按配置价计算。</p>
+      </div>
+      <div>
+        <button class="btn btn-rule" id="toggleRuleDrawer" type="button">📋 需求规则</button>
+      </div>
+    </header>
+
+    <div class="page-tab-bar" role="tablist">
+      <button type="button" class="active" data-page="view-cert" role="tab">代理认证</button>
+      <button type="button" data-page="view-withdraw" role="tab">代理提现</button>
+      <button type="button" data-page="view-price" role="tab">代理价格</button>
+    </div>
+
+    <div id="view-cert" class="page-view active">
+      <div class="module-tab-bar" role="tablist">
+        <button type="button" class="active" data-sub="cert-admin" role="tab">管理后台</button>
+        <button type="button" data-sub="cert-flow" role="tab">业务流程</button>
+      </div>
+      <div id="cert-admin" class="sub-view active">
+        <div class="glass-card">
+          <div class="stats-bar">
+            <div class="stat-item">
+              <div class="label">待审核</div>
+              <div class="value warn" id="statPending">0</div>
+            </div>
+            <div class="stat-item">
+              <div class="label">已通过</div>
+              <div class="value ok" id="statApproved">0</div>
+            </div>
+            <div class="stat-item">
+              <div class="label">已驳回</div>
+              <div class="value danger" id="statRejected">0</div>
+            </div>
+          </div>
+          <div class="table-toolbar">
+            <h3>代理认证</h3>
+          </div>
+          <div class="filter-bar">
+            <div class="filter-field">
+              <label>代理帐号</label>
+              <input id="accountQ" type="text" placeholder="agent_zhou" />
+            </div>
+            <div class="filter-field">
+              <label>审核状态</label>
+              <select id="statusQ">
+                <option value="">全部</option>
+                <option value="pending">待审核</option>
+                <option value="approved">已通过</option>
+                <option value="rejected">已驳回</option>
+              </select>
+            </div>
+            <div class="filter-actions">
+              <button class="btn-ghost-sm" type="button" onclick="resetFilter()">重置</button>
+              <button class="btn btn-primary" type="button" onclick="queryList()">查询</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table id="certTable">
+              <colgroup>
+                <col style="width:86px" />
+                <col style="width:108px" />
+                <col style="width:112px" />
+                <col style="width:210px" />
+                <col style="width:220px" />
+                <col style="width:136px" />
+                <col style="width:118px" />
+                <col style="width:118px" />
+                <col style="width:88px" />
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>代理ID</th>
+                  <th>代理帐号</th>
+                  <th>代理名称</th>
+                  <th>企业信息</th>
+                  <th>对公账户信息</th>
+                  <th>审核状态</th>
+                  <th>申请时间</th>
+                  <th>审核时间</th>
+                  <th class="col-action">操作</th>
+                </tr>
+              </thead>
+              <tbody id="certBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div id="cert-flow" class="sub-view">
+        <div class="glass-card">
+          <p class="flow-page-intro">代理提交企业资料后进入待审核；运营通过后写入审核时间，认证结果用于后续线上结算。驳回必须填写原因，代理按原因修订后重新提交。菱形为校验节点。</p>
+          <div class="flow-svg-wrap">
+            <svg width="920" height="560" viewBox="0 0 920 560" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                  <path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8" />
+                </marker>
+              </defs>
+              <g class="flow-edges" marker-end="url(#arr)">
+                <polyline points="460,60 460,84" />
+                <polyline points="460,136 460,160" />
+                <polyline points="460,212 460,236" />
+                <polyline points="352,280 204,280" />
+                <polyline points="568,280 716,280" />
+                <polyline points="120,308 120,356" />
+                <polyline points="36,382 20,382 20,8 460,8 460,20" />
+                <polyline points="800,308 800,446 590,446" />
+              </g>
+              <g class="flow-nodes" font-family="Inter, PingFang SC, sans-serif">
+                <text x="28" y="200" font-size="10" fill="#64748b" transform="rotate(-90 28 200)">重新提交</text>
+                <rect x="340" y="20" width="240" height="40" rx="8" fill="#eff6ff" stroke="#2563eb" />
+                <text x="460" y="45" text-anchor="middle" font-size="12" fill="#18222f">代理提交企业资料 + 对公账户</text>
+                <rect x="320" y="84" width="280" height="52" rx="8" fill="#f0fdf4" stroke="#16a34a" />
+                <text x="460" y="106" text-anchor="middle" font-size="12" fill="#18222f">写入认证记录</text>
+                <text x="460" y="122" text-anchor="middle" font-size="10" fill="#64748b">审核状态=待审核 · 写入申请时间</text>
+                <rect x="320" y="160" width="280" height="52" rx="8" fill="#eff6ff" stroke="#2563eb" />
+                <text x="460" y="182" text-anchor="middle" font-size="12" fill="#18222f">进入后台审核列表</text>
+                <text x="460" y="198" text-anchor="middle" font-size="10" fill="#64748b">可按代理帐号 / 审核状态筛选</text>
+                <polygon points="460,236 568,280 460,324 352,280" fill="#fffbeb" stroke="#d97706" />
+                <text x="460" y="284" text-anchor="middle" font-size="11" fill="#92400e">审核通过?</text>
+                <text x="248" y="272" font-size="11" fill="#dc2626">驳回</text>
+                <rect x="36" y="256" width="168" height="52" rx="8" fill="#fef2f2" stroke="#dc2626" />
+                <text x="120" y="278" text-anchor="middle" font-size="11" fill="#991b1b">状态=已驳回</text>
+                <text x="120" y="294" text-anchor="middle" font-size="10" fill="#64748b">必填原因 · 写审核时间</text>
+                <text x="620" y="272" font-size="11" fill="#16a34a">通过</text>
+                <rect x="716" y="256" width="168" height="52" rx="8" fill="#f0fdf4" stroke="#16a34a" />
+                <text x="800" y="278" text-anchor="middle" font-size="11" fill="#18222f">状态=已通过</text>
+                <text x="800" y="294" text-anchor="middle" font-size="10" fill="#64748b">写入审核时间</text>
+                <rect x="36" y="356" width="168" height="52" rx="8" fill="#eff6ff" stroke="#2563eb" />
+                <text x="120" y="378" text-anchor="middle" font-size="11" fill="#18222f">按原因修订后重提</text>
+                <text x="120" y="394" text-anchor="middle" font-size="10" fill="#64748b">生成新的待审核记录</text>
+                <rect x="330" y="420" width="260" height="52" rx="8" fill="#fff7ed" stroke="#ea580c" />
+                <text x="460" y="442" text-anchor="middle" font-size="11" fill="#18222f">对公账户可用于后续线上结算</text>
+                <text x="460" y="458" text-anchor="middle" font-size="10" fill="#64748b">未通过（待审核 / 已驳回）不可结算</text>
+              </g>
+            </svg>
+          </div>
+          <div class="flow-legend">
+            <span><i style="background:#eff6ff;border:1px solid #2563eb"></i>前端 / 代理提交</span>
+            <span><i style="background:#f0fdf4;border:1px solid #16a34a"></i>后端 / 数据写入</span>
+            <span><i style="background:#fff7ed;border:1px solid #ea580c"></i>后续结算</span>
+            <span><i style="background:#fffbeb;border:1px solid #d97706"></i>校验 / 分支</span>
+            <span><i style="background:#fef2f2;border:1px solid #dc2626"></i>驳回 / 阻断</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="view-withdraw" class="page-view">
+      <div class="module-tab-bar" role="tablist">
+        <button type="button" class="active" data-sub="wd-admin" role="tab">管理后台</button>
+        <button type="button" data-sub="wd-flow" role="tab">业务流程</button>
+      </div>
+      <div id="wd-admin" class="sub-view active">
+        <div class="glass-card">
+          <div class="stats-bar">
+            <div class="stat-item">
+              <div class="label">待审核</div>
+              <div class="value warn"><span id="wdStatReview">0</span><span class="stat-unit">笔</span></div>
+              <div class="stat-amount" id="wdAmtReview">¥0.00</div>
+            </div>
+            <div class="stat-item">
+              <div class="label">待打款</div>
+              <div class="value info"><span id="wdStatPayPending">0</span><span class="stat-unit">笔</span></div>
+              <div class="stat-amount" id="wdAmtPayPending">¥0.00</div>
+            </div>
+            <div class="stat-item">
+              <div class="label">已打款</div>
+              <div class="value ok"><span id="wdStatPaid">0</span><span class="stat-unit">笔</span></div>
+              <div class="stat-amount" id="wdAmtPaid">¥0.00</div>
+            </div>
+          </div>
+          <div class="table-toolbar">
+            <h3>代理提现</h3>
+          </div>
+          <div class="filter-bar">
+            <div class="filter-field">
+              <label>代理帐号</label>
+              <input id="wdAccountQ" type="text" placeholder="agent_zhou" />
+            </div>
+            <div class="filter-field">
+              <label>审核状态</label>
+              <select id="wdReviewQ">
+                <option value="">全部</option>
+                <option value="pending">待审核</option>
+                <option value="approved">审核通过</option>
+                <option value="rejected">审核驳回</option>
+              </select>
+            </div>
+            <div class="filter-field">
+              <label>打款状态</label>
+              <select id="wdPayQ">
+                <option value="">全部</option>
+                <option value="pending">待打款</option>
+                <option value="paid">已打款</option>
+                <option value="failed">打款失败</option>
+              </select>
+            </div>
+            <div class="filter-actions">
+              <button class="btn-ghost-sm" type="button" onclick="resetWdFilter()">重置</button>
+              <button class="btn btn-primary" type="button" onclick="queryWdList()">查询</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table id="wdTable">
+              <colgroup>
+                <col style="width:86px" />
+                <col style="width:108px" />
+                <col style="width:112px" />
+                <col style="width:148px" />
+                <col style="width:118px" />
+                <col style="width:150px" />
+                <col style="width:132px" />
+                <col style="width:220px" />
+                <col style="width:150px" />
+                <col style="width:150px" />
+                <col style="width:148px" />
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>代理ID</th>
+                  <th>代理帐号</th>
+                  <th>代理名称</th>
+                  <th>申请结算单</th>
+                  <th>申请提现金额</th>
+                  <th>开票信息</th>
+                  <th>申请资料</th>
+                  <th>对公账户信息</th>
+                  <th>审核状态</th>
+                  <th>打款状态</th>
+                  <th class="col-action">操作</th>
+                </tr>
+              </thead>
+              <tbody id="wdBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div id="wd-flow" class="sub-view">
+        <div class="glass-card">
+          <p class="flow-page-intro">认证通过的代理提交结算单与发票后进入待审核；运营审核通过后进入待打款。驳回、打款失败必须填写原因；打款成功必须上传回执单。打款失败可重新标记成功或失败。菱形为校验节点。</p>
+          <div class="flow-svg-wrap">
+            <svg width="960" height="720" viewBox="0 0 960 720" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <marker id="arr2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                  <path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8" />
+                </marker>
+              </defs>
+              <g class="flow-edges" marker-end="url(#arr2)">
+                <polyline points="480,60 480,84" />
+                <polyline points="480,136 480,160" />
+                <polyline points="480,212 480,236" />
+                <polyline points="372,280 220,280" />
+                <polyline points="588,280 740,280" />
+                <polyline points="136,308 136,356" />
+                <polyline points="52,382 20,382 20,8 480,8 480,20" />
+                <polyline points="824,308 824,356" />
+                <polyline points="824,408 824,432" />
+                <polyline points="716,476 564,476" />
+                <polyline points="932,476 932,560 480,560 480,596" />
+                <polyline points="480,476 480,432" />
+              </g>
+              <g class="flow-nodes" font-family="Inter, PingFang SC, sans-serif">
+                <text x="28" y="200" font-size="10" fill="#64748b" transform="rotate(-90 28 200)">重新提交</text>
+                <rect x="350" y="20" width="260" height="40" rx="8" fill="#eff6ff" stroke="#2563eb" />
+                <text x="480" y="45" text-anchor="middle" font-size="12" fill="#18222f">代理提交结算单 + 发票 + 对公账户</text>
+                <rect x="330" y="84" width="300" height="52" rx="8" fill="#f0fdf4" stroke="#16a34a" />
+                <text x="480" y="106" text-anchor="middle" font-size="12" fill="#18222f">写入提现记录</text>
+                <text x="480" y="122" text-anchor="middle" font-size="10" fill="#64748b">审核=待审核 · 打款=待打款</text>
+                <rect x="330" y="160" width="300" height="52" rx="8" fill="#eff6ff" stroke="#2563eb" />
+                <text x="480" y="182" text-anchor="middle" font-size="12" fill="#18222f">进入后台提现列表</text>
+                <text x="480" y="198" text-anchor="middle" font-size="10" fill="#64748b">可按帐号 / 审核 / 打款状态筛选</text>
+                <polygon points="480,236 588,280 480,324 372,280" fill="#fffbeb" stroke="#d97706" />
+                <text x="480" y="284" text-anchor="middle" font-size="11" fill="#92400e">审核通过?</text>
+                <text x="260" y="272" font-size="11" fill="#dc2626">驳回</text>
+                <rect x="52" y="256" width="168" height="52" rx="8" fill="#fef2f2" stroke="#dc2626" />
+                <text x="136" y="278" text-anchor="middle" font-size="11" fill="#991b1b">审核=审核驳回</text>
+                <text x="136" y="294" text-anchor="middle" font-size="10" fill="#64748b">必填原因 · 不再打款</text>
+                <rect x="52" y="356" width="168" height="52" rx="8" fill="#eff6ff" stroke="#2563eb" />
+                <text x="136" y="378" text-anchor="middle" font-size="11" fill="#18222f">按原因修订后重提</text>
+                <text x="136" y="394" text-anchor="middle" font-size="10" fill="#64748b">生成新的待审核记录</text>
+                <text x="640" y="272" font-size="11" fill="#16a34a">通过</text>
+                <rect x="740" y="256" width="168" height="52" rx="8" fill="#f0fdf4" stroke="#16a34a" />
+                <text x="824" y="278" text-anchor="middle" font-size="11" fill="#18222f">审核=审核通过</text>
+                <text x="824" y="294" text-anchor="middle" font-size="10" fill="#64748b">进入待打款</text>
+                <rect x="740" y="356" width="168" height="52" rx="8" fill="#ecfeff" stroke="#0891b2" />
+                <text x="824" y="378" text-anchor="middle" font-size="11" fill="#18222f">打款状态=待打款</text>
+                <text x="824" y="394" text-anchor="middle" font-size="10" fill="#64748b">可成功 / 失败</text>
+                <polygon points="824,432 932,476 824,520 716,476" fill="#fffbeb" stroke="#d97706" />
+                <text x="824" y="480" text-anchor="middle" font-size="11" fill="#92400e">打款成功?</text>
+                <text x="600" y="468" font-size="11" fill="#dc2626">失败</text>
+                <rect x="396" y="450" width="168" height="52" rx="8" fill="#fef2f2" stroke="#dc2626" />
+                <text x="480" y="472" text-anchor="middle" font-size="11" fill="#991b1b">打款=打款失败</text>
+                <text x="480" y="488" text-anchor="middle" font-size="10" fill="#64748b">必填原因 · 可重试</text>
+                <rect x="350" y="596" width="260" height="52" rx="8" fill="#f0fdf4" stroke="#16a34a" />
+                <text x="480" y="618" text-anchor="middle" font-size="11" fill="#18222f">打款=已打款</text>
+                <text x="480" y="634" text-anchor="middle" font-size="10" fill="#64748b">必须上传打款回执单</text>
+              </g>
+            </svg>
+          </div>
+          <div class="flow-legend">
+            <span><i style="background:#eff6ff;border:1px solid #2563eb"></i>前端 / 代理提交</span>
+            <span><i style="background:#f0fdf4;border:1px solid #16a34a"></i>后端 / 数据写入</span>
+            <span><i style="background:#ecfeff;border:1px solid #0891b2"></i>打款处理</span>
+            <span><i style="background:#fffbeb;border:1px solid #d97706"></i>校验 / 分支</span>
+            <span><i style="background:#fef2f2;border:1px solid #dc2626"></i>驳回 / 失败</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="view-price" class="page-view">
+      <div class="module-tab-bar" role="tablist">
+        <button type="button" class="active" data-sub="price-admin" role="tab">管理后台</button>
+        <button type="button" data-sub="price-flow" role="tab">业务流程</button>
+      </div>
+      <div id="price-admin" class="sub-view active">
+        <div id="price-project-list" class="glass-card">
+          <div class="stats-bar">
+            <div class="stat-item">
+              <div class="label">已授权项目</div>
+              <div class="value info" id="priceStatProjects">0</div>
+            </div>
+            <div class="stat-item">
+              <div class="label">已配置价格</div>
+              <div class="value ok" id="priceStatConfigured">0</div>
+            </div>
+            <div class="stat-item">
+              <div class="label">服务费合计</div>
+              <div class="value" id="priceStatFee">0.00</div>
+            </div>
+          </div>
+          <div class="detail-head">
+            <div>
+              <h3 id="priceAgentTitle">拓拔</h3>
+              <p class="page-desc" id="priceAgentDesc">已授权 0 个项目</p>
+            </div>
+            <button class="btn btn-primary" type="button" onclick="openBatchAdd()">+ 批量新增授权</button>
+          </div>
+          <div class="filter-bar">
+            <div class="filter-field">
+              <label>项目名称</label>
+              <input id="priceProjectQ" type="text" placeholder="请输入项目名称" />
+            </div>
+            <div class="filter-field">
+              <label>状态</label>
+              <select id="priceStatusQ">
+                <option value="">全部</option>
+                <option value="authorized">已授权</option>
+                <option value="disabled">已禁用</option>
+              </select>
+            </div>
+            <div class="filter-actions">
+              <button class="btn-ghost-sm" type="button" onclick="resetPriceProjectFilter()">重置</button>
+              <button class="btn btn-primary" type="button" onclick="queryPriceProjects()">查询</button>
+            </div>
+          </div>
+          <div class="table-toolbar">
+            <h3 id="priceTableTitle">项目授权列表 共0条</h3>
+            <div class="toolbar-actions">
+              <button class="btn-ghost-sm" type="button" onclick="openBatchRatio()">批量设置服务费比例</button>
+              <button class="btn-ghost-sm" type="button" onclick="toggleBatchStatus()">批量启用/禁用</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table id="priceTable">
+              <colgroup>
+                <col style="width:36px" />
+                <col style="width:52px" />
+                <col style="width:156px" />
+                <col style="width:72px" />
+                <col style="width:72px" />
+                <col style="width:60px" />
+                <col style="width:60px" />
+                <col style="width:60px" />
+                <col style="width:72px" />
+                <col style="width:88px" />
+                <col style="width:88px" />
+                <col style="width:148px" />
+                <col style="width:220px" />
+              </colgroup>
+              <thead>
+                <tr>
+                  <th class="check-col"><input type="checkbox" id="priceCheckAll" onclick="togglePriceCheckAll(this.checked)" /></th>
+                  <th>ID</th>
+                  <th>项目名称</th>
+                  <th>服务费比例</th>
+                  <th>状态</th>
+                  <th>订单数</th>
+                  <th>作品数</th>
+                  <th>订单量</th>
+                  <th>关键词数</th>
+                  <th>累计金额</th>
+                  <th title="服务费 = 累计金额 × 服务费比例">服务费</th>
+                  <th>更新时间</th>
+                  <th class="col-action">操作</th>
+                </tr>
+              </thead>
+              <tbody id="priceBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div id="price-flow" class="sub-view">
+        <div class="glass-card">
+          <p class="flow-page-intro">运营在已授权项目列表点击「价格配置」，拉取该项目在右豹已配置的结算字段、单价类型、原始价格与描述；仅代理价格可编辑。保存后写入操作日志，后续代理收益按配置的代理价格计算。菱形为校验节点。</p>
+          <div class="flow-svg-wrap">
+            <svg width="960" height="680" viewBox="0 0 960 680" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <marker id="arr3" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                  <path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8" />
+                </marker>
+              </defs>
+              <g class="flow-edges" marker-end="url(#arr3)">
+                <polyline points="480,60 480,84" />
+                <polyline points="480,136 480,160" />
+                <polyline points="480,212 480,236" />
+                <polyline points="480,288 480,312" />
+                <polyline points="480,364 480,388" />
+                <polyline points="372,432 220,432" />
+                <polyline points="588,432 740,432" />
+                <polyline points="136,458 136,508" />
+                <polyline points="136,560 20,560 20,300 480,300 480,312" />
+                <polyline points="824,458 824,508" />
+                <polyline points="824,560 824,596 590,596" />
+              </g>
+              <g class="flow-nodes" font-family="Inter, PingFang SC, sans-serif">
+                <rect x="340" y="20" width="280" height="40" rx="8" fill="#eff6ff" stroke="#2563eb" />
+                <text x="480" y="45" text-anchor="middle" font-size="12" fill="#18222f">进入代理已授权项目列表</text>
+                <rect x="330" y="84" width="300" height="52" rx="8" fill="#eff6ff" stroke="#2563eb" />
+                <text x="480" y="106" text-anchor="middle" font-size="12" fill="#18222f">点击行内「价格配置」</text>
+                <text x="480" y="122" text-anchor="middle" font-size="10" fill="#64748b">弹窗 · 可编辑表格</text>
+                <rect x="330" y="160" width="300" height="52" rx="8" fill="#f0fdf4" stroke="#16a34a" />
+                <text x="480" y="182" text-anchor="middle" font-size="12" fill="#18222f">拉取右豹项目价格配置</text>
+                <text x="480" y="198" text-anchor="middle" font-size="10" fill="#64748b">结算字段 / 单价类型 / 原始价格 / 描述</text>
+                <rect x="330" y="236" width="300" height="52" rx="8" fill="#eff6ff" stroke="#2563eb" />
+                <text x="480" y="258" text-anchor="middle" font-size="12" fill="#18222f">展示只读字段 + 可编辑代理价格</text>
+                <text x="480" y="274" text-anchor="middle" font-size="10" fill="#64748b">仅代理价格可改 · 其余禁编</text>
+                <rect x="330" y="312" width="300" height="52" rx="8" fill="#eff6ff" stroke="#2563eb" />
+                <text x="480" y="334" text-anchor="middle" font-size="12" fill="#18222f">运营填写 / 调整代理价格</text>
+                <text x="480" y="350" text-anchor="middle" font-size="10" fill="#64748b">空=未配置 · 该字段不计入收益</text>
+                <polygon points="480,388 588,432 480,476 372,432" fill="#fffbeb" stroke="#d97706" />
+                <text x="480" y="436" text-anchor="middle" font-size="11" fill="#92400e">代理价格合法?</text>
+                <text x="28" y="430" font-size="10" fill="#64748b" transform="rotate(-90 28 430)">重新填写</text>
+                <text x="248" y="424" font-size="11" fill="#dc2626">否</text>
+                <rect x="52" y="406" width="168" height="52" rx="8" fill="#fef2f2" stroke="#dc2626" />
+                <text x="136" y="428" text-anchor="middle" font-size="11" fill="#991b1b">阻断保存</text>
+                <text x="136" y="444" text-anchor="middle" font-size="10" fill="#64748b">须 ≥0 且最多两位小数</text>
+                <rect x="52" y="508" width="168" height="52" rx="8" fill="#eff6ff" stroke="#2563eb" />
+                <text x="136" y="538" text-anchor="middle" font-size="11" fill="#18222f">回到表格修正</text>
+                <text x="640" y="424" font-size="11" fill="#16a34a">是</text>
+                <rect x="740" y="406" width="168" height="52" rx="8" fill="#f0fdf4" stroke="#16a34a" />
+                <text x="824" y="428" text-anchor="middle" font-size="11" fill="#18222f">保存代理价格</text>
+                <text x="824" y="444" text-anchor="middle" font-size="10" fill="#64748b">覆盖该项目配置</text>
+                <rect x="740" y="508" width="168" height="52" rx="8" fill="#f0fdf4" stroke="#16a34a" />
+                <text x="824" y="530" text-anchor="middle" font-size="11" fill="#18222f">写入操作日志</text>
+                <text x="824" y="546" text-anchor="middle" font-size="10" fill="#64748b">价格配置 / 其他操作</text>
+                <rect x="330" y="570" width="260" height="52" rx="8" fill="#fff7ed" stroke="#ea580c" />
+                <text x="460" y="592" text-anchor="middle" font-size="11" fill="#18222f">代理收益 = 单量 × 代理价格</text>
+                <text x="460" y="608" text-anchor="middle" font-size="10" fill="#64748b">不再使用右豹原始价格</text>
+              </g>
+            </svg>
+          </div>
+          <div class="flow-legend">
+            <span><i style="background:#eff6ff;border:1px solid #2563eb"></i>运营操作</span>
+            <span><i style="background:#f0fdf4;border:1px solid #16a34a"></i>后端 / 数据写入</span>
+            <span><i style="background:#fff7ed;border:1px solid #ea580c"></i>收益计算</span>
+            <span><i style="background:#fffbeb;border:1px solid #d97706"></i>校验 / 分支</span>
+            <span><i style="background:#fef2f2;border:1px solid #dc2626"></i>阻断</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="drawer-overlay" id="ruleOverlay" onclick="setRuleDrawer(false)"></div>
+  <aside class="drawer" id="ruleDrawer" role="dialog">
+    <div class="drawer-header">
+      <h2>FR-010 · 需求规则 · v1</h2>
+      <button class="drawer-close" type="button" onclick="setRuleDrawer(false)">×</button>
+    </div>
+    <div class="rule-tab-bar" role="tablist">
+      <button type="button" class="active" data-rule="rule-cert" role="tab">代理认证</button>
+      <button type="button" data-rule="rule-withdraw" role="tab">代理提现</button>
+      <button type="button" data-rule="rule-price" role="tab">代理价格</button>
+    </div>
+    <div class="drawer-body">
+      <div id="rule-cert" class="rule-panel active">
+        <div class="rule-section">
+          <h3><span>1</span>业务目标</h3>
+          <div class="rule-content">
+            <p>在「代理迭代V1.0」下提供「代理认证」审核：运营审核代理提交的企业资料与对公账户，通过后支撑后续线上结算与提现。</p>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>2</span>数据表与字段</h3>
+          <div class="rule-content">
+            <p><strong>代理认证表</strong>：</p>
+            <ul>
+              <li>代理ID</li>
+              <li>代理帐号</li>
+              <li>代理名称</li>
+              <li><strong>企业信息</strong>（聚合展示）：企业名称、社会编码、公司电话、公司地址、营业执照</li>
+              <li><strong>对公账户信息</strong>（聚合展示）：收款帐户名称、开户行名称、支行名称、收款银行帐号、发票类型、发票税率</li>
+              <li>审核状态：待审核 / 已通过 / 已驳回；<strong>已驳回必须展示驳回原因</strong></li>
+              <li>申请时间（代理提交时系统写入）</li>
+              <li>审核时间（通过或驳回时系统写入；待审核为空）</li>
+              <li>操作：通过、驳回（驳回必须填写原因）</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>3</span>列表与筛选</h3>
+          <div class="rule-content">
+            <p><strong>筛选项</strong>：代理帐号、审核状态。</p>
+            <ul>
+              <li>代理帐号：模糊匹配。</li>
+              <li>审核状态：全部 / 待审核 / 已通过 / 已驳回。</li>
+              <li>查询：刷新列表，页码重置至第 1 页。</li>
+              <li>重置：清空筛选条件，<strong>不自动触发查询</strong>，Toast 提示「筛选条件已重置」。</li>
+            </ul>
+            <p style="margin-top:8px;"><strong>聚合展示</strong>：</p>
+            <ul>
+              <li>企业信息、对公账户信息在同一单元格内分行展示全部子字段，不拆列。</li>
+              <li>营业执照在企业信息内以「查看营业执照」文字链打开预览，不直接铺原图。</li>
+            </ul>
+            <p style="margin-top:8px;"><strong>表头统计</strong>（随当前查询结果联动）：待审核、已通过、已驳回笔数。</p>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>4</span>审核操作</h3>
+          <div class="rule-content">
+            <ul>
+              <li>仅<strong>待审核</strong>记录展示「通过 / 驳回」。已通过、已驳回不再提供审核操作。</li>
+              <li><strong>通过</strong>：二次确认后状态改为已通过，写入审核时间。通过不填原因。</li>
+              <li><strong>驳回</strong>：打开驳回弹窗，<strong>驳回原因必填</strong>；确认后状态改为已驳回，写入审核时间与原因。列表审核状态列展示「已驳回」+ 原因。</li>
+              <li>驳回弹窗为危险确认：遮罩不可点击关闭，防止误关丢失已填原因。</li>
+              <li>审核结论本轮不可撤回、不可改判。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>5</span>边界规则</h3>
+          <div class="rule-content">
+            <ul>
+              <li>一个代理同一时间仅允许一条<strong>待审核</strong>或<strong>已通过</strong>记录。驳回后可重新提交，历史驳回行保留。</li>
+              <li>已通过认证的对公账户用于后续线上结算与提现；未通过（待审核 / 已驳回）不可结算。</li>
+              <li>本轮<strong>不交付</strong>代理端填写页 Demo。填写字段与后台「企业信息 / 对公账户信息」聚合项对齐。</li>
+              <li>本 Demo 不做真实接口、权限与持久化。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>6</span>业务流程</h3>
+          <div class="rule-content">
+            <p>见「代理认证」下 Tab <strong>「业务流程」</strong>流程图。</p>
+          </div>
+        </div>
+      </div>
+      <div id="rule-withdraw" class="rule-panel">
+        <div class="rule-section">
+          <h3><span>1</span>业务目标</h3>
+          <div class="rule-content">
+            <p>在「代理迭代V1.0」下提供「代理提现」审核与打款：运营核对结算单、发票与对公账户后审核，审核通过后再执行打款，形成可追溯的结算闭环。</p>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>2</span>数据表与字段</h3>
+          <div class="rule-content">
+            <p><strong>代理提现表</strong>：</p>
+            <ul>
+              <li>代理ID</li>
+              <li>代理帐号</li>
+              <li>代理名称</li>
+              <li>申请结算单（结算单号，可预览结算单）</li>
+              <li>申请提现金额</li>
+              <li><strong>开票信息</strong>（聚合展示）：开票金额、开票税额</li>
+              <li><strong>申请资料</strong>：结算单、发票（文字链预览，不直接铺原图）</li>
+              <li><strong>对公账户信息</strong>（聚合展示）：收款帐户名称、开户行名称、支行名称、收款银行帐号、发票类型、发票税率</li>
+              <li>审核状态：待审核 / 审核通过 / 审核驳回；<strong>审核驳回必须展示驳回原因</strong></li>
+              <li>打款状态：待打款 / 已打款 / 打款失败；<strong>打款失败必须展示失败原因</strong>；已打款可查看回执单</li>
+              <li>操作：审核通过、审核驳回、打款成功、打款失败</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>3</span>列表与筛选</h3>
+          <div class="rule-content">
+            <p><strong>筛选项</strong>：代理帐号、审核状态、打款状态。</p>
+            <ul>
+              <li>代理帐号：模糊匹配。</li>
+              <li>审核状态：全部 / 待审核 / 审核通过 / 审核驳回。</li>
+              <li>打款状态：全部 / 待打款 / 已打款 / 打款失败。</li>
+              <li>查询：刷新列表，页码重置至第 1 页。</li>
+              <li>重置：清空筛选条件，<strong>不自动触发查询</strong>，Toast 提示「筛选条件已重置」。</li>
+            </ul>
+            <p style="margin-top:8px;"><strong>聚合展示</strong>：开票信息、对公账户信息在同一单元格内分行展示全部子字段，不拆列。</p>
+            <p style="margin-top:8px;"><strong>表头统计</strong>（随当前查询结果联动）：待审核、待打款、已打款的<strong>笔数 + 申请提现金额合计</strong>。</p>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>4</span>审核与打款操作</h3>
+          <div class="rule-content">
+            <ul>
+              <li>仅<strong>待审核</strong>记录展示「审核通过 / 审核驳回」。</li>
+              <li><strong>审核通过</strong>：二次确认后审核状态改为审核通过，打款状态保持待打款。通过不填原因。</li>
+              <li><strong>审核驳回</strong>：打开驳回弹窗，<strong>驳回原因必填</strong>；确认后审核状态改为审核驳回，不再进入打款。列表审核状态列展示「审核驳回」+ 原因。</li>
+              <li>仅<strong>审核通过且打款状态为待打款或打款失败</strong>的记录展示「打款成功 / 打款失败」。</li>
+              <li><strong>打款成功</strong>：必须上传打款回执单，确认后打款状态改为已打款。列表打款状态列可「查看回执」。</li>
+              <li><strong>打款失败</strong>：<strong>失败原因必填</strong>；确认后打款状态改为打款失败，列表展示原因。失败后允许重新标记打款成功或再次失败。</li>
+              <li>驳回、失败弹窗为危险确认：遮罩不可点击关闭。</li>
+              <li>审核驳回本轮不可改判；已打款不可再次打款。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>5</span>边界规则</h3>
+          <div class="rule-content">
+            <ul>
+              <li>仅<strong>认证已通过</strong>的代理可发起提现；未认证或认证驳回不可结算。</li>
+              <li>审核驳回后代理按原因修订并重新提交，生成新的待审核记录，历史驳回行保留。</li>
+              <li>本轮<strong>不交付</strong>代理端提现申请页 Demo。申请字段与后台列表聚合项对齐。</li>
+              <li>本 Demo 不做真实接口、权限、打款渠道与持久化。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>6</span>业务流程</h3>
+          <div class="rule-content">
+            <p>见「代理提现」下 Tab <strong>「业务流程」</strong>流程图。</p>
+          </div>
+        </div>
+      </div>
+      <div id="rule-price" class="rule-panel">
+        <div class="rule-section">
+          <h3><span>1</span>业务目标</h3>
+          <div class="rule-content">
+            <p>在「代理迭代V1.0」下提供「代理价格」：为代理已授权项目配置结算字段级代理价格。右豹项目侧的结算字段、单价类型、原始价格、描述只读带出；运营只改代理价格。保存后，该代理在对应项目的收益按配置的代理价格计算。</p>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>2</span>页面与入口</h3>
+          <div class="rule-content">
+            <p>本轮<strong>不另做代理列表</strong>，直接复用已上线的<strong>代理授权项目列表</strong>做价格配置与结果字段。</p>
+            <ul>
+              <li><strong>项目授权列表</strong>：ID、项目名称、服务费比例、状态、订单数、作品数、<strong>订单量（整数，非金额）</strong>、<strong>关键词数</strong>、<strong>累计金额</strong>、<strong>服务费</strong>、更新时间。</li>
+              <li><strong>服务费</strong> = 累计金额 × 服务费比例；服务费比例变更后即时重算。</li>
+              <li><strong>操作列</strong>：价格配置、编辑、日志、删除。</li>
+              <li>筛选项沿用现网：项目名称（模糊）、状态（全部 / 已授权 / 已禁用）。</li>
+              <li>现网已有能力保留：批量新增授权、批量设置服务费比例、批量启用/禁用；这些操作同样写入日志。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>3</span>价格配置弹窗</h3>
+          <div class="rule-content">
+            <p>点击「价格配置」打开弹窗，以<strong>可编辑表格</strong>配置该项目下全部结算字段。</p>
+            <p style="margin-top:8px;"><strong>列定义</strong>：</p>
+            <ul>
+              <li><strong>结算字段</strong>：取该项目在右豹的结算字段，只读展示。</li>
+              <li><strong>单价类型</strong>：取该项目在右豹的单价类型（如固定单价 / 阶梯单价 / 按量计价），只读展示。</li>
+              <li><strong>原始价格</strong>：取该项目在右豹配置的原始单价，只读展示。</li>
+              <li><strong>代理价格</strong>：本轮唯一可编辑列。允许为空（未配置）；填写时须 <code>≥ 0</code>，最多两位小数。</li>
+              <li><strong>描述</strong>：取该项目在右豹的字段说明，只读展示。</li>
+            </ul>
+            <p style="margin-top:8px;"><strong>交互</strong>：</p>
+            <ul>
+              <li>打开弹窗时按当前项目拉取右豹配置；已保存过的代理价格回填。</li>
+              <li>右豹侧字段增删或原始价格变更时，下次打开以右豹最新配置为准；已有代理价格按结算字段匹配保留，对不上的字段丢弃。</li>
+              <li>保存时校验全部已填代理价格；任一非法则阻断并定位到第一处错误，不写库。</li>
+              <li>取消不保存。普通弹窗可点遮罩 / ESC 关闭。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>4</span>操作日志</h3>
+          <div class="rule-content">
+            <p>每次价格配置及其他授权操作均记一条日志，按项目维度在「日志」抽屉查看，新记录在上。</p>
+            <ul>
+              <li><strong>价格配置</strong>：记录操作人、时间、各结算字段的代理价格变更（旧值 → 新值；空记为「未配置」）。</li>
+              <li><strong>其他操作</strong>：编辑（服务费比例 / 状态）、删除、批量新增授权、批量设置服务费比例、批量启用/禁用，均写日志。</li>
+              <li>日志字段：时间、操作人、操作类型、摘要。本 Demo 操作人固定为「运营·张敏」。</li>
+              <li>删除项目后历史日志随记录保留在 Demo 内存中，再次进入同一 ID 仍可查看；真实实现由后端按授权记录 ID 归档。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>5</span>收益计算</h3>
+          <div class="rule-content">
+            <ul>
+              <li>代理收益按<strong>已配置的代理价格</strong>计算：<code>字段收益 = 该字段单量 × 代理价格</code>，项目收益为各已配置字段之和。</li>
+              <li>未配置（代理价格为空）的结算字段<strong>不计入</strong>代理收益，也不回退右豹原始价格。</li>
+              <li>右豹原始价格仅作对照展示，不参与代理收益。</li>
+              <li>列表「累计金额」仍展示右豹原价口径，便于对账；「服务费」按 <code>累计金额 × 服务费比例</code> 展示；代理侧出账 / 提现以代理价格重算结果为准。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>6</span>边界规则</h3>
+          <div class="rule-content">
+            <ul>
+              <li>仅<strong>已授权</strong>项目可配置价格；已禁用项目仍可查看已有配置，保存时 Toast 提示「项目已禁用，价格配置未生效于新订单」，但允许改价（历史对账用）。</li>
+              <li>未授权或不存在的项目不提供「价格配置」。</li>
+              <li>本轮<strong>不交付</strong>代理端价格查看页；代理端收益数字以后台按代理价格算出的结果为准。</li>
+              <li>本 Demo 不做真实接口、权限与持久化。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>7</span>业务流程</h3>
+          <div class="rule-content">
+            <p>见「代理价格」下 Tab <strong>「业务流程」</strong>流程图。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="modal-overlay" id="approveOverlay">
+    <div class="modal" role="dialog" aria-labelledby="approveTitle">
+      <div class="modal-header" id="approveTitle">确认通过？</div>
+      <div class="modal-body">
+        <p id="approveDesc">通过后该代理可用于线上结算。</p>
+        <div class="confirm-summary" id="approveSummary"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" type="button" onclick="closeModal('approveOverlay')">取消</button>
+        <button class="btn btn-primary" type="button" onclick="submitApprove()">确认通过</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="rejectOverlay">
+    <div class="modal" role="dialog" aria-labelledby="rejectTitle">
+      <div class="modal-header" id="rejectTitle">驳回认证</div>
+      <div class="modal-body">
+        <p id="rejectDesc" style="margin-bottom:12px;">驳回后代理需按原因修订并重新提交。</p>
+        <div class="form-field">
+          <label>驳回原因<span class="req">*</span></label>
+          <textarea id="rejectReason" maxlength="200" placeholder="例如：营业执照不清晰，请重新上传"></textarea>
+          <div class="field-hint">必填，最多 200 字。原因会展示在列表审核状态列。</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" type="button" onclick="closeModal('rejectOverlay')">取消</button>
+        <button class="btn btn-danger" type="button" onclick="submitReject()">确认驳回</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="wdApproveOverlay">
+    <div class="modal" role="dialog">
+      <div class="modal-header">确认审核通过？</div>
+      <div class="modal-body">
+        <p id="wdApproveDesc">通过后进入待打款。</p>
+        <div class="confirm-summary" id="wdApproveSummary"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" type="button" onclick="closeModal('wdApproveOverlay')">取消</button>
+        <button class="btn btn-primary" type="button" onclick="submitWdApprove()">确认通过</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="wdRejectOverlay">
+    <div class="modal" role="dialog">
+      <div class="modal-header">审核驳回</div>
+      <div class="modal-body">
+        <p id="wdRejectDesc" style="margin-bottom:12px;">驳回后不再进入打款，代理需按原因修订并重新提交。</p>
+        <div class="form-field">
+          <label>驳回原因<span class="req">*</span></label>
+          <textarea id="wdRejectReason" maxlength="200" placeholder="例如：发票税额与结算单不一致"></textarea>
+          <div class="field-hint">必填，最多 200 字。原因会展示在列表审核状态列。</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" type="button" onclick="closeModal('wdRejectOverlay')">取消</button>
+        <button class="btn btn-danger" type="button" onclick="submitWdReject()">确认驳回</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="wdPayOkOverlay">
+    <div class="modal modal-md" role="dialog">
+      <div class="modal-header">打款成功</div>
+      <div class="modal-body">
+        <p id="wdPayOkDesc" style="margin-bottom:12px;">确认打款成功前必须上传打款回执单。</p>
+        <div class="confirm-summary" id="wdPayOkSummary"></div>
+        <div class="form-field" style="margin-top:12px;">
+          <label>打款回执单<span class="req">*</span></label>
+          <div class="file-pick">
+            <input id="receiptFile" type="file" accept="image/png,image/jpeg,image/webp,application/pdf" />
+            <button class="btn-ghost-sm" type="button" onclick="document.getElementById('receiptFile').click()">选择文件</button>
+            <span class="file-name empty" id="receiptFileName">未选择文件</span>
+          </div>
+          <div class="field-hint">必传，支持 JPG / PNG / PDF。回执将展示在打款状态列。</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" type="button" onclick="closeModal('wdPayOkOverlay')">取消</button>
+        <button class="btn btn-primary" type="button" onclick="submitWdPayOk()">确认打款成功</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="wdPayFailOverlay">
+    <div class="modal" role="dialog">
+      <div class="modal-header">打款失败</div>
+      <div class="modal-body">
+        <p id="wdPayFailDesc" style="margin-bottom:12px;">标记失败后可再次打款，须填写原因。</p>
+        <div class="form-field">
+          <label>失败原因<span class="req">*</span></label>
+          <textarea id="wdPayFailReason" maxlength="200" placeholder="例如：收款帐号校验失败，银行退回"></textarea>
+          <div class="field-hint">必填，最多 200 字。原因会展示在列表打款状态列。</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" type="button" onclick="closeModal('wdPayFailOverlay')">取消</button>
+        <button class="btn btn-danger" type="button" onclick="submitWdPayFail()">确认失败</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="docOverlay" onclick="closeModal('docOverlay')">
+    <div class="modal modal-md" role="dialog" onclick="event.stopPropagation()">
+      <div class="modal-header" id="docTitle">资料预览</div>
+      <div class="modal-body" id="docBody"></div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" type="button" onclick="closeModal('docOverlay')">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="priceConfigOverlay">
+    <div class="modal modal-xl" role="dialog" aria-labelledby="priceConfigTitle">
+      <div class="modal-header" id="priceConfigTitle">价格配置</div>
+      <div class="modal-body">
+        <p class="field-hint" style="margin-bottom:12px;">结算字段、单价类型、原始价格、描述取自该项目在右豹的配置，仅展示；仅<strong>代理价格</strong>可编辑。空=未配置，该字段不计入代理收益。</p>
+        <div class="confirm-summary" id="priceConfigSummary"></div>
+        <div class="table-wrap" style="margin-top:12px;">
+          <table id="priceConfigTable">
+            <colgroup>
+              <col style="width:140px" />
+              <col style="width:100px" />
+              <col style="width:90px" />
+              <col style="width:120px" />
+              <col />
+            </colgroup>
+            <thead>
+              <tr>
+                <th>结算字段</th>
+                <th>单价类型</th>
+                <th>原始价格</th>
+                <th>代理价格</th>
+                <th>描述</th>
+              </tr>
+            </thead>
+            <tbody id="priceConfigBody"></tbody>
+          </table>
+        </div>
+        <p class="field-hint" id="priceConfigHint" style="margin-top:10px;"></p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" type="button" onclick="closeModal('priceConfigOverlay')">取消</button>
+        <button class="btn btn-primary" type="button" onclick="submitPriceConfig()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="priceEditOverlay">
+    <div class="modal" role="dialog">
+      <div class="modal-header">编辑授权</div>
+      <div class="modal-body">
+        <div class="confirm-summary" id="priceEditSummary"></div>
+        <div class="form-field" style="margin-top:12px;">
+          <label>服务费比例（%）</label>
+          <input id="priceEditRatio" type="number" min="0" max="100" step="1" />
+        </div>
+        <div class="form-field">
+          <label>状态</label>
+          <select id="priceEditStatus">
+            <option value="authorized">已授权</option>
+            <option value="disabled">已禁用</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" type="button" onclick="closeModal('priceEditOverlay')">取消</button>
+        <button class="btn btn-primary" type="button" onclick="submitPriceEdit()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="priceDeleteOverlay">
+    <div class="modal" role="dialog">
+      <div class="modal-header">确认删除？</div>
+      <div class="modal-body">
+        <p>即将删除该项目授权，此操作不可撤销。</p>
+        <div class="confirm-summary" id="priceDeleteSummary"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" type="button" onclick="closeModal('priceDeleteOverlay')">取消</button>
+        <button class="btn btn-danger" type="button" onclick="submitPriceDelete()">确认删除</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="priceBatchRatioOverlay">
+    <div class="modal" role="dialog">
+      <div class="modal-header">批量设置服务费比例</div>
+      <div class="modal-body">
+        <p id="priceBatchRatioDesc" style="margin-bottom:12px;">将覆盖所选项目的服务费比例。</p>
+        <div class="form-field">
+          <label>服务费比例（%）<span class="req">*</span></label>
+          <input id="priceBatchRatio" type="number" min="0" max="100" step="1" placeholder="0" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" type="button" onclick="closeModal('priceBatchRatioOverlay')">取消</button>
+        <button class="btn btn-primary" type="button" onclick="submitBatchRatio()">确认</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="priceBatchAddOverlay">
+    <div class="modal modal-md" role="dialog">
+      <div class="modal-header">批量新增授权</div>
+      <div class="modal-body">
+        <p class="field-hint" style="margin-bottom:12px;">从右豹项目中勾选后授权给当前代理。已授权项目不重复添加。</p>
+        <div id="priceBatchAddBody"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" type="button" onclick="closeModal('priceBatchAddOverlay')">取消</button>
+        <button class="btn btn-primary" type="button" onclick="submitBatchAdd()">确认授权</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="drawer-overlay" id="priceLogOverlay" onclick="closePriceLog()"></div>
+  <aside class="drawer" id="priceLogDrawer" role="dialog">
+    <div class="drawer-header">
+      <h2 id="priceLogTitle">操作日志</h2>
+      <button class="drawer-close" type="button" onclick="closePriceLog()">×</button>
+    </div>
+    <div class="drawer-body" id="priceLogBody"></div>
+  </aside>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    var CERT_STATUS = {
+      pending: { label: '待审核', cls: 'tag-warn' },
+      approved: { label: '已通过', cls: 'tag-ok' },
+      rejected: { label: '已驳回', cls: 'tag-del' }
+    };
+    var WD_REVIEW = {
+      pending: { label: '待审核', cls: 'tag-warn' },
+      approved: { label: '审核通过', cls: 'tag-ok' },
+      rejected: { label: '审核驳回', cls: 'tag-del' }
+    };
+    var WD_PAY = {
+      pending: { label: '待打款', cls: 'tag-info' },
+      paid: { label: '已打款', cls: 'tag-ok' },
+      failed: { label: '打款失败', cls: 'tag-del' },
+      none: { label: '—', cls: 'tag-info' }
+    };
+
+    var rows = [
+      {
+        id: 'A-10086', account: 'agent_zhou', name: '周创作者工作室',
+        company: { name: '杭州周创文化传媒有限公司', code: '91330100MA2H1ABC1X', phone: '0571-86001234', address: '杭州市西湖区文三路 478 号' },
+        bank: { accountName: '杭州周创文化传媒有限公司', bank: '中国工商银行', branch: '杭州西湖支行', accountNo: '1202020909001234567', invoice: '增值税专用发票', tax: '6%' },
+        status: 'pending', appliedAt: '2026.09.04 10:18', reviewedAt: '', rejectReason: ''
+      },
+      {
+        id: 'A-10087', account: 'agent_lin', name: '林安文化传媒',
+        company: { name: '上海林安文化传媒有限公司', code: '91310115MA1K2DEF3Y', phone: '021-62308800', address: '上海市浦东新区张杨路 500 号' },
+        bank: { accountName: '上海林安文化传媒有限公司', bank: '招商银行', branch: '上海陆家嘴支行', accountNo: '6225882100123456789', invoice: '增值税专用发票', tax: '6%' },
+        status: 'approved', appliedAt: '2026.09.02 16:40', reviewedAt: '2026.09.03 11:05', rejectReason: ''
+      },
+      {
+        id: 'A-10088', account: 'agent_chen', name: '陈柯短剧工作室',
+        company: { name: '成都陈柯影视文化有限公司', code: '91510100MA6C3GHI4Z', phone: '028-85112200', address: '成都市高新区天府大道中段 1366 号' },
+        bank: { accountName: '成都陈柯影视文化有限公司', bank: '中国建设银行', branch: '成都高新支行', accountNo: '5100147580008888123', invoice: '增值税普通发票', tax: '3%' },
+        status: 'rejected', appliedAt: '2026.09.01 09:12', reviewedAt: '2026.09.01 18:30', rejectReason: '营业执照不清晰，请重新上传'
+      },
+      {
+        id: 'A-10089', account: 'agent_wu', name: '吴氏影视',
+        company: { name: '广州吴氏影视制作有限公司', code: '91440101MA5D4JKL5A', phone: '020-38881234', address: '广州市天河区体育西路 191 号' },
+        bank: { accountName: '广州吴氏影视制作有限公司', bank: '中国银行', branch: '广州天河支行', accountNo: '601382200012345678', invoice: '增值税专用发票', tax: '13%' },
+        status: 'pending', appliedAt: '2026.09.04 14:02', reviewedAt: '', rejectReason: ''
+      },
+      {
+        id: 'A-10090', account: 'agent_zhao', name: '赵氏内容科技',
+        company: { name: '深圳赵氏内容科技有限公司', code: '91440300MA5E6MNO6B', phone: '0755-86660011', address: '深圳市南山区科技园南路 18 号' },
+        bank: { accountName: '深圳赵氏内容科技有限公司', bank: '平安银行', branch: '深圳南山支行', accountNo: '6230580000123456789', invoice: '增值税普通发票', tax: '1%' },
+        status: 'approved', appliedAt: '2026.08.28 11:26', reviewedAt: '2026.08.29 09:48', rejectReason: ''
+      }
+    ];
+
+    var wdRows = [
+      {
+        id: 'W-1001', agentId: 'A-10086', account: 'agent_zhou', name: '周创作者工作室',
+        settleNo: 'JS-20260904-001', amount: 12800, invoiceAmount: 12075.47, invoiceTax: 724.53,
+        settleFile: '周创-2026年8月结算单.pdf', invoiceFile: '周创-专票-12800.pdf',
+        bank: { accountName: '杭州周创文化传媒有限公司', bank: '中国工商银行', branch: '杭州西湖支行', accountNo: '1202020909001234567', invoice: '增值税专用发票', tax: '6%' },
+        review: 'pending', pay: 'pending', rejectReason: '', payReason: '', receiptName: '', receiptAt: ''
+      },
+      {
+        id: 'W-1002', agentId: 'A-10087', account: 'agent_lin', name: '林安文化传媒',
+        settleNo: 'JS-20260903-018', amount: 8600, invoiceAmount: 8113.21, invoiceTax: 486.79,
+        settleFile: '林安-2026年8月结算单.pdf', invoiceFile: '林安-专票-8600.pdf',
+        bank: { accountName: '上海林安文化传媒有限公司', bank: '招商银行', branch: '上海陆家嘴支行', accountNo: '6225882100123456789', invoice: '增值税专用发票', tax: '6%' },
+        review: 'approved', pay: 'pending', rejectReason: '', payReason: '', receiptName: '', receiptAt: ''
+      },
+      {
+        id: 'W-1003', agentId: 'A-10088', account: 'agent_chen', name: '陈柯短剧工作室',
+        settleNo: 'JS-20260830-007', amount: 5200, invoiceAmount: 5048.54, invoiceTax: 151.46,
+        settleFile: '陈柯-2026年7月结算单.pdf', invoiceFile: '陈柯-普票-5200.pdf',
+        bank: { accountName: '成都陈柯影视文化有限公司', bank: '中国建设银行', branch: '成都高新支行', accountNo: '5100147580008888123', invoice: '增值税普通发票', tax: '3%' },
+        review: 'rejected', pay: 'none', rejectReason: '发票税额与结算单不一致', payReason: '', receiptName: '', receiptAt: ''
+      },
+      {
+        id: 'W-1004', agentId: 'A-10090', account: 'agent_zhao', name: '赵氏内容科技',
+        settleNo: 'JS-20260828-022', amount: 23600, invoiceAmount: 23366.34, invoiceTax: 233.66,
+        settleFile: '赵氏-2026年7月结算单.pdf', invoiceFile: '赵氏-普票-23600.pdf',
+        bank: { accountName: '深圳赵氏内容科技有限公司', bank: '平安银行', branch: '深圳南山支行', accountNo: '6230580000123456789', invoice: '增值税普通发票', tax: '1%' },
+        review: 'approved', pay: 'paid', rejectReason: '', payReason: '', receiptName: '平安银行回执-20260829.png', receiptAt: '2026.08.29 16:12'
+      },
+      {
+        id: 'W-1005', agentId: 'A-10091', account: 'agent_sun', name: '孙氏短剧',
+        settleNo: 'JS-20260902-011', amount: 9800, invoiceAmount: 8672.57, invoiceTax: 1127.43,
+        settleFile: '孙氏-2026年8月结算单.pdf', invoiceFile: '孙氏-专票-9800.pdf',
+        bank: { accountName: '南京孙氏影视文化有限公司', bank: '交通银行', branch: '南京新街口支行', accountNo: '301662000018888001', invoice: '增值税专用发票', tax: '13%' },
+        review: 'approved', pay: 'failed', rejectReason: '', payReason: '收款帐号校验失败，银行退回', receiptName: '', receiptAt: ''
+      }
+    ];
+
+    var appliedFilter = { account: '', status: '' };
+    var wdFilter = { account: '', review: '', pay: '' };
+    var pendingActionId = '';
+    var pendingReceiptName = '';
+    var OPERATOR = '运营·张敏';
+    var currentPriceAgentId = 'A-10092';
+    var pendingPriceAuthId = '';
+    var priceProjectFilter = { name: '', status: '' };
+    var nextAuthId = 80;
+
+    function youbaoFields(prefix) {
+      return [
+        { field: '拉新量', unitType: '固定单价', origin: 5.00, desc: prefix + ' · 有效拉新按条结算' },
+        { field: '拉旧量（拉失活量）', unitType: '固定单价', origin: 3.00, desc: prefix + ' · 拉回失活用户' },
+        { field: '转存量', unitType: '固定单价', origin: 2.50, desc: prefix + ' · 文件转存有效量' },
+        { field: '会员量', unitType: '阶梯单价', origin: 8.00, desc: prefix + ' · 会员开通按量阶梯计价' }
+      ];
+    }
+    var PRICE_CATALOG = [
+      { projectId: 188, projectName: '188 - 小云雀短剧', fields: youbaoFields('短剧拉新') },
+      { projectId: 191, projectName: '191 - 小云雀听书', fields: youbaoFields('听书拉新') },
+      { projectId: 205, projectName: '205 - 小云雀会员', fields: youbaoFields('会员开通') }
+    ];
+
+    function withAgentPrices(fields, agents) {
+      return fields.map(function (f, i) {
+        return {
+          field: f.field, unitType: f.unitType, origin: f.origin, desc: f.desc,
+          agent: Object.prototype.hasOwnProperty.call(agents, i) ? agents[i] : null
+        };
+      });
+    }
+
+    var priceAuths = [
+      {
+        id: 65, agentId: 'A-10092', projectId: 175, projectName: '175 - 小云雀驾归',
+        ratio: 100, status: 'authorized', orders: 13, works: 0, volume: 41, amount: 205, keywords: 165,
+        updatedAt: '2026-09-06 18:43:38',
+        prices: withAgentPrices(youbaoFields('驾归拉新'), { 0: 4.20, 1: 2.40, 2: 2.00 })
+      },
+      {
+        id: 64, agentId: 'A-10092', projectId: 202, projectName: '202 - 小云雀挂载',
+        ratio: 100, status: 'authorized', orders: 27, works: 0, volume: 42, amount: 168, keywords: 213,
+        updatedAt: '2026-09-06 18:43:38',
+        prices: withAgentPrices(youbaoFields('挂载拉新'), {})
+      },
+      {
+        id: 63, agentId: 'A-10092', projectId: 168, projectName: '168 - 小云雀小说',
+        ratio: 90, status: 'authorized', orders: 8, works: 2, volume: 20, amount: 96, keywords: 88,
+        updatedAt: '2026-09-05 11:20:16',
+        prices: withAgentPrices(youbaoFields('小说拉新'), { 0: 4.50, 3: 6.80 })
+      },
+      {
+        id: 62, agentId: 'A-10092', projectId: 154, projectName: '154 - 小云雀漫剧',
+        ratio: 100, status: 'disabled', orders: 3, works: 0, volume: 6, amount: 24, keywords: 21,
+        updatedAt: '2026-09-04 09:12:03',
+        prices: withAgentPrices(youbaoFields('漫剧拉新'), { 0: 3.80 })
+      },
+      {
+        id: 61, agentId: 'A-10092', projectId: 141, projectName: '141 - 红果短剧',
+        ratio: 95, status: 'authorized', orders: 41, works: 1, volume: 88, amount: 352, keywords: 306,
+        updatedAt: '2026-09-03 16:08:44',
+        prices: withAgentPrices(youbaoFields('红果拉新'), { 0: 4.00, 1: 2.20, 2: 1.80, 3: 7.00 })
+      },
+      {
+        id: 60, agentId: 'A-10092', projectId: 133, projectName: '133 - 番茄畅听',
+        ratio: 100, status: 'authorized', orders: 6, works: 0, volume: 12, amount: 48, keywords: 54,
+        updatedAt: '2026-09-02 14:31:09',
+        prices: withAgentPrices(youbaoFields('畅听拉新'), {})
+      },
+      {
+        id: 59, agentId: 'A-10092', projectId: 120, projectName: '120 - 知乎故事',
+        ratio: 92, status: 'authorized', orders: 15, works: 0, volume: 33, amount: 132, keywords: 97,
+        updatedAt: '2026-09-01 10:05:22',
+        prices: withAgentPrices(youbaoFields('知乎拉新'), { 0: 4.80 })
+      },
+    ];
+
+    var priceAgents = [
+      { id: 'A-10092', account: 'agent_tuoba', name: '拓拔' }
+    ];
+
+    var priceLogs = {
+      65: [
+        { time: '2026-09-06 18:40:12', actor: OPERATOR, op: '价格配置', text: '拉新量 未配置 → 4.20；拉旧量（拉失活量） 未配置 → 2.40；转存量 未配置 → 2.00' },
+        { time: '2026-09-01 09:18:40', actor: OPERATOR, op: '新增授权', text: '授权项目 175 - 小云雀驾归，服务费比例 100%' }
+      ],
+      64: [
+        { time: '2026-09-01 09:18:40', actor: OPERATOR, op: '新增授权', text: '授权项目 202 - 小云雀挂载，服务费比例 100%' }
+      ],
+      62: [
+        { time: '2026-09-04 09:12:03', actor: OPERATOR, op: '编辑授权', text: '状态 已授权 → 已禁用' },
+        { time: '2026-09-02 15:08:22', actor: OPERATOR, op: '价格配置', text: '拉新量 未配置 → 3.80' }
+      ],
+    };
+
+    function escapeHtml(s) {
+      return String(s || '').replace(/[&<>"']/g, function (ch) {
+        return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch];
+      });
+    }
+
+    function nowStamp() {
+      var d = new Date();
+      var p = function (n) { return n < 10 ? '0' + n : '' + n; };
+      return d.getFullYear() + '.' + p(d.getMonth() + 1) + '.' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+    }
+
+    function money(n) {
+      return '¥' + Number(n).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function filteredRows() {
+      var q = (appliedFilter.account || '').trim().toLowerCase();
+      var st = appliedFilter.status || '';
+      return rows.filter(function (r) {
+        if (q && r.account.toLowerCase().indexOf(q) === -1) return false;
+        if (st && r.status !== st) return false;
+        return true;
+      });
+    }
+
+    function statusCell(r) {
+      var meta = CERT_STATUS[r.status];
+      var html = '<span class="tag ' + meta.cls + '">' + meta.label + '</span>';
+      if (r.status === 'rejected' && r.rejectReason) {
+        html += '<div class="cell-sub reject-reason" title="' + escapeHtml(r.rejectReason) + '">原因：' + escapeHtml(r.rejectReason) + '</div>';
+      }
+      return html;
+    }
+
+    function companyCell(r) {
+      var c = r.company;
+      return '<div class="agg-cell">' +
+        '<div class="agg-title">' + escapeHtml(c.name) + '</div>' +
+        '<div class="cell-sub">社会编码 ' + escapeHtml(c.code) + '</div>' +
+        '<div class="cell-sub">公司电话 ' + escapeHtml(c.phone) + '</div>' +
+        '<div class="cell-sub">公司地址 ' + escapeHtml(c.address) + '</div>' +
+        '<button class="link" type="button" onclick="openLicense(\'' + r.id + '\')">查看营业执照</button>' +
+        '</div>';
+    }
+
+    function bankCell(b) {
+      return '<div class="agg-cell">' +
+        '<div class="agg-title">' + escapeHtml(b.accountName) + '</div>' +
+        '<div class="cell-sub">开户行 ' + escapeHtml(b.bank) + '</div>' +
+        '<div class="cell-sub">支行 ' + escapeHtml(b.branch) + '</div>' +
+        '<div class="cell-sub">帐号 ' + escapeHtml(b.accountNo) + '</div>' +
+        '<div class="cell-sub">发票 ' + escapeHtml(b.invoice) + ' · 税率 ' + escapeHtml(b.tax) + '</div>' +
+        '</div>';
+    }
+
+    function actionCell(r) {
+      if (r.status !== 'pending') {
+        return '<span class="cell-sub">已审核</span>';
+      }
+      return '<div class="op-stack">' +
+        '<button class="link" type="button" onclick="openApprove(\'' + r.id + '\')">通过</button>' +
+        '<button class="link link-danger" type="button" onclick="openReject(\'' + r.id + '\')">驳回</button>' +
+        '</div>';
+    }
+
+    function renderStats(list) {
+      document.getElementById('statPending').textContent = list.filter(function (r) { return r.status === 'pending'; }).length;
+      document.getElementById('statApproved').textContent = list.filter(function (r) { return r.status === 'approved'; }).length;
+      document.getElementById('statRejected').textContent = list.filter(function (r) { return r.status === 'rejected'; }).length;
+    }
+
+    function renderList() {
+      var list = filteredRows();
+      renderStats(list);
+      var body = document.getElementById('certBody');
+      if (!list.length) {
+        body.innerHTML = '<tr><td colspan="9"><div class="empty-row"><strong>暂无数据</strong>当前筛选条件下没有认证记录</div></td></tr>';
+        return;
+      }
+      body.innerHTML = list.map(function (r) {
+        return '<tr>' +
+          '<td class="mono">' + escapeHtml(r.id) + '</td>' +
+          '<td>' + escapeHtml(r.account) + '</td>' +
+          '<td>' + escapeHtml(r.name) + '</td>' +
+          '<td>' + companyCell(r) + '</td>' +
+          '<td>' + bankCell(r.bank) + '</td>' +
+          '<td>' + statusCell(r) + '</td>' +
+          '<td>' + escapeHtml(r.appliedAt) + '</td>' +
+          '<td>' + (r.reviewedAt ? escapeHtml(r.reviewedAt) : '<span class="cell-sub">—</span>') + '</td>' +
+          '<td class="col-action">' + actionCell(r) + '</td>' +
+          '</tr>';
+      }).join('');
+    }
+
+    function queryList() {
+      appliedFilter.account = document.getElementById('accountQ').value;
+      appliedFilter.status = document.getElementById('statusQ').value;
+      renderList();
+    }
+
+    function resetFilter() {
+      document.getElementById('accountQ').value = '';
+      document.getElementById('statusQ').value = '';
+      showToast('筛选条件已重置');
+    }
+
+    function findRow(id) {
+      return rows.find(function (r) { return r.id === id; });
+    }
+    function findWd(id) {
+      return wdRows.find(function (r) { return r.id === id; });
+    }
+
+    function openModal(id) {
+      document.getElementById(id).classList.add('open');
+    }
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('open');
+    }
+
+    function openApprove(id) {
+      var r = findRow(id);
+      if (!r || r.status !== 'pending') return;
+      pendingActionId = id;
+      document.getElementById('approveDesc').textContent = '即将通过「' + r.name + '」的认证申请，通过后可用于线上结算。';
+      document.getElementById('approveSummary').innerHTML =
+        '代理帐号 <strong>' + escapeHtml(r.account) + '</strong><br />企业名称 ' + escapeHtml(r.company.name);
+      openModal('approveOverlay');
+    }
+
+    function submitApprove() {
+      var r = findRow(pendingActionId);
+      if (!r) return;
+      r.status = 'approved';
+      r.reviewedAt = nowStamp();
+      r.rejectReason = '';
+      closeModal('approveOverlay');
+      renderList();
+      showToast('已通过「' + r.name + '」的认证');
+    }
+
+    function openReject(id) {
+      var r = findRow(id);
+      if (!r || r.status !== 'pending') return;
+      pendingActionId = id;
+      document.getElementById('rejectDesc').textContent = '即将驳回「' + r.name + '」的认证申请，须填写原因。';
+      document.getElementById('rejectReason').value = '';
+      openModal('rejectOverlay');
+      setTimeout(function () { document.getElementById('rejectReason').focus(); }, 80);
+    }
+
+    function submitReject() {
+      var reason = document.getElementById('rejectReason').value.trim();
+      if (!reason) { showToast('请填写驳回原因'); return; }
+      var r = findRow(pendingActionId);
+      if (!r) return;
+      r.status = 'rejected';
+      r.reviewedAt = nowStamp();
+      r.rejectReason = reason;
+      closeModal('rejectOverlay');
+      renderList();
+      showToast('已驳回「' + r.name + '」的认证');
+    }
+
+    function openLicense(id) {
+      var r = findRow(id);
+      if (!r) return;
+      document.getElementById('docTitle').textContent = r.company.name + ' · 营业执照';
+      document.getElementById('docBody').innerHTML =
+        '<div class="doc-card license">' +
+        '<h4>' + escapeHtml(r.company.name) + '</h4>' +
+        '<dl class="doc-grid">' +
+        '<dt>企业名称</dt><dd>' + escapeHtml(r.company.name) + '</dd>' +
+        '<dt>社会编码</dt><dd>' + escapeHtml(r.company.code) + '</dd>' +
+        '<dt>公司电话</dt><dd>' + escapeHtml(r.company.phone) + '</dd>' +
+        '<dt>公司地址</dt><dd>' + escapeHtml(r.company.address) + '</dd>' +
+        '</dl><div class="license-stamp">示 范 章</div></div>';
+      openModal('docOverlay');
+    }
+
+    function filteredWdRows() {
+      var q = (wdFilter.account || '').trim().toLowerCase();
+      var rv = wdFilter.review || '';
+      var py = wdFilter.pay || '';
+      return wdRows.filter(function (r) {
+        if (q && r.account.toLowerCase().indexOf(q) === -1) return false;
+        if (rv && r.review !== rv) return false;
+        if (py && r.pay !== py) return false;
+        return true;
+      });
+    }
+
+    function wdReviewCell(r) {
+      var meta = WD_REVIEW[r.review];
+      var html = '<span class="tag ' + meta.cls + '">' + meta.label + '</span>';
+      if (r.review === 'rejected' && r.rejectReason) {
+        html += '<div class="cell-sub reject-reason" title="' + escapeHtml(r.rejectReason) + '">原因：' + escapeHtml(r.rejectReason) + '</div>';
+      }
+      return html;
+    }
+
+    function wdPayCell(r) {
+      if (r.pay === 'none') return '<span class="cell-sub">—</span>';
+      var meta = WD_PAY[r.pay];
+      var html = '<span class="tag ' + meta.cls + '">' + meta.label + '</span>';
+      if (r.pay === 'failed' && r.payReason) {
+        html += '<div class="cell-sub reject-reason" title="' + escapeHtml(r.payReason) + '">原因：' + escapeHtml(r.payReason) + '</div>';
+      }
+      if (r.pay === 'paid' && r.receiptName) {
+        html += '<div class="cell-sub"><button class="link" type="button" onclick="openWdDoc(\'' + r.id + '\',\'receipt\')">查看回执</button></div>';
+      }
+      return html;
+    }
+
+    function wdInvoiceCell(r) {
+      return '<div class="agg-cell">' +
+        '<div class="cell-sub">开票金额 <span class="money">' + money(r.invoiceAmount) + '</span></div>' +
+        '<div class="cell-sub">开票税额 <span class="money">' + money(r.invoiceTax) + '</span></div>' +
+        '</div>';
+    }
+
+    function wdFilesCell(r) {
+      return '<div class="agg-cell">' +
+        '<button class="link" type="button" onclick="openWdDoc(\'' + r.id + '\',\'settle\')">查看结算单</button>' +
+        '<button class="link" type="button" onclick="openWdDoc(\'' + r.id + '\',\'invoice\')">查看发票</button>' +
+        '</div>';
+    }
+
+    function wdActionCell(r) {
+      if (r.review === 'pending') {
+        return '<div class="op-stack">' +
+          '<button class="link" type="button" onclick="openWdApprove(\'' + r.id + '\')">审核通过</button>' +
+          '<button class="link link-danger" type="button" onclick="openWdReject(\'' + r.id + '\')">审核驳回</button>' +
+          '</div>';
+      }
+      if (r.review === 'approved' && (r.pay === 'pending' || r.pay === 'failed')) {
+        return '<div class="op-stack">' +
+          '<button class="link" type="button" onclick="openWdPayOk(\'' + r.id + '\')">打款成功</button>' +
+          '<button class="link link-danger" type="button" onclick="openWdPayFail(\'' + r.id + '\')">打款失败</button>' +
+          '</div>';
+      }
+      if (r.review === 'rejected') return '<span class="cell-sub">已驳回</span>';
+      if (r.pay === 'paid') return '<span class="cell-sub">已打款</span>';
+      return '<span class="cell-sub">—</span>';
+    }
+
+    function sumAmount(list) {
+      return list.reduce(function (s, r) { return s + Number(r.amount || 0); }, 0);
+    }
+
+    function renderWdStats(list) {
+      var review = list.filter(function (r) { return r.review === 'pending'; });
+      var payPending = list.filter(function (r) { return r.review === 'approved' && r.pay === 'pending'; });
+      var paid = list.filter(function (r) { return r.pay === 'paid'; });
+      document.getElementById('wdStatReview').textContent = review.length;
+      document.getElementById('wdStatPayPending').textContent = payPending.length;
+      document.getElementById('wdStatPaid').textContent = paid.length;
+      document.getElementById('wdAmtReview').textContent = money(sumAmount(review));
+      document.getElementById('wdAmtPayPending').textContent = money(sumAmount(payPending));
+      document.getElementById('wdAmtPaid').textContent = money(sumAmount(paid));
+    }
+
+    function renderWdList() {
+      var list = filteredWdRows();
+      renderWdStats(list);
+      var body = document.getElementById('wdBody');
+      if (!list.length) {
+        body.innerHTML = '<tr><td colspan="11"><div class="empty-row"><strong>暂无数据</strong>当前筛选条件下没有提现记录</div></td></tr>';
+        return;
+      }
+      body.innerHTML = list.map(function (r) {
+        return '<tr data-id="' + escapeHtml(r.id) + '">' +
+          '<td class="mono">' + escapeHtml(r.agentId) + '</td>' +
+          '<td>' + escapeHtml(r.account) + '</td>' +
+          '<td>' + escapeHtml(r.name) + '</td>' +
+          '<td><button class="link" type="button" onclick="openWdDoc(\'' + r.id + '\',\'settle\')">' + escapeHtml(r.settleNo) + '</button></td>' +
+          '<td class="money">' + money(r.amount) + '</td>' +
+          '<td>' + wdInvoiceCell(r) + '</td>' +
+          '<td>' + wdFilesCell(r) + '</td>' +
+          '<td>' + bankCell(r.bank) + '</td>' +
+          '<td>' + wdReviewCell(r) + '</td>' +
+          '<td>' + wdPayCell(r) + '</td>' +
+          '<td class="col-action">' + wdActionCell(r) + '</td>' +
+          '</tr>';
+      }).join('');
+    }
+
+    function queryWdList() {
+      wdFilter.account = document.getElementById('wdAccountQ').value;
+      wdFilter.review = document.getElementById('wdReviewQ').value;
+      wdFilter.pay = document.getElementById('wdPayQ').value;
+      renderWdList();
+    }
+
+    function resetWdFilter() {
+      document.getElementById('wdAccountQ').value = '';
+      document.getElementById('wdReviewQ').value = '';
+      document.getElementById('wdPayQ').value = '';
+      showToast('筛选条件已重置');
+    }
+
+    function openWdApprove(id) {
+      var r = findWd(id);
+      if (!r || r.review !== 'pending') return;
+      pendingActionId = id;
+      document.getElementById('wdApproveDesc').textContent = '即将通过「' + r.name + '」的提现申请，通过后进入待打款。';
+      document.getElementById('wdApproveSummary').innerHTML =
+        '结算单 <strong>' + escapeHtml(r.settleNo) + '</strong><br />提现金额 ' + money(r.amount);
+      openModal('wdApproveOverlay');
+    }
+
+    function submitWdApprove() {
+      var r = findWd(pendingActionId);
+      if (!r) return;
+      r.review = 'approved';
+      r.pay = 'pending';
+      r.rejectReason = '';
+      closeModal('wdApproveOverlay');
+      renderWdList();
+      showToast('已审核通过「' + r.name + '」的提现');
+    }
+
+    function openWdReject(id) {
+      var r = findWd(id);
+      if (!r || r.review !== 'pending') return;
+      pendingActionId = id;
+      document.getElementById('wdRejectDesc').textContent = '即将驳回「' + r.name + '」的提现申请，须填写原因。';
+      document.getElementById('wdRejectReason').value = '';
+      openModal('wdRejectOverlay');
+      setTimeout(function () { document.getElementById('wdRejectReason').focus(); }, 80);
+    }
+
+    function submitWdReject() {
+      var reason = document.getElementById('wdRejectReason').value.trim();
+      if (!reason) { showToast('请填写驳回原因'); return; }
+      var r = findWd(pendingActionId);
+      if (!r) return;
+      r.review = 'rejected';
+      r.pay = 'none';
+      r.rejectReason = reason;
+      closeModal('wdRejectOverlay');
+      renderWdList();
+      showToast('已驳回「' + r.name + '」的提现');
+    }
+
+    function resetReceiptPick() {
+      pendingReceiptName = '';
+      var input = document.getElementById('receiptFile');
+      input.value = '';
+      var nameEl = document.getElementById('receiptFileName');
+      nameEl.textContent = '未选择文件';
+      nameEl.classList.add('empty');
+    }
+
+    function openWdPayOk(id) {
+      var r = findWd(id);
+      if (!r || r.review !== 'approved' || (r.pay !== 'pending' && r.pay !== 'failed')) return;
+      pendingActionId = id;
+      resetReceiptPick();
+      document.getElementById('wdPayOkDesc').textContent = '即将标记「' + r.name + '」打款成功，必须上传回执单。';
+      document.getElementById('wdPayOkSummary').innerHTML =
+        '结算单 <strong>' + escapeHtml(r.settleNo) + '</strong><br />提现金额 ' + money(r.amount) +
+        '<br />收款帐户 ' + escapeHtml(r.bank.accountName);
+      openModal('wdPayOkOverlay');
+    }
+
+    function submitWdPayOk() {
+      if (!pendingReceiptName) { showToast('请上传打款回执单'); return; }
+      var r = findWd(pendingActionId);
+      if (!r) return;
+      r.pay = 'paid';
+      r.payReason = '';
+      r.receiptName = pendingReceiptName;
+      r.receiptAt = nowStamp();
+      closeModal('wdPayOkOverlay');
+      renderWdList();
+      showToast('已标记「' + r.name + '」打款成功');
+    }
+
+    function openWdPayFail(id) {
+      var r = findWd(id);
+      if (!r || r.review !== 'approved' || (r.pay !== 'pending' && r.pay !== 'failed')) return;
+      pendingActionId = id;
+      document.getElementById('wdPayFailDesc').textContent = '即将标记「' + r.name + '」打款失败，须填写原因。';
+      document.getElementById('wdPayFailReason').value = '';
+      openModal('wdPayFailOverlay');
+      setTimeout(function () { document.getElementById('wdPayFailReason').focus(); }, 80);
+    }
+
+    function submitWdPayFail() {
+      var reason = document.getElementById('wdPayFailReason').value.trim();
+      if (!reason) { showToast('请填写失败原因'); return; }
+      var r = findWd(pendingActionId);
+      if (!r) return;
+      r.pay = 'failed';
+      r.payReason = reason;
+      r.receiptName = '';
+      r.receiptAt = '';
+      closeModal('wdPayFailOverlay');
+      renderWdList();
+      showToast('已标记「' + r.name + '」打款失败');
+    }
+
+    function openWdDoc(id, kind) {
+      var r = findWd(id);
+      if (!r) return;
+      var title = '';
+      var body = '';
+      if (kind === 'settle') {
+        title = r.settleNo + ' · 结算单';
+        body = '<div class="doc-card">' +
+          '<h4>' + escapeHtml(r.settleFile) + '</h4>' +
+          '<dl class="doc-grid">' +
+          '<dt>结算单号</dt><dd>' + escapeHtml(r.settleNo) + '</dd>' +
+          '<dt>代理名称</dt><dd>' + escapeHtml(r.name) + '</dd>' +
+          '<dt>提现金额</dt><dd>' + money(r.amount) + '</dd>' +
+          '<dt>开票金额</dt><dd>' + money(r.invoiceAmount) + '</dd>' +
+          '<dt>开票税额</dt><dd>' + money(r.invoiceTax) + '</dd>' +
+          '</dl></div>';
+      } else if (kind === 'invoice') {
+        title = r.name + ' · 发票';
+        body = '<div class="doc-card invoice">' +
+          '<h4>' + escapeHtml(r.invoiceFile) + '</h4>' +
+          '<dl class="doc-grid">' +
+          '<dt>发票类型</dt><dd>' + escapeHtml(r.bank.invoice) + '</dd>' +
+          '<dt>发票税率</dt><dd>' + escapeHtml(r.bank.tax) + '</dd>' +
+          '<dt>开票金额</dt><dd>' + money(r.invoiceAmount) + '</dd>' +
+          '<dt>开票税额</dt><dd>' + money(r.invoiceTax) + '</dd>' +
+          '<dt>收款帐户</dt><dd>' + escapeHtml(r.bank.accountName) + '</dd>' +
+          '</dl></div>';
+      } else {
+        title = r.name + ' · 打款回执';
+        body = '<div class="doc-card receipt">' +
+          '<h4>' + escapeHtml(r.receiptName || '打款回执单') + '</h4>' +
+          '<dl class="doc-grid">' +
+          '<dt>结算单号</dt><dd>' + escapeHtml(r.settleNo) + '</dd>' +
+          '<dt>打款金额</dt><dd>' + money(r.amount) + '</dd>' +
+          '<dt>收款帐户</dt><dd>' + escapeHtml(r.bank.accountName) + '</dd>' +
+          '<dt>开户行</dt><dd>' + escapeHtml(r.bank.bank) + ' ' + escapeHtml(r.bank.branch) + '</dd>' +
+          '<dt>回执时间</dt><dd>' + escapeHtml(r.receiptAt || '—') + '</dd>' +
+          '</dl><div class="license-stamp">银 行 回 执</div></div>';
+      }
+      document.getElementById('docTitle').textContent = title;
+      document.getElementById('docBody').innerHTML = body;
+      openModal('docOverlay');
+    }
+
+    function findPriceAgent(id) {
+      return priceAgents.find(function (a) { return a.id === id; });
+    }
+    function findPriceAuth(id) {
+      return priceAuths.find(function (r) { return r.id === Number(id); });
+    }
+    function authsOf(agentId) {
+      return priceAuths.filter(function (r) { return r.agentId === agentId; });
+    }
+    function configuredCount(list) {
+      return list.filter(function (r) {
+        return r.prices.some(function (p) { return p.agent !== null && p.agent !== ''; });
+      }).length;
+    }
+    function fmtNum(n, digits) {
+      return Number(n).toLocaleString('zh-CN', { minimumFractionDigits: digits, maximumFractionDigits: digits });
+    }
+    function fmtPrice(v) {
+      if (v === null || v === undefined || v === '') return '未配置';
+      return fmtNum(v, 2);
+    }
+    function serviceFee(r) {
+      return Number(r.amount || 0) * (Number(r.ratio || 0) / 100);
+    }
+    function pushLog(authId, op, text) {
+      if (!priceLogs[authId]) priceLogs[authId] = [];
+      priceLogs[authId].unshift({ time: nowStamp().replace(/\./g, '-'), actor: OPERATOR, op: op, text: text });
+    }
+    function stampAuth(r) {
+      r.updatedAt = nowStamp().replace(/\./g, '-');
+    }
+
+    function filteredPriceProjects() {
+      var q = (priceProjectFilter.name || '').trim().toLowerCase();
+      var st = priceProjectFilter.status || '';
+      return authsOf(currentPriceAgentId).filter(function (r) {
+        if (q && r.projectName.toLowerCase().indexOf(q) === -1) return false;
+        if (st && r.status !== st) return false;
+        return true;
+      });
+    }
+
+    function priceStatusTag(status) {
+      if (status === 'disabled') return '<span class="tag tag-gray">已禁用</span>';
+      return '<span class="tag tag-ok">已授权</span>';
+    }
+
+    function priceConfigBadge(r) {
+      var n = r.prices.filter(function (p) { return p.agent !== null && p.agent !== ''; }).length;
+      if (!n) return '<div class="cell-sub">价格未配置</div>';
+      return '<div class="cell-sub">已配置 ' + n + '/' + r.prices.length + '</div>';
+    }
+
+    function renderPriceProjects() {
+      var agent = findPriceAgent(currentPriceAgentId);
+      if (!agent) return;
+      var all = authsOf(agent.id);
+      var list = filteredPriceProjects();
+      var feeSum = all.reduce(function (s, r) { return s + serviceFee(r); }, 0);
+      document.getElementById('priceAgentTitle').textContent = agent.name;
+      document.getElementById('priceAgentDesc').textContent = '已授权 ' + all.length + ' 个项目';
+      document.getElementById('priceTableTitle').textContent = '项目授权列表 共' + list.length + '条';
+      document.getElementById('priceStatProjects').textContent = all.length;
+      document.getElementById('priceStatConfigured').textContent = configuredCount(all);
+      document.getElementById('priceStatFee').textContent = fmtNum(feeSum, 2);
+      var body = document.getElementById('priceBody');
+      if (!list.length) {
+        body.innerHTML = '<tr><td colspan="13"><div class="empty-row"><strong>暂无数据</strong>当前筛选条件下没有授权项目</div></td></tr>';
+        return;
+      }
+      body.innerHTML = list.map(function (r) {
+        return '<tr data-id="' + r.id + '">' +
+          '<td class="check-col"><input type="checkbox" class="price-row-check" value="' + r.id + '" /></td>' +
+          '<td class="mono">' + r.id + '</td>' +
+          '<td title="' + escapeHtml(r.projectName) + '">' + escapeHtml(r.projectName) + priceConfigBadge(r) + '</td>' +
+          '<td class="num">' + r.ratio + '%</td>' +
+          '<td>' + priceStatusTag(r.status) + '</td>' +
+          '<td class="num">' + r.orders + '</td>' +
+          '<td class="num">' + r.works + '</td>' +
+          '<td class="num">' + Math.round(Number(r.volume || 0)) + '</td>' +
+          '<td class="num">' + r.keywords + '</td>' +
+          '<td class="num">' + fmtNum(r.amount, 2) + '</td>' +
+          '<td class="num">' + fmtNum(serviceFee(r), 2) + '</td>' +
+          '<td>' + escapeHtml(r.updatedAt) + '</td>' +
+          '<td class="col-action"><div class="op-stack">' +
+            '<button class="link" type="button" onclick="openPriceConfig(' + r.id + ')">价格配置</button>' +
+            '<button class="link" type="button" onclick="openPriceEdit(' + r.id + ')">编辑</button>' +
+            '<button class="link link-muted" type="button" onclick="openPriceLog(' + r.id + ')">日志</button>' +
+            '<button class="link link-danger" type="button" onclick="openPriceDelete(' + r.id + ')">删除</button>' +
+          '</div></td>' +
+          '</tr>';
+      }).join('');
+    }
+
+    function queryPriceProjects() {
+      priceProjectFilter.name = document.getElementById('priceProjectQ').value;
+      priceProjectFilter.status = document.getElementById('priceStatusQ').value;
+      renderPriceProjects();
+    }
+    function resetPriceProjectFilter() {
+      document.getElementById('priceProjectQ').value = '';
+      document.getElementById('priceStatusQ').value = '';
+      showToast('筛选条件已重置');
+    }
+
+    function selectedPriceIds() {
+      return Array.prototype.map.call(document.querySelectorAll('.price-row-check:checked'), function (el) {
+        return Number(el.value);
+      });
+    }
+    function togglePriceCheckAll(checked) {
+      document.querySelectorAll('.price-row-check').forEach(function (el) { el.checked = checked; });
+    }
+
+    function openPriceConfig(id) {
+      var r = findPriceAuth(id);
+      if (!r) return;
+      pendingPriceAuthId = id;
+      var agent = findPriceAgent(r.agentId);
+      document.getElementById('priceConfigTitle').textContent = '价格配置 · ' + r.projectName;
+      document.getElementById('priceConfigSummary').innerHTML =
+        '代理 <strong>' + escapeHtml(agent ? agent.name : r.agentId) + '</strong> · 右豹项目 ' + escapeHtml(r.projectName) +
+        (r.status === 'disabled' ? '<br /><span class="reject-reason">项目已禁用，改价仅用于历史对账，不作用于新订单</span>' : '');
+      document.getElementById('priceConfigBody').innerHTML = r.prices.map(function (p, i) {
+        var val = p.agent === null || p.agent === undefined ? '' : p.agent;
+        return '<tr>' +
+          '<td class="readonly-cell">' + escapeHtml(p.field) + '</td>' +
+          '<td class="readonly-cell">' + escapeHtml(p.unitType) + '</td>' +
+          '<td class="readonly-cell num">' + fmtNum(p.origin, 2) + '</td>' +
+          '<td><input class="price-input" data-idx="' + i + '" type="number" min="0" step="0.01" placeholder="未配置" value="' + val + '" /></td>' +
+          '<td class="readonly-cell" title="' + escapeHtml(p.desc) + '">' + escapeHtml(p.desc) + '</td>' +
+          '</tr>';
+      }).join('');
+      document.getElementById('priceConfigHint').textContent = '保存后，该代理在本项目的收益按「单量 × 代理价格」计算，未配置字段不计入。';
+      openModal('priceConfigOverlay');
+      setTimeout(function () {
+        var first = document.querySelector('#priceConfigBody .price-input');
+        if (first) first.focus();
+      }, 80);
+    }
+
+    function parseAgentPrice(raw) {
+      var s = String(raw || '').trim();
+      if (!s) return { ok: true, value: null };
+      if (!/^\d+(\.\d{1,2})?$/.test(s)) return { ok: false };
+      var n = Number(s);
+      if (!(n >= 0) || !isFinite(n)) return { ok: false };
+      return { ok: true, value: n };
+    }
+
+    function submitPriceConfig() {
+      var r = findPriceAuth(pendingPriceAuthId);
+      if (!r) return;
+      var inputs = document.querySelectorAll('#priceConfigBody .price-input');
+      var next = [];
+      var firstError = null;
+      inputs.forEach(function (input, i) {
+        input.classList.remove('is-error');
+        var parsed = parseAgentPrice(input.value);
+        if (!parsed.ok) {
+          input.classList.add('is-error');
+          if (!firstError) firstError = input;
+          return;
+        }
+        next[i] = parsed.value;
+      });
+      if (firstError) {
+        showToast('代理价格须 ≥ 0，最多两位小数');
+        firstError.focus();
+        return;
+      }
+      var changes = [];
+      r.prices.forEach(function (p, i) {
+        var oldVal = p.agent;
+        var newVal = next[i];
+        if (oldVal !== newVal) {
+          changes.push(p.field + ' ' + fmtPrice(oldVal) + ' → ' + fmtPrice(newVal));
+          p.agent = newVal;
+        }
+      });
+      stampAuth(r);
+      if (changes.length) {
+        pushLog(r.id, '价格配置', changes.join('；'));
+        showToast('已保存「' + r.projectName + '」的代理价格');
+      } else {
+        showToast('价格未变化');
+      }
+      closeModal('priceConfigOverlay');
+      renderPriceProjects();
+    }
+
+    function openPriceEdit(id) {
+      var r = findPriceAuth(id);
+      if (!r) return;
+      pendingPriceAuthId = id;
+      document.getElementById('priceEditSummary').innerHTML = '项目 <strong>' + escapeHtml(r.projectName) + '</strong>';
+      document.getElementById('priceEditRatio').value = r.ratio;
+      document.getElementById('priceEditStatus').value = r.status;
+      openModal('priceEditOverlay');
+    }
+    function submitPriceEdit() {
+      var r = findPriceAuth(pendingPriceAuthId);
+      if (!r) return;
+      var ratio = Number(document.getElementById('priceEditRatio').value);
+      if (!(ratio >= 0) || ratio > 100 || !isFinite(ratio)) {
+        showToast('服务费比例须在 0–100');
+        return;
+      }
+      var status = document.getElementById('priceEditStatus').value;
+      var parts = [];
+      if (Number(r.ratio) !== ratio) parts.push('服务费比例 ' + r.ratio + '% → ' + ratio + '%');
+      if (r.status !== status) parts.push('状态 ' + (r.status === 'authorized' ? '已授权' : '已禁用') + ' → ' + (status === 'authorized' ? '已授权' : '已禁用'));
+      r.ratio = ratio;
+      r.status = status;
+      stampAuth(r);
+      if (parts.length) pushLog(r.id, '编辑授权', parts.join('；'));
+      closeModal('priceEditOverlay');
+      renderPriceProjects();
+      showToast(parts.length ? '已更新授权' : '未修改');
+    }
+
+    function openPriceDelete(id) {
+      var r = findPriceAuth(id);
+      if (!r) return;
+      pendingPriceAuthId = id;
+      document.getElementById('priceDeleteSummary').innerHTML = '即将删除「' + escapeHtml(r.projectName) + '」，此操作不可撤销。';
+      openModal('priceDeleteOverlay');
+    }
+    function submitPriceDelete() {
+      var r = findPriceAuth(pendingPriceAuthId);
+      if (!r) return;
+      pushLog(r.id, '删除授权', '删除项目 ' + r.projectName);
+      priceAuths = priceAuths.filter(function (x) { return x.id !== r.id; });
+      closeModal('priceDeleteOverlay');
+      renderPriceProjects();
+      showToast('已删除「' + r.projectName + '」');
+    }
+
+    function openPriceLog(id) {
+      var r = findPriceAuth(id);
+      var logs = priceLogs[id] || [];
+      document.getElementById('priceLogTitle').textContent = '操作日志 · ' + (r ? r.projectName : id);
+      document.getElementById('priceLogBody').innerHTML = logs.length
+        ? logs.map(function (l) {
+            return '<div class="log-item"><time>' + escapeHtml(l.time) + ' · ' + escapeHtml(l.actor) + '</time>' +
+              '<span class="log-op">' + escapeHtml(l.op) + '</span>' + escapeHtml(l.text) + '</div>';
+          }).join('')
+        : '<div class="empty-hint">暂无日志记录</div>';
+      document.getElementById('priceLogOverlay').classList.add('open');
+      document.getElementById('priceLogDrawer').classList.add('open');
+    }
+    function closePriceLog() {
+      document.getElementById('priceLogOverlay').classList.remove('open');
+      document.getElementById('priceLogDrawer').classList.remove('open');
+    }
+
+    function openBatchRatio() {
+      var ids = selectedPriceIds();
+      if (!ids.length) { showToast('请先勾选项目'); return; }
+      document.getElementById('priceBatchRatioDesc').textContent = '将覆盖已选 ' + ids.length + ' 个项目的服务费比例。';
+      document.getElementById('priceBatchRatio').value = '';
+      openModal('priceBatchRatioOverlay');
+      setTimeout(function () { document.getElementById('priceBatchRatio').focus(); }, 80);
+    }
+    function submitBatchRatio() {
+      var ids = selectedPriceIds();
+      var ratio = Number(document.getElementById('priceBatchRatio').value);
+      if (!(ratio >= 0) || ratio > 100 || !isFinite(ratio)) {
+        showToast('服务费比例须在 0–100');
+        return;
+      }
+      ids.forEach(function (id) {
+        var r = findPriceAuth(id);
+        if (!r) return;
+        var old = r.ratio;
+        r.ratio = ratio;
+        stampAuth(r);
+        pushLog(r.id, '批量设置服务费比例', '服务费比例 ' + old + '% → ' + ratio + '%');
+      });
+      closeModal('priceBatchRatioOverlay');
+      renderPriceProjects();
+      showToast('已更新 ' + ids.length + ' 个项目的服务费比例');
+    }
+
+    function toggleBatchStatus() {
+      var ids = selectedPriceIds();
+      if (!ids.length) { showToast('请先勾选项目'); return; }
+      var anyAuth = ids.some(function (id) {
+        var r = findPriceAuth(id);
+        return r && r.status === 'authorized';
+      });
+      var next = anyAuth ? 'disabled' : 'authorized';
+      var label = next === 'disabled' ? '已禁用' : '已授权';
+      ids.forEach(function (id) {
+        var r = findPriceAuth(id);
+        if (!r || r.status === next) return;
+        var old = r.status === 'authorized' ? '已授权' : '已禁用';
+        r.status = next;
+        stampAuth(r);
+        pushLog(r.id, '批量启用/禁用', '状态 ' + old + ' → ' + label);
+      });
+      renderPriceProjects();
+      showToast('已将所选项目设为' + label);
+    }
+
+    function openBatchAdd() {
+      var agent = findPriceAgent(currentPriceAgentId);
+      if (!agent) return;
+      var owned = {};
+      authsOf(agent.id).forEach(function (r) { owned[r.projectId] = true; });
+      var avail = PRICE_CATALOG.filter(function (p) { return !owned[p.projectId]; });
+      var box = document.getElementById('priceBatchAddBody');
+      if (!avail.length) {
+        box.innerHTML = '<div class="empty-hint">当前无可新增的右豹项目</div>';
+      } else {
+        box.innerHTML = avail.map(function (p) {
+          return '<label class="form-field" style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">' +
+            '<input type="checkbox" class="batch-add-check" value="' + p.projectId + '" style="width:16px;height:16px;" />' +
+            '<span>' + escapeHtml(p.projectName) + '</span></label>';
+        }).join('');
+      }
+      openModal('priceBatchAddOverlay');
+    }
+    function submitBatchAdd() {
+      var agent = findPriceAgent(currentPriceAgentId);
+      if (!agent) return;
+      var ids = Array.prototype.map.call(document.querySelectorAll('.batch-add-check:checked'), function (el) {
+        return Number(el.value);
+      });
+      if (!ids.length) { showToast('请勾选要授权的项目'); return; }
+      ids.forEach(function (pid) {
+        var cat = PRICE_CATALOG.find(function (p) { return p.projectId === pid; });
+        if (!cat) return;
+        var row = {
+          id: nextAuthId++, agentId: agent.id, projectId: cat.projectId, projectName: cat.projectName,
+          ratio: 100, status: 'authorized', orders: 0, works: 0, volume: 0, amount: 0, keywords: 0,
+          updatedAt: nowStamp().replace(/\./g, '-'),
+          prices: withAgentPrices(cat.fields, {})
+        };
+        priceAuths.unshift(row);
+        pushLog(row.id, '批量新增授权', '授权项目 ' + cat.projectName + '，服务费比例 100%');
+      });
+      closeModal('priceBatchAddOverlay');
+      renderPriceProjects();
+      showToast('已新增 ' + ids.length + ' 个项目授权');
+    }
+
+    function showToast(msg) {
+      var el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(function () { el.classList.remove('show'); }, 2500);
+    }
+
+    function currentTabKey() {
+      var id = document.querySelector('.page-view.active') && document.querySelector('.page-view.active').id;
+      return { 'view-cert': 'cert', 'view-withdraw': 'withdraw', 'view-price': 'price' }[id] || 'cert';
+    }
+    function currentViewKey() {
+      var view = document.querySelector('.page-view.active');
+      if (!view) return 'admin';
+      var sub = view.querySelector('.sub-view.active');
+      if (!sub) return 'admin';
+      return sub.id.indexOf('flow') >= 0 ? 'flow' : 'admin';
+    }
+    function syncPageUrl() {
+      history.replaceState(null, '', '?tab=' + currentTabKey() + '&view=' + currentViewKey());
+    }
+    function switchRuleTab(ruleId, btn) {
+      document.querySelectorAll('.rule-tab-bar button').forEach(function (b) { b.classList.remove('active'); });
+      document.querySelectorAll('.rule-panel').forEach(function (p) { p.classList.remove('active'); });
+      btn.classList.add('active');
+      document.getElementById(ruleId).classList.add('active');
+    }
+    function syncRuleTabToPage() {
+      var ruleId = currentTabKey() === 'withdraw' ? 'rule-withdraw' : (currentTabKey() === 'price' ? 'rule-price' : 'rule-cert');
+      var btn = document.querySelector('.rule-tab-bar button[data-rule="' + ruleId + '"]');
+      if (btn) switchRuleTab(ruleId, btn);
+    }
+    function setRuleDrawer(open) {
+      document.getElementById('ruleDrawer').classList.toggle('open', open);
+      document.getElementById('ruleOverlay').classList.toggle('open', open);
+      document.getElementById('toggleRuleDrawer').classList.toggle('active', open);
+      if (open) syncRuleTabToPage();
+    }
+
+    document.querySelectorAll('.page-tab-bar button').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('.page-tab-bar button').forEach(function (b) { b.classList.remove('active'); });
+        document.querySelectorAll('.page-view').forEach(function (v) { v.classList.remove('active'); });
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.page).classList.add('active');
+        syncPageUrl();
+        syncRuleTabToPage();
+      });
+    });
+    document.querySelectorAll('.module-tab-bar button').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var bar = btn.parentElement;
+        var view = bar.parentElement;
+        bar.querySelectorAll('button').forEach(function (b) { b.classList.remove('active'); });
+        view.querySelectorAll('.sub-view').forEach(function (v) { v.classList.remove('active'); });
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.sub).classList.add('active');
+        syncPageUrl();
+      });
+    });
+    document.querySelectorAll('.rule-tab-bar button').forEach(function (btn) {
+      btn.addEventListener('click', function () { switchRuleTab(btn.dataset.rule, btn); });
+    });
+    document.getElementById('toggleRuleDrawer').onclick = function () {
+      setRuleDrawer(!document.getElementById('ruleDrawer').classList.contains('open'));
+    };
+    document.getElementById('approveOverlay').addEventListener('click', function (e) {
+      if (e.target === this) closeModal('approveOverlay');
+    });
+    document.getElementById('wdApproveOverlay').addEventListener('click', function (e) {
+      if (e.target === this) closeModal('wdApproveOverlay');
+    });
+    document.getElementById('wdPayOkOverlay').addEventListener('click', function (e) {
+      if (e.target === this) closeModal('wdPayOkOverlay');
+    });
+    ['priceConfigOverlay', 'priceEditOverlay', 'priceBatchRatioOverlay', 'priceBatchAddOverlay'].forEach(function (id) {
+      document.getElementById(id).addEventListener('click', function (e) {
+        if (e.target === this) closeModal(id);
+      });
+    });
+    document.getElementById('receiptFile').addEventListener('change', function () {
+      var file = this.files && this.files[0];
+      pendingReceiptName = file ? file.name : '';
+      var nameEl = document.getElementById('receiptFileName');
+      nameEl.textContent = pendingReceiptName || '未选择文件';
+      nameEl.classList.toggle('empty', !pendingReceiptName);
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape') return;
+      var danger = ['rejectOverlay', 'wdRejectOverlay', 'wdPayFailOverlay', 'priceDeleteOverlay'];
+      var others = ['approveOverlay', 'wdApproveOverlay', 'wdPayOkOverlay', 'docOverlay', 'priceConfigOverlay', 'priceEditOverlay', 'priceBatchRatioOverlay', 'priceBatchAddOverlay'];
+      var i;
+      for (i = 0; i < danger.length; i++) {
+        if (document.getElementById(danger[i]).classList.contains('open')) {
+          closeModal(danger[i]);
+          return;
+        }
+      }
+      for (i = 0; i < others.length; i++) {
+        if (document.getElementById(others[i]).classList.contains('open')) {
+          closeModal(others[i]);
+          return;
+        }
+      }
+      if (document.getElementById('priceLogDrawer').classList.contains('open')) {
+        closePriceLog();
+        return;
+      }
+      setRuleDrawer(false);
+    });
+
+    var params = new URLSearchParams(location.search);
+    var tab = params.get('tab');
+    var view = params.get('view');
+    if (tab === 'withdraw' || tab === 'price' || tab === 'flow') {
+      var wdBtn = document.querySelector('[data-page="view-withdraw"]');
+      var priceBtn = document.querySelector('[data-page="view-price"]');
+      if (tab === 'withdraw' && wdBtn) wdBtn.click();
+      if (tab === 'price' && priceBtn) priceBtn.click();
+      if (tab === 'flow') {
+        var certFlow = document.querySelector('[data-sub="cert-flow"]');
+        if (certFlow) certFlow.click();
+      }
+    }
+    if (view === 'flow') {
+      var flowBtn = document.querySelector('.page-view.active [data-sub$="-flow"]');
+      if (flowBtn) flowBtn.click();
+    }
+    renderList();
+    renderWdList();
+    renderPriceProjects();
+  </script>
+  <script src="sidebar-nav.js"></script>
+</body>
+</html>

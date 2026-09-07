@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FR-011 · 机构导师看板 · 右豹迭代需求记录</title>
+  <style>
+    :root {
+      --primary: #2563eb; --primary-hover: #1d4ed8; --primary-light: #eff6ff; --primary-border: #bfdbfe;
+      --accent-rule: #0891b2; --accent-version: #7c3aed; --accent-fr: #d97706;
+      --success: #16a34a; --success-bg: #f0fdf4; --danger: #dc2626; --danger-bg: #fef2f2;
+      --warning: #d97706; --warning-bg: #fffbeb;
+      --info: #0891b2; --info-bg: #ecfeff;
+      --surface: #fff; --surface-glass: rgba(255,255,255,0.72); --surface-hover: #f8fafc; --border: #e8edf3;
+      --text-primary: #18222f; --text-secondary: #4a5568; --text-muted: #9aa5b4;
+      --sidebar-w: 240px; --drawer-w: 480px; --radius-sm: 7px; --radius-lg: 14px;
+      --shadow: 0 8px 32px rgba(30,40,80,0.10);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 13px;
+      color: var(--text-primary);
+      background: linear-gradient(135deg, #e0e7ff 0%, #f0f4f8 40%, #e0f2fe 100%);
+      background-attachment: fixed; min-height: 100vh;
+    }
+    .sidebar {
+      position: fixed; inset: 0 auto 0 0; width: var(--sidebar-w); z-index: 200;
+      display: flex; flex-direction: column;
+      background: rgba(240,244,255,0.95); backdrop-filter: blur(20px);
+      border-right: 1px solid rgba(148,163,196,0.22);
+    }
+    .sidebar-brand { padding: 16px 14px 12px; border-bottom: 1px solid rgba(148,163,196,0.22); }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: linear-gradient(135deg, #2563eb, #7c3aed); color: #fff;
+      display: flex; align-items: center; justify-content: center; font-weight: 700;
+    }
+    .brand-text { font-size: 14px; font-weight: 700; }
+    .brand-sub { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+    .sprint-pill {
+      display: inline-block; margin-top: 10px; font-size: 11px; font-weight: 600;
+      padding: 3px 8px; border-radius: 999px; background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0;
+    }
+    .sidebar-scroll { flex: 1; overflow-y: auto; padding: 8px 0 16px; }
+    .sidebar-foot { padding: 10px 14px 14px; border-top: 1px solid rgba(148,163,196,0.22); font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+    .main { margin-left: var(--sidebar-w); padding: 16px 20px 40px; min-height: 100vh; }
+    .breadcrumb { padding: 4px 0 12px; font-size: 12px; color: var(--text-muted); }
+    .breadcrumb a { color: var(--primary); text-decoration: none; }
+    .page-header { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
+    .page-header-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-start; }
+    .page-header h1 { font-size: 19px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .page-desc { font-size: 12px; color: var(--text-muted); max-width: 780px; line-height: 1.55; }
+    .badge { display: inline-flex; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: var(--radius-sm); width: fit-content; white-space: nowrap; }
+    .badge-fr { background: #fffbeb; color: var(--accent-fr); border: 1px solid #fde68a; }
+    .badge-version { background: #f5f3ff; color: var(--accent-version); border: 1px solid #ddd6fe; }
+    .page-tab-bar {
+      display: flex; gap: 0; margin-bottom: 16px;
+      background: var(--surface-glass); backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.55); border-radius: var(--radius-lg);
+      padding: 4px; box-shadow: var(--shadow); width: fit-content;
+    }
+    .page-tab-bar button {
+      padding: 8px 20px; border: none; background: transparent; cursor: pointer;
+      font-size: 13px; font-weight: 500; color: var(--text-secondary); border-radius: 10px;
+    }
+    .page-tab-bar button.active { background: var(--primary); color: #fff; font-weight: 600; }
+    .page-view { display: none; }
+    .page-view.active { display: block; }
+    .btn {
+      display: inline-flex; align-items: center; height: 34px; padding: 0 14px;
+      border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid transparent;
+    }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-rule { background: var(--primary-light); color: var(--primary); border-color: var(--primary-border); }
+    .btn-rule.active { background: var(--primary); color: #fff; }
+    .btn-ghost { background: var(--surface); color: var(--text-secondary); border-color: var(--border); }
+    .btn-ghost:hover { background: var(--surface-hover); }
+    .btn-ghost-sm { background: var(--surface); color: var(--text-secondary); border: 1px solid var(--border); height: 32px; padding: 0 12px; border-radius: var(--radius-sm); cursor: pointer; font-size: 12px; }
+    .btn-sm { height: 32px; padding: 0 12px; font-size: 12px; }
+    .glass-card {
+      background: var(--surface-glass); backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.55); border-radius: var(--radius-lg);
+      box-shadow: var(--shadow); overflow: hidden;
+    }
+    .stats-bar {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 0;
+      border-bottom: 1px solid var(--border); background: rgba(248,250,252,0.85);
+    }
+    .stat-item { padding: 14px 16px; border-right: 1px solid var(--border); }
+    .stat-item:last-child { border-right: none; }
+    .stat-item .label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+    .stat-item .value { font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .stat-item .value.info { color: var(--info); }
+    .table-toolbar { display: flex; justify-content: space-between; align-items: flex-start; padding: 12px 16px; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 8px; }
+    .table-toolbar h3 { font-size: 14px; font-weight: 700; }
+    .detail-back {
+      display: inline-flex; align-items: center; gap: 4px; margin-bottom: 6px;
+      color: var(--primary); background: none; border: none; cursor: pointer;
+      font-size: 12px; font-weight: 500; padding: 0;
+    }
+    .filter-bar { display: flex; flex-wrap: wrap; gap: 10px; padding: 14px 16px; align-items: flex-end; border-bottom: 1px solid var(--border); }
+    .form-field { display: flex; flex-direction: column; gap: 4px; }
+    .form-field > label { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+    .form-field > input[type="text"],
+    .form-field > select {
+      height: 30px; padding: 0 9px; border: 1px solid var(--border); border-radius: 6px; font-size: 12px; min-width: 160px; background: var(--surface);
+    }
+    .form-field > input:focus,
+    .form-field > select:focus {
+      outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.10);
+    }
+    .filter-actions { display: flex; gap: 8px; margin-left: auto; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+    #orgTable { min-width: 1080px; }
+    #mentorTable { min-width: 1040px; }
+    th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); font-size: 12px; vertical-align: middle; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    th { font-size: 11px; font-weight: 600; color: var(--text-muted); background: rgba(248,250,252,0.9); letter-spacing: 0.5px; }
+    tr:hover td { background: var(--surface-hover); }
+    .num { font-variant-numeric: tabular-nums; }
+    .money { font-variant-numeric: tabular-nums; font-weight: 600; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 12px; }
+    .link {
+      color: var(--primary); cursor: pointer; background: none; border: none; padding: 0;
+      font-size: 12px; font-weight: 600; font-family: inherit;
+    }
+    .link:hover { text-decoration: underline; }
+    .muted-num { color: var(--text-muted); font-variant-numeric: tabular-nums; }
+    .tag { display: inline-flex; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; width: fit-content; white-space: nowrap; }
+    .tag-blue { background: #eff6ff; color: #2563eb; }
+    .tag-purple { background: #faf5ff; color: #7c3aed; }
+    .tag-gray { background: #f1f5f9; color: #64748b; }
+    .empty-state { padding: 36px 16px; text-align: center; color: var(--text-muted); }
+    .empty-state svg { width: 64px; height: 64px; opacity: 0.25; margin-bottom: 8px; }
+    .empty-state strong { display: block; font-size: 14px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; }
+    .pager { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; font-size: 12px; color: var(--text-secondary); }
+    .admin-panel { display: none; }
+    .admin-panel.active { display: block; }
+    .name-list { display: flex; flex-wrap: wrap; gap: 8px; }
+    .name-chip {
+      display: inline-flex; align-items: center; padding: 6px 10px;
+      border-radius: 999px; background: var(--primary-light); color: var(--primary);
+      border: 1px solid var(--primary-border); font-size: 12px; font-weight: 600;
+    }
+    .name-empty { font-size: 13px; color: var(--text-muted); }
+    .drawer-overlay, .modal-overlay {
+      position: fixed; inset: 0; background: rgba(15,23,42,0.35); z-index: 500;
+      opacity: 0; pointer-events: none; transition: opacity 0.25s;
+    }
+    .drawer-overlay.open, .modal-overlay.open { opacity: 1; pointer-events: auto; }
+    .drawer {
+      position: fixed; top: 0; right: 0; bottom: 0; width: var(--drawer-w); z-index: 501;
+      background: rgba(255,255,255,0.98); backdrop-filter: blur(12px);
+      box-shadow: -8px 0 40px rgba(30,40,60,0.18);
+      transform: translateX(100%); transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
+      display: flex; flex-direction: column;
+      pointer-events: none; visibility: hidden;
+    }
+    .drawer.open { transform: translateX(0); pointer-events: auto; visibility: visible; }
+    .drawer-header { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+    .drawer-header h2 { font-size: 14px; font-weight: 700; }
+    .drawer-header p { font-size: 11px; color: var(--text-muted); margin-top: 2px; line-height: 1.35; }
+    .drawer-close { width: 26px; height: 26px; border: none; background: #f1f5f9; border-radius: 6px; cursor: pointer; font-size: 15px; flex-shrink: 0; }
+    .drawer-body { flex: 1; overflow-y: auto; padding: 10px 14px 16px; }
+    .rule-section { margin-bottom: 22px; }
+    .rule-section h3 { font-size: 14px; font-weight: 700; color: var(--accent-rule); margin-bottom: 8px; }
+    .rule-section h3 span {
+      display: inline-flex; width: 22px; height: 22px; align-items: center; justify-content: center;
+      background: #ecfeff; color: var(--accent-rule); border-radius: 6px; font-size: 12px; margin-right: 8px;
+    }
+    .rule-content { font-size: 13px; color: var(--text-secondary); line-height: 1.65; }
+    .rule-content ul, .rule-content ol { padding-left: 18px; margin-top: 6px; }
+    .rule-content ul ul { margin-top: 4px; margin-bottom: 6px; }
+    .rule-content li { margin-bottom: 5px; }
+    .rule-content code { font-family: ui-monospace, monospace; font-size: 12px; background: #f1f5f9; padding: 1px 5px; border-radius: 4px; }
+    .modal {
+      position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.95);
+      width: 520px; max-width: calc(100vw - 32px); max-height: 85vh; z-index: 501;
+      background: #fff; border-radius: var(--radius-lg); box-shadow: 0 16px 48px rgba(30,40,60,0.2);
+      opacity: 0; pointer-events: none; transition: all 0.22s ease-out;
+      display: flex; flex-direction: column;
+    }
+    .modal-overlay.open .modal { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
+    .modal-header { padding: 16px 20px; border-bottom: 1px solid var(--border); font-size: 15px; font-weight: 700; flex-shrink: 0; }
+    .modal-header p { font-size: 12px; color: var(--text-muted); font-weight: 400; margin-top: 4px; }
+    .modal-body { padding: 16px 20px; overflow-y: auto; }
+    .modal-footer { padding: 12px 20px 16px; display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid var(--border); flex-shrink: 0; }
+    .flow-page-intro { padding: 16px 18px 0; font-size: 12px; color: var(--text-muted); line-height: 1.55; }
+    .flow-svg-wrap { overflow: auto; padding: 16px 18px 24px; max-height: 72vh; border-top: 1px solid var(--border); }
+    .flow-svg-wrap svg { display: block; margin: 0 auto; min-width: 920px; }
+    .flow-edges line, .flow-edges polyline { stroke: #64748b; stroke-width: 2; fill: none; }
+    .flow-edges.edge-loop line, .flow-edges.edge-loop polyline { stroke-dasharray: 6 4; }
+    .flow-legend { display: flex; flex-wrap: wrap; gap: 12px; padding: 0 18px 20px; font-size: 11px; color: var(--text-muted); }
+    .flow-legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 4px; vertical-align: -2px; }
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: #1e293b; color: #fff; padding: 10px 18px; border-radius: 999px; font-size: 13px;
+      opacity: 0; transition: all 0.25s; z-index: 600; pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand">
+        <div class="brand-icon">迭</div>
+        <div>
+          <div class="brand-text">右豹迭代需求记录</div>
+          <div class="brand-sub">PRD Demo · 产品交付研发</div>
+        </div>
+      </div>
+      <span class="sprint-pill">YBDD2.0 · 迭代 v1</span>
+    </div>
+    <div class="sidebar-scroll" data-iteration-sidebar></div>
+    <div class="sidebar-foot">FR-011 · 机构导师看板<br />管理后台 / 业务流程</div>
+  </aside>
+
+  <main class="main">
+    <nav class="breadcrumb">
+      <a href="framework-shell.html">Sprint 概览</a>
+      <span> / 导师 / 机构导师看板</span>
+    </nav>
+
+    <header class="page-header">
+      <div>
+        <h1>
+          机构导师看板
+          <span class="badge badge-fr">FR-011</span>
+          <span class="badge badge-version">v1 当前</span>
+        </h1>
+        <p class="page-desc">以<strong>机构</strong>为看板主对象，查看该机构下的导师、导师团与社群聚合数据。点击导师数量下钻导师明细；导师行的导师团 / 社群数量弹窗列出名称。<strong>会员累计收益按会员加入时间窗口统计</strong>，加入之前与解绑之后的收益不计入。<strong>无 C 端呈现</strong>。</p>
+      </div>
+      <div class="page-header-actions">
+        <button class="btn btn-rule" id="toggleRuleDrawer" type="button">📋 需求规则</button>
+      </div>
+    </header>
+
+    <div class="page-tab-bar" role="tablist">
+      <button type="button" class="active" data-page="view-admin" role="tab">管理后台</button>
+      <button type="button" data-page="view-flow" role="tab">业务流程</button>
+    </div>
+
+    <div id="view-admin" class="page-view active">
+      <div id="panel-orgs" class="admin-panel active">
+        <div class="glass-card">
+          <div class="stats-bar">
+            <div class="stat-item">
+              <div class="label">机构数</div>
+              <div class="value" id="statOrgCount">0</div>
+            </div>
+            <div class="stat-item">
+              <div class="label">导师合计</div>
+              <div class="value info" id="statMentorCount">0</div>
+            </div>
+            <div class="stat-item">
+              <div class="label">会员合计</div>
+              <div class="value" id="statMemberCount">0</div>
+            </div>
+            <div class="stat-item">
+              <div class="label">会员累计收益</div>
+              <div class="value" id="statRevenue">¥0</div>
+            </div>
+          </div>
+          <div class="table-toolbar">
+            <div>
+              <h3>机构看板</h3>
+              <p class="cell-sub" style="margin-top:4px;font-size:12px;color:var(--text-muted);">数量为机构下去重聚合；点击导师数量查看该机构导师。会员累计收益只计加入后、解绑前。</p>
+            </div>
+          </div>
+          <div class="filter-bar">
+            <div class="form-field">
+              <label>机构名称</label>
+              <input id="orgNameQ" type="text" placeholder="如：星河文化" />
+            </div>
+            <div class="filter-actions">
+              <button class="btn-ghost-sm" type="button" onclick="resetOrgFilter()">重置</button>
+              <button class="btn btn-primary btn-sm" type="button" onclick="queryOrgs()">查询</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table id="orgTable">
+              <colgroup>
+                <col style="width:180px" />
+                <col style="width:110px" />
+                <col style="width:120px" />
+                <col style="width:110px" />
+                <col style="width:110px" />
+                <col style="width:140px" />
+                <col style="width:160px" />
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>机构名称</th>
+                  <th>社群数量</th>
+                  <th>导师团数量</th>
+                  <th>导师数量</th>
+                  <th>会员数量</th>
+                  <th title="按会员加入时间统计：加入之前与解绑之后的收益不计入">会员累计收益</th>
+                  <th>更新时间</th>
+                </tr>
+              </thead>
+              <tbody id="orgBody"></tbody>
+            </table>
+          </div>
+          <div class="pager">
+            <span id="orgPager">共 0 条</span>
+            <span>第 1/1 页</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="panel-mentors" class="admin-panel">
+        <div class="glass-card">
+          <div class="stats-bar">
+            <div class="stat-item">
+              <div class="label">本机构导师</div>
+              <div class="value info" id="mentorStatCount">0</div>
+            </div>
+            <div class="stat-item">
+              <div class="label">导师会员合计</div>
+              <div class="value" id="mentorStatMembers">0</div>
+            </div>
+            <div class="stat-item">
+              <div class="label">导师会员收益合计</div>
+              <div class="value" id="mentorStatRevenue">¥0</div>
+            </div>
+            <div class="stat-item">
+              <div class="label">机构更新时间</div>
+              <div class="value" id="mentorStatUpdated" style="font-size:14px;">—</div>
+            </div>
+          </div>
+          <div class="table-toolbar">
+            <div>
+              <button class="detail-back" type="button" onclick="backToOrgs()">← 返回机构列表</button>
+              <h3 id="mentorTitle">导师明细</h3>
+              <p class="cell-sub" id="mentorSub" style="margin-top:4px;font-size:12px;color:var(--text-muted);">点击关联导师团数量或社群数量，弹窗查看名称。会员收益只计该会员加入本导师后、解绑前。</p>
+            </div>
+          </div>
+          <div class="filter-bar">
+            <div class="form-field">
+              <label>导师名称</label>
+              <input id="mentorNameQ" type="text" placeholder="如：林晓舟" />
+            </div>
+            <div class="form-field">
+              <label>导师身份</label>
+              <select id="mentorRoleQ">
+                <option value="">全部</option>
+                <option value="主导师">主导师</option>
+                <option value="协同导师">协同导师</option>
+                <option value="见习导师">见习导师</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>右豹ID</label>
+              <input id="mentorYbQ" type="text" placeholder="YB8821001" />
+            </div>
+            <div class="filter-actions">
+              <button class="btn-ghost-sm" type="button" onclick="resetMentorFilter()">重置</button>
+              <button class="btn btn-primary btn-sm" type="button" onclick="queryMentors()">查询</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table id="mentorTable">
+              <colgroup>
+                <col style="width:130px" />
+                <col style="width:110px" />
+                <col style="width:130px" />
+                <col style="width:140px" />
+                <col style="width:110px" />
+                <col style="width:110px" />
+                <col style="width:130px" />
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>导师名称</th>
+                  <th>导师身份</th>
+                  <th>右豹ID</th>
+                  <th>关联导师团数量</th>
+                  <th>社群数量</th>
+                  <th>会员数量</th>
+                  <th title="按会员加入该导师的时间统计：加入之前与解绑之后的收益不计入">会员收益</th>
+                </tr>
+              </thead>
+              <tbody id="mentorBody"></tbody>
+            </table>
+          </div>
+          <div class="pager">
+            <span id="mentorPager">共 0 条</span>
+            <span>第 1/1 页</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="view-flow" class="page-view">
+      <div class="glass-card">
+        <p class="flow-page-intro">运营打开看板并按机构名称查询 → 后端按机构聚合社群 / 导师团 / 导师 / 会员 → 逐笔收益判定是否落在会员加入后、解绑前，窗口外不计入累计收益 → 点击导师数量（且 &gt; 0）下钻导师列表 → 点击导师团或社群数量（且 &gt; 0）弹窗列出名称。数量为 0 不可下钻。无 C 端。</p>
+        <div class="flow-svg-wrap">
+          <svg width="980" height="1030" viewBox="0 0 980 1030" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <marker id="flow-arrow-1" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+                <path d="M0,0 L10,5 L0,10 Z" fill="#64748b"/>
+              </marker>
+              <marker id="flow-arrow-1-block" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+                <path d="M0,0 L10,5 L0,10 Z" fill="#dc2626"/>
+              </marker>
+            </defs>
+
+            <g class="flow-edges" marker-end="url(#flow-arrow-1)">
+              <polyline points="490,52 490,68" />
+              <polyline points="490,116 490,140" />
+              <polyline points="490,188 490,212" />
+              <polyline points="490,300 490,324" />
+              <polyline points="490,364 490,388" />
+              <polyline points="490,476 490,500" />
+              <polyline points="490,588 490,612" />
+              <polyline points="490,660 490,684" />
+              <polyline points="490,724 490,748" />
+              <polyline points="490,836 490,860" />
+              <polyline points="490,940 490,964" />
+              <polyline points="405,432 240,432" />
+              <polyline points="575,256 700,256" />
+            </g>
+            <g class="flow-edges" marker-end="url(#flow-arrow-1-block)">
+              <polyline points="575,544 700,544" />
+              <polyline points="560,900 700,900" />
+            </g>
+            <g class="flow-edges edge-loop" marker-end="url(#flow-arrow-1)">
+              <polyline points="405,792 90,792 90,344 310,344" />
+              <polyline points="310,988 60,988 60,704 310,704" />
+            </g>
+
+            <g class="flow-nodes" font-family="Inter, PingFang SC, sans-serif">
+              <rect x="330" y="16" width="320" height="36" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
+              <text x="490" y="39" text-anchor="middle" font-size="12" font-weight="600" fill="#18222f">打开机构导师看板</text>
+
+              <rect x="310" y="68" width="360" height="48" rx="8" fill="#eff6ff" stroke="#2563eb"/>
+              <text x="490" y="88" text-anchor="middle" font-size="12" font-weight="600" fill="#18222f">输入机构名称并查询</text>
+              <text x="490" y="104" text-anchor="middle" font-size="10" fill="#64748b">重置只清空条件，不自动查询</text>
+
+              <rect x="310" y="140" width="360" height="48" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
+              <text x="490" y="160" text-anchor="middle" font-size="12" font-weight="600" fill="#18222f">按机构聚合看板数据</text>
+              <text x="490" y="176" text-anchor="middle" font-size="10" fill="#64748b">社群 / 导师团 / 导师 / 会员</text>
+
+              <polygon points="490,212 575,256 490,300 405,256" fill="#fffbeb" stroke="#d97706"/>
+              <text x="490" y="252" text-anchor="middle" font-size="11" font-weight="600" fill="#92400e">收益在绑定期内?</text>
+              <text x="490" y="268" text-anchor="middle" font-size="10" fill="#64748b">加入后且解绑前</text>
+              <text x="588" y="252" font-size="10" fill="#dc2626">否</text>
+              <text x="500" y="308" font-size="10" fill="#16a34a">是</text>
+
+              <rect x="700" y="236" width="240" height="40" rx="8" fill="#f1f5f9" stroke="#94a3b8"/>
+              <text x="820" y="261" text-anchor="middle" font-size="11" fill="#64748b">不计入对应累计收益</text>
+
+              <rect x="310" y="324" width="360" height="40" rx="8" fill="#eff6ff" stroke="#2563eb"/>
+              <text x="490" y="349" text-anchor="middle" font-size="12" fill="#18222f">渲染机构列表</text>
+
+              <polygon points="490,388 575,432 490,476 405,432" fill="#fffbeb" stroke="#d97706"/>
+              <text x="490" y="428" text-anchor="middle" font-size="11" font-weight="600" fill="#92400e">点击导师数量?</text>
+              <text x="300" y="428" font-size="10" fill="#dc2626">否</text>
+              <text x="500" y="484" font-size="10" fill="#16a34a">是</text>
+
+              <rect x="40" y="412" width="200" height="40" rx="8" fill="#f1f5f9" stroke="#94a3b8"/>
+              <text x="140" y="437" text-anchor="middle" font-size="11" fill="#64748b">继续浏览机构列表</text>
+
+              <polygon points="490,500 575,544 490,588 405,544" fill="#fffbeb" stroke="#d97706"/>
+              <text x="490" y="548" text-anchor="middle" font-size="11" font-weight="600" fill="#92400e">导师数量 &gt; 0?</text>
+              <text x="588" y="540" font-size="10" fill="#dc2626">否</text>
+              <text x="500" y="596" font-size="10" fill="#16a34a">是</text>
+
+              <rect x="700" y="524" width="240" height="40" rx="8" fill="#fef2f2" stroke="#dc2626"/>
+              <text x="820" y="549" text-anchor="middle" font-size="11" fill="#991b1b">阻断 · 0 不可下钻</text>
+
+              <rect x="310" y="612" width="360" height="48" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
+              <text x="490" y="632" text-anchor="middle" font-size="12" font-weight="600" fill="#18222f">加载该机构导师明细</text>
+              <text x="490" y="648" text-anchor="middle" font-size="10" fill="#64748b">收益同样只计加入后、解绑前</text>
+
+              <rect x="310" y="684" width="360" height="40" rx="8" fill="#eff6ff" stroke="#2563eb"/>
+              <text x="490" y="709" text-anchor="middle" font-size="12" fill="#18222f">展示导师列表</text>
+
+              <polygon points="490,748 575,792 490,836 405,792" fill="#fffbeb" stroke="#d97706"/>
+              <text x="490" y="788" text-anchor="middle" font-size="11" font-weight="600" fill="#92400e">点击团或社群数?</text>
+              <text x="268" y="788" font-size="10" fill="#64748b">否 · 回机构列表</text>
+              <text x="500" y="844" font-size="10" fill="#16a34a">是</text>
+
+              <polygon points="490,860 560,900 490,940 420,900" fill="#fffbeb" stroke="#d97706"/>
+              <text x="490" y="904" text-anchor="middle" font-size="11" font-weight="600" fill="#92400e">数量 &gt; 0?</text>
+              <text x="572" y="896" font-size="10" fill="#dc2626">否</text>
+              <text x="500" y="948" font-size="10" fill="#16a34a">是</text>
+
+              <rect x="700" y="880" width="240" height="40" rx="8" fill="#fef2f2" stroke="#dc2626"/>
+              <text x="820" y="905" text-anchor="middle" font-size="11" fill="#991b1b">阻断 · 0 不可弹窗</text>
+
+              <rect x="310" y="964" width="360" height="48" rx="8" fill="#eff6ff" stroke="#2563eb"/>
+              <text x="490" y="984" text-anchor="middle" font-size="12" font-weight="600" fill="#18222f">弹窗展示导师团 / 社群名称</text>
+              <text x="490" y="1000" text-anchor="middle" font-size="10" fill="#64748b">关闭后回到导师列表</text>
+            </g>
+          </svg>
+        </div>
+        <div class="flow-legend">
+          <span><i style="background:#eff6ff;border:1px solid #2563eb"></i>前端查询 / 展示 / 弹窗</span>
+          <span><i style="background:#f0fdf4;border:1px solid #16a34a"></i>后端聚合 / 加载</span>
+          <span><i style="background:#fffbeb;border:1px solid #d97706"></i>校验菱形</span>
+          <span><i style="background:#fef2f2;border:1px solid #dc2626"></i>阻断</span>
+          <span><i style="background:#f1f5f9;border:1px solid #94a3b8"></i>跳过 / 停留</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="modal-overlay" id="nameOverlay">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div>
+          <span id="nameModalTitle">关联名称</span>
+          <p id="nameModalSub"></p>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="name-list" id="nameModalList"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" type="button" onclick="closeNameModal()">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="drawer-overlay" id="ruleOverlay" onclick="setRuleDrawer(false)"></div>
+  <aside class="drawer" id="ruleDrawer">
+    <div class="drawer-header">
+      <div>
+        <h2>FR-011 · 需求规则 · v1</h2>
+        <p>后台需求 · 机构导师看板</p>
+      </div>
+      <button class="drawer-close" type="button" onclick="setRuleDrawer(false)">×</button>
+    </div>
+    <div class="drawer-body">
+      <div class="rule-section">
+        <h3><span>1</span>业务目标</h3>
+        <div class="rule-content">
+          <p>运营以<strong>机构</strong>为主要对象，查看该机构下的导师、导师团与社群聚合数据，并下钻到具体导师。本 FR <strong>无 C 端呈现</strong>。</p>
+        </div>
+      </div>
+      <div class="rule-section">
+        <h3><span>2</span>数据表与字段</h3>
+        <div class="rule-content">
+          <p><strong>机构看板（主表）</strong></p>
+          <ul>
+            <li><strong>机构名称</strong>：机构主对象。</li>
+            <li><strong>社群数量</strong>：该机构下去重后的社群数，只读展示，不可点击。</li>
+            <li><strong>导师团数量</strong>：该机构下去重后的导师团数，只读展示，不可点击。</li>
+            <li><strong>导师数量</strong>：该机构下导师数；<strong>大于 0 时可点击</strong>，进入该机构导师明细。</li>
+            <li><strong>会员数量</strong>：该机构下会员<strong>去重</strong>人数。</li>
+            <li><strong>会员累计收益</strong>：该机构下会员累计收益（会员去重后汇总）。<strong>按会员加入该机构的时间窗口统计</strong>：仅计入加入时刻起（含）至解绑时刻止（不含）产生的收益；<strong>加入之前</strong>与<strong>解绑之后</strong>的收益不计入。</li>
+            <li><strong>更新时间</strong>：本行看板数据最近一次聚合刷新时间。</li>
+          </ul>
+          <p style="margin-top:10px;"><strong>导师明细（下钻表）</strong></p>
+          <ul>
+            <li><strong>导师名称</strong>：导师在机构内的展示名。</li>
+            <li><strong>导师身份</strong>：导师在机构内的角色。本 Demo 枚举：<code>主导师</code> / <code>协同导师</code> / <code>见习导师</code>。</li>
+            <li><strong>右豹ID</strong>：导师的右豹帐号 ID，等宽展示。</li>
+            <li><strong>关联导师团数量</strong>：该导师关联的导师团数；<strong>大于 0 时可点击</strong>，弹窗列出导师团名称。</li>
+            <li><strong>社群数量</strong>：该导师关联的社群数；<strong>大于 0 时可点击</strong>，弹窗列出社群名称。</li>
+            <li><strong>会员数量</strong>：该导师名下会员数。</li>
+            <li><strong>会员收益</strong>：该导师名下会员收益合计。口径与机构「会员累计收益」相同，窗口按会员加入<strong>该导师</strong>的时间计算：加入之前与解绑之后不计入。</li>
+          </ul>
+        </div>
+      </div>
+      <div class="rule-section">
+        <h3><span>3</span>列表与筛选</h3>
+        <div class="rule-content">
+          <ul>
+            <li>机构列表筛选项：<strong>机构名称</strong>（模糊匹配）。查询刷新列表，页码重置至第 1 页。</li>
+            <li>重置：清空筛选值，<strong>不自动触发查询</strong>，Toast 提示「筛选条件已重置」。</li>
+            <li>导师列表示选项：导师名称（模糊）、导师身份（枚举）、右豹ID（精确或前缀）。规则同机构列表。</li>
+            <li>下钻导师列表时，导师筛选项重置为空。</li>
+            <li>机构列表顶部汇总：当前查询结果的机构数、导师合计、会员合计、会员累计收益合计。</li>
+          </ul>
+        </div>
+      </div>
+      <div class="rule-section">
+        <h3><span>4</span>下钻与弹窗</h3>
+        <div class="rule-content">
+          <ul>
+            <li>点击机构行<strong>导师数量</strong>：进入该机构导师明细页，页头展示机构名称，可返回机构列表。</li>
+            <li>点击导师行<strong>关联导师团数量</strong>：弹窗标题「关联导师团」，列出该导师的导师团名称。</li>
+            <li>点击导师行<strong>社群数量</strong>：弹窗标题「关联社群」，列出该导师的社群名称。</li>
+            <li>弹窗仅展示名称，不提供跳转与编辑。点击遮罩或「关闭」、按 ESC 关闭。</li>
+          </ul>
+        </div>
+      </div>
+      <div class="rule-section">
+        <h3><span>5</span>边界规则</h3>
+        <div class="rule-content">
+          <ul>
+            <li>数量为 <strong>0</strong> 的导师数量 / 关联导师团数量 / 社群数量：灰色数字，<strong>不可点击</strong>。</li>
+            <li>机构侧「社群数量」「导师团数量」即使大于 0 也<strong>不可点击</strong>；名称弹窗只出现在导师明细。</li>
+            <li>机构「会员数量」按机构会员<strong>去重</strong>；导师「会员数量」按该导师名下统计。同一会员可关联多名导师，故各导师会员数之和<strong>可以大于</strong>机构会员数。</li>
+            <li><strong>会员累计收益 / 会员收益统计窗口</strong>：
+              <ul>
+                <li>以会员与对应对象（机构 / 导师）的<strong>加入时间、解绑时间</strong>为准，不按会员全生命周期收益。</li>
+                <li>一笔收益的发生时间满足 <code>加入时间 ≤ 发生时间 &lt; 解绑时间</code> 才计入对应对象；未解绑则右端为统计截止（看板更新时间）。</li>
+                <li>加入之前的历史收益、解绑之后产生的收益，均<strong>不作为对应对象的收益</strong>。</li>
+                <li>同一会员多次加入 / 解绑：各绑定期分别计算后加总；间隙期不计入。</li>
+                <li>同一会员同时挂在多名导师下：各导师只计该会员挂在自己名下期间的收益，互不挪用。</li>
+              </ul>
+            </li>
+            <li>机构「社群数量 / 导师团数量」为机构下去重；导师侧为该导师关联数，不做机构级去重展示。</li>
+            <li>更新时间以数据聚合刷新为准，不随页面打开时间变化；未解绑会员的收益窗口右端对齐该更新时间。</li>
+            <li>本 FR 不提供新增 / 编辑 / 删除机构或导师；Demo 数据不持久化。</li>
+          </ul>
+        </div>
+      </div>
+      <div class="rule-section">
+        <h3><span>6</span>业务流程</h3>
+        <div class="rule-content">
+          <p>见页内 Tab <strong>「业务流程」</strong>。</p>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="toast" id="toast"></div>
+  <script src="sidebar-nav.js"></script>
+  <script>
+    var ORGS = [
+      {
+        id: 'ORG-01',
+        name: '星河文化机构',
+        memberCount: 860,
+        revenue: 186420.5,
+        updatedAt: '2026-09-07 10:20',
+        mentors: [
+          { name: '林晓舟', role: '主导师', ybId: 'YB8821001', groups: ['星河主导师团', '漫剧航海团'], communities: ['星河·早鸟社群', '星河·进阶营', '星河·夜读会'], memberCount: 320, revenue: 52800 },
+          { name: '周启明', role: '主导师', ybId: 'YB8821044', groups: ['星河主导师团'], communities: ['星河·进阶营', '星河·短剧特训'], memberCount: 210, revenue: 41260.5 },
+          { name: '苏晚晴', role: '协同导师', ybId: 'YB8821108', groups: ['星河陪跑团'], communities: ['星河·早鸟社群', '星河·陪跑营'], memberCount: 168, revenue: 28640 },
+          { name: '韩予安', role: '协同导师', ybId: 'YB8821190', groups: ['漫剧航海团', '星河陪跑团'], communities: ['星河·夜读会'], memberCount: 142, revenue: 22180 },
+          { name: '陈知夏', role: '见习导师', ybId: 'YB8821302', groups: ['星河见习团'], communities: ['星河·新人营'], memberCount: 86, revenue: 9640 },
+          { name: '许清和', role: '见习导师', ybId: 'YB8821316', groups: ['星河见习团'], communities: ['星河·新人营', '星河·早鸟社群'], memberCount: 74, revenue: 8120 }
+        ]
+      },
+      {
+        id: 'ORG-02',
+        name: '青藤成长学院',
+        memberCount: 540,
+        revenue: 97880,
+        updatedAt: '2026-09-07 09:05',
+        mentors: [
+          { name: '顾南山', role: '主导师', ybId: 'YB7732001', groups: ['青藤主导师团'], communities: ['青藤·成长营', '青藤·家长会'], memberCount: 260, revenue: 48600 },
+          { name: '叶书宁', role: '协同导师', ybId: 'YB7732088', groups: ['青藤陪跑团', '青藤主导师团'], communities: ['青藤·成长营'], memberCount: 190, revenue: 31240 },
+          { name: '何予川', role: '见习导师', ybId: 'YB7732210', groups: ['青藤见习团'], communities: ['青藤·入门营'], memberCount: 120, revenue: 18040 }
+        ]
+      },
+      {
+        id: 'ORG-03',
+        name: '漫剧航海工作室',
+        memberCount: 312,
+        revenue: 64320,
+        updatedAt: '2026-09-06 18:40',
+        mentors: [
+          { name: '沈星野', role: '主导师', ybId: 'YB6610091', groups: ['航海主团', '打榜特训团'], communities: ['航海·公开社群', '航海·打榜群', '航海·复盘群', '航海·物料群'], memberCount: 198, revenue: 42100 },
+          { name: '梁小满', role: '协同导师', ybId: 'YB6610144', groups: ['打榜特训团'], communities: ['航海·打榜群', '航海·复盘群'], memberCount: 146, revenue: 22220 }
+        ]
+      },
+      {
+        id: 'ORG-04',
+        name: '零点读书会',
+        memberCount: 0,
+        revenue: 0,
+        updatedAt: '2026-09-05 12:00',
+        mentors: []
+      },
+      {
+        id: 'ORG-05',
+        name: '云杉教育联盟',
+        memberCount: 48,
+        revenue: 6320,
+        updatedAt: '2026-09-07 08:12',
+        mentors: [
+          { name: '江晚', role: '主导师', ybId: 'YB5507003', groups: ['云杉主团'], communities: ['云杉·联盟社群'], memberCount: 48, revenue: 6320 },
+          { name: '陆知秋', role: '见习导师', ybId: 'YB5507088', groups: [], communities: [], memberCount: 0, revenue: 0 }
+        ]
+      }
+    ];
+
+    var orgApplied = { name: '' };
+    var mentorApplied = { name: '', role: '', ybId: '' };
+    var currentOrgId = null;
+    var currentView = 'orgs';
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function formatMoney(n) {
+      var num = Number(n) || 0;
+      return '¥' + num.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function uniqueCount(mentors, key) {
+      var set = {};
+      (mentors || []).forEach(function (m) {
+        (m[key] || []).forEach(function (name) { set[name] = true; });
+      });
+      return Object.keys(set).length;
+    }
+
+    function decorateOrg(org) {
+      return {
+        id: org.id,
+        name: org.name,
+        memberCount: org.memberCount,
+        revenue: org.revenue,
+        updatedAt: org.updatedAt,
+        mentors: org.mentors,
+        communityCount: uniqueCount(org.mentors, 'communities'),
+        groupCount: uniqueCount(org.mentors, 'groups'),
+        mentorCount: org.mentors.length
+      };
+    }
+
+    function filteredOrgs() {
+      var q = (orgApplied.name || '').trim().toLowerCase();
+      return ORGS.map(decorateOrg).filter(function (org) {
+        return !q || org.name.toLowerCase().indexOf(q) !== -1;
+      });
+    }
+
+    function findOrg(id) {
+      for (var i = 0; i < ORGS.length; i++) {
+        if (ORGS[i].id === id) return decorateOrg(ORGS[i]);
+      }
+      return null;
+    }
+
+    function filteredMentors(org) {
+      var nameQ = (mentorApplied.name || '').trim().toLowerCase();
+      var roleQ = mentorApplied.role || '';
+      var ybQ = (mentorApplied.ybId || '').trim().toLowerCase();
+      return org.mentors.filter(function (m) {
+        if (nameQ && m.name.toLowerCase().indexOf(nameQ) === -1) return false;
+        if (roleQ && m.role !== roleQ) return false;
+        if (ybQ && m.ybId.toLowerCase().indexOf(ybQ) !== 0) return false;
+        return true;
+      });
+    }
+
+    function emptyRow(cols, title, desc) {
+      return '<tr><td colspan="' + cols + '"><div class="empty-state">' +
+        '<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="10" y="14" width="44" height="36" rx="4"/><path d="M10 24h44M22 34h20M22 42h12"/></svg>' +
+        '<strong>' + title + '</strong>' +
+        '<div>' + desc + '</div>' +
+        '</div></td></tr>';
+    }
+
+    function countCell(n, onclick) {
+      if (!n) return '<span class="muted-num">0</span>';
+      return '<button type="button" class="link num" onclick="' + onclick + '">' + n + '</button>';
+    }
+
+    function roleTag(role) {
+      var cls = role === '主导师' ? 'tag-blue' : (role === '协同导师' ? 'tag-purple' : 'tag-gray');
+      return '<span class="tag ' + cls + '">' + escapeHtml(role) + '</span>';
+    }
+
+    function renderOrgs() {
+      var list = filteredOrgs();
+      var body = document.getElementById('orgBody');
+      var mentorSum = 0;
+      var memberSum = 0;
+      var revenueSum = 0;
+      list.forEach(function (org) {
+        mentorSum += org.mentorCount;
+        memberSum += org.memberCount;
+        revenueSum += org.revenue;
+      });
+      document.getElementById('statOrgCount').textContent = String(list.length);
+      document.getElementById('statMentorCount').textContent = String(mentorSum);
+      document.getElementById('statMemberCount').textContent = String(memberSum);
+      document.getElementById('statRevenue').textContent = formatMoney(revenueSum);
+      document.getElementById('orgPager').textContent = '共 ' + list.length + ' 条';
+
+      if (!list.length) {
+        body.innerHTML = emptyRow(7, '暂无数据', '没有匹配的机构，请调整筛选后查询');
+        return;
+      }
+
+      body.innerHTML = list.map(function (org) {
+        return '<tr>' +
+          '<td title="' + escapeHtml(org.name) + '">' + escapeHtml(org.name) + '</td>' +
+          '<td class="num">' + org.communityCount + '</td>' +
+          '<td class="num">' + org.groupCount + '</td>' +
+          '<td>' + countCell(org.mentorCount, "openMentors('" + org.id + "')") + '</td>' +
+          '<td class="num">' + org.memberCount + '</td>' +
+          '<td class="money">' + formatMoney(org.revenue) + '</td>' +
+          '<td class="num">' + escapeHtml(org.updatedAt) + '</td>' +
+          '</tr>';
+      }).join('');
+    }
+
+    function renderMentors() {
+      var org = findOrg(currentOrgId);
+      if (!org) {
+        backToOrgs();
+        return;
+      }
+      var list = filteredMentors(org);
+      var memberSum = 0;
+      var revenueSum = 0;
+      list.forEach(function (m) {
+        memberSum += m.memberCount;
+        revenueSum += m.revenue;
+      });
+      document.getElementById('mentorTitle').textContent = org.name + ' · 导师明细';
+      document.getElementById('mentorStatCount').textContent = String(list.length);
+      document.getElementById('mentorStatMembers').textContent = String(memberSum);
+      document.getElementById('mentorStatRevenue').textContent = formatMoney(revenueSum);
+      document.getElementById('mentorStatUpdated').textContent = org.updatedAt;
+      document.getElementById('mentorPager').textContent = '共 ' + list.length + ' 条';
+
+      var body = document.getElementById('mentorBody');
+      if (!list.length) {
+        body.innerHTML = emptyRow(7, '暂无数据', org.mentorCount === 0 ? '该机构下暂无导师' : '没有匹配的导师，请调整筛选后查询');
+        return;
+      }
+
+      body.innerHTML = list.map(function (m, idx) {
+        var groupN = m.groups.length;
+        var commN = m.communities.length;
+        return '<tr>' +
+          '<td title="' + escapeHtml(m.name) + '">' + escapeHtml(m.name) + '</td>' +
+          '<td>' + roleTag(m.role) + '</td>' +
+          '<td class="mono" title="' + escapeHtml(m.ybId) + '">' + escapeHtml(m.ybId) + '</td>' +
+          '<td>' + countCell(groupN, "openNameModal('" + org.id + "'," + idx + ",'groups')") + '</td>' +
+          '<td>' + countCell(commN, "openNameModal('" + org.id + "'," + idx + ",'communities')") + '</td>' +
+          '<td class="num">' + m.memberCount + '</td>' +
+          '<td class="money">' + formatMoney(m.revenue) + '</td>' +
+          '</tr>';
+      }).join('');
+    }
+
+    function showPanel(view) {
+      currentView = view;
+      document.getElementById('panel-orgs').classList.toggle('active', view === 'orgs');
+      document.getElementById('panel-mentors').classList.toggle('active', view === 'mentors');
+      var params = new URLSearchParams(location.search);
+      params.set('tab', 'admin');
+      if (view === 'mentors' && currentOrgId) {
+        params.set('org', currentOrgId);
+      } else {
+        params.delete('org');
+      }
+      history.replaceState(null, '', '?' + params.toString());
+    }
+
+    function openMentors(orgId) {
+      var org = findOrg(orgId);
+      if (!org || !org.mentorCount) return;
+      currentOrgId = orgId;
+      mentorApplied = { name: '', role: '', ybId: '' };
+      document.getElementById('mentorNameQ').value = '';
+      document.getElementById('mentorRoleQ').value = '';
+      document.getElementById('mentorYbQ').value = '';
+      renderMentors();
+      showPanel('mentors');
+    }
+
+    function backToOrgs() {
+      currentOrgId = null;
+      closeNameModal();
+      showPanel('orgs');
+    }
+
+    function queryOrgs() {
+      orgApplied.name = document.getElementById('orgNameQ').value;
+      renderOrgs();
+    }
+
+    function resetOrgFilter() {
+      document.getElementById('orgNameQ').value = '';
+      showToast('筛选条件已重置');
+    }
+
+    function queryMentors() {
+      mentorApplied.name = document.getElementById('mentorNameQ').value;
+      mentorApplied.role = document.getElementById('mentorRoleQ').value;
+      mentorApplied.ybId = document.getElementById('mentorYbQ').value;
+      renderMentors();
+    }
+
+    function resetMentorFilter() {
+      document.getElementById('mentorNameQ').value = '';
+      document.getElementById('mentorRoleQ').value = '';
+      document.getElementById('mentorYbQ').value = '';
+      showToast('筛选条件已重置');
+    }
+
+    function openNameModal(orgId, filteredIndex, type) {
+      var org = findOrg(orgId);
+      if (!org) return;
+      var list = filteredMentors(org);
+      var mentor = list[filteredIndex];
+      if (!mentor) return;
+      var names = type === 'groups' ? mentor.groups : mentor.communities;
+      if (!names.length) return;
+      document.getElementById('nameModalTitle').textContent = type === 'groups' ? '关联导师团' : '关联社群';
+      document.getElementById('nameModalSub').textContent = org.name + ' · ' + mentor.name + ' · 共 ' + names.length + ' 个';
+      document.getElementById('nameModalList').innerHTML = names.map(function (n) {
+        return '<span class="name-chip">' + escapeHtml(n) + '</span>';
+      }).join('');
+      document.getElementById('nameOverlay').classList.add('open');
+    }
+
+    function closeNameModal() {
+      document.getElementById('nameOverlay').classList.remove('open');
+    }
+
+    function showToast(msg) {
+      var t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(function () { t.classList.remove('show'); }, 2200);
+    }
+
+    function setRuleDrawer(open) {
+      document.getElementById('ruleOverlay').classList.toggle('open', open);
+      document.getElementById('ruleDrawer').classList.toggle('open', open);
+      document.getElementById('toggleRuleDrawer').classList.toggle('active', open);
+    }
+
+    function switchPageTab(pageId, btn) {
+      document.querySelectorAll('.page-tab-bar button').forEach(function (b) { b.classList.remove('active'); });
+      document.querySelectorAll('.page-view').forEach(function (v) { v.classList.remove('active'); });
+      btn.classList.add('active');
+      document.getElementById(pageId).classList.add('active');
+      var tabMap = { 'view-admin': 'admin', 'view-flow': 'flow' };
+      var params = new URLSearchParams(location.search);
+      params.set('tab', tabMap[pageId] || 'admin');
+      if (pageId !== 'view-admin') params.delete('org');
+      else if (currentView === 'mentors' && currentOrgId) params.set('org', currentOrgId);
+      history.replaceState(null, '', '?' + params.toString());
+    }
+
+    function closeTopLayer() {
+      if (document.getElementById('nameOverlay').classList.contains('open')) return closeNameModal();
+      if (document.getElementById('ruleDrawer').classList.contains('open')) return setRuleDrawer(false);
+    }
+
+    function initPage() {
+      document.getElementById('toggleRuleDrawer').addEventListener('click', function () {
+        setRuleDrawer(!document.getElementById('ruleDrawer').classList.contains('open'));
+      });
+      document.querySelectorAll('.page-tab-bar button').forEach(function (btn) {
+        btn.addEventListener('click', function () { switchPageTab(btn.dataset.page, btn); });
+      });
+      document.getElementById('nameOverlay').addEventListener('click', function (e) {
+        if (e.target === this) closeNameModal();
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeTopLayer();
+      });
+      document.getElementById('orgNameQ').addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') queryOrgs();
+      });
+
+      renderOrgs();
+
+      var params = new URLSearchParams(location.search);
+      var tabPageMap = { admin: 'view-admin', flow: 'view-flow' };
+      var tab = params.get('tab') || 'admin';
+      var pageBtn = document.querySelector('[data-page="' + (tabPageMap[tab] || 'view-admin') + '"]');
+      if (pageBtn) switchPageTab(tabPageMap[tab] || 'view-admin', pageBtn);
+      var orgId = params.get('org');
+      if (tab === 'admin' && orgId && findOrg(orgId) && findOrg(orgId).mentorCount) {
+        openMentors(orgId);
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initPage);
+    } else {
+      initPage();
+    }
+  </script>
+</body>
+</html>

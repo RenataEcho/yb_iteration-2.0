@@ -144,6 +144,7 @@
     .status-select-wrap.badge-status-todo { background: #f8fafc; color: #64748b; border-color: #e2e8f0; }
     .status-select-wrap.badge-status-dev { background: #ecfeff; color: #0891b2; border-color: #a5f3fc; }
     .status-select-wrap.badge-status-live { background: var(--success-bg); color: var(--success); border-color: #bbf7d0; }
+    .status-select-wrap.badge-status-paused { background: #fffbeb; color: #d97706; border-color: #fde68a; }
     .status-select-wrap::after {
       content: '';
       position: absolute;
@@ -210,7 +211,7 @@
       <span class="sprint-pill">YBDD2.0 · 迭代 v1</span>
     </div>
     <div class="sidebar-scroll" data-iteration-sidebar></div>
-    <div class="sidebar-foot">迭代需求 · 归档需求 · 废纸篓 FR-001</div>
+    <div class="sidebar-foot">迭代需求 · 归档需求 · 废纸篓（已暂停）</div>
   </aside>
 
   <main class="main">
@@ -218,7 +219,7 @@
     <header class="page-header">
       <div class="page-header-left">
         <h1>YBDD2.0 · 迭代需求总览</h1>
-        <p class="page-desc">统一入口：「迭代需求」含进行中的专项；状态改为「已上线」后自动归入「归档需求」。暂不需要的需求归入「废纸篓」，如代发分配 (FR-001)。</p>
+        <p class="page-desc">统一入口：「迭代需求」含进行中的专项；状态改为「已上线」后自动归入「归档需求」；改为「已暂停」后归入「废纸篓」。</p>
       </div>
     </header>
 
@@ -233,7 +234,7 @@
       </div>
       <div class="summary-card">
         <div class="label">废纸篓 · FR 数</div>
-        <div class="value">1</div>
+        <div class="value" id="count-trash">1</div>
       </div>
       <div class="summary-card">
         <div class="label">状态</div>
@@ -257,6 +258,7 @@
             <option value="todo">待开始</option>
             <option value="dev" selected>开发中</option>
             <option value="live">已上线</option>
+            <option value="paused">已暂停</option>
           </select>
         </label>
       </div>
@@ -270,6 +272,7 @@
             <option value="todo">待开始</option>
             <option value="dev" selected>开发中</option>
             <option value="live">已上线</option>
+            <option value="paused">已暂停</option>
           </select>
         </label>
       </div>
@@ -283,6 +286,7 @@
             <option value="todo">待开始</option>
             <option value="dev" selected>开发中</option>
             <option value="live">已上线</option>
+            <option value="paused">已暂停</option>
           </select>
         </label>
       </div>
@@ -296,6 +300,7 @@
             <option value="todo">待开始</option>
             <option value="dev" selected>开发中</option>
             <option value="live">已上线</option>
+            <option value="paused">已暂停</option>
           </select>
         </label>
       </div>
@@ -309,6 +314,7 @@
             <option value="todo">待开始</option>
             <option value="dev" selected>开发中</option>
             <option value="live">已上线</option>
+            <option value="paused">已暂停</option>
           </select>
         </label>
       </div>
@@ -322,6 +328,7 @@
             <option value="todo" selected>待开始</option>
             <option value="dev">开发中</option>
             <option value="live">已上线</option>
+            <option value="paused">已暂停</option>
           </select>
         </label>
       </div>
@@ -335,6 +342,7 @@
             <option value="todo" selected>待开始</option>
             <option value="dev">开发中</option>
             <option value="live">已上线</option>
+            <option value="paused">已暂停</option>
           </select>
         </label>
       </div>
@@ -348,6 +356,35 @@
             <option value="todo" selected>待开始</option>
             <option value="dev">开发中</option>
             <option value="live">已上线</option>
+            <option value="paused">已暂停</option>
+          </select>
+        </label>
+      </div>
+      <div class="table-row" data-fr-row="FR-010" data-order="10">
+        <span class="badge badge-fr">FR-010</span>
+        <span><a href="fr-agent-cert.html">代理迭代V1.0</a></span>
+        <span class="badge badge-template">A</span>
+        <span class="badge badge-version">v1</span>
+        <label class="status-select-wrap badge-status-todo">
+          <select class="status-select" data-fr="FR-010" aria-label="调整 FR-010 状态">
+            <option value="todo" selected>待开始</option>
+            <option value="dev">开发中</option>
+            <option value="live">已上线</option>
+            <option value="paused">已暂停</option>
+          </select>
+        </label>
+      </div>
+      <div class="table-row" data-fr-row="FR-011" data-order="11">
+        <span class="badge badge-fr">FR-011</span>
+        <span><a href="fr-org-mentor-board.html">机构导师看板</a></span>
+        <span class="badge badge-template">A</span>
+        <span class="badge badge-version">v1</span>
+        <label class="status-select-wrap badge-status-todo">
+          <select class="status-select" data-fr="FR-011" aria-label="调整 FR-011 状态">
+            <option value="todo" selected>待开始</option>
+            <option value="dev">开发中</option>
+            <option value="live">已上线</option>
+            <option value="paused">已暂停</option>
           </select>
         </label>
       </div>
@@ -369,19 +406,23 @@
       <div class="table-head">
         <span>FR-ID</span><span>需求名称</span><span>模板</span><span>版本</span><span>状态</span>
       </div>
-      <div class="table-row">
+      <div id="fr-rows-trash">
+      <div class="table-row" data-fr-row="FR-001" data-order="1">
         <span class="badge badge-fr">FR-001</span>
         <span><a href="fr-opc-daifa-allocation.html">代发分配</a></span>
         <span class="badge badge-template">B + A</span>
         <span class="badge badge-version">v1</span>
-        <label class="status-select-wrap badge-status-todo">
-          <select class="status-select" data-fr="FR-001" data-scope="trash" aria-label="调整 FR-001 状态">
-            <option value="todo" selected>待开始</option>
+        <label class="status-select-wrap badge-status-paused">
+          <select class="status-select" data-fr="FR-001" aria-label="调整 FR-001 状态">
+            <option value="todo">待开始</option>
             <option value="dev">开发中</option>
             <option value="live">已上线</option>
+            <option value="paused" selected>已暂停</option>
           </select>
         </label>
       </div>
+      </div>
+      <div class="table-empty" id="fr-empty-trash">暂无已暂停的需求</div>
     </div>
 
     <div class="glass-card" style="padding:16px 18px;">
@@ -397,9 +438,10 @@
       var STATUS = {
         todo: { label: '待开始', cls: 'badge-status-todo', color: '#64748b' },
         dev: { label: '开发中', cls: 'badge-status-dev', color: '#0891b2' },
-        live: { label: '已上线', cls: 'badge-status-live', color: '#16a34a' }
+        live: { label: '已上线', cls: 'badge-status-live', color: '#16a34a' },
+        paused: { label: '已暂停', cls: 'badge-status-paused', color: '#d97706' }
       };
-      var CLASS_LIST = ['badge-status-todo', 'badge-status-dev', 'badge-status-live'];
+      var CLASS_LIST = ['badge-status-todo', 'badge-status-dev', 'badge-status-live', 'badge-status-paused'];
 
       function load() {
         try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); }
@@ -419,9 +461,9 @@
       function deriveSprintStatus(selects) {
         var values = [];
         selects.forEach(function (el) {
-          if (el.getAttribute('data-scope') !== 'trash') values.push(el.value);
+          if (el.value !== 'paused') values.push(el.value);
         });
-        if (!values.length) return 'dev';
+        if (!values.length) return 'paused';
         var allLive = values.every(function (v) { return v === 'live'; });
         var allTodo = values.every(function (v) { return v === 'todo'; });
         if (allLive) return 'live';
@@ -447,26 +489,36 @@
         if (!empty) return;
         empty.classList.toggle('is-visible', !container.querySelector('.table-row[data-fr-row]'));
       }
+      function targetForStatus(value, reqBody, arcBody, trashBody) {
+        if (value === 'live') return arcBody;
+        if (value === 'paused') return trashBody;
+        return reqBody;
+      }
       function syncArchivePlacement() {
         var reqBody = document.getElementById('fr-rows-requirements');
         var arcBody = document.getElementById('fr-rows-archived');
-        if (!reqBody || !arcBody) return;
+        var trashBody = document.getElementById('fr-rows-trash');
+        if (!reqBody || !arcBody || !trashBody) return;
 
         document.querySelectorAll('.table-row[data-fr-row]').forEach(function (row) {
           var select = row.querySelector('.status-select');
-          if (!select || select.getAttribute('data-scope') === 'trash') return;
-          var target = select.value === 'live' ? arcBody : reqBody;
+          if (!select) return;
+          var target = targetForStatus(select.value, reqBody, arcBody, trashBody);
           if (row.parentNode !== target) target.appendChild(row);
         });
         sortRows(reqBody);
         sortRows(arcBody);
+        sortRows(trashBody);
         toggleEmpty('fr-empty-requirements', reqBody);
         toggleEmpty('fr-empty-archived', arcBody);
+        toggleEmpty('fr-empty-trash', trashBody);
 
         var reqCountEl = document.getElementById('count-requirements');
         var arcCountEl = document.getElementById('count-archived');
+        var trashCountEl = document.getElementById('count-trash');
         if (reqCountEl) reqCountEl.textContent = reqBody.querySelectorAll('.table-row[data-fr-row]').length;
         if (arcCountEl) arcCountEl.textContent = arcBody.querySelectorAll('.table-row[data-fr-row]').length;
+        if (trashCountEl) trashCountEl.textContent = trashBody.querySelectorAll('.table-row[data-fr-row]').length;
 
         if (typeof window.refreshIterationSidebar === 'function') {
           window.refreshIterationSidebar();

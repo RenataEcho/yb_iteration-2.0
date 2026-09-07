@@ -15,6 +15,7 @@
       key: 'requirements',
       label: '迭代需求',
       items: [
+        { id: 'fr-opc-daifa-allocation', label: '代发分配', href: 'fr-opc-daifa-allocation.html', fr: 'FR-001', defaultStatus: 'paused' },
         { id: 'fr-opc-daifa-revenue', label: '代发收益', href: 'fr-opc-daifa-revenue.html', fr: 'FR-002' },
         { id: 'fr-finance-brand-refund', label: '品牌退款', href: 'fr-finance-brand-refund.html', fr: 'FR-003' },
         { id: 'fr-project-estimated-data', label: '预估数据', href: 'fr-project-estimated-data.html', fr: 'FR-004' },
@@ -22,7 +23,9 @@
         { id: 'fr-activity-center', label: '活动中心', href: 'fr-activity-center.html', fr: 'FR-006' },
         { id: 'fr-project-order-distribute', label: '订单分发', href: 'fr-project-order-distribute.html', fr: 'FR-007' },
         { id: 'fr-gift-center', label: '礼品中心', href: 'fr-gift-center.html', fr: 'FR-008' },
-        { id: 'fr-ai-workbench', label: 'AI工作台', href: 'fr-ai-workbench.html', fr: 'FR-009' }
+        { id: 'fr-ai-workbench', label: 'AI工作台', href: 'fr-ai-workbench.html', fr: 'FR-009' },
+        { id: 'fr-agent-cert', label: '代理迭代V1.0', href: 'fr-agent-cert.html', fr: 'FR-010' },
+        { id: 'fr-org-mentor-board', label: '机构导师看板', href: 'fr-org-mentor-board.html', fr: 'FR-011' }
       ]
     },
     {
@@ -33,9 +36,7 @@
     {
       key: 'trash',
       label: '废纸篓',
-      items: [
-        { id: 'fr-opc-daifa-allocation', label: '代发分配', href: 'fr-opc-daifa-allocation.html' }
-      ]
+      items: []
     }
   ];
 
@@ -66,16 +67,25 @@
     }
   }
 
+  function resolveItemStatus(item, statusMap) {
+    if (item.fr && statusMap[item.fr]) return statusMap[item.fr];
+    return item.defaultStatus || '';
+  }
+
   function resolveNavGroups() {
     var statusMap = loadFrStatus();
     var archivedItems = [];
+    var trashItems = [];
 
     return NAV_GROUPS.map(function (group) {
       if (group.key === 'requirements') {
         var activeItems = [];
         group.items.forEach(function (item) {
-          if (item.fr && statusMap[item.fr] === 'live') {
+          var status = resolveItemStatus(item, statusMap);
+          if (status === 'live') {
             archivedItems.push(item);
+          } else if (status === 'paused') {
+            trashItems.push(item);
           } else {
             activeItems.push(item);
           }
@@ -84,6 +94,9 @@
       }
       if (group.key === 'archived') {
         return { key: group.key, label: group.label, items: archivedItems.slice() };
+      }
+      if (group.key === 'trash') {
+        return { key: group.key, label: group.label, items: trashItems.slice() };
       }
       return group;
     });
@@ -104,7 +117,7 @@
     if (Object.prototype.hasOwnProperty.call(savedState, group.key)) {
       return !!savedState[group.key];
     }
-    if (group.key === 'archived' && !group.items.length) return false;
+    if ((group.key === 'archived' || group.key === 'trash') && !group.items.length) return false;
     return true;
   }
 

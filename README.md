@@ -1,5 +1,5 @@
 # youbao2.0
-右豹 2.0 迭代需求 Demo（FR-002 ~ FR-009）
+右豹 2.0 迭代需求 Demo（FR-002 ~ FR-011）
 
 ## 预览入口
 
@@ -18,8 +18,12 @@
 | FR-007 | 订单分发 | `demo/iteration/fr-project-order-distribute.html` |
 | FR-008 | 礼品中心 | `demo/iteration/fr-gift-center.html` |
 | FR-009 | AI工作台 | `demo/iteration/fr-ai-workbench.html` |
+| FR-010 | 代理迭代V1.0 | `demo/iteration/fr-agent-cert.html` |
+| FR-011 | 机构导师看板 | `demo/iteration/fr-org-mentor-board.html` |
 
 ## 废纸篓
+
+Sprint 概览将状态为「已暂停」的需求归入废纸篓。默认暂停：
 
 | FR | 名称 | 路径 |
 |----|------|------|
