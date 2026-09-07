@@ -82,6 +82,7 @@ spacing:
   sidebar-w: 220px
   sidebar-collapsed-w: 56px
   drawer-w: 420px
+  drawer-w-form: 520px
   drawer-w-wide: 720px
   drawer-section-gap: 20px
   page-gutter: 20px
@@ -207,6 +208,7 @@ components:
 - **Confirm Modal**：居中 400px；Footer = Ghost 取消 + Primary/Danger 确认。
 - **Edit Modal**：居中 480px；含表单 + Footer 取消/保存。
 - **Detail Drawer**：右侧 `{spacing.drawer-w}` overlay；关键词详情、规则抽屉同类模式。
+- **Form Config Drawer**：中等表单（类型卡片 + 正文 + 附件 + 圈人）用 `.drawer.form`，宽 `{spacing.drawer-w-form}`（520px）；Header 15px + 副标题 12px，Body 分 `{config-block}`，Footer Ghost 取消 + Primary 提交。
 - **Wide Config Drawer**：复杂编辑/详情（多分组 + 内嵌表格）用 `{components.drawer-wide}`，宽 `{spacing.drawer-w-wide}`（720px）；见下节。
 - **Toast**：底部深色胶囊，Mock 反馈 2.5s。
 

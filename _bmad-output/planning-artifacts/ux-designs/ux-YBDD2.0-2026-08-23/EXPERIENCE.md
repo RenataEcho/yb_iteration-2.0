@@ -220,6 +220,27 @@ sources:
 
 → Live mock：[`demo/iteration/fr-gift-center.html`](../../../../demo/iteration/fr-gift-center.html) · C 端 [`gift-center-demo.html`](../../../../demo/iteration/gift-center-demo.html)
 
+### FR-010 代理通知 · 新增表单抽屉
+
+运营主动发通知用 **Form Config Drawer**（520px），不用弹窗。字段含类型二选一、正文、配图与代理圈选，侧滑不打断列表对照。
+
+| 区域 | 行为 |
+|------|------|
+| Header | 标题「新增通知」+ 副标题说明系统触发不在此配置 |
+| 1 通知内容 | 类型卡片（系统提示 / 平台通知）+ 标题 + 描述 |
+| 2 配图 | 虚线上传区，选填；已选可清除 |
+| 3 接收范围 | 全部代理 / 指定代理卡片；指定后出帐号勾选，展示已选人数 |
+| Footer | Ghost 取消 + Primary 确认发送；校验失败 Toast，不关抽屉 |
+
+**交互要点**
+
+- 打开新增时关闭详情抽屉与规则抽屉，避免双层叠加。
+- Esc / 遮罩 / 关闭钮 / 取消：均关闭且不保存。
+- 系统触发（资料审核 / 提现审核 / 账单生成）不进入此抽屉。
+- 视觉 token 见 `DESIGN.md` → Form Config Drawer；控件用 34px / 13px，禁止压成 26px。
+
+→ Live mock：[`demo/iteration/fr-agent-cert.html?tab=notice`](../../../../demo/iteration/fr-agent-cert.html)
+
 ### FR-005 策略配置抽屉（Wide Config Drawer）
 
 | 抽屉 | 入口 | 行为 |
