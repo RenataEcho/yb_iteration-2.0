@@ -16,13 +16,13 @@
       label: '迭代需求',
       items: [
         { id: 'fr-opc-daifa-allocation', label: '代发分配', href: 'fr-opc-daifa-allocation.html', fr: 'FR-001', defaultStatus: 'paused' },
-        { id: 'fr-opc-daifa-revenue', label: '代发收益', href: 'fr-opc-daifa-revenue.html', fr: 'FR-002' },
-        { id: 'fr-finance-brand-refund', label: '品牌退款', href: 'fr-finance-brand-refund.html', fr: 'FR-003' },
-        { id: 'fr-project-estimated-data', label: '预估数据', href: 'fr-project-estimated-data.html', fr: 'FR-004' },
+        { id: 'fr-opc-daifa-revenue', label: '代发收益', href: 'fr-opc-daifa-revenue.html', fr: 'FR-002', defaultStatus: 'live' },
+        { id: 'fr-finance-brand-refund', label: '品牌退款', href: 'fr-finance-brand-refund.html', fr: 'FR-003', defaultStatus: 'live' },
+        { id: 'fr-project-estimated-data', label: '预估数据', href: 'fr-project-estimated-data.html', fr: 'FR-004', defaultStatus: 'live' },
         { id: 'fr-project-order-optimize', label: '订单优化', href: 'fr-project-order-optimize.html', fr: 'FR-005' },
-        { id: 'fr-activity-center', label: '活动中心', href: 'fr-activity-center.html', fr: 'FR-006' },
+        { id: 'fr-activity-center', label: '活动中心', href: 'fr-activity-center.html', fr: 'FR-006', defaultStatus: 'paused' },
         { id: 'fr-project-order-distribute', label: '订单分发', href: 'fr-project-order-distribute.html', fr: 'FR-007' },
-        { id: 'fr-gift-center', label: '礼品中心', href: 'fr-gift-center.html', fr: 'FR-008' },
+        { id: 'fr-gift-center', label: '礼品中心', href: 'fr-gift-center.html', fr: 'FR-008', defaultStatus: 'paused' },
         { id: 'fr-ai-workbench', label: 'AI工作台', href: 'fr-ai-workbench.html', fr: 'FR-009' },
         { id: 'fr-agent-cert', label: '代理迭代V1.0', href: 'fr-agent-cert.html', fr: 'FR-010' },
         { id: 'fr-org-mentor-board', label: '机构导师看板', href: 'fr-org-mentor-board.html', fr: 'FR-011' }

@@ -226,15 +226,15 @@
     <div class="summary-grid">
       <div class="summary-card">
         <div class="label">迭代需求 · FR 数</div>
-        <div class="value" id="count-requirements">7</div>
+        <div class="value" id="count-requirements">5</div>
       </div>
       <div class="summary-card">
         <div class="label">归档需求 · FR 数</div>
-        <div class="value" id="count-archived">0</div>
+        <div class="value" id="count-archived">3</div>
       </div>
       <div class="summary-card">
         <div class="label">废纸篓 · FR 数</div>
-        <div class="value" id="count-trash">1</div>
+        <div class="value" id="count-trash">3</div>
       </div>
       <div class="summary-card">
         <div class="label">状态</div>
@@ -248,48 +248,6 @@
         <span>FR-ID</span><span>需求名称</span><span>模板</span><span>版本</span><span>状态</span>
       </div>
       <div id="fr-rows-requirements">
-      <div class="table-row" data-fr-row="FR-002" data-order="2">
-        <span class="badge badge-fr">FR-002</span>
-        <span><a href="fr-opc-daifa-revenue.html">代发收益</a></span>
-        <span class="badge badge-template">B + A</span>
-        <span class="badge badge-version">v1</span>
-        <label class="status-select-wrap badge-status-dev">
-          <select class="status-select" data-fr="FR-002" aria-label="调整 FR-002 状态">
-            <option value="todo">待开始</option>
-            <option value="dev" selected>开发中</option>
-            <option value="live">已上线</option>
-            <option value="paused">已暂停</option>
-          </select>
-        </label>
-      </div>
-      <div class="table-row" data-fr-row="FR-003" data-order="3">
-        <span class="badge badge-fr">FR-003</span>
-        <span><a href="fr-finance-brand-refund.html">品牌退款</a></span>
-        <span class="badge badge-template">B卡片 + A</span>
-        <span class="badge badge-version">v1</span>
-        <label class="status-select-wrap badge-status-dev">
-          <select class="status-select" data-fr="FR-003" aria-label="调整 FR-003 状态">
-            <option value="todo">待开始</option>
-            <option value="dev" selected>开发中</option>
-            <option value="live">已上线</option>
-            <option value="paused">已暂停</option>
-          </select>
-        </label>
-      </div>
-      <div class="table-row" data-fr-row="FR-004" data-order="4">
-        <span class="badge badge-fr">FR-004</span>
-        <span><a href="fr-project-estimated-data.html">预估数据</a></span>
-        <span class="badge badge-template">A</span>
-        <span class="badge badge-version">v1</span>
-        <label class="status-select-wrap badge-status-dev">
-          <select class="status-select" data-fr="FR-004" aria-label="调整 FR-004 状态">
-            <option value="todo">待开始</option>
-            <option value="dev" selected>开发中</option>
-            <option value="live">已上线</option>
-            <option value="paused">已暂停</option>
-          </select>
-        </label>
-      </div>
       <div class="table-row" data-fr-row="FR-005" data-order="5">
         <span class="badge badge-fr">FR-005</span>
         <span><a href="fr-project-order-optimize.html">订单优化</a></span>
@@ -304,20 +262,6 @@
           </select>
         </label>
       </div>
-      <div class="table-row" data-fr-row="FR-006" data-order="6">
-        <span class="badge badge-fr">FR-006</span>
-        <span><a href="fr-activity-center.html">活动中心</a></span>
-        <span class="badge badge-template">B + A</span>
-        <span class="badge badge-version">v1</span>
-        <label class="status-select-wrap badge-status-dev">
-          <select class="status-select" data-fr="FR-006" aria-label="调整 FR-006 状态">
-            <option value="todo">待开始</option>
-            <option value="dev" selected>开发中</option>
-            <option value="live">已上线</option>
-            <option value="paused">已暂停</option>
-          </select>
-        </label>
-      </div>
       <div class="table-row" data-fr-row="FR-007" data-order="7">
         <span class="badge badge-fr">FR-007</span>
         <span><a href="fr-project-order-distribute.html">订单分发</a></span>
@@ -325,20 +269,6 @@
         <span class="badge badge-version">v1</span>
         <label class="status-select-wrap badge-status-todo">
           <select class="status-select" data-fr="FR-007" aria-label="调整 FR-007 状态">
-            <option value="todo" selected>待开始</option>
-            <option value="dev">开发中</option>
-            <option value="live">已上线</option>
-            <option value="paused">已暂停</option>
-          </select>
-        </label>
-      </div>
-      <div class="table-row" data-fr-row="FR-008" data-order="8">
-        <span class="badge badge-fr">FR-008</span>
-        <span><a href="fr-gift-center.html">礼品中心</a></span>
-        <span class="badge badge-template">B + A</span>
-        <span class="badge badge-version">v1</span>
-        <label class="status-select-wrap badge-status-todo">
-          <select class="status-select" data-fr="FR-008" aria-label="调整 FR-008 状态">
             <option value="todo" selected>待开始</option>
             <option value="dev">开发中</option>
             <option value="live">已上线</option>
@@ -397,8 +327,51 @@
       <div class="table-head">
         <span>FR-ID</span><span>需求名称</span><span>模板</span><span>版本</span><span>状态</span>
       </div>
-      <div id="fr-rows-archived"></div>
-      <div class="table-empty is-visible" id="fr-empty-archived">暂无已上线归档的需求</div>
+      <div id="fr-rows-archived">
+      <div class="table-row" data-fr-row="FR-002" data-order="2">
+        <span class="badge badge-fr">FR-002</span>
+        <span><a href="fr-opc-daifa-revenue.html">代发收益</a></span>
+        <span class="badge badge-template">B + A</span>
+        <span class="badge badge-version">v1</span>
+        <label class="status-select-wrap badge-status-live">
+          <select class="status-select" data-fr="FR-002" aria-label="调整 FR-002 状态">
+            <option value="todo">待开始</option>
+            <option value="dev">开发中</option>
+            <option value="live" selected>已上线</option>
+            <option value="paused">已暂停</option>
+          </select>
+        </label>
+      </div>
+      <div class="table-row" data-fr-row="FR-003" data-order="3">
+        <span class="badge badge-fr">FR-003</span>
+        <span><a href="fr-finance-brand-refund.html">品牌退款</a></span>
+        <span class="badge badge-template">B卡片 + A</span>
+        <span class="badge badge-version">v1</span>
+        <label class="status-select-wrap badge-status-live">
+          <select class="status-select" data-fr="FR-003" aria-label="调整 FR-003 状态">
+            <option value="todo">待开始</option>
+            <option value="dev">开发中</option>
+            <option value="live" selected>已上线</option>
+            <option value="paused">已暂停</option>
+          </select>
+        </label>
+      </div>
+      <div class="table-row" data-fr-row="FR-004" data-order="4">
+        <span class="badge badge-fr">FR-004</span>
+        <span><a href="fr-project-estimated-data.html">预估数据</a></span>
+        <span class="badge badge-template">A</span>
+        <span class="badge badge-version">v1</span>
+        <label class="status-select-wrap badge-status-live">
+          <select class="status-select" data-fr="FR-004" aria-label="调整 FR-004 状态">
+            <option value="todo">待开始</option>
+            <option value="dev">开发中</option>
+            <option value="live" selected>已上线</option>
+            <option value="paused">已暂停</option>
+          </select>
+        </label>
+      </div>
+      </div>
+      <div class="table-empty" id="fr-empty-archived">暂无已上线归档的需求</div>
     </div>
 
     <div class="glass-card">
@@ -414,6 +387,34 @@
         <span class="badge badge-version">v1</span>
         <label class="status-select-wrap badge-status-paused">
           <select class="status-select" data-fr="FR-001" aria-label="调整 FR-001 状态">
+            <option value="todo">待开始</option>
+            <option value="dev">开发中</option>
+            <option value="live">已上线</option>
+            <option value="paused" selected>已暂停</option>
+          </select>
+        </label>
+      </div>
+      <div class="table-row" data-fr-row="FR-006" data-order="6">
+        <span class="badge badge-fr">FR-006</span>
+        <span><a href="fr-activity-center.html">活动中心</a></span>
+        <span class="badge badge-template">B + A</span>
+        <span class="badge badge-version">v1</span>
+        <label class="status-select-wrap badge-status-paused">
+          <select class="status-select" data-fr="FR-006" aria-label="调整 FR-006 状态">
+            <option value="todo">待开始</option>
+            <option value="dev">开发中</option>
+            <option value="live">已上线</option>
+            <option value="paused" selected>已暂停</option>
+          </select>
+        </label>
+      </div>
+      <div class="table-row" data-fr-row="FR-008" data-order="8">
+        <span class="badge badge-fr">FR-008</span>
+        <span><a href="fr-gift-center.html">礼品中心</a></span>
+        <span class="badge badge-template">B + A</span>
+        <span class="badge badge-version">v1</span>
+        <label class="status-select-wrap badge-status-paused">
+          <select class="status-select" data-fr="FR-008" aria-label="调整 FR-008 状态">
             <option value="todo">待开始</option>
             <option value="dev">开发中</option>
             <option value="live">已上线</option>
