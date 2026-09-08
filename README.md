@@ -14,7 +14,7 @@
 | FR-007 | 订单分发 | `demo/iteration/fr-project-order-distribute.html` |
 | FR-009 | AI工作台 | `demo/iteration/fr-ai-workbench.html` |
 | FR-010 | 代理迭代V1.0 | `demo/iteration/fr-agent-cert.html` |
-| FR-011 | 机构导师看板 | `demo/iteration/fr-org-mentor-board.html` |
+| FR-011 | 导师迭代V1.0 | `demo/iteration/fr-org-mentor-board.html` |
 
 ## 归档需求
 
