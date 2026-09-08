@@ -121,6 +121,34 @@
     #wdTable { min-width: 1680px; }
     #ntTable { min-width: 1480px; }
     #priceTable { min-width: 1280px; }
+    #stTable { min-width: 1180px; }
+    .page-tab-bar { flex-wrap: wrap; }
+    .drawer.bill { width: 780px; max-width: 92vw; }
+    .bill-head {
+      display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
+      padding: 20px 24px 16px; border-bottom: 1px solid var(--border);
+    }
+    .bill-head h2 { font-size: 20px; font-weight: 700; line-height: 1.3; }
+    .bill-head p { font-size: 12px; color: var(--text-muted); margin-top: 6px; line-height: 1.5; }
+    .bill-close {
+      height: 32px; padding: 0 12px; border: 1px solid var(--border); background: #fff;
+      border-radius: var(--radius-sm); cursor: pointer; font-size: 13px; color: var(--text-secondary);
+      flex-shrink: 0;
+    }
+    .bill-close:hover { background: var(--surface-hover); }
+    .bill-body { padding: 8px 24px 28px; }
+    #billDetailTable { table-layout: fixed; }
+    #billDetailTable th.num, #billDetailTable td.num { text-align: right; }
+    .bill-total {
+      display: flex; align-items: baseline; justify-content: space-between; gap: 16px;
+      padding: 16px 2px 14px; font-weight: 700;
+    }
+    .bill-total .amt { font-size: 22px; font-variant-numeric: tabular-nums; }
+    .bill-note {
+      background: #f8fafc; border: 1px solid var(--border); border-radius: 10px;
+      padding: 12px 14px; font-size: 12px; color: var(--text-secondary); line-height: 1.75;
+    }
+    .bill-note strong { color: #dc2626; font-weight: 600; }
     .stats-bar.cols-4 { grid-template-columns: repeat(4, 1fr); }
     .radio-row { display: flex; flex-wrap: wrap; gap: 14px 18px; }
     .radio-row label { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-primary); cursor: pointer; }
@@ -258,7 +286,7 @@
     .nt-upload.has-file { display: flex; align-items: center; justify-content: space-between; gap: 12px; text-align: left; }
     .nt-upload.has-file strong { color: var(--text-primary); }
     .agent-pick-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 12px; color: var(--text-muted); }
-    .rule-tab-bar { display: flex; gap: 0; padding: 0 16px; border-bottom: 1px solid var(--border); }
+    .rule-tab-bar { display: flex; gap: 0; padding: 0 16px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
     .rule-tab-bar button {
       padding: 10px 18px; border: none; background: none; cursor: pointer;
       font-size: 13px; color: var(--text-secondary); border-bottom: 2px solid transparent; margin-bottom: -1px;
@@ -443,7 +471,7 @@
       <span class="sprint-pill">YBDD2.0 · 迭代 v1</span>
     </div>
     <div class="sidebar-scroll" data-iteration-sidebar></div>
-    <div class="sidebar-foot">FR-010 · 代理迭代V1.0<br />业务解释 / 认证 / 提现 / 价格 / 通知</div>
+    <div class="sidebar-foot">FR-010 · 代理迭代V1.0<br />业务解释 / 认证 / 结算单 / 提现 / 价格 / 通知</div>
   </aside>
 
   <main class="main">
@@ -456,9 +484,9 @@
         <h1>
           代理迭代V1.0
           <span class="badge badge-fr">FR-010</span>
-          <span class="badge badge-version">v3 当前</span>
+          <span class="badge badge-version">v5 当前</span>
         </h1>
-        <p class="page-desc">代理板块本轮交付认证审核、提现结算、授权项目价格配置与代理通知。认证通过后对公账户可用于线上结算；提现需审核通过后再打款；已授权项目可配置代理价格；代理消息分系统提示与平台通知，支持系统触发与运营主动发送。</p>
+        <p class="page-desc">代理板块本轮交付认证审核、月结结算单、提现结算、授权项目价格配置与代理通知。认证通过后对公账户可用于线上结算；系统按订单日期自然月归集并在当月全部结算后推送结算单；提现需审核通过后再打款；已授权项目可配置代理价格；代理消息分系统提示与平台通知，支持系统触发与运营主动发送。</p>
       </div>
       <div>
         <button class="btn btn-rule" id="toggleRuleDrawer" type="button">📋 需求规则</button>
@@ -468,6 +496,7 @@
     <div class="page-tab-bar" role="tablist">
       <button type="button" data-page="view-explain" role="tab">业务解释</button>
       <button type="button" class="active" data-page="view-cert" role="tab">代理认证</button>
+      <button type="button" data-page="view-settle" role="tab">代理结算单</button>
       <button type="button" data-page="view-withdraw" role="tab">代理提现</button>
       <button type="button" data-page="view-price" role="tab">代理价格</button>
       <button type="button" data-page="view-notice" role="tab">代理通知</button>
@@ -477,19 +506,20 @@
       <div class="explain-layout">
         <nav class="glass-card explain-nav" aria-label="业务解释章节">
           <div class="nav-caption">运营手册 · 按章阅读</div>
-          <button type="button" class="active" data-explain="exp-overview">1 一句话看懂<small>四件事怎么串起来</small></button>
+          <button type="button" class="active" data-explain="exp-overview">1 一句话看懂<small>五件事怎么串起来</small></button>
           <button type="button" data-explain="exp-cert">2 认证怎么审<small>资料、合同、对公账户</small></button>
-          <button type="button" data-explain="exp-withdraw">3 提现怎么打款<small>先审后付、回执必传</small></button>
-          <button type="button" data-explain="exp-price">4 价格怎么配<small>只改代理价，原价只读</small></button>
-          <button type="button" data-explain="exp-notice">5 通知怎么发<small>系统自动 vs 运营主动</small></button>
-          <button type="button" data-explain="exp-faq">6 客诉怎么回<small>常见问题与边界</small></button>
+          <button type="button" data-explain="exp-settle">3 结算单怎么出<small>按自然月归集后推送</small></button>
+          <button type="button" data-explain="exp-withdraw">4 提现怎么打款<small>先审后付、回执必传</small></button>
+          <button type="button" data-explain="exp-price">5 价格怎么配<small>只改代理价，原价只读</small></button>
+          <button type="button" data-explain="exp-notice">6 通知怎么发<small>系统自动 vs 运营主动</small></button>
+          <button type="button" data-explain="exp-faq">7 客诉怎么回<small>常见问题与边界</small></button>
         </nav>
         <div class="glass-card">
           <section id="exp-overview" class="explain-panel active">
             <div class="explain-kicker">FR-010 · 代理迭代V1.0</div>
             <div class="explain-hero">
-              <h2>先认证对公账户，再配项目价格，提现必须审核通过后才能打款</h2>
-              <p>本轮后台交付四件事：<strong>认证审核、提现结算、授权项目价格、代理通知</strong>。代理端填写页、提现申请页、价格查看页、消息中心本轮都不做 Demo，但字段和后台对齐。运营日常只在本页四个业务 Tab 里审、配、发。</p>
+              <h2>先认证对公账户，再配项目价格；月结账单推送后，提现必须审核通过才能打款</h2>
+              <p>本轮后台交付五件事：<strong>认证审核、月结结算单、提现结算、授权项目价格、代理通知</strong>。代理端填写页、提现申请页、价格查看页、消息中心本轮都不做 Demo，但字段和后台对齐。运营日常只在本页五个业务 Tab 里审、核、配、发。</p>
             </div>
             <div class="explain-section">
               <h3>30 秒故事</h3>
@@ -497,16 +527,21 @@
                 <li>代理提交企业资料、对公账户、盖章合同 PDF → 运营在「代理认证」通过或驳回。</li>
                 <li>只有<strong>认证已通过</strong>，对公账户才能用于线上结算和提现；未通过不能结算。</li>
                 <li>已授权项目在「代理价格」配结算字段级代理价；代理收益按代理价算，不回退右豹原价。</li>
+                <li>系统按<strong>订单日期</strong>自然月归集，按代理拆单（未认证代理不跳过）。各项目都结算完成才把结算单标成已生成并推送；有项目还在结算中则未生成、不推送。</li>
                 <li>代理提交盖章结算单 + 发票 → 运营先审提现，通过后打款；打款成功必须上传回执。</li>
                 <li>认证/提现结果、账单生成会自动发平台通知；运营也可主动群发或定向发送。</li>
               </ol>
             </div>
             <div class="explain-section">
-              <h3>四个 Tab 各管什么</h3>
+              <h3>五个 Tab 各管什么</h3>
               <div class="explain-grid">
                 <div class="explain-card">
                   <h4>代理认证</h4>
                   <p>审企业、对公账户、盖章合同。通过后才具备结算资格。结论本轮不可改判。</p>
+                </div>
+                <div class="explain-card">
+                  <h4>代理结算单</h4>
+                  <p>系统按自然月按代理拆单。已生成才推送给代理；未生成说明还有项目在结算中。明细里看各项目结算状态。</p>
                 </div>
                 <div class="explain-card">
                   <h4>代理提现</h4>
@@ -521,7 +556,7 @@
                   <p>系统提示（功能/维护）与平台通知（审核/账单/下线）。系统触发不可手改；运营主动用抽屉发送。</p>
                 </div>
               </div>
-              <div class="callout info">对外口径：认证通过 ≠ 已经打款。钱要等代理自己提现，运营审过、打款成功并上传回执，才算闭环。</div>
+              <div class="callout info">对外口径：账单已生成 ≠ 已经打款。钱要等代理自己对照结算单提现，运营审过、打款成功并上传回执，才算闭环。</div>
             </div>
           </section>
 
@@ -555,6 +590,55 @@
                 </table>
               </div>
               <div class="callout warn">一个代理同一时间只允许一条「待审核」或「已通过」。驳回后才能再交新的。筛选重置只清空条件，不自动查，避免误以为数据没了。</div>
+            </div>
+          </section>
+
+          <section id="exp-settle" class="explain-panel">
+            <div class="explain-kicker">代理结算单</div>
+            <div class="explain-hero">
+              <h2>按代理拆单就能看见账单；只有已生成才会推送给代理</h2>
+              <p>关账后按代理拆出每月结算单，<strong>未认证代理不跳过</strong>，后台都能对账。运营在本 Tab 看结算单状态、金额和提现进度，不在这里审核打款。「查看明细」按项目拆开，并标结算状态。</p>
+            </div>
+            <div class="explain-section">
+              <h3>结算单状态怎么读</h3>
+              <div class="table-wrap">
+                <table class="explain-table">
+                  <thead>
+                    <tr><th>结算单状态</th><th>项目结算状态</th><th>是否推送给代理</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td><strong>已生成</strong></td><td>该月各项目都是「结算完成」</td><td>推送；代理才能对照账单申请提现</td></tr>
+                    <tr><td><strong>未生成</strong></td><td>只要有一个项目还是「结算中」</td><td>不推送；意味着还有项目订单未结算</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="callout warn">未认证代理也会出结算单行，方便对账。但认证没通过仍不能提现。一个代理同一个自然月只有一张结算单。</div>
+            </div>
+            <div class="explain-section">
+              <h3>钱怎么算</h3>
+              <ul>
+                <li><strong>收益金额</strong>：按该代理已配置的代理价格重算，不是列表里的右豹累计金额。</li>
+                <li><strong>服务费</strong>：各项目收益金额 × 服务费比例之和。</li>
+                <li><strong>可提现金额</strong>：各项目 <strong>收益金额 × (1 - 服务费比例)</strong> 之和。</li>
+                <li>月结归集<strong>订单日期</strong>落在该自然月的订单；未生成账单的可提现只是预览，不推送给代理。</li>
+              </ul>
+            </div>
+            <div class="explain-section">
+              <h3>提现状态怎么读</h3>
+              <div class="table-wrap">
+                <table class="explain-table">
+                  <thead>
+                    <tr><th>状态</th><th>含义</th><th>和「代理提现」的关系</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td><strong>—</strong></td><td>结算单未生成，尚未推送</td><td>没有提现行，也不能申请</td></tr>
+                    <tr><td><strong>未提现</strong></td><td>账单已生成并推送，代理还没申请</td><td>提现列表没有对应申请行</td></tr>
+                    <tr><td><strong>提现中</strong></td><td>已提交盖章结算单 + 发票</td><td>对应提现行处于待审核 / 待打款 / 打款失败</td></tr>
+                    <tr><td><strong>已提现</strong></td><td>打款成功并上传回执</td><td>对应提现行打款状态=已打款</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="callout info">本 Tab 只读对账。审核、驳回、打款都在「代理提现」。明细抽屉里的合计必须等于列表「可提现金额」。</div>
             </div>
           </section>
 
@@ -610,7 +694,7 @@
               <ul>
                 <li><strong>字段收益</strong> = 该字段单量 × 代理价格；项目收益 = 已配置字段之和。</li>
                 <li>代理价格为空的字段<strong>不计入</strong>代理收益，也不会自动改用右豹原价。</li>
-                <li>列表「累计金额」仍是右豹原价口径，方便对账；「服务费」= 累计金额 × 服务费比例。</li>
+                <li>列表「累计金额」是计算代理价格，方便对账；「服务费」= 累计金额 × 服务费比例。</li>
                 <li>代理侧出账 / 提现以<strong>按代理价格重算</strong>的结果为准，不是累计金额。</li>
               </ul>
               <div class="callout warn">右豹字段增删或原价变更后，下次打开弹窗以右豹最新配置为准；已有代理价按结算字段名匹配保留，对不上的字段丢掉。已禁用项目仍可改价（历史对账），但新订单不生效，会 Toast 提示。</div>
@@ -653,8 +737,8 @@
           <section id="exp-faq" class="explain-panel">
             <div class="explain-kicker">客服 / 运营话术</div>
             <div class="explain-hero">
-              <h2>先问卡在认证、提现、价格还是消息，再对状态</h2>
-              <p>代理很少说「FR-010」。他们会说「我交了资料没通过」「钱怎么还没到账」「价格怎么和后台不一样」。</p>
+              <h2>先问卡在认证、账单、提现、价格还是消息，再对状态</h2>
+              <p>代理很少说「FR-010」。他们会说「我交了资料没通过」「这个月账单怎么还没出」「钱怎么还没到账」「价格怎么和后台不一样」。</p>
             </div>
             <div class="explain-section">
               <div class="faq-item">
@@ -667,7 +751,7 @@
               </div>
               <div class="faq-item">
                 <div class="faq-q">Q3. 认证通过了，为什么还不能提现？</div>
-                <div class="faq-a">认证通过只是具备结算资格。提现要代理自己提交盖章结算单和发票，再走「待审核 → 审核通过 → 待打款 → 已打款」。没申请就没有提现行。</div>
+                <div class="faq-a">认证通过只是具备结算资格。还要等系统按订单日期把当月账单推送出来，代理再对照结算单提交盖章件和发票，走「待审核 → 审核通过 → 待打款 → 已打款」。没账单或没申请，提现列表都不会有行。</div>
               </div>
               <div class="faq-item">
                 <div class="faq-q">Q4. 提现审过了，钱还没到？</div>
@@ -690,8 +774,12 @@
                 <div class="faq-a">系统触发的平台通知不能在新增抽屉里改或补发。要补充说明，另外发一条运营主动通知。</div>
               </div>
               <div class="faq-item">
-                <div class="faq-q">Q9. 重置筛选后列表怎么没变？</div>
-                <div class="faq-a">四个列表都是「重置只清空条件，不自动查询」。再点一次查询才会按空条件刷新。</div>
+                <div class="faq-q">Q9. 这个月账单为什么还没出？</div>
+                <div class="faq-a">先看结算单状态。有项目还是「结算中」，整张结算单就是「未生成」，不会推送给代理。等各项目都「结算完成」才变成已生成并推送。未认证代理后台也会有结算单，只是认证没过不能提现。</div>
+              </div>
+              <div class="faq-item">
+                <div class="faq-q">Q10. 重置筛选后列表怎么没变？</div>
+                <div class="faq-a">五个列表都是「重置只清空条件，不自动查询」。再点一次查询才会按空条件刷新。</div>
               </div>
             </div>
             <div class="explain-section">
@@ -932,6 +1020,163 @@
                 </tr>
               </tbody>
             </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="view-settle" class="page-view">
+      <div class="module-tab-bar" role="tablist">
+        <button type="button" class="active" data-sub="st-admin" role="tab">管理后台</button>
+        <button type="button" data-sub="st-flow" role="tab">业务流程</button>
+      </div>
+      <div id="st-admin" class="sub-view active">
+        <div class="glass-card">
+          <div class="stats-bar cols-4">
+            <div class="stat-item">
+              <div class="label">未生成</div>
+              <div class="value warn"><span id="stStatDraft">0</span><span class="stat-unit">笔</span></div>
+              <div class="stat-amount" id="stAmtDraft">¥0.00</div>
+            </div>
+            <div class="stat-item">
+              <div class="label">已生成</div>
+              <div class="value ok"><span id="stStatReady">0</span><span class="stat-unit">笔</span></div>
+              <div class="stat-amount" id="stAmtReady">¥0.00</div>
+            </div>
+            <div class="stat-item">
+              <div class="label">未提现</div>
+              <div class="value info"><span id="stStatNone">0</span><span class="stat-unit">笔</span></div>
+              <div class="stat-amount" id="stAmtNone">¥0.00</div>
+            </div>
+            <div class="stat-item">
+              <div class="label">已提现</div>
+              <div class="value ok"><span id="stStatPaid">0</span><span class="stat-unit">笔</span></div>
+              <div class="stat-amount" id="stAmtPaid">¥0.00</div>
+            </div>
+          </div>
+          <div class="table-toolbar">
+            <h3>代理结算单</h3>
+          </div>
+          <div class="filter-bar">
+            <div class="filter-field">
+              <label>代理名称</label>
+              <input id="stNameQ" type="text" placeholder="赵氏内容科技" />
+            </div>
+            <div class="filter-field">
+              <label>账单月份</label>
+              <select id="stMonthQ">
+                <option value="">全部</option>
+                <option value="2026-08">2026-08</option>
+                <option value="2026-07">2026-07</option>
+              </select>
+            </div>
+            <div class="filter-field">
+              <label>结算单状态</label>
+              <select id="stGenQ">
+                <option value="">全部</option>
+                <option value="ready">已生成</option>
+                <option value="draft">未生成</option>
+              </select>
+            </div>
+            <div class="filter-field">
+              <label>提现状态</label>
+              <select id="stStatusQ">
+                <option value="">全部</option>
+                <option value="none">未提现</option>
+                <option value="pending">提现中</option>
+                <option value="paid">已提现</option>
+              </select>
+            </div>
+            <div class="filter-actions">
+              <button class="btn-ghost-sm" type="button" onclick="resetStFilter()">重置</button>
+              <button class="btn btn-primary" type="button" onclick="queryStList()">查询</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table id="stTable">
+              <colgroup>
+                <col style="width:140px" />
+                <col style="width:100px" />
+                <col style="width:140px" />
+                <col style="width:100px" />
+                <col style="width:120px" />
+                <col style="width:110px" />
+                <col style="width:130px" />
+                <col style="width:100px" />
+                <col style="width:96px" />
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>代理名称</th>
+                  <th>账单月份</th>
+                  <th>结算单</th>
+                  <th>结算单状态</th>
+                  <th>收益金额</th>
+                  <th>服务费</th>
+                  <th>可提现金额</th>
+                  <th>提现状态</th>
+                  <th class="col-action">操作</th>
+                </tr>
+              </thead>
+              <tbody id="stBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div id="st-flow" class="sub-view">
+        <div class="glass-card">
+          <p class="flow-page-intro">系统按订单日期归集当月订单后，进入后台按代理拆单，未认证代理不跳过。再按项目汇总收益并计算可提现。各项目都结算完成则结算单=已生成并推送给代理；任一项目仍结算中则结算单=未生成、不推送。菱形为校验节点。</p>
+          <div class="flow-svg-wrap">
+            <svg width="960" height="640" viewBox="0 0 960 640" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <marker id="arrSt" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                  <path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8" />
+                </marker>
+              </defs>
+              <g class="flow-edges" marker-end="url(#arrSt)">
+                <polyline points="480,60 480,84" />
+                <polyline points="480,136 480,160" />
+                <polyline points="480,212 480,236" />
+                <polyline points="480,288 480,320" />
+                <polyline points="372,364 220,364" />
+                <polyline points="588,364 740,364" />
+                <polyline points="136,416 136,500 350,500" />
+                <polyline points="824,416 824,500 610,500" />
+              </g>
+              <g class="flow-nodes" font-family="Inter, PingFang SC, sans-serif">
+                <rect x="350" y="20" width="260" height="40" rx="8" fill="#eff6ff" stroke="#2563eb" />
+                <text x="480" y="45" text-anchor="middle" font-size="12" fill="#18222f">自然月关账窗口触发</text>
+                <rect x="330" y="84" width="300" height="52" rx="8" fill="#f0fdf4" stroke="#16a34a" />
+                <text x="480" y="106" text-anchor="middle" font-size="12" fill="#18222f">按订单日期归集当月订单</text>
+                <text x="480" y="122" text-anchor="middle" font-size="10" fill="#64748b">只看订单日期，不看结算完成日</text>
+                <rect x="330" y="160" width="300" height="52" rx="8" fill="#eff6ff" stroke="#2563eb" />
+                <text x="480" y="182" text-anchor="middle" font-size="12" fill="#18222f">进入后台结算单生成</text>
+                <text x="480" y="198" text-anchor="middle" font-size="10" fill="#64748b">按代理拆单，未认证代理不跳过</text>
+                <rect x="330" y="236" width="300" height="52" rx="8" fill="#ecfeff" stroke="#0891b2" />
+                <text x="480" y="258" text-anchor="middle" font-size="12" fill="#18222f">按项目汇总并计算可提现</text>
+                <text x="480" y="274" text-anchor="middle" font-size="10" fill="#64748b">可提现=收益×(1-服务费比例)</text>
+                <polygon points="480,320 588,364 480,408 372,364" fill="#fffbeb" stroke="#d97706" />
+                <text x="480" y="360" text-anchor="middle" font-size="11" fill="#92400e">各项目都</text>
+                <text x="480" y="376" text-anchor="middle" font-size="11" fill="#92400e">结算完成?</text>
+                <text x="250" y="356" font-size="11" fill="#dc2626">否</text>
+                <rect x="52" y="338" width="168" height="52" rx="8" fill="#fffbeb" stroke="#d97706" />
+                <text x="136" y="360" text-anchor="middle" font-size="11" fill="#92400e">结算单=未生成</text>
+                <text x="136" y="376" text-anchor="middle" font-size="10" fill="#64748b">不推送给代理</text>
+                <text x="640" y="356" font-size="11" fill="#16a34a">是</text>
+                <rect x="740" y="338" width="168" height="52" rx="8" fill="#f0fdf4" stroke="#16a34a" />
+                <text x="824" y="360" text-anchor="middle" font-size="11" fill="#18222f">结算单=已生成</text>
+                <text x="824" y="376" text-anchor="middle" font-size="10" fill="#64748b">推送平台通知给代理</text>
+                <rect x="350" y="474" width="260" height="52" rx="8" fill="#f0fdf4" stroke="#16a34a" />
+                <text x="480" y="496" text-anchor="middle" font-size="11" fill="#18222f">写入后台结算单列表</text>
+                <text x="480" y="512" text-anchor="middle" font-size="10" fill="#64748b">未生成也可查看明细对账</text>
+              </g>
+            </svg>
+          </div>
+          <div class="flow-legend">
+            <span><i style="background:#eff6ff;border:1px solid #2563eb"></i>前端 / 关账触发</span>
+            <span><i style="background:#f0fdf4;border:1px solid #16a34a"></i>后端 / 数据写入</span>
+            <span><i style="background:#ecfeff;border:1px solid #0891b2"></i>金额计算</span>
+            <span><i style="background:#fffbeb;border:1px solid #d97706"></i>校验 / 未生成</span>
           </div>
         </div>
       </div>
@@ -1429,11 +1674,12 @@
   <div class="drawer-overlay" id="ruleOverlay" onclick="setRuleDrawer(false)"></div>
   <aside class="drawer" id="ruleDrawer" role="dialog">
     <div class="drawer-header">
-      <h2>FR-010 · 需求规则 · v3</h2>
+      <h2>FR-010 · 需求规则 · v5</h2>
       <button class="drawer-close" type="button" onclick="setRuleDrawer(false)">×</button>
     </div>
     <div class="rule-tab-bar" role="tablist">
       <button type="button" class="active" data-rule="rule-cert" role="tab">代理认证</button>
+      <button type="button" data-rule="rule-settle" role="tab">代理结算单</button>
       <button type="button" data-rule="rule-withdraw" role="tab">代理提现</button>
       <button type="button" data-rule="rule-price" role="tab">代理价格</button>
       <button type="button" data-rule="rule-notice" role="tab">代理通知</button>
@@ -1512,6 +1758,81 @@
           <h3><span>6</span>业务流程</h3>
           <div class="rule-content">
             <p>见「代理认证」下 Tab <strong>「业务流程」</strong>流程图。自动化用例见旁侧 Tab <strong>「QA用例」</strong>。</p>
+          </div>
+        </div>
+      </div>
+      <div id="rule-settle" class="rule-panel">
+        <div class="rule-section">
+          <h3><span>1</span>业务目标</h3>
+          <div class="rule-content">
+            <p>在「代理迭代V1.0」下提供「代理结算单」：系统按订单日期自然月归集订单，按代理拆单（未认证代理不跳过）。各项目都结算完成后结算单变为已生成并推送给代理；任一项目仍结算中则结算单为未生成、不推送。供运营核对收益、服务费、可提现与提现进度。</p>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>2</span>数据表与字段</h3>
+          <div class="rule-content">
+            <p><strong>代理结算单表</strong>：</p>
+            <ul>
+              <li>代理名称</li>
+              <li>账单月份（自然月，格式 <code>YYYY-MM</code>）</li>
+              <li>结算单（系统单号，格式 <code>SET-{YYYYMM}-{当月序数}</code>，示例 <code>SET-202608-01</code>）</li>
+              <li>结算单状态：已生成 / 未生成</li>
+              <li>收益金额：该月各项目按<strong>代理价格</strong>重算后的收益之和</li>
+              <li>服务费：各项目 <code>收益金额 × 服务费比例</code> 之和</li>
+              <li>可提现金额：各项目 <code>收益金额 × (1 - 服务费比例)</code> 之和</li>
+              <li>提现状态：未提现 / 提现中 / 已提现；结算单未生成时展示「—」</li>
+              <li>操作：查看明细</li>
+            </ul>
+            <p style="margin-top:8px;"><strong>明细抽屉字段</strong>：项目名称、订单量、收益金额、服务费比例、<strong>结算状态</strong>（结算中 / 结算完成）；底部展示可提现金额合计与口径说明。</p>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>3</span>列表与筛选</h3>
+          <div class="rule-content">
+            <p><strong>筛选项</strong>：代理名称、账单月份、结算单状态、提现状态。</p>
+            <ul>
+              <li>代理名称：模糊匹配。</li>
+              <li>账单月份：全部 / 已出现的自然月。</li>
+              <li>结算单状态：全部 / 已生成 / 未生成。</li>
+              <li>提现状态：全部 / 未提现 / 提现中 / 已提现。</li>
+              <li>查询：刷新列表，页码重置至第 1 页。</li>
+              <li>重置：清空筛选条件，<strong>不自动触发查询</strong>，Toast 提示「筛选条件已重置」。</li>
+            </ul>
+            <p style="margin-top:8px;"><strong>表头统计</strong>（随当前查询结果联动）：未生成、已生成、未提现、已提现的<strong>笔数 + 可提现金额合计</strong>。</p>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>4</span>查看明细</h3>
+          <div class="rule-content">
+            <ul>
+              <li>点击「查看明细」打开右侧抽屉，标题为 <code>{账单月份} 账单明细</code>。</li>
+              <li>副文案：已生成写「已生成，已推送给代理」；未生成写「未生成，尚有项目订单未结算，不推送给代理」。</li>
+              <li>明细表按项目分行：项目名称、订单量、收益金额、服务费比例、<strong>结算状态</strong>（结算中 / 结算完成）。</li>
+              <li>底部「可提现金额合计」必须等于列表该行可提现金额。</li>
+              <li>口径说明用红色强调「收益金额 × (1 - 服务费比例)」与「订单日期」。</li>
+              <li>本抽屉只读，不提供编辑、下载以外的写操作。关闭用「关闭」按钮、遮罩或 ESC。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>5</span>边界规则</h3>
+          <div class="rule-content">
+            <ul>
+              <li>按代理拆单时<strong>未认证代理不跳过</strong>；待审核 / 已驳回也会出结算单行，便于对账。认证未通过仍不能提现。</li>
+              <li>一个代理同一个自然月只有<strong>一张</strong>结算单。</li>
+              <li>任一项目结算状态为<strong>结算中</strong>，结算单状态=未生成，<strong>不推送给代理</strong>。各项目都是<strong>结算完成</strong>，结算单状态=已生成，才推送给代理。</li>
+              <li>月结以<strong>订单日期</strong>归集。</li>
+              <li>未配置代理价的字段不计入收益，也不回退右豹原价。</li>
+              <li>提现状态只读映射「代理提现」进度：结算单未生成=「—」；已生成且无申请=未提现；待审核/待打款/打款失败=提现中；已打款=已提现。审核驳回后回到未提现，可再申请。</li>
+              <li>本 Tab 不做审核、打款；本轮不交付代理端账单页 Demo。</li>
+              <li>本 Demo 不做真实接口、权限与持久化。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>6</span>业务流程</h3>
+          <div class="rule-content">
+            <p>见「代理结算单」下 Tab <strong>「业务流程」</strong>流程图。</p>
           </div>
         </div>
       </div>
@@ -1983,6 +2304,47 @@
     </div>
   </div>
 
+  <div class="drawer-overlay" id="stDetailOverlay" onclick="closeStDetail()"></div>
+  <aside class="drawer bill" id="stDetailDrawer" role="dialog" aria-labelledby="stDetailTitle">
+    <div class="bill-head">
+      <div>
+        <h2 id="stDetailTitle">账单明细</h2>
+        <p id="stDetailSub"></p>
+      </div>
+      <button class="bill-close" type="button" onclick="closeStDetail()">关闭</button>
+    </div>
+    <div class="drawer-body bill-body">
+      <div class="table-wrap">
+        <table id="billDetailTable">
+          <colgroup>
+            <col />
+            <col style="width:88px" />
+            <col style="width:120px" />
+            <col style="width:100px" />
+            <col style="width:96px" />
+          </colgroup>
+          <thead>
+            <tr>
+              <th>项目名称</th>
+              <th class="num">订单量</th>
+              <th class="num">收益金额</th>
+              <th class="num">服务费比例</th>
+              <th>结算状态</th>
+            </tr>
+          </thead>
+          <tbody id="stDetailBody"></tbody>
+        </table>
+      </div>
+      <div class="bill-total">
+        <span>可提现金额合计</span>
+        <span class="amt" id="stDetailTotal">¥0.00</span>
+      </div>
+      <div class="bill-note">
+        可提现金额口径：每个项目的 <strong>收益金额 × (1 - 服务费比例)</strong> 所得金额之和。月结账单以 <strong>订单日期</strong> 自然月归集。任一项目结算状态为 <strong>结算中</strong>，结算单为未生成、不推送给代理；各项目都 <strong>结算完成</strong> 才已生成并推送。
+      </div>
+    </div>
+  </aside>
+
   <div class="drawer-overlay" id="priceLogOverlay" onclick="closePriceLog()"></div>
   <aside class="drawer" id="priceLogDrawer" role="dialog">
     <div class="drawer-header">
@@ -2182,6 +2544,88 @@
       }
     ];
 
+    var ST_STATUS = {
+      none: { label: '未提现', cls: 'tag-warn' },
+      pending: { label: '提现中', cls: 'tag-info' },
+      paid: { label: '已提现', cls: 'tag-ok' },
+      na: { label: '—', cls: 'tag-gray' }
+    };
+    var ST_GEN = {
+      ready: { label: '已生成', cls: 'tag-ok' },
+      draft: { label: '未生成', cls: 'tag-warn' }
+    };
+    var ST_LINE = {
+      done: { label: '结算完成', cls: 'tag-ok' },
+      pending: { label: '结算中', cls: 'tag-warn' }
+    };
+    function stLine(project, orders, revenue, feeRate, settle) {
+      return { project: project, orders: orders, revenue: revenue, feeRate: feeRate, settle: settle || 'done' };
+    }
+    var stRows = [
+      {
+        id: 'S-1001', agentId: 'A-10090', account: 'agent_zhao', name: '赵氏内容科技',
+        month: '2026-08', settleNo: 'SET-202608-01', withdraw: 'none',
+        lines: [
+          stLine('小云雀挂载', 2481, 42310.18, 0.05, 'done'),
+          stLine('小云雀展归', 1762, 26890.21, 0.05, 'done'),
+          stLine('番茄小说-漫剧', 931, 38420.50, 0.05, 'done'),
+          stLine('网易云有声书', 704, 28760.00, 0.05, 'done'),
+          stLine('CapCut拉失活', 412, 24850.00, 0.05, 'done'),
+          stLine('CapCut拉新', 219, 18199.61, 0.05, 'done')
+        ]
+      },
+      {
+        id: 'S-1002', agentId: 'A-10086', account: 'agent_zhou', name: '周创作者工作室',
+        month: '2026-08', settleNo: 'SET-202608-02', withdraw: 'pending',
+        lines: [
+          stLine('小云雀挂载', 186, 8200.00, 0.05, 'done'),
+          stLine('番茄小说-漫剧', 94, 5273.68, 0.05, 'done')
+        ]
+      },
+      {
+        id: 'S-1003', agentId: 'A-10087', account: 'agent_lin', name: '林安文化传媒',
+        month: '2026-08', settleNo: 'SET-202608-03', withdraw: 'pending',
+        lines: [
+          stLine('小云雀展归', 142, 5400.00, 0.05, 'done'),
+          stLine('网易云有声书', 88, 3652.63, 0.05, 'done')
+        ]
+      },
+      {
+        id: 'S-1004', agentId: 'A-10090', account: 'agent_zhao', name: '赵氏内容科技',
+        month: '2026-07', settleNo: 'SET-202607-01', withdraw: 'paid',
+        lines: [
+          stLine('小云雀挂载', 320, 14800.00, 0.05, 'done'),
+          stLine('CapCut拉新', 156, 10042.11, 0.05, 'done')
+        ]
+      },
+      {
+        id: 'S-1005', agentId: 'A-10091', account: 'agent_sun', name: '孙氏短剧',
+        month: '2026-08', settleNo: 'SET-202608-04', withdraw: 'pending',
+        lines: [
+          stLine('CapCut拉失活', 110, 6200.00, 0.05, 'done'),
+          stLine('番茄小说-漫剧', 76, 4115.79, 0.05, 'done')
+        ]
+      },
+      {
+        id: 'S-1006', agentId: 'A-10092', account: 'agent_tuoba', name: '拓拔',
+        month: '2026-08', settleNo: 'SET-202608-05', withdraw: 'na',
+        lines: [
+          stLine('小云雀挂载', 410, 18600.00, 0.05, 'done'),
+          stLine('小云雀展归', 268, 12400.00, 0.05, 'done'),
+          stLine('知乎故事', 155, 9800.00, 0.05, 'pending')
+        ]
+      },
+      {
+        id: 'S-1007', agentId: 'A-10089', account: 'agent_wu', name: '吴氏影视',
+        month: '2026-08', settleNo: 'SET-202608-06', withdraw: 'none',
+        lines: [
+          stLine('小云雀挂载', 88, 4200.00, 0.05, 'done'),
+          stLine('CapCut拉新', 52, 2800.00, 0.05, 'done')
+        ]
+      }
+    ];
+    var stFilter = { name: '', month: '', gen: '', status: '' };
+
     var appliedFilter = { account: '', status: '' };
     var wdFilter = { account: '', review: '', pay: '' };
     var pendingActionId = '';
@@ -2362,6 +2806,128 @@
 
     function money(n) {
       return '¥' + Number(n).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function round2(n) {
+      return Math.round(Number(n) * 100) / 100;
+    }
+    function stLineFee(line) {
+      return round2(line.revenue * line.feeRate);
+    }
+    function stLineWithdraw(line) {
+      return round2(line.revenue * (1 - line.feeRate));
+    }
+    function stTotals(r) {
+      return (r.lines || []).reduce(function (acc, line) {
+        acc.revenue = round2(acc.revenue + line.revenue);
+        acc.fee = round2(acc.fee + stLineFee(line));
+        acc.withdraw = round2(acc.withdraw + stLineWithdraw(line));
+        return acc;
+      }, { revenue: 0, fee: 0, withdraw: 0 });
+    }
+    function stBillGen(r) {
+      var pending = (r.lines || []).some(function (line) { return line.settle === 'pending'; });
+      return pending ? 'draft' : 'ready';
+    }
+    function findSt(id) {
+      return stRows.filter(function (r) { return r.id === id; })[0];
+    }
+    function filteredStRows() {
+      var name = (stFilter.name || '').trim().toLowerCase();
+      var month = stFilter.month || '';
+      var gen = stFilter.gen || '';
+      var status = stFilter.status || '';
+      return stRows.filter(function (r) {
+        if (name && r.name.toLowerCase().indexOf(name) === -1) return false;
+        if (month && r.month !== month) return false;
+        if (gen && stBillGen(r) !== gen) return false;
+        if (status && r.withdraw !== status) return false;
+        return true;
+      });
+    }
+    function renderStStats(list) {
+      var draft = list.filter(function (r) { return stBillGen(r) === 'draft'; });
+      var ready = list.filter(function (r) { return stBillGen(r) === 'ready'; });
+      var none = list.filter(function (r) { return r.withdraw === 'none'; });
+      var paid = list.filter(function (r) { return r.withdraw === 'paid'; });
+      function sumWithdraw(arr) {
+        return arr.reduce(function (s, r) { return round2(s + stTotals(r).withdraw); }, 0);
+      }
+      document.getElementById('stStatDraft').textContent = draft.length;
+      document.getElementById('stStatReady').textContent = ready.length;
+      document.getElementById('stStatNone').textContent = none.length;
+      document.getElementById('stStatPaid').textContent = paid.length;
+      document.getElementById('stAmtDraft').textContent = money(sumWithdraw(draft));
+      document.getElementById('stAmtReady').textContent = money(sumWithdraw(ready));
+      document.getElementById('stAmtNone').textContent = money(sumWithdraw(none));
+      document.getElementById('stAmtPaid').textContent = money(sumWithdraw(paid));
+    }
+    function renderStList() {
+      var list = filteredStRows();
+      renderStStats(list);
+      var body = document.getElementById('stBody');
+      if (!list.length) {
+        body.innerHTML = '<tr><td colspan="9"><div class="empty-row"><strong>暂无数据</strong>当前筛选条件下没有结算单</div></td></tr>';
+        return;
+      }
+      body.innerHTML = list.map(function (r) {
+        var tot = stTotals(r);
+        var gen = ST_GEN[stBillGen(r)];
+        var wdKey = stBillGen(r) === 'draft' ? 'na' : (r.withdraw || 'na');
+        var st = ST_STATUS[wdKey] || ST_STATUS.na;
+        return '<tr data-id="' + escapeHtml(r.id) + '">' +
+          '<td title="' + escapeHtml(r.name) + '">' + escapeHtml(r.name) + '</td>' +
+          '<td class="mono">' + escapeHtml(r.month) + '</td>' +
+          '<td class="mono">' + escapeHtml(r.settleNo) + '</td>' +
+          '<td><span class="tag ' + gen.cls + '">' + gen.label + '</span></td>' +
+          '<td class="money">' + money(tot.revenue) + '</td>' +
+          '<td class="money">' + money(tot.fee) + '</td>' +
+          '<td class="money">' + money(tot.withdraw) + '</td>' +
+          '<td><span class="tag ' + st.cls + '">' + st.label + '</span></td>' +
+          '<td class="col-action"><button class="link" type="button" onclick="openStDetail(\'' + r.id + '\')">查看明细</button></td>' +
+          '</tr>';
+      }).join('');
+    }
+    function queryStList() {
+      stFilter.name = document.getElementById('stNameQ').value;
+      stFilter.month = document.getElementById('stMonthQ').value;
+      stFilter.gen = document.getElementById('stGenQ').value;
+      stFilter.status = document.getElementById('stStatusQ').value;
+      renderStList();
+    }
+    function resetStFilter() {
+      document.getElementById('stNameQ').value = '';
+      document.getElementById('stMonthQ').value = '';
+      document.getElementById('stGenQ').value = '';
+      document.getElementById('stStatusQ').value = '';
+      showToast('筛选条件已重置');
+    }
+    function openStDetail(id) {
+      var r = findSt(id);
+      if (!r) return;
+      var tot = stTotals(r);
+      var gen = stBillGen(r);
+      document.getElementById('stDetailTitle').textContent = r.month + ' 账单明细';
+      document.getElementById('stDetailSub').textContent = gen === 'ready'
+        ? r.settleNo + ' · 已生成，已推送给代理'
+        : r.settleNo + ' · 未生成，尚有项目订单未结算，不推送给代理';
+      document.getElementById('stDetailBody').innerHTML = r.lines.map(function (line) {
+        var settle = ST_LINE[line.settle === 'pending' ? 'pending' : 'done'];
+        return '<tr>' +
+          '<td title="' + escapeHtml(line.project) + '">' + escapeHtml(line.project) + '</td>' +
+          '<td class="num">' + Number(line.orders).toLocaleString('zh-CN') + '</td>' +
+          '<td class="num money">' + money(line.revenue) + '</td>' +
+          '<td class="num">' + Math.round(line.feeRate * 100) + '%</td>' +
+          '<td><span class="tag ' + settle.cls + '">' + settle.label + '</span></td>' +
+          '</tr>';
+      }).join('');
+      document.getElementById('stDetailTotal').textContent = money(tot.withdraw);
+      document.getElementById('stDetailDrawer').classList.add('open');
+      document.getElementById('stDetailOverlay').classList.add('open');
+    }
+    function closeStDetail() {
+      document.getElementById('stDetailDrawer').classList.remove('open');
+      document.getElementById('stDetailOverlay').classList.remove('open');
     }
 
     function compactDate(appliedAt) {
@@ -3450,7 +4016,7 @@
 
     function currentTabKey() {
       var id = document.querySelector('.page-view.active') && document.querySelector('.page-view.active').id;
-      return { 'view-explain': 'explain', 'view-cert': 'cert', 'view-withdraw': 'withdraw', 'view-price': 'price', 'view-notice': 'notice' }[id] || 'cert';
+      return { 'view-explain': 'explain', 'view-cert': 'cert', 'view-settle': 'settle', 'view-withdraw': 'withdraw', 'view-price': 'price', 'view-notice': 'notice' }[id] || 'cert';
     }
     function currentViewKey() {
       var view = document.querySelector('.page-view.active');
@@ -3486,7 +4052,7 @@
       document.getElementById(ruleId).classList.add('active');
     }
     function syncRuleTabToPage() {
-      var ruleId = ({ cert: 'rule-cert', withdraw: 'rule-withdraw', price: 'rule-price', notice: 'rule-notice' })[currentTabKey()] || 'rule-cert';
+      var ruleId = ({ cert: 'rule-cert', settle: 'rule-settle', withdraw: 'rule-withdraw', price: 'rule-price', notice: 'rule-notice' })[currentTabKey()] || 'rule-cert';
       var btn = document.querySelector('.rule-tab-bar button[data-rule="' + ruleId + '"]');
       if (btn) switchRuleTab(ruleId, btn);
     }
@@ -3585,6 +4151,10 @@
         closeNtDetail();
         return;
       }
+      if (document.getElementById('stDetailDrawer').classList.contains('open')) {
+        closeStDetail();
+        return;
+      }
       setRuleDrawer(false);
     });
 
@@ -3600,10 +4170,12 @@
         var secBtn = document.querySelector('.explain-nav button[data-explain="' + explainId + '"]');
         if (secBtn) switchExplainTab(explainId, secBtn);
       }
-    } else if (tab === 'withdraw' || tab === 'price' || tab === 'notice' || tab === 'flow') {
+    } else if (tab === 'settle' || tab === 'withdraw' || tab === 'price' || tab === 'notice' || tab === 'flow') {
+      var settleBtn = document.querySelector('[data-page="view-settle"]');
       var wdBtn = document.querySelector('[data-page="view-withdraw"]');
       var priceBtn = document.querySelector('[data-page="view-price"]');
       var noticeBtn = document.querySelector('[data-page="view-notice"]');
+      if (tab === 'settle' && settleBtn) settleBtn.click();
       if (tab === 'withdraw' && wdBtn) wdBtn.click();
       if (tab === 'price' && priceBtn) priceBtn.click();
       if (tab === 'notice' && noticeBtn) noticeBtn.click();
@@ -3621,6 +4193,7 @@
       if (qaBtn) qaBtn.click();
     }
     renderList();
+    renderStList();
     renderWdList();
     renderPriceProjects();
     renderNtList();
