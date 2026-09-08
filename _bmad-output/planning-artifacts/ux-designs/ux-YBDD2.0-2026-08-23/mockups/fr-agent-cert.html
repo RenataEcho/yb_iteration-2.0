@@ -484,7 +484,7 @@
         <h1>
           代理迭代V1.0
           <span class="badge badge-fr">FR-010</span>
-          <span class="badge badge-version">v5 当前</span>
+          <span class="badge badge-version">v6 当前</span>
         </h1>
         <p class="page-desc">代理板块本轮交付认证审核、月结结算单、提现结算、授权项目价格配置与代理通知。认证通过后对公账户可用于线上结算；系统按订单日期自然月归集并在当月全部结算后推送结算单；提现需审核通过后再打款；已授权项目可配置代理价格；代理消息分系统提示与平台通知，支持系统触发与运营主动发送。</p>
       </div>
@@ -709,7 +709,7 @@
             <div class="explain-kicker">代理通知</div>
             <div class="explain-hero">
               <h2>一条通知只属于一类：系统提示或平台通知</h2>
-              <p>两类进同一张表，用「通知类型」区分。后台和代理端都按类型分栏。系统触发记录不能在新增抽屉里改或补发。</p>
+              <p>两类进同一张表，用「通知类型」区分。后台和代理端都按类型分栏。系统触发记录不能在新增抽屉里改或补发。误发可在操作列删除，删除后<strong>代理端同步消失</strong>。</p>
             </div>
             <div class="explain-section">
               <div class="explain-grid">
@@ -729,8 +729,9 @@
                 <li><strong>系统触发</strong>：认证通过/驳回、提现审核通过/驳回、账单生成。类型固定为平台通知，接收人固定为该代理，标题描述由事件结果生成。运营不能手改类型和接收人。</li>
                 <li><strong>运营主动</strong>：点「新增通知」用右侧表单抽屉（不是弹窗）。关键词批量下线走主动发送，系统不代写。</li>
                 <li>主动发送：类型二选一、标题必填 ≤40 字、描述必填 ≤200 字、配图选填（JPG/PNG/WEBP）、接收范围=全部或至少勾 1 个代理。保存即视为已推送。</li>
+                <li><strong>删除</strong>：操作列提供删除，用于撤回误发。确认后后台列表移除，<strong>代理端对应消息同步删除</strong>，不可恢复。</li>
               </ul>
-              <div class="callout info">本轮不做代理端消息中心 Demo，也不做已读态和真实推送通道。和用户说「后台已发送」即可，不要承诺已读回执。</div>
+              <div class="callout info">本轮不做代理端消息中心 Demo，也不做已读态和真实推送通道。和用户说「后台已发送 / 已删除」即可，不要承诺已读回执。</div>
             </div>
           </section>
 
@@ -762,23 +763,19 @@
                 <div class="faq-a">本轮认证结论、提现审核驳回都不可改判。代理按原因改完重新提交，会多一行新的待审核，旧驳回行留着对账。</div>
               </div>
               <div class="faq-item">
-                <div class="faq-q">Q6. 列表累计金额和代理说的收益对不上？</div>
-                <div class="faq-a">累计金额是右豹原价。代理出账按「已配置代理价格 × 单量」。没配代理价的字段不计入，也不会用原价顶上。先打开价格配置看哪些字段空着。</div>
-              </div>
-              <div class="faq-item">
-                <div class="faq-q">Q7. 项目已禁用，为什么还能改价？</div>
+                <div class="faq-q">Q6. 项目已禁用，为什么还能改价？</div>
                 <div class="faq-a">允许改，方便历史对账；保存会提示「未生效于新订单」。未授权或不存在的项目没有价格配置入口。</div>
               </div>
               <div class="faq-item">
-                <div class="faq-q">Q8. 系统通知发错了能不能改？</div>
-                <div class="faq-a">系统触发的平台通知不能在新增抽屉里改或补发。要补充说明，另外发一条运营主动通知。</div>
+                <div class="faq-q">Q7. 系统通知发错了能不能改？</div>
+                <div class="faq-a">不能改内容。误发在操作列删除，删除后代理端消息同步消失。要补充说明，另外再发一条运营主动通知。</div>
               </div>
               <div class="faq-item">
-                <div class="faq-q">Q9. 这个月账单为什么还没出？</div>
+                <div class="faq-q">Q8. 这个月账单为什么还没出？</div>
                 <div class="faq-a">先看结算单状态。有项目还是「结算中」，整张结算单就是「未生成」，不会推送给代理。等各项目都「结算完成」才变成已生成并推送。未认证代理后台也会有结算单，只是认证没过不能提现。</div>
               </div>
               <div class="faq-item">
-                <div class="faq-q">Q10. 重置筛选后列表怎么没变？</div>
+                <div class="faq-q">Q9. 重置筛选后列表怎么没变？</div>
                 <div class="faq-a">五个列表都是「重置只清空条件，不自动查询」。再点一次查询才会按空条件刷新。</div>
               </div>
             </div>
@@ -1579,7 +1576,7 @@
                 <col style="width:92px" />
                 <col style="width:168px" />
                 <col style="width:136px" />
-                <col style="width:88px" />
+                <col style="width:120px" />
               </colgroup>
               <thead>
                 <tr>
@@ -1602,7 +1599,7 @@
       </div>
       <div id="nt-flow" class="sub-view">
         <div class="glass-card">
-          <p class="flow-page-intro">代理消息分系统提示与平台通知。资料审核结果、提现审核结果、账单生成由系统触发，类型锁定为平台通知、接收人为当事代理。功能更新、系统维护等由运营主动新增，须选通知类型、填写标题与描述、可选配图，并指定全部代理或指定代理。菱形为校验节点。</p>
+          <p class="flow-page-intro">代理消息分系统提示与平台通知。资料审核结果、提现审核结果、账单生成由系统触发，类型锁定为平台通知、接收人为当事代理。功能更新、系统维护等由运营主动新增，须选通知类型、填写标题与描述、可选配图，并指定全部代理或指定代理。后台删除误发后，代理端对应消息同步删除。菱形为校验节点。</p>
           <div class="flow-svg-wrap">
             <svg width="960" height="700" viewBox="0 0 960 700" xmlns="http://www.w3.org/2000/svg">
               <defs>
@@ -1656,7 +1653,7 @@
                 <text x="480" y="526" text-anchor="middle" font-size="10" fill="#64748b">进入后台通知列表</text>
                 <rect x="340" y="588" width="280" height="52" rx="8" fill="#eff6ff" stroke="#2563eb" />
                 <text x="480" y="610" text-anchor="middle" font-size="12" fill="#18222f">代理端展示对应消息</text>
-                <text x="480" y="626" text-anchor="middle" font-size="10" fill="#64748b">系统提示 / 平台通知分栏</text>
+                <text x="480" y="626" text-anchor="middle" font-size="10" fill="#64748b">后台删除后同步从代理端移除</text>
               </g>
             </svg>
           </div>
@@ -1674,7 +1671,7 @@
   <div class="drawer-overlay" id="ruleOverlay" onclick="setRuleDrawer(false)"></div>
   <aside class="drawer" id="ruleDrawer" role="dialog">
     <div class="drawer-header">
-      <h2>FR-010 · 需求规则 · v5</h2>
+      <h2>FR-010 · 需求规则 · v6</h2>
       <button class="drawer-close" type="button" onclick="setRuleDrawer(false)">×</button>
     </div>
     <div class="rule-tab-bar" role="tablist">
@@ -2037,7 +2034,7 @@
               <li>触发方式：系统触发 / 运营主动</li>
               <li>接收范围：全部代理 / 指定代理（列出帐号与名称）</li>
               <li>发送时间</li>
-              <li>操作：详情</li>
+              <li>操作：详情、删除</li>
             </ul>
           </div>
         </div>
@@ -2051,6 +2048,7 @@
               <li><strong>接收范围</strong>：全部代理 / 指定代理。指定代理须至少勾选 1 个已有代理帐号。</li>
             </ul>
             <p style="margin-top:8px;">保存后立即写入列表并视为已推送。系统触发记录不可在此抽屉编辑或补发。打开新增时关闭详情抽屉，避免双层叠加。</p>
+            <p style="margin-top:8px;"><strong>删除</strong>：操作列「删除」打开确认弹窗（标题「确认删除？」，文案含通知标题，不可撤销）。确认后从后台列表移除，并<strong>同步删除代理端对应消息</strong>。系统触发与运营主动均可删，用于撤回误发。</p>
           </div>
         </div>
         <div class="rule-section">
@@ -2069,7 +2067,7 @@
           <div class="rule-content">
             <ul>
               <li>系统触发通知的类型固定为<strong>平台通知</strong>，接收范围固定为<strong>当事代理</strong>，标题/描述由事件结果生成（通过/驳回/账单周期）。</li>
-              <li>本轮<strong>不交付</strong>代理端消息中心 Demo；代理端按系统提示 / 平台通知分栏展示，字段与后台列表对齐。</li>
+              <li>本轮<strong>不交付</strong>代理端消息中心 Demo；代理端按系统提示 / 平台通知分栏展示，字段与后台列表对齐。后台删除后代理端同一条消息同步消失。</li>
               <li>本 Demo 不做真实推送通道、已读态与持久化。</li>
             </ul>
           </div>
@@ -2269,6 +2267,20 @@
       <div class="modal-footer">
         <button class="btn btn-ghost" type="button" onclick="closeModal('priceDeleteOverlay')">取消</button>
         <button class="btn btn-danger" type="button" onclick="submitPriceDelete()">确认删除</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="ntDeleteOverlay">
+    <div class="modal" role="dialog" aria-labelledby="ntDeleteTitle">
+      <div class="modal-header" id="ntDeleteTitle">确认删除？</div>
+      <div class="modal-body">
+        <p>即将删除该通知，后台与代理端会同步移除，此操作不可撤销。</p>
+        <div class="confirm-summary" id="ntDeleteSummary"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" type="button" onclick="closeModal('ntDeleteOverlay')">取消</button>
+        <button class="btn btn-danger" type="button" onclick="submitNtDelete()">确认删除</button>
       </div>
     </div>
   </div>
@@ -2777,6 +2789,7 @@
     var ntFilter = { title: '', kind: '', trigger: '' };
     var nextNtSeq = 1007;
     var pendingNtImage = '';
+    var pendingNtId = '';
 
     var priceLogs = {
       65: [
@@ -3849,7 +3862,10 @@
               : '') +
           '</td>' +
           '<td>' + escapeHtml(r.sentAt) + '</td>' +
-          '<td class="col-action"><button class="link" type="button" onclick="openNtDetail(\'' + r.id + '\')">详情</button></td>' +
+          '<td class="col-action">' +
+            '<button class="link" type="button" onclick="openNtDetail(\'' + r.id + '\')">详情</button>' +
+            '<button class="link link-danger" type="button" onclick="openNtDelete(\'' + r.id + '\')">删除</button>' +
+          '</td>' +
           '</tr>';
       }).join('');
     }
@@ -3996,6 +4012,24 @@
       document.getElementById('ntDetailDrawer').classList.remove('open');
       document.getElementById('ntDetailOverlay').classList.remove('open');
     }
+    function openNtDelete(id) {
+      var r = findNt(id);
+      if (!r) return;
+      pendingNtId = id;
+      document.getElementById('ntDeleteSummary').innerHTML =
+        '即将删除「' + escapeHtml(r.title) + '」（' + escapeHtml(r.id) + '），代理端对应消息同步删除。';
+      openModal('ntDeleteOverlay');
+    }
+    function submitNtDelete() {
+      var r = findNt(pendingNtId);
+      if (!r) return;
+      ntRows = ntRows.filter(function (x) { return x.id !== r.id; });
+      pendingNtId = '';
+      closeModal('ntDeleteOverlay');
+      closeNtDetail();
+      renderNtList();
+      showToast('已删除「' + r.title + '」，代理端已同步移除');
+    }
     function openNtImage(id) {
       var r = findNt(id);
       if (!r || !r.image) return;
@@ -4124,7 +4158,7 @@
     });
     document.addEventListener('keydown', function (e) {
       if (e.key !== 'Escape') return;
-      var danger = ['rejectOverlay', 'wdRejectOverlay', 'wdPayFailOverlay', 'priceDeleteOverlay'];
+      var danger = ['rejectOverlay', 'wdRejectOverlay', 'wdPayFailOverlay', 'priceDeleteOverlay', 'ntDeleteOverlay'];
       var others = ['approveOverlay', 'wdApproveOverlay', 'wdPayOkOverlay', 'docOverlay', 'priceConfigOverlay', 'priceEditOverlay', 'priceBatchRatioOverlay', 'priceBatchAddOverlay'];
       var i;
       for (i = 0; i < danger.length; i++) {

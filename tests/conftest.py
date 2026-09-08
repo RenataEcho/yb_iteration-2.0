@@ -49,3 +49,10 @@ def settle_page(page, demo_server):
     page.goto(f"{demo_server}/fr-agent-cert.html?tab=settle", wait_until="domcontentloaded")
     page.locator("#stBody tr").first.wait_for()
     return page
+
+
+@pytest.fixture
+def notice_page(page, demo_server):
+    page.goto(f"{demo_server}/fr-agent-cert.html?tab=notice", wait_until="domcontentloaded")
+    page.locator("#ntBody tr").first.wait_for()
+    return page
