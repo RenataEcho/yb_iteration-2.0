@@ -302,6 +302,80 @@
       background: #f8fafc; border: 1px solid var(--border); font-size: 12px; color: var(--text-secondary); line-height: 1.6;
     }
     .form-hint.warn { background: #fffbeb; border-color: #fde68a; color: #92400e; }
+    /* 业务解释 · 运营手册 */
+    .explain-layout {
+      display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 16px; align-items: start;
+    }
+    @media (max-width: 900px) { .explain-layout { grid-template-columns: 1fr; } }
+    .explain-nav {
+      position: sticky; top: 12px; padding: 12px; display: flex; flex-direction: column; gap: 4px;
+    }
+    .explain-nav .nav-caption {
+      font-size: 11px; font-weight: 600; color: var(--text-muted); padding: 4px 10px 8px;
+    }
+    .explain-nav button {
+      text-align: left; border: none; background: transparent; cursor: pointer;
+      padding: 9px 12px; border-radius: 8px; font-size: 13px; color: var(--text-secondary); line-height: 1.35;
+    }
+    .explain-nav button small { display: block; font-size: 11px; color: var(--text-muted); margin-top: 2px; font-weight: 400; }
+    .explain-nav button.active { background: var(--primary-light); color: var(--primary); font-weight: 600; }
+    .explain-nav button.active small { color: #3b82f6; }
+    .explain-panel { display: none; padding: 20px 22px 28px; }
+    .explain-panel.active { display: block; }
+    .explain-hero {
+      padding: 16px 18px; border-radius: var(--radius-sm); margin-bottom: 18px;
+      background: linear-gradient(135deg, #eff6ff, #ecfeff); border: 1px solid #bfdbfe;
+    }
+    .explain-hero h2 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .explain-hero p { font-size: 13px; color: var(--text-secondary); line-height: 1.7; }
+    .explain-kicker { font-size: 11px; font-weight: 700; letter-spacing: .04em; color: var(--primary); margin-bottom: 6px; }
+    .explain-section { margin-bottom: 22px; }
+    .explain-section:last-child { margin-bottom: 0; }
+    .explain-section h3 { font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+    .explain-section p, .explain-section li { font-size: 13px; color: var(--text-secondary); line-height: 1.7; }
+    .explain-section code, .explain-hero code {
+      font-family: ui-monospace, monospace; font-size: 12px; background: #f1f5f9; padding: 1px 5px; border-radius: 4px;
+    }
+    .explain-section ul, .explain-section ol { padding-left: 18px; }
+    .explain-section li { margin-bottom: 6px; }
+    .explain-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    @media (max-width: 720px) { .explain-grid { grid-template-columns: 1fr; } }
+    .explain-card {
+      background: rgba(248,250,252,.9); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 14px 14px 12px;
+    }
+    .explain-card h4 { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+    .explain-card p, .explain-card li { font-size: 12px; color: var(--text-secondary); line-height: 1.65; }
+    .explain-card ul { padding-left: 16px; }
+    .explain-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .explain-table th, .explain-table td {
+      padding: 8px 10px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; line-height: 1.55;
+    }
+    .explain-table th { font-size: 11px; color: var(--text-muted); background: rgba(248,250,252,.9); white-space: nowrap; }
+    .explain-table td strong { color: var(--text-primary); }
+    .callout {
+      margin: 12px 0 0; padding: 10px 12px; border-radius: var(--radius-sm);
+      font-size: 12px; line-height: 1.65; color: var(--text-secondary);
+    }
+    .callout.warn { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
+    .callout.ok { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
+    .callout.info { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }
+    .callout.danger { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+    .faq-item { padding: 12px 0; border-bottom: 1px solid var(--border); }
+    .faq-item:last-child { border-bottom: none; }
+    .faq-q { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+    .faq-a { font-size: 13px; color: var(--text-secondary); line-height: 1.7; }
+    .step-list { counter-reset: step; list-style: none; padding-left: 0; }
+    .step-list li {
+      position: relative; padding-left: 36px; margin-bottom: 12px;
+    }
+    .step-list li::before {
+      counter-increment: step; content: counter(step);
+      position: absolute; left: 0; top: 1px;
+      width: 22px; height: 22px; border-radius: 50%;
+      background: var(--primary-light); color: var(--primary);
+      font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center;
+    }
   </style>
 </head>
 <body>
@@ -318,7 +392,7 @@
       <span class="sprint-pill">YBDD2.0 · 迭代 v1</span>
     </div>
     <div class="sidebar-scroll" data-iteration-sidebar></div>
-    <div class="sidebar-foot">FR-002 · 页内 Tab<br />前端交互 / 管理后台 / 业务流程</div>
+    <div class="sidebar-foot">FR-002 · 页内 Tab<br />业务解释 / 前端交互 / 管理后台 / 业务流程</div>
   </aside>
 
   <main class="main" id="main">
@@ -342,9 +416,384 @@
     </header>
 
     <div class="page-tab-bar" role="tablist">
+      <button type="button" data-page="view-explain" role="tab">业务解释</button>
       <button type="button" class="active" data-page="view-fe" role="tab">前端交互</button>
       <button type="button" data-page="view-admin" role="tab">管理后台</button>
       <button type="button" data-page="view-flow" role="tab">业务流程</button>
+    </div>
+
+    <!-- 业务解释 · 运营手册 -->
+    <div id="view-explain" class="page-view">
+      <div class="explain-layout">
+        <nav class="glass-card explain-nav" aria-label="业务解释章节">
+          <div class="nav-caption">运营手册 · 按章阅读</div>
+          <button type="button" class="active" data-explain="exp-overview">1 一句话看懂<small>这是什么、谁在用</small></button>
+          <button type="button" data-explain="exp-vs">2 和代发分配的区别<small>别和 FR-001 混为一谈</small></button>
+          <button type="button" data-explain="exp-type">3 两种分配类型<small>直接分配 vs 帐号归因</small></button>
+          <button type="button" data-explain="exp-agree">4 协议怎么走<small>邀请、同意、拒绝、重发</small></button>
+          <button type="button" data-explain="exp-money">5 钱怎么分<small>何时入账、金额口径</small></button>
+          <button type="button" data-explain="exp-admin">6 后台怎么查<small>三张表与对账路径</small></button>
+          <button type="button" data-explain="exp-faq">7 客诉怎么回<small>常见问题与排查</small></button>
+        </nav>
+        <div class="glass-card">
+          <section id="exp-overview" class="explain-panel active">
+            <div class="explain-kicker">FR-002 · 代发收益</div>
+            <div class="explain-hero">
+              <h2>主用户把一部分项目收益，按约定比例自动分给绑定的子用户</h2>
+              <p>这不是运营手工打款，也不是工作室内部的「代发分配」。主用户先邀请子用户签<strong>代发收益协议</strong>，子用户同意后，系统在收益<strong>已结算</strong>时按关系上的<strong>分配类型 + 分配比例</strong>自动入账：主用户钱包记一笔负数，子用户钱包记一笔正数。分出去的钱<strong>不能撤回</strong>。</p>
+            </div>
+            <div class="explain-section">
+              <h3>30 秒故事</h3>
+              <ol class="step-list">
+                <li>主用户在个人中心打开「代发收益」，添加子用户（填写右豹 ID + 分配比例 + 分配类型）。</li>
+                <li>子用户收到站内信「代发收益邀请」，在协议页同意或拒绝。拒绝后主用户可以重发。</li>
+                <li>协议已同意，且该关系「分配状态 = 启用」后，才具备分配资格。</li>
+                <li>主用户项目产生收益并完成结算后，系统自动按比例划给子用户，双方都在「项目收益明细」里看到「收益自动分配」。</li>
+              </ol>
+            </div>
+            <div class="explain-section">
+              <h3>三个角色各看什么</h3>
+              <div class="explain-grid">
+                <div class="explain-card">
+                  <h4>主用户（C 端）</h4>
+                  <p>个人中心 → 代发收益管理。看分配记录、子用户列表；可添加子用户、重走邀请。全程<strong>没有顶部汇总金额</strong>。入账/扣款看既有「项目收益明细」（金额为负）。</p>
+                </div>
+                <div class="explain-card">
+                  <h4>子用户（C 端）</h4>
+                  <p>只有协议确认页。同意或拒绝后流程结束，<strong>没有「我的代发收益」子页</strong>。钱到账后只在既有「项目收益明细」看正数记录，描述里没有跳转。</p>
+                </div>
+                <div class="explain-card">
+                  <h4>运营（管理后台）</h4>
+                  <p>查主子关系、协议状态、分配类型、已分配金额；帐号归因类型还要核对发布帐号授权和关键词归因。可新增/编辑关系、重发协议。不能替用户撤回已分配金额。</p>
+                </div>
+                <div class="explain-card">
+                  <h4>系统（自动）</h4>
+                  <p>出单结算后触发分配。写入分配记录时：<strong>分配行为 = 系统自动</strong>，<strong>业务来源 = 代发收益</strong>。不需要运营点确认。</p>
+                </div>
+              </div>
+              <div class="callout info">运营对外口径：代发收益是「主子用户之间的自动分账」，必须先签协议；不是客服手工调账，也不是工作室岗位分润（那个叫代发分配）。</div>
+            </div>
+          </section>
+
+          <section id="exp-vs" class="explain-panel">
+            <div class="explain-kicker">容易混 · 先记住这一页</div>
+            <div class="explain-hero">
+              <h2>代发收益 ≠ 代发分配</h2>
+              <p>两个需求名字都带「代发」，但服务的人和钱走的路径不同。用户说「代发没分到钱」时，先问清楚是<strong>主子协议分账</strong>还是<strong>工作室成员分润</strong>，再进对应后台。</p>
+            </div>
+            <div class="explain-section">
+              <div class="table-wrap">
+                <table class="explain-table">
+                  <thead>
+                    <tr>
+                      <th>对照项</th>
+                      <th>代发收益（本需求 FR-002）</th>
+                      <th>代发分配（FR-001）</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>谁和谁分</td>
+                      <td><strong>主用户 ↔ 子用户</strong>（协议绑定，可一对多）</td>
+                      <td>工作室负责人 ↔ 代发成员（岗位比例）</td>
+                    </tr>
+                    <tr>
+                      <td>怎么发起</td>
+                      <td>主用户邀请 + 子用户签协议</td>
+                      <td>加入工作室 / 岗位配置后自动或负责人主动分</td>
+                    </tr>
+                    <tr>
+                      <td>分配方式</td>
+                      <td>仅系统自动。两种类型：右豹 ID 直接分配 / 发布帐号归因</td>
+                      <td>系统自动（岗位比例）+ 负责人可主动分配</td>
+                    </tr>
+                    <tr>
+                      <td>能不能撤回</td>
+                      <td><strong>一律不可撤回</strong></td>
+                      <td>代发自动记录不可撤回；负责人主动分配可撤回</td>
+                    </tr>
+                    <tr>
+                      <td>C 端有没有「代发」标签</td>
+                      <td>分配信息<strong>不展示</strong>「代发」标签和「不可撤回」说明</td>
+                      <td>系统自动记录打「代发」标签</td>
+                    </tr>
+                    <tr>
+                      <td>子端有没有独立页</td>
+                      <td>没有。子用户只看项目收益明细</td>
+                      <td>成员有分配详情 / 发布帐号等入口</td>
+                    </tr>
+                    <tr>
+                      <td>后台怎么认</td>
+                      <td>业务来源 = 代发收益；看「主子分配关系」</td>
+                      <td>分配行为 = 系统自动 / 负责人主动；看工作室与成员</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="callout warn">两套能力复用同一套「分配引擎」，但关系模型和授权方式是独立的。同一发布帐号不建议同时参与两套代发；互斥规则待技术确认，客诉时先两边都查一遍，不要只查一张表就下结论。</div>
+            </div>
+          </section>
+
+          <section id="exp-type" class="explain-panel">
+            <div class="explain-kicker">核心规则 · 必须讲清楚</div>
+            <div class="explain-hero">
+              <h2>同一主用户只能选一种分配类型，不能混用</h2>
+              <p>主用户第一次建关系时选定类型，后续再绑子用户必须沿用。后台新增/编辑时若冲突会拦截。运营解释时先问「这个主用户是直接按右豹 ID 分，还是按发布帐号归因分」。</p>
+            </div>
+            <div class="explain-section">
+              <div class="explain-grid">
+                <div class="explain-card">
+                  <h4>右豹 ID 直接分配</h4>
+                  <ul>
+                    <li>按关系上的比例，把已结算收益打进<strong>子用户项目收益钱包</strong>。</li>
+                    <li><strong>不需要</strong>关键词归因，<strong>不依赖</strong>发布帐号三方授权。</li>
+                    <li>生效条件：协议已同意 + 分配状态启用。</li>
+                    <li>C 端：分配信息不能下钻详情；子用户卡片无授权帐号、不能进详情。</li>
+                    <li>后台：分配归因里关键词/发布帐号显示「—」；<strong>不进「代发关键词」表</strong>。</li>
+                  </ul>
+                </div>
+                <div class="explain-card">
+                  <h4>以发布帐号归因分配</h4>
+                  <ul>
+                    <li>出单后按 <strong>关键词 → 发布帐号 → 比例</strong> 归因（口径与代发分配一致）。</li>
+                    <li>必须该发布帐号<strong>三方授权有效</strong>。</li>
+                    <li>生效条件：协议已同意 + 授权有效 + 分配状态启用。</li>
+                    <li>C 端：可下钻分配详情（关键词、分配金额、比例、发布帐号 ID），可看子用户授权帐号（只读）。</li>
+                    <li>后台：走发布帐号表 + 代发关键词表对账。</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="callout ok">怎么帮用户选：没有稳定发布帐号、只按人分钱 → 右豹 ID 直接分配。要按哪个号出的单来分、要对到关键词 → 发布帐号归因。</div>
+            </div>
+            <div class="explain-section">
+              <h3>C 端页面会因此长得不一样</h3>
+              <div class="table-wrap">
+                <table class="explain-table">
+                  <thead>
+                    <tr><th>位置</th><th>发布帐号归因</th><th>右豹 ID 直接分配</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>分配信息卡片</td>
+                      <td>可点「查看详情」下钻到关键词 + 发布帐号 ID</td>
+                      <td>不能下钻，点了没详情页</td>
+                    </tr>
+                    <tr>
+                      <td>子用户信息卡片</td>
+                      <td>已分配金额 / 授权帐号数 / 分配比例，可进详情</td>
+                      <td>只有已分配金额 / 分配比例，无授权帐号、不可下钻</td>
+                    </tr>
+                    <tr>
+                      <td>子用户详情</td>
+                      <td>头像卡 + 授权帐号列表（只读），没有分配明细 Tab</td>
+                      <td>没有这个页面</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <section id="exp-agree" class="explain-panel">
+            <div class="explain-kicker">关系先于分钱</div>
+            <div class="explain-hero">
+              <h2>没同意协议，一分钱都不会分</h2>
+              <p>协议页复用现有邀请/接受页，本需求不重做、也不单独做协议配置。协议正文走现有配置 <code>rev_share_agreement</code>。一个主用户可以绑多个子用户，每条关系自己维护协议状态和比例。</p>
+            </div>
+            <div class="explain-section">
+              <h3>协议状态</h3>
+              <div class="table-wrap">
+                <table class="explain-table">
+                  <thead>
+                    <tr><th>状态</th><th>含义</th><th>会不会自动分钱</th><th>运营可做什么</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>待确认</strong></td>
+                      <td>邀请已推送，子用户还没处理</td>
+                      <td>不会</td>
+                      <td>可重发邀请；提醒子用户看站内信</td>
+                    </tr>
+                    <tr>
+                      <td><strong>已同意</strong></td>
+                      <td>子用户确认协议</td>
+                      <td>还要看「分配状态」是否启用；帐号归因还要授权有效</td>
+                      <td>可编辑比例/状态（类型受主用户锁定）</td>
+                    </tr>
+                    <tr>
+                      <td><strong>已拒绝</strong></td>
+                      <td>子用户拒绝，本轮结束</td>
+                      <td>不会</td>
+                      <td>主用户或后台可重发，状态回到待确认</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="callout warn">「已同意」不等于马上分钱。关系上还有「分配状态」：只有<strong>启用</strong>才参与自动分配；禁用后新出单不再分，已经分出去的记录仍保留、不可撤回。</div>
+            </div>
+            <div class="explain-section">
+              <h3>主用户 C 端怎么看关系</h3>
+              <ul>
+                <li>分配信息和子用户都为空：不展示 Tab，只出空态「暂无分配信息与子用户」，引导添加。</li>
+                <li>只要一边有数据：恢复「分配信息 / 子用户信息」两个 Tab；某一边暂时没数据就空列表，不要整页空态。</li>
+                <li>子用户卡片展示协议状态和时间；待确认的子用户仍会出现在列表里，已分配金额为「—」。</li>
+              </ul>
+            </div>
+          </section>
+
+          <section id="exp-money" class="explain-panel">
+            <div class="explain-kicker">对账口径</div>
+            <div class="explain-hero">
+              <h2>结算完成才会分；分配金额 = 该笔总金额 × 关系比例</h2>
+              <p>出单事件先入队，先更新关键词「累计产生收益」。只有收益<strong>已结算</strong>才触发代发分配。未结算就等待回调，不会提前划走。C 端所有代发收益页都<strong>没有顶部汇总条</strong>，不要按页面顶部数字跟用户对账。</p>
+            </div>
+            <div class="explain-section">
+              <h3>一笔分配会写到哪里</h3>
+              <div class="table-wrap">
+                <table class="explain-table">
+                  <thead>
+                    <tr><th>位置</th><th>主用户看到</th><th>子用户看到</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>项目收益明细（既有页）</td>
+                      <td>标题「收益自动分配」；金额<strong>为负</strong>；状态「收益分配」；描述「y-m-d产生收益自动分配 xx.xx」，可跳转代发收益管理</td>
+                      <td>同样标题和状态；金额<strong>为正</strong>；描述<strong>没有跳转</strong></td>
+                    </tr>
+                    <tr>
+                      <td>代发收益 · 分配信息</td>
+                      <td>卡片：分配金额 / 总金额 / 分配比例 / 分配用户（子用户昵称） / 分配时间</td>
+                      <td>没有这个页面</td>
+                    </tr>
+                    <tr>
+                      <td>后台 · 关系详情 · 分配详情</td>
+                      <td colspan="2">日期、主帐号收益、子帐号分配金额、分配时间、分配归因（项目 / 关键词 / 发布帐号）。直接分配时关键词和帐号为「—」。可导出 CSV。</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="explain-section">
+              <h3>数字怎么念给用户听</h3>
+              <ul>
+                <li><strong>总金额</strong>：这一笔已结算的项目收益，还没按比例切开之前的数。</li>
+                <li><strong>分配金额</strong>：按该条子用户关系比例切出去的数，也是主用户明细里那笔负数的绝对值。</li>
+                <li><strong>分配比例</strong>：关系上约定的 1%–99%，每条子用户可以不同，但类型必须相同。</li>
+                <li><strong>已分配金额</strong>（关系/子用户卡片）：该关系累计已成功分配，以数据更新时间为准。</li>
+                <li>关键词表的「累计产生收益 / 累计分配」只统计<strong>帐号归因</strong>那一类；直接分配不要跑到关键词表里找。</li>
+              </ul>
+              <div class="callout danger">代发收益分配记录<strong>不可撤回</strong>。用户要求「分错了退回来」，运营不能在本功能里点撤回；只能解释规则，并走另行约定的客服/财务流程（本需求不提供冲正入口）。</div>
+            </div>
+          </section>
+
+          <section id="exp-admin" class="explain-panel">
+            <div class="explain-kicker">管理后台 · 运营操作面</div>
+            <div class="explain-hero">
+              <h2>先查「主子分配关系」，再按类型决定要不要查帐号和关键词</h2>
+              <p>后台三张表职责不同：关系表管「能不能分、分给谁、分多少」；发布帐号表管「授权是否有效」；代发关键词表只管帐号归因的出单归因。列表顶上的已分配/待分配/启用关系/待确认是 Demo 展示，正式口径以后端定义为准。</p>
+            </div>
+            <div class="explain-section">
+              <h3>三张表分别解决什么</h3>
+              <div class="table-wrap">
+                <table class="explain-table">
+                  <thead>
+                    <tr><th>表</th><th>用来回答</th><th>关键动作</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>主子分配关系</strong></td>
+                      <td>这两个人有没有绑上？协议到哪一步？哪种类型？比例多少？累计分了多少？</td>
+                      <td>筛选主/子用户 ID、协议状态、分配状态、类型；详情（关系 + 分配明细）；编辑；重发协议；新增关系</td>
+                    </tr>
+                    <tr>
+                      <td><strong>发布帐号</strong></td>
+                      <td>子用户有没有把号授权给这个主用户？授权是否失效？</td>
+                      <td>按帐号/主子用户/授权状态/平台筛；看授权日志。数据来自三方，后台只展示对账，不在本需求里改授权。</td>
+                    </tr>
+                    <tr>
+                      <td><strong>代发关键词</strong></td>
+                      <td>这笔帐号归因的单，关键词、项目、累计收益和累计分配对不对？</td>
+                      <td>详情看 6 列：收益金额、产生时间、结算时间、分配金额、分配时间、分配批次。直接分配不进本表。</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="explain-section">
+              <h3>建议排查顺序</h3>
+              <ol class="step-list">
+                <li>用主用户 ID 或子用户 ID 打开「主子分配关系」，确认关系存在、协议已同意、分配状态启用、类型是哪一种。</li>
+                <li>点「详情 → 分配详情」，按日期/金额对那一笔。能对上就先回用户「系统已入账」；对不上再往下查。</li>
+                <li>类型是直接分配：不要查关键词表。核对项目收益明细正负是否成对即可。</li>
+                <li>类型是帐号归因：再查发布帐号授权是否有效，再查代发关键词详情里的结算时间和分配批次。</li>
+                <li>授权失效：该号<strong>新出单不再分配</strong>，历史记录保留。让用户重新走三方授权，不要承诺补分历史规则外的单。</li>
+              </ol>
+              <div class="callout info">关系详情里的分配归因三行是项目 / 关键词 / 发布帐号。直接分配缺归因时显示「—」，这是正常展示，不是数据丢失。</div>
+            </div>
+          </section>
+
+          <section id="exp-faq" class="explain-panel">
+            <div class="explain-kicker">客服 / 运营话术</div>
+            <div class="explain-hero">
+              <h2>先对身份和类型，再对协议，最后对那一笔钱</h2>
+              <p>用户很少说「FR-002」。他们会说「我帮别人发，怎么没分到钱」「我钱包少了一笔」。按下面清单走，可以独立闭环大部分咨询。</p>
+            </div>
+            <div class="explain-section">
+              <div class="faq-item">
+                <div class="faq-q">Q1. 子用户说：我同意了，为什么钱包没进账？</div>
+                <div class="faq-a">先确认他看的是<strong>项目收益明细</strong>，不是「代发收益」菜单——子用户本来就没有那个入口。再查关系：协议是否已同意、分配状态是否启用。若是帐号归因，再查对应发布帐号是否已授权且未失效。最后问出单是否已结算：未结算只累计、不分钱。</div>
+              </div>
+              <div class="faq-item">
+                <div class="faq-q">Q2. 主用户说：我钱包突然少了一笔，是不是被扣错了？</div>
+                <div class="faq-a">项目收益明细里标题为「收益自动分配」、状态「收益分配」、金额为负，就是代发收益划出。描述里的日期和金额应对上代发收益管理的分配信息。这是规则内自动划转，不是异常扣款。</div>
+              </div>
+              <div class="faq-item">
+                <div class="faq-q">Q3. 子用户找不到「代发收益」页面？</div>
+                <div class="faq-a">正常。子用户只处理协议邀请，入账只在项目收益明细。不要指导他去个人中心找代发收益管理。</div>
+              </div>
+              <div class="faq-item">
+                <div class="faq-q">Q4. 协议被拒绝了怎么办？</div>
+                <div class="faq-a">已拒绝不能参与分配。主用户或后台对该关系「重发协议」，子用户重新收到邀请。重发后状态回到待确认，在同意之前仍然不会分钱。</div>
+              </div>
+              <div class="faq-item">
+                <div class="faq-q">Q5. 为什么不能给同一个主用户同时建两种类型？</div>
+                <div class="faq-a">产品规则：一个主用户下所有子用户必须共用一种分配类型，避免同一笔收益按两套管账。后台保存时会拦截。要换类型，需要先处理掉该主用户已有关系（本需求未提供「一键切换类型」）。</div>
+              </div>
+              <div class="faq-item">
+                <div class="faq-q">Q6. 发布帐号授权失效了，以前分过的钱还在吗？新单还会分吗？</div>
+                <div class="faq-a">历史分配记录保留，不会因为失效被抹掉。失效之后该帐号的<strong>新出单不再参与分配</strong>。授权回调失败或超时，C 端只显示授权中/失败，不会写成有效授权。</div>
+              </div>
+              <div class="faq-item">
+                <div class="faq-q">Q7. 用户要求撤回某一笔分配？</div>
+                <div class="faq-a">本需求明确<strong>不可撤回</strong>。C 端也不展示「不可撤回」文案，避免刺激，但后台和客服口径必须一致：系统自动分配没有撤回按钮。分错需走额外财务流程，不要承诺能在代发收益里冲正。</div>
+              </div>
+              <div class="faq-item">
+                <div class="faq-q">Q8. 关键词表里找不到直接分配的用户？</div>
+                <div class="faq-a">对。代发关键词表只汇总「以发布帐号归因」的分配。直接分配请只看主子关系和项目收益明细。</div>
+              </div>
+              <div class="faq-item">
+                <div class="faq-q">Q9. 空态页是坏了吗？</div>
+                <div class="faq-a">分配信息和子用户都没有时，主用户看到缺省空态、不展示 Tab，这是设计。添加子用户并完成协议后才会出现两个 Tab。只有一边有数据时，另一个 Tab 可以是空列表。</div>
+              </div>
+              <div class="faq-item">
+                <div class="faq-q">Q10. 和「代发分配」搞混了怎么办？</div>
+                <div class="faq-a">问一句：是不是工作室里给成员按岗位分的？是 → 代发分配。是不是主号把收益按协议分给另一个右豹账号？是 → 代发收益。两套后台表不同，不要交叉承诺。</div>
+              </div>
+            </div>
+            <div class="explain-section">
+              <h3>对外不要承诺的事</h3>
+              <ul>
+                <li>不能撤回、不能在本页手工补发或冲正。</li>
+                <li>不能把同一主用户改成同时使用两种分配类型。</li>
+                <li>不能为子用户开通独立的「我的代发收益」管理页。</li>
+                <li>不能把未结算的出单当成已经分账。</li>
+                <li>授权失效期间的新单，不能按「以后补授权就自动补分」来承诺（本需求未定义补分）。</li>
+              </ul>
+              <div class="callout warn">页面原型和流程图给研发对照；和用户沟通请只用本 Tab 的口径。规则细节以页头「需求规则」抽屉为准，若两者冲突先记下来再找产品，不要现场发明规则。</div>
+            </div>
+          </section>
+        </div>
+      </div>
     </div>
 
     <!-- 前端交互 -->
@@ -1411,13 +1860,28 @@
       if (pageId === 'view-fe') {
         requestAnimationFrame(() => loadMockupFrame(false));
       }
-      const tabMap = { 'view-fe': 'fe', 'view-admin': 'admin', 'view-flow': 'flow' };
+      const tabMap = { 'view-explain': 'explain', 'view-fe': 'fe', 'view-admin': 'admin', 'view-flow': 'flow' };
       const params = new URLSearchParams();
       params.set('tab', tabMap[pageId] || 'fe');
       if (pageId === 'view-flow') {
         const activeFlow = document.querySelector('.flow-tab-bar button.active')?.dataset.flow || 'flow-1';
         params.set('flow', activeFlow.replace('flow-', ''));
       }
+      if (pageId === 'view-explain') {
+        const activeSec = document.querySelector('.explain-nav button.active')?.dataset.explain || 'exp-overview';
+        params.set('sec', activeSec.replace('exp-', ''));
+      }
+      history.replaceState(null, '', '?' + params.toString());
+    }
+
+    function switchExplainTab(explainId, btn) {
+      document.querySelectorAll('.explain-nav button').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.explain-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(explainId).classList.add('active');
+      const params = new URLSearchParams(location.search);
+      params.set('tab', 'explain');
+      params.set('sec', explainId.replace('exp-', ''));
       history.replaceState(null, '', '?' + params.toString());
     }
 
@@ -1434,6 +1898,10 @@
 
     document.querySelectorAll('.flow-tab-bar button').forEach(btn => {
       btn.addEventListener('click', () => switchFlowTab(btn.dataset.flow, btn));
+    });
+
+    document.querySelectorAll('.explain-nav button').forEach(btn => {
+      btn.addEventListener('click', () => switchExplainTab(btn.dataset.explain, btn));
     });
 
     document.querySelectorAll('.page-tab-bar button').forEach(btn => {
@@ -1523,11 +1991,18 @@
       }
     });
 
-    const tab = new URLSearchParams(location.search).get('tab');
-    const tabPageMap = { admin: 'view-admin', flow: 'view-flow', fe: 'view-fe' };
+    const initParams = new URLSearchParams(location.search);
+    const tab = initParams.get('tab');
+    const explainParam = initParams.get('sec');
+    const tabPageMap = { explain: 'view-explain', admin: 'view-admin', flow: 'view-flow', fe: 'view-fe' };
     if (tab && tabPageMap[tab]) {
       const btn = document.querySelector('[data-page="' + tabPageMap[tab] + '"]');
       if (btn) switchPageTab(tabPageMap[tab], btn);
+    }
+    if (tab === 'explain' && explainParam) {
+      const explainId = explainParam.startsWith('exp-') ? explainParam : 'exp-' + explainParam;
+      const explainBtn = document.querySelector('.explain-nav button[data-explain="' + explainId + '"]');
+      if (explainBtn) switchExplainTab(explainId, explainBtn);
     }
     const flowParam = new URLSearchParams(location.search).get('flow');
     if (flowParam) {

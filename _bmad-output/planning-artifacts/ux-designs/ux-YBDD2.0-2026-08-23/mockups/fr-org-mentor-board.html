@@ -336,6 +336,77 @@
       opacity: 0; transition: all 0.25s; z-index: 600; pointer-events: none;
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .explain-layout {
+      display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 16px; align-items: start;
+    }
+    @media (max-width: 900px) { .explain-layout { grid-template-columns: 1fr; } }
+    .explain-nav {
+      position: sticky; top: 12px; padding: 12px; display: flex; flex-direction: column; gap: 4px;
+    }
+    .explain-nav .nav-caption {
+      font-size: 11px; font-weight: 600; color: var(--text-muted); padding: 4px 10px 8px;
+    }
+    .explain-nav button {
+      text-align: left; border: none; background: transparent; cursor: pointer;
+      padding: 9px 12px; border-radius: 8px; font-size: 13px; color: var(--text-secondary); line-height: 1.35;
+    }
+    .explain-nav button small { display: block; font-size: 11px; color: var(--text-muted); margin-top: 2px; font-weight: 400; }
+    .explain-nav button.active { background: var(--primary-light); color: var(--primary); font-weight: 600; }
+    .explain-nav button.active small { color: #3b82f6; }
+    .explain-panel { display: none; padding: 20px 22px 28px; }
+    .explain-panel.active { display: block; }
+    .explain-hero {
+      padding: 16px 18px; border-radius: var(--radius-sm); margin-bottom: 18px;
+      background: linear-gradient(135deg, #eff6ff, #ecfeff); border: 1px solid #bfdbfe;
+    }
+    .explain-hero h2 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .explain-hero p { font-size: 13px; color: var(--text-secondary); line-height: 1.7; }
+    .explain-kicker { font-size: 11px; font-weight: 700; letter-spacing: .04em; color: var(--primary); margin-bottom: 6px; }
+    .explain-section { margin-bottom: 22px; }
+    .explain-section:last-child { margin-bottom: 0; }
+    .explain-section h3 { font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+    .explain-section p, .explain-section li { font-size: 13px; color: var(--text-secondary); line-height: 1.7; }
+    .explain-section code, .explain-hero code {
+      font-family: ui-monospace, monospace; font-size: 12px; background: #f1f5f9; padding: 1px 5px; border-radius: 4px;
+    }
+    .explain-section ul, .explain-section ol { padding-left: 18px; }
+    .explain-section li { margin-bottom: 6px; }
+    .explain-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    @media (max-width: 720px) { .explain-grid { grid-template-columns: 1fr; } }
+    .explain-card {
+      background: rgba(248,250,252,.9); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 14px 14px 12px;
+    }
+    .explain-card h4 { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+    .explain-card p, .explain-card li { font-size: 12px; color: var(--text-secondary); line-height: 1.65; }
+    .explain-card ul { padding-left: 16px; }
+    .explain-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .explain-table th, .explain-table td {
+      padding: 8px 10px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; line-height: 1.55;
+    }
+    .explain-table th { font-size: 11px; color: var(--text-muted); background: rgba(248,250,252,.9); white-space: nowrap; }
+    .explain-table td strong { color: var(--text-primary); }
+    .callout {
+      margin: 12px 0 0; padding: 10px 12px; border-radius: var(--radius-sm);
+      font-size: 12px; line-height: 1.65; color: var(--text-secondary);
+    }
+    .callout.warn { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
+    .callout.ok { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
+    .callout.info { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }
+    .callout.danger { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+    .faq-item { padding: 12px 0; border-bottom: 1px solid var(--border); }
+    .faq-item:last-child { border-bottom: none; }
+    .faq-q { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+    .faq-a { font-size: 13px; color: var(--text-secondary); line-height: 1.7; }
+    .step-list { counter-reset: step; list-style: none; padding-left: 0; }
+    .step-list li { position: relative; padding-left: 36px; margin-bottom: 12px; }
+    .step-list li::before {
+      counter-increment: step; content: counter(step);
+      position: absolute; left: 0; top: 1px;
+      width: 22px; height: 22px; border-radius: 50%;
+      background: var(--primary-light); color: var(--primary);
+      font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center;
+    }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
         animation-duration: 0.01ms !important;
@@ -358,7 +429,7 @@
       <span class="sprint-pill">YBDD2.0 · 迭代 v1</span>
     </div>
     <div class="sidebar-scroll" data-iteration-sidebar></div>
-    <div class="sidebar-foot">FR-011 · 导师迭代V1.0<br />机构看板 / 导师管理 / 业务流程</div>
+    <div class="sidebar-foot">FR-011 · 导师迭代V1.0<br />业务解释 / 机构看板 / 导师管理 / 业务流程</div>
   </aside>
 
   <main class="main">
@@ -382,9 +453,221 @@
     </header>
 
     <div class="page-tab-bar" role="tablist">
+      <button type="button" data-page="view-explain" role="tab">业务解释</button>
       <button type="button" class="active" data-page="view-board" role="tab">机构导师看板</button>
       <button type="button" data-page="view-mgmt" role="tab">导师管理</button>
       <button type="button" data-page="view-flow" role="tab">业务流程</button>
+    </div>
+
+    <div id="view-explain" class="page-view">
+      <div class="explain-layout">
+        <nav class="glass-card explain-nav" aria-label="业务解释章节">
+          <div class="nav-caption">运营手册 · 按章阅读</div>
+          <button type="button" class="active" data-explain="exp-overview">1 一句话看懂<small>看板看数，管理改档</small></button>
+          <button type="button" data-explain="exp-board">2 看板怎么看<small>机构下钻、点哪些数</small></button>
+          <button type="button" data-explain="exp-money">3 数字怎么算<small>会员去重与收益窗口</small></button>
+          <button type="button" data-explain="exp-mgmt">4 导师怎么管<small>主档、身份、子页</small></button>
+          <button type="button" data-explain="exp-import">5 批量导入<small>三种模版、哪些会失败</small></button>
+          <button type="button" data-explain="exp-faq">6 客诉怎么回<small>常见对不上的数</small></button>
+        </nav>
+        <div class="glass-card">
+          <section id="exp-overview" class="explain-panel active">
+            <div class="explain-kicker">FR-011 · 导师迭代V1.0</div>
+            <div class="explain-hero">
+              <h2>这是纯后台能力：看板只看数，导师管理才能改人</h2>
+              <p>本轮交付<strong>机构导师看板</strong>和<strong>导师管理</strong>。<strong>没有 C 端页面</strong>。看板按机构聚合导师/社群/会员/收益，点得进去看导师明细。管理页才是导师主档：新增、编辑、删除、三种 Excel 导入。</p>
+            </div>
+            <div class="explain-section">
+              <h3>两套页不要混用</h3>
+              <div class="table-wrap">
+                <table class="explain-table">
+                  <thead>
+                    <tr><th>对照</th><th>机构导师看板</th><th>导师管理</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>对象</td>
+                      <td>先看<strong>机构</strong>，再下钻导师</td>
+                      <td>直接看<strong>导师主档</strong></td>
+                    </tr>
+                    <tr>
+                      <td>身份枚举</td>
+                      <td>主导师 / 协同导师 / 见习导师（机构内角色）</td>
+                      <td>导师长 / 专项运营 / 专项服务 / 助教导师 / 创业导师</td>
+                    </tr>
+                    <tr>
+                      <td>能不能改</td>
+                      <td>只读。不新增、不编辑、不删除机构和导师</td>
+                      <td>详情 / 编辑 / 删除 / 批量导入</td>
+                    </tr>
+                    <tr>
+                      <td>收益口径</td>
+                      <td>会员累计收益：会员加入该机构/该导师期间</td>
+                      <td>累计收益 + 在籍收益（仍绑定的用户）</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="callout warn">看板身份和管理身份不是同一套词。有人问「这个主导师怎么在管理里叫专项运营」，先对右豹 ID，不要按称呼硬对。</div>
+            </div>
+          </section>
+
+          <section id="exp-board" class="explain-panel">
+            <div class="explain-kicker">机构导师看板</div>
+            <div class="explain-hero">
+              <h2>机构一行是总览；只有「导师数量 &gt; 0」能点进去</h2>
+              <p>筛机构名称（模糊）。查询刷新并回到第 1 页；重置只清空条件，不自动查。顶上四格统计跟当前查询结果走：机构数、导师合计、会员合计、会员累计收益。</p>
+            </div>
+            <div class="explain-section">
+              <h3>哪些数字能点</h3>
+              <div class="table-wrap">
+                <table class="explain-table">
+                  <thead>
+                    <tr><th>位置</th><th>字段</th><th>能不能点</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>机构列表</td><td>导师数量</td><td>&gt; 0 进入该机构导师明细；0 灰色不可点</td></tr>
+                    <tr><td>机构列表</td><td>社群数量、导师团数量</td><td>即使 &gt; 0 也<strong>不可点</strong>，只是去重后的只读数</td></tr>
+                    <tr><td>导师明细</td><td>关联导师团数量</td><td>&gt; 0 弹窗列出团名，不跳转、不能改</td></tr>
+                    <tr><td>导师明细</td><td>社群数量</td><td>&gt; 0 弹窗列出社群名，同样只读</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p style="margin-top:10px;">下钻导师列表时，导师筛选项会被清空。导师侧可按名称、身份、右豹 ID 再筛。更新时间是看板最近一次聚合刷新，不是你打开页面的时间。</p>
+            </div>
+          </section>
+
+          <section id="exp-money" class="explain-panel">
+            <div class="explain-kicker">对账口径 · 最容易说错</div>
+            <div class="explain-hero">
+              <h2>收益只计「绑在这个对象期间」产生的钱，不是会员一辈子的钱</h2>
+              <p>机构「会员累计收益」和导师「会员收益」窗口规则相同：<code>加入时间 ≤ 收益发生时间 &lt; 解绑时间</code>。没解绑时，右端对齐看板更新时间。加入之前、解绑之后都不算。</p>
+            </div>
+            <div class="explain-section">
+              <h3>会员数为什么加起来对不上</h3>
+              <ul>
+                <li>机构「会员数量」按机构会员<strong>去重</strong>。</li>
+                <li>导师「会员数量」按该导师名下统计。</li>
+                <li>同一会员可以挂多名导师，所以各导师会员数之和<strong>可以大于</strong>机构会员数。这不是脏数据。</li>
+              </ul>
+              <div class="callout info">同一会员多次加入/解绑：每个绑定时段分别算再加总，中间空档不计。同一会员同时挂多名导师：各导师只计挂在自己名下那段时间的收益，互不挪用。</div>
+            </div>
+            <div class="explain-section">
+              <h3>和导师管理里的「用户收益」</h3>
+              <ul>
+                <li>管理页拆成<strong>累计</strong>和<strong>在籍</strong>：累计仍是加入后、解绑前；在籍只含当前还绑着的用户。</li>
+                <li>底薪不在列表出现，只在详情/编辑抽屉里。</li>
+                <li>两页都按时间窗口，不要拿会员全生命周期流水硬对看板数字。</li>
+              </ul>
+            </div>
+          </section>
+
+          <section id="exp-mgmt" class="explain-panel">
+            <div class="explain-kicker">导师管理</div>
+            <div class="explain-hero">
+              <h2>主档聚合看人，详情/编辑共用一只抽屉</h2>
+              <p>列表按<strong>排序升序</strong>。必填：所属机构、导师身份、导师名称、导师右豹 ID、导师飞书 ID。打开新增/编辑时会关掉详情和规则抽屉，避免叠两层。</p>
+            </div>
+            <div class="explain-section">
+              <h3>列表上能点的数</h3>
+              <ul>
+                <li><strong>关联数据</strong>（社群数 + 导师团数）：任一 &gt; 0 进子页「关联数据」Tab。表头形如「X 个社群 · X 个导师团，累计 X 个学员」。</li>
+                <li><strong>下属导师数量</strong>：&gt; 0 进同一子页的「下属导师」Tab。表头按专项运营 / 专项服务 / 助教 / 创业四类计数。</li>
+                <li>数量为 0：灰色，不可点。</li>
+                <li>删除用确认弹窗，遮罩点不关；确认后从列表消失。</li>
+              </ul>
+              <div class="callout warn">筛选项：导师信息（名称/右豹ID/飞书ID/标签）、所属机构、身份、是否自营、状态。重置同样不自动查询。</div>
+            </div>
+          </section>
+
+          <section id="exp-import" class="explain-panel">
+            <div class="explain-kicker">批量导入</div>
+            <div class="explain-hero">
+              <h2>先选导入类型，再出对应 Excel 列；对不上的行直接失败，不瞎建</h2>
+              <p>工具栏「批量导入」。选类型后动态渲染模版列，可先下载再上传。三种类型校验不一样，失败只打该行，不要理解成整表作废（以实际上传结果为准）。</p>
+            </div>
+            <div class="explain-section">
+              <div class="table-wrap">
+                <table class="explain-table">
+                  <thead>
+                    <tr><th>类型</th><th>关键列</th><th>失败条件</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>导入导师</strong></td>
+                      <td>机构、身份、名称、右豹ID、飞书ID 必填；可带底薪、签约、合同、自营、导师团、排序</td>
+                      <td>机构必须已存在；身份必须是管理页那五个枚举；右豹 ID 不能和现有导师重复；填了导师团名称也必须已有该团，<strong>不新建团</strong></td>
+                    </tr>
+                    <tr>
+                      <td><strong>导入导师团队</strong></td>
+                      <td>导师名称、导师右豹ID、团队名称</td>
+                      <td>名称 + 右豹 ID 必须已在导师管理且对得上；团队名称必须是现有导师团，不存在则该行失败</td>
+                    </tr>
+                    <tr>
+                      <td><strong>导入签约信息</strong></td>
+                      <td>导师名称、导师右豹ID、底薪、签约日期、合同编号</td>
+                      <td>同样必须名称 + 右豹 ID 同时命中已有导师，缺一或对不上该行失败</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="callout danger">导入不会在系统里「顺便新建一个导师团」。团名写错就是该行失败。对导师也必须名称和右豹 ID 一起对，只对其中一个不算。</div>
+            </div>
+          </section>
+
+          <section id="exp-faq" class="explain-panel">
+            <div class="explain-kicker">客服 / 运营话术</div>
+            <div class="explain-hero">
+              <h2>先问是看板对不上，还是主档人找不到</h2>
+              <p>本需求没有用户端页面。外部导师/学员看不到这两张表。运营内部对账按下面说。</p>
+            </div>
+            <div class="explain-section">
+              <div class="faq-item">
+                <div class="faq-q">Q1. 机构下导师会员数加起来比机构会员多？</div>
+                <div class="faq-a">正常。机构会员去重，导师会员按人挂靠。一人多导师就会「分项之和 &gt; 机构去重数」。</div>
+              </div>
+              <div class="faq-item">
+                <div class="faq-q">Q2. 某会员历史流水很多，为什么机构收益没那么高？</div>
+                <div class="faq-a">只计加入该机构之后、解绑之前的收益。进机构前和离开后的单都不算进这个机构。</div>
+              </div>
+              <div class="faq-item">
+                <div class="faq-q">Q3. 为什么点不了机构上的社群数 / 导师团数？</div>
+                <div class="faq-a">设计如此。机构这两列只读去重。要看具体名字，先点导师数量进明细，再点该导师的团数或社群数，弹窗只列名称。</div>
+              </div>
+              <div class="faq-item">
+                <div class="faq-q">Q4. 看板里的「主导师」在管理页找不到这个身份？</div>
+                <div class="faq-a">两套枚举。看板是机构内角色（主导师/协同/见习），管理是主档岗位（导师长/专项运营等）。用右豹 ID 搜管理页。</div>
+              </div>
+              <div class="faq-item">
+                <div class="faq-q">Q5. 列表上看不到底薪？</div>
+                <div class="faq-a">底薪故意不在列表。打开详情或编辑抽屉才能看/改。</div>
+              </div>
+              <div class="faq-item">
+                <div class="faq-q">Q6. 导入提示团队不存在，能不能让系统自动建团？</div>
+                <div class="faq-a">不能。团队名称必须已在现有导师团里。先把团建好（本看板/管理不提供建团入口时，走既有导师团数据），再导。</div>
+              </div>
+              <div class="faq-item">
+                <div class="faq-q">Q7. 重置筛选后机构怎么还是筛过的？</div>
+                <div class="faq-a">重置不清查询结果。再点「查询」才会按空条件刷新。</div>
+              </div>
+              <div class="faq-item">
+                <div class="faq-q">Q8. 能不能在看板里改导师或删机构？</div>
+                <div class="faq-a">不能。看板只读。改人去「导师管理」。本 FR 也不提供新增/删除机构。</div>
+              </div>
+            </div>
+            <div class="explain-section">
+              <h3>对外不要承诺的事</h3>
+              <ul>
+                <li>没有 C 端「我的导师/机构」页面可给学员看。</li>
+                <li>不能按会员全生命周期流水对看板收益。</li>
+                <li>导入不会自动新建机构或导师团；右豹 ID 冲突不会覆盖已有导师。</li>
+                <li>数量为 0 的格子不会变成可点链接。</li>
+              </ul>
+              <div class="callout warn">流程图在页内「业务流程」：图1 看板、图2 导师管理、图3 批量导入。和同事对口径以本手册 + 需求规则抽屉为准。</div>
+            </div>
+          </section>
+        </div>
+      </div>
     </div>
 
     <div id="view-board" class="page-view active">
@@ -2601,9 +2884,24 @@
     function currentPageKey() {
       var btn = document.querySelector('.page-tab-bar button.active');
       var page = btn ? btn.dataset.page : 'view-board';
+      if (page === 'view-explain') return 'explain';
       if (page === 'view-mgmt') return 'mgmt';
       if (page === 'view-flow') return 'flow';
       return 'board';
+    }
+
+    function currentExplainSec() {
+      var btn = document.querySelector('.explain-nav button.active');
+      var id = btn && btn.dataset.explain ? btn.dataset.explain : 'exp-overview';
+      return id.replace('exp-', '');
+    }
+
+    function switchExplainTab(explainId, btn) {
+      document.querySelectorAll('.explain-nav button').forEach(function (b) { b.classList.remove('active'); });
+      document.querySelectorAll('.explain-panel').forEach(function (p) { p.classList.remove('active'); });
+      btn.classList.add('active');
+      document.getElementById(explainId).classList.add('active');
+      syncPageUrl();
     }
 
     function syncPageUrl() {
@@ -2621,6 +2919,8 @@
       }
       if (key === 'flow') params.set('flow', currentFlow);
       else params.delete('flow');
+      if (key === 'explain') params.set('sec', currentExplainSec());
+      else params.delete('sec');
       history.replaceState(null, '', '?' + params.toString());
     }
 
@@ -2733,6 +3033,9 @@
       document.querySelectorAll('.page-tab-bar button').forEach(function (btn) {
         btn.addEventListener('click', function () { switchPageTab(btn.dataset.page, btn); });
       });
+      document.querySelectorAll('.explain-nav button').forEach(function (btn) {
+        btn.addEventListener('click', function () { switchExplainTab(btn.dataset.explain, btn); });
+      });
       document.querySelectorAll('.module-tab-bar button').forEach(function (btn) {
         btn.addEventListener('click', function () { switchRelatedTab(btn.dataset.related, btn); });
       });
@@ -2763,10 +3066,16 @@
       renderMgmt();
 
       var params = new URLSearchParams(location.search);
-      var tabPageMap = { board: 'view-board', admin: 'view-board', mgmt: 'view-mgmt', flow: 'view-flow' };
+      var tabPageMap = { explain: 'view-explain', board: 'view-board', admin: 'view-board', mgmt: 'view-mgmt', flow: 'view-flow' };
       var tab = params.get('tab') || 'board';
+      var explainParam = params.get('sec');
       var pageBtn = document.querySelector('[data-page="' + (tabPageMap[tab] || 'view-board') + '"]');
       if (pageBtn) switchPageTab(tabPageMap[tab] || 'view-board', pageBtn);
+      if (tab === 'explain' && explainParam) {
+        var explainId = explainParam.indexOf('exp-') === 0 ? explainParam : 'exp-' + explainParam;
+        var explainSecBtn = document.querySelector('.explain-nav button[data-explain="' + explainId + '"]');
+        if (explainSecBtn) switchExplainTab(explainId, explainSecBtn);
+      }
       var orgId = params.get('org');
       if ((tab === 'board' || tab === 'admin') && orgId && findOrg(orgId) && findOrg(orgId).mentorCount) {
         openMentors(orgId);

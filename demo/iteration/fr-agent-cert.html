@@ -353,6 +353,77 @@
       opacity: 0; transition: all 0.25s; z-index: 600; pointer-events: none;
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .explain-layout {
+      display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 16px; align-items: start;
+    }
+    @media (max-width: 900px) { .explain-layout { grid-template-columns: 1fr; } }
+    .explain-nav {
+      position: sticky; top: 12px; padding: 12px; display: flex; flex-direction: column; gap: 4px;
+    }
+    .explain-nav .nav-caption {
+      font-size: 11px; font-weight: 600; color: var(--text-muted); padding: 4px 10px 8px;
+    }
+    .explain-nav button {
+      text-align: left; border: none; background: transparent; cursor: pointer;
+      padding: 9px 12px; border-radius: 8px; font-size: 13px; color: var(--text-secondary); line-height: 1.35;
+    }
+    .explain-nav button small { display: block; font-size: 11px; color: var(--text-muted); margin-top: 2px; font-weight: 400; }
+    .explain-nav button.active { background: var(--primary-light); color: var(--primary); font-weight: 600; }
+    .explain-nav button.active small { color: #3b82f6; }
+    .explain-panel { display: none; padding: 20px 22px 28px; }
+    .explain-panel.active { display: block; }
+    .explain-hero {
+      padding: 16px 18px; border-radius: var(--radius-sm); margin-bottom: 18px;
+      background: linear-gradient(135deg, #eff6ff, #ecfeff); border: 1px solid #bfdbfe;
+    }
+    .explain-hero h2 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .explain-hero p { font-size: 13px; color: var(--text-secondary); line-height: 1.7; }
+    .explain-kicker { font-size: 11px; font-weight: 700; letter-spacing: .04em; color: var(--primary); margin-bottom: 6px; }
+    .explain-section { margin-bottom: 22px; }
+    .explain-section:last-child { margin-bottom: 0; }
+    .explain-section h3 { font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+    .explain-section p, .explain-section li { font-size: 13px; color: var(--text-secondary); line-height: 1.7; }
+    .explain-section code, .explain-hero code {
+      font-family: ui-monospace, monospace; font-size: 12px; background: #f1f5f9; padding: 1px 5px; border-radius: 4px;
+    }
+    .explain-section ul, .explain-section ol { padding-left: 18px; }
+    .explain-section li { margin-bottom: 6px; }
+    .explain-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    @media (max-width: 720px) { .explain-grid { grid-template-columns: 1fr; } }
+    .explain-card {
+      background: rgba(248,250,252,.9); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 14px 14px 12px;
+    }
+    .explain-card h4 { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+    .explain-card p, .explain-card li { font-size: 12px; color: var(--text-secondary); line-height: 1.65; }
+    .explain-card ul { padding-left: 16px; }
+    .explain-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .explain-table th, .explain-table td {
+      padding: 8px 10px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; line-height: 1.55;
+    }
+    .explain-table th { font-size: 11px; color: var(--text-muted); background: rgba(248,250,252,.9); white-space: nowrap; }
+    .explain-table td strong { color: var(--text-primary); }
+    .callout {
+      margin: 12px 0 0; padding: 10px 12px; border-radius: var(--radius-sm);
+      font-size: 12px; line-height: 1.65; color: var(--text-secondary);
+    }
+    .callout.warn { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
+    .callout.ok { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
+    .callout.info { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }
+    .callout.danger { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+    .faq-item { padding: 12px 0; border-bottom: 1px solid var(--border); }
+    .faq-item:last-child { border-bottom: none; }
+    .faq-q { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+    .faq-a { font-size: 13px; color: var(--text-secondary); line-height: 1.7; }
+    .step-list { counter-reset: step; list-style: none; padding-left: 0; }
+    .step-list li { position: relative; padding-left: 36px; margin-bottom: 12px; }
+    .step-list li::before {
+      counter-increment: step; content: counter(step);
+      position: absolute; left: 0; top: 1px;
+      width: 22px; height: 22px; border-radius: 50%;
+      background: var(--primary-light); color: var(--primary);
+      font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center;
+    }
     [hidden] { display: none !important; }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
@@ -372,7 +443,7 @@
       <span class="sprint-pill">YBDD2.0 · 迭代 v1</span>
     </div>
     <div class="sidebar-scroll" data-iteration-sidebar></div>
-    <div class="sidebar-foot">FR-010 · 代理迭代V1.0<br />代理认证 / 代理提现 / 代理价格 / 代理通知</div>
+    <div class="sidebar-foot">FR-010 · 代理迭代V1.0<br />业务解释 / 认证 / 提现 / 价格 / 通知</div>
   </aside>
 
   <main class="main">
@@ -395,10 +466,247 @@
     </header>
 
     <div class="page-tab-bar" role="tablist">
+      <button type="button" data-page="view-explain" role="tab">业务解释</button>
       <button type="button" class="active" data-page="view-cert" role="tab">代理认证</button>
       <button type="button" data-page="view-withdraw" role="tab">代理提现</button>
       <button type="button" data-page="view-price" role="tab">代理价格</button>
       <button type="button" data-page="view-notice" role="tab">代理通知</button>
+    </div>
+
+    <div id="view-explain" class="page-view">
+      <div class="explain-layout">
+        <nav class="glass-card explain-nav" aria-label="业务解释章节">
+          <div class="nav-caption">运营手册 · 按章阅读</div>
+          <button type="button" class="active" data-explain="exp-overview">1 一句话看懂<small>四件事怎么串起来</small></button>
+          <button type="button" data-explain="exp-cert">2 认证怎么审<small>资料、合同、对公账户</small></button>
+          <button type="button" data-explain="exp-withdraw">3 提现怎么打款<small>先审后付、回执必传</small></button>
+          <button type="button" data-explain="exp-price">4 价格怎么配<small>只改代理价，原价只读</small></button>
+          <button type="button" data-explain="exp-notice">5 通知怎么发<small>系统自动 vs 运营主动</small></button>
+          <button type="button" data-explain="exp-faq">6 客诉怎么回<small>常见问题与边界</small></button>
+        </nav>
+        <div class="glass-card">
+          <section id="exp-overview" class="explain-panel active">
+            <div class="explain-kicker">FR-010 · 代理迭代V1.0</div>
+            <div class="explain-hero">
+              <h2>先认证对公账户，再配项目价格，提现必须审核通过后才能打款</h2>
+              <p>本轮后台交付四件事：<strong>认证审核、提现结算、授权项目价格、代理通知</strong>。代理端填写页、提现申请页、价格查看页、消息中心本轮都不做 Demo，但字段和后台对齐。运营日常只在本页四个业务 Tab 里审、配、发。</p>
+            </div>
+            <div class="explain-section">
+              <h3>30 秒故事</h3>
+              <ol class="step-list">
+                <li>代理提交企业资料、对公账户、盖章合同 PDF → 运营在「代理认证」通过或驳回。</li>
+                <li>只有<strong>认证已通过</strong>，对公账户才能用于线上结算和提现；未通过不能结算。</li>
+                <li>已授权项目在「代理价格」配结算字段级代理价；代理收益按代理价算，不回退右豹原价。</li>
+                <li>代理提交盖章结算单 + 发票 → 运营先审提现，通过后打款；打款成功必须上传回执。</li>
+                <li>认证/提现结果、账单生成会自动发平台通知；运营也可主动群发或定向发送。</li>
+              </ol>
+            </div>
+            <div class="explain-section">
+              <h3>四个 Tab 各管什么</h3>
+              <div class="explain-grid">
+                <div class="explain-card">
+                  <h4>代理认证</h4>
+                  <p>审企业、对公账户、盖章合同。通过后才具备结算资格。结论本轮不可改判。</p>
+                </div>
+                <div class="explain-card">
+                  <h4>代理提现</h4>
+                  <p>核对结算单、发票、对公账户后审核；通过再打款。审核驳回不可改判，打款失败可重标。</p>
+                </div>
+                <div class="explain-card">
+                  <h4>代理价格</h4>
+                  <p>复用已上线的授权项目列表。右豹结算字段/原价只读，运营只改代理价格。未配置字段不计入代理收益。</p>
+                </div>
+                <div class="explain-card">
+                  <h4>代理通知</h4>
+                  <p>系统提示（功能/维护）与平台通知（审核/账单/下线）。系统触发不可手改；运营主动用抽屉发送。</p>
+                </div>
+              </div>
+              <div class="callout info">对外口径：认证通过 ≠ 已经打款。钱要等代理自己提现，运营审过、打款成功并上传回执，才算闭环。</div>
+            </div>
+          </section>
+
+          <section id="exp-cert" class="explain-panel">
+            <div class="explain-kicker">代理认证</div>
+            <div class="explain-hero">
+              <h2>只审待审核；通过不填原因，驳回必须写原因</h2>
+              <p>列表聚合看企业信息、对公账户、合同，不拆很多列。营业执照和合同都用文字链预览，不直接铺原图。「查看合同」打开的是代理回传的<strong>加盖公章 PDF</strong>，不是系统草稿。</p>
+            </div>
+            <div class="explain-section">
+              <h3>合同从哪来</h3>
+              <ol class="step-list">
+                <li>系统按模板动态渲染合同，代理下载。</li>
+                <li>代理加盖公章后上传 PDF（仅 PDF）。</li>
+                <li>合同编号系统生成，运营/代理都不能手改：<code>YB-DL-{年月日}-{代理编号}-{合同序数}</code>。示例 <code>YB-DL-20260904-10086-01</code>。</li>
+                <li>驳回后重新提交，合同序数递增（01 → 02）。</li>
+              </ol>
+            </div>
+            <div class="explain-section">
+              <h3>审核规则</h3>
+              <div class="table-wrap">
+                <table class="explain-table">
+                  <thead>
+                    <tr><th>状态</th><th>列表操作</th><th>运营要记住</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td><strong>待审核</strong></td><td>通过 / 驳回</td><td>通过二次确认，不填原因；驳回弹窗原因必填，遮罩点不关</td></tr>
+                    <tr><td><strong>已通过</strong></td><td>已审核（无按钮）</td><td>对公账户可用于结算和提现；本轮不能改判</td></tr>
+                    <tr><td><strong>已驳回</strong></td><td>已审核（无按钮）</td><td>必须展示驳回原因；代理可重提，历史驳回行保留</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="callout warn">一个代理同一时间只允许一条「待审核」或「已通过」。驳回后才能再交新的。筛选重置只清空条件，不自动查，避免误以为数据没了。</div>
+            </div>
+          </section>
+
+          <section id="exp-withdraw" class="explain-panel">
+            <div class="explain-kicker">代理提现</div>
+            <div class="explain-hero">
+              <h2>两段状态：先审核，再打款。回执只在打款成功后出现</h2>
+              <p>申请资料全部由代理上传：盖章结算单 PDF + 发票 PDF。运营不代传。对公账户从认证带出，聚合展示。表头统计是当前查询结果的笔数和申请提现金额合计。</p>
+            </div>
+            <div class="explain-section">
+              <h3>状态怎么走</h3>
+              <div class="table-wrap">
+                <table class="explain-table">
+                  <thead>
+                    <tr><th>阶段</th><th>可做什么</th><th>结果</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>待审核</strong></td>
+                      <td>审核通过 / 审核驳回</td>
+                      <td>通过 → 打款状态仍是待打款；驳回必须写原因，不再进入打款，本轮不可改判</td>
+                    </tr>
+                    <tr>
+                      <td><strong>审核通过 + 待打款/打款失败</strong></td>
+                      <td>打款成功 / 打款失败</td>
+                      <td>成功必须上传回执，列表出现「查看回执」；失败必须写原因，允许再标成功或再失败</td>
+                    </tr>
+                    <tr>
+                      <td><strong>已打款</strong></td>
+                      <td>无打款按钮</td>
+                      <td>不可再次打款；回执可预览</td>
+                    </tr>
+                    <tr>
+                      <td><strong>审核驳回</strong></td>
+                      <td>无审核/打款按钮</td>
+                      <td>代理按原因修订后重新提交，生成新的待审核行，旧行保留</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="callout danger">未认证或认证已驳回的代理不能提现。打款回执只在「已打款」展示；待打款、打款失败、审核驳回这一列都是「—」，不是丢了文件。</div>
+            </div>
+          </section>
+
+          <section id="exp-price" class="explain-panel">
+            <div class="explain-kicker">代理价格</div>
+            <div class="explain-hero">
+              <h2>不另做代理列表，直接在已授权项目上配价</h2>
+              <p>右豹侧的结算字段、单价类型、原始价格、描述全部只读带出。运营唯一能改的是<strong>代理价格</strong>（可空，填了必须 ≥ 0，最多两位小数）。保存后，该代理在这个项目的收益按代理价算。</p>
+            </div>
+            <div class="explain-section">
+              <h3>钱怎么算，别和列表数字搞混</h3>
+              <ul>
+                <li><strong>字段收益</strong> = 该字段单量 × 代理价格；项目收益 = 已配置字段之和。</li>
+                <li>代理价格为空的字段<strong>不计入</strong>代理收益，也不会自动改用右豹原价。</li>
+                <li>列表「累计金额」仍是右豹原价口径，方便对账；「服务费」= 累计金额 × 服务费比例。</li>
+                <li>代理侧出账 / 提现以<strong>按代理价格重算</strong>的结果为准，不是累计金额。</li>
+              </ul>
+              <div class="callout warn">右豹字段增删或原价变更后，下次打开弹窗以右豹最新配置为准；已有代理价按结算字段名匹配保留，对不上的字段丢掉。已禁用项目仍可改价（历史对账），但新订单不生效，会 Toast 提示。</div>
+            </div>
+            <div class="explain-section">
+              <h3>还保留的现网能力</h3>
+              <p>批量新增授权、批量设服务费比例、批量启用/禁用、编辑、删除，全部写日志。日志按项目看，新的在上面；价格变更记旧值 → 新值，空记「未配置」。</p>
+            </div>
+          </section>
+
+          <section id="exp-notice" class="explain-panel">
+            <div class="explain-kicker">代理通知</div>
+            <div class="explain-hero">
+              <h2>一条通知只属于一类：系统提示或平台通知</h2>
+              <p>两类进同一张表，用「通知类型」区分。后台和代理端都按类型分栏。系统触发记录不能在新增抽屉里改或补发。</p>
+            </div>
+            <div class="explain-section">
+              <div class="explain-grid">
+                <div class="explain-card">
+                  <h4>系统提示</h4>
+                  <p>功能更新、系统维护等平台侧提示，不绑单一业务单据。一般由运营主动发。</p>
+                </div>
+                <div class="explain-card">
+                  <h4>平台通知</h4>
+                  <p>资料审核、提现审核、账单生成、关键词批量下线等业务结果。前三项系统自动发给当事代理。</p>
+                </div>
+              </div>
+            </div>
+            <div class="explain-section">
+              <h3>谁触发</h3>
+              <ul>
+                <li><strong>系统触发</strong>：认证通过/驳回、提现审核通过/驳回、账单生成。类型固定为平台通知，接收人固定为该代理，标题描述由事件结果生成。运营不能手改类型和接收人。</li>
+                <li><strong>运营主动</strong>：点「新增通知」用右侧表单抽屉（不是弹窗）。关键词批量下线走主动发送，系统不代写。</li>
+                <li>主动发送：类型二选一、标题必填 ≤40 字、描述必填 ≤200 字、配图选填（JPG/PNG/WEBP）、接收范围=全部或至少勾 1 个代理。保存即视为已推送。</li>
+              </ul>
+              <div class="callout info">本轮不做代理端消息中心 Demo，也不做已读态和真实推送通道。和用户说「后台已发送」即可，不要承诺已读回执。</div>
+            </div>
+          </section>
+
+          <section id="exp-faq" class="explain-panel">
+            <div class="explain-kicker">客服 / 运营话术</div>
+            <div class="explain-hero">
+              <h2>先问卡在认证、提现、价格还是消息，再对状态</h2>
+              <p>代理很少说「FR-010」。他们会说「我交了资料没通过」「钱怎么还没到账」「价格怎么和后台不一样」。</p>
+            </div>
+            <div class="explain-section">
+              <div class="faq-item">
+                <div class="faq-q">Q1. 代理说合同编号不对，能不能改？</div>
+                <div class="faq-a">不能手改。编号是 <code>YB-DL-年月日-代理编号-序数</code>，系统生成。先核对该代理 ID 数字段和合同生成日；驳回重提序数会加一，旧编号不会复用。</div>
+              </div>
+              <div class="faq-item">
+                <div class="faq-q">Q2. 「查看合同」看到的是空白草稿？</div>
+                <div class="faq-a">后台预览必须是代理回传的盖章 PDF。若仍是系统草稿，说明代理还没上传盖章件，应驳回并写明「请上传加盖公章的合同 PDF」。</div>
+              </div>
+              <div class="faq-item">
+                <div class="faq-q">Q3. 认证通过了，为什么还不能提现？</div>
+                <div class="faq-a">认证通过只是具备结算资格。提现要代理自己提交盖章结算单和发票，再走「待审核 → 审核通过 → 待打款 → 已打款」。没申请就没有提现行。</div>
+              </div>
+              <div class="faq-item">
+                <div class="faq-q">Q4. 提现审过了，钱还没到？</div>
+                <div class="faq-a">看打款状态。还是「待打款」说明运营还没标打款成功；「打款失败」会带失败原因，可以重新标记。只有「已打款」且有回执，才算打出去。已打款不能再打一次。</div>
+              </div>
+              <div class="faq-item">
+                <div class="faq-q">Q5. 审核驳回能不能改成通过？</div>
+                <div class="faq-a">本轮认证结论、提现审核驳回都不可改判。代理按原因改完重新提交，会多一行新的待审核，旧驳回行留着对账。</div>
+              </div>
+              <div class="faq-item">
+                <div class="faq-q">Q6. 列表累计金额和代理说的收益对不上？</div>
+                <div class="faq-a">累计金额是右豹原价。代理出账按「已配置代理价格 × 单量」。没配代理价的字段不计入，也不会用原价顶上。先打开价格配置看哪些字段空着。</div>
+              </div>
+              <div class="faq-item">
+                <div class="faq-q">Q7. 项目已禁用，为什么还能改价？</div>
+                <div class="faq-a">允许改，方便历史对账；保存会提示「未生效于新订单」。未授权或不存在的项目没有价格配置入口。</div>
+              </div>
+              <div class="faq-item">
+                <div class="faq-q">Q8. 系统通知发错了能不能改？</div>
+                <div class="faq-a">系统触发的平台通知不能在新增抽屉里改或补发。要补充说明，另外发一条运营主动通知。</div>
+              </div>
+              <div class="faq-item">
+                <div class="faq-q">Q9. 重置筛选后列表怎么没变？</div>
+                <div class="faq-a">四个列表都是「重置只清空条件，不自动查询」。再点一次查询才会按空条件刷新。</div>
+              </div>
+            </div>
+            <div class="explain-section">
+              <h3>对外不要承诺的事</h3>
+              <ul>
+                <li>不能改合同编号、不能改判已审结论、不能替代理代传盖章件和发票。</li>
+                <li>不能把未配置代理价的字段按右豹原价给代理结算。</li>
+                <li>不能承诺代理端消息已读、真实推送到达回执。</li>
+                <li>本轮没有代理端填写/提现/价格/消息中心 Demo，不要说「App 里某页可以改」。</li>
+              </ul>
+              <div class="callout warn">流程图和 QA 在各业务 Tab 里给研发对照；和代理沟通只用本手册口径。细节以页头「需求规则」为准。</div>
+            </div>
+          </section>
+        </div>
+      </div>
     </div>
 
     <div id="view-cert" class="page-view active">
@@ -3142,7 +3450,7 @@
 
     function currentTabKey() {
       var id = document.querySelector('.page-view.active') && document.querySelector('.page-view.active').id;
-      return { 'view-cert': 'cert', 'view-withdraw': 'withdraw', 'view-price': 'price', 'view-notice': 'notice' }[id] || 'cert';
+      return { 'view-explain': 'explain', 'view-cert': 'cert', 'view-withdraw': 'withdraw', 'view-price': 'price', 'view-notice': 'notice' }[id] || 'cert';
     }
     function currentViewKey() {
       var view = document.querySelector('.page-view.active');
@@ -3152,8 +3460,24 @@
       if (sub.id.indexOf('qa') >= 0) return 'qa';
       return sub.id.indexOf('flow') >= 0 ? 'flow' : 'admin';
     }
+    function currentExplainSec() {
+      var btn = document.querySelector('.explain-nav button.active');
+      var id = btn && btn.dataset.explain ? btn.dataset.explain : 'exp-overview';
+      return id.replace('exp-', '');
+    }
     function syncPageUrl() {
+      if (currentTabKey() === 'explain') {
+        history.replaceState(null, '', '?tab=explain&sec=' + currentExplainSec());
+        return;
+      }
       history.replaceState(null, '', '?tab=' + currentTabKey() + '&view=' + currentViewKey());
+    }
+    function switchExplainTab(explainId, btn) {
+      document.querySelectorAll('.explain-nav button').forEach(function (b) { b.classList.remove('active'); });
+      document.querySelectorAll('.explain-panel').forEach(function (p) { p.classList.remove('active'); });
+      btn.classList.add('active');
+      document.getElementById(explainId).classList.add('active');
+      syncPageUrl();
     }
     function switchRuleTab(ruleId, btn) {
       document.querySelectorAll('.rule-tab-bar button').forEach(function (b) { b.classList.remove('active'); });
@@ -3193,6 +3517,9 @@
         document.getElementById(btn.dataset.sub).classList.add('active');
         syncPageUrl();
       });
+    });
+    document.querySelectorAll('.explain-nav button').forEach(function (btn) {
+      btn.addEventListener('click', function () { switchExplainTab(btn.dataset.explain, btn); });
     });
     document.querySelectorAll('.rule-tab-bar button').forEach(function (btn) {
       btn.addEventListener('click', function () { switchRuleTab(btn.dataset.rule, btn); });
@@ -3264,7 +3591,16 @@
     var params = new URLSearchParams(location.search);
     var tab = params.get('tab');
     var view = params.get('view');
-    if (tab === 'withdraw' || tab === 'price' || tab === 'notice' || tab === 'flow') {
+    var explainParam = params.get('sec');
+    if (tab === 'explain') {
+      var explainBtn = document.querySelector('[data-page="view-explain"]');
+      if (explainBtn) explainBtn.click();
+      if (explainParam) {
+        var explainId = explainParam.indexOf('exp-') === 0 ? explainParam : 'exp-' + explainParam;
+        var secBtn = document.querySelector('.explain-nav button[data-explain="' + explainId + '"]');
+        if (secBtn) switchExplainTab(explainId, secBtn);
+      }
+    } else if (tab === 'withdraw' || tab === 'price' || tab === 'notice' || tab === 'flow') {
       var wdBtn = document.querySelector('[data-page="view-withdraw"]');
       var priceBtn = document.querySelector('[data-page="view-price"]');
       var noticeBtn = document.querySelector('[data-page="view-notice"]');
