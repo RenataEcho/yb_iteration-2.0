@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FR-014 · 一键代发 · 右豹迭代需求记录</title>
+  <style>
+    :root {
+      --primary: #2563eb; --primary-hover: #1d4ed8; --primary-light: #eff6ff; --primary-border: #bfdbfe;
+      --accent-rule: #0891b2; --accent-version: #7c3aed; --accent-fr: #d97706;
+      --success: #16a34a; --success-bg: #f0fdf4; --warning: #d97706; --warning-bg: #fffbeb;
+      --danger: #dc2626; --danger-bg: #fef2f2;
+      --surface: #fff; --surface-glass: rgba(255,255,255,0.72); --surface-hover: #f8fafc; --border: #e8edf3;
+      --text-primary: #18222f; --text-secondary: #4a5568; --text-muted: #9aa5b4;
+      --sidebar-w: 240px; --drawer-w: 480px; --radius-sm: 7px; --radius-lg: 14px;
+      --shadow: 0 8px 32px rgba(30,40,80,0.10);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 13px;
+      color: var(--text-primary);
+      background: linear-gradient(135deg, #e0e7ff 0%, #f0f4f8 40%, #e0f2fe 100%);
+      background-attachment: fixed; min-height: 100vh;
+    }
+    .sidebar {
+      position: fixed; inset: 0 auto 0 0; width: var(--sidebar-w); z-index: 200;
+      display: flex; flex-direction: column;
+      background: rgba(240,244,255,0.95); backdrop-filter: blur(20px);
+      border-right: 1px solid rgba(148,163,196,0.22);
+    }
+    .sidebar-brand { padding: 16px 14px 12px; border-bottom: 1px solid rgba(148,163,196,0.22); }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: linear-gradient(135deg, #2563eb, #7c3aed); color: #fff;
+      display: flex; align-items: center; justify-content: center; font-weight: 700;
+    }
+    .brand-text { font-size: 14px; font-weight: 700; }
+    .brand-sub { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+    .sprint-pill {
+      display: inline-block; margin-top: 10px; font-size: 11px; font-weight: 600;
+      padding: 3px 8px; border-radius: 999px; background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0;
+    }
+    .sidebar-scroll { flex: 1; overflow-y: auto; padding: 8px 0 16px; }
+    .sidebar-foot { padding: 10px 14px 14px; border-top: 1px solid rgba(148,163,196,0.22); font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+    .main { margin-left: var(--sidebar-w); padding: 16px 20px 40px; min-height: 100vh; }
+    .breadcrumb { padding: 4px 0 12px; font-size: 12px; color: var(--text-muted); }
+    .breadcrumb a { color: var(--primary); text-decoration: none; }
+    .page-header { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; }
+    .page-header h1 { font-size: 19px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .page-desc { font-size: 12px; color: var(--text-muted); max-width: 760px; line-height: 1.55; }
+    .badge { display: inline-flex; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: var(--radius-sm); }
+    .badge-fr { background: #fffbeb; color: var(--accent-fr); border: 1px solid #fde68a; }
+    .badge-version { background: #f5f3ff; color: var(--accent-version); border: 1px solid #ddd6fe; }
+    .page-tab-bar, .admin-tab-bar {
+      display: flex; gap: 0; margin-bottom: 16px; flex-wrap: wrap;
+      background: var(--surface-glass); backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.55); border-radius: var(--radius-lg);
+      padding: 4px; box-shadow: var(--shadow); width: fit-content;
+    }
+    .admin-tab-bar { margin: 12px 16px 0; }
+    .page-tab-bar button, .admin-tab-bar button {
+      padding: 8px 16px; border: none; background: transparent; cursor: pointer;
+      font-size: 13px; font-weight: 500; color: var(--text-secondary); border-radius: 10px;
+    }
+    .page-tab-bar button.active, .admin-tab-bar button.active { background: var(--primary); color: #fff; font-weight: 600; }
+    .page-view, .admin-pane { display: none; }
+    .page-view.active, .admin-pane.active { display: block; }
+    .btn {
+      display: inline-flex; align-items: center; height: 34px; padding: 0 14px;
+      border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid transparent;
+    }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-rule { background: var(--primary-light); color: var(--primary); border-color: var(--primary-border); }
+    .btn-rule.active { background: var(--primary); color: #fff; }
+    .btn-ghost-sm { background: var(--surface); color: var(--text-secondary); border: 1px solid var(--border); height: 32px; padding: 0 12px; border-radius: var(--radius-sm); cursor: pointer; font-size: 12px; }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .glass-card {
+      background: var(--surface-glass); backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.55); border-radius: var(--radius-lg);
+      box-shadow: var(--shadow); overflow: hidden;
+    }
+    .demo-layout { display: grid; grid-template-columns: minmax(280px, 5fr) minmax(360px, 7fr); gap: 16px; }
+    @media (max-width: 1024px) { .demo-layout { grid-template-columns: 1fr; } }
+    .scene-panel { padding: 16px 18px; }
+    .scene-panel h2 { font-size: 14px; font-weight: 700; margin-bottom: 10px; }
+    .scene-list { display: flex; flex-direction: column; gap: 6px; }
+    .scene-btn {
+      text-align: left; padding: 10px 12px; border-radius: var(--radius-sm);
+      border: 1px solid var(--border); background: rgba(255,255,255,0.6); cursor: pointer;
+    }
+    .scene-btn.active { border-color: var(--primary-border); background: var(--primary-light); color: var(--primary); font-weight: 600; }
+    .scene-btn .scene-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+    .scene-btn .scene-desc { font-size: 11px; color: var(--text-muted); line-height: 1.45; }
+    .scene-btn.active .scene-desc { color: #3b82f6; }
+    .scene-note { margin-top: 14px; padding: 10px 12px; border-radius: var(--radius-sm); background: #fffbeb; border: 1px solid #fde68a; font-size: 12px; color: #92400e; line-height: 1.55; }
+    .mockup-panel { padding: 16px; display: flex; justify-content: center; min-height: 520px; }
+    .mockup-frame-wrap {
+      width: 100%; max-width: 375px; border-radius: 28px; overflow: hidden;
+      background: #1e293b; box-shadow: 0 16px 48px rgba(0,0,0,0.18); aspect-ratio: 375 / 812;
+    }
+    .mockup-frame-wrap iframe { width: 100%; height: 100%; border: none; display: block; background: #fff; }
+    .table-toolbar { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--border); gap: 10px; flex-wrap: wrap; }
+    .table-toolbar h3 { font-size: 14px; font-weight: 700; }
+    .filter-bar { display: flex; flex-wrap: wrap; gap: 10px; padding: 14px 16px; align-items: flex-end; border-bottom: 1px solid var(--border); }
+    .filter-field { display: flex; flex-direction: column; gap: 4px; }
+    .filter-field label { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+    .filter-field input, .filter-field select { height: 32px; padding: 0 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 12px; min-width: 130px; }
+    .filter-actions { display: flex; gap: 8px; margin-left: auto; align-items: center; flex-wrap: wrap; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 880px; }
+    th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); font-size: 12px; vertical-align: top; }
+    th { font-size: 11px; font-weight: 600; color: var(--text-muted); background: rgba(248,250,252,0.9); white-space: nowrap; }
+    tr:hover td { background: var(--surface-hover); }
+    .link { color: var(--primary); cursor: pointer; text-decoration: none; margin-right: 10px; font-size: 12px; font-weight: 500; background: none; border: none; padding: 0; }
+    .link-danger { color: var(--danger); }
+    .tag { display: inline-flex; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+    .tag-ok { background: var(--success-bg); color: var(--success); }
+    .tag-warn { background: var(--warning-bg); color: var(--warning); }
+    .tag-muted { background: #f1f5f9; color: var(--text-muted); }
+    .tag-del { background: var(--danger-bg); color: var(--danger); }
+    .cell-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .drawer-overlay, .modal-overlay {
+      position: fixed; inset: 0; background: rgba(15,23,42,0.35); z-index: 500;
+      opacity: 0; pointer-events: none; transition: opacity 0.25s;
+    }
+    .drawer-overlay.open, .modal-overlay.open { opacity: 1; pointer-events: auto; }
+    .drawer {
+      position: fixed; top: 0; right: 0; bottom: 0; width: var(--drawer-w); z-index: 501;
+      background: rgba(255,255,255,0.98); backdrop-filter: blur(12px);
+      box-shadow: -8px 0 40px rgba(30,40,60,0.18);
+      transform: translateX(100%); transition: transform 0.28s ease;
+      display: flex; flex-direction: column;
+    }
+    .drawer.open { transform: translateX(0); }
+    .drawer-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .drawer-header h2 { font-size: 15px; font-weight: 700; }
+    .drawer-close { width: 28px; height: 28px; border: none; background: #f1f5f9; border-radius: 6px; cursor: pointer; font-size: 16px; }
+    .rule-tab-bar { display: flex; gap: 0; padding: 0 16px; border-bottom: 1px solid var(--border); }
+    .rule-tab-bar button {
+      padding: 10px 18px; border: none; background: none; cursor: pointer;
+      font-size: 13px; color: var(--text-secondary); border-bottom: 2px solid transparent; margin-bottom: -1px;
+    }
+    .rule-tab-bar button.active { color: var(--primary); font-weight: 600; border-bottom-color: var(--primary); }
+    .drawer-body { flex: 1; overflow-y: auto; padding: 16px 20px 32px; }
+    .rule-panel { display: none; }
+    .rule-panel.active { display: block; }
+    .rule-section { margin-bottom: 22px; }
+    .rule-section h3 { font-size: 14px; font-weight: 700; color: var(--accent-rule); margin-bottom: 8px; }
+    .rule-section h3 span {
+      display: inline-flex; width: 22px; height: 22px; align-items: center; justify-content: center;
+      background: #ecfeff; color: var(--accent-rule); border-radius: 6px; font-size: 12px; margin-right: 8px;
+    }
+    .rule-content { font-size: 13px; color: var(--text-secondary); line-height: 1.65; }
+    .rule-content ul { padding-left: 18px; margin-top: 6px; }
+    .rule-content li { margin-bottom: 5px; }
+    .kv { display: grid; grid-template-columns: 88px 1fr; gap: 8px 10px; font-size: 13px; }
+    .kv dt { color: var(--text-muted); }
+    .modal {
+      position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(.96);
+      width: 400px; max-width: calc(100vw - 32px); background: #fff; border-radius: 14px;
+      box-shadow: 0 16px 48px rgba(15,23,42,.2); z-index: 502; padding: 20px;
+      opacity: 0; pointer-events: none; transition: .2s;
+    }
+    .modal.modal-md { width: 480px; }
+    .modal.open { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
+    .modal h3 { font-size: 16px; margin-bottom: 10px; }
+    .modal p { font-size: 13px; color: var(--text-secondary); line-height: 1.55; margin-bottom: 16px; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 8px; }
+    .field { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
+    .field label { font-size: 11px; color: var(--text-muted); }
+    .field input, .field select { height: 34px; padding: 0 10px; border: 1px solid var(--border); border-radius: 7px; }
+    .flow-page-intro { padding: 16px 18px 0; font-size: 12px; color: var(--text-muted); line-height: 1.55; }
+    .flow-svg-wrap { overflow: auto; padding: 16px 18px 24px; max-height: 72vh; }
+    .flow-svg-wrap svg { display: block; margin: 0 auto; min-width: 920px; }
+    .flow-edges line, .flow-edges polyline { stroke: #94a3b8; stroke-width: 1.5; fill: none; }
+    .flow-legend { display: flex; flex-wrap: wrap; gap: 12px; padding: 0 18px 20px; font-size: 11px; color: var(--text-muted); }
+    .flow-legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 4px; vertical-align: -2px; }
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: #1e293b; color: #fff; padding: 10px 18px; border-radius: 999px; font-size: 13px;
+      opacity: 0; transition: all 0.25s; z-index: 600; pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand">
+        <div class="brand-icon">迭</div>
+        <div>
+          <div class="brand-text">右豹迭代需求记录</div>
+          <div class="brand-sub">PRD Demo · 产品交付研发</div>
+        </div>
+      </div>
+      <span class="sprint-pill">YBDD2.0 · 迭代 v1</span>
+    </div>
+    <div class="sidebar-scroll" data-iteration-sidebar></div>
+    <div class="sidebar-foot">FR-014 · 页内 Tab<br />前端交互 / 管理后台 / 业务流程</div>
+  </aside>
+
+  <main class="main">
+    <nav class="breadcrumb">
+      <a href="framework-shell.html">Sprint 概览</a>
+      <span> / 运营 / 一键代发</span>
+    </nav>
+    <header class="page-header">
+      <div>
+        <h1>
+          一键代发
+          <span class="badge badge-fr">FR-014</span>
+          <span class="badge badge-version">v2 当前</span>
+        </h1>
+        <p class="page-desc">剪辑手经海报+客服入驻后供图集/视频；用户在广场领取，次数足够后点击即成功。占用中藏起；24h 未回填释放且不退次，终身超时超过 3 次进黑名单。</p>
+      </div>
+      <div class="page-header-actions">
+        <button class="btn btn-rule" id="toggleRuleDrawer" type="button">📋 需求规则</button>
+      </div>
+    </header>
+
+    <div class="page-tab-bar" role="tablist">
+      <button type="button" class="active" data-page="view-fe" role="tab">前端交互</button>
+      <button type="button" data-page="view-admin" role="tab">管理后台</button>
+      <button type="button" data-page="view-flow" role="tab">业务流程</button>
+    </div>
+
+    <div id="view-fe" class="page-view active">
+      <div class="demo-layout">
+        <div class="glass-card scene-panel">
+          <h2>场景切换</h2>
+          <div class="scene-list">
+            <button class="scene-btn active" type="button" data-screen="feed">
+              <div class="scene-title">作品广场</div>
+              <div class="scene-desc">项目图标直选 + 搜索在下方 + 其余下拉 + 最多 5 条 BN 轮播；不展示收益</div>
+            </button>
+            <button class="scene-btn" type="button" data-screen="detail">
+              <div class="scene-title">稿件详情</div>
+              <div class="scene-desc">素材铺满；领取后底栏改为复制标题 / 编辑稿件</div>
+            </button>
+            <button class="scene-btn" type="button" data-screen="claim">
+              <div class="scene-title">浮层选词</div>
+              <div class="scene-desc">对照场景：选词浮层仍可打开；主路径点击领取即成功</div>
+            </button>
+            <button class="scene-btn" type="button" data-screen="buy">
+              <div class="scene-title">积分购次</div>
+              <div class="scene-desc">详情浮层选档，按钮为兑换；最多 4 档</div>
+            </button>
+            <button class="scene-btn" type="button" data-screen="claims">
+              <div class="scene-title">我的领取</div>
+              <div class="scene-desc">有记录才出项目；7 天下载倒计时；立即回填始终高亮</div>
+            </button>
+            <button class="scene-btn" type="button" data-screen="fillback">
+              <div class="scene-title">项目回填</div>
+              <div class="scene-desc">复用该项目已有回填页</div>
+            </button>
+            <button class="scene-btn" type="button" data-screen="timeout">
+              <div class="scene-title">24h 超时释放</div>
+              <div class="scene-desc">记 1 次未回填，稿件回 feed，次数不退</div>
+            </button>
+            <button class="scene-btn" type="button" data-screen="banned">
+              <div class="scene-title">停权无法领</div>
+              <div class="scene-desc">终身未回填超过 3 次</div>
+            </button>
+            <button class="scene-btn" type="button" data-screen="poster">
+              <div class="scene-title">招募海报</div>
+              <div class="scene-desc">卖点 / 适合谁 / 底部客服二维码，无站内申请表</div>
+            </button>
+            <button class="scene-btn" type="button" data-screen="editor-guest">
+              <div class="scene-title">未录入阻断</div>
+              <div class="scene-desc">未进剪辑手管理不能上传</div>
+            </button>
+            <button class="scene-btn" type="button" data-screen="editor-upload">
+              <div class="scene-title">剪辑手上传</div>
+              <div class="scene-desc">选项目、稿件类型、素材类型后发布</div>
+            </button>
+          </div>
+          <div class="scene-note">Mockup 只 iframe 嵌入。领取成功即扣次，超时释放不退；原领取人未进黑名单可再领同一稿（再扣次）。</div>
+        </div>
+        <div class="glass-card mockup-panel">
+          <div class="mockup-frame-wrap">
+            <iframe id="mockupFrame" title="一键代发 Mockup" src="about:blank"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="view-admin" class="page-view">
+      <div class="glass-card">
+        <div class="admin-tab-bar" role="tablist">
+          <button type="button" class="active" data-admin="admin-editors">剪辑手管理</button>
+          <button type="button" data-admin="admin-works">稿件管理</button>
+          <button type="button" data-admin="admin-claims">领取记录</button>
+          <button type="button" data-admin="admin-ban">黑名单</button>
+          <button type="button" data-admin="admin-projects">项目管理</button>
+          <button type="button" data-admin="admin-mats">素材类型</button>
+          <button type="button" data-admin="admin-skus">次数商品</button>
+          <button type="button" data-admin="admin-banners">广场 Banner</button>
+        </div>
+
+        <div id="admin-editors" class="admin-pane active">
+          <div class="table-toolbar"><h3>剪辑手</h3><button class="btn btn-primary" type="button" onclick="openEditorModal()">录入</button></div>
+          <div class="filter-bar">
+            <div class="filter-field"><label>昵称 / ID</label><input id="edQ" placeholder="林夏 / E-01" /></div>
+            <div class="filter-field"><label>状态</label><select id="edS"><option value="">全部</option><option>已录入</option><option>已停用</option></select></div>
+            <div class="filter-actions">
+              <button class="btn-ghost-sm" type="button" onclick="resetEd()">重置</button>
+              <button class="btn btn-primary" type="button" onclick="renderEditors()">查询</button>
+            </div>
+          </div>
+          <div class="table-wrap"><table><thead><tr><th>ID</th><th>昵称</th><th>来源</th><th>可上传项目</th><th>状态</th><th>录入时间</th><th>操作</th></tr></thead><tbody id="edBody"></tbody></table></div>
+        </div>
+
+        <div id="admin-works" class="admin-pane">
+          <div class="table-toolbar"><h3>稿件</h3></div>
+          <div class="filter-bar">
+            <div class="filter-field"><label>标题 / ID</label><input id="wkQ" placeholder="掌心宠" /></div>
+            <div class="filter-field"><label>占用</label><select id="wkO"><option value="">全部</option><option>空闲</option><option>占用中</option></select></div>
+            <div class="filter-actions">
+              <button class="btn-ghost-sm" type="button" onclick="document.getElementById('wkQ').value='';document.getElementById('wkO').value='';renderWorks()">重置</button>
+              <button class="btn btn-primary" type="button" onclick="renderWorks()">查询</button>
+            </div>
+          </div>
+          <div class="table-wrap"><table><thead><tr><th>ID</th><th>标题</th><th>项目 / 书</th><th>剪辑手</th><th>类型</th><th>素材类型</th><th>占用</th><th>上传时间</th><th>操作</th></tr></thead><tbody id="wkBody"></tbody></table></div>
+        </div>
+
+        <div id="admin-claims" class="admin-pane">
+          <div class="table-toolbar"><h3>领取记录</h3></div>
+          <div class="filter-bar">
+            <div class="filter-field"><label>用户 / 稿件</label><input id="clQ" placeholder="U-10086" /></div>
+            <div class="filter-field"><label>回填状态</label><select id="clS"><option value="">全部</option><option>待回填</option><option>已回填</option><option>已超时释放</option></select></div>
+            <div class="filter-actions">
+              <button class="btn-ghost-sm" type="button" onclick="document.getElementById('clQ').value='';document.getElementById('clS').value='';renderClaimsAdm()">重置</button>
+              <button class="btn btn-primary" type="button" onclick="renderClaimsAdm()">查询</button>
+            </div>
+          </div>
+          <div class="table-wrap"><table><thead><tr><th>ID</th><th>用户</th><th>稿件</th><th>关键词</th><th>回填信息</th><th>状态</th><th>领取时间</th><th>操作</th></tr></thead><tbody id="clBody"></tbody></table></div>
+        </div>
+
+        <div id="admin-ban" class="admin-pane">
+          <div class="table-toolbar"><h3>黑名单</h3></div>
+          <div class="filter-bar">
+            <div class="filter-field"><label>用户</label><input id="bnQ" placeholder="U-10999" /></div>
+            <div class="filter-actions">
+              <button class="btn-ghost-sm" type="button" onclick="document.getElementById('bnQ').value='';renderBan()">重置</button>
+              <button class="btn btn-primary" type="button" onclick="renderBan()">查询</button>
+            </div>
+          </div>
+          <div class="table-wrap"><table><thead><tr><th>用户</th><th>未回填次数</th><th>停权时间</th><th>状态</th><th>操作</th></tr></thead><tbody id="bnBody"></tbody></table></div>
+        </div>
+
+        <div id="admin-projects" class="admin-pane">
+          <div class="table-toolbar"><h3>项目</h3></div>
+          <div class="table-wrap"><table><thead><tr><th>项目</th><th>一键代发</th><th>免费次数</th><th>回填页</th><th>操作</th></tr></thead>
+            <tbody>
+              <tr><td>番茄小说</td><td><span class="tag tag-ok">开放</span></td><td>1</td><td>项目已有回填页</td><td><button class="link" type="button" onclick="showToast('Demo：字段未锁，仅示意')">编辑</button></td></tr>
+              <tr><td>不鸣推文</td><td><span class="tag tag-ok">开放</span></td><td>0</td><td>项目已有回填页</td><td><button class="link" type="button" onclick="showToast('Demo：字段未锁，仅示意')">编辑</button></td></tr>
+            </tbody>
+          </table></div>
+        </div>
+
+        <div id="admin-mats" class="admin-pane">
+          <div class="table-toolbar"><h3>素材类型</h3><button class="btn btn-primary" type="button" onclick="showToast('已新增素材类型（Demo）')">新增</button></div>
+          <div class="table-wrap"><table><thead><tr><th>类型</th><th>用于</th><th>状态</th><th>操作</th></tr></thead>
+            <tbody>
+              <tr><td>口播</td><td>上传必选 / feed 筛选</td><td><span class="tag tag-ok">启用</span></td><td><button class="link" type="button">编辑</button></td></tr>
+              <tr><td>混剪</td><td>上传必选 / feed 筛选</td><td><span class="tag tag-ok">启用</span></td><td><button class="link" type="button">编辑</button></td></tr>
+              <tr><td>图文切片</td><td>上传必选 / feed 筛选</td><td><span class="tag tag-ok">启用</span></td><td><button class="link" type="button">编辑</button></td></tr>
+              <tr><td>解压</td><td>上传必选 / feed 筛选</td><td><span class="tag tag-ok">启用</span></td><td><button class="link" type="button">编辑</button></td></tr>
+            </tbody>
+          </table></div>
+        </div>
+
+        <div id="admin-skus" class="admin-pane">
+          <div class="table-toolbar"><h3>次数商品</h3><span class="cell-sub">同时在售最多 4 档</span></div>
+          <div class="table-wrap"><table><thead><tr><th>档位</th><th>次数</th><th>积分</th><th>状态</th><th>操作</th></tr></thead><tbody id="skuBody"></tbody></table></div>
+        </div>
+
+        <div id="admin-banners" class="admin-pane">
+          <div class="table-toolbar">
+            <div>
+              <h3>广场 Banner</h3>
+              <span class="cell-sub">最多 5 条 · ≥2 条 C 端自动轮播</span>
+            </div>
+            <button class="btn btn-primary" type="button" id="addBannerBtn" onclick="addBanner()">新增</button>
+          </div>
+          <div class="table-wrap"><table><thead><tr><th>ID</th><th>标题</th><th>类型</th><th>图片</th><th>状态</th><th>操作</th></tr></thead><tbody id="bannerBody"></tbody></table></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="view-flow" class="page-view">
+      <div class="glass-card flow-page">
+        <p class="flow-page-intro">一张闭环：海报入驻 → 供稿进广场 → 次数 → 浮层选词 → 独占隐藏 → 24h 回填或释放。失败回对应校验，超时释放回广场顶边。</p>
+        <div class="flow-svg-wrap">
+          <svg width="1080" height="1420" viewBox="0 0 1080 1420" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <marker id="flow-arrow-1" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                <path d="M0,0 L8,4 L0,8 Z" fill="#94a3b8" />
+              </marker>
+            </defs>
+            <g class="flow-edges" marker-end="url(#flow-arrow-1)">
+              <line x1="540" y1="56" x2="540" y2="80" />
+              <line x1="540" y1="160" x2="540" y2="188" />
+              <polyline points="460,228 200,228" />
+              <line x1="540" y1="268" x2="540" y2="300" />
+              <line x1="540" y1="360" x2="540" y2="392" />
+              <line x1="540" y1="452" x2="540" y2="484" />
+              <line x1="540" y1="544" x2="540" y2="576" />
+              <polyline points="460,616 200,616" />
+              <line x1="540" y1="656" x2="540" y2="688" />
+              <polyline points="460,728 200,728" />
+              <polyline points="200,728 200,800 460,800" />
+              <line x1="540" y1="768" x2="540" y2="820" />
+              <line x1="540" y1="880" x2="540" y2="912" />
+              <polyline points="620,952 860,952" />
+              <line x1="540" y1="992" x2="540" y2="1024" />
+              <line x1="540" y1="1084" x2="540" y2="1116" />
+              <polyline points="460,1156 120,1156" />
+              <line x1="540" y1="1196" x2="540" y2="1228" />
+              <polyline points="360,1252 120,1252 120,16 540,16" />
+              <polyline points="120,1156 120,16 540,16" />
+              <polyline points="200,228 80,228 80,16 540,16" />
+              <polyline points="200,616 80,616 80,16" />
+              <polyline points="960,952 960,392 540,392" />
+            </g>
+            <g font-family="Inter, PingFang SC, sans-serif">
+              <rect x="360" y="16" width="360" height="40" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="540" y="41" text-anchor="middle" font-size="12" fill="#1e40af">看招募海报 · 底部客服二维码</text>
+
+              <polygon points="540,80 620,120 540,160 460,120" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="540" y="124" text-anchor="middle" font-size="11" fill="#854d0e">后台已录入?</text>
+              <text x="336" y="220" font-size="10" fill="#dc2626">否</text>
+              <rect x="40" y="208" width="160" height="40" rx="6" fill="#fecaca" stroke="#dc2626" />
+              <text x="120" y="233" text-anchor="middle" font-size="11" fill="#991b1b">阻断上传</text>
+              <text x="552" y="180" font-size="10" fill="#16a34a">是</text>
+
+              <rect x="360" y="188" width="360" height="80" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="540" y="220" text-anchor="middle" font-size="12" fill="#1e40af">选项目 · 上传图集或视频</text>
+              <text x="540" y="240" text-anchor="middle" font-size="10" fill="#64748b">必须选择素材类型</text>
+
+              <rect x="360" y="300" width="360" height="60" rx="6" fill="#dcfce7" stroke="#16a34a" />
+              <text x="540" y="324" text-anchor="middle" font-size="12" fill="#166534">发布到平台</text>
+              <text x="540" y="342" text-anchor="middle" font-size="10" fill="#64748b">进入用户可见 feed</text>
+
+              <rect x="360" y="392" width="360" height="60" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="540" y="416" text-anchor="middle" font-size="12" fill="#1e40af">作品广场宫格 + 项目直选</text>
+              <text x="540" y="434" text-anchor="middle" font-size="10" fill="#64748b">搜索在项目下 · 不展示金额</text>
+
+              <rect x="360" y="484" width="360" height="60" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="540" y="508" text-anchor="middle" font-size="12" fill="#1e40af">详情铺满素材 · 发起领取</text>
+              <text x="540" y="526" text-anchor="middle" font-size="10" fill="#64748b">次数旁显 · 浮层选词 · 分成比例</text>
+
+              <polygon points="540,576 620,616 540,656 460,616" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="540" y="620" text-anchor="middle" font-size="11" fill="#854d0e">剩余次数&gt;0?</text>
+              <text x="336" y="608" font-size="10" fill="#dc2626">否 · 购次</text>
+              <rect x="40" y="596" width="160" height="40" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="120" y="621" text-anchor="middle" font-size="11" fill="#1e40af">积分买在售档</text>
+              <text x="552" y="672" font-size="10" fill="#16a34a">是</text>
+
+              <polygon points="540,688 620,728 540,768 460,728" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="540" y="732" text-anchor="middle" font-size="11" fill="#854d0e">已选通过关键词?</text>
+              <text x="336" y="720" font-size="10" fill="#dc2626">否</text>
+              <rect x="40" y="780" width="160" height="40" rx="6" fill="#fecaca" stroke="#dc2626" />
+              <text x="120" y="805" text-anchor="middle" font-size="11" fill="#991b1b">拦截领取</text>
+              <text x="552" y="784" font-size="10" fill="#16a34a">是</text>
+
+              <rect x="360" y="820" width="360" height="60" rx="6" fill="#dcfce7" stroke="#16a34a" />
+              <text x="540" y="844" text-anchor="middle" font-size="12" fill="#166534">领取成功 · 扣次不退</text>
+              <text x="540" y="862" text-anchor="middle" font-size="10" fill="#64748b">占用并对他人 feed 隐藏</text>
+
+              <polygon points="540,912 620,952 540,992 460,952" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="540" y="956" text-anchor="middle" font-size="11" fill="#854d0e">24h 内已回填?</text>
+              <text x="636" y="940" font-size="10" fill="#16a34a">是</text>
+              <rect x="860" y="924" width="160" height="56" rx="6" fill="#dcfce7" stroke="#16a34a" />
+              <text x="940" y="948" text-anchor="middle" font-size="11" fill="#166534">完成占用</text>
+              <text x="940" y="966" text-anchor="middle" font-size="10" fill="#64748b">不再出现 feed</text>
+              <text x="552" y="1008" font-size="10" fill="#dc2626">否</text>
+
+              <rect x="360" y="1024" width="360" height="60" rx="6" fill="#ffedd5" stroke="#ea580c" />
+              <text x="540" y="1048" text-anchor="middle" font-size="12" fill="#9a3412">记 1 次未回填 + 释放</text>
+              <text x="540" y="1066" text-anchor="middle" font-size="10" fill="#64748b">不退次 · 稿件回 feed</text>
+
+              <polygon points="540,1116 620,1156 540,1196 460,1156" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="540" y="1160" text-anchor="middle" font-size="11" fill="#854d0e">终身未回填&gt;3?</text>
+              <text x="336" y="1148" font-size="10" fill="#dc2626">是 · 黑名单</text>
+              <rect x="20" y="1136" width="140" height="40" rx="6" fill="#fecaca" stroke="#dc2626" />
+              <text x="90" y="1161" text-anchor="middle" font-size="11" fill="#991b1b">停权 · 仅手动恢复</text>
+              <text x="552" y="1212" font-size="10" fill="#16a34a">否 · 可再领</text>
+
+              <rect x="360" y="1228" width="360" height="48" rx="6" fill="#e2e8f0" stroke="#94a3b8" />
+              <text x="540" y="1258" text-anchor="middle" font-size="12" fill="#475569">原领取人与他人均可再领（再扣次）</text>
+            </g>
+          </svg>
+        </div>
+        <div class="flow-legend">
+          <span><i style="background:#dbeafe;border:1px solid #2563eb"></i>前端 / 用户操作</span>
+          <span><i style="background:#dcfce7;border:1px solid #16a34a"></i>后端判定 / 写入</span>
+          <span><i style="background:#ffedd5;border:1px solid #ea580c"></i>异步 / 超时</span>
+          <span><i style="background:#fef9c3;border:1px solid #ca8a04"></i>校验</span>
+          <span><i style="background:#fecaca;border:1px solid #dc2626"></i>阻断</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="drawer-overlay" id="ruleOverlay" onclick="setRuleDrawer(false)"></div>
+  <aside class="drawer" id="ruleDrawer" role="dialog" aria-labelledby="ruleTitle">
+    <div class="drawer-header">
+      <h2 id="ruleTitle">FR-014 · v2 需求规则</h2>
+      <button class="drawer-close" type="button" onclick="setRuleDrawer(false)">×</button>
+    </div>
+    <div class="rule-tab-bar">
+      <button type="button" class="active" data-rule="rule-fe">前端需求</button>
+      <button type="button" data-rule="rule-admin">后台需求</button>
+    </div>
+    <div class="drawer-body">
+      <div id="rule-fe" class="rule-panel active">
+        <div class="rule-section">
+          <h3><span>1</span>业务目标</h3>
+          <div class="rule-content"><p>没有剪辑能力的用户，通过领取剪辑手已发布的图集/视频稿件做项目变现；剪辑手只走客服招募，不走站内申请。</p></div>
+        </div>
+        <div class="rule-section">
+          <h3><span>2</span>页面与入口</h3>
+          <div class="rule-content">
+            <ul>
+              <li><strong>作品广场</strong>：宫格；项目图标横滑直选；搜索在项目下方；下拉筛剪辑师 / 素材类型 / 稿件类型；封面为本地图片（小说/漫画/视频题材）。Banner 可配 0–5 条：≥2 自动轮播（指示点+循环），1 条静止，0 条隐藏。点招募帧进海报详情。只列未占用稿件。不展示收益金额。底栏切「已领」。</li>
+              <li><strong>稿件详情</strong>：素材铺满。未领取底栏：剩余次数、快捷提词（提示跳转该项目题词页）、领取。领取后底栏：复制标题、编辑稿件。不展示收益金额。</li>
+              <li><strong>我的领取</strong>：项目图标只展示有领取记录的项目。胶囊 Tab：未回填 / 已回填 / 已超时。卡片：关键词标题；封面、作品标题、项目名称、作者、领取时间、下载时间、7 天下载倒计时（超时不可再下）。下载/复制链接为次级；立即回填始终高亮，已回填/已超时点按提示。点信息区（不含灰底三按钮）进该 mid 稿件详情，底栏为已领取；返回回到领取页。「立即回填」仍只去回填页。</li>
+              <li><strong>招募海报</strong>：招募氛围（卖点 / 适合谁 / 底部客服二维码）。无站内申请表。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>3</span>交互规则</h3>
+          <div class="rule-content">
+            <ul>
+              <li>领取门禁：先校验剩余次数（按钮旁可见），次数足够后浮层选该项目已通过关键词，不进下级页。确认后 loading：正在下载稿件 → 正在保存到相册 → 已保存到相册。</li>
+              <li>次数不足弹出兑换浮层，选档后点「兑换」；在售最多 4 档，下架不可兑。</li>
+              <li>领取成功即扣次，超时释放不退。原领取人未停权可再领同一稿，再领再扣次。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>4</span>边界规则</h3>
+          <div class="rule-content">
+            <ul>
+              <li>一稿同时一人占用；占用中对他人 feed 隐藏。</li>
+              <li>领取成功后 24h 未完成回填 = 1 次未回填，并释放回 feed。</li>
+              <li>终身未回填超过 3 次停权，仅后台黑名单手动恢复。</li>
+              <li>未录入剪辑手不能上传发布。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>5</span>业务流程</h3>
+          <div class="rule-content"><p>见页内 Tab <strong>「业务流程」</strong>。</p></div>
+        </div>
+      </div>
+      <div id="rule-admin" class="rule-panel">
+        <div class="rule-section">
+          <h3><span>1</span>业务目标</h3>
+          <div class="rule-content"><p>运营在右豹后台管剪辑手、稿件、领取/回填、停权恢复、项目、素材类型和次数商品。</p></div>
+        </div>
+        <div class="rule-section">
+          <h3><span>2</span>数据表与字段</h3>
+          <div class="rule-content">
+            <ul>
+              <li><strong>剪辑手</strong>：ID、昵称、客服来源、可上传项目、状态、录入时间。</li>
+              <li><strong>稿件</strong>：标题、项目/书、剪辑手、图集或视频、素材类型、占用态、上传时间。</li>
+              <li><strong>领取记录</strong>：用户、稿件、关键词、回填信息、待回填/已回填/已超时释放。操作列「详情」看出回填；「稿件详情」抽屉出示稿件字段。</li>
+              <li><strong>广场 Banner</strong>：最多 5 条；再新增拦截并提示最多 5 条。类型含招募 / 运营。</li>
+              <li><strong>黑名单</strong>：用户、未回填次数、停权时间；支持手动恢复。</li>
+              <li><strong>次数商品</strong>：x 次 / y 积分，最多 4 档在售，可改价、下架。免费次数在项目侧配置。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>3</span>列表与筛选</h3>
+          <div class="rule-content">
+            <ul>
+              <li>详情用 Drawer，编辑/改价用 Modal，恢复/下架用 Confirm。</li>
+              <li>领取记录必须能看出回填信息与三种状态。</li>
+              <li>广场 Banner 已满 5 条时禁止再新增。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>4</span>边界规则</h3>
+          <div class="rule-content">
+            <ul>
+              <li>停权恢复只能后台手动，没有自助解禁。</li>
+              <li>下架商品立即不可新购；已购次数保留。</li>
+              <li>本 Demo 不做真实积分扣减或权限落库。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="drawer-overlay" id="detailOverlay" onclick="closeDetail()"></div>
+  <aside class="drawer" id="detailDrawer">
+    <div class="drawer-header">
+      <h2 id="detailTitle">详情</h2>
+      <button class="drawer-close" type="button" onclick="closeDetail()">×</button>
+    </div>
+    <div class="drawer-body" id="detailBody"></div>
+  </aside>
+
+  <div class="modal-overlay" id="modalOverlay" onclick="closeModal()"></div>
+  <div class="modal modal-md" id="appModal">
+    <h3 id="modalTitle">确认</h3>
+    <div id="modalBody"></div>
+    <div class="modal-actions">
+      <button class="btn-ghost-sm" type="button" onclick="closeModal()">取消</button>
+      <button class="btn btn-primary" type="button" id="modalOk">确定</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    var EDITORS = [
+      { id: 'E-01', name: '林夏', src: '客服二维码', projects: '番茄小说', status: '已录入', time: '2026-09-01 10:12' },
+      { id: 'E-02', name: '阿凯', src: '客服二维码', projects: '不鸣推文 / 番茄小说', status: '已录入', time: '2026-09-02 15:40' },
+      { id: 'E-03', name: '小禾', src: '客服二维码', projects: '—', status: '已停用', time: '2026-08-20 09:03' }
+    ];
+    var WORKS = [
+      { id: 'M-01', title: '掌心宠 · 口播切片', project: '番茄小说', book: '我成了老公掌心宠', editor: '林夏', kind: '图集', mat: '口播', occ: '占用中', time: '今天 11:20' },
+      { id: 'M-02', title: '末世囤货混剪', project: '不鸣推文', book: '我在末世囤了亿万物资', editor: '阿凯', kind: '视频', mat: '混剪', occ: '空闲', time: '昨天 18:02' },
+      { id: 'M-03', title: '团宠解压图集', project: '番茄小说', book: '被偷听心声后我成了全村团宠', editor: '林夏', kind: '图集', mat: '解压', occ: '占用中', time: '昨天 09:40' },
+      { id: 'M-06', title: '银发军官图集', project: '番茄小说', book: '银发军官把我宠上天', editor: '庭宇', kind: '图集', mat: '图文切片', occ: '占用中', time: '今天 10:02' }
+    ];
+    var CLAIMS = [
+      { id: 'C-8801', user: 'U-10086', mid: 'M-01', work: '掌心宠 · 口播切片', kw: '掌心宠溺', fill: '抖音 / 作品链接已填', status: '待回填', time: '今天 11:28' },
+      { id: 'C-8802', user: 'U-10221', mid: 'M-06', work: '银发军官图集', kw: '银发军官', fill: '视频号 / @北城', status: '已回填', time: '昨天 16:02' },
+      { id: 'C-8803', user: 'U-10086', mid: 'M-03', work: '团宠解压图集', kw: '全村团宠', fill: '—', status: '已超时释放', time: '前天 09:11' }
+    ];
+    var ADMIN_BANNERS = [
+      { id: 'B-01', title: '剪辑手招募', kind: 'recruit', on: true, img: 'assets/fr014/bn-recruit.jpg' },
+      { id: 'B-02', title: '热门稿件上新', kind: 'promo', on: true, img: 'assets/fr014/bn-hot.jpg' },
+      { id: 'B-03', title: '领取后 24 小时回填', kind: 'promo', on: true, img: 'assets/fr014/bn-guide.jpg' },
+      { id: 'B-04', title: '剪辑手精选', kind: 'promo', on: true, img: 'assets/fr014/bn-pick.jpg' },
+      { id: 'B-05', title: '不会剪辑也能做项目', kind: 'promo', on: true, img: 'assets/fr014/bn-tips.jpg' }
+    ];
+    var BANS = [
+      { user: 'U-10999', strikes: 4, time: '2026-09-07 20:11', status: '停权中' },
+      { user: 'U-10801', strikes: 4, time: '2026-09-03 13:40', status: '已恢复' }
+    ];
+    var SKUS = [
+      { id: 'S-1', times: 1, points: 50, on: true },
+      { id: 'S-2', times: 3, points: 120, on: true },
+      { id: 'S-3', times: 10, points: 350, on: true },
+      { id: 'S-4', times: 30, points: 900, on: false }
+    ];
+
+    function showToast(msg) {
+      var el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(function () { el.classList.remove('show'); }, 1600);
+    }
+    function stTag(s) {
+      if (s === '已录入' || s === '空闲' || s === '已回填' || s === '已恢复' || s === true) return '<span class="tag tag-ok">' + (s === true ? '在售' : s) + '</span>';
+      if (s === '待回填' || s === '占用中') return '<span class="tag tag-warn">' + s + '</span>';
+      if (s === '停权中' || s === '已超时释放') return '<span class="tag tag-del">' + s + '</span>';
+      return '<span class="tag tag-muted">' + s + '</span>';
+    }
+    function renderEditors() {
+      var q = (document.getElementById('edQ').value || '').trim();
+      var s = document.getElementById('edS').value;
+      document.getElementById('edBody').innerHTML = EDITORS.filter(function (e) {
+        if (q && e.name.indexOf(q) === -1 && e.id.indexOf(q) === -1) return false;
+        if (s && e.status !== s) return false;
+        return true;
+      }).map(function (e) {
+        return '<tr><td>' + e.id + '</td><td>' + e.name + '</td><td>' + e.src + '</td><td>' + e.projects + '</td><td>' + stTag(e.status) + '</td><td>' + e.time + '</td>' +
+          '<td><button class="link" type="button" onclick="openKv(\'剪辑手 ' + e.id + '\',\'' + e.name + ' / ' + e.projects + '\')">详情</button></td></tr>';
+      }).join('') || '<tr><td colspan="7" style="text-align:center;color:#9aa5b4">无匹配</td></tr>';
+    }
+    function resetEd() { document.getElementById('edQ').value = ''; document.getElementById('edS').value = ''; renderEditors(); }
+    function renderWorks() {
+      var q = (document.getElementById('wkQ').value || '').trim();
+      var o = document.getElementById('wkO').value;
+      document.getElementById('wkBody').innerHTML = WORKS.filter(function (w) {
+        if (q && w.title.indexOf(q) === -1 && w.id.indexOf(q) === -1) return false;
+        if (o && w.occ !== o) return false;
+        return true;
+      }).map(function (w) {
+        return '<tr><td>' + w.id + '</td><td>' + w.title + '</td><td>' + w.project + '<div class="cell-sub">' + w.book + '</div></td><td>' + w.editor + '</td><td>' + w.kind + '</td><td>' + w.mat + '</td><td>' + stTag(w.occ) + '</td><td>' + w.time + '</td>' +
+          '<td><button class="link" type="button" onclick="openKv(\'' + w.id + '\',\'' + w.title + ' · ' + w.mat + '\')">详情</button></td></tr>';
+      }).join('') || '<tr><td colspan="9" style="text-align:center;color:#9aa5b4">无匹配</td></tr>';
+    }
+    function renderClaimsAdm() {
+      var q = (document.getElementById('clQ').value || '').trim();
+      var s = document.getElementById('clS').value;
+      document.getElementById('clBody').innerHTML = CLAIMS.filter(function (c) {
+        if (q && c.user.indexOf(q) === -1 && c.work.indexOf(q) === -1) return false;
+        if (s && c.status !== s) return false;
+        return true;
+      }).map(function (c) {
+        return '<tr><td>' + c.id + '</td><td>' + c.user + '</td><td>' + c.work + '</td><td>' + c.kw + '</td><td>' + c.fill + '</td><td>' + stTag(c.status) + '</td><td>' + c.time + '</td>' +
+          '<td><button class="link" type="button" onclick="openKv(\'' + c.id + '\',\'回填：' + c.fill + '\')">详情</button>' +
+          '<button class="link" type="button" onclick="openWorkDetail(\'' + c.mid + '\')">稿件详情</button></td></tr>';
+      }).join('') || '<tr><td colspan="8" style="text-align:center;color:#9aa5b4">无匹配</td></tr>';
+    }
+    function renderBan() {
+      var q = (document.getElementById('bnQ').value || '').trim();
+      document.getElementById('bnBody').innerHTML = BANS.filter(function (b) {
+        return !q || b.user.indexOf(q) !== -1;
+      }).map(function (b) {
+        var act = b.status === '停权中'
+          ? '<button class="link" type="button" onclick="confirmRestore(\'' + b.user + '\')">恢复</button>'
+          : '<span class="cell-sub">—</span>';
+        return '<tr><td>' + b.user + '</td><td>' + b.strikes + '</td><td>' + b.time + '</td><td>' + stTag(b.status) + '</td><td>' + act + '</td></tr>';
+      }).join('');
+    }
+    function renderSkus() {
+      document.getElementById('skuBody').innerHTML = SKUS.map(function (s) {
+        var act = '<button class="link" type="button" onclick="editSku(\'' + s.id + '\')">编辑</button>';
+        act += s.on
+          ? '<button class="link link-danger" type="button" onclick="toggleSku(\'' + s.id + '\',false)">下架</button>'
+          : '<button class="link" type="button" onclick="toggleSku(\'' + s.id + '\',true)">上架</button>';
+        return '<tr><td>' + s.id + '</td><td>' + s.times + ' 次</td><td>' + s.points + '</td><td>' + (s.on ? stTag(true) : '<span class="tag tag-muted">下架</span>') + '</td><td>' + act + '</td></tr>';
+      }).join('');
+    }
+    function openKv(title, body) {
+      document.getElementById('detailTitle').textContent = title;
+      document.getElementById('detailBody').innerHTML = '<p>' + body + '</p>';
+      document.getElementById('detailOverlay').classList.add('open');
+      document.getElementById('detailDrawer').classList.add('open');
+    }
+    function openWorkDetail(mid) {
+      var w = WORKS.find(function (x) { return x.id === mid; });
+      if (!w) { showToast('稿件已不存在'); return; }
+      document.getElementById('detailTitle').textContent = '稿件详情';
+      document.getElementById('detailBody').innerHTML =
+        '<dl class="kv">' +
+        '<dt>稿件 ID</dt><dd>' + w.id + '</dd>' +
+        '<dt>标题</dt><dd>' + w.title + '</dd>' +
+        '<dt>项目</dt><dd>' + w.project + '</dd>' +
+        '<dt>书籍</dt><dd>' + w.book + '</dd>' +
+        '<dt>剪辑手</dt><dd>' + w.editor + '</dd>' +
+        '<dt>稿件类型</dt><dd>' + w.kind + '</dd>' +
+        '<dt>素材类型</dt><dd>' + w.mat + '</dd>' +
+        '<dt>占用</dt><dd>' + w.occ + '</dd>' +
+        '<dt>上传时间</dt><dd>' + w.time + '</dd>' +
+        '</dl>';
+      document.getElementById('detailOverlay').classList.add('open');
+      document.getElementById('detailDrawer').classList.add('open');
+    }
+    function renderBannersAdm() {
+      document.getElementById('bannerBody').innerHTML = ADMIN_BANNERS.map(function (b) {
+        return '<tr><td>' + b.id + '</td><td>' + b.title + '</td><td>' + (b.kind === 'recruit' ? '招募' : '运营') + '</td>' +
+          '<td><span class="cell-sub">' + b.img + '</span></td>' +
+          '<td>' + (b.on ? '<span class="tag tag-ok">启用</span>' : '<span class="tag tag-muted">停用</span>') + '</td>' +
+          '<td><button class="link" type="button" onclick="toggleBanner(\'' + b.id + '\')">' + (b.on ? '停用' : '启用') + '</button></td></tr>';
+      }).join('') || '<tr><td colspan="6" style="text-align:center;color:#9aa5b4">暂无 Banner</td></tr>';
+    }
+    function addBanner() {
+      if (ADMIN_BANNERS.length >= 5) {
+        showToast('最多 5 条');
+        return;
+      }
+      openModal('新增 Banner',
+        '<div class="field"><label>标题</label><input id="bnTitle" placeholder="运营条" /></div>' +
+        '<div class="field"><label>类型</label><select id="bnKind"><option value="promo">运营</option><option value="recruit">招募</option></select></div>',
+        function () {
+          if (ADMIN_BANNERS.length >= 5) { showToast('最多 5 条'); return; }
+          ADMIN_BANNERS.push({
+            id: 'B-0' + (ADMIN_BANNERS.length + 1),
+            title: document.getElementById('bnTitle').value || '运营条',
+            kind: document.getElementById('bnKind').value || 'promo',
+            on: true,
+            img: 'assets/fr014/bn-tips.jpg'
+          });
+          renderBannersAdm();
+          showToast('已新增 Banner');
+        });
+    }
+    function toggleBanner(id) {
+      var row = ADMIN_BANNERS.find(function (b) { return b.id === id; });
+      if (row) row.on = !row.on;
+      renderBannersAdm();
+    }
+    function closeDetail() {
+      document.getElementById('detailOverlay').classList.remove('open');
+      document.getElementById('detailDrawer').classList.remove('open');
+    }
+    function openModal(title, html, onOk) {
+      document.getElementById('modalTitle').textContent = title;
+      document.getElementById('modalBody').innerHTML = html;
+      document.getElementById('modalOverlay').classList.add('open');
+      document.getElementById('appModal').classList.add('open');
+      document.getElementById('modalOk').onclick = function () { onOk(); closeModal(); };
+    }
+    function closeModal() {
+      document.getElementById('modalOverlay').classList.remove('open');
+      document.getElementById('appModal').classList.remove('open');
+    }
+    function openEditorModal() {
+      openModal('录入剪辑手',
+        '<div class="field"><label>昵称</label><input id="mName" placeholder="剪辑手昵称" /></div><div class="field"><label>可上传项目</label><input id="mProj" placeholder="番茄小说" /></div>',
+        function () {
+          EDITORS.unshift({ id: 'E-0' + (EDITORS.length + 1), name: document.getElementById('mName').value || '新剪辑手', src: '客服二维码', projects: document.getElementById('mProj').value || '—', status: '已录入', time: '刚刚' });
+          renderEditors();
+          showToast('已录入，该账号可上传发布');
+        });
+    }
+    function confirmRestore(user) {
+      openModal('恢复领取权限', '<p>确认手动恢复 <strong>' + user + '</strong>？恢复后可再次领取。</p>', function () {
+        var row = BANS.find(function (b) { return b.user === user; });
+        if (row) row.status = '已恢复';
+        renderBan();
+        showToast('已手动恢复');
+      });
+    }
+    function editSku(id) {
+      var s = SKUS.find(function (x) { return x.id === id; });
+      openModal('改价',
+        '<div class="field"><label>次数</label><input id="mT" type="number" value="' + s.times + '" /></div><div class="field"><label>积分</label><input id="mP" type="number" value="' + s.points + '" /></div>',
+        function () {
+          s.times = Number(document.getElementById('mT').value) || s.times;
+          s.points = Number(document.getElementById('mP').value) || s.points;
+          renderSkus();
+          showToast('已改价');
+        });
+    }
+    function toggleSku(id, on) {
+      var onSale = SKUS.filter(function (x) { return x.on; }).length;
+      if (on && onSale >= 4) { showToast('同时在售最多 4 档'); return; }
+      openModal(on ? '上架商品' : '下架商品', '<p>' + (on ? '上架后用户可购买。' : '下架后不可新购，已购次数保留。') + '</p>', function () {
+        SKUS.find(function (x) { return x.id === id; }).on = on;
+        renderSkus();
+        showToast(on ? '已上架' : '已下架');
+      });
+    }
+
+    function getActiveScreen() {
+      return document.querySelector('.scene-list .scene-btn.active')?.dataset.screen || 'feed';
+    }
+    function currentTabKey() {
+      var id = document.querySelector('.page-view.active')?.id;
+      return { 'view-fe': 'fe', 'view-admin': 'admin', 'view-flow': 'flow' }[id] || 'fe';
+    }
+    function syncPageUrl() {
+      var params = new URLSearchParams();
+      params.set('tab', currentTabKey());
+      history.replaceState(null, '', '?' + params.toString());
+    }
+    function buildMockupSrc(screen) {
+      return 'yijian-daifa-demo.html?embed=1&v=10&screen=' + screen;
+    }
+    function loadMockupFrame() {
+      document.getElementById('mockupFrame').src = buildMockupSrc(getActiveScreen());
+    }
+    function switchRuleTab(ruleId, btn) {
+      document.querySelectorAll('.rule-tab-bar button').forEach(function (b) { b.classList.remove('active'); });
+      document.querySelectorAll('.rule-panel').forEach(function (p) { p.classList.remove('active'); });
+      btn.classList.add('active');
+      document.getElementById(ruleId).classList.add('active');
+    }
+    function syncRuleTabToPage() {
+      var activePage = document.querySelector('.page-view.active')?.id;
+      var ruleId = activePage === 'view-admin' ? 'rule-admin' : 'rule-fe';
+      var btn = document.querySelector('.rule-tab-bar button[data-rule="' + ruleId + '"]');
+      if (btn) switchRuleTab(ruleId, btn);
+    }
+    var ruleDrawer = document.getElementById('ruleDrawer');
+    var toggleRuleBtn = document.getElementById('toggleRuleDrawer');
+    function setRuleDrawer(open) {
+      ruleDrawer.classList.toggle('open', open);
+      document.getElementById('ruleOverlay').classList.toggle('open', open);
+      toggleRuleBtn.classList.toggle('active', open);
+      if (open) syncRuleTabToPage();
+    }
+    toggleRuleBtn.onclick = function () { setRuleDrawer(!ruleDrawer.classList.contains('open')); };
+
+    document.querySelectorAll('.scene-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('.scene-btn').forEach(function (b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        syncPageUrl();
+        loadMockupFrame();
+      });
+    });
+    document.querySelectorAll('.page-tab-bar button').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('.page-tab-bar button').forEach(function (b) { b.classList.remove('active'); });
+        document.querySelectorAll('.page-view').forEach(function (v) { v.classList.remove('active'); });
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.page).classList.add('active');
+        if (btn.dataset.page === 'view-fe') loadMockupFrame();
+        syncPageUrl();
+        syncRuleTabToPage();
+      });
+    });
+    document.querySelectorAll('.admin-tab-bar button').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('.admin-tab-bar button').forEach(function (b) { b.classList.remove('active'); });
+        document.querySelectorAll('.admin-pane').forEach(function (p) { p.classList.remove('active'); });
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.admin).classList.add('active');
+      });
+    });
+    document.querySelectorAll('.rule-tab-bar button').forEach(function (btn) {
+      btn.addEventListener('click', function () { switchRuleTab(btn.dataset.rule, btn); });
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape') return;
+      closeDetail();
+      closeModal();
+      setRuleDrawer(false);
+    });
+
+    var params = new URLSearchParams(location.search);
+    var tab = params.get('tab');
+    var tabPageMap = { admin: 'view-admin', flow: 'view-flow', fe: 'view-fe' };
+    if (tab && tabPageMap[tab]) {
+      var tbtn = document.querySelector('[data-page="' + tabPageMap[tab] + '"]');
+      if (tbtn) tbtn.click();
+    }
+    renderEditors();
+    renderWorks();
+    renderClaimsAdm();
+    renderBan();
+    renderSkus();
+    renderBannersAdm();
+    if (document.querySelector('.page-view.active')?.id === 'view-fe') loadMockupFrame();
+  </script>
+  <script src="sidebar-nav.js"></script>
+</body>
+</html>
