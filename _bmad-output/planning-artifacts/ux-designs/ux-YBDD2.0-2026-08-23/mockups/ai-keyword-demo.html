@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>AI申词 · 前端交互 Demo</title>
+  <style>
+    :root {
+      --orange: #ff6b1a;
+      --orange-start: #ff8a4c;
+      --orange-light: #fff3eb;
+      --orange-border: #ffd4b8;
+      --orange-soft: #fff6ee;
+      --bg: #f5f6f8;
+      --surface: #fff;
+      --text: #1a2332;
+      --muted: #8a93a0;
+      --text-muted: #9aa3af;
+      --border: #ececec;
+      --line: #f0f1f3;
+      --phone-w: 375px;
+      --phone-h: 812px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: #e8eaed; min-height: 100vh; color: var(--text);
+    }
+    .demo-shell { display: flex; flex-direction: column; align-items: center; padding: 20px 16px 40px; gap: 16px; }
+    .demo-header { width: 100%; max-width: 960px; background: #fff; border-radius: 12px; padding: 16px 20px; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
+    .demo-header h1 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+    .demo-header p { font-size: 13px; color: #6b7280; line-height: 1.5; }
+    .demo-nav { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .demo-nav button {
+      padding: 6px 12px; border-radius: 999px; border: 1px solid var(--border);
+      background: #fff; font-size: 12px; cursor: pointer; color: #6b7280;
+    }
+    .demo-nav button.active, .demo-nav button:hover {
+      background: var(--orange-light); border-color: var(--orange-border); color: var(--orange); font-weight: 600;
+    }
+    .phone-frame {
+      width: var(--phone-w); height: var(--phone-h);
+      border-radius: 36px; overflow: hidden; position: relative;
+      box-shadow: 0 20px 60px rgba(0,0,0,.18), inset 0 0 0 8px #1a1a1a;
+      background: #f4f5f7;
+    }
+    .phone-notch {
+      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      width: 120px; height: 28px; background: #1a1a1a; border-radius: 0 0 16px 16px; z-index: 120;
+    }
+    .screen { display: flex; flex-direction: column; height: 100%; overflow: hidden; position: relative; }
+    .status-bar {
+      height: 44px; flex-shrink: 0; display: flex; align-items: flex-end; justify-content: space-between;
+      padding: 0 20px 6px; font-size: 12px; font-weight: 600; color: #111; background: #f4f5f7;
+    }
+    .nav-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 2px 8px 8px; flex-shrink: 0; background: #f4f5f7;
+    }
+    .nav-bar .back {
+      width: 36px; height: 36px; border: none; background: none; font-size: 22px; cursor: pointer; color: #222;
+    }
+    .nav-bar .title { font-size: 17px; font-weight: 700; flex: 1; text-align: center; margin-right: 36px; }
+    .form-scroll { flex: 1; overflow-y: auto; padding: 0 16px 20px; }
+    .card {
+      background: #fff; border-radius: 12px; padding: 14px; margin-bottom: 12px;
+    }
+    .card-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; gap: 8px; }
+    .card-head h3 { font-size: 15px; font-weight: 700; }
+    .field { margin-bottom: 12px; }
+    .field:last-child { margin-bottom: 0; }
+    .field label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 8px; }
+    .field select, .field textarea, .field input[type="text"] {
+      width: 100%; padding: 0 12px; border: 1px solid #e6e8eb; border-radius: 8px;
+      background: #fff; font-size: 13px; color: var(--text); font-family: inherit;
+    }
+    .field select {
+      height: 40px; appearance: none;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'><path d='M1 1l5 5 5-5' stroke='%239aa3af' stroke-width='1.6' fill='none' stroke-linecap='round'/></svg>");
+      background-repeat: no-repeat; background-position: right 12px center;
+    }
+    .field textarea {
+      min-height: 88px; padding: 10px 12px; resize: none; line-height: 1.5;
+    }
+    .field select:focus, .field textarea:focus, .field input:focus { outline: none; border-color: #ffc09a; }
+    .field-hint { margin-top: 6px; font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+    .id-row { display: flex; gap: 8px; align-items: flex-start; }
+    .id-row textarea { flex: 1; }
+    .btn-add {
+      height: 40px; padding: 0 14px; border: none; border-radius: 8px; flex-shrink: 0; margin-top: 0;
+      background: var(--orange); color: #fff; font-size: 13px; font-weight: 600; cursor: pointer;
+    }
+    .rec-empty {
+      padding: 18px 8px; text-align: center; font-size: 12px; color: var(--text-muted); line-height: 1.6;
+    }
+    .rec-list { display: flex; flex-direction: column; gap: 8px; max-height: 220px; overflow-y: auto; }
+    .rec-item {
+      display: flex; align-items: flex-start; gap: 10px; padding: 8px 4px;
+      border-bottom: 1px solid #f3f3f3; cursor: pointer;
+    }
+    .rec-item:last-child { border-bottom: none; }
+    .rec-item input { margin-top: 3px; accent-color: var(--orange); }
+    .rec-title { font-size: 13px; font-weight: 600; line-height: 1.4; }
+    .rec-id { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .btn-rec {
+      width: 100%; height: 40px; margin-top: 10px; border: 1px solid var(--orange); border-radius: 8px;
+      background: #fff; color: var(--orange); font-size: 13px; font-weight: 600; cursor: pointer;
+    }
+    .btn-rec:disabled { opacity: .45; cursor: not-allowed; }
+    .kw-row {
+      border: 1px solid #f0f1f3; border-radius: 10px; padding: 12px; margin-bottom: 10px;
+    }
+    .kw-row:last-child { margin-bottom: 0; }
+    .row-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+    .row-id { font-size: 12px; font-weight: 700; color: var(--text); }
+    .row-title { font-size: 12px; color: #4b5563; margin-top: 2px; }
+    .row-title.unmatched { color: #d97706; }
+    .row-del {
+      border: none; background: none; color: #ef4444; font-size: 12px; cursor: pointer; padding: 0;
+    }
+    .ai-row { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+    .ai-qty {
+      flex: 1; display: flex; align-items: center; height: 42px; padding: 0 12px;
+      border: 1px solid #e6e8eb; border-radius: 8px; background: #fff;
+    }
+    .ai-qty span { font-size: 13px; color: #6b7280; margin-right: 8px; white-space: nowrap; }
+    .ai-qty input {
+      width: 48px; border: none; outline: none; font-size: 15px; font-weight: 700; color: var(--text);
+    }
+    .ai-qty em { font-style: normal; font-size: 12px; color: var(--text-muted); }
+    .btn-swap {
+      height: 42px; padding: 0 16px; border: 1px solid var(--orange); border-radius: 8px;
+      background: #fff; color: var(--orange); font-size: 13px; font-weight: 600; cursor: pointer;
+    }
+    .ai-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; min-height: 28px; }
+    .ai-chip {
+      padding: 5px 10px; border-radius: 6px; background: var(--orange-soft);
+      color: #c2410c; font-size: 12px; font-weight: 600;
+    }
+    .ai-empty { font-size: 12px; color: var(--text-muted); padding: 4px 0; }
+    .rows-empty { font-size: 12px; color: var(--text-muted); padding: 8px 0 0; }
+    .submit-btn {
+      width: 100%; height: 46px; margin-top: 4px; border: none; border-radius: 10px;
+      background: var(--orange); color: #fff; font-size: 16px; font-weight: 700; cursor: pointer;
+    }
+    .submit-btn:disabled { opacity: .45; cursor: not-allowed; }
+    .toast {
+      position: absolute; left: 50%; bottom: 36px; transform: translateX(-50%) translateY(12px);
+      background: rgba(0,0,0,.78); color: #fff; padding: 10px 16px; border-radius: 999px;
+      font-size: 13px; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 200;
+      max-width: 86%; text-align: center;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    body.embed-mode { background: #fff; margin: 0; }
+    body.embed-mode .demo-header, body.embed-mode .demo-nav { display: none !important; }
+    body.embed-mode .demo-shell { padding: 0; min-height: 100vh; }
+    body.embed-mode .phone-frame { width: 100%; max-width: 100%; height: 100vh; border-radius: 0; box-shadow: none; }
+    body.embed-mode .phone-notch { display: none; }
+    body.embed-mode .status-bar { display: none; }
+    body.embed-mode .nav-bar { padding-top: 10px; }
+  </style>
+</head>
+<body>
+  <div class="demo-shell">
+    <div class="demo-header">
+      <h1>AI申词 · 前端交互 Demo</h1>
+      <p>已知书籍 ID 或只要选书中心已上架书时，批量 AI 申词：选项目 / 类型，手填 ID 和/或勾选官方推荐，每本 1–10 词后一次提交。</p>
+      <div class="demo-nav" id="screenNav"></div>
+    </div>
+    <div class="phone-frame">
+      <div class="phone-notch"></div>
+      <section class="screen" id="screen-form">
+        <div class="status-bar"><span>12:40</span><span>5G ●●●</span></div>
+        <div class="nav-bar">
+          <button class="back" type="button" aria-label="返回">‹</button>
+          <div class="title">AI申词</div>
+        </div>
+        <div class="form-scroll" id="formScroll"></div>
+      </section>
+      <div class="toast" id="toast"></div>
+    </div>
+  </div>
+
+  <script>
+    const SCREENS = [
+      { id: 'form', label: '表单' },
+      { id: 'recommend', label: '官方推荐' },
+      { id: 'manual', label: '手填 ID' },
+      { id: 'preview', label: '预览出词' },
+      { id: 'empty', label: '空推荐' },
+      { id: 'no-type', label: '无类型' }
+    ];
+    const STORAGE_KEY = 'ybdd-fr013-batches';
+    const AI_POOL = [
+      '掌心宠溺', '年代团宠', '八零后妈', '闪婚宠妻', '末世囤货', '反派白月光',
+      '种田日常', '偷听心声', '重生复仇', '全村团宠', '死对头新娘', '豪门隐婚',
+      '穿书女配', '银发救赎', '世情暖文', '异能觉醒'
+    ];
+    const PROJECTS = [
+      { id: 'buming', name: '不鸣推文', ownLibrary: false, types: ['真人出镜', '图文', '解压TTS', '解说混剪', 'AIGC'] },
+      { id: 'xinghe', name: '星河小说', ownLibrary: true, types: ['真人出镜', '图文', '解压TTS', '解说混剪', 'AIGC'] },
+      { id: 'unconfigured', name: '未配置项目', ownLibrary: false, types: [] }
+    ];
+    const CATALOG = [
+      { id: 'BK-1001', title: '我成了老公掌心宠', listed: true },
+      { id: 'BK-1002', title: '我给死对头当了百日新娘', listed: true },
+      { id: 'BK-1003', title: '我在八零年代当后妈', listed: true },
+      { id: 'BK-1004', title: '被偷听心声后我成了全村团宠', listed: true },
+      { id: 'BK-1005', title: '我在末世囤了亿万物资', listed: true },
+      { id: 'BK-1006', title: '末世里我带全家躺赢', listed: false },
+      { id: 'BK-1007', title: '银发军官把我宠上天', listed: true },
+      { id: 'BK-1008', title: '穿成年代文后我成了团宠', listed: true },
+      { id: 'BK-1009', title: '穿成恶毒女配后我只想种田', listed: true },
+      { id: 'BK-1010', title: '八零年代我成了全家的宝', listed: true },
+      { id: 'BK-1011', title: '重生后我成了前夫的白月光', listed: true },
+      { id: 'BK-1012', title: '穿书后我成了反派的掌心宝', listed: true },
+      { id: 'BK-1013', title: '闪婚后大佬他宠妻入骨', listed: true },
+      { id: 'BK-1014', title: '我给反派当了三年白月光', listed: true }
+    ];
+    const RECOMMENDED = CATALOG.filter(function (b) { return b.listed; });
+
+    const state = {
+      screen: 'form',
+      projectId: '',
+      promo: '',
+      rawIds: '',
+      recChecked: {},
+      rows: []
+    };
+
+    function esc(s) {
+      return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+      });
+    }
+    function currentProject() {
+      return PROJECTS.find(function (p) { return p.id === state.projectId; }) || null;
+    }
+    function normalizeId(raw) {
+      var id = String(raw || '').trim();
+      if (/^bk-\d+$/i.test(id)) return id.replace(/^bk/i, 'BK');
+      return id;
+    }
+    function parseIds(text) {
+      return String(text || '').split(/[\s,，、]+/).map(normalizeId).filter(Boolean);
+    }
+    function lookupBook(id) {
+      var key = normalizeId(id).toUpperCase();
+      return CATALOG.find(function (b) { return b.id.toUpperCase() === key; }) || null;
+    }
+    function pickAiWords(n) {
+      var pool = AI_POOL.slice();
+      var out = [];
+      while (out.length < n && pool.length) {
+        out.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
+      }
+      return out;
+    }
+    function rowLabel(row) {
+      return row.unmatched ? (row.id + '（未匹配书名）') : (row.title || row.id);
+    }
+    function makeRow(id) {
+      var book = lookupBook(id);
+      return {
+        id: normalizeId(id),
+        title: book ? book.title : '未匹配书名',
+        unmatched: !book,
+        qty: 3,
+        words: []
+      };
+    }
+    function addIds(ids, fromRecommend) {
+      var added = 0;
+      var dup = 0;
+      ids.forEach(function (id) {
+        var nid = normalizeId(id);
+        if (!nid) return;
+        if (state.rows.some(function (r) { return r.id.toUpperCase() === nid.toUpperCase(); })) {
+          dup += 1;
+          return;
+        }
+        state.rows.push(makeRow(nid));
+        added += 1;
+      });
+      if (!added && dup) toast('已添加');
+      else if (dup) toast('已添加');
+      return added;
+    }
+    function clampQty(raw) {
+      if (raw == null) return null;
+      var s = String(raw).trim();
+      if (s === '') return null;
+      var n = Number(s);
+      if (Number.isNaN(n)) return null;
+      if (n < 1) return 1;
+      if (n > 10) return 10;
+      return Math.floor(n);
+    }
+    function localDateTime() {
+      var d = new Date();
+      function pad(n) { return n < 10 ? '0' + n : String(n); }
+      return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) +
+        ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+    }
+    function toast(msg) {
+      var el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(toast._t);
+      toast._t = setTimeout(function () { el.classList.remove('show'); }, 1800);
+    }
+    function persistBatch(batch) {
+      var list = [];
+      try {
+        var parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        list = Array.isArray(parsed) ? parsed : [];
+      } catch (_) { list = []; }
+      list.unshift(batch);
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+        return true;
+      } catch (_) {
+        return false;
+      }
+    }
+
+    function render() {
+      var project = currentProject();
+      var types = project ? project.types : [];
+      var showRec = !!(project && !project.ownLibrary && types.length);
+      var recEmptyOwn = !!(project && project.ownLibrary);
+      var promoOpts = '<option value="">请选择推广类型</option>' + types.map(function (t) {
+        return '<option value="' + esc(t) + '"' + (state.promo === t ? ' selected' : '') + '>' + esc(t) + '</option>';
+      }).join('');
+      var projectOpts = '<option value="">请选择项目</option>' + PROJECTS.map(function (p) {
+        return '<option value="' + p.id + '"' + (state.projectId === p.id ? ' selected' : '') + '>' + esc(p.name) + '</option>';
+      }).join('');
+
+      var recHtml = '';
+      if (!project) {
+        recHtml = '<div class="rec-empty" id="recommendEmpty">先选择项目后再看官方推荐</div>';
+      } else if (recEmptyOwn) {
+        recHtml = '<div class="rec-empty" id="recommendEmpty">该项目有自有书库，无官方推荐，请手填书籍 ID</div>';
+      } else if (!types.length) {
+        recHtml = '<div class="rec-empty" id="recommendEmpty">项目未配置推广类型，无法使用推荐</div>';
+      } else {
+        recHtml = '<div class="rec-list" id="recommendList">' + RECOMMENDED.map(function (b) {
+          var checked = !!state.recChecked[b.id];
+          return '<label class="rec-item"><input type="checkbox" data-id="' + b.id + '"' + (checked ? ' checked' : '') + ' />' +
+            '<span><div class="rec-title">' + esc(b.title) + '</div><div class="rec-id">' + b.id + '</div></span></label>';
+        }).join('') + '</div>' +
+          '<button class="btn-rec" type="button" id="addRecommend">加入待申</button>';
+      }
+
+      var rowsHtml = state.rows.length ? state.rows.map(function (row, idx) {
+        var chips = row.words.length
+          ? row.words.map(function (w) { return '<span class="ai-chip">' + esc(w) + '</span>'; }).join('')
+          : '<div class="ai-empty">输入数量后点「更换」，一次最多 10 个</div>';
+        return '<div class="kw-row" data-id="' + esc(row.id) + '" data-idx="' + idx + '">' +
+          '<div class="row-top">' +
+            '<div><div class="row-id">' + esc(row.id) + '</div>' +
+            '<div class="row-title' + (row.unmatched ? ' unmatched' : '') + '">' + esc(row.title) + '</div></div>' +
+            '<button class="row-del" type="button" data-idx="' + idx + '">移除</button>' +
+          '</div>' +
+          '<div class="ai-row">' +
+            '<label class="ai-qty"><span>申请数量</span><input class="row-qty" type="number" min="1" max="10" value="' + esc(row.qty) + '" /><em>最多 10 个</em></label>' +
+            '<button class="btn-swap row-swap" type="button">更换</button>' +
+          '</div>' +
+          '<div class="ai-chips">' + chips + '</div>' +
+        '</div>';
+      }).join('') : '<div class="rows-empty" id="rowsEmpty">还没有待申词的书，手填 ID 或从官方推荐勾选</div>';
+
+      document.getElementById('formScroll').innerHTML =
+        '<div class="card">' +
+          '<div class="field"><label>项目</label><select id="projectSelect">' + projectOpts + '</select></div>' +
+          '<div class="field"><label>推广类型</label><select id="promoSelect">' + promoOpts + '</select>' +
+            (project && !types.length ? '<div class="field-hint">该项目未配置推广类型</div>' : '') +
+          '</div>' +
+        '</div>' +
+        '<div class="card">' +
+          '<div class="card-head"><h3>手填书籍 ID</h3></div>' +
+          '<div class="field"><div class="id-row">' +
+            '<textarea id="bookIds" placeholder="BK-1001, BK-1002&#10;换行 / 逗号 / 空格分隔">' + esc(state.rawIds) + '</textarea>' +
+            '<button class="btn-add" type="button" id="addIds">添加</button>' +
+          '</div><div class="field-hint">不要求命中书库；未匹配仍可申。按 ID 去重。</div></div>' +
+        '</div>' +
+        '<div class="card" id="recBlock">' +
+          '<div class="card-head"><h3>官方推荐</h3></div>' + recHtml +
+        '</div>' +
+        '<div class="card">' +
+          '<div class="card-head"><h3>待申词</h3></div>' +
+          '<div id="rowList">' + rowsHtml + '</div>' +
+        '</div>' +
+        '<button class="submit-btn" type="button" id="submitKw">立即提交</button>';
+
+      bindForm();
+      document.querySelectorAll('#screenNav button').forEach(function (btn) {
+        btn.classList.toggle('active', btn.dataset.screen === state.screen);
+      });
+      if (state.rows.length && (state.screen === 'preview' || state.screen === 'manual')) {
+        var scroll = document.getElementById('formScroll');
+        var list = document.getElementById('rowList');
+        if (scroll && list) scroll.scrollTop = Math.max(0, list.offsetTop - 8);
+      }
+    }
+
+    function bindForm() {
+      document.getElementById('projectSelect').onchange = function (e) {
+        state.projectId = e.target.value;
+        var p = currentProject();
+        if (!p || p.types.indexOf(state.promo) === -1) state.promo = '';
+        state.recChecked = {};
+        render();
+      };
+      document.getElementById('promoSelect').onchange = function (e) { state.promo = e.target.value; };
+      document.getElementById('bookIds').oninput = function (e) { state.rawIds = e.target.value; };
+      document.getElementById('addIds').onclick = function () {
+        var ids = parseIds(state.rawIds);
+        if (!ids.length) { toast('请输入有效书籍 ID'); return; }
+        addIds(ids, false);
+        state.rawIds = '';
+        render();
+      };
+      var recList = document.getElementById('recommendList');
+      if (recList) {
+        recList.querySelectorAll('input[type="checkbox"]').forEach(function (box) {
+          box.onchange = function () { state.recChecked[box.dataset.id] = box.checked; };
+        });
+      }
+      var addRec = document.getElementById('addRecommend');
+      if (addRec) addRec.onclick = function () {
+        var ids = Object.keys(state.recChecked).filter(function (id) { return state.recChecked[id]; });
+        if (!ids.length) { toast('请先勾选推荐书'); return; }
+        addIds(ids, true);
+        ids.forEach(function (id) { state.recChecked[id] = false; });
+        render();
+      };
+      document.querySelectorAll('.kw-row').forEach(function (el) {
+        var idx = Number(el.dataset.idx);
+        var row = state.rows[idx];
+        el.querySelector('.row-qty').oninput = function (e) { row.qty = e.target.value; };
+        el.querySelector('.row-swap').onclick = function () {
+          var n = clampQty(row.qty);
+          if (n == null) { toast('请输入申请数量'); return; }
+          row.qty = n;
+          row.words = pickAiWords(n);
+          render();
+          toast('已更换一批关键词');
+        };
+        el.querySelector('.row-del').onclick = function () {
+          state.rows.splice(idx, 1);
+          render();
+        };
+      });
+      document.getElementById('submitKw').onclick = submitApply;
+    }
+
+    function submitApply() {
+      var project = currentProject();
+      if (!state.projectId || !project) { toast('请先选择项目'); return; }
+      if (!project.types.length) { toast('该项目未配置推广类型'); return; }
+      if (!state.promo) { toast('请先选择推广类型'); return; }
+      if (!state.rows.length) { toast('请添加有效书籍 ID'); return; }
+      var missing = state.rows.find(function (r) { return !r.words.length; });
+      if (missing) { toast('请先为「' + rowLabel(missing) + '」更换关键词'); return; }
+      var stale = state.rows.find(function (r) { return clampQty(r.qty) !== r.words.length; });
+      if (stale) { toast('请先按新数量更换'); return; }
+      var batch = {
+        id: 'BAT-' + Date.now(),
+        user: 'U-10086',
+        project: project.name,
+        promo: state.promo,
+        books: state.rows.map(function (r) {
+          return { id: r.id, title: r.title, unmatched: r.unmatched, words: r.words.slice() };
+        }),
+        status: '待审核',
+        time: localDateTime()
+      };
+      if (!persistBatch(batch)) { toast('保存失败'); return; }
+      state.rows = [];
+      state.recChecked = {};
+      render();
+      toast('已提交批次 · ' + batch.books.length + ' 本书');
+    }
+
+    function resetBase() {
+      state.projectId = '';
+      state.promo = '';
+      state.rawIds = '';
+      state.recChecked = {};
+      state.rows = [];
+    }
+    function applyScene(id) {
+      var known = SCREENS.some(function (s) { return s.id === id; });
+      state.screen = known ? id : 'form';
+      resetBase();
+      if (state.screen === 'recommend') {
+        state.projectId = 'buming';
+        state.promo = '图文';
+      } else if (state.screen === 'manual') {
+        state.projectId = 'buming';
+        state.promo = '图文';
+        state.rawIds = 'BK-1001,BK-1003';
+        addIds(parseIds(state.rawIds), false);
+        state.rawIds = '';
+      } else if (state.screen === 'preview') {
+        state.projectId = 'buming';
+        state.promo = '图文';
+        addIds(['BK-1001', 'BK-1002'], true);
+        state.rows.forEach(function (r) {
+          r.qty = 3;
+          r.words = pickAiWords(3);
+        });
+      } else if (state.screen === 'empty') {
+        state.projectId = 'xinghe';
+        state.promo = '图文';
+      } else if (state.screen === 'no-type') {
+        state.projectId = 'unconfigured';
+      }
+      render();
+      notifyScreen(state.screen);
+    }
+    function notifyScreen(id) {
+      if (window.parent !== window) window.parent.postMessage({ type: 'aiKeywordScreen', screen: id }, '*');
+    }
+    function setScreen(id) { applyScene(id); }
+
+    document.getElementById('screenNav').innerHTML = SCREENS.map(function (s) {
+      return '<button type="button" data-screen="' + s.id + '">' + s.label + '</button>';
+    }).join('');
+    document.querySelectorAll('#screenNav button').forEach(function (btn) {
+      btn.addEventListener('click', function () { setScreen(btn.dataset.screen); });
+    });
+
+    var params = new URLSearchParams(location.search);
+    if (params.get('embed') === '1') document.body.classList.add('embed-mode');
+    setScreen(params.get('screen') || 'form');
+    window.addEventListener('message', function (e) {
+      if (e.data && e.data.type === 'setScreen' && SCREENS.some(function (s) { return s.id === e.data.screen; })) {
+        setScreen(e.data.screen);
+      }
+    });
+  </script>
+</body>
+</html>

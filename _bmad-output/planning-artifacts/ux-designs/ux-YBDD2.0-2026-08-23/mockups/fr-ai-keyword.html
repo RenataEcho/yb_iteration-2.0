@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FR-013 · AI申词 · 右豹迭代需求记录</title>
+  <style>
+    :root {
+      --primary: #2563eb; --primary-hover: #1d4ed8; --primary-light: #eff6ff; --primary-border: #bfdbfe;
+      --accent-rule: #0891b2; --accent-version: #7c3aed; --accent-fr: #d97706;
+      --success: #16a34a; --success-bg: #f0fdf4; --warning: #d97706; --warning-bg: #fffbeb;
+      --danger: #dc2626; --danger-bg: #fef2f2;
+      --surface: #fff; --surface-glass: rgba(255,255,255,0.72); --surface-hover: #f8fafc; --border: #e8edf3;
+      --text-primary: #18222f; --text-secondary: #4a5568; --text-muted: #9aa5b4;
+      --sidebar-w: 240px; --drawer-w: 480px; --radius-sm: 7px; --radius-lg: 14px;
+      --shadow: 0 8px 32px rgba(30,40,80,0.10);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 13px;
+      color: var(--text-primary);
+      background: linear-gradient(135deg, #e0e7ff 0%, #f0f4f8 40%, #e0f2fe 100%);
+      background-attachment: fixed; min-height: 100vh;
+    }
+    .sidebar {
+      position: fixed; inset: 0 auto 0 0; width: var(--sidebar-w); z-index: 200;
+      display: flex; flex-direction: column;
+      background: rgba(240,244,255,0.95); backdrop-filter: blur(20px);
+      border-right: 1px solid rgba(148,163,196,0.22);
+    }
+    .sidebar-brand { padding: 16px 14px 12px; border-bottom: 1px solid rgba(148,163,196,0.22); }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: linear-gradient(135deg, #2563eb, #7c3aed); color: #fff;
+      display: flex; align-items: center; justify-content: center; font-weight: 700;
+    }
+    .brand-text { font-size: 14px; font-weight: 700; }
+    .brand-sub { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+    .sprint-pill {
+      display: inline-block; margin-top: 10px; font-size: 11px; font-weight: 600;
+      padding: 3px 8px; border-radius: 999px; background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0;
+    }
+    .sidebar-scroll { flex: 1; overflow-y: auto; padding: 8px 0 16px; }
+    .sidebar-foot { padding: 10px 14px 14px; border-top: 1px solid rgba(148,163,196,0.22); font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+    .main { margin-left: var(--sidebar-w); padding: 16px 20px 40px; min-height: 100vh; }
+    .breadcrumb { padding: 4px 0 12px; font-size: 12px; color: var(--text-muted); }
+    .breadcrumb a { color: var(--primary); text-decoration: none; }
+    .page-header { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; }
+    .page-header h1 { font-size: 19px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .page-desc { font-size: 12px; color: var(--text-muted); max-width: 760px; line-height: 1.55; }
+    .badge { display: inline-flex; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: var(--radius-sm); }
+    .badge-fr { background: #fffbeb; color: var(--accent-fr); border: 1px solid #fde68a; }
+    .badge-version { background: #f5f3ff; color: var(--accent-version); border: 1px solid #ddd6fe; }
+    .page-tab-bar {
+      display: flex; gap: 0; margin-bottom: 16px;
+      background: var(--surface-glass); backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.55); border-radius: var(--radius-lg);
+      padding: 4px; box-shadow: var(--shadow); width: fit-content;
+    }
+    .page-tab-bar button {
+      padding: 8px 20px; border: none; background: transparent; cursor: pointer;
+      font-size: 13px; font-weight: 500; color: var(--text-secondary); border-radius: 10px;
+    }
+    .page-tab-bar button.active { background: var(--primary); color: #fff; font-weight: 600; }
+    .page-view { display: none; }
+    .page-view.active { display: block; }
+    .btn {
+      display: inline-flex; align-items: center; height: 34px; padding: 0 14px;
+      border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid transparent;
+    }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-rule { background: var(--primary-light); color: var(--primary); border-color: var(--primary-border); }
+    .btn-rule.active { background: var(--primary); color: #fff; }
+    .btn-ghost-sm { background: var(--surface); color: var(--text-secondary); border: 1px solid var(--border); height: 32px; padding: 0 12px; border-radius: var(--radius-sm); cursor: pointer; font-size: 12px; }
+    .glass-card {
+      background: var(--surface-glass); backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.55); border-radius: var(--radius-lg);
+      box-shadow: var(--shadow); overflow: hidden;
+    }
+    .demo-layout { display: grid; grid-template-columns: minmax(280px, 5fr) minmax(360px, 7fr); gap: 16px; }
+    @media (max-width: 1024px) { .demo-layout { grid-template-columns: 1fr; } }
+    .scene-panel { padding: 16px 18px; }
+    .scene-panel h2 { font-size: 14px; font-weight: 700; margin-bottom: 10px; }
+    .scene-list { display: flex; flex-direction: column; gap: 6px; }
+    .scene-btn {
+      text-align: left; padding: 10px 12px; border-radius: var(--radius-sm);
+      border: 1px solid var(--border); background: rgba(255,255,255,0.6); cursor: pointer;
+    }
+    .scene-btn.active { border-color: var(--primary-border); background: var(--primary-light); color: var(--primary); font-weight: 600; }
+    .scene-btn .scene-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+    .scene-btn .scene-desc { font-size: 11px; color: var(--text-muted); line-height: 1.45; }
+    .scene-btn.active .scene-desc { color: #3b82f6; }
+    .scene-note { margin-top: 14px; padding: 10px 12px; border-radius: var(--radius-sm); background: #fffbeb; border: 1px solid #fde68a; font-size: 12px; color: #92400e; line-height: 1.55; }
+    .mockup-panel { padding: 16px; display: flex; justify-content: center; min-height: 520px; }
+    .mockup-frame-wrap {
+      width: 100%; max-width: 375px; border-radius: 28px; overflow: hidden;
+      background: #1e293b; box-shadow: 0 16px 48px rgba(0,0,0,0.18); aspect-ratio: 375 / 812;
+    }
+    .mockup-frame-wrap iframe { width: 100%; height: 100%; border: none; display: block; background: #fff; }
+    .table-toolbar { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--border); gap: 10px; flex-wrap: wrap; }
+    .table-toolbar h3 { font-size: 14px; font-weight: 700; }
+    .filter-bar { display: flex; flex-wrap: wrap; gap: 10px; padding: 14px 16px; align-items: flex-end; border-bottom: 1px solid var(--border); }
+    .filter-field { display: flex; flex-direction: column; gap: 4px; }
+    .filter-field label { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+    .filter-field input, .filter-field select { height: 32px; padding: 0 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 12px; min-width: 130px; }
+    .filter-actions { display: flex; gap: 8px; margin-left: auto; align-items: center; flex-wrap: wrap; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 980px; }
+    th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); font-size: 12px; vertical-align: top; }
+    th { font-size: 11px; font-weight: 600; color: var(--text-muted); background: rgba(248,250,252,0.9); white-space: nowrap; }
+    tr:hover td { background: var(--surface-hover); }
+    .link { color: var(--primary); cursor: pointer; text-decoration: none; margin-right: 10px; font-size: 12px; font-weight: 500; background: none; border: none; padding: 0; }
+    .tag { display: inline-flex; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+    .tag-ok { background: var(--success-bg); color: var(--success); }
+    .tag-warn { background: var(--warning-bg); color: var(--warning); }
+    .tag-muted { background: #f1f5f9; color: var(--text-muted); }
+    .cell-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .book-block { padding: 12px 0; border-bottom: 1px solid var(--border); }
+    .book-block:last-child { border-bottom: none; }
+    .chip-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .word-chip { padding: 3px 8px; border-radius: 6px; background: #fff7ed; color: #c2410c; font-size: 12px; font-weight: 600; }
+    .drawer-overlay {
+      position: fixed; inset: 0; background: rgba(15,23,42,0.35); z-index: 500;
+      opacity: 0; pointer-events: none; transition: opacity 0.25s;
+    }
+    .drawer-overlay.open { opacity: 1; pointer-events: auto; }
+    .drawer {
+      position: fixed; top: 0; right: 0; bottom: 0; width: var(--drawer-w); z-index: 501;
+      background: rgba(255,255,255,0.98); backdrop-filter: blur(12px);
+      box-shadow: -8px 0 40px rgba(30,40,60,0.18);
+      transform: translateX(100%); transition: transform 0.28s ease;
+      display: flex; flex-direction: column;
+    }
+    .drawer.open { transform: translateX(0); }
+    .drawer-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .drawer-header h2 { font-size: 15px; font-weight: 700; }
+    .drawer-close { width: 28px; height: 28px; border: none; background: #f1f5f9; border-radius: 6px; cursor: pointer; font-size: 16px; }
+    .rule-tab-bar { display: flex; gap: 0; padding: 0 16px; border-bottom: 1px solid var(--border); }
+    .rule-tab-bar button {
+      padding: 10px 18px; border: none; background: none; cursor: pointer;
+      font-size: 13px; color: var(--text-secondary); border-bottom: 2px solid transparent; margin-bottom: -1px;
+    }
+    .rule-tab-bar button.active { color: var(--primary); font-weight: 600; border-bottom-color: var(--primary); }
+    .drawer-body { flex: 1; overflow-y: auto; padding: 16px 20px 32px; }
+    .rule-panel { display: none; }
+    .rule-panel.active { display: block; }
+    .rule-section { margin-bottom: 22px; }
+    .rule-section h3 { font-size: 14px; font-weight: 700; color: var(--accent-rule); margin-bottom: 8px; }
+    .rule-section h3 span {
+      display: inline-flex; width: 22px; height: 22px; align-items: center; justify-content: center;
+      background: #ecfeff; color: var(--accent-rule); border-radius: 6px; font-size: 12px; margin-right: 8px;
+    }
+    .rule-content { font-size: 13px; color: var(--text-secondary); line-height: 1.65; }
+    .rule-content ul { padding-left: 18px; margin-top: 6px; }
+    .rule-content li { margin-bottom: 5px; }
+    .rule-content code { font-family: ui-monospace, monospace; font-size: 12px; background: #f1f5f9; padding: 1px 5px; border-radius: 4px; }
+    .kv { display: grid; grid-template-columns: 88px 1fr; gap: 8px 10px; font-size: 13px; }
+    .kv dt { color: var(--text-muted); }
+    .kv dd { color: var(--text-primary); }
+    .flow-page-intro { padding: 16px 18px 0; font-size: 12px; color: var(--text-muted); line-height: 1.55; }
+    .flow-svg-wrap { overflow: auto; padding: 16px 18px 24px; max-height: 72vh; }
+    .flow-svg-wrap svg { display: block; margin: 0 auto; min-width: 920px; }
+    .flow-edges line, .flow-edges polyline { stroke: #94a3b8; stroke-width: 1.5; fill: none; }
+    .flow-legend { display: flex; flex-wrap: wrap; gap: 12px; padding: 0 18px 20px; font-size: 11px; color: var(--text-muted); }
+    .flow-legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 4px; vertical-align: -2px; }
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: #1e293b; color: #fff; padding: 10px 18px; border-radius: 999px; font-size: 13px;
+      opacity: 0; transition: all 0.25s; z-index: 600; pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand">
+        <div class="brand-icon">迭</div>
+        <div>
+          <div class="brand-text">右豹迭代需求记录</div>
+          <div class="brand-sub">PRD Demo · 产品交付研发</div>
+        </div>
+      </div>
+      <span class="sprint-pill">YBDD2.0 · 迭代 v1</span>
+    </div>
+    <div class="sidebar-scroll" data-iteration-sidebar></div>
+    <div class="sidebar-foot">FR-013 · 页内 Tab<br />前端交互 / 管理后台 / 业务流程</div>
+  </aside>
+
+  <main class="main">
+    <nav class="breadcrumb">
+      <a href="framework-shell.html">Sprint 概览</a>
+      <span> / 运营 / AI申词</span>
+    </nav>
+    <header class="page-header">
+      <div>
+        <h1>
+          AI申词
+          <span class="badge badge-fr">FR-013</span>
+          <span class="badge badge-version">v1 当前</span>
+        </h1>
+        <p class="page-desc">用户已知书籍 ID、或只要用选书中心已上架书时，走独立批量 AI 申词：选项目与推广类型，手填 ID 和/或勾选官方推荐，多本书每本 1–10 词，先预览更换再一次提交。</p>
+      </div>
+      <div class="page-header-actions">
+        <button class="btn btn-rule" id="toggleRuleDrawer" type="button">📋 需求规则</button>
+      </div>
+    </header>
+
+    <div class="page-tab-bar" role="tablist">
+      <button type="button" class="active" data-page="view-fe" role="tab">前端交互</button>
+      <button type="button" data-page="view-admin" role="tab">管理后台</button>
+      <button type="button" data-page="view-flow" role="tab">业务流程</button>
+    </div>
+
+    <div id="view-fe" class="page-view active">
+      <div class="demo-layout">
+        <div class="glass-card scene-panel">
+          <h2>场景切换</h2>
+          <div class="scene-list">
+            <button class="scene-btn active" type="button" data-screen="form">
+              <div class="scene-title">表单</div>
+              <div class="scene-desc">选项目 / 类型，手填与推荐入口，待申词为空</div>
+            </button>
+            <button class="scene-btn" type="button" data-screen="recommend">
+              <div class="scene-title">官方推荐</div>
+              <div class="scene-desc">不鸣推文 + 图文，展示已上架拷贝，可多选</div>
+            </button>
+            <button class="scene-btn" type="button" data-screen="manual">
+              <div class="scene-title">手填 ID</div>
+              <div class="scene-desc">两本合法 ID 入行，命中带书名</div>
+            </button>
+            <button class="scene-btn" type="button" data-screen="preview">
+              <div class="scene-title">预览出词</div>
+              <div class="scene-desc">两本已更换出词，可一次提交</div>
+            </button>
+            <button class="scene-btn" type="button" data-screen="empty">
+              <div class="scene-title">空推荐</div>
+              <div class="scene-desc">星河小说有自有书库，推荐为空，仍可手填</div>
+            </button>
+            <button class="scene-btn" type="button" data-screen="no-type">
+              <div class="scene-title">无类型</div>
+              <div class="scene-desc">未配置项目，类型下拉空并阻断提交</div>
+            </button>
+          </div>
+          <div class="scene-note">官方推荐是选书中心<strong>已上架书</strong>的独立拷贝（ID 用 <code>BK-10xx</code>），无推荐标记、无维护表。下架书不出现。推广类型来自项目题词配置。</div>
+        </div>
+        <div class="glass-card mockup-panel">
+          <div class="mockup-frame-wrap">
+            <iframe id="mockupFrame" title="AI申词 Mockup" src="about:blank"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="view-admin" class="page-view">
+      <div class="glass-card">
+        <div class="table-toolbar">
+          <h3>申词批次</h3>
+        </div>
+        <div class="filter-bar">
+          <div class="filter-field"><label>批次 / 项目</label><input id="batchQ" placeholder="BAT-9001 / 不鸣推文" /></div>
+          <div class="filter-field">
+            <label>审核状态</label>
+            <select id="batchStatusQ">
+              <option value="">全部</option>
+              <option>待审核</option>
+              <option>已通过</option>
+              <option>已驳回</option>
+            </select>
+          </div>
+          <div class="filter-actions">
+            <button class="btn-ghost-sm" type="button" onclick="resetBatchFilter()">重置</button>
+            <button class="btn btn-primary" type="button" onclick="renderBatches()">查询</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>批次 ID</th><th>用户</th><th>项目</th><th>推广类型</th><th>书籍</th><th>词数</th><th>状态</th><th>申请时间</th><th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="batchBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="view-flow" class="page-view">
+      <div class="glass-card flow-page">
+        <p class="flow-page-intro">一张闭环：选项目 → 读题词配置 → 选类型 → 手填和/或勾选推荐 → 按行出词 → 一次写入一条批次，复用现有申词审核。缺项拦截回起点，不另开第二条流程。</p>
+        <div class="flow-svg-wrap">
+          <svg width="1080" height="1080" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <marker id="flow-arrow-1" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                <path d="M0,0 L8,4 L0,8 Z" fill="#94a3b8" />
+              </marker>
+            </defs>
+            <g class="flow-edges" marker-end="url(#flow-arrow-1)">
+              <line x1="540" y1="64" x2="540" y2="94" />
+              <line x1="540" y1="174" x2="540" y2="204" />
+              <line x1="540" y1="244" x2="540" y2="274" />
+              <line x1="540" y1="354" x2="540" y2="384" />
+              <line x1="540" y1="424" x2="540" y2="454" />
+              <line x1="540" y1="534" x2="540" y2="564" />
+              <line x1="540" y1="612" x2="540" y2="642" />
+              <line x1="540" y1="722" x2="540" y2="752" />
+              <line x1="540" y1="800" x2="540" y2="830" />
+              <line x1="540" y1="910" x2="540" y2="940" />
+              <line x1="540" y1="980" x2="540" y2="1004" />
+              <line x1="460" y1="134" x2="230" y2="134" />
+              <line x1="460" y1="314" x2="230" y2="314" />
+              <line x1="460" y1="494" x2="230" y2="494" />
+              <line x1="460" y1="682" x2="230" y2="682" />
+              <line x1="460" y1="870" x2="230" y2="870" />
+              <polyline points="60,134 20,134 20,4 540,4 540,16" />
+              <polyline points="60,314 20,314 20,4 540,4 540,16" />
+              <polyline points="60,494 20,494 20,4 540,4 540,16" />
+              <polyline points="60,682 20,682 20,4 540,4 540,16" />
+              <polyline points="60,870 20,870 20,4 540,4 540,16" />
+            </g>
+            <g class="flow-nodes" font-family="Inter, PingFang SC, sans-serif">
+              <rect x="360" y="16" width="360" height="48" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="540" y="36" text-anchor="middle" font-size="12" fill="#1e40af">进入 AI申词 · 选择项目</text>
+              <text x="540" y="52" text-anchor="middle" font-size="10" fill="#64748b">不鸣推文 / 星河小说 / 未配置</text>
+
+              <polygon points="540,94 620,134 540,174 460,134" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="540" y="138" text-anchor="middle" font-size="11" fill="#854d0e">已选项目?</text>
+              <text x="300" y="126" font-size="10" fill="#dc2626">否</text>
+              <rect x="60" y="114" width="170" height="40" rx="6" fill="#fecaca" stroke="#dc2626" />
+              <text x="145" y="139" text-anchor="middle" font-size="11" fill="#991b1b">拦截 · Toast 点名项目</text>
+              <text x="552" y="190" font-size="10" fill="#16a34a">是</text>
+
+              <rect x="360" y="204" width="360" height="40" rx="6" fill="#dcfce7" stroke="#16a34a" />
+              <text x="540" y="229" text-anchor="middle" font-size="12" fill="#166534">读取该项目题词配置</text>
+
+              <polygon points="540,274 620,314 540,354 460,314" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="540" y="318" text-anchor="middle" font-size="11" fill="#854d0e">项目有类型?</text>
+              <text x="300" y="306" font-size="10" fill="#dc2626">否</text>
+              <rect x="60" y="294" width="170" height="40" rx="6" fill="#fecaca" stroke="#dc2626" />
+              <text x="145" y="319" text-anchor="middle" font-size="11" fill="#991b1b">阻断 · 类型下拉空</text>
+              <text x="552" y="370" font-size="10" fill="#16a34a">是</text>
+
+              <rect x="360" y="384" width="360" height="40" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="540" y="409" text-anchor="middle" font-size="12" fill="#1e40af">选择推广类型</text>
+
+              <polygon points="540,454 620,494 540,534 460,494" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="540" y="498" text-anchor="middle" font-size="11" fill="#854d0e">已选推广类型?</text>
+              <text x="300" y="486" font-size="10" fill="#dc2626">否</text>
+              <rect x="60" y="474" width="170" height="40" rx="6" fill="#fecaca" stroke="#dc2626" />
+              <text x="145" y="499" text-anchor="middle" font-size="11" fill="#991b1b">拦截 · Toast 点名类型</text>
+              <text x="552" y="550" font-size="10" fill="#16a34a">是</text>
+
+              <rect x="360" y="564" width="360" height="48" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="540" y="584" text-anchor="middle" font-size="12" fill="#1e40af">手填 ID 和/或勾选官方推荐</text>
+              <text x="540" y="600" text-anchor="middle" font-size="10" fill="#64748b">无自有书库才有推荐 · 下架书不出现</text>
+
+              <polygon points="540,642 620,682 540,722 460,682" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="540" y="686" text-anchor="middle" font-size="11" fill="#854d0e">有有效书籍 ID?</text>
+              <text x="300" y="674" font-size="10" fill="#dc2626">否</text>
+              <rect x="60" y="662" width="170" height="40" rx="6" fill="#fecaca" stroke="#dc2626" />
+              <text x="145" y="687" text-anchor="middle" font-size="11" fill="#991b1b">拦截 · 无有效 ID</text>
+              <text x="552" y="738" font-size="10" fill="#16a34a">是</text>
+
+              <rect x="360" y="752" width="360" height="48" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="540" y="772" text-anchor="middle" font-size="12" fill="#1e40af">每本数量 1–10，按行更换出词</text>
+              <text x="540" y="788" text-anchor="middle" font-size="10" fill="#64748b">默认 3 · 越界钳到 1–10 · 空数量 Toast</text>
+
+              <polygon points="540,830 620,870 540,910 460,870" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="540" y="874" text-anchor="middle" font-size="11" fill="#854d0e">每行都已出词?</text>
+              <text x="300" y="862" font-size="10" fill="#dc2626">否</text>
+              <rect x="60" y="850" width="170" height="40" rx="6" fill="#fecaca" stroke="#dc2626" />
+              <text x="145" y="875" text-anchor="middle" font-size="11" fill="#991b1b">拦截 · 行未出词</text>
+              <text x="552" y="926" font-size="10" fill="#16a34a">是</text>
+
+              <rect x="360" y="940" width="360" height="40" rx="6" fill="#dcfce7" stroke="#16a34a" />
+              <text x="540" y="965" text-anchor="middle" font-size="12" fill="#166534">一次提交 = 一条批次记录</text>
+
+              <rect x="360" y="1004" width="360" height="40" rx="6" fill="#ffedd5" stroke="#ea580c" />
+              <text x="540" y="1029" text-anchor="middle" font-size="12" fill="#9a3412">写入现有申词审核 · 不重定义状态</text>
+            </g>
+          </svg>
+        </div>
+        <div class="flow-legend">
+          <span><i style="background:#dbeafe;border:1px solid #2563eb"></i>前端 / 用户操作</span>
+          <span><i style="background:#dcfce7;border:1px solid #16a34a"></i>后端判定 / 写入</span>
+          <span><i style="background:#ffedd5;border:1px solid #ea580c"></i>异步 / 审核</span>
+          <span><i style="background:#fef9c3;border:1px solid #ca8a04"></i>校验</span>
+          <span><i style="background:#fecaca;border:1px solid #dc2626"></i>阻断</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="drawer-overlay" id="ruleOverlay" onclick="setRuleDrawer(false)"></div>
+  <aside class="drawer" id="ruleDrawer" role="dialog" aria-labelledby="ruleTitle">
+    <div class="drawer-header">
+      <h2 id="ruleTitle">FR-013 · v1 需求规则</h2>
+      <button class="drawer-close" type="button" onclick="setRuleDrawer(false)">×</button>
+    </div>
+    <div class="rule-tab-bar">
+      <button type="button" class="active" data-rule="rule-fe">前端需求</button>
+      <button type="button" data-rule="rule-admin">后台需求</button>
+    </div>
+    <div class="drawer-body">
+      <div id="rule-fe" class="rule-panel active">
+        <div class="rule-section">
+          <h3><span>1</span>业务目标</h3>
+          <div class="rule-content">
+            <p>用户已经知道书籍 ID、或只要用选书中心里的书时，不必再逛选书中心单本申词，直接在 AI申词里批量出词并一次提交。</p>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>2</span>页面与入口</h3>
+          <div class="rule-content">
+            <ul>
+              <li><strong>入口</strong>：独立「AI申词」H5，不挂在选书中心详情里。</li>
+              <li><strong>项目</strong>：必选。Demo：不鸣推文（有推荐）、星河小说（自有书库，推荐空）、未配置项目（类型空）。</li>
+              <li><strong>推广类型</strong>：读取该项目题词配置。Demo 枚举：真人出镜、图文、解压TTS、解说混剪、AIGC。</li>
+              <li><strong>手填 ID</strong>：换行 / 逗号 / 空格分隔，按 ID 去重。命中书库带书名，未命中标「未匹配书名」仍可申。</li>
+              <li><strong>官方推荐</strong>：选书中心已上架书的独立拷贝，同书名，ID 用 <code>BK-10xx</code>。无推荐 flag、无推荐维护表。下架书不出现。有自有书库的项目推荐为空。</li>
+              <li><strong>待申词行</strong>：ID、书名或「未匹配书名」、数量 1–10（默认 3）、词芯片、「更换」。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>3</span>交互规则</h3>
+          <div class="rule-content">
+            <ul>
+              <li>双层批量：多本书；每本独立数量；「更换」只按该行换词。</li>
+              <li>推荐已加入的 ID 再手填，Toast「已添加」，不重复行。</li>
+              <li>数量 0 或超过 10，点更换时钳到 1–10 再出词；数量为空 Toast。</li>
+              <li>一次提交 = 一条批次。先预览 / 更换，再提交。</li>
+              <li>提交成功走<strong>现有申词审核</strong>，本 FR 不重定义审核态。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>4</span>边界规则</h3>
+          <div class="rule-content">
+            <ul>
+              <li>缺项目 / 类型 / 有效 ID / 任一行未出词，不可提交，Toast 点名缺项。</li>
+              <li>项目没有类型时，下拉为空并阻断。</li>
+              <li>不做手动「申请关键词」Tab；不在本页做上下架或新推荐表。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>5</span>业务流程</h3>
+          <div class="rule-content">
+            <p>见页内 Tab <strong>「业务流程」</strong>。</p>
+          </div>
+        </div>
+      </div>
+      <div id="rule-admin" class="rule-panel">
+        <div class="rule-section">
+          <h3><span>1</span>业务目标</h3>
+          <div class="rule-content">
+            <p>运营按批次查看 AI申词提交：一次提交对应一条记录，详情展开多本书和词，审核复用现有流程。</p>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>2</span>数据表与字段</h3>
+          <div class="rule-content">
+            <ul>
+              <li><strong>申词批次</strong>：批次 ID、用户、项目、推广类型、书籍数、词数、审核状态、申请时间。</li>
+              <li>详情展开：每本书的 ID、书名或「未匹配书名」、关键词列表。</li>
+              <li>推广类型落库当时值。审核状态复用现有：待审核 / 已通过 / 已驳回。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>3</span>列表与筛选</h3>
+          <div class="rule-content">
+            <ul>
+              <li>可按批次 ID / 项目、审核状态筛选。</li>
+              <li>详情用 overlay 抽屉，不挤压列表。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>4</span>边界规则</h3>
+          <div class="rule-content">
+            <ul>
+              <li>一批就是一笔审核单，不在本 FR 拆成多笔。</li>
+              <li>本页只做批次记录表，不做书库上下架、不做新推荐维护表。</li>
+              <li>审核通过 / 驳回复用现有申词后台，本 Demo 不另做审批弹窗。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="drawer-overlay" id="detailOverlay" onclick="closeDetail()"></div>
+  <aside class="drawer" id="detailDrawer">
+    <div class="drawer-header">
+      <h2 id="detailTitle">批次详情</h2>
+      <button class="drawer-close" type="button" onclick="closeDetail()">×</button>
+    </div>
+    <div class="drawer-body" id="detailBody"></div>
+  </aside>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const STORAGE_KEY = 'ybdd-fr013-batches';
+    const SEED_BATCHES = [
+      {
+        id: 'BAT-9001',
+        user: 'U-10086',
+        project: '不鸣推文',
+        promo: '图文',
+        books: [
+          { id: 'BK-1001', title: '我成了老公掌心宠', words: ['掌心宠溺', '年代团宠', '闪婚宠妻'] },
+          { id: 'BK-1002', title: '我给死对头当了百日新娘', words: ['死对头新娘', '豪门隐婚'] }
+        ],
+        status: '待审核',
+        time: '2026-09-08 14:12'
+      },
+      {
+        id: 'BAT-9002',
+        user: 'U-10221',
+        project: '不鸣推文',
+        promo: '解说混剪',
+        books: [
+          { id: 'BK-1005', title: '我在末世囤了亿万物资', words: ['末世囤货'] }
+        ],
+        status: '已通过',
+        time: '2026-09-08 11:03'
+      },
+      {
+        id: 'BAT-9003',
+        user: 'U-10888',
+        project: '星河小说',
+        promo: 'AIGC',
+        books: [
+          { id: 'BK-9999', title: '未匹配书名', unmatched: true, words: ['银发救赎', '世情暖文'] }
+        ],
+        status: '已驳回',
+        time: '2026-09-07 16:22'
+      }
+    ];
+
+    function esc(s) {
+      return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+      });
+    }
+    function loadUserBatches() {
+      try {
+        var parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (_) { return []; }
+    }
+    function allBatches() {
+      var extra = loadUserBatches();
+      if (!Array.isArray(extra)) extra = [];
+      var seen = {};
+      var out = [];
+      extra.concat(SEED_BATCHES).forEach(function (b) {
+        if (!b || !b.id || seen[b.id]) return;
+        seen[b.id] = true;
+        out.push(b);
+      });
+      return out;
+    }
+    function wordCount(batch) {
+      return (batch.books || []).reduce(function (n, b) { return n + (b.words || []).length; }, 0);
+    }
+    function applyTag(s) {
+      if (s === '已通过') return '<span class="tag tag-ok">已通过</span>';
+      if (s === '已驳回') return '<span class="tag tag-warn">已驳回</span>';
+      return '<span class="tag tag-muted">待审核</span>';
+    }
+    function renderBatches() {
+      var q = (document.getElementById('batchQ').value || '').trim();
+      var status = document.getElementById('batchStatusQ').value;
+      var rows = allBatches().filter(function (b) {
+        if (q && b.id.indexOf(q) === -1 && b.project.indexOf(q) === -1) return false;
+        if (status && b.status !== status) return false;
+        return true;
+      });
+      document.getElementById('batchBody').innerHTML = rows.map(function (b) {
+        var titles = (b.books || []).map(function (x) { return esc(x.title); }).join('、');
+        return '<tr data-batch="' + esc(b.id) + '"><td>' + esc(b.id) + '</td><td>' + esc(b.user) + '</td><td>' + esc(b.project) + '</td><td>' + esc(b.promo) + '</td><td>' + (b.books || []).length +
+          '<div class="cell-sub">' + titles + '</div></td><td>' + wordCount(b) + '</td><td>' + applyTag(b.status) + '</td><td>' + esc(b.time) + '</td><td>' +
+          '<button class="link" type="button" onclick="openBatchDetail(\'' + esc(b.id) + '\')">详情</button></td></tr>';
+      }).join('') || '<tr><td colspan="9" style="text-align:center;color:#9aa5b4">无匹配批次</td></tr>';
+    }
+    function resetBatchFilter() {
+      document.getElementById('batchQ').value = '';
+      document.getElementById('batchStatusQ').value = '';
+      renderBatches();
+    }
+    function openBatchDetail(id) {
+      var b = allBatches().find(function (x) { return x.id === id; });
+      if (!b) return;
+      document.getElementById('detailTitle').textContent = b.id;
+      var booksHtml = (b.books || []).map(function (book) {
+        var chips = (book.words || []).map(function (w) { return '<span class="word-chip">' + esc(w) + '</span>'; }).join('');
+        return '<div class="book-block"><div><strong>' + esc(book.id) + '</strong> · ' + esc(book.title) + '</div><div class="chip-list">' + chips + '</div></div>';
+      }).join('');
+      document.getElementById('detailBody').innerHTML =
+        '<dl class="kv">' +
+        '<dt>用户</dt><dd>' + esc(b.user) + '</dd>' +
+        '<dt>项目</dt><dd>' + esc(b.project) + '</dd>' +
+        '<dt>推广类型</dt><dd>' + esc(b.promo) + '</dd>' +
+        '<dt>状态</dt><dd>' + esc(b.status) + '</dd>' +
+        '<dt>申请时间</dt><dd>' + esc(b.time) + '</dd>' +
+        '</dl>' +
+        '<div style="margin-top:16px">' + booksHtml + '</div>' +
+        '<p class="cell-sub" style="margin-top:12px">审核复用现有申词后台，本 FR 不另做审批。</p>';
+      document.getElementById('detailOverlay').classList.add('open');
+      document.getElementById('detailDrawer').classList.add('open');
+    }
+    function closeDetail() {
+      document.getElementById('detailOverlay').classList.remove('open');
+      document.getElementById('detailDrawer').classList.remove('open');
+    }
+
+    function getActiveScreen() {
+      return document.querySelector('.scene-list .scene-btn.active')?.dataset.screen || 'form';
+    }
+    function currentTabKey() {
+      var id = document.querySelector('.page-view.active')?.id;
+      return { 'view-fe': 'fe', 'view-admin': 'admin', 'view-flow': 'flow' }[id] || 'fe';
+    }
+    function syncPageUrl() {
+      var params = new URLSearchParams();
+      params.set('tab', currentTabKey());
+      history.replaceState(null, '', '?' + params.toString());
+    }
+    function buildMockupSrc(screen) {
+      return 'ai-keyword-demo.html?embed=1&v=1&screen=' + screen;
+    }
+    function loadMockupFrame() {
+      document.getElementById('mockupFrame').src = buildMockupSrc(getActiveScreen());
+    }
+    function switchRuleTab(ruleId, btn) {
+      document.querySelectorAll('.rule-tab-bar button').forEach(function (b) { b.classList.remove('active'); });
+      document.querySelectorAll('.rule-panel').forEach(function (p) { p.classList.remove('active'); });
+      btn.classList.add('active');
+      document.getElementById(ruleId).classList.add('active');
+    }
+    function syncRuleTabToPage() {
+      var activePage = document.querySelector('.page-view.active')?.id;
+      var ruleId = activePage === 'view-admin' ? 'rule-admin' : 'rule-fe';
+      var btn = document.querySelector('.rule-tab-bar button[data-rule="' + ruleId + '"]');
+      if (btn) switchRuleTab(ruleId, btn);
+    }
+    var ruleDrawer = document.getElementById('ruleDrawer');
+    var toggleRuleBtn = document.getElementById('toggleRuleDrawer');
+    function setRuleDrawer(open) {
+      ruleDrawer.classList.toggle('open', open);
+      document.getElementById('ruleOverlay').classList.toggle('open', open);
+      toggleRuleBtn.classList.toggle('active', open);
+      if (open) syncRuleTabToPage();
+    }
+    toggleRuleBtn.onclick = function () { setRuleDrawer(!ruleDrawer.classList.contains('open')); };
+
+    document.querySelectorAll('.scene-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('.scene-btn').forEach(function (b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        syncPageUrl();
+        loadMockupFrame();
+      });
+    });
+    document.querySelectorAll('.page-tab-bar button').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('.page-tab-bar button').forEach(function (b) { b.classList.remove('active'); });
+        document.querySelectorAll('.page-view').forEach(function (v) { v.classList.remove('active'); });
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.page).classList.add('active');
+        if (btn.dataset.page === 'view-fe') loadMockupFrame();
+        if (btn.dataset.page === 'view-admin') renderBatches();
+        syncPageUrl();
+        syncRuleTabToPage();
+      });
+    });
+    document.querySelectorAll('.rule-tab-bar button').forEach(function (btn) {
+      btn.addEventListener('click', function () { switchRuleTab(btn.dataset.rule, btn); });
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape') return;
+      closeDetail();
+      setRuleDrawer(false);
+    });
+    window.addEventListener('message', function (e) {
+      if (!e.data || e.data.type !== 'aiKeywordScreen') return;
+      var btn = document.querySelector('.scene-btn[data-screen="' + e.data.screen + '"]');
+      if (!btn) return;
+      document.querySelectorAll('.scene-btn').forEach(function (b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+    });
+    window.addEventListener('storage', function (e) {
+      if (e.key === STORAGE_KEY) renderBatches();
+    });
+
+    var params = new URLSearchParams(location.search);
+    var tab = params.get('tab');
+    var tabPageMap = { admin: 'view-admin', flow: 'view-flow', fe: 'view-fe' };
+    if (tab && tabPageMap[tab]) {
+      var tbtn = document.querySelector('[data-page="' + tabPageMap[tab] + '"]');
+      if (tbtn) tbtn.click();
+    }
+    renderBatches();
+    if (document.querySelector('.page-view.active')?.id === 'view-fe') loadMockupFrame();
+  </script>
+  <script src="sidebar-nav.js"></script>
+</body>
+</html>
