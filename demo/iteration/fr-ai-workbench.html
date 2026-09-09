@@ -440,6 +440,10 @@
         <b>看某个人的项目收益</b>
         <p>可以这样问：用户 1001 近7日项目收益；用户 1001 近30日项目收益；用户 1001 累计项目收益；用户 1001 2026年项目收益<br />你会看到：累计收益；按日会列出每天，按年会列出每月</p>
       </div>
+      <div class="scene">
+        <b>看某个人在某个业务下的订单明细</b>
+        <p>可以这样问：用户 1001 2026-08-01至2026-08-31 品牌业务 已审核待结算订单明细；组合如 用户 1001 2026-08-01至2026-08-31 星图融合 已结算和退款订单明细<br />你会看到：表按所选状态过滤，表头 KPI 仍按该用户+日期+业务汇总三态（不过滤状态）；再出项目明细和带关键词词面的订单明细。业务必须点名：品牌业务、海外故事、海外短剧、星图融合、星图。别名：品牌→品牌业务、融合→星图融合。状态可组合（和 / 、 / 及），不说状态就三种都出。</p>
+      </div>
       <h4>用户关系</h4>
       <div class="scene">
         <b>看两个人是不是一条线上的上下级</b>
@@ -466,7 +470,7 @@
       <ul>
         <li>独立工作台：左对话、右结果表；v1 只读，写指令必须拒绝。</li>
         <li>只执行已批准意图，禁止开放 NL2SQL / 模型口算排名与关系。</li>
-        <li>缺赛道 / 项目 / 用户ID / 时间范围：先澄清，结果区不出假表。</li>
+        <li>缺赛道 / 项目 / 用户ID / 时间范围 / 业务名称：先澄清，结果区不出假表。</li>
         <li>本页 Demo 为 Mock，题词量、赛道、时区未接真库。</li>
       </ul>
       <h4>项目业务 · 实现口径</h4>
@@ -502,6 +506,10 @@
       <div class="scene">
         <b>FR-25 项目收益</b>
         <p>必出用户ID + 累计收益。近7/30/日期范围：按日明细。按年：按月明细。累计：可不出明细。</p>
+      </div>
+      <div class="scene">
+        <b>FR-28 用户订单明细</b>
+        <p>槽位：用户ID + 日期范围 + 业务 title，缺一先澄清，结果区不出假表。业务 title 由提问带上：品牌业务、海外故事、海外短剧、星图融合、星图；别名品牌→品牌业务、融合→星图融合。状态可组合：已审核待结算、已结算、退款/已退款；未点名则三态全出。KPI 按用户+范围+业务汇总三态，不过滤状态。表1 一行=项目×状态；表2 出订单ID与关键词词面。状态展示：已审核待结算→已审核，退款→已退款。缺业务 title 列出五个 title，不回退成全业务汇总。detect 须先于 FR-20，避免「用户…订单明细」被当成要项目名。</p>
       </div>
       <h4>用户关系 · 实现口径</h4>
       <div class="scene">
@@ -615,6 +623,27 @@
         '都市短剧': buildOrderDays(55),
         '悬疑短剧': buildOrderDays(27)
       };
+      var ORDER_STATUS_LABEL = { reviewed: '已审核', settled: '已结算', refunded: '已退款' };
+      var BIZ_TITLES = ['品牌业务', '海外故事', '海外短剧', '星图融合', '星图'];
+      var USER_ORDERS = [
+        { userId: '1001', biz: '品牌业务', project: '品牌旗舰A', orderId: 'BO-88001', keyword: '夏日护肤套装', date: '2026-08-05', amount: 1280, status: 'reviewed' },
+        { userId: '1001', biz: '品牌业务', project: '品牌旗舰A', orderId: 'BO-88002', keyword: '会员续费礼包', date: '2026-08-12', amount: 860, status: 'settled' },
+        { userId: '1001', biz: '品牌业务', project: '品牌联名B', orderId: 'BO-88003', keyword: '联名周边', date: '2026-08-18', amount: 420, status: 'refunded' },
+        { userId: '1001', biz: '品牌业务', project: '品牌旗舰A', orderId: 'BO-88004', keyword: '秋季预售', date: '2026-08-22', amount: 1990, status: 'reviewed' },
+        { userId: '1001', biz: '品牌业务', project: '品牌旗舰A', orderId: 'BO-77000', keyword: '七月清仓', date: '2026-07-20', amount: 500, status: 'settled' },
+        { userId: '1001', biz: '海外故事', project: '北境传说', orderId: 'OS-77001', keyword: '北境传说第一章', date: '2026-08-03', amount: 68, status: 'reviewed' },
+        { userId: '1001', biz: '海外故事', project: '南洋夜话', orderId: 'OS-77002', keyword: '南洋夜话试读', date: '2026-08-11', amount: 32, status: 'settled' },
+        { userId: '1001', biz: '海外故事', project: '北境传说', orderId: 'OS-77003', keyword: '北境传说番外', date: '2026-08-20', amount: 45, status: 'refunded' },
+        { userId: '1001', biz: '海外短剧', project: '海外都市剧', orderId: 'OD-66001', keyword: '都市逆袭第3集', date: '2026-08-08', amount: 19.9, status: 'settled' },
+        { userId: '1001', biz: '海外短剧', project: '海外悬疑剧', orderId: 'OD-66002', keyword: '午夜证人', date: '2026-08-16', amount: 12.8, status: 'reviewed' },
+        { userId: '1001', biz: '星图融合', project: '星图融合A', orderId: 'XF-55001', keyword: '融合投放包A', date: '2026-08-06', amount: 3200, status: 'settled' },
+        { userId: '1001', biz: '星图融合', project: '星图融合A', orderId: 'XF-55002', keyword: '融合投放包B', date: '2026-08-14', amount: 1800, status: 'refunded' },
+        { userId: '1001', biz: '星图融合', project: '星图融合B', orderId: 'XF-55003', keyword: '达人联投', date: '2026-08-25', amount: 960, status: 'settled' },
+        { userId: '1001', biz: '星图融合', project: '星图融合B', orderId: 'XF-55004', keyword: '待结算投放', date: '2026-08-28', amount: 540, status: 'reviewed' },
+        { userId: '1001', biz: '星图', project: '星图种草', orderId: 'XT-44001', keyword: '种草笔记01', date: '2026-08-09', amount: 780, status: 'reviewed' },
+        { userId: '1001', biz: '星图', project: '星图直播', orderId: 'XT-44002', keyword: '直播专场', date: '2026-08-21', amount: 1560, status: 'settled' },
+        { userId: '1002', biz: '品牌业务', project: '品牌旗舰A', orderId: 'BO-99001', keyword: '他人订单', date: '2026-08-10', amount: 999, status: 'reviewed' }
+      ];
       var REVENUE = {
         '1001': { 7: buildDays(7, 86), 30: buildDays(30, 64), total: 28640, year: [
           { month: '2026-01', amount: 1820 }, { month: '2026-02', amount: 1640 },
@@ -708,6 +737,30 @@
       function parseRange(text) {
         var m = text.match(/(\d{4}-\d{2}-\d{2})\s*(?:至|到|-)\s*(\d{4}-\d{2}-\d{2})/);
         return m ? { from: m[1], to: m[2] } : null;
+      }
+      function matchBizTitle(text) {
+        if (text.indexOf('品牌业务') !== -1) return '品牌业务';
+        if (text.indexOf('海外故事') !== -1) return '海外故事';
+        if (text.indexOf('海外短剧') !== -1) return '海外短剧';
+        if (text.indexOf('星图融合') !== -1) return '星图融合';
+        if (text.indexOf('星图') !== -1) return '星图';
+        if (text.indexOf('品牌') !== -1) return '品牌业务';
+        if (text.indexOf('融合') !== -1) return '星图融合';
+        return '';
+      }
+      function matchUserId(text) {
+        var labeled = text.match(/用户\s*(\d{3,})/);
+        if (labeled) return labeled[1];
+        var cleaned = text.replace(/\d{4}-\d{2}-\d{2}/g, '');
+        var ids = cleaned.match(/\d{3,}/g) || [];
+        return ids[0] || '';
+      }
+      function parseOrderStatuses(text) {
+        var selected = [];
+        if (/已审核待结算/.test(text)) selected.push('reviewed');
+        if (/已结算/.test(text)) selected.push('settled');
+        if (/退款/.test(text)) selected.push('refunded');
+        return selected.length ? selected : ['reviewed', 'settled', 'refunded'];
       }
       function addBubble(role, html) {
         var wrap = document.createElement('div');
@@ -935,6 +988,69 @@
         setResult(html, '用户数据 · ' + title);
         return USERS[id].name + ' ' + title + '累计 ' + money(total) + (showDetail ? '，明细在右侧。' : '。');
       }
+      function renderUserOrders(id, range, biz, statuses) {
+        if (!USERS[id]) return missingUser(id);
+        if (range.from > range.to) {
+          setResult('<div class="result-empty"><strong>还缺时间范围</strong><span>用户订单明细需要日期范围，起始日不能晚于结束日，例如 2026-08-01至2026-08-31。</span></div>', '待澄清');
+          return '用户订单明细的起始日不能晚于结束日。';
+        }
+        var inScope = USER_ORDERS.filter(function (row) {
+          return row.userId === id && row.biz === biz && row.date >= range.from && row.date <= range.to;
+        });
+        var filtered = inScope.filter(function (row) {
+          return statuses.indexOf(row.status) !== -1;
+        });
+        var kpiAmt = { reviewed: 0, settled: 0, refunded: 0 };
+        inScope.forEach(function (row) { kpiAmt[row.status] += row.amount; });
+        var html = summary('用户数据', USERS[id].name + ' · ' + biz + ' · 订单明细 · ' + range.from + ' 至 ' + range.to) +
+          kpiHtml([
+            { k: '日期范围订单量', v: inScope.length },
+            { k: '已审核累计收益', v: money(kpiAmt.reviewed) },
+            { k: '已结算累计收益', v: money(kpiAmt.settled) },
+            { k: '已退款累计收益', v: money(kpiAmt.refunded) }
+          ]);
+        var groups = {};
+        filtered.forEach(function (row) {
+          var key = row.project + '\0' + row.status;
+          if (!groups[key]) groups[key] = { project: row.project, status: row.status, count: 0, amount: 0 };
+          groups[key].count += 1;
+          groups[key].amount += row.amount;
+        });
+        var agg = [];
+        var statusOrder = { reviewed: 0, settled: 1, refunded: 2 };
+        for (var key in groups) {
+          if (Object.prototype.hasOwnProperty.call(groups, key)) agg.push(groups[key]);
+        }
+        agg.sort(function (a, b) {
+          if (a.project !== b.project) return a.project < b.project ? -1 : 1;
+          return statusOrder[a.status] - statusOrder[b.status];
+        });
+        html += '<div class="project-block"><div class="project-head"><span>项目明细</span></div>';
+        html += '<table><thead><tr><th>项目名称</th><th>订单量</th><th>订单金额</th><th>状态</th></tr></thead><tbody>';
+        if (!agg.length) {
+          html += '<tr><td class="empty-cell" colspan="4">暂无数据</td></tr>';
+        } else {
+          agg.forEach(function (row) {
+            html += '<tr><td>' + esc(row.project) + '</td><td>' + row.count + '</td><td>' +
+              money(row.amount) + '</td><td>' + esc(ORDER_STATUS_LABEL[row.status]) + '</td></tr>';
+          });
+        }
+        html += '</tbody></table></div>';
+        html += '<div class="project-block"><div class="project-head"><span>订单明细</span></div>';
+        html += '<table><thead><tr><th>项目名称</th><th>订单ID</th><th>关键词</th><th>订单日期</th><th>订单金额</th><th>状态</th></tr></thead><tbody>';
+        if (!filtered.length) {
+          html += '<tr><td class="empty-cell" colspan="6">暂无数据</td></tr>';
+        } else {
+          filtered.forEach(function (row) {
+            html += '<tr><td>' + esc(row.project) + '</td><td class="mono">' + esc(row.orderId) + '</td><td>' +
+              esc(row.keyword) + '</td><td>' + esc(row.date) + '</td><td>' + money(row.amount) +
+              '</td><td>' + esc(ORDER_STATUS_LABEL[row.status]) + '</td></tr>';
+          });
+        }
+        html += '</tbody></table></div>';
+        setResult(html, '用户数据 · 订单明细 · ' + biz);
+        return USERS[id].name + ' 在 ' + biz + ' ' + range.from + ' 至 ' + range.to + ' 的订单明细已出表。关键词出词面。';
+      }
       function renderOrders(name) {
         var rows = ORDER_DAYS[name] || [];
         var html = summary('项目业务', name + ' · 按日订单数据');
@@ -1034,6 +1150,15 @@
           if (!track) return { kind: 'clarify-track' };
           return { kind: 'dividend', track: track };
         }
+        var biz = matchBizTitle(t);
+        var userId = matchUserId(t);
+        var hasOrderStatus = /已审核待结算|已结算|退款/.test(t);
+        if (/订单明细/.test(t) || (userId && /订单/.test(t) && (hasOrderStatus || biz))) {
+          if (!userId) return { kind: 'clarify-user', need: '用户订单明细查询' };
+          if (!range || range.from > range.to) return { kind: 'clarify-order-range' };
+          if (!biz) return { kind: 'clarify-biz' };
+          return { kind: 'user-orders', id: userId, range: range, biz: biz, statuses: parseOrderStatuses(t) };
+        }
         if (/订单/.test(t)) {
           if (!project) return { kind: 'clarify-project' };
           return { kind: 'orders', project: project };
@@ -1087,9 +1212,18 @@
           setResult('<div class="result-empty"><strong>还缺时间范围</strong><span>可指定近7日、近30日、累计、某年，或 2026-08-01 至 2026-08-15。</span></div>', '待澄清');
           return '收益查询请指定近7日 / 近30日 / 累计 / 某年 / 日期范围。';
         }
+        if (intent.kind === 'clarify-order-range') {
+          setResult('<div class="result-empty"><strong>还缺时间范围</strong><span>用户订单明细需要日期范围，例如 2026-08-01至2026-08-31。</span></div>', '待澄清');
+          return '用户订单明细需要时间范围。';
+        }
+        if (intent.kind === 'clarify-biz') {
+          setResult('<div class="result-empty"><strong>还缺业务名称</strong><span>可问：' + BIZ_TITLES.join('、') + '。</span></div>', '待澄清');
+          return '用户订单明细需要业务名称。可问' + BIZ_TITLES.join('、') + '。';
+        }
         if (intent.kind === 'rank-project') return renderRankByProject(intent.track);
         if (intent.kind === 'rank-track') return renderRankByTrack(intent.track);
         if (intent.kind === 'dividend') return renderDividend(intent.track);
+        if (intent.kind === 'user-orders') return renderUserOrders(intent.id, intent.range, intent.biz, intent.statuses);
         if (intent.kind === 'orders') return renderOrders(intent.project);
         if (intent.kind === 'invite') return renderInvite(intent.id);
         if (intent.kind === 'register') return renderRegister();

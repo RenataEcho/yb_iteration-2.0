@@ -56,3 +56,10 @@ def notice_page(page, demo_server):
     page.goto(f"{demo_server}/fr-agent-cert.html?tab=notice", wait_until="domcontentloaded")
     page.locator("#ntBody tr").first.wait_for()
     return page
+
+
+@pytest.fixture
+def ai_page(page, demo_server):
+    page.goto(f"{demo_server}/fr-ai-workbench.html", wait_until="domcontentloaded")
+    page.locator("#chatInput").wait_for()
+    return page
