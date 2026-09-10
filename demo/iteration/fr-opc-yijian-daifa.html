@@ -81,26 +81,62 @@
       border: 1px solid rgba(255,255,255,0.55); border-radius: var(--radius-lg);
       box-shadow: var(--shadow); overflow: hidden;
     }
-    .demo-layout { display: grid; grid-template-columns: minmax(280px, 5fr) minmax(360px, 7fr); gap: 16px; }
-    @media (max-width: 1024px) { .demo-layout { grid-template-columns: 1fr; } }
-    .scene-panel { padding: 16px 18px; }
-    .scene-panel h2 { font-size: 14px; font-weight: 700; margin-bottom: 10px; }
-    .scene-list { display: flex; flex-direction: column; gap: 6px; }
+    .demo-layout { display: flex; flex-direction: column; gap: 16px; }
+    .scene-panel { padding: 16px 20px 18px; background: #fff; }
+    .scene-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+    .scene-panel h2 { font-size: 18px; font-weight: 700; margin-bottom: 4px; color: var(--text-primary); }
+    .scene-lead { font-size: 13px; color: #6b7280; line-height: 1.5; max-width: 760px; }
+    .scene-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
     .scene-btn {
-      text-align: left; padding: 10px 12px; border-radius: var(--radius-sm);
-      border: 1px solid var(--border); background: rgba(255,255,255,0.6); cursor: pointer;
+      padding: 6px 12px; border-radius: 999px; border: 1px solid var(--border);
+      background: #fff; font-size: 12px; cursor: pointer; color: #6b7280; line-height: 1.4;
     }
+    .scene-btn:hover { border-color: var(--primary-border); color: var(--primary); }
     .scene-btn.active { border-color: var(--primary-border); background: var(--primary-light); color: var(--primary); font-weight: 600; }
-    .scene-btn .scene-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
-    .scene-btn .scene-desc { font-size: 11px; color: var(--text-muted); line-height: 1.45; }
-    .scene-btn.active .scene-desc { color: #3b82f6; }
-    .scene-note { margin-top: 14px; padding: 10px 12px; border-radius: var(--radius-sm); background: #fffbeb; border: 1px solid #fde68a; font-size: 12px; color: #92400e; line-height: 1.55; }
-    .mockup-panel { padding: 16px; display: flex; justify-content: center; min-height: 520px; }
+    .scene-hint { margin-top: 10px; font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+    .btn-preview {
+      display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0;
+      height: 32px; padding: 0 12px; border-radius: 999px; cursor: pointer;
+      border: 1px solid var(--border); background: #fff; color: var(--text-secondary);
+      font-size: 12px; font-weight: 600;
+    }
+    .btn-preview:hover, .btn-preview[aria-pressed="true"] {
+      border-color: var(--primary-border); background: var(--primary-light); color: var(--primary);
+    }
+    .mockup-panel { padding: 20px 16px; display: flex; justify-content: center; min-height: 520px; }
     .mockup-frame-wrap {
       width: 100%; max-width: 375px; border-radius: 28px; overflow: hidden;
       background: #1e293b; box-shadow: 0 16px 48px rgba(0,0,0,0.18); aspect-ratio: 375 / 812;
     }
     .mockup-frame-wrap iframe { width: 100%; height: 100%; border: none; display: block; background: #fff; }
+    .mockup-frame-wrap.pc-frame {
+      max-width: none; border-radius: 10px; aspect-ratio: 16 / 10; max-height: calc(100vh - 280px);
+      background: #e8eaed;
+    }
+    .demo-layout:fullscreen, .demo-layout:-webkit-full-screen,
+    body.preview-fs-fallback .demo-layout.is-preview {
+      width: 100%; height: 100%; padding: 16px; gap: 12px; overflow: auto;
+      background: linear-gradient(135deg, #e0e7ff 0%, #f0f4f8 40%, #e0f2fe 100%);
+    }
+    body.preview-fs-fallback .demo-layout.is-preview {
+      position: fixed; inset: 0; z-index: 400;
+    }
+    .demo-layout:fullscreen .mockup-panel,
+    .demo-layout:-webkit-full-screen .mockup-panel,
+    body.preview-fs-fallback .demo-layout.is-preview .mockup-panel {
+      flex: 1; min-height: 0; align-items: stretch;
+    }
+    .demo-layout:fullscreen .mockup-frame-wrap:not(.pc-frame),
+    .demo-layout:-webkit-full-screen .mockup-frame-wrap:not(.pc-frame),
+    body.preview-fs-fallback .demo-layout.is-preview .mockup-frame-wrap:not(.pc-frame) {
+      max-width: min(390px, calc((100vh - 200px) * 375 / 812));
+      height: calc(100vh - 200px); aspect-ratio: 375 / 812;
+    }
+    .demo-layout:fullscreen .mockup-frame-wrap.pc-frame,
+    .demo-layout:-webkit-full-screen .mockup-frame-wrap.pc-frame,
+    body.preview-fs-fallback .demo-layout.is-preview .mockup-frame-wrap.pc-frame {
+      aspect-ratio: auto; height: calc(100vh - 180px); max-height: none;
+    }
     .table-toolbar { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--border); gap: 10px; flex-wrap: wrap; }
     .table-toolbar h3 { font-size: 14px; font-weight: 700; }
     .filter-bar { display: flex; flex-wrap: wrap; gap: 10px; padding: 14px 16px; align-items: flex-end; border-bottom: 1px solid var(--border); }
@@ -170,7 +206,14 @@
     .modal-actions { display: flex; justify-content: flex-end; gap: 8px; }
     .field { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
     .field label { font-size: 11px; color: var(--text-muted); }
-    .field input, .field select { height: 34px; padding: 0 10px; border: 1px solid var(--border); border-radius: 7px; }
+    .field input, .field select, .field textarea { padding: 0 10px; border: 1px solid var(--border); border-radius: 7px; font: inherit; }
+    .field input, .field select { height: 34px; }
+    .field textarea { min-height: 64px; padding: 8px 10px; resize: vertical; }
+    .req { color: var(--danger); margin-left: 2px; }
+    .logo-cell { display: flex; align-items: center; gap: 8px; }
+    .logo-cell img { width: 28px; height: 28px; border-radius: 6px; object-fit: cover; background: #f1f5f9; flex-shrink: 0; }
+    .cell-agg { max-width: 220px; line-height: 1.45; word-break: break-all; }
+    .kv { grid-template-columns: 96px 1fr; }
     .flow-page-intro { padding: 16px 18px 0; font-size: 12px; color: var(--text-muted); line-height: 1.55; }
     .flow-svg-wrap { overflow: auto; padding: 16px 18px 24px; max-height: 72vh; }
     .flow-svg-wrap svg { display: block; margin: 0 auto; min-width: 920px; }
@@ -198,7 +241,7 @@
       <span class="sprint-pill">YBDD2.0 · 迭代 v1</span>
     </div>
     <div class="sidebar-scroll" data-iteration-sidebar></div>
-    <div class="sidebar-foot">FR-014 · 页内 Tab<br />前端交互 / 管理后台 / 业务流程</div>
+    <div class="sidebar-foot">FR-014 · 页内 Tab<br />前端 / PC / 后台 / 流程</div>
   </aside>
 
   <main class="main">
@@ -211,9 +254,9 @@
         <h1>
           一键代发
           <span class="badge badge-fr">FR-014</span>
-          <span class="badge badge-version">v2 当前</span>
+          <span class="badge badge-version">v6 当前</span>
         </h1>
-        <p class="page-desc">剪辑手经海报+客服入驻后供图集/视频；用户在广场领取，次数足够后点击即成功。占用中藏起；24h 未回填释放且不退次，终身超时超过 3 次进黑名单。</p>
+        <p class="page-desc">C 端只领取。剪辑手在已有 PC 创作者中心用文件夹或压缩包上传，先走平台审核。招募、看板、上传弹窗与 list 都在 PC。后台与 C/PC 共用同一份演示数据。</p>
       </div>
       <div class="page-header-actions">
         <button class="btn btn-rule" id="toggleRuleDrawer" type="button">📋 需求规则</button>
@@ -222,65 +265,65 @@
 
     <div class="page-tab-bar" role="tablist">
       <button type="button" class="active" data-page="view-fe" role="tab">前端交互</button>
+      <button type="button" data-page="view-pc" role="tab">PC端</button>
       <button type="button" data-page="view-admin" role="tab">管理后台</button>
       <button type="button" data-page="view-flow" role="tab">业务流程</button>
     </div>
 
     <div id="view-fe" class="page-view active">
-      <div class="demo-layout">
+      <div class="demo-layout" id="feDemo">
         <div class="glass-card scene-panel">
-          <h2>场景切换</h2>
-          <div class="scene-list">
-            <button class="scene-btn active" type="button" data-screen="feed">
-              <div class="scene-title">作品广场</div>
-              <div class="scene-desc">项目图标直选 + 搜索在下方 + 其余下拉 + 最多 5 条 BN 轮播；不展示收益</div>
-            </button>
-            <button class="scene-btn" type="button" data-screen="detail">
-              <div class="scene-title">稿件详情</div>
-              <div class="scene-desc">素材铺满；领取后底栏改为复制标题 / 编辑稿件</div>
-            </button>
-            <button class="scene-btn" type="button" data-screen="claim">
-              <div class="scene-title">浮层选词</div>
-              <div class="scene-desc">对照场景：选词浮层仍可打开；主路径点击领取即成功</div>
-            </button>
-            <button class="scene-btn" type="button" data-screen="buy">
-              <div class="scene-title">积分购次</div>
-              <div class="scene-desc">详情浮层选档，按钮为兑换；最多 4 档</div>
-            </button>
-            <button class="scene-btn" type="button" data-screen="claims">
-              <div class="scene-title">我的领取</div>
-              <div class="scene-desc">有记录才出项目；7 天下载倒计时；立即回填始终高亮</div>
-            </button>
-            <button class="scene-btn" type="button" data-screen="fillback">
-              <div class="scene-title">项目回填</div>
-              <div class="scene-desc">复用该项目已有回填页</div>
-            </button>
-            <button class="scene-btn" type="button" data-screen="timeout">
-              <div class="scene-title">24h 超时释放</div>
-              <div class="scene-desc">记 1 次未回填，稿件回 feed，次数不退</div>
-            </button>
-            <button class="scene-btn" type="button" data-screen="banned">
-              <div class="scene-title">停权无法领</div>
-              <div class="scene-desc">终身未回填超过 3 次</div>
-            </button>
-            <button class="scene-btn" type="button" data-screen="poster">
-              <div class="scene-title">招募海报</div>
-              <div class="scene-desc">卖点 / 适合谁 / 底部客服二维码，无站内申请表</div>
-            </button>
-            <button class="scene-btn" type="button" data-screen="editor-guest">
-              <div class="scene-title">未录入阻断</div>
-              <div class="scene-desc">未进剪辑手管理不能上传</div>
-            </button>
-            <button class="scene-btn" type="button" data-screen="editor-upload">
-              <div class="scene-title">剪辑手上传</div>
-              <div class="scene-desc">选项目、稿件类型、素材类型后发布</div>
-            </button>
+          <div class="scene-head">
+            <div>
+              <h2>一键代发 · 前端交互 Demo</h2>
+              <p class="scene-lead">先校验次数再浮层选词。广场项目图标直选，详情素材铺满；列表不展示收益金额。</p>
+            </div>
+            <button class="btn-preview" type="button" data-preview="fe" aria-pressed="false">全屏预览</button>
           </div>
-          <div class="scene-note">Mockup 只 iframe 嵌入。领取成功即扣次，超时释放不退；原领取人未进黑名单可再领同一稿（再扣次）。</div>
+          <div class="scene-list" id="feScenes">
+            <button class="scene-btn active" type="button" data-screen="feed" data-desc="项目图标直选 + 搜索在下方 + 其余下拉 + 最多 5 条 BN 轮播；点招募帧进海报；不展示收益">作品广场</button>
+            <button class="scene-btn" type="button" data-screen="poster" data-desc="点广场招募帧进入；卖点 / 适合谁 / 客服二维码；无申请表">招募海报</button>
+            <button class="scene-btn" type="button" data-screen="detail" data-desc="领取后改为发布技巧；底栏添加水印 / 下载稿件">稿件详情</button>
+            <button class="scene-btn" type="button" data-screen="claim" data-desc="对照场景：选词浮层仍可打开；主路径点击领取即成功">浮层选词</button>
+            <button class="scene-btn" type="button" data-screen="buy" data-desc="详情浮层选档，按钮为兑换；最多 4 档">浮层兑换</button>
+            <button class="scene-btn" type="button" data-screen="claims" data-desc="有记录才出项目；7 天下载倒计时；立即回填始终高亮">我的领取</button>
+            <button class="scene-btn" type="button" data-screen="fillback" data-desc="复用该项目已有回填页">项目回填</button>
+            <button class="scene-btn" type="button" data-screen="watermark" data-desc="底部编辑坞一屏内完成全部操作；文字可拖动">添加水印</button>
+            <button class="scene-btn" type="button" data-screen="timeout" data-desc="记 1 次未回填，稿件回 feed，次数不退">24h超时释放</button>
+            <button class="scene-btn" type="button" data-screen="banned" data-desc="终身未回填超过 3 次">停权无法领</button>
+          </div>
+          <p class="scene-hint" id="feSceneHint">项目图标直选 + 搜索在下方 + 其余下拉 + 最多 5 条 BN 轮播；不展示收益</p>
         </div>
         <div class="glass-card mockup-panel">
           <div class="mockup-frame-wrap">
             <iframe id="mockupFrame" title="一键代发 Mockup" src="about:blank"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="view-pc" class="page-view">
+      <div class="demo-layout" id="pcDemo">
+        <div class="glass-card scene-panel">
+          <div class="scene-head">
+            <div>
+              <h2>一键代发 · PC端 Demo</h2>
+              <p class="scene-lead">PC 是已有创作者中心。左栏「项目中心 / 作品管理 / 收益中心」为线上已有，本 FR 只加「剪辑供稿」闭环。</p>
+            </div>
+            <button class="btn-preview" type="button" data-preview="pc" aria-pressed="false">全屏预览</button>
+          </div>
+          <div class="scene-list" id="pcScenes">
+            <button class="scene-btn active" type="button" data-pcscreen="home" data-desc="同一入口：顶部招募 BN + 下方看板">剪辑供稿</button>
+            <button class="scene-btn" type="button" data-pcscreen="recruit" data-desc="点 BN 侧栏展开卖点 / 适合谁 / 二维码">招募详情抽屉</button>
+            <button class="scene-btn" type="button" data-pcscreen="guest" data-desc="无权限时看板走缺省，招募 BN 仍在">非剪辑手缺省</button>
+            <button class="scene-btn" type="button" data-pcscreen="upload" data-desc="弹窗三步：文件夹/压缩包 → 填齐字段 → 提交审核">上传入口</button>
+            <button class="scene-btn" type="button" data-pcscreen="list" data-desc="与后台同字段，无下载链接；仅空闲可删">上传 list</button>
+          </div>
+          <p class="scene-hint" id="pcSceneHint">同一入口：顶部招募 BN + 下方看板</p>
+        </div>
+        <div class="glass-card mockup-panel">
+          <div class="mockup-frame-wrap pc-frame">
+            <iframe id="pcFrame" title="一键代发 PC Mockup" src="about:blank"></iframe>
           </div>
         </div>
       </div>
@@ -296,33 +339,33 @@
           <button type="button" data-admin="admin-projects">项目管理</button>
           <button type="button" data-admin="admin-mats">素材类型</button>
           <button type="button" data-admin="admin-skus">次数商品</button>
-          <button type="button" data-admin="admin-banners">广场 Banner</button>
         </div>
 
         <div id="admin-editors" class="admin-pane active">
           <div class="table-toolbar"><h3>剪辑手</h3><button class="btn btn-primary" type="button" onclick="openEditorModal()">录入</button></div>
           <div class="filter-bar">
-            <div class="filter-field"><label>昵称 / ID</label><input id="edQ" placeholder="林夏 / E-01" /></div>
+            <div class="filter-field"><label>右豹 ID / 昵称</label><input id="edQ" placeholder="YB10086 / 林夏" /></div>
             <div class="filter-field"><label>状态</label><select id="edS"><option value="">全部</option><option>已录入</option><option>已停用</option></select></div>
             <div class="filter-actions">
               <button class="btn-ghost-sm" type="button" onclick="resetEd()">重置</button>
               <button class="btn btn-primary" type="button" onclick="renderEditors()">查询</button>
             </div>
           </div>
-          <div class="table-wrap"><table><thead><tr><th>ID</th><th>昵称</th><th>来源</th><th>可上传项目</th><th>状态</th><th>录入时间</th><th>操作</th></tr></thead><tbody id="edBody"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>ID</th><th>右豹 ID</th><th>昵称</th><th>分成比例</th><th>备注</th><th>来源</th><th>可上传项目</th><th>状态</th><th>录入时间</th><th>操作</th></tr></thead><tbody id="edBody"></tbody></table></div>
         </div>
 
         <div id="admin-works" class="admin-pane">
-          <div class="table-toolbar"><h3>稿件</h3></div>
+          <div class="table-toolbar"><h3>稿件</h3><button class="btn btn-primary" type="button" onclick="openWorkModal()">录入</button></div>
           <div class="filter-bar">
             <div class="filter-field"><label>标题 / ID</label><input id="wkQ" placeholder="掌心宠" /></div>
-            <div class="filter-field"><label>占用</label><select id="wkO"><option value="">全部</option><option>空闲</option><option>占用中</option></select></div>
+            <div class="filter-field"><label>占用</label><select id="wkO"><option value="">全部</option><option>空闲</option><option>占用中</option><option>已完成</option></select></div>
+            <div class="filter-field"><label>审核</label><select id="wkA"><option value="">全部</option><option>审核中</option><option>已通过</option><option>已驳回</option></select></div>
             <div class="filter-actions">
-              <button class="btn-ghost-sm" type="button" onclick="document.getElementById('wkQ').value='';document.getElementById('wkO').value='';renderWorks()">重置</button>
+              <button class="btn-ghost-sm" type="button" onclick="document.getElementById('wkQ').value='';document.getElementById('wkO').value='';document.getElementById('wkA').value='';renderWorks()">重置</button>
               <button class="btn btn-primary" type="button" onclick="renderWorks()">查询</button>
             </div>
           </div>
-          <div class="table-wrap"><table><thead><tr><th>ID</th><th>标题</th><th>项目 / 书</th><th>剪辑手</th><th>类型</th><th>素材类型</th><th>占用</th><th>上传时间</th><th>操作</th></tr></thead><tbody id="wkBody"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>ID</th><th>标题</th><th>项目</th><th>书</th><th>稿件信息</th><th>发布技巧</th><th>剪辑手</th><th>类型</th><th>素材类型</th><th>占用</th><th>审核</th><th>上传时间</th><th>操作</th></tr></thead><tbody id="wkBody"></tbody></table></div>
         </div>
 
         <div id="admin-claims" class="admin-pane">
@@ -351,50 +394,46 @@
         </div>
 
         <div id="admin-projects" class="admin-pane">
-          <div class="table-toolbar"><h3>项目</h3></div>
-          <div class="table-wrap"><table><thead><tr><th>项目</th><th>一键代发</th><th>免费次数</th><th>回填页</th><th>操作</th></tr></thead>
-            <tbody>
-              <tr><td>番茄小说</td><td><span class="tag tag-ok">开放</span></td><td>1</td><td>项目已有回填页</td><td><button class="link" type="button" onclick="showToast('Demo：字段未锁，仅示意')">编辑</button></td></tr>
-              <tr><td>不鸣推文</td><td><span class="tag tag-ok">开放</span></td><td>0</td><td>项目已有回填页</td><td><button class="link" type="button" onclick="showToast('Demo：字段未锁，仅示意')">编辑</button></td></tr>
-            </tbody>
-          </table></div>
+          <div class="table-toolbar"><h3>项目</h3><button class="btn btn-primary" type="button" onclick="openProjectModal()">添加</button></div>
+          <div class="filter-bar">
+            <div class="filter-field"><label>项目名称</label><input id="pjQ" placeholder="番茄小说" /></div>
+            <div class="filter-field"><label>状态</label><select id="pjS"><option value="">全部</option><option>启用</option><option>禁用</option></select></div>
+            <div class="filter-actions">
+              <button class="btn-ghost-sm" type="button" onclick="document.getElementById('pjQ').value='';document.getElementById('pjS').value='';renderProjects()">重置</button>
+              <button class="btn btn-primary" type="button" onclick="renderProjects()">查询</button>
+            </div>
+          </div>
+          <div class="table-wrap"><table><thead><tr><th>项目名称</th><th>Logo 信息</th><th>状态</th><th>排序</th><th>更新时间</th><th>操作</th></tr></thead><tbody id="pjBody"></tbody></table></div>
         </div>
 
         <div id="admin-mats" class="admin-pane">
-          <div class="table-toolbar"><h3>素材类型</h3><button class="btn btn-primary" type="button" onclick="showToast('已新增素材类型（Demo）')">新增</button></div>
-          <div class="table-wrap"><table><thead><tr><th>类型</th><th>用于</th><th>状态</th><th>操作</th></tr></thead>
-            <tbody>
-              <tr><td>口播</td><td>上传必选 / feed 筛选</td><td><span class="tag tag-ok">启用</span></td><td><button class="link" type="button">编辑</button></td></tr>
-              <tr><td>混剪</td><td>上传必选 / feed 筛选</td><td><span class="tag tag-ok">启用</span></td><td><button class="link" type="button">编辑</button></td></tr>
-              <tr><td>图文切片</td><td>上传必选 / feed 筛选</td><td><span class="tag tag-ok">启用</span></td><td><button class="link" type="button">编辑</button></td></tr>
-              <tr><td>解压</td><td>上传必选 / feed 筛选</td><td><span class="tag tag-ok">启用</span></td><td><button class="link" type="button">编辑</button></td></tr>
-            </tbody>
-          </table></div>
+          <div class="table-toolbar"><h3>素材类型</h3><button class="btn btn-primary" type="button" onclick="openMatModal()">新增</button></div>
+          <div class="table-wrap"><table><thead><tr><th>类型</th><th>用于</th><th>状态</th><th>操作</th></tr></thead><tbody id="matBody"></tbody></table></div>
         </div>
 
         <div id="admin-skus" class="admin-pane">
-          <div class="table-toolbar"><h3>次数商品</h3><span class="cell-sub">同时在售最多 4 档</span></div>
-          <div class="table-wrap"><table><thead><tr><th>档位</th><th>次数</th><th>积分</th><th>状态</th><th>操作</th></tr></thead><tbody id="skuBody"></tbody></table></div>
-        </div>
-
-        <div id="admin-banners" class="admin-pane">
           <div class="table-toolbar">
             <div>
-              <h3>广场 Banner</h3>
-              <span class="cell-sub">最多 5 条 · ≥2 条 C 端自动轮播</span>
+              <h3>次数商品</h3>
+              <span class="cell-sub">同时在售最多 4 档 · 免费次数挂本页</span>
             </div>
-            <button class="btn btn-primary" type="button" id="addBannerBtn" onclick="addBanner()">新增</button>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+              <label class="cell-sub" for="freeQuota">免费次数</label>
+              <input id="freeQuota" type="number" min="0" style="width:72px;height:30px;padding:0 8px;border:1px solid var(--border);border-radius:7px" />
+              <button class="btn-ghost-sm" type="button" onclick="saveFreeQuota()">保存免费次数</button>
+              <button class="btn btn-primary" type="button" onclick="openSkuModal()">新增档位</button>
+            </div>
           </div>
-          <div class="table-wrap"><table><thead><tr><th>ID</th><th>标题</th><th>类型</th><th>图片</th><th>状态</th><th>操作</th></tr></thead><tbody id="bannerBody"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>档位</th><th>次数</th><th>积分</th><th>状态</th><th>操作</th></tr></thead><tbody id="skuBody"></tbody></table></div>
         </div>
       </div>
     </div>
 
     <div id="view-flow" class="page-view">
       <div class="glass-card flow-page">
-        <p class="flow-page-intro">一张闭环：海报入驻 → 供稿进广场 → 次数 → 浮层选词 → 独占隐藏 → 24h 回填或释放。失败回对应校验，超时释放回广场顶边。</p>
+        <p class="flow-page-intro">一张闭环：PC 招募 → 后台录入 → 电脑上传（文件夹/压缩包）→ 平台审核 → C 端广场领取 → 次数 → 选词 → 占用 → 24h 回填或释放。C 端不做剪辑手上传。</p>
         <div class="flow-svg-wrap">
-          <svg width="1080" height="1420" viewBox="0 0 1080 1420" xmlns="http://www.w3.org/2000/svg">
+          <svg width="1080" height="1800" viewBox="0 0 1080 1800" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <marker id="flow-arrow-1" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
                 <path d="M0,0 L8,4 L0,8 Z" fill="#94a3b8" />
@@ -403,94 +442,129 @@
             <g class="flow-edges" marker-end="url(#flow-arrow-1)">
               <line x1="540" y1="56" x2="540" y2="80" />
               <line x1="540" y1="160" x2="540" y2="188" />
-              <polyline points="460,228 200,228" />
+              <polyline points="460,120 200,120 200,140" />
+              <polyline points="40,160 16,160 16,16 360,16" />
               <line x1="540" y1="268" x2="540" y2="300" />
-              <line x1="540" y1="360" x2="540" y2="392" />
-              <line x1="540" y1="452" x2="540" y2="484" />
-              <line x1="540" y1="544" x2="540" y2="576" />
-              <polyline points="460,616 200,616" />
-              <line x1="540" y1="656" x2="540" y2="688" />
-              <polyline points="460,728 200,728" />
-              <polyline points="200,728 200,800 460,800" />
-              <line x1="540" y1="768" x2="540" y2="820" />
-              <line x1="540" y1="880" x2="540" y2="912" />
-              <polyline points="620,952 860,952" />
-              <line x1="540" y1="992" x2="540" y2="1024" />
-              <line x1="540" y1="1084" x2="540" y2="1116" />
-              <polyline points="460,1156 120,1156" />
-              <line x1="540" y1="1196" x2="540" y2="1228" />
-              <polyline points="360,1252 120,1252 120,16 540,16" />
-              <polyline points="120,1156 120,16 540,16" />
-              <polyline points="200,228 80,228 80,16 540,16" />
-              <polyline points="200,616 80,616 80,16" />
-              <polyline points="960,952 960,392 540,392" />
+              <polyline points="460,340 200,340" />
+              <polyline points="40,340 24,340 24,176 540,176 540,188" />
+              <line x1="540" y1="380" x2="540" y2="412" />
+              <line x1="540" y1="472" x2="540" y2="492" />
+              <polyline points="460,532 200,532" />
+              <polyline points="40,532 24,532 24,176 540,176 540,188" />
+              <line x1="540" y1="572" x2="540" y2="624" />
+              <line x1="540" y1="684" x2="540" y2="716" />
+              <line x1="540" y1="776" x2="540" y2="808" />
+              <polyline points="460,848 200,848" />
+              <polyline points="120,828 120,792 540,792 540,808" />
+              <line x1="540" y1="888" x2="540" y2="920" />
+              <polyline points="460,960 200,960" />
+              <polyline points="120,940 120,904 540,904 540,920" />
+              <line x1="540" y1="1000" x2="540" y2="1032" />
+              <polyline points="620,1072 860,1072" />
+              <polyline points="1040,1072 1064,1072 1064,608 720,608 720,624" />
+              <line x1="540" y1="1112" x2="540" y2="1144" />
+              <line x1="540" y1="1204" x2="540" y2="1236" />
+              <polyline points="620,1276 860,1276" />
+              <polyline points="1040,1276 1064,1276 1064,608 720,608 720,624" />
+              <line x1="540" y1="1316" x2="540" y2="1348" />
+              <line x1="540" y1="1408" x2="540" y2="1440" />
+              <polyline points="460,1480 160,1480" />
+              <line x1="90" y1="1500" x2="90" y2="1540" />
+              <polyline points="20,1560 8,1560 8,608 360,608 360,624" />
+              <line x1="540" y1="1520" x2="540" y2="1552" />
+              <polyline points="360,1576 200,1576 200,608 360,624" />
             </g>
             <g font-family="Inter, PingFang SC, sans-serif">
               <rect x="360" y="16" width="360" height="40" rx="6" fill="#dbeafe" stroke="#2563eb" />
-              <text x="540" y="41" text-anchor="middle" font-size="12" fill="#1e40af">看招募海报 · 底部客服二维码</text>
+              <text x="540" y="41" text-anchor="middle" font-size="12" fill="#1e40af">PC 招募海报 · 底部客服二维码</text>
 
               <polygon points="540,80 620,120 540,160 460,120" fill="#fef9c3" stroke="#ca8a04" />
-              <text x="540" y="124" text-anchor="middle" font-size="11" fill="#854d0e">后台已录入?</text>
-              <text x="336" y="220" font-size="10" fill="#dc2626">否</text>
-              <rect x="40" y="208" width="160" height="40" rx="6" fill="#fecaca" stroke="#dc2626" />
-              <text x="120" y="233" text-anchor="middle" font-size="11" fill="#991b1b">阻断上传</text>
+              <text x="540" y="124" text-anchor="middle" font-size="11" fill="#854d0e">已录入剪辑手?</text>
+              <text x="336" y="112" font-size="10" fill="#dc2626">否</text>
+              <rect x="40" y="140" width="160" height="40" rx="6" fill="#fecaca" stroke="#dc2626" />
+              <text x="120" y="165" text-anchor="middle" font-size="11" fill="#991b1b">阻断上传</text>
               <text x="552" y="180" font-size="10" fill="#16a34a">是</text>
 
               <rect x="360" y="188" width="360" height="80" rx="6" fill="#dbeafe" stroke="#2563eb" />
-              <text x="540" y="220" text-anchor="middle" font-size="12" fill="#1e40af">选项目 · 上传图集或视频</text>
-              <text x="540" y="240" text-anchor="middle" font-size="10" fill="#64748b">必须选择素材类型</text>
+              <text x="540" y="216" text-anchor="middle" font-size="12" fill="#1e40af">PC 弹窗上传 · 文件夹或压缩包</text>
+              <text x="540" y="236" text-anchor="middle" font-size="10" fill="#64748b">填齐后台同款字段 · 必选素材类型</text>
+              <text x="540" y="252" text-anchor="middle" font-size="10" fill="#64748b">禁用项目不可上传</text>
 
-              <rect x="360" y="300" width="360" height="60" rx="6" fill="#dcfce7" stroke="#16a34a" />
-              <text x="540" y="324" text-anchor="middle" font-size="12" fill="#166534">发布到平台</text>
-              <text x="540" y="342" text-anchor="middle" font-size="10" fill="#64748b">进入用户可见 feed</text>
+              <polygon points="540,300 620,340 540,380 460,340" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="540" y="344" text-anchor="middle" font-size="11" fill="#854d0e">项目已启用?</text>
+              <text x="336" y="332" font-size="10" fill="#dc2626">否</text>
+              <rect x="40" y="320" width="160" height="40" rx="6" fill="#fecaca" stroke="#dc2626" />
+              <text x="120" y="345" text-anchor="middle" font-size="11" fill="#991b1b">项目禁用拦截</text>
+              <text x="552" y="396" font-size="10" fill="#16a34a">是</text>
 
-              <rect x="360" y="392" width="360" height="60" rx="6" fill="#dbeafe" stroke="#2563eb" />
-              <text x="540" y="416" text-anchor="middle" font-size="12" fill="#1e40af">作品广场宫格 + 项目直选</text>
-              <text x="540" y="434" text-anchor="middle" font-size="10" fill="#64748b">搜索在项目下 · 不展示金额</text>
+              <rect x="360" y="412" width="360" height="60" rx="6" fill="#dcfce7" stroke="#16a34a" />
+              <text x="540" y="436" text-anchor="middle" font-size="12" fill="#166534">提交平台审核</text>
+              <text x="540" y="454" text-anchor="middle" font-size="10" fill="#64748b">审核中不进广场；驳回出示原因</text>
 
-              <rect x="360" y="484" width="360" height="60" rx="6" fill="#dbeafe" stroke="#2563eb" />
-              <text x="540" y="508" text-anchor="middle" font-size="12" fill="#1e40af">详情铺满素材 · 发起领取</text>
-              <text x="540" y="526" text-anchor="middle" font-size="10" fill="#64748b">次数旁显 · 浮层选词 · 分成比例</text>
+              <polygon points="540,492 620,532 540,572 460,532" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="540" y="536" text-anchor="middle" font-size="11" fill="#854d0e">审核通过?</text>
+              <text x="336" y="524" font-size="10" fill="#dc2626">否</text>
+              <rect x="40" y="512" width="160" height="40" rx="6" fill="#fecaca" stroke="#dc2626" />
+              <text x="120" y="537" text-anchor="middle" font-size="11" fill="#991b1b">已驳回出示原因</text>
+              <text x="552" y="588" font-size="10" fill="#16a34a">是</text>
 
-              <polygon points="540,576 620,616 540,656 460,616" fill="#fef9c3" stroke="#ca8a04" />
-              <text x="540" y="620" text-anchor="middle" font-size="11" fill="#854d0e">剩余次数&gt;0?</text>
-              <text x="336" y="608" font-size="10" fill="#dc2626">否 · 购次</text>
-              <rect x="40" y="596" width="160" height="40" rx="6" fill="#dbeafe" stroke="#2563eb" />
-              <text x="120" y="621" text-anchor="middle" font-size="11" fill="#1e40af">积分买在售档</text>
-              <text x="552" y="672" font-size="10" fill="#16a34a">是</text>
+              <rect x="360" y="624" width="360" height="60" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="540" y="648" text-anchor="middle" font-size="12" fill="#1e40af">作品广场宫格 + 项目直选</text>
+              <text x="540" y="666" text-anchor="middle" font-size="10" fill="#64748b">仅已通过且空闲 · 不展示金额</text>
 
-              <polygon points="540,688 620,728 540,768 460,728" fill="#fef9c3" stroke="#ca8a04" />
-              <text x="540" y="732" text-anchor="middle" font-size="11" fill="#854d0e">已选通过关键词?</text>
-              <text x="336" y="720" font-size="10" fill="#dc2626">否</text>
-              <rect x="40" y="780" width="160" height="40" rx="6" fill="#fecaca" stroke="#dc2626" />
-              <text x="120" y="805" text-anchor="middle" font-size="11" fill="#991b1b">拦截领取</text>
-              <text x="552" y="784" font-size="10" fill="#16a34a">是</text>
+              <rect x="360" y="716" width="360" height="60" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="540" y="740" text-anchor="middle" font-size="12" fill="#1e40af">详情铺满素材 · 发起领取</text>
+              <text x="540" y="758" text-anchor="middle" font-size="10" fill="#64748b">次数旁显 · 浮层选词 · 分成比例</text>
 
-              <rect x="360" y="820" width="360" height="60" rx="6" fill="#dcfce7" stroke="#16a34a" />
-              <text x="540" y="844" text-anchor="middle" font-size="12" fill="#166534">领取成功 · 扣次不退</text>
-              <text x="540" y="862" text-anchor="middle" font-size="10" fill="#64748b">占用并对他人 feed 隐藏</text>
+              <polygon points="540,808 620,848 540,888 460,848" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="540" y="852" text-anchor="middle" font-size="11" fill="#854d0e">剩余次数&gt;0?</text>
+              <text x="336" y="840" font-size="10" fill="#dc2626">否 · 购次</text>
+              <rect x="40" y="828" width="160" height="40" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="120" y="853" text-anchor="middle" font-size="11" fill="#1e40af">积分买在售档</text>
+              <text x="552" y="904" font-size="10" fill="#16a34a">是</text>
 
-              <polygon points="540,912 620,952 540,992 460,952" fill="#fef9c3" stroke="#ca8a04" />
-              <text x="540" y="956" text-anchor="middle" font-size="11" fill="#854d0e">24h 内已回填?</text>
-              <text x="636" y="940" font-size="10" fill="#16a34a">是</text>
-              <rect x="860" y="924" width="160" height="56" rx="6" fill="#dcfce7" stroke="#16a34a" />
-              <text x="940" y="948" text-anchor="middle" font-size="11" fill="#166534">完成占用</text>
-              <text x="940" y="966" text-anchor="middle" font-size="10" fill="#64748b">不再出现 feed</text>
-              <text x="552" y="1008" font-size="10" fill="#dc2626">否</text>
+              <polygon points="540,920 620,960 540,1000 460,960" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="540" y="964" text-anchor="middle" font-size="11" fill="#854d0e">已选通过关键词?</text>
+              <text x="336" y="952" font-size="10" fill="#dc2626">否</text>
+              <rect x="40" y="940" width="160" height="40" rx="6" fill="#fecaca" stroke="#dc2626" />
+              <text x="120" y="965" text-anchor="middle" font-size="11" fill="#991b1b">拦截领取</text>
+              <text x="552" y="1016" font-size="10" fill="#16a34a">是</text>
 
-              <rect x="360" y="1024" width="360" height="60" rx="6" fill="#ffedd5" stroke="#ea580c" />
-              <text x="540" y="1048" text-anchor="middle" font-size="12" fill="#9a3412">记 1 次未回填 + 释放</text>
-              <text x="540" y="1066" text-anchor="middle" font-size="10" fill="#64748b">不退次 · 稿件回 feed</text>
+              <polygon points="540,1032 620,1072 540,1112 460,1072" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="540" y="1076" text-anchor="middle" font-size="11" fill="#854d0e">稿件空闲未占用?</text>
+              <text x="636" y="1060" font-size="10" fill="#dc2626">否</text>
+              <rect x="860" y="1044" width="180" height="56" rx="6" fill="#fecaca" stroke="#dc2626" />
+              <text x="950" y="1068" text-anchor="middle" font-size="11" fill="#991b1b">领取失败</text>
+              <text x="950" y="1086" text-anchor="middle" font-size="10" fill="#64748b">他人占用 · 回广场</text>
+              <text x="552" y="1128" font-size="10" fill="#16a34a">是</text>
 
-              <polygon points="540,1116 620,1156 540,1196 460,1156" fill="#fef9c3" stroke="#ca8a04" />
-              <text x="540" y="1160" text-anchor="middle" font-size="11" fill="#854d0e">终身未回填&gt;3?</text>
-              <text x="336" y="1148" font-size="10" fill="#dc2626">是 · 黑名单</text>
-              <rect x="20" y="1136" width="140" height="40" rx="6" fill="#fecaca" stroke="#dc2626" />
-              <text x="90" y="1161" text-anchor="middle" font-size="11" fill="#991b1b">停权 · 仅手动恢复</text>
-              <text x="552" y="1212" font-size="10" fill="#16a34a">否 · 可再领</text>
+              <rect x="360" y="1144" width="360" height="60" rx="6" fill="#dcfce7" stroke="#16a34a" />
+              <text x="540" y="1168" text-anchor="middle" font-size="12" fill="#166534">领取成功 · 扣次不退</text>
+              <text x="540" y="1186" text-anchor="middle" font-size="10" fill="#64748b">占用并对他人 feed 隐藏</text>
 
-              <rect x="360" y="1228" width="360" height="48" rx="6" fill="#e2e8f0" stroke="#94a3b8" />
-              <text x="540" y="1258" text-anchor="middle" font-size="12" fill="#475569">原领取人与他人均可再领（再扣次）</text>
+              <polygon points="540,1236 620,1276 540,1316 460,1276" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="540" y="1280" text-anchor="middle" font-size="11" fill="#854d0e">24h 内已回填?</text>
+              <text x="636" y="1264" font-size="10" fill="#16a34a">是</text>
+              <rect x="860" y="1248" width="180" height="56" rx="6" fill="#dcfce7" stroke="#16a34a" />
+              <text x="950" y="1272" text-anchor="middle" font-size="11" fill="#166534">完成占用</text>
+              <text x="950" y="1290" text-anchor="middle" font-size="10" fill="#64748b">不再出现 feed</text>
+              <text x="552" y="1332" font-size="10" fill="#dc2626">否</text>
+
+              <rect x="360" y="1348" width="360" height="60" rx="6" fill="#ffedd5" stroke="#ea580c" />
+              <text x="540" y="1372" text-anchor="middle" font-size="12" fill="#9a3412">记 1 次未回填 + 释放</text>
+              <text x="540" y="1390" text-anchor="middle" font-size="10" fill="#64748b">不退次 · 稿件回 feed</text>
+
+              <polygon points="540,1440 620,1480 540,1520 460,1480" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="540" y="1484" text-anchor="middle" font-size="11" fill="#854d0e">终身未回填&gt;3?</text>
+              <text x="336" y="1472" font-size="10" fill="#dc2626">是 · 黑名单</text>
+              <rect x="20" y="1460" width="140" height="40" rx="6" fill="#fecaca" stroke="#dc2626" />
+              <text x="90" y="1485" text-anchor="middle" font-size="11" fill="#991b1b">停权</text>
+              <rect x="20" y="1540" width="140" height="40" rx="6" fill="#dcfce7" stroke="#16a34a" />
+              <text x="90" y="1565" text-anchor="middle" font-size="11" fill="#166534">后台手动恢复</text>
+              <text x="552" y="1536" font-size="10" fill="#16a34a">否 · 可再领</text>
+
+              <rect x="360" y="1552" width="360" height="48" rx="6" fill="#e2e8f0" stroke="#94a3b8" />
+              <text x="540" y="1582" text-anchor="middle" font-size="12" fill="#475569">原领取人与他人均可再领（再扣次）</text>
             </g>
           </svg>
         </div>
@@ -508,11 +582,12 @@
   <div class="drawer-overlay" id="ruleOverlay" onclick="setRuleDrawer(false)"></div>
   <aside class="drawer" id="ruleDrawer" role="dialog" aria-labelledby="ruleTitle">
     <div class="drawer-header">
-      <h2 id="ruleTitle">FR-014 · v2 需求规则</h2>
+      <h2 id="ruleTitle">FR-014 · v6 需求规则</h2>
       <button class="drawer-close" type="button" onclick="setRuleDrawer(false)">×</button>
     </div>
     <div class="rule-tab-bar">
       <button type="button" class="active" data-rule="rule-fe">前端需求</button>
+      <button type="button" data-rule="rule-pc">PC端需求</button>
       <button type="button" data-rule="rule-admin">后台需求</button>
     </div>
     <div class="drawer-body">
@@ -525,10 +600,11 @@
           <h3><span>2</span>页面与入口</h3>
           <div class="rule-content">
             <ul>
-              <li><strong>作品广场</strong>：宫格；项目图标横滑直选；搜索在项目下方；下拉筛剪辑师 / 素材类型 / 稿件类型；封面为本地图片（小说/漫画/视频题材）。Banner 可配 0–5 条：≥2 自动轮播（指示点+循环），1 条静止，0 条隐藏。点招募帧进海报详情。只列未占用稿件。不展示收益金额。底栏切「已领」。</li>
-              <li><strong>稿件详情</strong>：素材铺满。未领取底栏：剩余次数、快捷提词（提示跳转该项目题词页）、领取。领取后底栏：复制标题、编辑稿件。不展示收益金额。</li>
+              <li><strong>作品广场</strong>：宫格；项目图标横滑直选；搜索在项目下方；下拉筛剪辑师 / 素材类型 / 稿件类型；封面为本地图片（小说/漫画/视频题材）。广场 Banner 复用平台已有能力（0–5 条轮播已实现），本 FR 不另做后台配置。只列启用项目、平台已通过且空闲的稿件；审核中 / 已驳回 / 占用中 / 已回填完成均不回广场。不展示收益金额。底栏切「已领」。</li>
+              <li><strong>稿件详情</strong>：素材铺满。标题下展示标签；书籍名称下为书籍 ID。内容底、按钮上展示注意事项。未领取展示领取步骤；领取后改为作品发布技巧（发布标题 / 发布描述可复制）。未领取底栏：剩余次数、快捷提词、领取。领取后底栏：添加水印、下载稿件。不展示收益金额。</li>
+              <li><strong>添加水印</strong>：底部坞按四组功能最高高度锁死，预览吃剩余空间。文本可点出键盘。字体 / 字色 / 背景 / 水印横向 Tab；四组叠同一高度，切 Tab 浮层不跳动。字色/背景的颜色与透明度上下分行，选项换行露出。水印文字可拖动。下载先打水印再下载。</li>
               <li><strong>我的领取</strong>：项目图标只展示有领取记录的项目。胶囊 Tab：未回填 / 已回填 / 已超时。卡片：关键词标题；封面、作品标题、项目名称、作者、领取时间、下载时间、7 天下载倒计时（超时不可再下）。下载/复制链接为次级；立即回填始终高亮，已回填/已超时点按提示。点信息区（不含灰底三按钮）进该 mid 稿件详情，底栏为已领取；返回回到领取页。「立即回填」仍只去回填页。</li>
-              <li><strong>招募海报</strong>：招募氛围（卖点 / 适合谁 / 底部客服二维码）。无站内申请表。</li>
+              <li>C 端不承载剪辑手上传或工作台。广场招募帧进海报详情；上传只在 PC。</li>
             </ul>
           </div>
         </div>
@@ -549,7 +625,7 @@
               <li>一稿同时一人占用；占用中对他人 feed 隐藏。</li>
               <li>领取成功后 24h 未完成回填 = 1 次未回填，并释放回 feed。</li>
               <li>终身未回填超过 3 次停权，仅后台黑名单手动恢复。</li>
-              <li>未录入剪辑手不能上传发布。</li>
+              <li>禁用项目不出现在作品广场。</li>
             </ul>
           </div>
         </div>
@@ -558,21 +634,53 @@
           <div class="rule-content"><p>见页内 Tab <strong>「业务流程」</strong>。</p></div>
         </div>
       </div>
+      <div id="rule-pc" class="rule-panel">
+        <div class="rule-section">
+          <h3><span>1</span>业务目标</h3>
+          <div class="rule-content"><p>剪辑手用电脑在<strong>已有</strong>右豹创作者中心供稿。本 FR 不新造 PC 产品，只在现有业务线增加剪辑供稿闭环。</p></div>
+        </div>
+        <div class="rule-section">
+          <h3><span>2</span>页面与入口</h3>
+          <div class="rule-content">
+            <ul>
+              <li><strong>已有导航</strong>：项目中心 / 作品管理 / 收益中心保持原样，本 FR 不改。</li>
+              <li><strong>剪辑供稿（单一菜单）</strong>：顶部招募 BN，下方剪辑手看板。点 BN 用侧栏抽屉展开招募详情（卖点 / 适合谁 / 客服二维码），无站内申请表。</li>
+              <li><strong>剪辑手看板</strong>：已录入才出数。已授权项目、上传的稿件、已被领取的稿件、已经产生的收益。非剪辑手（未录入 / 已停用）看板走缺省，不跳走。</li>
+              <li><strong>最近上传</strong>：出示书籍 ID、稿件信息（稿件大小 + 稿件名称）。</li>
+              <li><strong>上传入口</strong>：弹窗三步。① 选文件夹或压缩包；② 填齐后台同款字段（标题、项目、书名、书籍 ID、大小、稿件名称、发布标题/描述、图集或视频、素材类型；剪辑手=当前登录人）；③ 确认后提交平台审核。</li>
+              <li><strong>上传 list</strong>：与后台稿件表同字段，不展示稿件下载链接。出示平台审核：审核中 / 已通过 / 已驳回（驳回出示原因）。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>3</span>边界</h3>
+          <div class="rule-content">
+            <ul>
+              <li>未录入或已停用：看板缺省；不能上传。招募 BN 仍可点开抽屉。</li>
+              <li>只可传到录入时的可上传项目，且项目须启用。</li>
+              <li>必须用文件夹或压缩包上传，不能只选单文件。</li>
+              <li>提交后为审核中，不进广场；后台通过后才可见。已驳回 list 出示原因。</li>
+              <li>剪辑手个人删除仅支持未占用（空闲）稿件；占用中与已完成不能删。</li>
+              <li>发布写入与 C 端 / 后台同一份演示数据。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
       <div id="rule-admin" class="rule-panel">
         <div class="rule-section">
           <h3><span>1</span>业务目标</h3>
-          <div class="rule-content"><p>运营在右豹后台管剪辑手、稿件、领取/回填、停权恢复、项目、素材类型和次数商品。</p></div>
+          <div class="rule-content"><p>运营在右豹后台管剪辑手、稿件、领取/回填、停权恢复、项目、素材类型和次数商品。广场 Banner 复用平台已有能力，本 FR 不单开配置页。</p></div>
         </div>
         <div class="rule-section">
           <h3><span>2</span>数据表与字段</h3>
           <div class="rule-content">
             <ul>
-              <li><strong>剪辑手</strong>：ID、昵称、客服来源、可上传项目、状态、录入时间。</li>
-              <li><strong>稿件</strong>：标题、项目/书、剪辑手、图集或视频、素材类型、占用态、上传时间。</li>
+              <li><strong>剪辑手</strong>：录入必填右豹 ID、分成比例、备注；另有昵称、客服来源、可上传项目、状态、录入时间。未录右豹 ID 不能上传发布。</li>
+              <li><strong>稿件</strong>：项目与书分列。书聚合书籍名称 + 书籍 ID。稿件信息聚合文件大小 + 下载链接。发布技巧聚合作品标题 + 作品描述。另有剪辑手、图集或视频、素材类型、占用态、平台审核（审核中 / 已通过 / 已驳回，驳回出示原因）、上传时间。PC 端 list 同字段但不展示下载链接。</li>
               <li><strong>领取记录</strong>：用户、稿件、关键词、回填信息、待回填/已回填/已超时释放。操作列「详情」看出回填；「稿件详情」抽屉出示稿件字段。</li>
-              <li><strong>广场 Banner</strong>：最多 5 条；再新增拦截并提示最多 5 条。类型含招募 / 运营。</li>
+              <li><strong>项目</strong>：支持添加 / 编辑。字段：项目名称、Logo 信息、状态（启用 / 禁用）、排序、更新时间。禁用项目不可上传、不进广场。</li>
               <li><strong>黑名单</strong>：用户、未回填次数、停权时间；支持手动恢复。</li>
-              <li><strong>次数商品</strong>：x 次 / y 积分，最多 4 档在售，可改价、下架。免费次数在项目侧配置。</li>
+              <li><strong>次数商品</strong>：x 次 / y 积分，最多 4 档在售，可改价、下架。免费次数挂本页。</li>
             </ul>
           </div>
         </div>
@@ -580,9 +688,9 @@
           <h3><span>3</span>列表与筛选</h3>
           <div class="rule-content">
             <ul>
-              <li>详情用 Drawer，编辑/改价用 Modal，恢复/下架用 Confirm。</li>
+              <li>详情用 Drawer，录入/编辑/改价用 Modal，恢复/下架用 Confirm。</li>
               <li>领取记录必须能看出回填信息与三种状态。</li>
-              <li>广场 Banner 已满 5 条时禁止再新增。</li>
+              <li>剪辑手列表可按右豹 ID / 昵称筛选；项目列表可按名称 / 启用禁用筛选。</li>
             </ul>
           </div>
         </div>
@@ -590,8 +698,13 @@
           <h3><span>4</span>边界规则</h3>
           <div class="rule-content">
             <ul>
-              <li>停权恢复只能后台手动，没有自助解禁。</li>
+              <li>停权恢复只能后台手动，没有自助解禁。恢复后回广场，可再领。</li>
+              <li>禁用项目不可上传、不出现在作品广场。</li>
               <li>下架商品立即不可新购；已购次数保留。</li>
+              <li>剪辑手停用后不能上传；有占用中稿件不能停用；有稿件不能硬删只能停用。</li>
+              <li>占用中稿件不能删；有未超时领取不能删；回填后稿件为已完成，不回广场。</li>
+              <li>PC 新上传稿件默认审核中；后台通过后进广场，驳回须填原因且不进广场。</li>
+              <li>前后端共用同一份演示数据：后台启用/停用/改次即时影响广场、上传与领取次数。本 Demo 是逻辑闭环，不是真实接口闭环。</li>
               <li>本 Demo 不做真实积分扣减或权限落库。</li>
             </ul>
           </div>
@@ -621,39 +734,32 @@
 
   <div class="toast" id="toast"></div>
 
+  <script src="yijian-daifa-store.js"></script>
   <script>
-    var EDITORS = [
-      { id: 'E-01', name: '林夏', src: '客服二维码', projects: '番茄小说', status: '已录入', time: '2026-09-01 10:12' },
-      { id: 'E-02', name: '阿凯', src: '客服二维码', projects: '不鸣推文 / 番茄小说', status: '已录入', time: '2026-09-02 15:40' },
-      { id: 'E-03', name: '小禾', src: '客服二维码', projects: '—', status: '已停用', time: '2026-08-20 09:03' }
-    ];
-    var WORKS = [
-      { id: 'M-01', title: '掌心宠 · 口播切片', project: '番茄小说', book: '我成了老公掌心宠', editor: '林夏', kind: '图集', mat: '口播', occ: '占用中', time: '今天 11:20' },
-      { id: 'M-02', title: '末世囤货混剪', project: '不鸣推文', book: '我在末世囤了亿万物资', editor: '阿凯', kind: '视频', mat: '混剪', occ: '空闲', time: '昨天 18:02' },
-      { id: 'M-03', title: '团宠解压图集', project: '番茄小说', book: '被偷听心声后我成了全村团宠', editor: '林夏', kind: '图集', mat: '解压', occ: '占用中', time: '昨天 09:40' },
-      { id: 'M-06', title: '银发军官图集', project: '番茄小说', book: '银发军官把我宠上天', editor: '庭宇', kind: '图集', mat: '图文切片', occ: '占用中', time: '今天 10:02' }
-    ];
-    var CLAIMS = [
-      { id: 'C-8801', user: 'U-10086', mid: 'M-01', work: '掌心宠 · 口播切片', kw: '掌心宠溺', fill: '抖音 / 作品链接已填', status: '待回填', time: '今天 11:28' },
-      { id: 'C-8802', user: 'U-10221', mid: 'M-06', work: '银发军官图集', kw: '银发军官', fill: '视频号 / @北城', status: '已回填', time: '昨天 16:02' },
-      { id: 'C-8803', user: 'U-10086', mid: 'M-03', work: '团宠解压图集', kw: '全村团宠', fill: '—', status: '已超时释放', time: '前天 09:11' }
-    ];
-    var ADMIN_BANNERS = [
-      { id: 'B-01', title: '剪辑手招募', kind: 'recruit', on: true, img: 'assets/fr014/bn-recruit.jpg' },
-      { id: 'B-02', title: '热门稿件上新', kind: 'promo', on: true, img: 'assets/fr014/bn-hot.jpg' },
-      { id: 'B-03', title: '领取后 24 小时回填', kind: 'promo', on: true, img: 'assets/fr014/bn-guide.jpg' },
-      { id: 'B-04', title: '剪辑手精选', kind: 'promo', on: true, img: 'assets/fr014/bn-pick.jpg' },
-      { id: 'B-05', title: '不会剪辑也能做项目', kind: 'promo', on: true, img: 'assets/fr014/bn-tips.jpg' }
-    ];
-    var BANS = [
-      { user: 'U-10999', strikes: 4, time: '2026-09-07 20:11', status: '停权中' },
-      { user: 'U-10801', strikes: 4, time: '2026-09-03 13:40', status: '已恢复' }
-    ];
-    var SKUS = [
-      { id: 'S-1', times: 1, points: 50, on: true },
-      { id: 'S-2', times: 3, points: 120, on: true },
-      { id: 'S-3', times: 10, points: 350, on: true },
-      { id: 'S-4', times: 30, points: 900, on: false }
+    var STORE = YJD.open();
+    var EDITORS = STORE.editors;
+    var WORKS = STORE.works;
+    var PROJECTS = STORE.projects;
+    var CLAIMS = STORE.claims;
+    var BANS = STORE.bans;
+    var SKUS = STORE.skus;
+    var MATS = STORE.mats;
+    function persist() { YJD.save(STORE); }
+    function rebind() {
+      STORE = YJD.open();
+      EDITORS = STORE.editors;
+      WORKS = STORE.works;
+      PROJECTS = STORE.projects;
+      CLAIMS = STORE.claims;
+      BANS = STORE.bans;
+      SKUS = STORE.skus;
+      MATS = STORE.mats;
+    }
+    var LOGO_OPTS = [
+      { name: '番茄小说', src: 'assets/fr014/logo-fanqie.jpg' },
+      { name: '红果短剧', src: 'assets/fr014/logo-hongguo-drama.jpg' },
+      { name: '知乎故事', src: 'assets/fr014/logo-zhihu.jpg' },
+      { name: '红果漫剧', src: 'assets/fr014/logo-hongguo-comic.jpg' }
     ];
 
     function showToast(msg) {
@@ -664,46 +770,113 @@
       showToast._t = setTimeout(function () { el.classList.remove('show'); }, 1600);
     }
     function stTag(s) {
-      if (s === '已录入' || s === '空闲' || s === '已回填' || s === '已恢复' || s === true) return '<span class="tag tag-ok">' + (s === true ? '在售' : s) + '</span>';
-      if (s === '待回填' || s === '占用中') return '<span class="tag tag-warn">' + s + '</span>';
-      if (s === '停权中' || s === '已超时释放') return '<span class="tag tag-del">' + s + '</span>';
+      if (s === '已录入' || s === '空闲' || s === '已回填' || s === '已恢复' || s === '启用' || s === '已通过' || s === true) return '<span class="tag tag-ok">' + (s === true ? '在售' : s) + '</span>';
+      if (s === '待回填' || s === '未回填' || s === '占用中' || s === '审核中') return '<span class="tag tag-warn">' + (s === '未回填' ? '待回填' : s) + '</span>';
+      if (s === '停权中' || s === '已超时释放' || s === '已超时' || s === '已驳回') return '<span class="tag tag-del">' + (s === '已超时' ? '已超时释放' : s) + '</span>';
       return '<span class="tag tag-muted">' + s + '</span>';
+    }
+    function nextPrefixedId(prefix, list) {
+      var n = 1, id;
+      var used = {};
+      list.forEach(function (x) { used[x.id] = true; });
+      do {
+        id = prefix + (n < 10 ? '0' + n : String(n));
+        n += 1;
+      } while (used[id]);
+      return id;
+    }
+    function esc(s) {
+      return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+        return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
+      });
+    }
+    function nowStamp() {
+      var d = new Date();
+      function p(n) { return n < 10 ? '0' + n : '' + n; }
+      return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
     }
     function renderEditors() {
       var q = (document.getElementById('edQ').value || '').trim();
       var s = document.getElementById('edS').value;
       document.getElementById('edBody').innerHTML = EDITORS.filter(function (e) {
-        if (q && e.name.indexOf(q) === -1 && e.id.indexOf(q) === -1) return false;
+        if (q && e.name.indexOf(q) === -1 && e.id.indexOf(q) === -1 && String(e.ybId || '').indexOf(q) === -1) return false;
         if (s && e.status !== s) return false;
         return true;
       }).map(function (e) {
-        return '<tr><td>' + e.id + '</td><td>' + e.name + '</td><td>' + e.src + '</td><td>' + e.projects + '</td><td>' + stTag(e.status) + '</td><td>' + e.time + '</td>' +
-          '<td><button class="link" type="button" onclick="openKv(\'剪辑手 ' + e.id + '\',\'' + e.name + ' / ' + e.projects + '\')">详情</button></td></tr>';
-      }).join('') || '<tr><td colspan="7" style="text-align:center;color:#9aa5b4">无匹配</td></tr>';
+        return '<tr><td>' + esc(e.id) + '</td><td>' + esc(e.ybId) + '</td><td>' + esc(e.name) + '</td><td>' + esc(e.share) + '</td>' +
+          '<td class="cell-agg" title="' + esc(e.note) + '">' + esc(e.note) + '</td><td>' + esc(e.src) + '</td><td>' + esc(e.projects) + '</td><td>' + stTag(e.status) + '</td><td>' + esc(e.time) + '</td>' +
+          '<td><button class="link" type="button" onclick="openEditorDetail(\'' + e.id + '\')">详情</button>' +
+          '<button class="link" type="button" onclick="openEditorModal(\'' + e.id + '\')">编辑</button>' +
+          (e.status === '已录入'
+            ? '<button class="link" type="button" onclick="toggleEditor(\'' + e.id + '\',false)">停用</button>'
+            : '<button class="link" type="button" onclick="toggleEditor(\'' + e.id + '\',true)">启用</button>') +
+          '<button class="link link-danger" type="button" onclick="deleteEditor(\'' + e.id + '\')">删除</button></td></tr>';
+      }).join('') || '<tr><td colspan="10" style="text-align:center;color:#9aa5b4">无匹配</td></tr>';
     }
     function resetEd() { document.getElementById('edQ').value = ''; document.getElementById('edS').value = ''; renderEditors(); }
     function renderWorks() {
       var q = (document.getElementById('wkQ').value || '').trim();
       var o = document.getElementById('wkO').value;
+      var a = document.getElementById('wkA').value;
       document.getElementById('wkBody').innerHTML = WORKS.filter(function (w) {
         if (q && w.title.indexOf(q) === -1 && w.id.indexOf(q) === -1) return false;
         if (o && w.occ !== o) return false;
+        if (a && (w.audit || '已通过') !== a) return false;
         return true;
       }).map(function (w) {
-        return '<tr><td>' + w.id + '</td><td>' + w.title + '</td><td>' + w.project + '<div class="cell-sub">' + w.book + '</div></td><td>' + w.editor + '</td><td>' + w.kind + '</td><td>' + w.mat + '</td><td>' + stTag(w.occ) + '</td><td>' + w.time + '</td>' +
-          '<td><button class="link" type="button" onclick="openKv(\'' + w.id + '\',\'' + w.title + ' · ' + w.mat + '\')">详情</button></td></tr>';
-      }).join('') || '<tr><td colspan="9" style="text-align:center;color:#9aa5b4">无匹配</td></tr>';
+        var audit = w.audit || '已通过';
+        var auditCell = stTag(audit) + (audit === '已驳回' && w.rejectReason ? '<div class="cell-sub">原因：' + esc(w.rejectReason) + '</div>' : '');
+        var auditBtns = '';
+        if (audit === '审核中' || audit === '已驳回') {
+          auditBtns += '<button class="link" type="button" onclick="approveWork(\'' + w.id + '\')">通过</button>';
+        }
+        if (audit === '审核中' && w.occ === '空闲') {
+          auditBtns += '<button class="link link-danger" type="button" onclick="rejectWork(\'' + w.id + '\')">驳回</button>';
+        }
+        return '<tr><td>' + esc(w.id) + '</td><td>' + esc(w.title) + '</td><td>' + esc(w.project) + '</td>' +
+          '<td class="cell-agg">' + esc(w.book) + '<div class="cell-sub">书籍 ID ' + esc(w.bookId) + '</div></td>' +
+          '<td class="cell-agg">' + esc(w.size) + '<div class="cell-sub">' + esc(w.dl) + '</div></td>' +
+          '<td class="cell-agg" title="' + esc(w.pubDesc) + '">' + esc(w.pubTitle) + '<div class="cell-sub">' + esc(w.pubDesc) + '</div></td>' +
+          '<td>' + esc(w.editor) + '</td><td>' + esc(w.kind) + '</td><td>' + esc(w.mat) + '</td><td>' + stTag(w.occ) + '</td>' +
+          '<td>' + auditCell + '</td><td>' + esc(w.time) + '</td>' +
+          '<td><button class="link" type="button" onclick="openWorkDetail(\'' + w.id + '\')">详情</button>' +
+          '<button class="link" type="button" onclick="openWorkModal(\'' + w.id + '\')">编辑</button>' +
+          auditBtns +
+          '<button class="link link-danger" type="button" onclick="deleteWork(\'' + w.id + '\')">删除</button></td></tr>';
+      }).join('') || '<tr><td colspan="13" style="text-align:center;color:#9aa5b4">无匹配</td></tr>';
+    }
+    function renderProjects() {
+      var q = (document.getElementById('pjQ').value || '').trim();
+      var s = document.getElementById('pjS').value;
+      var rows = PROJECTS.filter(function (p) {
+        if (q && p.name.indexOf(q) === -1) return false;
+        if (s && p.status !== s) return false;
+        return true;
+      }).slice().sort(function (a, b) { return a.sort - b.sort; });
+      document.getElementById('pjBody').innerHTML = rows.map(function (p) {
+        var logoName = (LOGO_OPTS.find(function (o) { return o.src === p.logo; }) || {}).name || p.logo;
+        return '<tr><td>' + esc(p.name) + '</td>' +
+          '<td><div class="logo-cell"><img src="' + esc(p.logo) + '" alt="" /><div>' + esc(logoName) + '<div class="cell-sub">' + esc(p.logo) + '</div></div></div></td>' +
+          '<td>' + (p.status === '启用' ? stTag('启用') : '<span class="tag tag-muted">禁用</span>') + '</td>' +
+          '<td>' + esc(p.sort) + '</td><td>' + esc(p.updated) + '</td>' +
+          '<td><button class="link" type="button" onclick="openProjectModal(\'' + p.id + '\')">编辑</button>' +
+          '<button class="link link-danger" type="button" onclick="deleteProject(\'' + p.id + '\')">删除</button></td></tr>';
+      }).join('') || '<tr><td colspan="6" style="text-align:center;color:#9aa5b4">无匹配</td></tr>';
     }
     function renderClaimsAdm() {
       var q = (document.getElementById('clQ').value || '').trim();
       var s = document.getElementById('clS').value;
       document.getElementById('clBody').innerHTML = CLAIMS.filter(function (c) {
-        if (q && c.user.indexOf(q) === -1 && c.work.indexOf(q) === -1) return false;
-        if (s && c.status !== s) return false;
+        var st = YJD.admClaimSt(c.status);
+        var title = c.work || c.title || '';
+        if (q && String(c.user || '').indexOf(q) === -1 && title.indexOf(q) === -1) return false;
+        if (s && st !== s) return false;
         return true;
       }).map(function (c) {
-        return '<tr><td>' + c.id + '</td><td>' + c.user + '</td><td>' + c.work + '</td><td>' + c.kw + '</td><td>' + c.fill + '</td><td>' + stTag(c.status) + '</td><td>' + c.time + '</td>' +
-          '<td><button class="link" type="button" onclick="openKv(\'' + c.id + '\',\'回填：' + c.fill + '\')">详情</button>' +
+        var st = YJD.admClaimSt(c.status);
+        var title = c.work || c.title || '';
+        return '<tr><td>' + esc(c.id) + '</td><td>' + esc(c.user || STORE.user.id) + '</td><td>' + esc(title) + '</td><td>' + esc(c.kw) + '</td><td>' + esc(c.fill || '—') + '</td><td>' + stTag(st) + '</td><td>' + esc(c.time) + '</td>' +
+          '<td><button class="link" type="button" onclick="openKv(\'' + c.id + '\',\'回填：' + esc(c.fill || '—') + '\')">详情</button>' +
           '<button class="link" type="button" onclick="openWorkDetail(\'' + c.mid + '\')">稿件详情</button></td></tr>';
       }).join('') || '<tr><td colspan="8" style="text-align:center;color:#9aa5b4">无匹配</td></tr>';
     }
@@ -739,81 +912,166 @@
       document.getElementById('detailTitle').textContent = '稿件详情';
       document.getElementById('detailBody').innerHTML =
         '<dl class="kv">' +
-        '<dt>稿件 ID</dt><dd>' + w.id + '</dd>' +
-        '<dt>标题</dt><dd>' + w.title + '</dd>' +
-        '<dt>项目</dt><dd>' + w.project + '</dd>' +
-        '<dt>书籍</dt><dd>' + w.book + '</dd>' +
-        '<dt>剪辑手</dt><dd>' + w.editor + '</dd>' +
-        '<dt>稿件类型</dt><dd>' + w.kind + '</dd>' +
-        '<dt>素材类型</dt><dd>' + w.mat + '</dd>' +
-        '<dt>占用</dt><dd>' + w.occ + '</dd>' +
-        '<dt>上传时间</dt><dd>' + w.time + '</dd>' +
+        '<dt>稿件 ID</dt><dd>' + esc(w.id) + '</dd>' +
+        '<dt>标题</dt><dd>' + esc(w.title) + '</dd>' +
+        '<dt>项目</dt><dd>' + esc(w.project) + '</dd>' +
+        '<dt>书籍名称</dt><dd>' + esc(w.book) + '</dd>' +
+        '<dt>书籍 ID</dt><dd>' + esc(w.bookId) + '</dd>' +
+        '<dt>文件大小</dt><dd>' + esc(w.size) + '</dd>' +
+        '<dt>下载链接</dt><dd>' + esc(w.dl) + '</dd>' +
+        '<dt>作品标题</dt><dd>' + esc(w.pubTitle) + '</dd>' +
+        '<dt>作品描述</dt><dd>' + esc(w.pubDesc) + '</dd>' +
+        '<dt>剪辑手</dt><dd>' + esc(w.editor) + '</dd>' +
+        '<dt>稿件类型</dt><dd>' + esc(w.kind) + '</dd>' +
+        '<dt>素材类型</dt><dd>' + esc(w.mat) + '</dd>' +
+        '<dt>占用</dt><dd>' + esc(w.occ) + '</dd>' +
+        '<dt>平台审核</dt><dd>' + esc(w.audit || '已通过') + '</dd>' +
+        (w.audit === '已驳回' && w.rejectReason ? '<dt>驳回原因</dt><dd>' + esc(w.rejectReason) + '</dd>' : '') +
+        '<dt>上传时间</dt><dd>' + esc(w.time) + '</dd>' +
         '</dl>';
       document.getElementById('detailOverlay').classList.add('open');
       document.getElementById('detailDrawer').classList.add('open');
-    }
-    function renderBannersAdm() {
-      document.getElementById('bannerBody').innerHTML = ADMIN_BANNERS.map(function (b) {
-        return '<tr><td>' + b.id + '</td><td>' + b.title + '</td><td>' + (b.kind === 'recruit' ? '招募' : '运营') + '</td>' +
-          '<td><span class="cell-sub">' + b.img + '</span></td>' +
-          '<td>' + (b.on ? '<span class="tag tag-ok">启用</span>' : '<span class="tag tag-muted">停用</span>') + '</td>' +
-          '<td><button class="link" type="button" onclick="toggleBanner(\'' + b.id + '\')">' + (b.on ? '停用' : '启用') + '</button></td></tr>';
-      }).join('') || '<tr><td colspan="6" style="text-align:center;color:#9aa5b4">暂无 Banner</td></tr>';
-    }
-    function addBanner() {
-      if (ADMIN_BANNERS.length >= 5) {
-        showToast('最多 5 条');
-        return;
-      }
-      openModal('新增 Banner',
-        '<div class="field"><label>标题</label><input id="bnTitle" placeholder="运营条" /></div>' +
-        '<div class="field"><label>类型</label><select id="bnKind"><option value="promo">运营</option><option value="recruit">招募</option></select></div>',
-        function () {
-          if (ADMIN_BANNERS.length >= 5) { showToast('最多 5 条'); return; }
-          ADMIN_BANNERS.push({
-            id: 'B-0' + (ADMIN_BANNERS.length + 1),
-            title: document.getElementById('bnTitle').value || '运营条',
-            kind: document.getElementById('bnKind').value || 'promo',
-            on: true,
-            img: 'assets/fr014/bn-tips.jpg'
-          });
-          renderBannersAdm();
-          showToast('已新增 Banner');
-        });
-    }
-    function toggleBanner(id) {
-      var row = ADMIN_BANNERS.find(function (b) { return b.id === id; });
-      if (row) row.on = !row.on;
-      renderBannersAdm();
     }
     function closeDetail() {
       document.getElementById('detailOverlay').classList.remove('open');
       document.getElementById('detailDrawer').classList.remove('open');
     }
-    function openModal(title, html, onOk) {
+    function openModal(title, html, onOk, danger) {
       document.getElementById('modalTitle').textContent = title;
       document.getElementById('modalBody').innerHTML = html;
       document.getElementById('modalOverlay').classList.add('open');
       document.getElementById('appModal').classList.add('open');
-      document.getElementById('modalOk').onclick = function () { onOk(); closeModal(); };
+      var ok = document.getElementById('modalOk');
+      ok.className = danger ? 'btn btn-danger' : 'btn btn-primary';
+      ok.textContent = danger ? '确认删除' : '确定';
+      ok.onclick = function () { if (onOk() === true) return; closeModal(); };
     }
     function closeModal() {
       document.getElementById('modalOverlay').classList.remove('open');
       document.getElementById('appModal').classList.remove('open');
     }
-    function openEditorModal() {
-      openModal('录入剪辑手',
-        '<div class="field"><label>昵称</label><input id="mName" placeholder="剪辑手昵称" /></div><div class="field"><label>可上传项目</label><input id="mProj" placeholder="番茄小说" /></div>',
-        function () {
-          EDITORS.unshift({ id: 'E-0' + (EDITORS.length + 1), name: document.getElementById('mName').value || '新剪辑手', src: '客服二维码', projects: document.getElementById('mProj').value || '—', status: '已录入', time: '刚刚' });
-          renderEditors();
+    function openEditorDetail(id) {
+      var e = EDITORS.find(function (x) { return x.id === id; });
+      if (!e) return;
+      document.getElementById('detailTitle').textContent = '剪辑手 ' + e.id;
+      document.getElementById('detailBody').innerHTML =
+        '<dl class="kv">' +
+        '<dt>右豹 ID</dt><dd>' + esc(e.ybId) + '</dd>' +
+        '<dt>昵称</dt><dd>' + esc(e.name) + '</dd>' +
+        '<dt>分成比例</dt><dd>' + esc(e.share) + '</dd>' +
+        '<dt>备注</dt><dd>' + esc(e.note) + '</dd>' +
+        '<dt>来源</dt><dd>' + esc(e.src) + '</dd>' +
+        '<dt>可上传项目</dt><dd>' + esc(e.projects) + '</dd>' +
+        '<dt>状态</dt><dd>' + esc(e.status) + '</dd>' +
+        '<dt>录入时间</dt><dd>' + esc(e.time) + '</dd>' +
+        '</dl>';
+      document.getElementById('detailOverlay').classList.add('open');
+      document.getElementById('detailDrawer').classList.add('open');
+    }
+    function editorFormHtml(e) {
+      e = e || {};
+      return '<div class="field"><label>右豹 ID<span class="req">*</span></label><input id="mYb" placeholder="YB10086" value="' + esc(e.ybId || '') + '" /></div>' +
+        '<div class="field"><label>昵称<span class="req">*</span></label><input id="mName" placeholder="剪辑手昵称" value="' + esc(e.name || '') + '" /></div>' +
+        '<div class="field"><label>分成比例<span class="req">*</span></label><input id="mShare" placeholder="50%" value="' + esc(e.share || '') + '" /></div>' +
+        '<div class="field"><label>可上传项目</label><input id="mProj" placeholder="番茄小说" value="' + esc(e.projects || '') + '" /></div>' +
+        '<div class="field"><label>备注<span class="req">*</span></label><textarea id="mNote" placeholder="合作说明 / 对接备注">' + esc(e.note || '') + '</textarea></div>';
+    }
+    function openEditorModal(id) {
+      var row = id ? EDITORS.find(function (x) { return x.id === id; }) : null;
+      openModal(row ? '编辑剪辑手' : '录入剪辑手', editorFormHtml(row), function () {
+        var ybId = (document.getElementById('mYb').value || '').trim();
+        var name = (document.getElementById('mName').value || '').trim();
+        var share = (document.getElementById('mShare').value || '').trim();
+        var note = (document.getElementById('mNote').value || '').trim();
+        if (!ybId || !share || !note) { showToast('请填写右豹 ID、分成比例、备注'); return true; }
+        if (EDITORS.some(function (x) { return x.ybId === ybId && (!row || x.id !== row.id); })) {
+          showToast('右豹 ID 已存在'); return true;
+        }
+        if (row) {
+          var oldEd = row.name;
+          row.ybId = ybId;
+          row.name = name || row.name;
+          row.share = share;
+          row.note = note;
+          row.projects = document.getElementById('mProj').value || '—';
+          WORKS.forEach(function (w) {
+            if (w.editor === oldEd) { w.editor = row.name; w.share = share; }
+          });
+          CLAIMS.forEach(function (c) { if (c.editor === oldEd) c.editor = row.name; });
+          persist();
+          showToast('已更新剪辑手');
+        } else {
+          EDITORS.unshift({
+            id: nextPrefixedId('E-', EDITORS),
+            ybId: ybId,
+            name: name || '新剪辑手',
+            share: share,
+            note: note,
+            src: '客服二维码',
+            projects: document.getElementById('mProj').value || '—',
+            status: '已录入',
+            time: nowStamp()
+          });
+          persist();
           showToast('已录入，该账号可上传发布');
+        }
+        renderEditors();
+      });
+    }
+    function logoSelectHtml(selected) {
+      return LOGO_OPTS.map(function (o) {
+        return '<option value="' + esc(o.src) + '"' + (o.src === selected ? ' selected' : '') + '>' + esc(o.name) + '</option>';
+      }).join('');
+    }
+    function openProjectModal(id) {
+      var row = id ? PROJECTS.find(function (x) { return x.id === id; }) : null;
+      openModal(row ? '编辑项目' : '添加项目',
+        '<div class="field"><label>项目名称<span class="req">*</span></label><input id="pjName" placeholder="项目名称" value="' + esc(row ? row.name : '') + '" /></div>' +
+        '<div class="field"><label>Logo 信息<span class="req">*</span></label><select id="pjLogo">' + logoSelectHtml(row ? row.logo : LOGO_OPTS[0].src) + '</select></div>' +
+        '<div class="field"><label>状态</label><select id="pjOn"><option' + (!row || row.status === '启用' ? ' selected' : '') + '>启用</option><option' + (row && row.status === '禁用' ? ' selected' : '') + '>禁用</option></select></div>' +
+        '<div class="field"><label>排序<span class="req">*</span></label><input id="pjSort" type="number" value="' + (row ? row.sort : PROJECTS.length + 1) + '" /></div>',
+        function () {
+          var name = (document.getElementById('pjName').value || '').trim();
+          var logo = document.getElementById('pjLogo').value;
+          var status = document.getElementById('pjOn').value;
+          var sort = Number(document.getElementById('pjSort').value);
+          if (!name || !logo) { showToast('请填写项目名称、Logo、排序'); return true; }
+          if (!Number.isInteger(sort) || sort < 1) { showToast('排序须为正整数'); return true; }
+          if (PROJECTS.some(function (p) { return p.name === name && (!row || p.id !== row.id); })) {
+            showToast('项目名称已存在'); return true;
+          }
+          if (row) {
+            var oldName = row.name;
+            row.name = name;
+            row.logo = logo;
+            row.status = status;
+            row.sort = sort;
+            row.updated = nowStamp();
+            if (oldName !== name) {
+              WORKS.forEach(function (w) { if (w.project === oldName) w.project = name; });
+              CLAIMS.forEach(function (c) { if (c.project === oldName) c.project = name; });
+              if (STORE.keywords[oldName]) {
+                STORE.keywords[name] = STORE.keywords[oldName];
+                delete STORE.keywords[oldName];
+              }
+            }
+            persist();
+            showToast('已更新项目');
+          } else {
+            PROJECTS.push({ id: nextPrefixedId('P-', PROJECTS), name: name, logo: logo, status: status, sort: sort, updated: nowStamp() });
+            if (!STORE.keywords[name]) STORE.keywords[name] = [];
+            persist();
+            showToast('已添加项目');
+          }
+          renderProjects();
         });
     }
     function confirmRestore(user) {
       openModal('恢复领取权限', '<p>确认手动恢复 <strong>' + user + '</strong>？恢复后可再次领取。</p>', function () {
         var row = BANS.find(function (b) { return b.user === user; });
         if (row) row.status = '已恢复';
+        if (STORE.user && STORE.user.id === user) STORE.user.banned = false;
+        persist();
         renderBan();
         showToast('已手动恢复');
       });
@@ -823,8 +1081,12 @@
       openModal('改价',
         '<div class="field"><label>次数</label><input id="mT" type="number" value="' + s.times + '" /></div><div class="field"><label>积分</label><input id="mP" type="number" value="' + s.points + '" /></div>',
         function () {
-          s.times = Number(document.getElementById('mT').value) || s.times;
-          s.points = Number(document.getElementById('mP').value) || s.points;
+          var t = Number(document.getElementById('mT').value);
+          var p = Number(document.getElementById('mP').value);
+          if (!(t > 0) || !(p > 0)) { showToast('次数与积分须为正数'); return true; }
+          s.times = t;
+          s.points = p;
+          persist();
           renderSkus();
           showToast('已改价');
         });
@@ -834,17 +1096,304 @@
       if (on && onSale >= 4) { showToast('同时在售最多 4 档'); return; }
       openModal(on ? '上架商品' : '下架商品', '<p>' + (on ? '上架后用户可购买。' : '下架后不可新购，已购次数保留。') + '</p>', function () {
         SKUS.find(function (x) { return x.id === id; }).on = on;
+        persist();
         renderSkus();
         showToast(on ? '已上架' : '已下架');
       });
     }
 
+    function optList(arr, valKey, labelKey, selected) {
+      return arr.map(function (x) {
+        var v = valKey ? x[valKey] : x;
+        var l = labelKey ? x[labelKey] : x;
+        return '<option value="' + esc(v) + '"' + (v === selected ? ' selected' : '') + '>' + esc(l) + '</option>';
+      }).join('');
+    }
+    function toggleEditor(id, on) {
+      var row = EDITORS.find(function (x) { return x.id === id; });
+      if (!row) return;
+      if (!on && WORKS.some(function (w) { return w.editor === row.name && w.occ === '占用中'; })) {
+        showToast('该剪辑手有占用中稿件，不能停用');
+        return;
+      }
+      openModal(on ? '启用剪辑手' : '停用剪辑手',
+        '<p>' + (on ? '启用后可再次上传发布。' : '停用后不能上传发布，已有稿件仍保留。') + '</p>',
+        function () {
+          row.status = on ? '已录入' : '已停用';
+          persist();
+          renderEditors();
+          showToast(on ? '已启用' : '已停用');
+        });
+    }
+    function deleteEditor(id) {
+      var row = EDITORS.find(function (x) { return x.id === id; });
+      if (!row) return;
+      if (WORKS.some(function (w) { return w.editor === row.name; })) {
+        showToast('该剪辑手仍有稿件，请先处理稿件或改为停用');
+        return;
+      }
+      openModal('确认删除？', '<p>即将删除剪辑手「' + esc(row.name) + '」，此操作不可撤销。</p>', function () {
+        STORE.editors = EDITORS = EDITORS.filter(function (x) { return x.id !== id; });
+        persist();
+        renderEditors();
+        showToast('已删除');
+      }, true);
+    }
+    function workFormHtml(w) {
+      w = w || {};
+      var eds = YJD.enrolledEditors(STORE).slice();
+      var pjs = YJD.enabledProjects(STORE).slice();
+      var mats = YJD.enabledMats(STORE).slice();
+      if (w.editor && !eds.some(function (e) { return e.name === w.editor; })) {
+        var curEd = YJD.editorByName(STORE, w.editor);
+        if (curEd) eds.unshift(curEd);
+      }
+      if (w.project && !pjs.some(function (p) { return p.name === w.project; })) {
+        var curPj = YJD.projectByName(STORE, w.project);
+        if (curPj) pjs.unshift(curPj);
+      }
+      if (w.mat && !mats.some(function (m) { return m.name === w.mat; })) {
+        var curMat = (STORE.mats || []).find(function (m) { return m.name === w.mat; });
+        if (curMat) mats.unshift(curMat);
+      }
+      return '<div class="field"><label>标题<span class="req">*</span></label><input id="wTitle" value="' + esc(w.title || '') + '" /></div>' +
+        '<div class="field"><label>项目<span class="req">*</span></label><select id="wProj">' + optList(pjs, 'name', 'name', w.project) + '</select></div>' +
+        '<div class="field"><label>书籍名称<span class="req">*</span></label><input id="wBook" value="' + esc(w.book || '') + '" /></div>' +
+        '<div class="field"><label>书籍 ID<span class="req">*</span></label><input id="wBookId" value="' + esc(w.bookId || '') + '" /></div>' +
+        '<div class="field"><label>文件大小</label><input id="wSize" value="' + esc(w.size || '') + '" /></div>' +
+        '<div class="field"><label>下载链接</label><input id="wDl" value="' + esc(w.dl || '') + '" /></div>' +
+        '<div class="field"><label>作品标题</label><input id="wPubT" value="' + esc(w.pubTitle || '') + '" /></div>' +
+        '<div class="field"><label>作品描述</label><textarea id="wPubD">' + esc(w.pubDesc || '') + '</textarea></div>' +
+        '<div class="field"><label>剪辑手<span class="req">*</span></label><select id="wEd">' + optList(eds, 'name', 'name', w.editor) + '</select></div>' +
+        '<div class="field"><label>类型</label><select id="wKind"><option' + (w.kind !== '视频' ? ' selected' : '') + '>图集</option><option' + (w.kind === '视频' ? ' selected' : '') + '>视频</option></select></div>' +
+        '<div class="field"><label>素材类型<span class="req">*</span></label><select id="wMat">' + optList(mats, 'name', 'name', w.mat) + '</select></div>';
+    }
+    function openWorkModal(id) {
+      var row = id ? WORKS.find(function (x) { return x.id === id; }) : null;
+      if (!YJD.enrolledEditors(STORE).length) { showToast('请先录入剪辑手'); return; }
+      if (!YJD.enabledProjects(STORE).length) { showToast('请先启用至少一个项目'); return; }
+      if (!YJD.enabledMats(STORE).length) { showToast('请先启用至少一个素材类型'); return; }
+      openModal(row ? '编辑稿件' : '录入稿件', workFormHtml(row), function () {
+        var title = (document.getElementById('wTitle').value || '').trim();
+        var project = document.getElementById('wProj').value;
+        var book = (document.getElementById('wBook').value || '').trim();
+        var bookId = (document.getElementById('wBookId').value || '').trim();
+        var editor = document.getElementById('wEd').value;
+        var mat = document.getElementById('wMat').value;
+        if (!title || !project || !book || !bookId || !editor || !mat) { showToast('请填写标题、项目、书、剪辑手、素材类型'); return true; }
+        var ed = YJD.editorByName(STORE, editor);
+        var payload = {
+          title: title, project: project, book: book, bookId: bookId,
+          size: document.getElementById('wSize').value || '—',
+          dl: document.getElementById('wDl').value || '',
+          pubTitle: document.getElementById('wPubT').value || title,
+          pubDesc: document.getElementById('wPubD').value || '',
+          editor: editor, kind: document.getElementById('wKind').value, mat: mat,
+          share: ed ? ed.share : '—',
+          time: row ? row.time : '刚刚'
+        };
+        if (row) {
+          Object.keys(payload).forEach(function (k) { row[k] = payload[k]; });
+          persist();
+          showToast('已更新稿件');
+        } else {
+          var nid = 'M-' + Date.now();
+          WORKS.unshift(Object.assign({
+            id: nid, occ: '空闲', occupied: false, cover: 'assets/fr014/cover-m01.jpg',
+            genre: '小说', tags: [], imgs: 8, duration: 0, dl: payload.dl || ('https://ybdd.demo/ms/' + nid),
+            audit: '已通过', rejectReason: '', fileName: title
+          }, payload));
+          persist();
+          showToast('已录入，已通过的空闲稿件将出现在广场');
+        }
+        renderWorks();
+      });
+    }
+    function approveWork(id) {
+      var w = WORKS.find(function (x) { return x.id === id; });
+      if (!w) return;
+      w.audit = '已通过';
+      w.rejectReason = '';
+      persist();
+      renderWorks();
+      showToast('已通过，空闲稿将出现在广场');
+    }
+    function rejectWork(id) {
+      var w = WORKS.find(function (x) { return x.id === id; });
+      if (!w) return;
+      if ((w.audit || '已通过') !== '审核中') { showToast('仅审核中稿件可驳回'); return; }
+      if (w.occ !== '空闲') { showToast('占用中稿件不能驳回'); return; }
+      openModal('驳回稿件', '<p>驳回后不进广场，剪辑手 list 会出示原因。</p><div class="field"><label>驳回原因<span class="req">*</span></label><textarea id="rjReason" placeholder="例如：成片缺封面或书名不符"></textarea></div>', function () {
+        var reason = (document.getElementById('rjReason').value || '').trim();
+        if (!reason) { showToast('请填写驳回原因'); return true; }
+        w.audit = '已驳回';
+        w.rejectReason = reason;
+        persist();
+        renderWorks();
+        showToast('已驳回');
+      });
+    }
+    function deleteWork(id) {
+      var w = WORKS.find(function (x) { return x.id === id; });
+      if (!w) return;
+      if (w.occ === '占用中') { showToast('占用中的稿件不能删除'); return; }
+      if (CLAIMS.some(function (c) { return c.mid === id && c.status !== '已超时'; })) {
+        showToast('仍有未超时领取记录，不能删除');
+        return;
+      }
+      openModal('确认删除？', '<p>即将删除稿件「' + esc(w.title) + '」，广场将不再展示。</p>', function () {
+        STORE.works = WORKS = WORKS.filter(function (x) { return x.id !== id; });
+        persist();
+        renderWorks();
+        showToast('已删除');
+      }, true);
+    }
+    function deleteProject(id) {
+      var p = PROJECTS.find(function (x) { return x.id === id; });
+      if (!p) return;
+      if (WORKS.some(function (w) { return w.project === p.name; })) {
+        showToast('该项目仍有稿件，请先处理稿件或改为禁用');
+        return;
+      }
+      openModal('确认删除？', '<p>即将删除项目「' + esc(p.name) + '」。</p>', function () {
+        STORE.projects = PROJECTS = PROJECTS.filter(function (x) { return x.id !== id; });
+        persist();
+        renderProjects();
+        showToast('已删除');
+      }, true);
+    }
+    function renderMats() {
+      document.getElementById('matBody').innerHTML = MATS.map(function (m) {
+        return '<tr><td>' + esc(m.name) + '</td><td>上传必选 / feed 筛选</td><td>' +
+          (m.status === '启用' ? stTag('启用') : '<span class="tag tag-muted">禁用</span>') + '</td>' +
+          '<td><button class="link" type="button" onclick="openMatModal(\'' + m.id + '\')">编辑</button>' +
+          '<button class="link" type="button" onclick="toggleMat(\'' + m.id + '\')">' + (m.status === '启用' ? '停用' : '启用') + '</button>' +
+          '<button class="link link-danger" type="button" onclick="deleteMat(\'' + m.id + '\')">删除</button></td></tr>';
+      }).join('') || '<tr><td colspan="4" style="text-align:center;color:#9aa5b4">暂无</td></tr>';
+    }
+    function openMatModal(id) {
+      var row = id ? MATS.find(function (x) { return x.id === id; }) : null;
+      openModal(row ? '编辑素材类型' : '新增素材类型',
+        '<div class="field"><label>类型名称<span class="req">*</span></label><input id="matName" value="' + esc(row ? row.name : '') + '" /></div>',
+        function () {
+          var name = (document.getElementById('matName').value || '').trim();
+          if (!name) { showToast('请填写类型名称'); return true; }
+          if (row) {
+            var oldMat = row.name;
+            row.name = name;
+            if (oldMat !== name) WORKS.forEach(function (w) { if (w.mat === oldMat) w.mat = name; });
+            persist();
+            showToast('已更新');
+          }
+          else { MATS.push({ id: 'T-0' + (MATS.length + 1), name: name, status: '启用' }); persist(); showToast('已新增'); }
+          renderMats();
+        });
+    }
+    function toggleMat(id) {
+      var row = MATS.find(function (x) { return x.id === id; });
+      if (!row) return;
+      row.status = row.status === '启用' ? '禁用' : '启用';
+      persist();
+      renderMats();
+      showToast(row.status === '启用' ? '已启用' : '已停用，上传与广场筛选不再列出');
+    }
+    function deleteMat(id) {
+      var row = MATS.find(function (x) { return x.id === id; });
+      if (!row) return;
+      if (WORKS.some(function (w) { return w.mat === row.name; })) {
+        showToast('仍有稿件使用该类型，请改为停用');
+        return;
+      }
+      openModal('确认删除？', '<p>即将删除素材类型「' + esc(row.name) + '」。</p>', function () {
+        STORE.mats = MATS = MATS.filter(function (x) { return x.id !== id; });
+        persist();
+        renderMats();
+        showToast('已删除');
+      }, true);
+    }
+    function openSkuModal() {
+      openModal('新增档位',
+        '<div class="field"><label>次数<span class="req">*</span></label><input id="mT" type="number" value="5" /></div>' +
+        '<div class="field"><label>积分<span class="req">*</span></label><input id="mP" type="number" value="200" /></div>',
+        function () {
+          var t = Number(document.getElementById('mT').value);
+          var p = Number(document.getElementById('mP').value);
+          if (!(t > 0) || !(p > 0)) { showToast('次数与积分须为正数'); return true; }
+          SKUS.push({
+            id: nextPrefixedId('S-', SKUS),
+            times: t,
+            points: p,
+            on: false
+          });
+          persist();
+          renderSkus();
+          showToast('已新增，默认下架');
+        });
+    }
+    function saveFreeQuota() {
+      var n = Number(document.getElementById('freeQuota').value);
+      if (isNaN(n) || n < 0) { showToast('免费次数须为不小于 0 的数字'); return; }
+      STORE.user.free = n;
+      persist();
+      showToast('免费次数已保存，C 端剩余次数立即生效');
+    }
+    function renderAllAdmin() {
+      renderEditors();
+      renderWorks();
+      renderClaimsAdm();
+      renderBan();
+      renderSkus();
+      renderProjects();
+      renderMats();
+      var fq = document.getElementById('freeQuota');
+      if (fq) fq.value = STORE.user.free;
+    }
+
+    function syncSceneHint(scope, hintId) {
+      var btn = document.querySelector(scope + ' .scene-btn.active');
+      var hint = document.getElementById(hintId);
+      if (hint && btn) hint.textContent = btn.dataset.desc || '';
+    }
+    function setPreviewButtons(on) {
+      document.querySelectorAll('[data-preview]').forEach(function (b) {
+        b.textContent = on ? '退出全屏' : '全屏预览';
+        b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
+    }
+    function isPreviewOn() {
+      return !!(document.fullscreenElement || document.webkitFullscreenElement || document.body.classList.contains('preview-fs-fallback'));
+    }
+    function exitPreview() {
+      document.body.classList.remove('preview-fs-fallback');
+      document.querySelectorAll('.demo-layout').forEach(function (el) { el.classList.remove('is-preview'); });
+      setPreviewButtons(false);
+      if (document.fullscreenElement || document.webkitFullscreenElement) {
+        var exitFs = document.exitFullscreen || document.webkitExitFullscreen;
+        if (exitFs) {
+          var done = exitFs.call(document);
+          if (done && done.catch) done.catch(function () {});
+        }
+      }
+    }
+    function togglePreview(which) {
+      var layout = document.getElementById(which === 'pc' ? 'pcDemo' : 'feDemo');
+      if (!layout) return;
+      if (isPreviewOn()) { exitPreview(); return; }
+      layout.classList.add('is-preview');
+      setPreviewButtons(true);
+      var req = layout.requestFullscreen || layout.webkitRequestFullscreen;
+      if (req) {
+        req.call(layout).catch(function () { document.body.classList.add('preview-fs-fallback'); });
+      } else {
+        document.body.classList.add('preview-fs-fallback');
+      }
+    }
     function getActiveScreen() {
-      return document.querySelector('.scene-list .scene-btn.active')?.dataset.screen || 'feed';
+      return document.querySelector('#view-fe .scene-btn.active')?.dataset.screen || 'feed';
     }
     function currentTabKey() {
       var id = document.querySelector('.page-view.active')?.id;
-      return { 'view-fe': 'fe', 'view-admin': 'admin', 'view-flow': 'flow' }[id] || 'fe';
+      return { 'view-fe': 'fe', 'view-pc': 'pc', 'view-admin': 'admin', 'view-flow': 'flow' }[id] || 'fe';
     }
     function syncPageUrl() {
       var params = new URLSearchParams();
@@ -852,10 +1401,16 @@
       history.replaceState(null, '', '?' + params.toString());
     }
     function buildMockupSrc(screen) {
-      return 'yijian-daifa-demo.html?embed=1&v=10&screen=' + screen;
+      return 'yijian-daifa-demo.html?embed=1&v=19&screen=' + screen;
     }
     function loadMockupFrame() {
       document.getElementById('mockupFrame').src = buildMockupSrc(getActiveScreen());
+    }
+    function getActivePcScreen() {
+      return document.querySelector('#pcScenes .scene-btn.active')?.dataset.pcscreen || 'home';
+    }
+    function loadPcFrame() {
+      document.getElementById('pcFrame').src = 'yijian-daifa-pc.html?embed=1&v=4&screen=' + getActivePcScreen();
     }
     function switchRuleTab(ruleId, btn) {
       document.querySelectorAll('.rule-tab-bar button').forEach(function (b) { b.classList.remove('active'); });
@@ -865,7 +1420,7 @@
     }
     function syncRuleTabToPage() {
       var activePage = document.querySelector('.page-view.active')?.id;
-      var ruleId = activePage === 'view-admin' ? 'rule-admin' : 'rule-fe';
+      var ruleId = activePage === 'view-admin' ? 'rule-admin' : (activePage === 'view-pc' ? 'rule-pc' : 'rule-fe');
       var btn = document.querySelector('.rule-tab-bar button[data-rule="' + ruleId + '"]');
       if (btn) switchRuleTab(ruleId, btn);
     }
@@ -879,21 +1434,38 @@
     }
     toggleRuleBtn.onclick = function () { setRuleDrawer(!ruleDrawer.classList.contains('open')); };
 
-    document.querySelectorAll('.scene-btn').forEach(function (btn) {
+    document.querySelectorAll('#view-fe .scene-btn').forEach(function (btn) {
       btn.addEventListener('click', function () {
-        document.querySelectorAll('.scene-btn').forEach(function (b) { b.classList.remove('active'); });
+        document.querySelectorAll('#view-fe .scene-btn').forEach(function (b) { b.classList.remove('active'); });
         btn.classList.add('active');
+        syncSceneHint('#view-fe', 'feSceneHint');
         syncPageUrl();
         loadMockupFrame();
       });
     });
+    document.querySelectorAll('[data-preview]').forEach(function (btn) {
+      btn.addEventListener('click', function () { togglePreview(btn.dataset.preview); });
+    });
+    function onFsChange() {
+      if (document.fullscreenElement || document.webkitFullscreenElement) {
+        setPreviewButtons(true);
+        return;
+      }
+      if (document.body.classList.contains('preview-fs-fallback')) return;
+      document.querySelectorAll('.demo-layout').forEach(function (el) { el.classList.remove('is-preview'); });
+      setPreviewButtons(false);
+    }
+    document.addEventListener('fullscreenchange', onFsChange);
+    document.addEventListener('webkitfullscreenchange', onFsChange);
     document.querySelectorAll('.page-tab-bar button').forEach(function (btn) {
       btn.addEventListener('click', function () {
+        exitPreview();
         document.querySelectorAll('.page-tab-bar button').forEach(function (b) { b.classList.remove('active'); });
         document.querySelectorAll('.page-view').forEach(function (v) { v.classList.remove('active'); });
         btn.classList.add('active');
         document.getElementById(btn.dataset.page).classList.add('active');
         if (btn.dataset.page === 'view-fe') loadMockupFrame();
+        if (btn.dataset.page === 'view-pc') loadPcFrame();
         syncPageUrl();
         syncRuleTabToPage();
       });
@@ -914,22 +1486,32 @@
       closeDetail();
       closeModal();
       setRuleDrawer(false);
+      if (document.body.classList.contains('preview-fs-fallback')) exitPreview();
     });
 
     var params = new URLSearchParams(location.search);
     var tab = params.get('tab');
-    var tabPageMap = { admin: 'view-admin', flow: 'view-flow', fe: 'view-fe' };
+    var tabPageMap = { admin: 'view-admin', flow: 'view-flow', fe: 'view-fe', pc: 'view-pc' };
     if (tab && tabPageMap[tab]) {
       var tbtn = document.querySelector('[data-page="' + tabPageMap[tab] + '"]');
       if (tbtn) tbtn.click();
     }
-    renderEditors();
-    renderWorks();
-    renderClaimsAdm();
-    renderBan();
-    renderSkus();
-    renderBannersAdm();
+    renderAllAdmin();
+    YJD.onChange(function () {
+      rebind();
+      renderAllAdmin();
+    });
+    document.querySelectorAll('#pcScenes .scene-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('#pcScenes .scene-btn').forEach(function (b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        syncSceneHint('#pcScenes', 'pcSceneHint');
+        syncPageUrl();
+        loadPcFrame();
+      });
+    });
     if (document.querySelector('.page-view.active')?.id === 'view-fe') loadMockupFrame();
+    if (document.querySelector('.page-view.active')?.id === 'view-pc') loadPcFrame();
   </script>
   <script src="sidebar-nav.js"></script>
 </body>

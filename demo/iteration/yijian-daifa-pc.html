@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>右豹 · 创作者中心 · 剪辑供稿</title>
+  <style>
+    :root {
+      --orange: #ff6b1a;
+      --orange-light: #fff3eb;
+      --nav: #1a2332;
+      --bg: #f4f5f7;
+      --surface: #fff;
+      --text: #1a2332;
+      --muted: #8a93a0;
+      --border: #e6e8eb;
+      --exist: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; background: #d8dce3; color: var(--text); }
+    .pc-shell { max-width: 1180px; margin: 16px auto 32px; background: var(--surface); min-height: 720px; border-radius: 10px; overflow: hidden; box-shadow: 0 16px 48px rgba(0,0,0,.12); position: relative; }
+    body.embed-mode { background: #e8eaed; }
+    body.embed-mode .pc-shell { margin: 0; max-width: none; min-height: 100vh; border-radius: 0; box-shadow: none; }
+    .topbar {
+      height: 52px; background: var(--nav); color: #fff; display: flex; align-items: center;
+      justify-content: space-between; padding: 0 18px;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; }
+    .brand i { width: 26px; height: 26px; border-radius: 6px; background: var(--orange); display: grid; place-items: center; font-size: 12px; }
+    .brand-sub { font-size: 12px; font-weight: 500; color: #cbd5e1; margin-left: 8px; }
+    .who { font-size: 12px; color: #cbd5e1; }
+    .layout { display: grid; grid-template-columns: 200px 1fr; min-height: 668px; }
+    .side { background: #f8fafc; border-right: 1px solid var(--border); padding: 12px 8px; }
+    .side .hint { font-size: 10px; color: var(--exist); padding: 6px 10px 8px; }
+    .nav-btn {
+      display: block; width: 100%; text-align: left; border: none; background: none;
+      padding: 9px 12px; border-radius: 8px; font-size: 13px; color: var(--exist); cursor: pointer;
+    }
+    .nav-btn.exist { color: var(--exist); }
+    .nav-btn.on { background: var(--orange-light); color: var(--orange); font-weight: 700; }
+    .main { background: var(--bg); padding: 18px 20px 28px; min-width: 0; }
+    .view { display: none; }
+    .view.on { display: block; }
+    h1 { font-size: 18px; margin-bottom: 4px; }
+    .desc { font-size: 12px; color: var(--muted); margin-bottom: 16px; line-height: 1.5; }
+    .recruit-bn {
+      display: block; width: 100%; border: none; padding: 0; border-radius: 12px; overflow: hidden;
+      cursor: pointer; position: relative; min-height: 148px; text-align: left;
+      background: #16110e center/cover no-repeat;
+      margin-bottom: 16px;
+    }
+    .recruit-bn::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(0,0,0,.55), rgba(0,0,0,.15)); }
+    .recruit-bn .t { position: relative; z-index: 1; padding: 22px 24px; color: #fff; }
+    .recruit-bn .kicker { font-size: 11px; opacity: .85; letter-spacing: .04em; }
+    .recruit-bn h2 { font-size: 22px; margin: 6px 0 6px; }
+    .recruit-bn p { font-size: 13px; opacity: .92; line-height: 1.5; max-width: 520px; }
+    .recruit-bn .hint { margin-top: 10px; font-size: 12px; color: #ffd4b8; }
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+    .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+    .stat span { font-size: 12px; color: var(--muted); }
+    .stat b { display: block; margin-top: 8px; font-size: 22px; }
+    .stat em { display: block; margin-top: 4px; font-size: 11px; color: var(--muted); font-style: normal; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; margin-bottom: 12px; }
+    .card h2 { font-size: 14px; margin-bottom: 10px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip { padding: 4px 10px; border-radius: 999px; background: var(--orange-light); color: var(--orange); font-size: 12px; font-weight: 600; }
+    .chip.off { background: #f1f5f9; color: var(--muted); }
+    .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 12px; }
+    .btn { height: 34px; padding: 0 14px; border-radius: 8px; border: none; cursor: pointer; font-size: 13px; font-weight: 600; }
+    .btn-primary { background: var(--orange); color: #fff; }
+    .btn-ghost { background: #fff; border: 1px solid var(--border); color: #475569; }
+    .btn[disabled] { opacity: .45; cursor: not-allowed; }
+    .table-scroll { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 720px; }
+    th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { font-size: 11px; color: var(--muted); white-space: nowrap; }
+    .cell-sub { font-size: 11px; color: var(--muted); margin-top: 2px; word-break: break-all; }
+    .field { margin-bottom: 12px; }
+    .field label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+    .field input, .field select, .field textarea { width: 100%; padding: 0 10px; border: 1px solid var(--border); border-radius: 8px; font: inherit; }
+    .field input, .field select { height: 34px; }
+    .field textarea { min-height: 72px; padding: 8px 10px; resize: vertical; }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .empty {
+      padding: 48px 20px; text-align: center; color: var(--muted); line-height: 1.7;
+      background: var(--surface); border: 1px dashed var(--border); border-radius: 10px;
+    }
+    .empty b { display: block; color: var(--text); font-size: 14px; margin-bottom: 6px; }
+    .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: #1a2332; color: #fff; padding: 8px 14px; border-radius: 8px; font-size: 13px; opacity: 0; pointer-events: none; z-index: 50; }
+    .toast.show { opacity: 1; }
+    .tag { display: inline-flex; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+    .tag-ok { background: #f0fdf4; color: #16a34a; }
+    .tag-warn { background: #fffbeb; color: #d97706; }
+    .tag-del { background: #fef2f2; color: #dc2626; }
+    .tag-muted { background: #f1f5f9; color: var(--muted); }
+    .link { background: none; border: none; color: var(--orange); cursor: pointer; font-size: 12px; font-weight: 600; padding: 0 6px 0 0; }
+    .link-danger { color: #dc2626; }
+    .link[disabled] { color: var(--muted); cursor: not-allowed; }
+    .drawer-overlay {
+      position: absolute; inset: 0; background: rgba(15,23,42,.35); z-index: 20;
+      opacity: 0; pointer-events: none; transition: opacity .2s;
+    }
+    .drawer-overlay.open { opacity: 1; pointer-events: auto; }
+    .drawer {
+      position: absolute; top: 0; right: 0; bottom: 0; width: 400px; z-index: 21;
+      background: #fff; box-shadow: -8px 0 32px rgba(0,0,0,.16);
+      transform: translateX(100%); transition: transform .24s ease;
+      display: flex; flex-direction: column;
+    }
+    .drawer.open { transform: translateX(0); }
+    .drawer-header { padding: 16px 18px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .drawer-header h2 { font-size: 15px; }
+    .drawer-close { width: 28px; height: 28px; border: none; background: #f1f5f9; border-radius: 6px; cursor: pointer; }
+    .drawer-body { flex: 1; overflow-y: auto; padding: 16px 18px 28px; }
+    .drawer-body h3 { font-size: 13px; color: var(--orange); margin: 12px 0 6px; }
+    .drawer-body li { font-size: 13px; margin-left: 18px; line-height: 1.7; }
+    .qr-wrap { margin-top: 16px; text-align: center; }
+    .qr { width: 120px; height: 120px; margin: 0 auto; border-radius: 8px; background:
+      repeating-conic-gradient(#1a2332 0 25%, #fff 0 50%) 0 0 / 12px 12px; border: 4px solid #eee; }
+    .up-overlay { z-index: 30; }
+    .up-modal {
+      position: absolute; left: 50%; top: 50%; width: min(680px, calc(100% - 40px)); max-height: calc(100% - 48px);
+      transform: translate(-50%, -46%) scale(.98); z-index: 31; background: #fff; border-radius: 12px;
+      box-shadow: 0 24px 64px rgba(0,0,0,.22); display: none; flex-direction: column; overflow: hidden;
+    }
+    .up-modal.open { display: flex; transform: translate(-50%, -50%) scale(1); }
+    .up-head { padding: 16px 18px 12px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+    .up-head h2 { font-size: 16px; }
+    .up-head p { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    .steps { display: flex; gap: 8px; padding: 12px 18px 0; }
+    .step {
+      flex: 1; height: 32px; border-radius: 999px; background: #f1f5f9; color: var(--muted);
+      display: grid; place-items: center; font-size: 12px; font-weight: 600;
+    }
+    .step.on { background: var(--orange-light); color: var(--orange); }
+    .step.done { background: #f0fdf4; color: #16a34a; }
+    .up-body { padding: 16px 18px; overflow-y: auto; flex: 1; }
+    .up-foot { padding: 12px 18px 16px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; }
+    .pack-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .pack-card {
+      border: 1px solid var(--border); border-radius: 10px; padding: 16px; text-align: left;
+      background: #fff; cursor: pointer; min-height: 112px;
+    }
+    .pack-card.on { border-color: var(--orange); background: var(--orange-light); }
+    .pack-card b { display: block; font-size: 14px; margin-bottom: 6px; }
+    .pack-card span { font-size: 12px; color: var(--muted); line-height: 1.5; }
+    .pack-sum { margin-top: 14px; padding: 12px; border-radius: 8px; background: #f8fafc; font-size: 13px; line-height: 1.7; }
+    .sum-row { display: grid; grid-template-columns: 88px 1fr; gap: 8px; font-size: 13px; margin-bottom: 8px; }
+    .sum-row span { color: var(--muted); }
+    .confirm-box {
+      position: absolute; left: 50%; top: 50%; width: 400px; max-width: calc(100% - 40px);
+      transform: translate(-50%, -50%); z-index: 41; background: #fff; border-radius: 12px;
+      padding: 18px; display: none; box-shadow: 0 16px 40px rgba(0,0,0,.2);
+    }
+    .confirm-box.open { display: block; }
+    .confirm-box h3 { font-size: 15px; margin-bottom: 8px; }
+    .confirm-box p { font-size: 13px; color: #475569; line-height: 1.6; margin-bottom: 16px; }
+    .confirm-box .up-foot { padding: 0; border: none; }
+    .demo-nav { display: none; }
+    body:not(.embed-mode) .demo-nav { display: flex; gap: 8px; max-width: 1180px; margin: 16px auto 0; flex-wrap: wrap; }
+    body:not(.embed-mode) .demo-nav button { padding: 6px 10px; border-radius: 999px; border: 1px solid #ddd; background: #fff; font-size: 12px; cursor: pointer; }
+    body:not(.embed-mode) .demo-nav button.on { background: var(--orange-light); color: var(--orange); border-color: #ffd4b8; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <div class="demo-nav" id="sceneNav"></div>
+  <div class="pc-shell">
+    <header class="topbar">
+      <div class="brand"><i>右</i> 右豹<span class="brand-sub">创作者中心 · 已有 PC</span></div>
+      <div class="who" id="whoLine">未登录剪辑手</div>
+    </header>
+    <div class="layout">
+      <aside class="side">
+        <div class="hint">以下为已有业务线，本 FR 不改</div>
+        <button class="nav-btn exist" type="button" data-exist="项目中心">项目中心</button>
+        <button class="nav-btn exist" type="button" data-exist="作品管理">作品管理</button>
+        <button class="nav-btn exist" type="button" data-exist="收益中心">收益中心</button>
+        <div class="hint" style="margin-top:12px">本增量</div>
+        <button class="nav-btn on" type="button" data-go="home">剪辑供稿</button>
+      </aside>
+      <main class="main">
+        <section class="view" id="view-home">
+          <button class="recruit-bn" type="button" id="recruitBn" style="background-image:url('assets/fr014/bn-recruit.jpg')">
+            <div class="t">
+              <div class="kicker">剪辑手招募</div>
+              <h2>剪辑手招募中</h2>
+              <p>书和项目都备好，你来做图集和视频。扫码联系客服即可入驻。</p>
+              <div class="hint">点击查看招募详情 →</div>
+            </div>
+          </button>
+          <div class="toolbar">
+            <div>
+              <h1>剪辑手看板</h1>
+              <p class="desc" id="boardDesc">已授权项目与供稿结果</p>
+            </div>
+            <button class="btn btn-primary" type="button" id="goUpload" data-go="upload">上传稿件</button>
+          </div>
+          <div id="boardReady">
+            <div class="stats">
+              <div class="stat"><span>已授权项目</span><b id="stAuth">0</b><em>录入时可上传 ∩ 已启用</em></div>
+              <div class="stat"><span>上传的稿件</span><b id="stUp">0</b><em>我传到平台的全部</em></div>
+              <div class="stat"><span>已被领取</span><b id="stClaim">0</b><em>占用中 + 已回填完成</em></div>
+              <div class="stat"><span>已经产生的收益</span><b id="stEarn">0</b><em>仅已回填完成稿件已记收益</em></div>
+            </div>
+            <div class="card">
+              <h2>已授权项目</h2>
+              <div class="chips" id="authChips"></div>
+            </div>
+            <div class="card">
+              <div class="toolbar"><h2>最近上传</h2><button class="btn btn-ghost" type="button" data-go="list">查看全部 list</button></div>
+              <div class="table-scroll" id="recentBox"></div>
+            </div>
+          </div>
+          <div id="boardEmpty" class="empty" hidden>
+            <b>你还不是剪辑手</b>
+            请先点击上方招募入口，扫描客服二维码报名。<br />后台录入右豹 ID、分成比例、备注后，再看本看板。
+          </div>
+        </section>
+
+        <section class="view" id="view-list">
+          <div class="toolbar">
+            <div>
+              <h1>上传 list</h1>
+              <p class="desc">字段与后台稿件表一致，不展示下载链接。仅未占用稿件可删。提交后先走平台审核。</p>
+            </div>
+            <button class="btn btn-primary" type="button" data-go="upload">上传稿件</button>
+          </div>
+          <div class="card table-scroll" id="listBox"></div>
+        </section>
+      </main>
+    </div>
+    <div class="drawer-overlay" id="recruitOverlay"></div>
+    <aside class="drawer" id="recruitDrawer" role="dialog" aria-labelledby="recruitTitle">
+      <div class="drawer-header">
+        <h2 id="recruitTitle">剪辑手招募</h2>
+        <button class="drawer-close" type="button" id="recruitClose">×</button>
+      </div>
+      <div class="drawer-body">
+        <p class="desc">客服接入、后台录入。不在站内填申请表。</p>
+        <h3>卖点</h3>
+        <ul>
+          <li>不用自己找书、找项目，平台持续供稿</li>
+          <li>口播、混剪、图文切片按你擅长的类型接</li>
+          <li>客服一对一接入，后台录入后立刻能在电脑上传</li>
+        </ul>
+        <h3>适合谁</h3>
+        <ul>
+          <li>有成片作品、想接稳定兼职的剪辑手</li>
+          <li>不愿意走站内自助申请，愿意加客服沟通的人</li>
+        </ul>
+        <div class="qr-wrap">
+          <div class="qr" aria-label="客服二维码"></div>
+          <p class="desc" style="margin:8px 0 0">扫描二维码联系客服报名 · 无站内申请表</p>
+        </div>
+      </div>
+    </aside>
+
+    <div class="drawer-overlay up-overlay" id="upOverlay"></div>
+    <div class="up-modal" id="upModal" role="dialog" aria-labelledby="upTitle">
+      <div class="up-head">
+        <div>
+          <h2 id="upTitle">上传稿件</h2>
+          <p>必须用文件夹或压缩包。字段与后台一致。提交后进入平台审核，通过才进广场。</p>
+        </div>
+        <button class="drawer-close" type="button" id="upClose">×</button>
+      </div>
+      <div class="steps">
+        <div class="step on" id="step1">1 选成片</div>
+        <div class="step" id="step2">2 填字段</div>
+        <div class="step" id="step3">3 确认提交</div>
+      </div>
+      <div class="up-body">
+        <div id="upStep1">
+          <div class="pack-grid">
+            <button class="pack-card on" type="button" id="upPackFolder">
+              <b>文件夹</b>
+              <span>选择整夹成片。演示会读取夹名、文件数和总大小。</span>
+            </button>
+            <button class="pack-card" type="button" id="upPackZip">
+              <b>压缩包</b>
+              <span>支持 zip。演示读取包名和大小，不真实解压。</span>
+            </button>
+          </div>
+          <input id="upFolder" type="file" webkitdirectory multiple hidden />
+          <input id="upZip" type="file" accept=".zip,.rar,.7z" hidden />
+          <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-ghost" type="button" id="upPickReal">选择本地成片</button>
+            <button class="btn btn-primary" type="button" id="upUseDemo">使用演示文件夹</button>
+          </div>
+          <div class="pack-sum" id="upPackSum">尚未选择文件夹或压缩包。</div>
+        </div>
+        <div id="upStep2" hidden>
+          <div class="field-row">
+            <div class="field"><label>标题</label><input id="upTitleField" /></div>
+            <div class="field"><label>选择项目</label><select id="upProject"></select></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>书籍名称</label><input id="upBook" value="我成了老公掌心宠" /></div>
+            <div class="field"><label>书籍 ID</label><input id="upBookId" value="7128491023" /></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>稿件类型</label><select id="upKind"><option>图集</option><option>视频</option></select></div>
+            <div class="field"><label>素材类型</label><select id="upMat"></select></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>稿件名称</label><input id="upFileName" /></div>
+            <div class="field"><label>稿件大小</label><input id="upSize" /></div>
+          </div>
+          <div class="field"><label>作品标题</label><input id="upPubT" /></div>
+          <div class="field"><label>作品描述</label><textarea id="upPubD" placeholder="给领取用户看的发布描述"></textarea></div>
+          <div class="field"><label>剪辑手</label><input id="upEditor" readonly /></div>
+        </div>
+        <div id="upStep3" hidden>
+          <p class="desc">核对后提交审核。审核中不进用户广场；驳回后 list 出示原因。</p>
+          <div id="upConfirmSum"></div>
+        </div>
+      </div>
+      <div class="up-foot">
+        <button class="btn btn-ghost" type="button" id="upBack" hidden>上一步</button>
+        <button class="btn btn-primary" type="button" id="upNext">下一步</button>
+        <button class="btn btn-primary" type="button" id="doPublish" hidden>提交审核</button>
+      </div>
+    </div>
+
+    <div class="drawer-overlay up-overlay" id="pcConfirmOverlay"></div>
+    <div class="confirm-box" id="pcConfirm">
+      <h3 id="pcConfirmTitle">确认删除？</h3>
+      <p id="pcConfirmBody"></p>
+      <div class="up-foot">
+        <button class="btn btn-ghost" type="button" id="pcConfirmCancel">取消</button>
+        <button class="btn btn-primary" type="button" id="pcConfirmOk">确认删除</button>
+      </div>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+  <script src="yijian-daifa-store.js"></script>
+  <script>
+    var SCREENS = [
+      { id: 'home', label: '剪辑供稿' },
+      { id: 'guest', label: '非剪辑手缺省' },
+      { id: 'recruit', label: '招募详情抽屉' },
+      { id: 'upload', label: '上传入口' },
+      { id: 'list', label: '上传 list' }
+    ];
+    var embedMode = /(?:^|[?&])embed=1(?:&|$)/.test(location.search);
+    var STORE = YJD.open({ reset: !embedMode });
+    var scene = 'home';
+    var reportScene = 'home';
+    var forceGuest = false;
+    var upStep = 1;
+    var upPackType = '文件夹';
+    var upPack = null;
+    var pendingDeleteId = '';
+
+    function toast(msg) {
+      var el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(toast._t);
+      toast._t = setTimeout(function () { el.classList.remove('show'); }, 1800);
+    }
+    function persist() { YJD.save(STORE); }
+    function rebind() { STORE = YJD.open(); }
+    function esc(s) {
+      return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+        return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
+      });
+    }
+
+    function currentEditor() {
+      if (forceGuest) return null;
+      return YJD.editorByName(STORE, '庭宇') || YJD.enrolledEditors(STORE)[0] || null;
+    }
+    function canUpload(ed) { return !!(ed && ed.status === '已录入'); }
+
+    function setRecruitDrawer(open) {
+      document.getElementById('recruitOverlay').classList.toggle('open', open);
+      document.getElementById('recruitDrawer').classList.toggle('open', open);
+    }
+    function setUpModal(open) {
+      document.getElementById('upOverlay').classList.toggle('open', open);
+      document.getElementById('upModal').classList.toggle('open', open);
+      if (open) {
+        upStep = 1;
+        if (!upPack) renderPackSum();
+        paintUpStep();
+        fillUploadFields();
+      }
+    }
+    function setConfirm(open, title, body) {
+      if (title) document.getElementById('pcConfirmTitle').textContent = title;
+      if (body) document.getElementById('pcConfirmBody').textContent = body;
+      document.getElementById('pcConfirmOverlay').classList.toggle('open', open);
+      document.getElementById('pcConfirm').classList.toggle('open', open);
+    }
+
+    function showView(id) {
+      var openDrawer = false;
+      var openUpload = false;
+      if (id === 'guest') { forceGuest = true; id = 'home'; }
+      else if (id === 'recruit') { openDrawer = true; id = 'home'; }
+      else if (id === 'board' || id === 'home') { forceGuest = false; id = 'home'; }
+      else if (id === 'upload') {
+        if (!canUpload(currentEditor())) {
+          forceGuest = true;
+          id = 'home';
+          toast('未录入剪辑手，无法上传发布');
+        } else {
+          openUpload = true;
+          id = (scene === 'list') ? 'list' : 'home';
+          forceGuest = false;
+        }
+      }
+      if ((id === 'list') && !canUpload(currentEditor())) {
+        forceGuest = true;
+        id = 'home';
+        toast('未录入剪辑手，无法上传发布');
+      }
+      scene = id;
+      reportScene = forceGuest ? 'guest' : (openDrawer ? 'recruit' : (openUpload ? 'upload' : id));
+      document.querySelectorAll('.view').forEach(function (v) { v.classList.remove('on'); });
+      var el = document.getElementById('view-' + id);
+      if (!el) { id = 'home'; scene = 'home'; el = document.getElementById('view-home'); }
+      el.classList.add('on');
+      document.querySelectorAll('.side .nav-btn[data-go]').forEach(function (b) {
+        b.classList.toggle('on', b.dataset.go === 'home');
+      });
+      document.querySelectorAll('#sceneNav button').forEach(function (b) {
+        b.classList.toggle('on', b.dataset.screen === reportScene);
+      });
+      render();
+      setRecruitDrawer(openDrawer);
+      if (openUpload) setUpModal(true);
+      else setUpModal(false);
+      if (window.parent !== window) window.parent.postMessage({ type: 'yijianDaifaPcScreen', screen: reportScene }, '*');
+    }
+
+    function occTag(occ) {
+      if (occ === '空闲') return '<span class="tag tag-ok">空闲</span>';
+      if (occ === '占用中') return '<span class="tag tag-warn">占用中</span>';
+      return '<span class="tag tag-muted">' + esc(occ) + '</span>';
+    }
+    function auditTag(w) {
+      var a = w.audit || '已通过';
+      if (a === '已通过') return '<span class="tag tag-ok">已通过</span>';
+      if (a === '审核中') return '<span class="tag tag-warn">审核中</span>';
+      var reason = w.rejectReason ? '<div class="cell-sub">原因：' + esc(w.rejectReason) + '</div>' : '';
+      return '<span class="tag tag-del">已驳回</span>' + reason;
+    }
+    function recentTable(rows) {
+      if (!rows.length) return '<div class="empty">还没有上传记录</div>';
+      return '<table><thead><tr><th>书籍 ID</th><th>稿件信息</th></tr></thead><tbody>' +
+        rows.map(function (w) {
+          return '<tr><td>' + esc(w.bookId || '—') + '</td>' +
+            '<td>' + esc(w.size || '—') + '<div class="cell-sub">' + esc(w.fileName || w.title) + '</div></td></tr>';
+        }).join('') + '</tbody></table>';
+    }
+    function fullTable(rows) {
+      if (!rows.length) return '<div class="empty">还没有上传记录</div>';
+      return '<table><thead><tr><th>ID</th><th>标题</th><th>项目</th><th>书</th><th>稿件信息</th><th>发布技巧</th><th>剪辑手</th><th>类型</th><th>素材类型</th><th>占用</th><th>审核</th><th>上传时间</th><th>操作</th></tr></thead><tbody>' +
+        rows.map(function (w) {
+          var idle = w.occ === '空闲';
+          var del = idle
+            ? '<button class="link link-danger" type="button" data-del="' + esc(w.id) + '">删除</button>'
+            : '<button class="link" type="button" disabled title="仅未占用可删">删除</button>';
+          return '<tr><td>' + esc(w.id) + '</td><td>' + esc(w.title) + '</td><td>' + esc(w.project) + '</td>' +
+            '<td>' + esc(w.book) + '<div class="cell-sub">书籍 ID ' + esc(w.bookId || '—') + '</div></td>' +
+            '<td>' + esc(w.size || '—') + '<div class="cell-sub">' + esc(w.fileName || w.title) + '</div></td>' +
+            '<td>' + esc(w.pubTitle || '—') + '<div class="cell-sub">' + esc(w.pubDesc || '') + '</div></td>' +
+            '<td>' + esc(w.editor) + '</td><td>' + esc(w.kind) + '</td><td>' + esc(w.mat) + '</td>' +
+            '<td>' + occTag(w.occ) + '</td><td>' + auditTag(w) + '</td><td>' + esc(w.time) + '</td><td>' + del + '</td></tr>';
+        }).join('') + '</tbody></table>';
+    }
+    function fillSelect(id, names) {
+      var el = document.getElementById(id);
+      el.innerHTML = names.length
+        ? names.map(function (n) { return '<option>' + n + '</option>'; }).join('')
+        : '<option value="">暂无可用项</option>';
+    }
+    function fillUploadFields() {
+      var ed = currentEditor();
+      if (!canUpload(ed)) return;
+      fillSelect('upProject', YJD.authorizedProjects(STORE, ed));
+      fillSelect('upMat', YJD.enabledMats(STORE).map(function (m) { return m.name; }));
+      document.getElementById('upEditor').value = ed.name;
+      if (upPack) {
+        if (!document.getElementById('upFileName').value) document.getElementById('upFileName').value = upPack.fileName;
+        if (!document.getElementById('upSize').value) document.getElementById('upSize').value = upPack.size;
+        if (!document.getElementById('upTitleField').value) document.getElementById('upTitleField').value = upPack.fileName;
+        if (!document.getElementById('upPubT').value) document.getElementById('upPubT').value = upPack.fileName;
+      }
+    }
+    function renderPackSum() {
+      var el = document.getElementById('upPackSum');
+      if (!upPack) { el.textContent = '尚未选择文件夹或压缩包。'; return; }
+      el.innerHTML = '已选 <b>' + esc(upPack.type) + '</b> · ' + esc(upPack.fileName) +
+        '<div class="cell-sub">大小 ' + esc(upPack.size) + (upPack.count ? ' · ' + upPack.count + ' 个文件' : '') + '</div>';
+    }
+    function paintUpStep() {
+      [1, 2, 3].forEach(function (n) {
+        var el = document.getElementById('step' + n);
+        el.classList.toggle('on', n === upStep);
+        el.classList.toggle('done', n < upStep);
+        document.getElementById('upStep' + n).hidden = n !== upStep;
+      });
+      document.getElementById('upBack').hidden = upStep === 1;
+      document.getElementById('upNext').hidden = upStep === 3;
+      document.getElementById('doPublish').hidden = upStep !== 3;
+      document.getElementById('upPackFolder').classList.toggle('on', upPackType === '文件夹');
+      document.getElementById('upPackZip').classList.toggle('on', upPackType === '压缩包');
+      if (upStep === 3) renderConfirm();
+    }
+    function renderConfirm() {
+      var f = readForm();
+      document.getElementById('upConfirmSum').innerHTML =
+        '<div class="sum-row"><span>成片</span><b>' + esc(upPack ? upPack.type + ' · ' + upPack.fileName : '—') + '</b></div>' +
+        '<div class="sum-row"><span>标题</span><b>' + esc(f.title) + '</b></div>' +
+        '<div class="sum-row"><span>项目</span><b>' + esc(f.project) + '</b></div>' +
+        '<div class="sum-row"><span>书</span><b>' + esc(f.book) + ' / ' + esc(f.bookId) + '</b></div>' +
+        '<div class="sum-row"><span>稿件信息</span><b>' + esc(f.size) + ' · ' + esc(f.fileName) + '</b></div>' +
+        '<div class="sum-row"><span>发布技巧</span><b>' + esc(f.pubTitle) + '<div class="cell-sub">' + esc(f.pubDesc) + '</div></b></div>' +
+        '<div class="sum-row"><span>类型 / 素材</span><b>' + esc(f.kind) + ' / ' + esc(f.mat) + '</b></div>' +
+        '<div class="sum-row"><span>剪辑手</span><b>' + esc(f.editor) + '</b></div>';
+    }
+    function readForm() {
+      return {
+        title: (document.getElementById('upTitleField').value || '').trim(),
+        project: document.getElementById('upProject').value,
+        book: (document.getElementById('upBook').value || '').trim(),
+        bookId: (document.getElementById('upBookId').value || '').trim(),
+        kind: document.getElementById('upKind').value,
+        mat: document.getElementById('upMat').value,
+        fileName: (document.getElementById('upFileName').value || '').trim(),
+        size: (document.getElementById('upSize').value || '').trim(),
+        pubTitle: (document.getElementById('upPubT').value || '').trim(),
+        pubDesc: (document.getElementById('upPubD').value || '').trim(),
+        editor: document.getElementById('upEditor').value
+      };
+    }
+    function fmtSize(bytes) {
+      if (!bytes) return '0 MB';
+      return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+    function setPack(pack) {
+      upPack = pack;
+      renderPackSum();
+      fillUploadFields();
+    }
+
+    function render() {
+      var ed = currentEditor();
+      var ok = canUpload(ed);
+      document.getElementById('whoLine').textContent = ok
+        ? (ed.name + ' · ' + ed.ybId + ' · 分成 ' + ed.share)
+        : '未录入剪辑手';
+      document.getElementById('boardReady').hidden = !ok;
+      document.getElementById('boardEmpty').hidden = ok;
+      document.getElementById('goUpload').hidden = !ok;
+      document.getElementById('boardDesc').textContent = ok ? (ed.name + ' 的供稿看板') : '需已录入剪辑手权限';
+      if (ok) {
+        var works = YJD.worksByEditor(STORE, ed.name);
+        var auth = YJD.authorizedProjects(STORE, ed);
+        document.getElementById('stAuth').textContent = auth.length;
+        document.getElementById('stUp').textContent = works.length;
+        document.getElementById('stClaim').textContent = YJD.claimedWorksByEditor(STORE, ed.name).length;
+        document.getElementById('stEarn').textContent = YJD.earnByEditor(STORE, ed.name);
+        document.getElementById('authChips').innerHTML = auth.length
+          ? auth.map(function (n) { return '<span class="chip">' + n + '</span>'; }).join('')
+          : '<span class="chip off">暂无已启用的授权项目</span>';
+        document.getElementById('recentBox').innerHTML = recentTable(works.slice(0, 4));
+      }
+      if (scene === 'list' && ok) {
+        document.getElementById('listBox').innerHTML = fullTable(YJD.worksByEditor(STORE, ed.name));
+        document.getElementById('listBox').querySelectorAll('[data-del]').forEach(function (btn) {
+          btn.addEventListener('click', function () { askDelete(btn.dataset.del); });
+        });
+      }
+    }
+
+    function askDelete(id) {
+      var w = STORE.works.find(function (x) { return x.id === id; });
+      if (!w) return;
+      if (w.occ !== '空闲') { toast('仅未占用的稿件可删除'); return; }
+      pendingDeleteId = id;
+      setConfirm(true, '确认删除？', '即将删除未占用稿件「' + w.title + '」。占用中与已完成不能删。');
+    }
+    function doDelete() {
+      var w = STORE.works.find(function (x) { return x.id === pendingDeleteId; });
+      if (!w || w.occ !== '空闲') { toast('仅未占用的稿件可删除'); setConfirm(false); return; }
+      STORE.works = STORE.works.filter(function (x) { return x.id !== pendingDeleteId; });
+      persist();
+      pendingDeleteId = '';
+      setConfirm(false);
+      toast('已删除');
+      render();
+    }
+
+    function goNext() {
+      if (upStep === 1) {
+        if (!upPack) { toast('请先选择文件夹或压缩包'); return; }
+        upStep = 2;
+        fillUploadFields();
+      } else if (upStep === 2) {
+        var f = readForm();
+        var ed = currentEditor();
+        var allowed = YJD.authorizedProjects(STORE, ed);
+        if (!f.title || !f.project || !f.book || !f.bookId || !f.mat || !f.fileName || !f.size || !f.pubTitle || !f.pubDesc) {
+          toast('请填齐标题、项目、书、书籍 ID、素材、稿件名称、大小、作品标题、作品描述');
+          return;
+        }
+        if (allowed.indexOf(f.project) === -1) { toast('该项目未授权或已禁用，不可上传'); return; }
+        if (!YJD.enabledMats(STORE).some(function (m) { return m.name === f.mat; })) { toast('请选择启用中的素材类型'); return; }
+        upStep = 3;
+      }
+      paintUpStep();
+    }
+    function doPublish() {
+      var ed = currentEditor();
+      if (!canUpload(ed)) { toast('未录入剪辑手，无法上传发布'); showView('guest'); return; }
+      if (!upPack) { toast('请先选择文件夹或压缩包'); upStep = 1; paintUpStep(); return; }
+      var f = readForm();
+      if (YJD.authorizedProjects(STORE, ed).indexOf(f.project) === -1) { toast('该项目未授权或已禁用，不可上传'); return; }
+      if (!YJD.enabledMats(STORE).some(function (m) { return m.name === f.mat; })) { toast('请选择启用中的素材类型'); return; }
+      if (!f.pubDesc) { toast('请填齐发布描述'); return; }
+      var nid = 'M-' + Date.now();
+      STORE.works.unshift({
+        id: nid, title: f.title, project: f.project, book: f.book, bookId: f.bookId,
+        size: f.size, fileName: f.fileName, dl: 'https://ybdd.demo/ms/' + nid,
+        editor: ed.name, kind: f.kind, mat: f.mat,
+        occ: '空闲', occupied: false, time: '刚刚', share: ed.share,
+        cover: 'assets/fr014/cover-m01.jpg', genre: f.kind === '视频' ? '视频' : '小说',
+        tags: [], imgs: f.kind === '图集' ? 8 : 0, duration: f.kind === '视频' ? 15 : 0,
+        pubTitle: f.pubTitle, pubDesc: f.pubDesc, earn: 0,
+        audit: '审核中', rejectReason: ''
+      });
+      persist();
+      upPack = null;
+      document.getElementById('upTitleField').value = '';
+      document.getElementById('upFileName').value = '';
+      document.getElementById('upPubT').value = '';
+      document.getElementById('upPubD').value = '';
+      toast('已提交审核，通过后才会出现在用户广场');
+      showView('list');
+    }
+
+    document.getElementById('upPackFolder').onclick = function () {
+      upPackType = '文件夹';
+      paintUpStep();
+    };
+    document.getElementById('upPackZip').onclick = function () {
+      upPackType = '压缩包';
+      paintUpStep();
+    };
+    document.getElementById('upPickReal').onclick = function () {
+      if (upPackType === '文件夹') document.getElementById('upFolder').click();
+      else document.getElementById('upZip').click();
+    };
+    document.getElementById('upUseDemo').onclick = function () {
+      setPack({
+        type: upPackType,
+        fileName: upPackType === '压缩包' ? '闭环演示包.zip' : '闭环演示文件夹',
+        size: '18.6 MB',
+        count: upPackType === '压缩包' ? 1 : 12
+      });
+    };
+    document.getElementById('upFolder').onchange = function () {
+      var files = Array.prototype.slice.call(this.files || []);
+      if (!files.length) return;
+      var root = (files[0].webkitRelativePath || files[0].name).split('/')[0];
+      var bytes = files.reduce(function (n, f) { return n + (f.size || 0); }, 0);
+      setPack({ type: '文件夹', fileName: root, size: fmtSize(bytes), count: files.length });
+    };
+    document.getElementById('upZip').onchange = function () {
+      var f = this.files && this.files[0];
+      if (!f) return;
+      setPack({ type: '压缩包', fileName: f.name, size: fmtSize(f.size), count: 1 });
+    };
+    document.getElementById('upNext').onclick = goNext;
+    document.getElementById('upBack').onclick = function () { upStep = Math.max(1, upStep - 1); paintUpStep(); };
+    document.getElementById('doPublish').onclick = doPublish;
+    document.getElementById('upClose').onclick = function () { setUpModal(false); };
+    document.getElementById('upOverlay').onclick = function () { setUpModal(false); };
+    document.getElementById('pcConfirmOk').onclick = doDelete;
+    document.getElementById('pcConfirmCancel').onclick = function () { setConfirm(false); };
+    document.getElementById('pcConfirmOverlay').onclick = function () { setConfirm(false); };
+    document.getElementById('recruitBn').onclick = function () { setRecruitDrawer(true); };
+    document.getElementById('recruitClose').onclick = function () { setRecruitDrawer(false); };
+    document.getElementById('recruitOverlay').onclick = function () { setRecruitDrawer(false); };
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape') return;
+      setRecruitDrawer(false);
+      setUpModal(false);
+      setConfirm(false);
+    });
+    document.querySelectorAll('[data-go]').forEach(function (btn) {
+      btn.addEventListener('click', function () { showView(btn.dataset.go); });
+    });
+    document.querySelectorAll('.nav-btn.exist').forEach(function (btn) {
+      btn.addEventListener('click', function () { toast(btn.dataset.exist + '是现有功能，本 FR 不改'); });
+    });
+    document.getElementById('sceneNav').innerHTML = SCREENS.map(function (s) {
+      return '<button type="button" data-screen="' + s.id + '">' + s.label + '</button>';
+    }).join('');
+    document.querySelectorAll('#sceneNav button').forEach(function (btn) {
+      btn.addEventListener('click', function () { showView(btn.dataset.screen); });
+    });
+
+    if (embedMode) document.body.classList.add('embed-mode');
+    var params = new URLSearchParams(location.search);
+    showView(params.get('screen') || 'home');
+    window.addEventListener('message', function (e) {
+      if (e.data && e.data.type === 'setPcScreen') showView(e.data.screen);
+    });
+    window.addEventListener('storage', function (e) {
+      if (e.key !== YJD.KEY) return;
+      rebind();
+      render();
+    });
+  </script>
+</body>
+</html>
