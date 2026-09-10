@@ -21,3 +21,11 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-014-2-visibility-gates.md`
   summary: 其它写死 M-01 的 QA 入口没有超时空守卫
   evidence: 本 story 只护了 applyScene('timeout')
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-fr014-yijian-daifa-v7.md`
+  summary: brownfield.md 仍写旧的四 Tab（前端 / PC / 后台 / 业务流程）
+  evidence: 本增量任务只同步 SPEC / surfaces / flows，未改 brownfield
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-fr014-yijian-daifa-v7.md`
+  summary: Sprint 概览 framework-shell 仍标 FR-014 v6 与旧 Tab 文案
+  evidence: 规格未要求改框架壳，属入口文档漂移

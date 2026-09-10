@@ -1,5 +1,7 @@
 """FR-014 一键代发：feed 隐藏占用、领取门禁、购次、回填、后台页。"""
 
+import re
+
 from playwright.sync_api import expect
 
 
@@ -151,15 +153,35 @@ def test_fr_shell_admin_and_flow(page, demo_server):
     expect(page.locator("#edBody")).to_contain_text("林夏")
     page.locator('.admin-tab-bar button[data-admin="admin-skus"]').click()
     expect(page.locator("#skuBody")).to_contain_text("120")
-    page.locator('.page-tab-bar button[data-page="view-flow"]').click()
-    expect(page.locator(".flow-svg-wrap")).to_contain_text("已选通过关键词?")
-    expect(page.locator(".flow-svg-wrap")).to_contain_text("稿件空闲未占用?")
-    expect(page.locator(".flow-svg-wrap")).to_contain_text("项目已启用?")
-    expect(page.locator(".flow-svg-wrap")).to_contain_text("审核通过?")
-    expect(page.locator(".flow-svg-wrap")).to_contain_text("后台手动恢复")
+    expect(page.locator('.page-tab-bar button[data-page="view-flow"]')).to_have_count(0)
+    expect(page.locator(".page-tab-bar")).not_to_contain_text("业务流程")
+    expect(page.locator(".page-tab-bar")).to_contain_text("业务解释")
+    expect(page.locator(".page-tab-bar")).to_contain_text("前后端数据交互")
+    page.locator('.page-tab-bar button[data-page="view-explain"]').click()
+    expect(page.locator("#view-explain")).to_contain_text("不会剪辑也能做项目")
+    expect(page.locator("#view-explain")).to_contain_text("演示预览用现有封面凑 3 张，不是书内页。")
+    page.locator('.page-tab-bar button[data-page="view-data"]').click()
+    expect(page.locator("#view-data")).to_contain_text("将落地契约")
+    expect(page.locator("#view-data")).to_contain_text("本 Demo 无真实 HTTP")
+    expect(page.locator("#view-data")).to_contain_text("状态机")
+    expect(page.locator("#view-data")).to_contain_text("次数不足")
+    page.locator('.page-tab-bar button[data-page="view-fe"]').click()
+    page.locator('#view-fe .module-tab-bar button[data-sub="fe-flow"]').click()
+    expect(page.locator("#fe-flow")).to_contain_text("已选通过关键词?")
+    expect(page.locator("#fe-flow")).to_contain_text("稿件空闲未占用?")
+    expect(page.locator("#fe-flow")).to_contain_text("后台手动恢复")
+    page.locator('.page-tab-bar button[data-page="view-pc"]').click()
+    page.locator('#view-pc .module-tab-bar button[data-sub="pc-flow"]').click()
+    expect(page.locator("#pc-flow")).to_contain_text("项目已启用?")
+    expect(page.locator("#pc-flow")).to_contain_text("审核通过?")
+    page.locator('.page-tab-bar button[data-page="view-admin"]').click()
+    page.locator('.admin-tab-bar button[data-admin="admin-works"]').click()
+    page.locator('#admin-works .module-tab-bar button[data-sub="admin-works-flow"]').click()
+    expect(page.locator("#admin-works-flow")).to_contain_text("审核通过?")
     page.locator("#toggleRuleDrawer").click()
     expect(page.locator("#ruleDrawer")).to_have_class("drawer open")
     expect(page.locator("#rule-fe")).to_contain_text("作品广场")
+    expect(page.locator("#rule-fe")).to_contain_text("前端交互 → 业务流程")
     expect(page.locator(".badge-version")).to_contain_text("v7")
     page.locator("#ruleDrawer .drawer-close").click()
     expect(page.locator("#ruleDrawer")).not_to_have_class("drawer open")
@@ -168,6 +190,68 @@ def test_fr_shell_admin_and_flow(page, demo_server):
     expect(page.locator("#pcFrame")).to_be_visible()
     expect(page.locator("#pcScenes")).to_contain_text("剪辑供稿")
     expect(page.locator('[data-preview="pc"]')).to_have_text("全屏预览")
+    page.goto(f"{demo_server}/fr-opc-yijian-daifa.html?tab=flow", wait_until="domcontentloaded")
+    expect(page.locator("#fe-flow")).to_be_visible()
+    expect(page.locator("#fe-flow")).to_contain_text("已选通过关键词?")
+
+
+def test_album_preview_limit_and_no_save(page, demo_server):
+    page.goto(f"{demo_server}/yijian-daifa-demo.html?screen=detail", wait_until="domcontentloaded")
+    expect(page.locator("#albumPreview .media-badge")).to_contain_text("12 张")
+    page.evaluate(
+        """() => {
+          window.__dlCalls = 0;
+          const orig = window.downloadManuscript;
+          window.downloadManuscript = function () {
+            window.__dlCalls += 1;
+            if (typeof orig === 'function') return orig.apply(this, arguments);
+          };
+        }"""
+    )
+    page.locator("#albumPreview").click()
+    expect(page.locator("#previewMask")).to_have_class("preview-mask show")
+    expect(page.locator("#previewCount")).to_have_text("1 / 3")
+    expect(page.locator("#previewImg")).to_have_attribute("src", re.compile(r"cover-m01"))
+    expect(page.locator("#previewWm")).to_contain_text("U-10086")
+    expect(page.locator("#loadMask")).not_to_have_class(re.compile(r"\bshow\b"))
+    expect(page.locator("#toast")).not_to_contain_text("保存到相册")
+    assert page.evaluate("() => window.__dlCalls") == 0
+
+    page.evaluate(
+        """() => {
+          Object.defineProperty(document, 'hidden', { configurable: true, get: () => true });
+          document.dispatchEvent(new Event('visibilitychange'));
+        }"""
+    )
+    expect(page.locator("#previewStage")).to_have_class(re.compile(r"is-blur"))
+    page.evaluate(
+        """() => {
+          Object.defineProperty(document, 'hidden', { configurable: true, get: () => false });
+          document.dispatchEvent(new Event('visibilitychange'));
+        }"""
+    )
+    expect(page.locator("#previewStage")).to_have_class(re.compile(r"is-blur"))
+    expect(page.locator("#previewWm")).to_contain_text("U-10086")
+
+    page.locator("#previewClose").click()
+    page.evaluate(
+        """() => {
+          const w = STORE.works.find((x) => x.id === 'M-01');
+          w.preview = [];
+          YJD.save(STORE);
+          renderDetail();
+        }"""
+    )
+    page.locator("#albumPreview").click()
+    expect(page.locator("#previewCount")).to_have_text("1 / 3")
+    expect(page.locator("#previewImg")).to_have_attribute("src", re.compile(r"cover-m01"))
+    page.locator("#previewClose").click()
+
+    page.evaluate("state.current = 'M-02'; showScreen('detail')")
+    expect(page.locator("#previewMask")).not_to_have_class(re.compile(r"\bshow\b"))
+    page.locator("#playVideo").click()
+    expect(page.locator("#previewMask")).not_to_have_class(re.compile(r"\bshow\b"))
+    expect(page.locator("#albumPreview")).to_have_count(0)
 
 
 def test_covers_banner_poster_and_claim_detail(page, demo_server):

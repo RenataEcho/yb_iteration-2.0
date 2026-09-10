@@ -77,6 +77,18 @@
     };
   }
 
+  function albumPreview(cover) {
+    var own = String(cover || '').replace(/^assets\/fr014\//, '');
+    var pool = ['cover-m01.jpg', 'cover-m03.jpg', 'cover-m04.jpg', 'cover-m06.jpg'];
+    var out = [];
+    if (own) out.push('assets/fr014/' + own);
+    pool.forEach(function (c) {
+      var url = 'assets/fr014/' + c;
+      if (out.indexOf(url) < 0 && out.length < 3) out.push(url);
+    });
+    return out.slice(0, 3);
+  }
+
   function work(id, title, project, book, bookId, size, editor, kind, mat, occ, time, share, cover, genre, tags, imgs, pubTitle, pubDesc, duration, audit, rejectReason) {
     return {
       id: id, title: title, project: project, book: book, bookId: bookId, size: size,
@@ -87,7 +99,8 @@
       earn: occ === '已完成' && id === 'M-06' ? 186 : 0,
       audit: audit || '已通过',
       rejectReason: rejectReason || '',
-      fileName: title
+      fileName: title,
+      preview: kind === '图集' ? albumPreview(cover) : []
     };
   }
 
@@ -127,6 +140,12 @@
       if (!w.audit) w.audit = '已通过';
       if (w.rejectReason == null) w.rejectReason = '';
       if (!w.fileName) w.fileName = w.title;
+      if (w.kind === '图集') {
+        var list = Array.isArray(w.preview) ? w.preview.filter(Boolean) : [];
+        w.preview = (list.length ? list : albumPreview(w.cover)).slice(0, 3);
+      } else {
+        w.preview = [];
+      }
     });
   }
 
@@ -234,6 +253,7 @@
     enrolledEditors: enrolledEditors,
     parseProjectNames: parseProjectNames,
     authorizedProjects: authorizedProjects,
+    albumPreview: albumPreview,
     plazaEligible: plazaEligible,
     worksByEditor: worksByEditor,
     claimedWorksByEditor: claimedWorksByEditor,

@@ -192,6 +192,7 @@
     .kv dt { color: var(--muted); }
     #screen-detail .scroll { padding: 0 0 12px; }
     .media-full { position: relative; width: 100%; aspect-ratio: 1; background: #1a1a1a; overflow: hidden; }
+    .media-full.is-album { cursor: pointer; }
     .media-full .cover-wrap { position: absolute; inset: 0; }
     .media-badge {
       position: absolute; top: 10px; right: 10px; z-index: 2;
@@ -216,6 +217,35 @@
       position: absolute; inset: 0; background: rgba(20,24,32,.4); z-index: 70; display: none;
     }
     .kw-mask.show { display: block; }
+    .preview-mask {
+      position: absolute; inset: 0; z-index: 90; display: none;
+      background: rgba(8,10,14,.92);
+      -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
+    }
+    .preview-mask.show { display: block; }
+    .preview-stage { position: absolute; inset: 0; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+    .preview-stage.is-blur .preview-img,
+    .preview-stage.is-blur .preview-wm { filter: blur(18px); }
+    .preview-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; pointer-events: none; -webkit-user-drag: none; user-select: none; }
+    .preview-wm {
+      position: absolute; inset: 0; z-index: 2; pointer-events: none;
+      display: flex; align-items: center; justify-content: center;
+      color: rgba(255,255,255,.38); font-size: 18px; font-weight: 700;
+      letter-spacing: .08em; transform: rotate(-24deg);
+      text-shadow: 0 1px 2px rgba(0,0,0,.35);
+    }
+    .preview-close, .preview-nav { position: absolute; z-index: 3; border: none; background: rgba(0,0,0,.45); color: #fff; cursor: pointer; border-radius: 50%; }
+    .preview-close { top: 48px; right: 12px; width: 36px; height: 36px; font-size: 22px; }
+    body.embed-mode .preview-close { top: 12px; }
+    .preview-nav { top: 50%; transform: translateY(-50%); width: 36px; height: 48px; font-size: 22px; border-radius: 8px; }
+    .preview-nav.prev { left: 8px; }
+    .preview-nav.next { right: 8px; }
+    .preview-nav[hidden], .preview-count[hidden] { display: none !important; }
+    .preview-count {
+      position: absolute; left: 50%; bottom: 28px; transform: translateX(-50%);
+      z-index: 3; color: #fff; font-size: 12px; font-weight: 600;
+      background: rgba(0,0,0,.45); padding: 4px 10px; border-radius: 999px;
+    }
     .kw-sheet {
       position: absolute; left: 0; right: 0; bottom: 0; z-index: 71; display: none;
       background: #fff; border-radius: 16px 16px 0 0; max-height: 78%; 
@@ -514,6 +544,16 @@
       <div class="dd-mask" id="ddMask"></div>
       <div class="dd-sheet" id="ddSheet"></div>
       <div class="kw-mask" id="kwMask"></div>
+      <div class="preview-mask" id="previewMask">
+        <div class="preview-stage" id="previewStage">
+          <img class="preview-img" id="previewImg" alt="" draggable="false" />
+          <div class="preview-wm" id="previewWm"></div>
+          <button class="preview-close" type="button" id="previewClose" aria-label="关闭预览">×</button>
+          <button class="preview-nav prev" type="button" id="previewPrev" aria-label="上一张">‹</button>
+          <button class="preview-nav next" type="button" id="previewNext" aria-label="下一张">›</button>
+          <div class="preview-count" id="previewCount"></div>
+        </div>
+      </div>
       <div class="kw-sheet" id="kwSheet">
         <div class="kw-head">
           <h3>选择该项目关键词</h3>
@@ -1035,7 +1075,7 @@
           '<button class="play-btn" type="button" id="playVideo">▶</button>' +
           '<div class="v-bar"><div class="v-prog" id="vProg"></div></div>' +
           '<div class="v-end" id="vEnd">试看结束，领取后查看完整稿件</div></div>'
-        : '<div class="media-full">' + coverHtml(it.cover, it.book, it.genre) +
+        : '<div class="media-full is-album" id="albumPreview">' + coverHtml(it.cover, it.book, it.genre) +
           '<span class="media-badge">' + (it.imgs || 1) + ' 张</span></div>';
       var extraCard = mine
         ? '<div class="card" id="pubTips"><h3 style="font-size:14px;margin-bottom:10px">作品发布技巧</h3>' +
@@ -1074,6 +1114,8 @@
           : (claimReason && claimReason !== '次数不足' ? '当前不可领' : '领取稿件'));
       var play = document.getElementById('playVideo');
       if (play) play.onclick = startVideoPreview;
+      var album = document.getElementById('albumPreview');
+      if (album) album.onclick = function () { openAlbumPreview(it); };
       document.querySelectorAll('#pubTips [data-copy]').forEach(function (b) {
         b.onclick = function () {
           var txt = b.dataset.copy === 'desc' ? (it.pubDesc || '') : (it.pubTitle || it.title);
@@ -1105,6 +1147,45 @@
         }
       }
       state.videoTimer = requestAnimationFrame(tick);
+    }
+    function previewUrls(it) {
+      var list = (it.preview || []).filter(Boolean).slice(0, 3);
+      if (!list.length && it.cover) list = [it.cover];
+      return list.slice(0, 3);
+    }
+    function renderAlbumPreview() {
+      var urls = state.previewUrls || [];
+      var i = state.previewIdx || 0;
+      if (i < 0) i = 0;
+      if (i > urls.length - 1) i = Math.max(0, urls.length - 1);
+      state.previewIdx = i;
+      var img = document.getElementById('previewImg');
+      img.src = urls[i] || '';
+      document.getElementById('previewCount').textContent = urls.length ? (i + 1) + ' / ' + urls.length : '';
+      document.getElementById('previewCount').hidden = urls.length < 2;
+      document.getElementById('previewPrev').hidden = urls.length < 2;
+      document.getElementById('previewNext').hidden = urls.length < 2;
+      document.getElementById('previewWm').textContent = (STORE.user && STORE.user.id) || 'U-10086';
+    }
+    function openAlbumPreview(it) {
+      if (!it || it.kind === '视频') return;
+      state.previewUrls = previewUrls(it);
+      state.previewIdx = 0;
+      document.getElementById('previewStage').classList.toggle('is-blur', !!document.hidden);
+      renderAlbumPreview();
+      document.getElementById('previewMask').classList.add('show');
+    }
+    function closeAlbumPreview() {
+      document.getElementById('previewMask').classList.remove('show');
+      document.getElementById('previewStage').classList.remove('is-blur');
+      state.previewUrls = [];
+      state.previewIdx = 0;
+    }
+    function stepAlbumPreview(delta) {
+      var urls = state.previewUrls || [];
+      if (urls.length < 2) return;
+      state.previewIdx = (state.previewIdx + delta + urls.length) % urls.length;
+      renderAlbumPreview();
     }
     function currentKws() {
       var it = item(state.current);
@@ -1745,6 +1826,7 @@
       if (id === 'claim') { id = 'detail'; state.pendingSheet = state.pendingSheet || 'claim'; }
       if (id === 'buy') { id = 'detail'; state.pendingBuy = true; }
       if (!state.pendingSheet && !state.pendingBuy) closeKwSheet();
+      if (document.getElementById('previewMask').classList.contains('show')) closeAlbumPreview();
       document.querySelectorAll('.screen').forEach(function (s) { s.classList.remove('active'); });
       var el = document.getElementById('screen-' + id);
       if (!el) { id = 'feed'; el = document.getElementById('screen-feed'); }
@@ -1768,6 +1850,7 @@
       notifyScreen(id);
     }
     function setScreen(id, keep) {
+      if (document.getElementById('previewMask').classList.contains('show')) closeAlbumPreview();
       if (!keep) resetForNav(id);
       showScreen(id);
     }
@@ -1789,6 +1872,21 @@
     document.getElementById('confirmKw').onclick = confirmKw;
     document.getElementById('kwClose').onclick = closeKwSheet;
     document.getElementById('kwMask').onclick = function () { closeKwSheet(); closeBuySheet(); };
+    document.getElementById('previewClose').onclick = closeAlbumPreview;
+    document.getElementById('previewPrev').onclick = function () { stepAlbumPreview(-1); };
+    document.getElementById('previewNext').onclick = function () { stepAlbumPreview(1); };
+    document.getElementById('previewMask').addEventListener('contextmenu', function (e) { e.preventDefault(); });
+    document.getElementById('previewMask').addEventListener('dragstart', function (e) { e.preventDefault(); });
+    document.getElementById('previewMask').addEventListener('touchstart', function (e) {
+      if (e.touches && e.touches.length > 1) e.preventDefault();
+    }, { passive: false });
+    document.addEventListener('visibilitychange', function () {
+      if (!document.getElementById('previewMask').classList.contains('show')) return;
+      if (document.hidden) document.getElementById('previewStage').classList.add('is-blur');
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeAlbumPreview();
+    });
     document.getElementById('buyClose').onclick = closeBuySheet;
     document.getElementById('confirmBuy').onclick = confirmBuy;
     document.getElementById('kwSearch').addEventListener('input', function (e) {

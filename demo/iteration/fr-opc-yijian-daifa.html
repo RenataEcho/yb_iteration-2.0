@@ -64,8 +64,92 @@
       font-size: 13px; font-weight: 500; color: var(--text-secondary); border-radius: 10px;
     }
     .page-tab-bar button.active, .admin-tab-bar button.active { background: var(--primary); color: #fff; font-weight: 600; }
-    .page-view, .admin-pane { display: none; }
-    .page-view.active, .admin-pane.active { display: block; }
+    .page-view, .admin-pane, .sub-view { display: none; }
+    .page-view.active, .admin-pane.active, .sub-view.active { display: block; }
+    .module-tab-bar {
+      display: flex; gap: 0; margin: 0 0 14px; border-bottom: 1px solid var(--border);
+    }
+    .module-tab-bar button {
+      padding: 8px 16px; border: none; background: none; cursor: pointer;
+      font-size: 13px; color: var(--text-secondary); border-bottom: 2px solid transparent; margin-bottom: -1px;
+    }
+    .module-tab-bar button.active { color: var(--primary); font-weight: 600; border-bottom-color: var(--primary); }
+    .admin-pane > .module-tab-bar { margin: 8px 16px 0; }
+    .explain-layout {
+      display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 16px; align-items: start;
+    }
+    @media (max-width: 900px) { .explain-layout { grid-template-columns: 1fr; } }
+    .explain-nav {
+      position: sticky; top: 12px; padding: 12px; display: flex; flex-direction: column; gap: 4px;
+    }
+    .explain-nav .nav-caption {
+      font-size: 11px; font-weight: 600; color: var(--text-muted); padding: 4px 10px 8px;
+    }
+    .explain-nav button {
+      text-align: left; border: none; background: transparent; cursor: pointer;
+      padding: 9px 12px; border-radius: 8px; font-size: 13px; color: var(--text-secondary); line-height: 1.35;
+    }
+    .explain-nav button small { display: block; font-size: 11px; color: var(--text-muted); margin-top: 2px; font-weight: 400; }
+    .explain-nav button.active { background: var(--primary-light); color: var(--primary); font-weight: 600; }
+    .explain-nav button.active small { color: #3b82f6; }
+    .explain-panel { display: none; padding: 20px 22px 28px; }
+    .explain-panel.active { display: block; }
+    .explain-hero {
+      padding: 16px 18px; border-radius: var(--radius-sm); margin-bottom: 18px;
+      background: linear-gradient(135deg, #eff6ff, #ecfeff); border: 1px solid #bfdbfe;
+    }
+    .explain-hero h2 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .explain-hero p { font-size: 13px; color: var(--text-secondary); line-height: 1.7; }
+    .explain-kicker { font-size: 11px; font-weight: 700; letter-spacing: .04em; color: var(--primary); margin-bottom: 6px; }
+    .explain-section { margin-bottom: 22px; }
+    .explain-section:last-child { margin-bottom: 0; }
+    .explain-section h3 { font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+    .explain-section p, .explain-section li { font-size: 13px; color: var(--text-secondary); line-height: 1.7; }
+    .explain-section code, .explain-hero code {
+      font-family: ui-monospace, monospace; font-size: 12px; background: #f1f5f9; padding: 1px 5px; border-radius: 4px;
+    }
+    .explain-section ul, .explain-section ol { padding-left: 18px; }
+    .explain-section li { margin-bottom: 6px; }
+    .explain-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    @media (max-width: 720px) { .explain-grid { grid-template-columns: 1fr; } }
+    .explain-card {
+      background: rgba(248,250,252,.9); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 14px 14px 12px;
+    }
+    .explain-card h4 { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+    .explain-card p, .explain-card li { font-size: 12px; color: var(--text-secondary); line-height: 1.65; }
+    .explain-card ul { padding-left: 16px; }
+    .explain-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .explain-table th, .explain-table td {
+      padding: 8px 10px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; line-height: 1.55;
+    }
+    .explain-table th { font-size: 11px; color: var(--text-muted); background: rgba(248,250,252,.9); white-space: nowrap; }
+    .explain-table td strong { color: var(--text-primary); }
+    .callout {
+      margin: 12px 0 0; padding: 10px 12px; border-radius: var(--radius-sm);
+      font-size: 12px; line-height: 1.65; color: var(--text-secondary);
+    }
+    .callout.warn { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
+    .callout.ok { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
+    .callout.info { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }
+    .callout.danger { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+    .faq-item { padding: 12px 0; border-bottom: 1px solid var(--border); }
+    .faq-item:last-child { border-bottom: none; }
+    .faq-q { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+    .faq-a { font-size: 13px; color: var(--text-secondary); line-height: 1.7; }
+    .step-list { counter-reset: step; list-style: none; padding-left: 0; }
+    .step-list li { position: relative; padding-left: 36px; margin-bottom: 12px; }
+    .step-list li::before {
+      counter-increment: step; content: counter(step);
+      position: absolute; left: 0; top: 1px;
+      width: 22px; height: 22px; border-radius: 50%;
+      background: var(--primary-light); color: var(--primary);
+      font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center;
+    }
+    .data-block { padding: 18px 20px 24px; }
+    .data-block + .data-block { border-top: 1px solid var(--border); }
+    .data-block h2 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .data-block p { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
     .btn {
       display: inline-flex; align-items: center; height: 34px; padding: 0 14px;
       border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid transparent;
@@ -243,7 +327,7 @@
       <span class="sprint-pill">YBDD2.0 · 迭代 v1</span>
     </div>
     <div class="sidebar-scroll" data-iteration-sidebar></div>
-    <div class="sidebar-foot">FR-014 · 页内 Tab<br />前端 / PC / 后台 / 流程</div>
+    <div class="sidebar-foot">FR-014 · 页内 Tab<br />解释 / 前端 / PC / 后台 / 数据交互</div>
   </aside>
 
   <main class="main">
@@ -266,13 +350,123 @@
     </header>
 
     <div class="page-tab-bar" role="tablist">
+      <button type="button" data-page="view-explain" role="tab">业务解释</button>
       <button type="button" class="active" data-page="view-fe" role="tab">前端交互</button>
       <button type="button" data-page="view-pc" role="tab">PC端</button>
       <button type="button" data-page="view-admin" role="tab">管理后台</button>
-      <button type="button" data-page="view-flow" role="tab">业务流程</button>
+      <button type="button" data-page="view-data" role="tab">前后端数据交互</button>
+    </div>
+    <div id="view-explain" class="page-view">
+      <div class="explain-layout">
+        <nav class="glass-card explain-nav" aria-label="业务解释章节">
+          <div class="nav-caption">研发 / 运营手册</div>
+          <button type="button" class="active" data-explain="exp-overview">1 背景与一句话<small>为什么做一键代发</small></button>
+          <button type="button" data-explain="exp-roles">2 角色怎么分工<small>用户 / 剪辑手 / 运营</small></button>
+          <button type="button" data-explain="exp-path">3 主路径<small>供稿 → 领取 → 回填</small></button>
+          <button type="button" data-explain="exp-bound">4 边界<small>门禁、占用、停权</small></button>
+          <button type="button" data-explain="exp-faq">5 FAQ<small>客诉与对内口径</small></button>
+        </nav>
+        <div class="glass-card">
+          <section id="exp-overview" class="explain-panel active">
+            <div class="explain-kicker">FR-014 · 一键代发</div>
+            <div class="explain-hero">
+              <h2>不会剪辑也能做项目：剪辑手供稿，用户领取后回填变现</h2>
+              <p>没有制作能力的用户进不了项目。平台用客服招募剪辑手，在已有 PC 创作者中心上传图集/视频；用户只在 C 端领取，再走该项目已有回填页发布。本手册给研发和运营对齐口径，不写迭代平台通用规范。</p>
+            </div>
+            <div class="explain-section">
+              <h3>30 秒故事</h3>
+              <ol class="step-list">
+                <li>有制作能力的人扫 PC / 广场招募海报的客服二维码，后台录入后才是剪辑手。</li>
+                <li>已录入剪辑手在电脑选授权且启用的项目，用文件夹或压缩包上传，提交平台审核。</li>
+                <li>审核通过且空闲的稿件出现在作品广场；审核中、已驳回、占用中、已完成都不进广场。</li>
+                <li>用户先看剩余次数，再浮层选该项目已通过关键词，才能领取；成功即扣次、占用、对他人隐藏。</li>
+                <li>24 小时内从「我的领取」回填则占用结束；超时记 1 次未回填、不退次、稿件回广场。终身未回填超过 3 次进黑名单，仅后台可恢复。</li>
+              </ol>
+              <div class="callout info">C 端不做剪辑手上传。广场招募帧只进海报。列表不展示收益金额，详情只出分成比例。</div>
+            </div>
+          </section>
+          <section id="exp-roles" class="explain-panel">
+            <div class="explain-kicker">角色</div>
+            <div class="explain-hero">
+              <h2>三方各走各的入口，不要让用户去 PC 上传，也不要让剪辑手走 C 端工作台</h2>
+              <p>剪辑手只在已有 PC 创作者中心；用户只在 C 端广场 / 详情 / 领取页；运营只在右豹后台七页。</p>
+            </div>
+            <div class="explain-section">
+              <div class="explain-grid">
+                <div class="explain-card"><h4>用户</h4><p>浏览已通过且空闲的稿件，先校验次数再选词领取，24h 内回填。无剪辑能力，不做上传。</p></div>
+                <div class="explain-card"><h4>剪辑手</h4><p>客服接入、后台录入（右豹 ID / 分成 / 备注）。电脑上传，默认审核中。仅可删空闲稿。</p></div>
+                <div class="explain-card"><h4>运营</h4><p>管剪辑手、稿件审核、领取、黑名单、项目、素材、次数商品。后台录入稿件视为已审通过。</p></div>
+                <div class="explain-card"><h4>客服</h4><p>海报二维码接入剪辑手，不提供站内申请表或自助审核。</p></div>
+              </div>
+            </div>
+          </section>
+          <section id="exp-path" class="explain-panel">
+            <div class="explain-kicker">主路径</div>
+            <div class="explain-hero">
+              <h2>PC 供稿与 C 端领取是两条闭环，在「已通过且空闲」汇合</h2>
+              <p>流程图挂在各端「业务流程」子 Tab：前端=用户领取；PC=剪辑手上传；后台七菜单各一张。旧顶层「业务流程」已取消。</p>
+            </div>
+            <div class="explain-section">
+              <h3>剪辑手（仅 PC）</h3>
+              <ol class="step-list">
+                <li>打开已有创作者中心 → 单一菜单「剪辑供稿」（招募 BN + 看板）。</li>
+                <li>未录入 / 已停用：看板缺省，不能上传。</li>
+                <li>已录入：选授权∩启用项目 → 文件夹或压缩包 → 填齐字段 → 提交审核。</li>
+                <li>后台通过后，空闲稿进广场；驳回 list 出示原因。</li>
+              </ol>
+            </div>
+            <div class="explain-section">
+              <h3>用户领取</h3>
+              <ol class="step-list">
+                <li>广场宫格（项目图标直选，搜索在项目下）→ 详情铺满素材。</li>
+                <li>图集可点开放大，最多预览 3 张，不扣次、不占用、不能保存；视频仍试看 5 秒。</li>
+                <li>领取：次数 → 选词 → 空闲。成功后停在详情，底栏改为加水印 / 下载。</li>
+                <li>回填只从「我的领取」。超时释放可再领，再领再扣次。</li>
+              </ol>
+            </div>
+          </section>
+          <section id="exp-bound" class="explain-panel">
+            <div class="explain-kicker">边界</div>
+            <div class="explain-hero">
+              <h2>门禁顺序、占用和停权不能改口</h2>
+              <p>先次数，后浮层选词，后占用。次数不足不得打开选词浮层。一稿同时一人占用。超时不退次。终身未回填超过 3 次停权，只能后台恢复。</p>
+            </div>
+            <div class="explain-section">
+              <ul>
+                <li>禁用项目不可上传、不进广场。停用剪辑手或禁用素材的已通过空闲稿也不进广场。</li>
+                <li>审核中 / 已驳回不进广场。已通过不可再驳回。</li>
+                <li>领取后 7 天内可下载，超时未下不可再下。</li>
+                <li>图集预览最多 3 张；角标仍显示真实张数。防截屏=禁右键/长按保存 + 用户水印 + 切后台模糊；真机系统截屏禁不掉。</li>
+                <li>任何列表不展示金额。Demo 无真实 HTTP，数据在 localStorage 闭环。</li>
+              </ul>
+              <div class="callout warn">不要对用户承诺「截不了屏」。规则只保证 Demo 级禁保存，真机截屏拦不住。</div>
+            </div>
+          </section>
+          <section id="exp-faq" class="explain-panel">
+            <div class="explain-kicker">FAQ</div>
+            <div class="explain-hero">
+              <h2>先问卡在上传、领取、回填还是停权，再对状态</h2>
+              <p>对用户不要讲 FR 编号。对研发指到对应端的「业务流程」和「前后端数据交互」。</p>
+            </div>
+            <div class="explain-section">
+              <div class="faq-item"><div class="faq-q">Q1. 为什么广场看不到刚传的稿？</div><div class="faq-a">PC 新稿默认审核中。后台通过且空闲才进广场。占用中、已完成、已驳回、禁用项目、停用剪辑手、禁用素材都不可见。</div></div>
+              <div class="faq-item"><div class="faq-q">Q2. 次数够了为什么还领不了？</div><div class="faq-a">还要选该项目已通过关键词，且稿件当时空闲。未选词、已被占用、未审核通过、项目禁用、已停权都会失败。</div></div>
+              <div class="faq-item"><div class="faq-q">Q3. 超时了次数能退吗？</div><div class="faq-a">不退。记 1 次未回填，稿件回广场。原领取人未进黑名单可再领，再领再扣次。</div></div>
+              <div class="faq-item"><div class="faq-q">Q4. 停权了怎么办？</div><div class="faq-a">终身未回填超过 3 次。只能后台黑名单手动恢复，没有自助解禁。</div></div>
+              <div class="faq-item"><div class="faq-q">Q5. 图集详情为什么只能看 3 张？</div><div class="faq-a">预览上限 3 张，角标仍是真实张数。领取前预览不扣次、不能保存。完整稿领取后再下。演示预览用现有封面凑 3 张，不是书内页。</div></div>
+              <div class="faq-item"><div class="faq-q">Q6. 用户能在 App 里当剪辑手上传吗？</div><div class="faq-a">不能。C 端只领取。上传只在 PC 创作者中心。广场招募帧只看海报。</div></div>
+            </div>
+          </section>
+        </div>
+      </div>
     </div>
 
     <div id="view-fe" class="page-view active">
+      <div class="module-tab-bar" role="tablist">
+        <button type="button" class="active" data-sub="fe-scene" role="tab">场景</button>
+        <button type="button" data-sub="fe-flow" role="tab">业务流程</button>
+      </div>
+      <div id="fe-scene" class="sub-view active">
       <div class="demo-layout" id="feDemo">
         <div class="glass-card scene-panel">
           <div class="scene-head">
@@ -302,9 +496,115 @@
           </div>
         </div>
       </div>
+      </div>
+      <div id="fe-flow" class="sub-view">
+      <div class="glass-card flow-page">
+        <p class="flow-page-intro">用户领取闭环：广场 → 详情预览 → 次数 → 选词 → 占用 → 24h 回填或释放。预览不扣次。</p>
+        <div class="flow-svg-wrap">
+          <svg width="920" height="960" viewBox="0 0 920 960" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <marker id="flow-arrow-fe" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                <path d="M0,0 L8,4 L0,8 Z" fill="#94a3b8" />
+              </marker>
+            </defs>
+            <g class="flow-edges" marker-end="url(#flow-arrow-fe)">
+              <line x1="460" y1="72" x2="460" y2="100" />
+              <line x1="460" y1="156" x2="460" y2="184" />
+              <line x1="380" y1="224" x2="200" y2="224" />
+              <polyline points="40,224 16,224 16,184 460,184" />
+              <line x1="460" y1="264" x2="460" y2="288" />
+              <line x1="380" y1="328" x2="200" y2="328" />
+              <polyline points="120,308 120,288 460,288" />
+              <line x1="460" y1="368" x2="460" y2="392" />
+              <line x1="540" y1="432" x2="700" y2="432" />
+              <polyline points="880,440 904,440 904,16 640,16" />
+              <line x1="460" y1="472" x2="460" y2="496" />
+              <line x1="540" y1="616" x2="700" y2="616" />
+              <line x1="460" y1="656" x2="460" y2="680" />
+              <line x1="380" y1="800" x2="160" y2="800" />
+              <line x1="90" y1="820" x2="90" y2="860" />
+              <polyline points="20,880 8,880 8,16 280,16" />
+              <line x1="460" y1="840" x2="460" y2="864" />
+            </g>
+            <g class="flow-nodes" font-family="Inter, PingFang SC, sans-serif">
+              <rect x="280" y="16" width="360" height="56" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="460" y="40" text-anchor="middle" font-size="12" fill="#1e40af">作品广场宫格 + 项目直选</text>
+              <text x="460" y="58" text-anchor="middle" font-size="10" fill="#64748b">仅已通过且空闲 · 不展示金额</text>
+
+              <rect x="280" y="100" width="360" height="56" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="460" y="124" text-anchor="middle" font-size="12" fill="#1e40af">详情铺满素材 · 发起领取</text>
+              <text x="460" y="142" text-anchor="middle" font-size="10" fill="#64748b">图集预览≤3 · 视频试看5秒 · 分成比例</text>
+
+              <polygon points="460,184 540,224 460,264 380,224" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="460" y="228" text-anchor="middle" font-size="11" fill="#854d0e">剩余次数&gt;0?</text>
+              <text x="268" y="216" font-size="10" fill="#dc2626">否 · 购次</text>
+              <rect x="40" y="204" width="160" height="40" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="120" y="229" text-anchor="middle" font-size="11" fill="#1e40af">积分买在售档</text>
+              <text x="472" y="280" font-size="10" fill="#16a34a">是</text>
+
+              <polygon points="460,288 540,328 460,368 380,328" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="460" y="332" text-anchor="middle" font-size="11" fill="#854d0e">已选通过关键词?</text>
+              <text x="268" y="320" font-size="10" fill="#dc2626">否</text>
+              <rect x="40" y="308" width="160" height="40" rx="6" fill="#fecaca" stroke="#dc2626" />
+              <text x="120" y="333" text-anchor="middle" font-size="11" fill="#991b1b">拦截领取</text>
+              <text x="472" y="384" font-size="10" fill="#16a34a">是</text>
+
+              <polygon points="460,392 540,432 460,472 380,432" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="460" y="436" text-anchor="middle" font-size="11" fill="#854d0e">稿件空闲未占用?</text>
+              <text x="556" y="420" font-size="10" fill="#dc2626">否</text>
+              <rect x="700" y="412" width="180" height="56" rx="6" fill="#fecaca" stroke="#dc2626" />
+              <text x="790" y="436" text-anchor="middle" font-size="11" fill="#991b1b">领取失败</text>
+              <text x="790" y="454" text-anchor="middle" font-size="10" fill="#64748b">他人占用 · 回广场</text>
+              <text x="472" y="488" font-size="10" fill="#16a34a">是</text>
+
+              <rect x="280" y="496" width="360" height="56" rx="6" fill="#dcfce7" stroke="#16a34a" />
+              <text x="460" y="520" text-anchor="middle" font-size="12" fill="#166534">领取成功 · 扣次不退</text>
+              <text x="460" y="538" text-anchor="middle" font-size="10" fill="#64748b">占用并对他人 feed 隐藏</text>
+
+              <polygon points="460,576 540,616 460,656 380,616" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="460" y="620" text-anchor="middle" font-size="11" fill="#854d0e">24h 内已回填?</text>
+              <text x="556" y="604" font-size="10" fill="#16a34a">是</text>
+              <rect x="700" y="596" width="180" height="56" rx="6" fill="#dcfce7" stroke="#16a34a" />
+              <text x="790" y="620" text-anchor="middle" font-size="11" fill="#166534">完成占用</text>
+              <text x="790" y="638" text-anchor="middle" font-size="10" fill="#64748b">不再出现 feed</text>
+              <text x="472" y="672" font-size="10" fill="#dc2626">否</text>
+
+              <rect x="280" y="680" width="360" height="56" rx="6" fill="#ffedd5" stroke="#ea580c" />
+              <text x="460" y="704" text-anchor="middle" font-size="12" fill="#9a3412">记 1 次未回填 + 释放</text>
+              <text x="460" y="722" text-anchor="middle" font-size="10" fill="#64748b">不退次 · 稿件回 feed</text>
+
+              <polygon points="460,760 540,800 460,840 380,800" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="460" y="804" text-anchor="middle" font-size="11" fill="#854d0e">终身未回填&gt;3?</text>
+              <text x="256" y="792" font-size="10" fill="#dc2626">是 · 黑名单</text>
+              <rect x="20" y="780" width="140" height="40" rx="6" fill="#fecaca" stroke="#dc2626" />
+              <text x="90" y="805" text-anchor="middle" font-size="11" fill="#991b1b">停权</text>
+              <rect x="20" y="860" width="140" height="40" rx="6" fill="#dcfce7" stroke="#16a34a" />
+              <text x="90" y="885" text-anchor="middle" font-size="11" fill="#166534">后台手动恢复</text>
+              <text x="472" y="856" font-size="10" fill="#16a34a">否 · 可再领</text>
+
+              <rect x="280" y="864" width="360" height="48" rx="6" fill="#e2e8f0" stroke="#94a3b8" />
+              <text x="460" y="894" text-anchor="middle" font-size="12" fill="#475569">原领取人与他人均可再领（再扣次）</text>
+            </g>
+          </svg>
+        </div>
+        <div class="flow-legend">
+          <span><i style="background:#dbeafe;border:1px solid #2563eb"></i>前端 / 用户操作</span>
+          <span><i style="background:#dcfce7;border:1px solid #16a34a"></i>后端判定 / 写入</span>
+          <span><i style="background:#ffedd5;border:1px solid #ea580c"></i>异步 / 超时</span>
+          <span><i style="background:#fef9c3;border:1px solid #ca8a04"></i>校验</span>
+          <span><i style="background:#fecaca;border:1px solid #dc2626"></i>阻断</span>
+          <span><i style="background:#e2e8f0;border:1px solid #94a3b8"></i>跳过 / 再领</span>
+        </div>
+      </div>
+      </div>
     </div>
 
     <div id="view-pc" class="page-view">
+      <div class="module-tab-bar" role="tablist">
+        <button type="button" class="active" data-sub="pc-scene" role="tab">场景</button>
+        <button type="button" data-sub="pc-flow" role="tab">业务流程</button>
+      </div>
+      <div id="pc-scene" class="sub-view active">
       <div class="demo-layout" id="pcDemo">
         <div class="glass-card scene-panel">
           <div class="scene-head">
@@ -329,6 +629,81 @@
           </div>
         </div>
       </div>
+      </div>
+      <div id="pc-flow" class="sub-view">
+      <div class="glass-card flow-page">
+        <p class="flow-page-intro">剪辑手上传闭环：招募 → 录入校验 → 文件夹/压缩包上传 → 项目启用 → 平台审核。C 端不做上传。</p>
+        <div class="flow-svg-wrap">
+          <svg width="920" height="700" viewBox="0 0 920 700" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <marker id="flow-arrow-pc" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                <path d="M0,0 L8,4 L0,8 Z" fill="#94a3b8" />
+              </marker>
+            </defs>
+            <g class="flow-edges" marker-end="url(#flow-arrow-pc)">
+              <line x1="460" y1="56" x2="460" y2="80" />
+              <line x1="380" y1="120" x2="200" y2="120" />
+              <polyline points="40,140 16,140 16,16 280,16" />
+              <line x1="460" y1="160" x2="460" y2="184" />
+              <line x1="460" y1="256" x2="460" y2="280" />
+              <line x1="380" y1="320" x2="200" y2="320" />
+              <polyline points="40,340 24,340 24,184 460,184" />
+              <line x1="460" y1="360" x2="460" y2="384" />
+              <line x1="460" y1="440" x2="460" y2="464" />
+              <line x1="380" y1="504" x2="200" y2="504" />
+              <polyline points="40,524 24,524 24,184 460,184" />
+              <line x1="460" y1="544" x2="460" y2="568" />
+            </g>
+            <g class="flow-nodes" font-family="Inter, PingFang SC, sans-serif">
+              <rect x="280" y="16" width="360" height="40" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="460" y="41" text-anchor="middle" font-size="12" fill="#1e40af">PC 招募海报 · 底部客服二维码</text>
+
+              <polygon points="460,80 540,120 460,160 380,120" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="460" y="124" text-anchor="middle" font-size="11" fill="#854d0e">已录入剪辑手?</text>
+              <text x="256" y="112" font-size="10" fill="#dc2626">否</text>
+              <rect x="40" y="100" width="160" height="40" rx="6" fill="#fecaca" stroke="#dc2626" />
+              <text x="120" y="125" text-anchor="middle" font-size="11" fill="#991b1b">阻断上传</text>
+              <text x="472" y="176" font-size="10" fill="#16a34a">是</text>
+
+              <rect x="280" y="184" width="360" height="72" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="460" y="212" text-anchor="middle" font-size="12" fill="#1e40af">PC 弹窗上传 · 文件夹或压缩包</text>
+              <text x="460" y="232" text-anchor="middle" font-size="10" fill="#64748b">填齐后台同款字段 · 必选素材类型</text>
+              <text x="460" y="248" text-anchor="middle" font-size="10" fill="#64748b">只列授权 ∩ 启用项目</text>
+
+              <polygon points="460,280 540,320 460,360 380,320" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="460" y="324" text-anchor="middle" font-size="11" fill="#854d0e">项目已启用?</text>
+              <text x="256" y="312" font-size="10" fill="#dc2626">否</text>
+              <rect x="40" y="300" width="160" height="40" rx="6" fill="#fecaca" stroke="#dc2626" />
+              <text x="120" y="325" text-anchor="middle" font-size="11" fill="#991b1b">项目禁用拦截</text>
+              <text x="472" y="376" font-size="10" fill="#16a34a">是</text>
+
+              <rect x="280" y="384" width="360" height="56" rx="6" fill="#dcfce7" stroke="#16a34a" />
+              <text x="460" y="408" text-anchor="middle" font-size="12" fill="#166534">提交平台审核</text>
+              <text x="460" y="426" text-anchor="middle" font-size="10" fill="#64748b">审核中不进广场；驳回出示原因</text>
+
+              <polygon points="460,464 540,504 460,544 380,504" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="460" y="508" text-anchor="middle" font-size="11" fill="#854d0e">审核通过?</text>
+              <text x="256" y="496" font-size="10" fill="#dc2626">否</text>
+              <rect x="40" y="484" width="160" height="40" rx="6" fill="#fecaca" stroke="#dc2626" />
+              <text x="120" y="509" text-anchor="middle" font-size="11" fill="#991b1b">已驳回出示原因</text>
+              <text x="472" y="560" font-size="10" fill="#16a34a">是</text>
+
+              <rect x="280" y="568" width="360" height="56" rx="6" fill="#dcfce7" stroke="#16a34a" />
+              <text x="460" y="592" text-anchor="middle" font-size="12" fill="#166534">空闲稿进入用户广场</text>
+              <text x="460" y="610" text-anchor="middle" font-size="10" fill="#64748b">占用中 / 已完成不回广场</text>
+            </g>
+          </svg>
+        </div>
+        <div class="flow-legend">
+          <span><i style="background:#dbeafe;border:1px solid #2563eb"></i>前端 / 用户操作</span>
+          <span><i style="background:#dcfce7;border:1px solid #16a34a"></i>后端判定 / 写入</span>
+          <span><i style="background:#ffedd5;border:1px solid #ea580c"></i>异步 / 超时</span>
+          <span><i style="background:#fef9c3;border:1px solid #ca8a04"></i>校验</span>
+          <span><i style="background:#fecaca;border:1px solid #dc2626"></i>阻断</span>
+          <span><i style="background:#e2e8f0;border:1px solid #94a3b8"></i>跳过 / 再领</span>
+        </div>
+      </div>
+      </div>
     </div>
 
     <div id="view-admin" class="page-view">
@@ -344,6 +719,11 @@
         </div>
 
         <div id="admin-editors" class="admin-pane active">
+          <div class="module-tab-bar" role="tablist">
+            <button type="button" class="active" data-sub="admin-editors-list" role="tab">列表</button>
+            <button type="button" data-sub="admin-editors-flow" role="tab">业务流程</button>
+          </div>
+          <div id="admin-editors-list" class="sub-view active">
           <div class="table-toolbar"><h3>剪辑手</h3><button class="btn btn-primary" type="button" onclick="openEditorModal()">录入</button></div>
           <div class="filter-bar">
             <div class="filter-field"><label>右豹 ID / 昵称</label><input id="edQ" placeholder="YB10086 / 林夏" /></div>
@@ -354,9 +734,61 @@
             </div>
           </div>
           <div class="table-wrap"><table><thead><tr><th>ID</th><th>右豹 ID</th><th>昵称</th><th>分成比例</th><th>备注</th><th>来源</th><th>可上传项目</th><th>状态</th><th>录入时间</th><th>操作</th></tr></thead><tbody id="edBody"></tbody></table></div>
+          </div>
+          <div id="admin-editors-flow" class="sub-view">
+      <div class="glass-card flow-page">
+        <p class="flow-page-intro">剪辑手：客服接入 → 录入必填项 → 已录入可上传，停用阻断。</p>
+        <div class="flow-svg-wrap">
+          <svg width="920" height="420" viewBox="0 0 920 420" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <marker id="flow-arrow-ed" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                <path d="M0,0 L8,4 L0,8 Z" fill="#94a3b8" />
+              </marker>
+            </defs>
+            <g class="flow-edges" marker-end="url(#flow-arrow-ed)">
+              <line x1="460" y1="56" x2="460" y2="80" />
+              <line x1="460" y1="160" x2="460" y2="184" />
+              <line x1="380" y1="224" x2="200" y2="224" />
+              <polyline points="40,244 16,244 16,16 280,16" />
+              <line x1="460" y1="264" x2="460" y2="288" />
+            </g>
+            <g class="flow-nodes" font-family="Inter, PingFang SC, sans-serif">
+              <rect x="280" y="16" width="360" height="40" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="460" y="41" text-anchor="middle" font-size="12" fill="#1e40af">客服二维码招募接入</text>
+              <rect x="280" y="80" width="360" height="80" rx="6" fill="#dcfce7" stroke="#16a34a" />
+              <text x="460" y="108" text-anchor="middle" font-size="12" fill="#166534">后台录入剪辑手</text>
+              <text x="460" y="128" text-anchor="middle" font-size="10" fill="#64748b">必填右豹 ID / 分成比例 / 备注</text>
+              <text x="460" y="146" text-anchor="middle" font-size="10" fill="#64748b">无站内申请表</text>
+              <polygon points="460,184 540,224 460,264 380,224" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="460" y="228" text-anchor="middle" font-size="11" fill="#854d0e">已录入且未停用?</text>
+              <text x="256" y="216" font-size="10" fill="#dc2626">否</text>
+              <rect x="40" y="204" width="160" height="40" rx="6" fill="#fecaca" stroke="#dc2626" />
+              <text x="120" y="229" text-anchor="middle" font-size="11" fill="#991b1b">不能上传</text>
+              <text x="472" y="280" font-size="10" fill="#16a34a">是</text>
+              <rect x="280" y="288" width="360" height="56" rx="6" fill="#dcfce7" stroke="#16a34a" />
+              <text x="460" y="312" text-anchor="middle" font-size="12" fill="#166534">可上传授权 ∩ 启用项目</text>
+              <text x="460" y="330" text-anchor="middle" font-size="10" fill="#64748b">有占用稿不能停用；有稿不能硬删</text>
+            </g>
+          </svg>
+        </div>
+        <div class="flow-legend">
+          <span><i style="background:#dbeafe;border:1px solid #2563eb"></i>前端 / 用户操作</span>
+          <span><i style="background:#dcfce7;border:1px solid #16a34a"></i>后端判定 / 写入</span>
+          <span><i style="background:#ffedd5;border:1px solid #ea580c"></i>异步 / 超时</span>
+          <span><i style="background:#fef9c3;border:1px solid #ca8a04"></i>校验</span>
+          <span><i style="background:#fecaca;border:1px solid #dc2626"></i>阻断</span>
+          <span><i style="background:#e2e8f0;border:1px solid #94a3b8"></i>跳过 / 再领</span>
+        </div>
+      </div>
+          </div>
         </div>
 
         <div id="admin-works" class="admin-pane">
+          <div class="module-tab-bar" role="tablist">
+            <button type="button" class="active" data-sub="admin-works-list" role="tab">列表</button>
+            <button type="button" data-sub="admin-works-flow" role="tab">业务流程</button>
+          </div>
+          <div id="admin-works-list" class="sub-view active">
           <div class="table-toolbar"><h3>稿件</h3><button class="btn btn-primary" type="button" onclick="openWorkModal()">录入</button></div>
           <div class="filter-bar">
             <div class="filter-field"><label>标题 / ID</label><input id="wkQ" placeholder="掌心宠" /></div>
@@ -368,9 +800,74 @@
             </div>
           </div>
           <div class="table-wrap"><table><thead><tr><th>ID</th><th>标题</th><th>项目</th><th>书</th><th>稿件信息</th><th>发布技巧</th><th>剪辑手</th><th>类型</th><th>素材类型</th><th>占用</th><th>审核</th><th>上传时间</th><th>操作</th></tr></thead><tbody id="wkBody"></tbody></table></div>
+          </div>
+          <div id="admin-works-flow" class="sub-view">
+      <div class="glass-card flow-page">
+        <p class="flow-page-intro">稿件：PC 新稿审核中，后台录入已通过；通过后空闲进广场。</p>
+        <div class="flow-svg-wrap">
+          <svg width="920" height="620" viewBox="0 0 920 620" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <marker id="flow-arrow-wk" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                <path d="M0,0 L8,4 L0,8 Z" fill="#94a3b8" />
+              </marker>
+            </defs>
+            <g class="flow-edges" marker-end="url(#flow-arrow-wk)">
+              <line x1="220" y1="72" x2="220" y2="184" />
+              <line x1="700" y1="72" x2="700" y2="184" />
+              <polyline points="220,184 220,224 380,224" />
+              <polyline points="700,184 700,224 540,224" />
+              <line x1="380" y1="224" x2="200" y2="224" />
+              <line x1="460" y1="264" x2="460" y2="288" />
+              <line x1="460" y1="344" x2="460" y2="368" />
+              <line x1="380" y1="408" x2="200" y2="408" />
+              <line x1="460" y1="448" x2="460" y2="472" />
+            </g>
+            <g class="flow-nodes" font-family="Inter, PingFang SC, sans-serif">
+              <rect x="40" y="16" width="360" height="56" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="220" y="40" text-anchor="middle" font-size="12" fill="#1e40af">PC 新上传</text>
+              <text x="220" y="58" text-anchor="middle" font-size="10" fill="#64748b">默认审核中</text>
+              <rect x="520" y="16" width="360" height="56" rx="6" fill="#dcfce7" stroke="#16a34a" />
+              <text x="700" y="40" text-anchor="middle" font-size="12" fill="#166534">后台录入稿件</text>
+              <text x="700" y="58" text-anchor="middle" font-size="10" fill="#64748b">视为已审 · 默认已通过</text>
+              <polygon points="460,184 540,224 460,264 380,224" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="460" y="228" text-anchor="middle" font-size="11" fill="#854d0e">审核中?</text>
+              <text x="256" y="216" font-size="10" fill="#dc2626">否</text>
+              <rect x="40" y="204" width="160" height="40" rx="6" fill="#e2e8f0" stroke="#94a3b8" />
+              <text x="120" y="229" text-anchor="middle" font-size="11" fill="#475569">已通过不可再驳</text>
+              <text x="472" y="280" font-size="10" fill="#16a34a">是</text>
+              <rect x="280" y="288" width="360" height="56" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="460" y="312" text-anchor="middle" font-size="12" fill="#1e40af">通过 / 驳回</text>
+              <text x="460" y="330" text-anchor="middle" font-size="10" fill="#64748b">驳回原因必填</text>
+              <polygon points="460,368 540,408 460,448 380,408" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="460" y="412" text-anchor="middle" font-size="11" fill="#854d0e">审核通过?</text>
+              <text x="256" y="400" font-size="10" fill="#dc2626">否</text>
+              <rect x="40" y="388" width="160" height="40" rx="6" fill="#fecaca" stroke="#dc2626" />
+              <text x="120" y="413" text-anchor="middle" font-size="11" fill="#991b1b">不进广场</text>
+              <text x="472" y="464" font-size="10" fill="#16a34a">是</text>
+              <rect x="280" y="472" width="360" height="56" rx="6" fill="#dcfce7" stroke="#16a34a" />
+              <text x="460" y="496" text-anchor="middle" font-size="12" fill="#166534">空闲稿进入广场</text>
+              <text x="460" y="514" text-anchor="middle" font-size="10" fill="#64748b">占用中 / 已完成不回广场</text>
+            </g>
+          </svg>
+        </div>
+        <div class="flow-legend">
+          <span><i style="background:#dbeafe;border:1px solid #2563eb"></i>前端 / 用户操作</span>
+          <span><i style="background:#dcfce7;border:1px solid #16a34a"></i>后端判定 / 写入</span>
+          <span><i style="background:#ffedd5;border:1px solid #ea580c"></i>异步 / 超时</span>
+          <span><i style="background:#fef9c3;border:1px solid #ca8a04"></i>校验</span>
+          <span><i style="background:#fecaca;border:1px solid #dc2626"></i>阻断</span>
+          <span><i style="background:#e2e8f0;border:1px solid #94a3b8"></i>跳过 / 再领</span>
+        </div>
+      </div>
+          </div>
         </div>
 
         <div id="admin-claims" class="admin-pane">
+          <div class="module-tab-bar" role="tablist">
+            <button type="button" class="active" data-sub="admin-claims-list" role="tab">列表</button>
+            <button type="button" data-sub="admin-claims-flow" role="tab">业务流程</button>
+          </div>
+          <div id="admin-claims-list" class="sub-view active">
           <div class="table-toolbar"><h3>领取记录</h3></div>
           <div class="filter-bar">
             <div class="filter-field"><label>用户 / 稿件</label><input id="clQ" placeholder="U-10086" /></div>
@@ -381,9 +878,62 @@
             </div>
           </div>
           <div class="table-wrap"><table><thead><tr><th>ID</th><th>用户</th><th>稿件</th><th>关键词</th><th>回填信息</th><th>状态</th><th>领取时间</th><th>操作</th></tr></thead><tbody id="clBody"></tbody></table></div>
+          </div>
+          <div id="admin-claims-flow" class="sub-view">
+      <div class="glass-card flow-page">
+        <p class="flow-page-intro">领取记录：待回填 / 已回填 / 已超时释放。详情看回填，稿件详情走抽屉。</p>
+        <div class="flow-svg-wrap">
+          <svg width="920" height="420" viewBox="0 0 920 420" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <marker id="flow-arrow-cl" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                <path d="M0,0 L8,4 L0,8 Z" fill="#94a3b8" />
+              </marker>
+            </defs>
+            <g class="flow-edges" marker-end="url(#flow-arrow-cl)">
+              <line x1="460" y1="56" x2="460" y2="80" />
+              <polyline points="380,120 80,120 80,200" />
+              <polyline points="540,120 840,120 840,200" />
+              <line x1="460" y1="160" x2="460" y2="200" />
+              <line x1="460" y1="256" x2="460" y2="288" />
+            </g>
+            <g class="flow-nodes" font-family="Inter, PingFang SC, sans-serif">
+              <rect x="280" y="16" width="360" height="40" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="460" y="41" text-anchor="middle" font-size="12" fill="#1e40af">领取记录列表</text>
+              <polygon points="460,80 540,120 460,160 380,120" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="460" y="124" text-anchor="middle" font-size="11" fill="#854d0e">回填状态?</text>
+              <rect x="20" y="200" width="140" height="56" rx="6" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="90" y="224" text-anchor="middle" font-size="11" fill="#854d0e">待回填</text>
+              <text x="90" y="242" text-anchor="middle" font-size="10" fill="#64748b">占用中</text>
+              <rect x="280" y="200" width="360" height="56" rx="6" fill="#dcfce7" stroke="#16a34a" />
+              <text x="460" y="224" text-anchor="middle" font-size="12" fill="#166534">已回填</text>
+              <text x="460" y="242" text-anchor="middle" font-size="10" fill="#64748b">稿件已完成 · 不回广场</text>
+              <rect x="760" y="200" width="140" height="56" rx="6" fill="#ffedd5" stroke="#ea580c" />
+              <text x="830" y="224" text-anchor="middle" font-size="11" fill="#9a3412">已超时释放</text>
+              <text x="830" y="242" text-anchor="middle" font-size="10" fill="#64748b">不退次</text>
+              <rect x="280" y="288" width="360" height="56" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="460" y="312" text-anchor="middle" font-size="12" fill="#1e40af">详情看回填 · 稿件详情抽屉</text>
+              <text x="460" y="330" text-anchor="middle" font-size="10" fill="#64748b">不改领取门禁 / 占用规则</text>
+            </g>
+          </svg>
+        </div>
+        <div class="flow-legend">
+          <span><i style="background:#dbeafe;border:1px solid #2563eb"></i>前端 / 用户操作</span>
+          <span><i style="background:#dcfce7;border:1px solid #16a34a"></i>后端判定 / 写入</span>
+          <span><i style="background:#ffedd5;border:1px solid #ea580c"></i>异步 / 超时</span>
+          <span><i style="background:#fef9c3;border:1px solid #ca8a04"></i>校验</span>
+          <span><i style="background:#fecaca;border:1px solid #dc2626"></i>阻断</span>
+          <span><i style="background:#e2e8f0;border:1px solid #94a3b8"></i>跳过 / 再领</span>
+        </div>
+      </div>
+          </div>
         </div>
 
         <div id="admin-ban" class="admin-pane">
+          <div class="module-tab-bar" role="tablist">
+            <button type="button" class="active" data-sub="admin-ban-list" role="tab">列表</button>
+            <button type="button" data-sub="admin-ban-flow" role="tab">业务流程</button>
+          </div>
+          <div id="admin-ban-list" class="sub-view active">
           <div class="table-toolbar"><h3>黑名单</h3></div>
           <div class="filter-bar">
             <div class="filter-field"><label>用户</label><input id="bnQ" placeholder="U-10999" /></div>
@@ -393,9 +943,60 @@
             </div>
           </div>
           <div class="table-wrap"><table><thead><tr><th>用户</th><th>未回填次数</th><th>停权时间</th><th>状态</th><th>操作</th></tr></thead><tbody id="bnBody"></tbody></table></div>
+          </div>
+          <div id="admin-ban-flow" class="sub-view">
+      <div class="glass-card flow-page">
+        <p class="flow-page-intro">黑名单：终身未回填超过 3 次停权，仅后台手动恢复。</p>
+        <div class="flow-svg-wrap">
+          <svg width="920" height="420" viewBox="0 0 920 420" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <marker id="flow-arrow-bn" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                <path d="M0,0 L8,4 L0,8 Z" fill="#94a3b8" />
+              </marker>
+            </defs>
+            <g class="flow-edges" marker-end="url(#flow-arrow-bn)">
+              <line x1="460" y1="56" x2="460" y2="80" />
+              <line x1="460" y1="160" x2="460" y2="184" />
+              <line x1="380" y1="224" x2="200" y2="224" />
+              <line x1="460" y1="264" x2="460" y2="288" />
+            </g>
+            <g class="flow-nodes" font-family="Inter, PingFang SC, sans-serif">
+              <rect x="280" y="16" width="360" height="40" rx="6" fill="#ffedd5" stroke="#ea580c" />
+              <text x="460" y="41" text-anchor="middle" font-size="12" fill="#9a3412">终身未回填超过 3 次</text>
+              <rect x="280" y="80" width="360" height="80" rx="6" fill="#fecaca" stroke="#dc2626" />
+              <text x="460" y="108" text-anchor="middle" font-size="12" fill="#991b1b">写入黑名单 · 停权</text>
+              <text x="460" y="128" text-anchor="middle" font-size="10" fill="#64748b">无法再领任何稿</text>
+              <text x="460" y="146" text-anchor="middle" font-size="10" fill="#64748b">无自助解禁</text>
+              <polygon points="460,184 540,224 460,264 380,224" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="460" y="228" text-anchor="middle" font-size="11" fill="#854d0e">运营手动恢复?</text>
+              <text x="256" y="216" font-size="10" fill="#dc2626">否</text>
+              <rect x="40" y="204" width="160" height="40" rx="6" fill="#fecaca" stroke="#dc2626" />
+              <text x="120" y="229" text-anchor="middle" font-size="11" fill="#991b1b">停权中</text>
+              <text x="472" y="280" font-size="10" fill="#16a34a">是</text>
+              <rect x="280" y="288" width="360" height="56" rx="6" fill="#dcfce7" stroke="#16a34a" />
+              <text x="460" y="312" text-anchor="middle" font-size="12" fill="#166534">后台手动恢复</text>
+              <text x="460" y="330" text-anchor="middle" font-size="10" fill="#64748b">回广场可再领</text>
+            </g>
+          </svg>
+        </div>
+        <div class="flow-legend">
+          <span><i style="background:#dbeafe;border:1px solid #2563eb"></i>前端 / 用户操作</span>
+          <span><i style="background:#dcfce7;border:1px solid #16a34a"></i>后端判定 / 写入</span>
+          <span><i style="background:#ffedd5;border:1px solid #ea580c"></i>异步 / 超时</span>
+          <span><i style="background:#fef9c3;border:1px solid #ca8a04"></i>校验</span>
+          <span><i style="background:#fecaca;border:1px solid #dc2626"></i>阻断</span>
+          <span><i style="background:#e2e8f0;border:1px solid #94a3b8"></i>跳过 / 再领</span>
+        </div>
+      </div>
+          </div>
         </div>
 
         <div id="admin-projects" class="admin-pane">
+          <div class="module-tab-bar" role="tablist">
+            <button type="button" class="active" data-sub="admin-projects-list" role="tab">列表</button>
+            <button type="button" data-sub="admin-projects-flow" role="tab">业务流程</button>
+          </div>
+          <div id="admin-projects-list" class="sub-view active">
           <div class="table-toolbar"><h3>项目</h3><button class="btn btn-primary" type="button" onclick="openProjectModal()">添加</button></div>
           <div class="filter-bar">
             <div class="filter-field"><label>项目名称</label><input id="pjQ" placeholder="番茄小说" /></div>
@@ -406,14 +1007,111 @@
             </div>
           </div>
           <div class="table-wrap"><table><thead><tr><th>项目名称</th><th>Logo 信息</th><th>状态</th><th>排序</th><th>更新时间</th><th>操作</th></tr></thead><tbody id="pjBody"></tbody></table></div>
+          </div>
+          <div id="admin-projects-flow" class="sub-view">
+      <div class="glass-card flow-page">
+        <p class="flow-page-intro">项目：启用可上传可进广场；禁用两者都不行。</p>
+        <div class="flow-svg-wrap">
+          <svg width="920" height="380" viewBox="0 0 920 380" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <marker id="flow-arrow-pj" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                <path d="M0,0 L8,4 L0,8 Z" fill="#94a3b8" />
+              </marker>
+            </defs>
+            <g class="flow-edges" marker-end="url(#flow-arrow-pj)">
+              <line x1="460" y1="72" x2="460" y2="100" />
+              <line x1="380" y1="140" x2="200" y2="140" />
+              <line x1="460" y1="180" x2="460" y2="208" />
+            </g>
+            <g class="flow-nodes" font-family="Inter, PingFang SC, sans-serif">
+              <rect x="280" y="16" width="360" height="56" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="460" y="40" text-anchor="middle" font-size="12" fill="#1e40af">添加 / 编辑项目</text>
+              <text x="460" y="58" text-anchor="middle" font-size="10" fill="#64748b">名称 / Logo / 启用禁用 / 排序</text>
+              <polygon points="460,100 540,140 460,180 380,140" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="460" y="144" text-anchor="middle" font-size="11" fill="#854d0e">项目已启用?</text>
+              <text x="256" y="132" font-size="10" fill="#dc2626">否</text>
+              <rect x="40" y="120" width="160" height="40" rx="6" fill="#fecaca" stroke="#dc2626" />
+              <text x="120" y="145" text-anchor="middle" font-size="11" fill="#991b1b">不可上传不进广场</text>
+              <text x="472" y="196" font-size="10" fill="#16a34a">是</text>
+              <rect x="280" y="208" width="360" height="56" rx="6" fill="#dcfce7" stroke="#16a34a" />
+              <text x="460" y="232" text-anchor="middle" font-size="12" fill="#166534">可上传 · 空闲稿可进广场</text>
+              <text x="460" y="250" text-anchor="middle" font-size="10" fill="#64748b">广场 Banner 复用已有能力</text>
+            </g>
+          </svg>
+        </div>
+        <div class="flow-legend">
+          <span><i style="background:#dbeafe;border:1px solid #2563eb"></i>前端 / 用户操作</span>
+          <span><i style="background:#dcfce7;border:1px solid #16a34a"></i>后端判定 / 写入</span>
+          <span><i style="background:#ffedd5;border:1px solid #ea580c"></i>异步 / 超时</span>
+          <span><i style="background:#fef9c3;border:1px solid #ca8a04"></i>校验</span>
+          <span><i style="background:#fecaca;border:1px solid #dc2626"></i>阻断</span>
+          <span><i style="background:#e2e8f0;border:1px solid #94a3b8"></i>跳过 / 再领</span>
+        </div>
+      </div>
+          </div>
         </div>
 
         <div id="admin-mats" class="admin-pane">
+          <div class="module-tab-bar" role="tablist">
+            <button type="button" class="active" data-sub="admin-mats-list" role="tab">列表</button>
+            <button type="button" data-sub="admin-mats-flow" role="tab">业务流程</button>
+          </div>
+          <div id="admin-mats-list" class="sub-view active">
           <div class="table-toolbar"><h3>素材类型</h3><button class="btn btn-primary" type="button" onclick="openMatModal()">新增</button></div>
           <div class="table-wrap"><table><thead><tr><th>类型</th><th>用于</th><th>状态</th><th>操作</th></tr></thead><tbody id="matBody"></tbody></table></div>
+          </div>
+          <div id="admin-mats-flow" class="sub-view">
+      <div class="glass-card flow-page">
+        <p class="flow-page-intro">素材类型：上传必选；feed 素材只筛该字段。</p>
+        <div class="flow-svg-wrap">
+          <svg width="920" height="360" viewBox="0 0 920 360" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <marker id="flow-arrow-mat" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                <path d="M0,0 L8,4 L0,8 Z" fill="#94a3b8" />
+              </marker>
+            </defs>
+            <g class="flow-edges" marker-end="url(#flow-arrow-mat)">
+              <line x1="460" y1="56" x2="460" y2="80" />
+              <line x1="460" y1="160" x2="460" y2="184" />
+              <line x1="380" y1="224" x2="200" y2="224" />
+              <line x1="460" y1="264" x2="460" y2="288" />
+            </g>
+            <g class="flow-nodes" font-family="Inter, PingFang SC, sans-serif">
+              <rect x="280" y="16" width="360" height="40" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="460" y="41" text-anchor="middle" font-size="12" fill="#1e40af">维护素材类型</text>
+              <rect x="280" y="80" width="360" height="80" rx="6" fill="#dcfce7" stroke="#16a34a" />
+              <text x="460" y="108" text-anchor="middle" font-size="12" fill="#166534">上传必须选择素材类型</text>
+              <text x="460" y="128" text-anchor="middle" font-size="10" fill="#64748b">feed「素材」只筛该字段</text>
+              <text x="460" y="146" text-anchor="middle" font-size="10" fill="#64748b">不是稿件类型（图集/视频）</text>
+              <polygon points="460,184 540,224 460,264 380,224" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="460" y="228" text-anchor="middle" font-size="11" fill="#854d0e">类型启用?</text>
+              <text x="256" y="216" font-size="10" fill="#dc2626">否</text>
+              <rect x="40" y="204" width="160" height="40" rx="6" fill="#fecaca" stroke="#dc2626" />
+              <text x="120" y="229" text-anchor="middle" font-size="11" fill="#991b1b">不可选 / 不可筛</text>
+              <text x="472" y="280" font-size="10" fill="#16a34a">是</text>
+              <rect x="280" y="288" width="360" height="40" rx="6" fill="#dcfce7" stroke="#16a34a" />
+              <text x="460" y="313" text-anchor="middle" font-size="12" fill="#166534">上传下拉与广场筛选项可见</text>
+            </g>
+          </svg>
+        </div>
+        <div class="flow-legend">
+          <span><i style="background:#dbeafe;border:1px solid #2563eb"></i>前端 / 用户操作</span>
+          <span><i style="background:#dcfce7;border:1px solid #16a34a"></i>后端判定 / 写入</span>
+          <span><i style="background:#ffedd5;border:1px solid #ea580c"></i>异步 / 超时</span>
+          <span><i style="background:#fef9c3;border:1px solid #ca8a04"></i>校验</span>
+          <span><i style="background:#fecaca;border:1px solid #dc2626"></i>阻断</span>
+          <span><i style="background:#e2e8f0;border:1px solid #94a3b8"></i>跳过 / 再领</span>
+        </div>
+      </div>
+          </div>
         </div>
 
         <div id="admin-skus" class="admin-pane">
+          <div class="module-tab-bar" role="tablist">
+            <button type="button" class="active" data-sub="admin-skus-list" role="tab">列表</button>
+            <button type="button" data-sub="admin-skus-flow" role="tab">业务流程</button>
+          </div>
+          <div id="admin-skus-list" class="sub-view active">
           <div class="table-toolbar">
             <div>
               <h3>次数商品</h3>
@@ -427,146 +1125,38 @@
             </div>
           </div>
           <div class="table-wrap"><table><thead><tr><th>档位</th><th>次数</th><th>积分</th><th>状态</th><th>操作</th></tr></thead><tbody id="skuBody"></tbody></table></div>
-        </div>
-      </div>
-    </div>
-
-    <div id="view-flow" class="page-view">
+          </div>
+          <div id="admin-skus-flow" class="sub-view">
       <div class="glass-card flow-page">
-        <p class="flow-page-intro">一张闭环：PC 招募 → 后台录入 → 电脑上传（文件夹/压缩包）→ 平台审核 → C 端广场领取 → 次数 → 选词 → 占用 → 24h 回填或释放。C 端不做剪辑手上传。</p>
+        <p class="flow-page-intro">次数商品：免费次数挂本页；在售最多 4 档，可改价下架。</p>
         <div class="flow-svg-wrap">
-          <svg width="1080" height="1800" viewBox="0 0 1080 1800" xmlns="http://www.w3.org/2000/svg">
+          <svg width="920" height="420" viewBox="0 0 920 420" xmlns="http://www.w3.org/2000/svg">
             <defs>
-              <marker id="flow-arrow-1" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+              <marker id="flow-arrow-sku" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
                 <path d="M0,0 L8,4 L0,8 Z" fill="#94a3b8" />
               </marker>
             </defs>
-            <g class="flow-edges" marker-end="url(#flow-arrow-1)">
-              <line x1="540" y1="56" x2="540" y2="80" />
-              <line x1="540" y1="160" x2="540" y2="188" />
-              <polyline points="460,120 200,120 200,140" />
-              <polyline points="40,160 16,160 16,16 360,16" />
-              <line x1="540" y1="268" x2="540" y2="300" />
-              <polyline points="460,340 200,340" />
-              <polyline points="40,340 24,340 24,176 540,176 540,188" />
-              <line x1="540" y1="380" x2="540" y2="412" />
-              <line x1="540" y1="472" x2="540" y2="492" />
-              <polyline points="460,532 200,532" />
-              <polyline points="40,532 24,532 24,176 540,176 540,188" />
-              <line x1="540" y1="572" x2="540" y2="624" />
-              <line x1="540" y1="684" x2="540" y2="716" />
-              <line x1="540" y1="776" x2="540" y2="808" />
-              <polyline points="460,848 200,848" />
-              <polyline points="120,828 120,792 540,792 540,808" />
-              <line x1="540" y1="888" x2="540" y2="920" />
-              <polyline points="460,960 200,960" />
-              <polyline points="120,940 120,904 540,904 540,920" />
-              <line x1="540" y1="1000" x2="540" y2="1032" />
-              <polyline points="620,1072 860,1072" />
-              <polyline points="1040,1072 1064,1072 1064,608 720,608 720,624" />
-              <line x1="540" y1="1112" x2="540" y2="1144" />
-              <line x1="540" y1="1204" x2="540" y2="1236" />
-              <polyline points="620,1276 860,1276" />
-              <polyline points="1040,1276 1064,1276 1064,608 720,608 720,624" />
-              <line x1="540" y1="1316" x2="540" y2="1348" />
-              <line x1="540" y1="1408" x2="540" y2="1440" />
-              <polyline points="460,1480 160,1480" />
-              <line x1="90" y1="1500" x2="90" y2="1540" />
-              <polyline points="20,1560 8,1560 8,608 360,608 360,624" />
-              <line x1="540" y1="1520" x2="540" y2="1552" />
-              <polyline points="360,1576 200,1576 200,608 360,624" />
+            <g class="flow-edges" marker-end="url(#flow-arrow-sku)">
+              <line x1="460" y1="72" x2="460" y2="100" />
+              <line x1="380" y1="140" x2="200" y2="140" />
+              <line x1="460" y1="180" x2="460" y2="208" />
+              <line x1="460" y1="264" x2="460" y2="288" />
             </g>
-            <g font-family="Inter, PingFang SC, sans-serif">
-              <rect x="360" y="16" width="360" height="40" rx="6" fill="#dbeafe" stroke="#2563eb" />
-              <text x="540" y="41" text-anchor="middle" font-size="12" fill="#1e40af">PC 招募海报 · 底部客服二维码</text>
-
-              <polygon points="540,80 620,120 540,160 460,120" fill="#fef9c3" stroke="#ca8a04" />
-              <text x="540" y="124" text-anchor="middle" font-size="11" fill="#854d0e">已录入剪辑手?</text>
-              <text x="336" y="112" font-size="10" fill="#dc2626">否</text>
-              <rect x="40" y="140" width="160" height="40" rx="6" fill="#fecaca" stroke="#dc2626" />
-              <text x="120" y="165" text-anchor="middle" font-size="11" fill="#991b1b">阻断上传</text>
-              <text x="552" y="180" font-size="10" fill="#16a34a">是</text>
-
-              <rect x="360" y="188" width="360" height="80" rx="6" fill="#dbeafe" stroke="#2563eb" />
-              <text x="540" y="216" text-anchor="middle" font-size="12" fill="#1e40af">PC 弹窗上传 · 文件夹或压缩包</text>
-              <text x="540" y="236" text-anchor="middle" font-size="10" fill="#64748b">填齐后台同款字段 · 必选素材类型</text>
-              <text x="540" y="252" text-anchor="middle" font-size="10" fill="#64748b">禁用项目不可上传</text>
-
-              <polygon points="540,300 620,340 540,380 460,340" fill="#fef9c3" stroke="#ca8a04" />
-              <text x="540" y="344" text-anchor="middle" font-size="11" fill="#854d0e">项目已启用?</text>
-              <text x="336" y="332" font-size="10" fill="#dc2626">否</text>
-              <rect x="40" y="320" width="160" height="40" rx="6" fill="#fecaca" stroke="#dc2626" />
-              <text x="120" y="345" text-anchor="middle" font-size="11" fill="#991b1b">项目禁用拦截</text>
-              <text x="552" y="396" font-size="10" fill="#16a34a">是</text>
-
-              <rect x="360" y="412" width="360" height="60" rx="6" fill="#dcfce7" stroke="#16a34a" />
-              <text x="540" y="436" text-anchor="middle" font-size="12" fill="#166534">提交平台审核</text>
-              <text x="540" y="454" text-anchor="middle" font-size="10" fill="#64748b">审核中不进广场；驳回出示原因</text>
-
-              <polygon points="540,492 620,532 540,572 460,532" fill="#fef9c3" stroke="#ca8a04" />
-              <text x="540" y="536" text-anchor="middle" font-size="11" fill="#854d0e">审核通过?</text>
-              <text x="336" y="524" font-size="10" fill="#dc2626">否</text>
-              <rect x="40" y="512" width="160" height="40" rx="6" fill="#fecaca" stroke="#dc2626" />
-              <text x="120" y="537" text-anchor="middle" font-size="11" fill="#991b1b">已驳回出示原因</text>
-              <text x="552" y="588" font-size="10" fill="#16a34a">是</text>
-
-              <rect x="360" y="624" width="360" height="60" rx="6" fill="#dbeafe" stroke="#2563eb" />
-              <text x="540" y="648" text-anchor="middle" font-size="12" fill="#1e40af">作品广场宫格 + 项目直选</text>
-              <text x="540" y="666" text-anchor="middle" font-size="10" fill="#64748b">仅已通过且空闲 · 不展示金额</text>
-
-              <rect x="360" y="716" width="360" height="60" rx="6" fill="#dbeafe" stroke="#2563eb" />
-              <text x="540" y="740" text-anchor="middle" font-size="12" fill="#1e40af">详情铺满素材 · 发起领取</text>
-              <text x="540" y="758" text-anchor="middle" font-size="10" fill="#64748b">次数旁显 · 浮层选词 · 分成比例</text>
-
-              <polygon points="540,808 620,848 540,888 460,848" fill="#fef9c3" stroke="#ca8a04" />
-              <text x="540" y="852" text-anchor="middle" font-size="11" fill="#854d0e">剩余次数&gt;0?</text>
-              <text x="336" y="840" font-size="10" fill="#dc2626">否 · 购次</text>
-              <rect x="40" y="828" width="160" height="40" rx="6" fill="#dbeafe" stroke="#2563eb" />
-              <text x="120" y="853" text-anchor="middle" font-size="11" fill="#1e40af">积分买在售档</text>
-              <text x="552" y="904" font-size="10" fill="#16a34a">是</text>
-
-              <polygon points="540,920 620,960 540,1000 460,960" fill="#fef9c3" stroke="#ca8a04" />
-              <text x="540" y="964" text-anchor="middle" font-size="11" fill="#854d0e">已选通过关键词?</text>
-              <text x="336" y="952" font-size="10" fill="#dc2626">否</text>
-              <rect x="40" y="940" width="160" height="40" rx="6" fill="#fecaca" stroke="#dc2626" />
-              <text x="120" y="965" text-anchor="middle" font-size="11" fill="#991b1b">拦截领取</text>
-              <text x="552" y="1016" font-size="10" fill="#16a34a">是</text>
-
-              <polygon points="540,1032 620,1072 540,1112 460,1072" fill="#fef9c3" stroke="#ca8a04" />
-              <text x="540" y="1076" text-anchor="middle" font-size="11" fill="#854d0e">稿件空闲未占用?</text>
-              <text x="636" y="1060" font-size="10" fill="#dc2626">否</text>
-              <rect x="860" y="1044" width="180" height="56" rx="6" fill="#fecaca" stroke="#dc2626" />
-              <text x="950" y="1068" text-anchor="middle" font-size="11" fill="#991b1b">领取失败</text>
-              <text x="950" y="1086" text-anchor="middle" font-size="10" fill="#64748b">他人占用 · 回广场</text>
-              <text x="552" y="1128" font-size="10" fill="#16a34a">是</text>
-
-              <rect x="360" y="1144" width="360" height="60" rx="6" fill="#dcfce7" stroke="#16a34a" />
-              <text x="540" y="1168" text-anchor="middle" font-size="12" fill="#166534">领取成功 · 扣次不退</text>
-              <text x="540" y="1186" text-anchor="middle" font-size="10" fill="#64748b">占用并对他人 feed 隐藏</text>
-
-              <polygon points="540,1236 620,1276 540,1316 460,1276" fill="#fef9c3" stroke="#ca8a04" />
-              <text x="540" y="1280" text-anchor="middle" font-size="11" fill="#854d0e">24h 内已回填?</text>
-              <text x="636" y="1264" font-size="10" fill="#16a34a">是</text>
-              <rect x="860" y="1248" width="180" height="56" rx="6" fill="#dcfce7" stroke="#16a34a" />
-              <text x="950" y="1272" text-anchor="middle" font-size="11" fill="#166534">完成占用</text>
-              <text x="950" y="1290" text-anchor="middle" font-size="10" fill="#64748b">不再出现 feed</text>
-              <text x="552" y="1332" font-size="10" fill="#dc2626">否</text>
-
-              <rect x="360" y="1348" width="360" height="60" rx="6" fill="#ffedd5" stroke="#ea580c" />
-              <text x="540" y="1372" text-anchor="middle" font-size="12" fill="#9a3412">记 1 次未回填 + 释放</text>
-              <text x="540" y="1390" text-anchor="middle" font-size="10" fill="#64748b">不退次 · 稿件回 feed</text>
-
-              <polygon points="540,1440 620,1480 540,1520 460,1480" fill="#fef9c3" stroke="#ca8a04" />
-              <text x="540" y="1484" text-anchor="middle" font-size="11" fill="#854d0e">终身未回填&gt;3?</text>
-              <text x="336" y="1472" font-size="10" fill="#dc2626">是 · 黑名单</text>
-              <rect x="20" y="1460" width="140" height="40" rx="6" fill="#fecaca" stroke="#dc2626" />
-              <text x="90" y="1485" text-anchor="middle" font-size="11" fill="#991b1b">停权</text>
-              <rect x="20" y="1540" width="140" height="40" rx="6" fill="#dcfce7" stroke="#16a34a" />
-              <text x="90" y="1565" text-anchor="middle" font-size="11" fill="#166534">后台手动恢复</text>
-              <text x="552" y="1536" font-size="10" fill="#16a34a">否 · 可再领</text>
-
-              <rect x="360" y="1552" width="360" height="48" rx="6" fill="#e2e8f0" stroke="#94a3b8" />
-              <text x="540" y="1582" text-anchor="middle" font-size="12" fill="#475569">原领取人与他人均可再领（再扣次）</text>
+            <g class="flow-nodes" font-family="Inter, PingFang SC, sans-serif">
+              <rect x="280" y="16" width="360" height="56" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="460" y="40" text-anchor="middle" font-size="12" fill="#1e40af">配置免费次数 + 次数商品</text>
+              <text x="460" y="58" text-anchor="middle" font-size="10" fill="#64748b">形态：x 次需要 y 积分</text>
+              <polygon points="460,100 540,140 460,180 380,140" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="460" y="144" text-anchor="middle" font-size="11" fill="#854d0e">在售档位数≤4?</text>
+              <text x="256" y="132" font-size="10" fill="#dc2626">否</text>
+              <rect x="40" y="120" width="160" height="40" rx="6" fill="#fecaca" stroke="#dc2626" />
+              <text x="120" y="145" text-anchor="middle" font-size="11" fill="#991b1b">不可再上架</text>
+              <text x="472" y="196" font-size="10" fill="#16a34a">是</text>
+              <rect x="280" y="208" width="360" height="56" rx="6" fill="#dcfce7" stroke="#16a34a" />
+              <text x="460" y="232" text-anchor="middle" font-size="12" fill="#166534">C 端兑换浮层可见在售档</text>
+              <text x="460" y="250" text-anchor="middle" font-size="10" fill="#64748b">下架立即不可新购 · 已购保留</text>
+              <rect x="280" y="288" width="360" height="40" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="460" y="313" text-anchor="middle" font-size="12" fill="#1e40af">改价 / 下架 / 保存免费次数</text>
             </g>
           </svg>
         </div>
@@ -576,15 +1166,108 @@
           <span><i style="background:#ffedd5;border:1px solid #ea580c"></i>异步 / 超时</span>
           <span><i style="background:#fef9c3;border:1px solid #ca8a04"></i>校验</span>
           <span><i style="background:#fecaca;border:1px solid #dc2626"></i>阻断</span>
+          <span><i style="background:#e2e8f0;border:1px solid #94a3b8"></i>跳过 / 再领</span>
+        </div>
+      </div>
+          </div>
         </div>
       </div>
     </div>
+
+    <div id="view-data" class="page-view">
+      <div class="glass-card">
+        <div class="data-block">
+          <h2>将落地契约</h2>
+          <p>下列方法 / 路径 / 请求 / 响应是研发对照用的落地契约。<strong>本 Demo 无真实 HTTP</strong>，C / PC / 后台共用 <code>yijian-daifa-store.js</code> 的 localStorage 逻辑闭环。</p>
+          <div class="table-wrap">
+            <table class="explain-table">
+              <thead><tr><th>能力</th><th>方法 / 路径</th><th>请求</th><th>响应</th></tr></thead>
+              <tbody>
+                <tr><td><strong>广场列表</strong></td><td><code>GET /api/yjd/feed</code></td><td>project / editor / mat / kind / q</td><td>已通过且空闲稿件；不含金额</td></tr>
+                <tr><td><strong>稿件详情</strong></td><td><code>GET /api/yjd/works/:id</code></td><td>id</td><td>七字段 + preview≤3 + imgs + 试看标记</td></tr>
+                <tr><td><strong>预览图集</strong></td><td><code>GET /api/yjd/works/:id/preview</code></td><td>id</td><td>最多 3 张 URL；不扣次、不占用</td></tr>
+                <tr><td><strong>领取</strong></td><td><code>POST /api/yjd/claims</code></td><td>mid / keywordId</td><td>占用 + 扣次；或 次数不足 / 未选词 / 已占用 / 停权 / 未通过</td></tr>
+                <tr><td><strong>兑换次数</strong></td><td><code>POST /api/yjd/skus/:id/redeem</code></td><td>skuId</td><td>已购次数 +n；下架不可兑</td></tr>
+                <tr><td><strong>回填</strong></td><td><code>POST /api/yjd/claims/:id/fill</code></td><td>复用项目回填字段</td><td>已回填；稿件已完成</td></tr>
+                <tr><td><strong>超时释放</strong></td><td><code>POST /api/yjd/claims/:id/timeout</code></td><td>job / cron</td><td>未回填 +1、释放、不退次</td></tr>
+                <tr><td><strong>PC 上传</strong></td><td><code>POST /api/yjd/pc/works</code></td><td>文件夹或压缩包 + 后台同款字段</td><td>审核中；未录入 / 项目禁用拦截</td></tr>
+                <tr><td><strong>审核</strong></td><td><code>POST /api/yjd/admin/works/:id/audit</code></td><td>pass | reject + reason</td><td>已通过进广场；驳回不进；已通过不可再驳</td></tr>
+                <tr><td><strong>黑名单恢复</strong></td><td><code>POST /api/yjd/admin/bans/:user/restore</code></td><td>userId</td><td>已恢复，可再领</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="callout warn">Demo 不发起上述请求。联调时按此契约落地，不要用 Demo 的 localStorage 当接口。</div>
+        </div>
+        <div class="data-block">
+          <h2>状态机</h2>
+          <div class="table-wrap">
+            <table class="explain-table">
+              <thead><tr><th>域</th><th>状态</th><th>谁改</th><th>后果</th></tr></thead>
+              <tbody>
+                <tr><td><strong>审核</strong></td><td>审核中 → 已通过 / 已驳回</td><td>运营审 PC 新稿；后台录入直接已通过</td><td>仅已通过且空闲进广场；已通过不可再驳回</td></tr>
+                <tr><td><strong>占用</strong></td><td>空闲 → 占用中 → 已完成 / 空闲</td><td>领取成功占用；回填完成；24h 超时释放</td><td>占用中对他人隐藏；已完成不回广场</td></tr>
+                <tr><td><strong>领取</strong></td><td>未回填 / 已回填 / 已超时</td><td>用户回填；超时任务</td><td>后台展示待回填 / 已回填 / 已超时释放</td></tr>
+                <tr><td><strong>黑名单</strong></td><td>停权中 / 已恢复</td><td>终身未回填&gt;3 写入；仅后台恢复</td><td>停权中不可再领</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="data-block">
+          <h2>异常</h2>
+          <div class="table-wrap">
+            <table class="explain-table">
+              <thead><tr><th>场景</th><th>条件</th><th>前端表现</th><th>是否扣次</th></tr></thead>
+              <tbody>
+                <tr><td><strong>次数不足</strong></td><td>免费+已购 = 0</td><td>详情浮层兑换，不打开选词</td><td>否</td></tr>
+                <tr><td><strong>占用</strong></td><td>稿件占用中 / 已完成</td><td>领取失败，回广场</td><td>否</td></tr>
+                <tr><td><strong>停权</strong></td><td>黑名单停权中</td><td>按钮「已被停权，无法领取」</td><td>否</td></tr>
+                <tr><td><strong>未审核通过</strong></td><td>审核中 / 已驳回</td><td>不进广场；详情不可领</td><td>否</td></tr>
+                <tr><td>未选词</td><td>浮层未点关键词</td><td>Toast 拦截领取</td><td>否</td></tr>
+                <tr><td>项目禁用</td><td>项目状态=禁用</td><td>不进广场；PC 不可传到该项目</td><td>否</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="data-block">
+          <h2>字段清单（按 store 实体）</h2>
+          <ul>
+            <li><strong>editors</strong>：id / ybId / name / share / note / src / projects / status / time</li>
+            <li><strong>works</strong>：id / title / project / book / bookId / size / dl / editor / kind / mat / occ / time / share / cover / genre / tags / imgs / preview(≤3) / pubTitle / pubDesc / duration / audit / rejectReason / fileName / occupied / earn</li>
+            <li><strong>projects</strong>：id / name / logo / status / sort / updated</li>
+            <li><strong>mats</strong>：id / name / status</li>
+            <li><strong>skus</strong>：id / times / points / on</li>
+            <li><strong>claims</strong>：id / user / mid / title / work / project / editor / cover / kind / kw / fill / status / time / link / claimedAt / downloadedAt / expireAt</li>
+            <li><strong>bans</strong>：user / strikes / time / status</li>
+            <li><strong>user</strong>：id / free / bought / strikes / banned</li>
+          </ul>
+        </div>
+        <div class="data-block">
+          <h2>接口清单</h2>
+          <p>与上方契约表同一组路径。Demo 全部短路为 <code>YJD.open / YJD.save</code>，无 fetch、无鉴权头。</p>
+        </div>
+        <div class="data-block">
+          <h2>状态清单</h2>
+          <ul>
+            <li>剪辑手：已录入 / 已停用</li>
+            <li>稿件占用：空闲 / 占用中 / 已完成</li>
+            <li>平台审核：审核中 / 已通过 / 已驳回</li>
+            <li>领取（C 端）：未回填 / 已回填 / 已超时</li>
+            <li>领取（后台）：待回填 / 已回填 / 已超时释放</li>
+            <li>黑名单：停权中 / 已恢复</li>
+            <li>项目 / 素材：启用 / 禁用</li>
+            <li>次数商品：在售 / 下架</li>
+          </ul>
+          <div class="callout info">状态枚举与门禁顺序（次数 → 选词 → 占用）本轮不改。</div>
+        </div>
+      </div>
+    </div>
+
   </main>
 
   <div class="drawer-overlay" id="ruleOverlay" onclick="setRuleDrawer(false)"></div>
   <aside class="drawer" id="ruleDrawer" role="dialog" aria-labelledby="ruleTitle">
     <div class="drawer-header">
-      <h2 id="ruleTitle">FR-014 · v6 需求规则</h2>
+      <h2 id="ruleTitle">FR-014 · v7 需求规则</h2>
       <button class="drawer-close" type="button" onclick="setRuleDrawer(false)">×</button>
     </div>
     <div class="rule-tab-bar">
@@ -634,7 +1317,7 @@
         </div>
         <div class="rule-section">
           <h3><span>5</span>业务流程</h3>
-          <div class="rule-content"><p>见页内 Tab <strong>「业务流程」</strong>。</p></div>
+          <div class="rule-content"><p>见本页「前端交互 → 业务流程」。</p></div>
         </div>
       </div>
       <div id="rule-pc" class="rule-panel">
@@ -1421,7 +2104,7 @@
     }
     function currentTabKey() {
       var id = document.querySelector('.page-view.active')?.id;
-      return { 'view-fe': 'fe', 'view-pc': 'pc', 'view-admin': 'admin', 'view-flow': 'flow' }[id] || 'fe';
+      return { 'view-explain': 'explain', 'view-fe': 'fe', 'view-pc': 'pc', 'view-admin': 'admin', 'view-data': 'data' }[id] || 'fe';
     }
     function syncPageUrl() {
       var params = new URLSearchParams();
@@ -1492,10 +2175,39 @@
         document.querySelectorAll('.page-view').forEach(function (v) { v.classList.remove('active'); });
         btn.classList.add('active');
         document.getElementById(btn.dataset.page).classList.add('active');
-        if (btn.dataset.page === 'view-fe') loadMockupFrame();
-        if (btn.dataset.page === 'view-pc') loadPcFrame();
+        if (btn.dataset.page === 'view-fe') {
+          var feScene = document.querySelector('#view-fe .module-tab-bar button[data-sub="fe-scene"]');
+          if (feScene) feScene.click();
+          else loadMockupFrame();
+        }
+        if (btn.dataset.page === 'view-pc') {
+          var pcScene = document.querySelector('#view-pc .module-tab-bar button[data-sub="pc-scene"]');
+          if (pcScene) pcScene.click();
+          else loadPcFrame();
+        }
         syncPageUrl();
         syncRuleTabToPage();
+      });
+    });
+    document.querySelectorAll('.module-tab-bar button').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var bar = btn.closest('.module-tab-bar');
+        var scope = bar.parentElement;
+        bar.querySelectorAll('button').forEach(function (b) { b.classList.remove('active'); });
+        scope.querySelectorAll(':scope > .sub-view').forEach(function (v) { v.classList.remove('active'); });
+        btn.classList.add('active');
+        var target = document.getElementById(btn.dataset.sub);
+        if (target) target.classList.add('active');
+        if (btn.dataset.sub === 'fe-scene') loadMockupFrame();
+        if (btn.dataset.sub === 'pc-scene') loadPcFrame();
+      });
+    });
+    document.querySelectorAll('.explain-nav button').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('.explain-nav button').forEach(function (b) { b.classList.remove('active'); });
+        document.querySelectorAll('.explain-panel').forEach(function (p) { p.classList.remove('active'); });
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.explain).classList.add('active');
       });
     });
     document.querySelectorAll('.admin-tab-bar button').forEach(function (btn) {
@@ -1503,7 +2215,10 @@
         document.querySelectorAll('.admin-tab-bar button').forEach(function (b) { b.classList.remove('active'); });
         document.querySelectorAll('.admin-pane').forEach(function (p) { p.classList.remove('active'); });
         btn.classList.add('active');
-        document.getElementById(btn.dataset.admin).classList.add('active');
+        var pane = document.getElementById(btn.dataset.admin);
+        pane.classList.add('active');
+        var first = pane.querySelector('.module-tab-bar button');
+        if (first) first.click();
       });
     });
     document.querySelectorAll('.rule-tab-bar button').forEach(function (btn) {
@@ -1519,9 +2234,14 @@
 
     var params = new URLSearchParams(location.search);
     var tab = params.get('tab');
-    var tabPageMap = { admin: 'view-admin', flow: 'view-flow', fe: 'view-fe', pc: 'view-pc' };
-    if (tab && tabPageMap[tab]) {
-      var tbtn = document.querySelector('[data-page="' + tabPageMap[tab] + '"]');
+    var tabPageMap = { admin: 'view-admin', fe: 'view-fe', pc: 'view-pc', explain: 'view-explain', data: 'view-data' };
+    if (tab === 'flow') {
+      var feBtn = document.querySelector('.page-tab-bar button[data-page="view-fe"]');
+      if (feBtn) feBtn.click();
+      var flowBtn = document.querySelector('#view-fe .module-tab-bar button[data-sub="fe-flow"]');
+      if (flowBtn) flowBtn.click();
+    } else if (tab && tabPageMap[tab]) {
+      var tbtn = document.querySelector('.page-tab-bar button[data-page="' + tabPageMap[tab] + '"]');
       if (tbtn) tbtn.click();
     }
     renderAllAdmin();
