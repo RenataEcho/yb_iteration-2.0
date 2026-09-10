@@ -383,6 +383,11 @@
     .rule-content li { margin-bottom: 5px; }
     .rule-content p { margin-bottom: 6px; }
     .rule-content code { font-size: 11px; background: #f1f5f9; padding: 1px 4px; border-radius: 4px; }
+    .rule-content .prompt-block, .prompt-block {
+      margin-top: 8px; padding: 12px 14px; background: #f8fafc; border: 1px solid var(--border);
+      border-radius: 8px; font-size: 12px; line-height: 1.7; white-space: pre-wrap;
+      font-family: ui-monospace, "SF Mono", Menlo, monospace; color: var(--text-primary);
+    }
     .drawer-header { align-items: flex-start; }
     .drawer-header h2 { margin-bottom: 2px; }
     .drawer-sub { font-size: 12px; color: var(--text-muted); font-weight: 400; }
@@ -490,7 +495,7 @@
         <h1>
           一键代发
           <span class="badge badge-fr">FR-014</span>
-          <span class="badge badge-version">v8 当前</span>
+          <span class="badge badge-version">v9 当前</span>
         </h1>
         <p class="page-desc">C 端只领取。剪辑手在已有 PC 创作者中心用文件夹或压缩包上传，先走平台审核。招募、看板、上传弹窗与 list 都在 PC。后台与 C/PC 共用同一份演示数据。</p>
       </div>
@@ -688,7 +693,7 @@
                     <tr><td>C</td><td>作品广场</td><td>启用项目图标、搜索、筛选项、已通过空闲稿封面。无金额。</td><td>点卡片进详情；点招募帧进海报。</td></tr>
                     <tr><td>C</td><td>稿件详情</td><td>素材铺满、标签、书籍 ID、注意事项。未领=领取步骤；已领=发布技巧。</td><td>次数够→选词；不够→兑换。</td></tr>
                     <tr><td>C</td><td>我的领取</td><td>未回填 / 已回填 / 已超时。7 天下载倒计时。立即回填始终高亮。</td><td>回填页；或点信息区回该稿详情。</td></tr>
-                    <tr><td>PC</td><td>剪辑供稿</td><td>招募 BN + 看板（已授权项目 / 上传数 / 被领数 / 收益）。</td><td>点 BN 开招募抽屉；点上传走三步。</td></tr>
+                    <tr><td>PC</td><td>剪辑供稿</td><td>招募 BN + 看板（已授权项目 / 上传数 / 被领数 / 收益）。「操作说明」在标题旁。</td><td>点 BN 开招募抽屉；点操作说明看手册；点上传走三步。</td></tr>
                     <tr><td>后台</td><td>七页</td><td>剪辑手 / 稿件 / 领取 / 黑名单 / 项目 / 素材 / 次数。</td><td>录入、审核、恢复、改配置即时影响广场。</td></tr>
                   </tbody>
                 </table>
@@ -754,7 +759,7 @@
               <div class="faq-item"><div class="faq-q">Q5. 图集详情为什么只能看 3 张？</div><div class="faq-a">预览上限 3 张，角标仍是真实张数。领取前预览不扣次、不能保存。完整稿领取后再下。演示预览用现有封面凑 3 张，不是书内页。</div></div>
               <div class="faq-item"><div class="faq-q">Q6. 用户能在 App 里当剪辑手上传吗？</div><div class="faq-a">不能。C 端只领取。上传只在 PC 创作者中心。广场招募帧只看海报。</div></div>
               <div class="faq-item"><div class="faq-q">Q7. 领取后怎么下载？水印必做吗？</div><div class="faq-a">底栏「下载稿件」7 天内有效。加水印可选，下载会先打当前水印再出文件。超时未下不能再下，但回填不受 7 天下载影响，只受 24h 回填窗影响。</div></div>
-              <div class="faq-item"><div class="faq-q">Q8. 非剪辑手打开 PC「剪辑供稿」会怎样？</div><div class="faq-a">不跳走。招募 BN 仍在，点开抽屉可看海报。看板走缺省，上传入口不可用。</div></div>
+              <div class="faq-item"><div class="faq-q">Q8. 非剪辑手打开 PC「剪辑供稿」会怎样？</div><div class="faq-a">不跳走。招募 BN 仍在，点开抽屉可看海报。看板走缺省，上传入口不可用。「操作说明」仍可打开。</div></div>
               <div class="faq-item"><div class="faq-q">Q9. 用剪辑手稿件回填后，关键词收益怎么入账？</div><div class="faq-a">订单已结算时先判该词是不是代发。是则按分成拆成用户实结和剪辑手分账，两边都进项目收益明细，状态「已结算」。不是则全额给用户。对账看「前后端数据交互 → 用户收益入账」。</div></div>
             </div>
           </section>
@@ -780,7 +785,7 @@
           <div class="scene-list" id="feScenes">
             <button class="scene-btn active" type="button" data-screen="feed" data-desc="项目图标直选 + 搜索在下方 + 其余下拉 + 最多 5 条 BN 轮播；点招募帧进海报；不展示收益">作品广场</button>
             <button class="scene-btn" type="button" data-screen="poster" data-desc="点广场招募帧进入；卖点 / 适合谁 / 客服二维码；无申请表">招募海报</button>
-            <button class="scene-btn" type="button" data-screen="detail" data-desc="领取后改为发布技巧；底栏添加水印 / 下载稿件">稿件详情</button>
+            <button class="scene-btn" type="button" data-screen="detail" data-desc="领取后出示「发布技巧」字段 + 一段可复制；底栏添加水印 / 下载稿件">稿件详情</button>
             <button class="scene-btn" type="button" data-screen="claim" data-desc="对照场景：选词浮层仍可打开；主路径点击领取即成功">浮层选词</button>
             <button class="scene-btn" type="button" data-screen="buy" data-desc="详情浮层选档，按钮为兑换；最多 4 档">浮层兑换</button>
             <button class="scene-btn" type="button" data-screen="claims" data-desc="有记录才出项目；7 天下载倒计时；立即回填始终高亮">我的领取</button>
@@ -921,6 +926,7 @@
             <button class="scene-btn" type="button" data-pcscreen="guest" data-desc="无权限时看板走缺省，招募 BN 仍在">非剪辑手缺省</button>
             <button class="scene-btn" type="button" data-pcscreen="upload" data-desc="弹窗三步：先填字段 → 选文件夹/压缩包 → 表格确认后队列上传">上传入口</button>
             <button class="scene-btn" type="button" data-pcscreen="list" data-desc="与后台同字段，无下载链接；另列上传状态；仅空闲可删">上传 list</button>
+            <button class="scene-btn" type="button" data-pcscreen="guide" data-desc="看板/清单入口；页内手册；未录入也可看">操作说明</button>
           </div>
           <p class="scene-hint" id="pcSceneHint">同一入口：顶部招募 BN + 下方看板</p>
         </div>
@@ -1505,64 +1511,15 @@
           </div>
           <div id="ix-fe" class="ix-pane active">
             <div class="ix-rule">
-              <strong>重要规则：领取门禁与广场可见性</strong>
+              <strong>本页只挂唯一 FR，不再复述场景细则</strong>
               <ul>
-                <li>门禁顺序固定：停权 → 次数 → 选词浮层 → 资格/占用。</li>
-                <li>次数不足只打开兑换浮层，不打开选词浮层，不扣次。</li>
-                <li>广场只返回 <code>plazaEligible</code> 为真的稿：已通过 + 空闲 + 项目启用 + 剪辑手已录入 + 素材启用。</li>
-                <li>领取成功必须同时写：占用中、扣次、领取记录未回填。三者同一业务关联编号（claimId）。</li>
-                <li>任何列表响应不得带金额、收益、积分售价以外的收益字段。</li>
+                <li>WHAT 以 FR-014-01 … FR-014-27 为准。字段、toast、状态机在页头「需求规则」对应场景卡。</li>
+                <li>领取门禁（FR-014-11）：停权 → 次数 → 选词浮层 → 资格/占用。次数不足只开兑换，不扣次。</li>
+                <li>广场只返回 <code>plazaEligible</code> 为真的稿（FR-014-08）。领取成功必须同时写占用、扣次、未回填（FR-014-12）。</li>
+                <li>任何列表响应不得带金额。接口、状态机、入账文案见本 Tab 其余子页。</li>
               </ul>
             </div>
-            <h3>1. 作品广场</h3>
-            <ul>
-              <li>项目图标只列<strong>启用</strong>项目，按 sort 横滑直选；点图标即筛该项目。</li>
-              <li>搜索在项目图标下方，按标题模糊匹配；下拉筛剪辑师 / 启用素材 / 图集或视频。</li>
-              <li>封面必须是图片 URL，禁止纯色块。图集出示 <code>imgs</code> 张数角标，视频不出张数。</li>
-              <li>广场 Banner 复用平台已有 0–5 条能力；本 FR 后台不单开配置。点招募帧进海报，不进申请表。</li>
-              <li>空态：「没有可领取的稿件；占用中的稿件已对他人隐藏。」</li>
-            </ul>
-            <h3>2. 稿件详情与图集预览</h3>
-            <ul>
-              <li>标题下展示标签；书籍名称下为书籍 ID。内容底、按钮上展示注意事项。</li>
-              <li>未领取展示领取步骤；领取成功后改为作品发布技巧（发布标题 / 发布描述可复制）。</li>
-              <li>未领底栏：剩余次数、快捷提词、领取。已领底栏：添加水印、下载稿件。</li>
-              <li>图集可点开预览，最多 3 张，可左右切；<code>imgs</code> 角标仍是真实张数。预览不扣次、不占用、不能保存。</li>
-              <li>预览禁右键/长按保存，叠用户水印，切后台模糊。规则写明真机系统截屏禁不掉。</li>
-              <li>视频仍 5 秒试看，不进图集浮层。</li>
-            </ul>
-            <h3>3. 领取与选词浮层</h3>
-            <ul>
-              <li>次数足够后才打开选词浮层，只列该项目已通过关键词，不进下级页。</li>
-              <li>未选词点确认：Toast「请先选择该项目已通过的关键关键词」，浮层不关。</li>
-              <li>确认后 loading：正在下载稿件 → 正在保存到相册 → 已保存到相册。成功停在详情。</li>
-              <li>停权中按钮文案「已被停权，无法领取」，不打开浮层。</li>
-            </ul>
-            <h3>4. 兑换次数</h3>
-            <ul>
-              <li>只展示 <code>on=true</code> 的档位，最多 4 档。下架/草稿不返回。</li>
-              <li>选档后点「兑换」。Demo 不真扣积分；落地时以后端扣减结果为准。</li>
-              <li>兑换成功关浮层、刷新剩余次数，<strong>不自动打开选词</strong>。</li>
-            </ul>
-            <h3>5. 我的领取与回填</h3>
-            <ul>
-              <li>项目图标只展示有领取记录的项目。胶囊：未回填 / 已回填 / 已超时。</li>
-              <li>卡片含关键词标题、封面、作品标题、项目、作者、领取时间、下载时间、7 天下载倒计时。</li>
-              <li>立即回填始终高亮。已回填 toast「该稿件已回填」；已超时 toast「已超时，无法回填」。</li>
-              <li>回填复用该项目已有回填页字段，提交后领取→已回填，稿件→已完成，不再回广场。</li>
-            </ul>
-            <h3>6. PC 上传</h3>
-            <ul>
-              <li>未录入 / 已停用：看板缺省，不能上传；招募 BN 仍可点开。</li>
-              <li>先填共享字段（含书籍链接，不含标题/大小），再选文件夹或压缩包。压缩包先解压中。</li>
-              <li>按命名约定解析（文件名=标题；图集一夹一组），表格确认后队列上传。失败只重传失败文件。</li>
-              <li>已上传后按剪辑手「稿件需要审核」落态：是=审核中，否=已通过。list 不展示下载链接。已驳回出示原因。仅空闲可删。</li>
-            </ul>
-            <h3>7. 后台审核与黑名单</h3>
-            <ul>
-              <li>PC 新稿：剪辑手需审则审核中，免审则已通过。后台可单条或批量审核 / 删除。已通过不可再驳回。驳回必须填原因。</li>
-              <li>后台录入稿视为已通过。停权恢复只能手动，没有自助解禁。</li>
-            </ul>
+            <div id="ix-fe-frs"></div>
           </div>
           <div id="ix-api" class="ix-pane">
             <h3>1. 页面初始化数据流</h3>
@@ -1605,7 +1562,7 @@
             <h3>4. 字段清单</h3>
             <ul>
               <li><strong>user</strong>：userId、free、bought、strikes、banned、remainQuota=free+bought。</li>
-              <li><strong>work</strong>：id、title、project、book、bookId、kind、mat、occ、audit、rejectReason、imgs、preview[≤3]、pubTitle、pubDesc、cover、tags、share。</li>
+              <li><strong>work</strong>：id、title、project、book、bookId、kind、mat、occ、audit、rejectReason、imgs、preview[≤3]、pubTips、cover、tags、share。</li>
               <li><strong>claim</strong>：id、user、mid、kw、status（未回填|已回填|已超时）、claimedAt、downloadedAt、expireAt、fill。</li>
               <li><strong>editor</strong>：id、ybId、name、share、needReview、note、projects[]、status。</li>
               <li><strong>sku</strong>：id、times、points、on。</li>
@@ -1669,7 +1626,7 @@
               <strong>重要规则：关键词结算入账必须先判代发</strong>
               <ul>
                 <li>用户用剪辑手稿件完成作品回填后，领取时所选关键词产生的订单收益，在<strong>入账</strong>时必须校验该词是否为代发关键词。</li>
-                <li>代发关键词：按剪辑手分成比例自动拆成用户侧实结 + 剪辑手侧分账，两笔同时写入既有「项目收益明细」。</li>
+                <li>代发关键词：按该领取的分成快照自动拆成用户侧实结 + 剪辑手侧分账，两笔同时写入既有「项目收益明细」。</li>
                 <li>非代发关键词：走既有全额用户入账，不写剪辑手分账，不套用本页文案。</li>
                 <li>只在平台关键词订单<strong>已结算</strong>时落账；待结算只累计，不写明细。状态固定为「已结算」。必须带秒级时间戳与金额。</li>
               </ul>
@@ -1679,15 +1636,15 @@
               <div class="ix-step"><i>1</i><div><b>回填完成</b><span>用户领取剪辑手稿件并走该项目回填页提交。领取记录 → 已回填，稿件 → 已完成。此时还不入账。</span></div></div>
               <div class="ix-step"><i>2</i><div><b>关键词出单</b><span>回填所用关键词产生平台订单收益。结算态沿用既有关键词订单：待结算 / 已结算。</span></div></div>
               <div class="ix-step"><i>3</i><div><b>入账前回检</b><span>订单转为已结算时，后端先查该关键词是否绑定一条已回填的一键代发领取（claim.status=已回填，且 mid 为剪辑手稿件）。</span></div></div>
-              <div class="ix-step"><i>4</i><div><b>按比例分账</b><span>判定为代发后：应结算总额 × 分成比例 = 剪辑手分账；用户实结 = 应结算 − 剪辑手分账。同一结算事件原子写入用户账 + 剪辑手账。</span></div></div>
+              <div class="ix-step"><i>4</i><div><b>按快照分账</b><span>判定为代发后：应结算 × 该 claim 分成快照（四舍五入）= 剪辑手分账；用户实结 = 应结算 − 分账。同一结算事件原子写入用户账 + 剪辑手账。</span></div></div>
             </div>
             <h3>2. 代发判定</h3>
             <div class="table-wrap">
               <table class="explain-table">
                 <thead><tr><th>条件</th><th>结果</th><th>入账</th></tr></thead>
                 <tbody>
-                  <tr><td>关键词绑定已回填的一键代发领取（用户用剪辑手稿件回填）</td><td>代发关键词</td><td>按分成比例拆用户实结 + 剪辑手分账；文案用本页模板</td></tr>
-                  <tr><td>关键词无已回填代发领取，或领取已超时释放</td><td>非代发</td><td>既有全额用户入账；不写剪辑手分账</td></tr>
+                  <tr><td>该 keywordId 存在已回填绑定 (keywordId, claimId)；一词多条取 filledAt 最近</td><td>代发关键词</td><td>按该 claim 分成快照拆用户实结 + 剪辑手分账；文案用本页模板</td></tr>
+                  <tr><td>无已回填绑定，或领取未回填 / 已超时</td><td>非代发</td><td>既有全额用户入账；不写剪辑手分账</td></tr>
                   <tr><td>订单仍为待结算</td><td>不入账</td><td>只累计；明细不出现「已结算」记录</td></tr>
                 </tbody>
               </table>
@@ -1695,7 +1652,7 @@
             <h3>3. 分账口径</h3>
             <ul>
               <li><strong>应结算总额</strong> = 该关键词本笔已结算订单收益。</li>
-              <li><strong>分成比例</strong> = 领取稿件对应剪辑手录入时的 <code>share</code>（如 50%）。</li>
+              <li><strong>分成比例</strong> = 该领取写入的分成快照（领取成功时的剪辑手比例），不读事后改过的当前值。</li>
               <li><strong>剪辑手分账</strong> = 应结算总额 × 分成比例（代发作品分账）。</li>
               <li><strong>用户实结</strong> = 应结算总额 − 剪辑手分账。</li>
               <li>用户实结 + 剪辑手分账必须等于应结算总额。复用既有项目收益明细，不另建账本，不改 FR-002。</li>
@@ -1879,7 +1836,7 @@
           <div id="list-fields" class="ix-pane">
             <ul>
               <li><strong>editors</strong>：id / ybId / name / share / needReview / note / src / projects / status / time；统计派生 worksByEditor / claimedWorksByEditor / earnByEditor / pendingEarnByEditor</li>
-              <li><strong>works</strong>：id / title / project / book / bookId / size / dl / editor / kind / mat / occ / time / share / cover / genre / tags / imgs / preview(≤3) / pubTitle / pubDesc / duration / audit / rejectReason / fileName / occupied / earn</li>
+              <li><strong>works</strong>：id / title / project / book / bookId / size / dl / editor / kind / mat / occ / time / share / cover / genre / tags / imgs / preview(≤3) / pubTips / duration / audit / rejectReason / fileName / occupied / earn</li>
               <li><strong>projects</strong>：id / name / logo / status / sort / updated。新增从 BRAND_CATALOG 点选，不手填、不写 keywords</li>
               <li><strong>mats</strong>：id / name / status</li>
               <li><strong>skus</strong>：id / times / points / on / buyers（只读购买人数）</li>
@@ -1925,7 +1882,7 @@
   <aside class="drawer" id="ruleDrawer" role="dialog" aria-labelledby="ruleTitle">
     <div class="drawer-header">
       <div>
-        <h2 id="ruleTitle">FR-014 · v8 需求规则</h2>
+        <h2 id="ruleTitle">FR-014 · v9 需求规则</h2>
         <p class="drawer-sub">按场景分列 · 页内 Tab 只放 Demo</p>
       </div>
       <button class="drawer-close" type="button" onclick="setRuleDrawer(false)">×</button>
@@ -2118,7 +2075,7 @@
           '<td>' + esc(w.id) + '</td><td>' + esc(w.title) + '</td><td>' + esc(w.project) + '</td>' +
           '<td class="cell-agg">' + esc(w.book) + '<div class="cell-sub">书籍 ID ' + esc(w.bookId) + '</div></td>' +
           '<td class="cell-agg">' + esc(YJD.workInfoLabel(w)) + '<div class="cell-sub">' + esc(w.dl) + '</div></td>' +
-          '<td class="cell-agg" title="' + esc(w.pubDesc) + '">' + esc(w.pubTitle) + '<div class="cell-sub">' + esc(w.pubDesc) + '</div></td>' +
+          '<td class="cell-agg" title="' + esc(YJD.tipText(w)) + '">' + esc(YJD.tipText(w) || '—') + '</td>' +
           '<td>' + esc(w.editor) + '</td><td>' + esc(w.kind) + '</td><td>' + esc(w.mat) + '</td><td>' + stTag(w.occ) + '</td>' +
           '<td>' + auditCell + '</td><td>' + esc(w.time) + '</td>' +
           '<td><button class="link" type="button" onclick="openWorkDetail(\'' + w.id + '\')">详情</button>' +
@@ -2213,8 +2170,7 @@
         '<dt>书籍 ID</dt><dd>' + esc(w.bookId) + '</dd>' +
         '<dt>文件大小</dt><dd>' + esc(YJD.workInfoLabel(w)) + '</dd>' +
         '<dt>下载链接</dt><dd>' + esc(w.dl) + '</dd>' +
-        '<dt>作品标题</dt><dd>' + esc(w.pubTitle) + '</dd>' +
-        '<dt>作品描述</dt><dd>' + esc(w.pubDesc) + '</dd>' +
+        '<dt>发布技巧</dt><dd>' + esc(YJD.tipText(w) || '—') + '</dd>' +
         '<dt>剪辑手</dt><dd>' + esc(w.editor) + '</dd>' +
         '<dt>稿件类型</dt><dd>' + esc(w.kind) + '</dd>' +
         '<dt>素材类型</dt><dd>' + esc(w.mat) + '</dd>' +
@@ -2528,8 +2484,7 @@
         '<div class="field"><label>书籍 ID<span class="req">*</span></label><input id="wBookId" value="' + esc(w.bookId || '') + '" /></div>' +
         '<div class="field"><label>文件大小</label><input id="wSize" value="' + esc(w.size || '') + '" /></div>' +
         '<div class="field"><label>下载链接</label><input id="wDl" value="' + esc(w.dl || '') + '" /></div>' +
-        '<div class="field"><label>作品标题</label><input id="wPubT" value="' + esc(w.pubTitle || '') + '" /></div>' +
-        '<div class="field"><label>作品描述</label><textarea id="wPubD">' + esc(w.pubDesc || '') + '</textarea></div>' +
+        '<div class="field"><label>发布技巧</label><textarea id="wPubTips">' + esc(YJD.tipText(w)) + '</textarea></div>' +
         '<div class="field"><label>剪辑手<span class="req">*</span></label><select id="wEd">' + optList(eds, 'name', 'name', w.editor) + '</select></div>' +
         '<div class="field"><label>类型</label><select id="wKind"><option' + (w.kind !== '视频' ? ' selected' : '') + '>图集</option><option' + (w.kind === '视频' ? ' selected' : '') + '>视频</option></select></div>' +
         '<div class="field"><label>素材类型<span class="req">*</span></label><select id="wMat">' + optList(mats, 'name', 'name', w.mat) + '</select></div>';
@@ -2554,8 +2509,7 @@
           title: title, project: project, book: book, bookId: bookId,
           size: document.getElementById('wSize').value || '—',
           dl: document.getElementById('wDl').value || '',
-          pubTitle: document.getElementById('wPubT').value || title,
-          pubDesc: document.getElementById('wPubD').value || '',
+          pubTips: document.getElementById('wPubTips').value || '',
           editor: editor, kind: document.getElementById('wKind').value, mat: mat,
           share: ed ? ed.share : '—',
           time: row ? row.time : '刚刚'
@@ -2841,7 +2795,7 @@
       history.replaceState(null, '', '?' + params.toString());
     }
     function buildMockupSrc(screen) {
-      return 'yijian-daifa-demo.html?embed=1&v=21&screen=' + screen;
+      return 'yijian-daifa-demo.html?embed=1&v=23&screen=' + screen;
     }
     function loadMockupFrame() {
       document.getElementById('mockupFrame').src = buildMockupSrc(getActiveScreen());
@@ -2850,7 +2804,7 @@
       return document.querySelector('#pcScenes .scene-btn.active')?.dataset.pcscreen || 'home';
     }
     function loadPcFrame() {
-      document.getElementById('pcFrame').src = 'yijian-daifa-pc.html?embed=1&v=6&screen=' + getActivePcScreen();
+      document.getElementById('pcFrame').src = 'yijian-daifa-pc.html?embed=1&v=8&screen=' + getActivePcScreen();
     }
     function switchRuleTab(ruleId, btn) {
       document.querySelectorAll('.rule-tab-bar button').forEach(function (b) { b.classList.remove('active'); });
@@ -2870,7 +2824,7 @@
     function currentRuleKey() {
       var page = document.querySelector('.page-view.active')?.id;
       var R = YJD_RULES;
-      if (page === 'view-explain') return 'explain-main';
+      if (page === 'view-explain') return 'explain-frs';
       if (page === 'view-data') return 'data-main';
       if (page === 'view-pc') {
         return R.pcSceneMap[getActivePcScreen()] || 'pc-home';
@@ -2925,6 +2879,8 @@
             YJD_RULES.htmlOf(key) + '</div>';
         }).join('');
       });
+      var frHost = document.getElementById('ix-fe-frs');
+      if (frHost) frHost.innerHTML = YJD_RULES.htmlOf('explain-frs');
     }
     var ruleDrawer = document.getElementById('ruleDrawer');
     var toggleRuleBtn = document.getElementById('toggleRuleDrawer');

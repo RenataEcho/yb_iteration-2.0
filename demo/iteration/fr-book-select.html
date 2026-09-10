@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FR-012 · 选书中心 · 右豹迭代需求记录</title>
+  <style>
+    :root {
+      --primary: #2563eb; --primary-hover: #1d4ed8; --primary-light: #eff6ff; --primary-border: #bfdbfe;
+      --accent-rule: #0891b2; --accent-version: #7c3aed; --accent-fr: #d97706;
+      --success: #16a34a; --success-bg: #f0fdf4; --warning: #d97706; --warning-bg: #fffbeb;
+      --danger: #dc2626; --danger-bg: #fef2f2;
+      --surface: #fff; --surface-glass: rgba(255,255,255,0.72); --surface-hover: #f8fafc; --border: #e8edf3;
+      --text-primary: #18222f; --text-secondary: #4a5568; --text-muted: #9aa5b4;
+      --sidebar-w: 240px; --drawer-w: 480px; --radius-sm: 7px; --radius-lg: 14px;
+      --shadow: 0 8px 32px rgba(30,40,80,0.10);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 13px;
+      color: var(--text-primary);
+      background: linear-gradient(135deg, #e0e7ff 0%, #f0f4f8 40%, #e0f2fe 100%);
+      background-attachment: fixed; min-height: 100vh;
+    }
+    .sidebar {
+      position: fixed; inset: 0 auto 0 0; width: var(--sidebar-w); z-index: 200;
+      display: flex; flex-direction: column;
+      background: rgba(240,244,255,0.95); backdrop-filter: blur(20px);
+      border-right: 1px solid rgba(148,163,196,0.22);
+    }
+    .sidebar-brand { padding: 16px 14px 12px; border-bottom: 1px solid rgba(148,163,196,0.22); }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: linear-gradient(135deg, #2563eb, #7c3aed); color: #fff;
+      display: flex; align-items: center; justify-content: center; font-weight: 700;
+    }
+    .brand-text { font-size: 14px; font-weight: 700; }
+    .brand-sub { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+    .sprint-pill {
+      display: inline-block; margin-top: 10px; font-size: 11px; font-weight: 600;
+      padding: 3px 8px; border-radius: 999px; background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0;
+    }
+    .sidebar-scroll { flex: 1; overflow-y: auto; padding: 8px 0 16px; }
+    .sidebar-foot { padding: 10px 14px 14px; border-top: 1px solid rgba(148,163,196,0.22); font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+    .main { margin-left: var(--sidebar-w); padding: 16px 20px 40px; min-height: 100vh; }
+    .breadcrumb { padding: 4px 0 12px; font-size: 12px; color: var(--text-muted); }
+    .breadcrumb a { color: var(--primary); text-decoration: none; }
+    .page-header { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; }
+    .page-header h1 { font-size: 19px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .page-desc { font-size: 12px; color: var(--text-muted); max-width: 760px; line-height: 1.55; }
+    .badge { display: inline-flex; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: var(--radius-sm); }
+    .badge-fr { background: #fffbeb; color: var(--accent-fr); border: 1px solid #fde68a; }
+    .badge-version { background: #f5f3ff; color: var(--accent-version); border: 1px solid #ddd6fe; }
+    .page-tab-bar, .admin-tab-bar {
+      display: flex; gap: 0; margin-bottom: 16px;
+      background: var(--surface-glass); backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.55); border-radius: var(--radius-lg);
+      padding: 4px; box-shadow: var(--shadow); width: fit-content;
+    }
+    .admin-tab-bar { margin: 12px 16px 0; }
+    .page-tab-bar button, .admin-tab-bar button {
+      padding: 8px 20px; border: none; background: transparent; cursor: pointer;
+      font-size: 13px; font-weight: 500; color: var(--text-secondary); border-radius: 10px;
+    }
+    .page-tab-bar button.active, .admin-tab-bar button.active { background: var(--primary); color: #fff; font-weight: 600; }
+    .page-view, .admin-pane { display: none; }
+    .page-view.active, .admin-pane.active { display: block; }
+    .btn {
+      display: inline-flex; align-items: center; height: 34px; padding: 0 14px;
+      border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid transparent;
+    }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-rule { background: var(--primary-light); color: var(--primary); border-color: var(--primary-border); }
+    .btn-rule.active { background: var(--primary); color: #fff; }
+    .btn-ghost-sm { background: var(--surface); color: var(--text-secondary); border: 1px solid var(--border); height: 32px; padding: 0 12px; border-radius: var(--radius-sm); cursor: pointer; font-size: 12px; }
+    .glass-card {
+      background: var(--surface-glass); backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.55); border-radius: var(--radius-lg);
+      box-shadow: var(--shadow); overflow: hidden;
+    }
+    .demo-layout { display: grid; grid-template-columns: minmax(280px, 5fr) minmax(360px, 7fr); gap: 16px; }
+    @media (max-width: 1024px) { .demo-layout { grid-template-columns: 1fr; } }
+    .scene-panel { padding: 16px 18px; }
+    .scene-panel h2 { font-size: 14px; font-weight: 700; margin-bottom: 10px; }
+    .scene-list { display: flex; flex-direction: column; gap: 6px; }
+    .scene-btn {
+      text-align: left; padding: 10px 12px; border-radius: var(--radius-sm);
+      border: 1px solid var(--border); background: rgba(255,255,255,0.6); cursor: pointer;
+    }
+    .scene-btn.active { border-color: var(--primary-border); background: var(--primary-light); color: var(--primary); font-weight: 600; }
+    .scene-btn .scene-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+    .scene-btn .scene-desc { font-size: 11px; color: var(--text-muted); line-height: 1.45; }
+    .scene-btn.active .scene-desc { color: #3b82f6; }
+    .scene-note { margin-top: 14px; padding: 10px 12px; border-radius: var(--radius-sm); background: #fffbeb; border: 1px solid #fde68a; font-size: 12px; color: #92400e; line-height: 1.55; }
+    .mockup-panel { padding: 16px; display: flex; justify-content: center; min-height: 520px; }
+    .mockup-frame-wrap {
+      width: 100%; max-width: 375px; border-radius: 28px; overflow: hidden;
+      background: #1e293b; box-shadow: 0 16px 48px rgba(0,0,0,0.18); aspect-ratio: 375 / 812;
+    }
+    .mockup-frame-wrap iframe { width: 100%; height: 100%; border: none; display: block; background: #fff; }
+    .table-toolbar { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--border); gap: 10px; flex-wrap: wrap; }
+    .table-toolbar h3 { font-size: 14px; font-weight: 700; }
+    .filter-bar { display: flex; flex-wrap: wrap; gap: 10px; padding: 14px 16px; align-items: flex-end; border-bottom: 1px solid var(--border); }
+    .filter-field { display: flex; flex-direction: column; gap: 4px; }
+    .filter-field label { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+    .filter-field input, .filter-field select { height: 32px; padding: 0 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 12px; min-width: 130px; }
+    .filter-actions { display: flex; gap: 8px; margin-left: auto; align-items: center; flex-wrap: wrap; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 980px; }
+    th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); font-size: 12px; vertical-align: top; }
+    th { font-size: 11px; font-weight: 600; color: var(--text-muted); background: rgba(248,250,252,0.9); white-space: nowrap; }
+    tr:hover td { background: var(--surface-hover); }
+    .link { color: var(--primary); cursor: pointer; text-decoration: none; margin-right: 10px; font-size: 12px; font-weight: 500; background: none; border: none; padding: 0; }
+    .tag { display: inline-flex; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+    .tag-ok { background: var(--success-bg); color: var(--success); }
+    .tag-warn { background: var(--warning-bg); color: var(--warning); }
+    .tag-muted { background: #f1f5f9; color: var(--text-muted); }
+    .cell-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .drawer-overlay, .modal-overlay {
+      position: fixed; inset: 0; background: rgba(15,23,42,0.35); z-index: 500;
+      opacity: 0; pointer-events: none; transition: opacity 0.25s;
+    }
+    .drawer-overlay.open, .modal-overlay.open { opacity: 1; pointer-events: auto; }
+    .drawer {
+      position: fixed; top: 0; right: 0; bottom: 0; width: var(--drawer-w); z-index: 501;
+      background: rgba(255,255,255,0.98); backdrop-filter: blur(12px);
+      box-shadow: -8px 0 40px rgba(30,40,60,0.18);
+      transform: translateX(100%); transition: transform 0.28s ease;
+      display: flex; flex-direction: column;
+    }
+    .drawer.open { transform: translateX(0); }
+    .drawer-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .drawer-header h2 { font-size: 15px; font-weight: 700; }
+    .drawer-close { width: 28px; height: 28px; border: none; background: #f1f5f9; border-radius: 6px; cursor: pointer; font-size: 16px; }
+    .rule-tab-bar { display: flex; gap: 0; padding: 0 16px; border-bottom: 1px solid var(--border); }
+    .rule-tab-bar button {
+      padding: 10px 18px; border: none; background: none; cursor: pointer;
+      font-size: 13px; color: var(--text-secondary); border-bottom: 2px solid transparent; margin-bottom: -1px;
+    }
+    .rule-tab-bar button.active { color: var(--primary); font-weight: 600; border-bottom-color: var(--primary); }
+    .drawer-body { flex: 1; overflow-y: auto; padding: 16px 20px 32px; }
+    .rule-panel { display: none; }
+    .rule-panel.active { display: block; }
+    .rule-section { margin-bottom: 22px; }
+    .rule-section h3 { font-size: 14px; font-weight: 700; color: var(--accent-rule); margin-bottom: 8px; }
+    .rule-section h3 span {
+      display: inline-flex; width: 22px; height: 22px; align-items: center; justify-content: center;
+      background: #ecfeff; color: var(--accent-rule); border-radius: 6px; font-size: 12px; margin-right: 8px;
+    }
+    .rule-content { font-size: 13px; color: var(--text-secondary); line-height: 1.65; }
+    .rule-content ul { padding-left: 18px; margin-top: 6px; }
+    .rule-content li { margin-bottom: 5px; }
+    .rule-content code { font-family: ui-monospace, monospace; font-size: 12px; background: #f1f5f9; padding: 1px 5px; border-radius: 4px; }
+    .prompt-block {
+      margin-top: 8px; padding: 12px 14px; background: #f8fafc; border: 1px solid var(--border);
+      border-radius: 8px; font-size: 12px; line-height: 1.7; white-space: pre-wrap;
+      font-family: ui-monospace, "SF Mono", Menlo, monospace; color: var(--text-primary);
+    }
+    .kv { display: grid; grid-template-columns: 88px 1fr; gap: 8px 10px; font-size: 13px; }
+    .kv dt { color: var(--text-muted); }
+    .kv dd { color: var(--text-primary); }
+    .flow-page-intro { padding: 16px 18px 0; font-size: 12px; color: var(--text-muted); line-height: 1.55; }
+    .flow-svg-wrap { overflow: auto; padding: 16px 18px 24px; max-height: 72vh; }
+    .flow-svg-wrap svg { display: block; margin: 0 auto; min-width: 920px; }
+    .flow-edges line, .flow-edges polyline { stroke: #94a3b8; stroke-width: 1.5; fill: none; }
+    .flow-legend { display: flex; flex-wrap: wrap; gap: 12px; padding: 0 18px 20px; font-size: 11px; color: var(--text-muted); }
+    .flow-legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 4px; vertical-align: -2px; }
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: #1e293b; color: #fff; padding: 10px 18px; border-radius: 999px; font-size: 13px;
+      opacity: 0; transition: all 0.25s; z-index: 600; pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand">
+        <div class="brand-icon">迭</div>
+        <div>
+          <div class="brand-text">右豹迭代需求记录</div>
+          <div class="brand-sub">PRD Demo · 产品交付研发</div>
+        </div>
+      </div>
+      <span class="sprint-pill">YBDD2.0 · 迭代 v1</span>
+    </div>
+    <div class="sidebar-scroll" data-iteration-sidebar></div>
+    <div class="sidebar-foot">FR-012 · 页内 Tab<br />前端交互 / 管理后台 / 业务流程</div>
+  </aside>
+
+  <main class="main">
+    <nav class="breadcrumb">
+      <a href="framework-shell.html">Sprint 概览</a>
+      <span> / 运营 / 选书中心</span>
+    </nav>
+    <header class="page-header">
+      <div>
+        <h1>
+          选书中心
+          <span class="badge badge-fr">FR-012</span>
+          <span class="badge badge-version">v1 当前</span>
+        </h1>
+        <p class="page-desc">部分项目没有自有书库，平台抓取版权书作为选书中心。H5 浏览/筛选/详情后申请关键词；推广类型取自项目题词配置；去掉 AI 换词，改为旁路 Tab「AI申词」（一次最多 10 个，可更换）。</p>
+      </div>
+      <div class="page-header-actions">
+        <button class="btn btn-rule" id="toggleRuleDrawer" type="button">📋 需求规则</button>
+      </div>
+    </header>
+
+    <div class="page-tab-bar" role="tablist">
+      <button type="button" class="active" data-page="view-fe" role="tab">前端交互</button>
+      <button type="button" data-page="view-admin" role="tab">管理后台</button>
+      <button type="button" data-page="view-flow" role="tab">业务流程</button>
+    </div>
+
+    <div id="view-fe" class="page-view active">
+      <div class="demo-layout">
+        <div class="glass-card scene-panel">
+          <h2>场景切换</h2>
+          <div class="scene-list">
+            <button class="scene-btn active" type="button" data-screen="list">
+              <div class="scene-title">书库列表</div>
+              <div class="scene-desc">搜索 + 项目方 Tab + 三列封面；默认「全部」</div>
+            </button>
+            <button class="scene-btn" type="button" data-screen="filter">
+              <div class="scene-title">筛选浮层</div>
+              <div class="scene-desc">偏好 / 篇幅 / 状态 / 类型；重置与确定</div>
+            </button>
+            <button class="scene-btn" type="button" data-screen="search">
+              <div class="scene-title">搜索结果</div>
+              <div class="scene-desc">按书名「掌心」过滤</div>
+            </button>
+            <button class="scene-btn" type="button" data-screen="empty">
+              <div class="scene-title">空结果</div>
+              <div class="scene-desc">无匹配书时的空态文案</div>
+            </button>
+            <button class="scene-btn" type="button" data-screen="detail">
+              <div class="scene-title">详情 · 申请关键词</div>
+              <div class="scene-desc">封面→书名→标签后接可复制 ID/链接；主按钮「立即题词」</div>
+            </button>
+            <button class="scene-btn" type="button" data-screen="detail-ai">
+              <div class="scene-title">详情 · AI申词</div>
+              <div class="scene-desc">数字框内嵌「申请」；Tab 旁是更换；提示词见规则</div>
+            </button>
+            <button class="scene-btn" type="button" data-screen="submitted">
+              <div class="scene-title">题词成功</div>
+              <div class="scene-desc">校验通过后 Toast，走现有申词审核</div>
+            </button>
+          </div>
+          <div class="scene-note">入口只给<strong>没有自有书库</strong>的项目。推广类型下拉来自该项目题词配置，本 Demo mock：真人出镜、图文、解压TTS、解说混剪、AIGC。</div>
+        </div>
+        <div class="glass-card mockup-panel">
+          <div class="mockup-frame-wrap">
+            <iframe id="mockupFrame" title="选书中心 Mockup" src="about:blank"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="view-admin" class="page-view">
+      <div class="glass-card">
+        <div class="admin-tab-bar" role="tablist">
+          <button type="button" class="active" data-admin="admin-books" role="tab">书库</button>
+          <button type="button" data-admin="admin-applies" role="tab">申词记录</button>
+        </div>
+
+        <div id="admin-books" class="admin-pane active">
+          <div class="table-toolbar">
+            <h3>抓取书库</h3>
+          </div>
+          <div class="filter-bar">
+            <div class="filter-field"><label>书名 / ID</label><input id="bookQ" placeholder="掌心宠" /></div>
+            <div class="filter-field">
+              <label>项目方</label>
+              <select id="bookSourceQ">
+                <option value="">全部</option>
+                <option>番茄小说</option>
+                <option>番茄短剧</option>
+                <option>番茄漫剧</option>
+              </select>
+            </div>
+            <div class="filter-field">
+              <label>上架</label>
+              <select id="bookVisQ">
+                <option value="">全部</option>
+                <option value="1">上架</option>
+                <option value="0">下架</option>
+              </select>
+            </div>
+            <div class="filter-actions">
+              <button class="btn-ghost-sm" type="button" onclick="resetBookFilter()">重置</button>
+              <button class="btn btn-primary" type="button" onclick="renderBooks()">查询</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th><th>书名</th><th>作者</th><th>项目方</th><th>偏好</th><th>篇幅</th><th>状态</th><th>字数</th><th>类型</th><th>上架</th><th>抓取时间</th><th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="bookBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="admin-applies" class="admin-pane">
+          <div class="table-toolbar">
+            <h3>选书申词记录</h3>
+          </div>
+          <div class="filter-bar">
+            <div class="filter-field"><label>用户 / 关键词</label><input id="applyQ" placeholder="U-10086 / 掌心宠溺" /></div>
+            <div class="filter-field">
+              <label>申词方式</label>
+              <select id="applyModeQ">
+                <option value="">全部</option>
+                <option>手动</option>
+                <option>AI申词</option>
+              </select>
+            </div>
+            <div class="filter-field">
+              <label>审核状态</label>
+              <select id="applyStatusQ">
+                <option value="">全部</option>
+                <option>待审核</option>
+                <option>已通过</option>
+                <option>已驳回</option>
+              </select>
+            </div>
+            <div class="filter-actions">
+              <button class="btn-ghost-sm" type="button" onclick="resetApplyFilter()">重置</button>
+              <button class="btn btn-primary" type="button" onclick="renderApplies()">查询</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th><th>用户</th><th>项目</th><th>书名</th><th>推广类型</th><th>方式</th><th>关键词</th><th>状态</th><th>申请时间</th><th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="applyBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="view-flow" class="page-view">
+      <div class="glass-card flow-page">
+        <p class="flow-page-intro">一条主链：无书库项目进入选书中心 → 浏览/筛选 → 详情必选推广类型 → 手动申词或 AI申词 → 校验通过后写入现有申词审核。失败回详情，不另开第二条流程。</p>
+        <div class="flow-svg-wrap">
+          <svg width="1080" height="980" viewBox="0 0 1080 980" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <marker id="flow-arrow-1" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                <path d="M0,0 L8,4 L0,8 Z" fill="#94a3b8" />
+              </marker>
+            </defs>
+            <g class="flow-edges" marker-end="url(#flow-arrow-1)">
+              <line x1="540" y1="56" x2="540" y2="80" />
+              <line x1="540" y1="140" x2="540" y2="164" />
+              <polyline points="460,204 200,204" />
+              <line x1="540" y1="244" x2="540" y2="276" />
+              <line x1="540" y1="336" x2="540" y2="368" />
+              <line x1="540" y1="428" x2="540" y2="460" />
+              <polyline points="460,500 200,500" />
+              <line x1="540" y1="540" x2="540" y2="572" />
+              <polyline points="620,612 820,612" />
+              <polyline points="920,640 920,740 720,740" />
+              <line x1="540" y1="652" x2="540" y2="700" />
+              <line x1="540" y1="780" x2="540" y2="812" />
+              <line x1="540" y1="892" x2="540" y2="920" />
+              <polyline points="200,204 80,204 80,4 540,4" />
+              <polyline points="200,500 80,500 80,4" />
+              <polyline points="460,852 80,852 80,4 540,4 540,16" />
+            </g>
+            <g font-family="Inter, PingFang SC, sans-serif">
+              <rect x="360" y="16" width="360" height="40" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="540" y="41" text-anchor="middle" font-size="12" fill="#1e40af">用户从无书库项目进入选书中心</text>
+
+              <rect x="340" y="80" width="400" height="60" rx="6" fill="#dcfce7" stroke="#16a34a" />
+              <text x="540" y="104" text-anchor="middle" font-size="12" fill="#166534">拉取上架书库 + 项目推广类型</text>
+              <text x="540" y="122" text-anchor="middle" font-size="10" fill="#64748b">类型来自该项目题词配置，不是写死枚举</text>
+
+              <polygon points="540,164 620,204 540,244 460,204" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="540" y="208" text-anchor="middle" font-size="11" fill="#854d0e">项目有类型?</text>
+              <text x="336" y="196" font-size="10" fill="#dc2626">否</text>
+              <rect x="40" y="184" width="160" height="40" rx="6" fill="#fecaca" stroke="#dc2626" />
+              <text x="120" y="209" text-anchor="middle" font-size="11" fill="#991b1b">阻断 · 提示配置</text>
+              <text x="552" y="260" font-size="10" fill="#16a34a">是</text>
+
+              <rect x="360" y="276" width="360" height="60" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="540" y="300" text-anchor="middle" font-size="12" fill="#1e40af">搜索 / 项目方 Tab / 筛选后点书</text>
+              <text x="540" y="318" text-anchor="middle" font-size="10" fill="#64748b">偏好·篇幅·状态·类型 · 仅上架可见</text>
+
+              <rect x="360" y="368" width="360" height="60" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="540" y="392" text-anchor="middle" font-size="12" fill="#1e40af">详情：封面 / 简介 / 选推广类型</text>
+              <text x="540" y="410" text-anchor="middle" font-size="10" fill="#64748b">可下载封面、复制文案、展开全文</text>
+
+              <polygon points="540,460 620,500 540,540 460,500" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="540" y="504" text-anchor="middle" font-size="11" fill="#854d0e">已选推广类型?</text>
+              <text x="336" y="492" font-size="10" fill="#dc2626">否</text>
+              <rect x="40" y="480" width="160" height="40" rx="6" fill="#fecaca" stroke="#dc2626" />
+              <text x="120" y="505" text-anchor="middle" font-size="11" fill="#991b1b">拦截提交</text>
+              <text x="552" y="556" font-size="10" fill="#16a34a">是</text>
+
+              <polygon points="540,572 620,612 540,652 460,612" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="540" y="616" text-anchor="middle" font-size="11" fill="#854d0e">哪条申词?</text>
+              <text x="636" y="600" font-size="10" fill="#16a34a">AI申词</text>
+              <text x="552" y="668" font-size="10" fill="#64748b">申请关键词</text>
+
+              <rect x="820" y="584" width="200" height="56" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="920" y="606" text-anchor="middle" font-size="12" fill="#1e40af">输入数量 1-10</text>
+              <text x="920" y="624" text-anchor="middle" font-size="10" fill="#64748b">点申请生成一批词</text>
+
+              <rect x="360" y="700" width="360" height="80" rx="6" fill="#dcfce7" stroke="#16a34a" />
+              <text x="540" y="724" text-anchor="middle" font-size="12" fill="#166534">校验关键词</text>
+              <text x="540" y="742" text-anchor="middle" font-size="10" fill="#64748b">手动：4-10 汉字 · 无符号字母空格敏感词</text>
+              <text x="540" y="760" text-anchor="middle" font-size="10" fill="#64748b">AI：已生成且数量 ≤ 10</text>
+
+              <polygon points="540,812 620,852 540,892 460,852" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="540" y="856" text-anchor="middle" font-size="11" fill="#854d0e">校验通过?</text>
+              <text x="336" y="844" font-size="10" fill="#dc2626">否 · 回起点</text>
+              <text x="552" y="908" font-size="10" fill="#16a34a">是</text>
+
+              <rect x="360" y="920" width="360" height="40" rx="6" fill="#ffedd5" stroke="#ea580c" />
+              <text x="540" y="945" text-anchor="middle" font-size="12" fill="#9a3412">写入申词审核 · 复用现有流程</text>
+            </g>
+          </svg>
+        </div>
+        <div class="flow-legend">
+          <span><i style="background:#dbeafe;border:1px solid #2563eb"></i>前端 / 用户操作</span>
+          <span><i style="background:#dcfce7;border:1px solid #16a34a"></i>后端判定 / 写入</span>
+          <span><i style="background:#ffedd5;border:1px solid #ea580c"></i>异步 / 审核</span>
+          <span><i style="background:#fef9c3;border:1px solid #ca8a04"></i>校验</span>
+          <span><i style="background:#fecaca;border:1px solid #dc2626"></i>阻断</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="drawer-overlay" id="ruleOverlay" onclick="setRuleDrawer(false)"></div>
+  <aside class="drawer" id="ruleDrawer" role="dialog" aria-labelledby="ruleTitle">
+    <div class="drawer-header">
+      <h2 id="ruleTitle">FR-012 · v1 需求规则</h2>
+      <button class="drawer-close" type="button" onclick="setRuleDrawer(false)">×</button>
+    </div>
+    <div class="rule-tab-bar">
+      <button type="button" class="active" data-rule="rule-fe">前端需求</button>
+      <button type="button" data-rule="rule-admin">后台需求</button>
+    </div>
+    <div class="drawer-body">
+      <div id="rule-fe" class="rule-panel active">
+        <div class="rule-section">
+          <h3><span>1</span>业务目标</h3>
+          <div class="rule-content">
+            <p>没有自有书库的项目，用户也能在平台抓取书库里把书找出来，选好推广类型后申请关键词，不用再口头问「这本书能不能推」。</p>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>2</span>页面与入口</h3>
+          <div class="rule-content">
+            <ul>
+              <li><strong>入口</strong>：仅无自有书库的项目，从该项目申词入口进入选书中心。有书库的项目不展示本入口。</li>
+              <li><strong>列表</strong>：页头为「选书中心」；搜索书名；项目方 Tab（全部 / 番茄小说 / 番茄短剧 / 番茄漫剧）；三列封面 + 书名 +「完本/未完本 · 字数」。</li>
+              <li><strong>筛选</strong>：偏好、篇幅、状态、类型。点确定才生效，点 × / 蒙层关闭不改已生效条件。重置回到各维「全部」。</li>
+              <li><strong>详情</strong>：封面（可下载）独立在上。书名、作者·偏好·篇幅·状态·字数、类型标签与<strong>书籍ID / 书籍链接</strong>收在同一张「基础信息」卡内，ID/链接在卡底细线下方，均可一键复制。再下是作品简介（复制文案 / 阅读全文）。</li>
+              <li><strong>推广类型</strong>：在申请关键词区域上方，下拉必选。字段标题字号与「作品简介 / 申请关键词」对齐（15px / 700）。选项来自<strong>当前项目题词配置的类型</strong>。Demo mock：真人出镜、图文、解压TTS、解说混剪、AIGC。</li>
+              <li><strong>申词 Tab</strong>：<code>申请关键词</code> | <code>AI申词</code>。原输入框内「AI换词」删除，不再出现。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>3</span>交互规则</h3>
+          <div class="rule-content">
+            <ul>
+              <li><strong>申请关键词</strong>：用户手输 4-10 个汉字；不可带标点 / 符号 / 字母 / 空格 / 涉黄涉政等敏感字眼。</li>
+              <li><strong>AI申词</strong>：不标「申请数量」字段名。数字输入框做成圆角描边容器，右侧内嵌橙色描边按钮「申请」。Tab「AI申词」右侧是文字按钮「更换」，用来换一批。数量 1–10；未点「申请」出词不能题词。出词必须走第 5 节提示词，入参为当次书籍ID、作品简介、推广类型、申请数量。</li>
+              <li>主按钮文案为<strong>立即题词</strong>，不再使用「立即提交」。</li>
+              <li>推广类型对两个 Tab 共用，切换 Tab 不丢失已选类型。</li>
+              <li>提交成功走<strong>现有申词审核</strong>，本 FR 不重定义审核态。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>4</span>边界规则</h3>
+          <div class="rule-content">
+            <ul>
+              <li>未选推广类型不可提交。</li>
+              <li>项目题词配置没有类型时，下拉为空，阻断申词并提示运营配置。</li>
+              <li>下架书不出现在 C 端列表；已打开的详情若被下架，提交时后端再拒一次。</li>
+              <li>AI 申词数量 &lt; 1 或 &gt; 10 直接拦截；「申请」出词，「更换」只换词，都不改数量。</li>
+              <li>模型输出后仍按「4–10 个汉字、无标点/符号/字母/数字/空格」过滤；过滤后不足申请数量则重试或提示失败，不得用不合格词凑数。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>5</span>AI 提示词</h3>
+          <div class="rule-content">
+            <p>AI申词按<strong>书籍ID + 作品简介</strong>出词。服务端用下面模板，把花括号换成当次请求值。模型只允许输出词；前后端再按 4–10 汉字、无符号规则过滤。</p>
+            <pre class="prompt-block">你是短视频投放的关键词策划。只根据下面给定的「书籍ID」和「作品简介」申请关键词，不为其他书出词，也不用训练集里的同名作品补设定。
+
+【输入】
+书籍ID：{book_id}
+作品简介：{intro}
+推广类型：{promo_type}
+申请条数：{count}
+
+【目标】
+围绕该书籍ID对应的这一本作品，从简介里的人物关系、冲突、世界观和可传播卖点，提炼恰好 {count} 个适合该推广类型检索、点击的关键词。
+
+【必须遵守】
+1. 每个词只能是 4 到 10 个连续汉字；禁止标点、符号、空格、字母、阿拉伯数字、英文。
+2. 恰好输出 {count} 行，一行一词；不要序号、引号、冒号、解释或前后空行。
+3. 每个词都必须能被简介直接解释；简介没写的人名、地名、身份、结局一律不准编。
+4. 书籍ID只用来锚定是哪一本书，禁止把 ID 字符写进任何一个词；也不要把纯书名、作者名当词。
+5. 不要「小说」「全集」「免费」「完结」「番茄」等平台无效词；词与词不要近义复读。
+6. 禁止涉黄、涉政、暴力、歧视及平台敏感表述。
+7. 可按推广类型微调语气（解压TTS偏情绪，解说混剪偏反转/冲突），但不要把类型名称写进词里。
+
+【自检】
+输出前逐条核对：汉字数 4–10、能指回简介、互不重复。任一不合格先改写，再一次性输出终稿。</pre>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>6</span>业务流程</h3>
+          <div class="rule-content">
+            <p>见页内 Tab <strong>「业务流程」</strong>。</p>
+          </div>
+        </div>
+      </div>
+      <div id="rule-admin" class="rule-panel">
+        <div class="rule-section">
+          <h3><span>1</span>业务目标</h3>
+          <div class="rule-content">
+            <p>运营能看见抓回来的书是否上架、从哪条源来，以及用户从选书中心交出的申词有没有进审核。</p>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>2</span>数据表与字段</h3>
+          <div class="rule-content">
+            <ul>
+              <li><strong>书库</strong>：ID、书名、作者、项目方（番茄小说 / 番茄短剧 / 番茄漫剧）、偏好、篇幅、连载状态、字数、类型、简介、封面、上架、抓取时间。封面与简介只读，本 FR 不提供人工录入书。</li>
+              <li><strong>申词记录</strong>：用户、项目、书 ID/书名、推广类型、申词方式（手动 / AI申词）、关键词列表、审核状态、申请时间。推广类型落库当时值，不随后台改配置回溯改写。</li>
+              <li>推广类型枚举不在本表维护，读取<strong>项目题词配置</strong>。</li>
+              <li>AI申词调用模型时，必须带上前端规则第 5 节的提示词模板，并传入当次书籍ID、作品简介、推广类型、申请数量。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>3</span>列表与筛选</h3>
+          <div class="rule-content">
+            <ul>
+              <li>书库可按书名/ID、项目方、上架筛选；详情抽屉只读。</li>
+              <li>申词记录可按用户/关键词、方式、审核状态筛选；详情看词列表。</li>
+              <li>上架/下架立即影响 C 端可见池。下架不删除抓取底表。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>4</span>边界规则</h3>
+          <div class="rule-content">
+            <ul>
+              <li>抓取任务与源站同步不在本 FR 重做，后台只消费已入库数据。</li>
+              <li>删除书库记录不允许；只允许下架。已产生的申词记录保留。</li>
+              <li>审核通过/驳回复用现有申词后台，本 Demo 不另做审批弹窗。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="drawer-overlay" id="detailOverlay" onclick="closeDetail()"></div>
+  <aside class="drawer" id="detailDrawer">
+    <div class="drawer-header">
+      <h2 id="detailTitle">详情</h2>
+      <button class="drawer-close" type="button" onclick="closeDetail()">×</button>
+    </div>
+    <div class="drawer-body" id="detailBody"></div>
+  </aside>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const BOOKS = [
+      { id: 'BK-1001', title: '我成了老公掌心宠', author: '林晚星', source: '番茄小说', pref: '女频', length: '中篇', status: '完本', words: '12.1万', genres: '年代 / 世情', visible: true, crawled: '2026-09-01 03:12', intro: '穿进年代文的林晚，成了冷面军官的掌心宠。' },
+      { id: 'BK-1002', title: '我给死对头当了百日新娘', author: '南枝', source: '番茄短剧', pref: '女频', length: '长篇', status: '完本', words: '36.8万', genres: '豪门 / 世情', visible: true, crawled: '2026-09-01 03:12', intro: '契约百日新娘，假戏真做。' },
+      { id: 'BK-1003', title: '我在八零年代当后妈', author: '秋水长', source: '番茄小说', pref: '女频', length: '长篇', status: '完本', words: '58.2万', genres: '年代', visible: true, crawled: '2026-09-02 04:08', intro: '八零后妈把这个家一点点捂热。' },
+      { id: 'BK-1004', title: '被偷听心声后我成了全村团宠', author: '禾喜', source: '番茄小说', pref: '女频', length: '短篇', status: '完本', words: '8.6万', genres: '年代 / 异能', visible: true, crawled: '2026-09-02 04:08', intro: '心声被听见，日子过成热闹。' },
+      { id: 'BK-1005', title: '我在末世囤了亿万物资', author: '北城', source: '番茄短剧', pref: '通用', length: '长篇', status: '未完本', words: '72.5万', genres: '末世', visible: true, crawled: '2026-09-03 02:40', intro: '末世仓储系统，带着一群人好好活。' },
+      { id: 'BK-1006', title: '末世里我带全家躺赢', author: '江北', source: '番茄漫剧', pref: '男频', length: '长篇', status: '未完本', words: '63.0万', genres: '末世 / 异能', visible: false, crawled: '2026-09-03 02:41', intro: '空间异能，先安置家人。' },
+      { id: 'BK-1007', title: '银发军官把我宠上天', author: '清酒', source: '番茄漫剧', pref: '通用', length: '短篇', status: '完本', words: '6.4万', genres: '年代 / 银发', visible: true, crawled: '2026-09-04 01:20', intro: '边疆小护士与银发军官。' }
+    ];
+    const APPLIES = [
+      { id: 'KW-8801', user: 'U-10086', project: '番茄小说', book: '我成了老公掌心宠', promo: '图文', mode: '手动', words: '掌心宠溺', status: '待审核', time: '2026-09-08 14:12' },
+      { id: 'KW-8802', user: 'U-10221', project: '番茄短剧', book: '我在末世囤了亿万物资', promo: '解说混剪', mode: 'AI申词', words: '末世囤货、物资翻盘、末日基地', status: '已通过', time: '2026-09-08 11:03' },
+      { id: 'KW-8803', user: 'U-10086', project: '番茄小说', book: '被偷听心声后我成了全村团宠', promo: '解压TTS', mode: 'AI申词', words: '偷听心声、全村团宠', status: '已驳回', time: '2026-09-07 19:40' },
+      { id: 'KW-8804', user: 'U-10888', project: '番茄漫剧', book: '银发军官把我宠上天', promo: 'AIGC', mode: '手动', words: '银发军官', status: '待审核', time: '2026-09-07 16:22' },
+      { id: 'KW-8805', user: 'U-10301', project: '番茄短剧', book: '我给死对头当了百日新娘', promo: '真人出镜', mode: '手动', words: '百日新娘', status: '已通过', time: '2026-09-06 09:18' }
+    ];
+
+    function showToast(msg) {
+      var el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(function () { el.classList.remove('show'); }, 1600);
+    }
+    function visTag(v) {
+      return v ? '<span class="tag tag-ok">上架</span>' : '<span class="tag tag-muted">下架</span>';
+    }
+    function applyTag(s) {
+      if (s === '已通过') return '<span class="tag tag-ok">已通过</span>';
+      if (s === '已驳回') return '<span class="tag tag-warn">已驳回</span>';
+      return '<span class="tag tag-muted">待审核</span>';
+    }
+    function renderBooks() {
+      var q = (document.getElementById('bookQ').value || '').trim();
+      var source = document.getElementById('bookSourceQ').value;
+      var vis = document.getElementById('bookVisQ').value;
+      var rows = BOOKS.filter(function (b) {
+        if (q && b.title.indexOf(q) === -1 && b.id.indexOf(q) === -1) return false;
+        if (source && b.source !== source) return false;
+        if (vis === '1' && !b.visible) return false;
+        if (vis === '0' && b.visible) return false;
+        return true;
+      });
+      document.getElementById('bookBody').innerHTML = rows.map(function (b) {
+        return '<tr><td>' + b.id + '</td><td>' + b.title + '<div class="cell-sub">' + b.intro + '</div></td><td>' + b.author + '</td><td>' + b.source + '</td><td>' + b.pref + '</td><td>' + b.length + '</td><td>' + b.status + '</td><td>' + b.words + '</td><td>' + b.genres + '</td><td>' + visTag(b.visible) + '</td><td>' + b.crawled + '</td><td>' +
+          '<button class="link" type="button" onclick="openBookDetail(\'' + b.id + '\')">详情</button>' +
+          '<button class="link" type="button" onclick="toggleBook(\'' + b.id + '\')">' + (b.visible ? '下架' : '上架') + '</button></td></tr>';
+      }).join('') || '<tr><td colspan="12" style="text-align:center;color:#9aa5b4">无匹配书</td></tr>';
+    }
+    function resetBookFilter() {
+      document.getElementById('bookQ').value = '';
+      document.getElementById('bookSourceQ').value = '';
+      document.getElementById('bookVisQ').value = '';
+      renderBooks();
+    }
+    function toggleBook(id) {
+      var b = BOOKS.find(function (x) { return x.id === id; });
+      if (!b) return;
+      b.visible = !b.visible;
+      renderBooks();
+      showToast(b.visible ? '已上架（Mock）' : '已下架，C 端不可见（Mock）');
+    }
+    function openBookDetail(id) {
+      var b = BOOKS.find(function (x) { return x.id === id; });
+      if (!b) return;
+      document.getElementById('detailTitle').textContent = b.title;
+      document.getElementById('detailBody').innerHTML =
+        '<dl class="kv">' +
+        '<dt>ID</dt><dd>' + b.id + '</dd>' +
+        '<dt>作者</dt><dd>' + b.author + '</dd>' +
+        '<dt>项目方</dt><dd>' + b.source + '</dd>' +
+        '<dt>偏好 / 篇幅</dt><dd>' + b.pref + ' · ' + b.length + '</dd>' +
+        '<dt>状态 / 字数</dt><dd>' + b.status + ' · ' + b.words + '</dd>' +
+        '<dt>类型</dt><dd>' + b.genres + '</dd>' +
+        '<dt>上架</dt><dd>' + (b.visible ? '上架' : '下架') + '</dd>' +
+        '<dt>抓取时间</dt><dd>' + b.crawled + '</dd>' +
+        '<dt>简介</dt><dd>' + b.intro + '</dd>' +
+        '</dl>';
+      document.getElementById('detailOverlay').classList.add('open');
+      document.getElementById('detailDrawer').classList.add('open');
+    }
+    function renderApplies() {
+      var q = (document.getElementById('applyQ').value || '').trim();
+      var mode = document.getElementById('applyModeQ').value;
+      var status = document.getElementById('applyStatusQ').value;
+      var rows = APPLIES.filter(function (a) {
+        if (q && a.user.indexOf(q) === -1 && a.words.indexOf(q) === -1) return false;
+        if (mode && a.mode !== mode) return false;
+        if (status && a.status !== status) return false;
+        return true;
+      });
+      document.getElementById('applyBody').innerHTML = rows.map(function (a) {
+        return '<tr><td>' + a.id + '</td><td>' + a.user + '</td><td>' + a.project + '</td><td>' + a.book + '</td><td>' + a.promo + '</td><td>' + a.mode + '</td><td>' + a.words + '</td><td>' + applyTag(a.status) + '</td><td>' + a.time + '</td><td>' +
+          '<button class="link" type="button" onclick="openApplyDetail(\'' + a.id + '\')">详情</button></td></tr>';
+      }).join('') || '<tr><td colspan="10" style="text-align:center;color:#9aa5b4">无匹配记录</td></tr>';
+    }
+    function resetApplyFilter() {
+      document.getElementById('applyQ').value = '';
+      document.getElementById('applyModeQ').value = '';
+      document.getElementById('applyStatusQ').value = '';
+      renderApplies();
+    }
+    function openApplyDetail(id) {
+      var a = APPLIES.find(function (x) { return x.id === id; });
+      if (!a) return;
+      document.getElementById('detailTitle').textContent = a.id;
+      document.getElementById('detailBody').innerHTML =
+        '<dl class="kv">' +
+        '<dt>用户</dt><dd>' + a.user + '</dd>' +
+        '<dt>项目</dt><dd>' + a.project + '</dd>' +
+        '<dt>书名</dt><dd>' + a.book + '</dd>' +
+        '<dt>推广类型</dt><dd>' + a.promo + '</dd>' +
+        '<dt>方式</dt><dd>' + a.mode + '</dd>' +
+        '<dt>关键词</dt><dd>' + a.words + '</dd>' +
+        '<dt>状态</dt><dd>' + a.status + '</dd>' +
+        '<dt>申请时间</dt><dd>' + a.time + '</dd>' +
+        '</dl><p class="cell-sub" style="margin-top:12px">审核复用现有申词后台，本 FR 不另做审批。</p>';
+      document.getElementById('detailOverlay').classList.add('open');
+      document.getElementById('detailDrawer').classList.add('open');
+    }
+    function closeDetail() {
+      document.getElementById('detailOverlay').classList.remove('open');
+      document.getElementById('detailDrawer').classList.remove('open');
+    }
+
+    function getActiveScreen() {
+      return document.querySelector('.scene-list .scene-btn.active')?.dataset.screen || 'list';
+    }
+    function currentTabKey() {
+      var id = document.querySelector('.page-view.active')?.id;
+      return { 'view-fe': 'fe', 'view-admin': 'admin', 'view-flow': 'flow' }[id] || 'fe';
+    }
+    function syncPageUrl() {
+      var params = new URLSearchParams();
+      params.set('tab', currentTabKey());
+      history.replaceState(null, '', '?' + params.toString());
+    }
+    function buildMockupSrc(screen) {
+      return 'book-select-demo.html?embed=1&v=7&screen=' + screen;
+    }
+    function loadMockupFrame() {
+      document.getElementById('mockupFrame').src = buildMockupSrc(getActiveScreen());
+    }
+    function switchRuleTab(ruleId, btn) {
+      document.querySelectorAll('.rule-tab-bar button').forEach(function (b) { b.classList.remove('active'); });
+      document.querySelectorAll('.rule-panel').forEach(function (p) { p.classList.remove('active'); });
+      btn.classList.add('active');
+      document.getElementById(ruleId).classList.add('active');
+    }
+    function syncRuleTabToPage() {
+      var activePage = document.querySelector('.page-view.active')?.id;
+      var ruleId = activePage === 'view-admin' ? 'rule-admin' : 'rule-fe';
+      var btn = document.querySelector('.rule-tab-bar button[data-rule="' + ruleId + '"]');
+      if (btn) switchRuleTab(ruleId, btn);
+    }
+    var ruleDrawer = document.getElementById('ruleDrawer');
+    var toggleRuleBtn = document.getElementById('toggleRuleDrawer');
+    function setRuleDrawer(open) {
+      ruleDrawer.classList.toggle('open', open);
+      document.getElementById('ruleOverlay').classList.toggle('open', open);
+      toggleRuleBtn.classList.toggle('active', open);
+      if (open) syncRuleTabToPage();
+    }
+    toggleRuleBtn.onclick = function () { setRuleDrawer(!ruleDrawer.classList.contains('open')); };
+
+    document.querySelectorAll('.scene-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('.scene-btn').forEach(function (b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        syncPageUrl();
+        loadMockupFrame();
+      });
+    });
+    document.querySelectorAll('.page-tab-bar button').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('.page-tab-bar button').forEach(function (b) { b.classList.remove('active'); });
+        document.querySelectorAll('.page-view').forEach(function (v) { v.classList.remove('active'); });
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.page).classList.add('active');
+        if (btn.dataset.page === 'view-fe') loadMockupFrame();
+        syncPageUrl();
+        syncRuleTabToPage();
+      });
+    });
+    document.querySelectorAll('.admin-tab-bar button').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('.admin-tab-bar button').forEach(function (b) { b.classList.remove('active'); });
+        document.querySelectorAll('.admin-pane').forEach(function (p) { p.classList.remove('active'); });
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.admin).classList.add('active');
+      });
+    });
+    document.querySelectorAll('.rule-tab-bar button').forEach(function (btn) {
+      btn.addEventListener('click', function () { switchRuleTab(btn.dataset.rule, btn); });
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape') return;
+      closeDetail();
+      setRuleDrawer(false);
+    });
+
+    var params = new URLSearchParams(location.search);
+    var tab = params.get('tab');
+    var tabPageMap = { admin: 'view-admin', flow: 'view-flow', fe: 'view-fe' };
+    if (tab && tabPageMap[tab]) {
+      var tbtn = document.querySelector('[data-page="' + tabPageMap[tab] + '"]');
+      if (tbtn) tbtn.click();
+    }
+    renderBooks();
+    renderApplies();
+    if (document.querySelector('.page-view.active')?.id === 'view-fe') loadMockupFrame();
+  </script>
+  <script src="sidebar-nav.js"></script>
+</body>
+</html>

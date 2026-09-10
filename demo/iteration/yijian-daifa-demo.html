@@ -190,7 +190,8 @@
     .seg button.on { background: #fff; color: var(--orange); font-weight: 700; }
     .kv { display: grid; grid-template-columns: 76px 1fr; gap: 8px 10px; font-size: 13px; }
     .kv dt { color: var(--muted); }
-    #screen-detail .scroll { padding: 0 0 12px; }
+    #screen-detail .scroll { padding: 0 0 20px; }
+    #pubTips { margin-bottom: 12px; }
     .media-full { position: relative; width: 100%; aspect-ratio: 1; background: #1a1a1a; overflow: hidden; }
     .media-full.is-album { cursor: pointer; }
     .media-full .cover-wrap { position: absolute; inset: 0; }
@@ -313,14 +314,17 @@
     .c-tools button.primary {
       flex: 1.2; border-radius: 8px; background: var(--orange); color: #fff; font-weight: 700;
     }
-    .tip-h { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
-    .tip-h span { font-size: 12px; color: var(--muted); font-weight: 600; }
+    .tip-h { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+    .tip-h .tip-label { font-size: 14px; font-weight: 700; color: #222; }
     .tip-h button {
       border: none; background: var(--orange-light); color: var(--orange);
       font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 999px; cursor: pointer;
     }
-    .tip-body { font-size: 14px; line-height: 1.55; color: #222; }
-    .tip-block + .tip-block { margin-top: 12px; padding-top: 12px; border-top: 1px solid #f3f3f3; }
+    #pubTips .tip-box {
+      width: 100%; min-height: 88px; padding: 10px 12px; border: 1px solid #eee;
+      border-radius: 8px; font: inherit; font-size: 14px; line-height: 1.55;
+      resize: none; background: #fafafa; color: #222;
+    }
     #loadSub { margin-top: 8px; font-size: 12px; color: var(--muted); }
     .load-bar { display: none; margin-top: 10px; height: 6px; background: #ffe8d6; border-radius: 99px; overflow: hidden; }
     .load-bar.show { display: block; }
@@ -997,12 +1001,27 @@
       var pad = function (n) { return n < 10 ? '0' + n : '' + n; };
       return (d.getMonth() + 1) + '月' + d.getDate() + '日 ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
     }
+    function workTakenAfterTimeout(c) {
+      if (!c || c.status !== '已超时') return false;
+      var w = item(c.mid);
+      if (w && (w.occ === '占用中' || w.occ === '已完成' || w.occupied)) return true;
+      return STORE.claims.some(function (x) {
+        return x.id !== c.id && x.mid === c.mid && (x.status === '未回填' || x.status === '已回填');
+      });
+    }
     function dlCountdown(c) {
+      if (workTakenAfterTimeout(c)) return { text: '已被他人领取', expired: true, taken: true };
       var left = (c.expireAt || 0) - Date.now();
       if (left <= 0) return { text: '下载已过期', expired: true };
       var d = Math.floor(left / 86400000);
       var h = Math.floor((left % 86400000) / 3600000);
       return { text: '还可下载 ' + d + '天' + h + '时', expired: false };
+    }
+    function downloadBlockToast(c) {
+      var cd = dlCountdown(c);
+      if (cd.taken) return '稿件已被他人领取，无法再下载';
+      if (cd.expired) return '领取已超过 7 天，无法再下载';
+      return '';
     }
     function renderProjects() {
       renderProjectRow('projectRow', state.filters.project, function (id) {
@@ -1078,11 +1097,8 @@
         : '<div class="media-full is-album" id="albumPreview">' + coverHtml(it.cover, it.book, it.genre) +
           '<span class="media-badge">' + (it.imgs || 1) + ' 张</span></div>';
       var extraCard = mine
-        ? '<div class="card" id="pubTips"><h3 style="font-size:14px;margin-bottom:10px">作品发布技巧</h3>' +
-          '<div class="tip-block"><div class="tip-h"><span>发布标题</span><button type="button" data-copy="title">复制</button></div>' +
-          '<p class="tip-body">' + esc(it.pubTitle || it.title) + '</p></div>' +
-          '<div class="tip-block"><div class="tip-h"><span>发布描述</span><button type="button" data-copy="desc">复制</button></div>' +
-          '<p class="tip-body">' + esc(it.pubDesc || '') + '</p></div></div>'
+        ? '<div class="card" id="pubTips"><div class="tip-h"><span class="tip-label" id="pubTipsLabel">发布技巧</span><button type="button" data-copy="tips" aria-label="复制发布技巧">复制</button></div>' +
+          '<textarea class="tip-box" readonly aria-labelledby="pubTipsLabel">' + esc(YJD.tipText(it)) + '</textarea></div>'
         : '<div class="card"><h3 style="font-size:14px;margin-bottom:6px">领取步骤</h3>' +
           '<ol class="steps" id="claimSteps">' +
           '<li><b>1.</b> 确认剩余次数（按钮旁可见）</li>' +
@@ -1118,11 +1134,14 @@
       if (album) album.onclick = function () { openAlbumPreview(it); };
       document.querySelectorAll('#pubTips [data-copy]').forEach(function (b) {
         b.onclick = function () {
-          var txt = b.dataset.copy === 'desc' ? (it.pubDesc || '') : (it.pubTitle || it.title);
+          var txt = YJD.tipText(it);
+          if (!txt) { toast('暂无发布技巧'); return; }
           if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt);
-          toast(b.dataset.copy === 'desc' ? '已复制发布描述' : '已复制发布标题');
+          toast('已复制发布技巧');
         };
       });
+      var tipBox = document.querySelector('#pubTips .tip-box');
+      if (tipBox) tipBox.scrollIntoView({ block: 'end' });
     }
     function myClaimOf(mid) {
       return myClaims().find(function (c) { return c.mid === mid && c.status !== '已超时'; });
@@ -1328,7 +1347,8 @@
           e.stopPropagation();
           var c = state.claims.find(function (x) { return x.id === btn.dataset.dl; });
           if (!c) return;
-          if (dlCountdown(c).expired) { toast('领取已超过 7 天，无法再下载'); return; }
+          var block = downloadBlockToast(c);
+          if (block) { toast(block); return; }
           c.downloadedAt = Date.now();
           persistFe();
           toast('稿件已开始下载');
@@ -1368,7 +1388,12 @@
         link: extra.link || ('https://ybdd.demo/ms/' + it.id),
         claimedAt: now,
         expireAt: extra.expireAt || (now + 7 * 86400000),
-        downloadedAt: extra.downloadedAt !== undefined ? extra.downloadedAt : now
+        downloadedAt: extra.downloadedAt !== undefined ? extra.downloadedAt : now,
+        shareSnapshot: extra.shareSnapshot || (function () {
+          var ed = YJD.editorByName(STORE, it.editor);
+          return (ed && ed.share) || it.share || '50%';
+        })(),
+        filledAt: extra.filledAt || ''
       };
     }
     function hexA(hex, a) {
@@ -1624,7 +1649,8 @@
       var mine = currentClaim();
       var it = item(state.current);
       if (!mine || !it) return;
-      if (dlCountdown(mine).expired) { toast('领取已超过 7 天，无法再下载'); return; }
+      var dlBlock = downloadBlockToast(mine);
+      if (dlBlock) { toast(dlBlock); return; }
       if (state.loadTimer) clearTimeout(state.loadTimer);
       var isVideo = it.kind === '视频';
       var total = isVideo ? 100 : (it.imgs || 1);
@@ -1663,6 +1689,8 @@
     function openWatermark() {
       var mine = currentClaim();
       if (!mine) { toast('请先领取稿件'); return; }
+      var wmBlock = downloadBlockToast(mine);
+      if (wmBlock) { toast(wmBlock); return; }
       state.wm = defaultWm(mine);
       setScreen('watermark', true);
     }
@@ -1750,6 +1778,7 @@
         c.fill = c.fill && c.fill !== '—' ? c.fill : '已回填';
         c.fillVideo = c.fillVideo || ('https://channels.weixin.qq.com/demo/' + c.id);
         c.pendingEarn = 0;
+        c.filledAt = c.filledAt || YJD.now();
         var it = item(c.mid);
         if (it) {
           it.occ = '已完成';

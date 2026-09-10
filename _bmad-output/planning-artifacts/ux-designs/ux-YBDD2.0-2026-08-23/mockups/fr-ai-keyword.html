@@ -202,9 +202,9 @@
         <h1>
           AI申词
           <span class="badge badge-fr">FR-013</span>
-          <span class="badge badge-version">v1 当前</span>
+          <span class="badge badge-version">v2 当前</span>
         </h1>
-        <p class="page-desc">用户已知书籍 ID、或只要用选书中心已上架书时，走独立批量 AI 申词：选项目与推广类型，手填 ID 和/或勾选官方推荐，多本书每本 1–10 词，先预览更换再一次提交。</p>
+        <p class="page-desc">用户已知书籍 ID、或只要用选书中心已上架书时，走独立批量 AI 申词：选项目与推广类型，Tab 选手填 ID 或官方推荐，填一次申请数量，点「立即申词」出结果，再点「立即题词」提交。</p>
       </div>
       <div class="page-header-actions">
         <button class="btn btn-rule" id="toggleRuleDrawer" type="button">📋 需求规则</button>
@@ -224,30 +224,30 @@
           <div class="scene-list">
             <button class="scene-btn active" type="button" data-screen="form">
               <div class="scene-title">表单</div>
-              <div class="scene-desc">选项目 / 类型，手填与推荐入口，待申词为空</div>
+              <div class="scene-desc">选项目 / 类型，默认手填 Tab，尚未申词</div>
             </button>
             <button class="scene-btn" type="button" data-screen="recommend">
               <div class="scene-title">官方推荐</div>
-              <div class="scene-desc">不鸣推文 + 图文，展示已上架拷贝，可多选</div>
+              <div class="scene-desc">推荐 Tab：搜索 + 最多 10 本 + 更换</div>
             </button>
             <button class="scene-btn" type="button" data-screen="manual">
               <div class="scene-title">手填 ID</div>
-              <div class="scene-desc">两本合法 ID 入行，命中带书名</div>
+              <div class="scene-desc">手填 Tab 已填两本合法 ID</div>
             </button>
             <button class="scene-btn" type="button" data-screen="preview">
               <div class="scene-title">预览出词</div>
-              <div class="scene-desc">两本已更换出词，可一次提交</div>
+              <div class="scene-desc">已立即申词，结果独立成块，按钮左右并排</div>
             </button>
             <button class="scene-btn" type="button" data-screen="empty">
-              <div class="scene-title">空推荐</div>
-              <div class="scene-desc">星河小说有自有书库，推荐为空，仍可手填</div>
+              <div class="scene-title">番茄漫剧</div>
+              <div class="scene-desc">番茄漫剧 + 图文，推荐 Tab 可多选</div>
             </button>
             <button class="scene-btn" type="button" data-screen="no-type">
-              <div class="scene-title">无类型</div>
-              <div class="scene-desc">未配置项目，类型下拉空并阻断提交</div>
+              <div class="scene-title">番茄短剧</div>
+              <div class="scene-desc">已选番茄短剧，类型可配，可选手填或推荐</div>
             </button>
           </div>
-          <div class="scene-note">官方推荐是选书中心<strong>已上架书</strong>的独立拷贝（ID 用 <code>BK-10xx</code>），无推荐标记、无维护表。下架书不出现。推广类型来自项目题词配置。</div>
+          <div class="scene-note">官方推荐是选书中心<strong>已上架书</strong>的独立拷贝（ID 用 <code>BK-10xx</code>），无推荐标记、无维护表。下架书不出现。列表最多 10 本，支持搜索书名/ID 与「更换」。推广类型来自项目题词配置。</div>
         </div>
         <div class="glass-card mockup-panel">
           <div class="mockup-frame-wrap">
@@ -263,7 +263,7 @@
           <h3>申词批次</h3>
         </div>
         <div class="filter-bar">
-          <div class="filter-field"><label>批次 / 项目</label><input id="batchQ" placeholder="BAT-9001 / 不鸣推文" /></div>
+          <div class="filter-field"><label>批次 / 项目</label><input id="batchQ" placeholder="BAT-9001 / 番茄小说" /></div>
           <div class="filter-field">
             <label>审核状态</label>
             <select id="batchStatusQ">
@@ -293,7 +293,7 @@
 
     <div id="view-flow" class="page-view">
       <div class="glass-card flow-page">
-        <p class="flow-page-intro">一张闭环：选项目 → 读题词配置 → 选类型 → 手填和/或勾选推荐 → 按行出词 → 一次写入一条批次，复用现有申词审核。缺项拦截回起点，不另开第二条流程。</p>
+        <p class="flow-page-intro">一张闭环：选项目 → 读题词配置 → 选类型 → Tab 选手填或官方推荐 → 填申请数量 → 立即申词出结果 → 立即题词写入一条批次。缺项拦截回起点，不另开第二条流程。</p>
         <div class="flow-svg-wrap">
           <svg width="1080" height="1080" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
             <defs>
@@ -327,7 +327,7 @@
             <g class="flow-nodes" font-family="Inter, PingFang SC, sans-serif">
               <rect x="360" y="16" width="360" height="48" rx="6" fill="#dbeafe" stroke="#2563eb" />
               <text x="540" y="36" text-anchor="middle" font-size="12" fill="#1e40af">进入 AI申词 · 选择项目</text>
-              <text x="540" y="52" text-anchor="middle" font-size="10" fill="#64748b">不鸣推文 / 星河小说 / 未配置</text>
+              <text x="540" y="52" text-anchor="middle" font-size="10" fill="#64748b">番茄小说 / 番茄漫剧 / 番茄短剧</text>
 
               <polygon points="540,94 620,134 540,174 460,134" fill="#fef9c3" stroke="#ca8a04" />
               <text x="540" y="138" text-anchor="middle" font-size="11" fill="#854d0e">已选项目?</text>
@@ -357,8 +357,8 @@
               <text x="552" y="550" font-size="10" fill="#16a34a">是</text>
 
               <rect x="360" y="564" width="360" height="48" rx="6" fill="#dbeafe" stroke="#2563eb" />
-              <text x="540" y="584" text-anchor="middle" font-size="12" fill="#1e40af">手填 ID 和/或勾选官方推荐</text>
-              <text x="540" y="600" text-anchor="middle" font-size="10" fill="#64748b">无自有书库才有推荐 · 下架书不出现</text>
+              <text x="540" y="584" text-anchor="middle" font-size="12" fill="#1e40af">Tab 选手填 ID 或官方推荐</text>
+              <text x="540" y="600" text-anchor="middle" font-size="10" fill="#64748b">最多 10 本 · 可搜索 / 更换 · 下架书不出现</text>
 
               <polygon points="540,642 620,682 540,722 460,682" fill="#fef9c3" stroke="#ca8a04" />
               <text x="540" y="686" text-anchor="middle" font-size="11" fill="#854d0e">有有效书籍 ID?</text>
@@ -368,18 +368,18 @@
               <text x="552" y="738" font-size="10" fill="#16a34a">是</text>
 
               <rect x="360" y="752" width="360" height="48" rx="6" fill="#dbeafe" stroke="#2563eb" />
-              <text x="540" y="772" text-anchor="middle" font-size="12" fill="#1e40af">每本数量 1–10，按行更换出词</text>
-              <text x="540" y="788" text-anchor="middle" font-size="10" fill="#64748b">默认 3 · 越界钳到 1–10 · 空数量 Toast</text>
+              <text x="540" y="772" text-anchor="middle" font-size="12" fill="#1e40af">填申请数量，点立即申词</text>
+              <text x="540" y="788" text-anchor="middle" font-size="10" fill="#64748b">一次填写 · 1–10 · 结果独立 · 按钮左右排</text>
 
               <polygon points="540,830 620,870 540,910 460,870" fill="#fef9c3" stroke="#ca8a04" />
-              <text x="540" y="874" text-anchor="middle" font-size="11" fill="#854d0e">每行都已出词?</text>
+              <text x="540" y="874" text-anchor="middle" font-size="11" fill="#854d0e">已立即申词?</text>
               <text x="300" y="862" font-size="10" fill="#dc2626">否</text>
               <rect x="60" y="850" width="170" height="40" rx="6" fill="#fecaca" stroke="#dc2626" />
               <text x="145" y="875" text-anchor="middle" font-size="11" fill="#991b1b">拦截 · 行未出词</text>
               <text x="552" y="926" font-size="10" fill="#16a34a">是</text>
 
               <rect x="360" y="940" width="360" height="40" rx="6" fill="#dcfce7" stroke="#16a34a" />
-              <text x="540" y="965" text-anchor="middle" font-size="12" fill="#166534">一次提交 = 一条批次记录</text>
+              <text x="540" y="965" text-anchor="middle" font-size="12" fill="#166534">立即题词 = 一条批次记录</text>
 
               <rect x="360" y="1004" width="360" height="40" rx="6" fill="#ffedd5" stroke="#ea580c" />
               <text x="540" y="1029" text-anchor="middle" font-size="12" fill="#9a3412">写入现有申词审核 · 不重定义状态</text>
@@ -400,7 +400,7 @@
   <div class="drawer-overlay" id="ruleOverlay" onclick="setRuleDrawer(false)"></div>
   <aside class="drawer" id="ruleDrawer" role="dialog" aria-labelledby="ruleTitle">
     <div class="drawer-header">
-      <h2 id="ruleTitle">FR-013 · v1 需求规则</h2>
+      <h2 id="ruleTitle">FR-013 · v2 需求规则</h2>
       <button class="drawer-close" type="button" onclick="setRuleDrawer(false)">×</button>
     </div>
     <div class="rule-tab-bar">
@@ -420,11 +420,14 @@
           <div class="rule-content">
             <ul>
               <li><strong>入口</strong>：独立「AI申词」H5，不挂在选书中心详情里。</li>
-              <li><strong>项目</strong>：必选。Demo：不鸣推文（有推荐）、星河小说（自有书库，推荐空）、未配置项目（类型空）。</li>
+              <li><strong>项目</strong>：必选。Demo：番茄小说、番茄漫剧、番茄短剧（均无自有书库，有官方推荐）。</li>
               <li><strong>推广类型</strong>：读取该项目题词配置。Demo 枚举：真人出镜、图文、解压TTS、解说混剪、AIGC。</li>
-              <li><strong>手填 ID</strong>：换行 / 逗号 / 空格分隔，按 ID 去重。命中书库带书名，未命中标「未匹配书名」仍可申。</li>
-              <li><strong>官方推荐</strong>：选书中心已上架书的独立拷贝，同书名，ID 用 <code>BK-10xx</code>。无推荐 flag、无推荐维护表。下架书不出现。有自有书库的项目推荐为空。</li>
-              <li><strong>待申词行</strong>：ID、书名或「未匹配书名」、数量 1–10（默认 3）、词芯片、「更换」。</li>
+              <li><strong>书籍来源 Tab</strong>：<code>手填书籍 ID</code> | <code>官方推荐</code>。立即申词只取当前 Tab。</li>
+              <li><strong>手填 ID</strong>：矮输入框（约 2 行）。换行 / 逗号 / 空格分隔，按 ID 去重。命中书库带书名，未命中标「未匹配书名」仍可申。</li>
+              <li><strong>官方推荐</strong>：选书中心已上架书的独立拷贝，同书名，ID 用 <code>BK-10xx</code>。无推荐 flag、无推荐维护表。下架书不出现。支持按书名 / 书籍 ID 搜索；列表最多展示 10 本，点「更换」换下一批。有自有书库的项目推荐为空。</li>
+              <li><strong>申请数量</strong>：一次填写，对本次全部书籍生效，1–10（默认 3）。</li>
+              <li><strong>申词结果</strong>：独立卡片组件，按书展示词芯片与「移除」。</li>
+              <li><strong>主按钮</strong>：「立即申词」「立即题词」左右并排，等宽。</li>
             </ul>
           </div>
         </div>
@@ -432,11 +435,11 @@
           <h3><span>3</span>交互规则</h3>
           <div class="rule-content">
             <ul>
-              <li>双层批量：多本书；每本独立数量；「更换」只按该行换词。</li>
-              <li>推荐已加入的 ID 再手填，Toast「已添加」，不重复行。</li>
-              <li>数量 0 或超过 10，点更换时钳到 1–10 再出词；数量为空 Toast。</li>
-              <li>一次提交 = 一条批次。先预览 / 更换，再提交。</li>
-              <li>提交成功走<strong>现有申词审核</strong>，本 FR 不重定义审核态。</li>
+              <li>双层批量：多本书共用一个申请数量；「立即申词」一次出齐。</li>
+              <li>同一批 ID 重复时去重，Toast 提示已去重。</li>
+              <li>数量 0 或超过 10，点立即申词时钳到 1–10；数量为空 Toast。</li>
+              <li>先「立即申词」出结果，再「立即题词」提交。一次题词 = 一条批次。</li>
+              <li>题词成功走<strong>现有申词审核</strong>，本 FR 不重定义审核态。</li>
             </ul>
           </div>
         </div>
@@ -444,7 +447,7 @@
           <h3><span>4</span>边界规则</h3>
           <div class="rule-content">
             <ul>
-              <li>缺项目 / 类型 / 有效 ID / 任一行未出词，不可提交，Toast 点名缺项。</li>
+              <li>缺项目 / 类型 / 有效 ID / 申请数量，不可立即申词；未申词不可立即题词。Toast 点名缺项。</li>
               <li>项目没有类型时，下拉为空并阻断。</li>
               <li>不做手动「申请关键词」Tab；不在本页做上下架或新推荐表。</li>
             </ul>
@@ -514,7 +517,7 @@
       {
         id: 'BAT-9001',
         user: 'U-10086',
-        project: '不鸣推文',
+        project: '番茄小说',
         promo: '图文',
         books: [
           { id: 'BK-1001', title: '我成了老公掌心宠', words: ['掌心宠溺', '年代团宠', '闪婚宠妻'] },
@@ -526,7 +529,7 @@
       {
         id: 'BAT-9002',
         user: 'U-10221',
-        project: '不鸣推文',
+        project: '番茄漫剧',
         promo: '解说混剪',
         books: [
           { id: 'BK-1005', title: '我在末世囤了亿万物资', words: ['末世囤货'] }
@@ -537,7 +540,7 @@
       {
         id: 'BAT-9003',
         user: 'U-10888',
-        project: '星河小说',
+        project: '番茄短剧',
         promo: 'AIGC',
         books: [
           { id: 'BK-9999', title: '未匹配书名', unmatched: true, words: ['银发救赎', '世情暖文'] }

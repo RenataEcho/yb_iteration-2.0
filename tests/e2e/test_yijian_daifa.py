@@ -57,14 +57,17 @@ def test_feed_hides_occupied_and_claim_requires_keyword(page, demo_server):
     expect(page.locator("#screen-detail")).to_have_class("screen active")
     expect(page.locator("#footUnclaimed")).to_be_hidden()
     expect(page.locator("#footClaimed")).to_be_visible()
-    expect(page.locator("#detailBody")).to_contain_text("作品发布技巧")
-    expect(page.locator("#detailBody")).to_contain_text("发布标题")
-    expect(page.locator("#detailBody")).to_contain_text("发布描述")
+    expect(page.locator("#pubTips")).to_be_visible()
+    expect(page.locator("#pubTips .tip-label")).to_have_text("发布技巧")
+    expect(page.locator("#pubTips textarea")).to_be_visible()
+    expect(page.locator("#detailBody")).not_to_contain_text("作品发布技巧")
+    expect(page.locator("#detailBody")).not_to_contain_text("发布标题")
+    expect(page.locator("#detailBody")).not_to_contain_text("发布描述")
     expect(page.locator("#detailBody")).not_to_contain_text("领取步骤")
     expect(page.locator("#copyTitle")).to_have_text("添加水印")
     expect(page.locator("#editWork")).to_have_text("下载稿件")
-    page.locator("#pubTips [data-copy='title']").click()
-    expect(page.locator("#toast")).to_contain_text("已复制发布标题")
+    page.locator("#pubTips [data-copy='tips']").click()
+    expect(page.locator("#toast")).to_contain_text("已复制发布技巧")
 
     page.locator("#screenNav button", has_text="我的领取").click()
     expect(page.locator("#claimTabs .on")).to_contain_text("未回填")
@@ -224,7 +227,7 @@ def test_fr_shell_admin_and_flow(page, demo_server):
     expect(page.locator("#rule-fe")).to_contain_text("前端交互 → 业务流程")
     expect(page.locator("#rule-fe")).to_contain_text("plazaEligible")
     expect(page.locator("#ruleSubBar")).to_contain_text("稿件管理")
-    expect(page.locator(".badge-version")).to_contain_text("v8")
+    expect(page.locator(".badge-version")).to_contain_text("v9")
     page.locator('.rule-tab-bar button[data-rule="rule-fe"]').click()
     expect(page.locator("#ruleSubBar")).to_contain_text("作品广场")
     expect(page.locator("#ruleSubBar")).to_contain_text("稿件详情")
@@ -236,6 +239,7 @@ def test_fr_shell_admin_and_flow(page, demo_server):
     expect(page.locator("#pcDemo h2")).to_contain_text("PC端 Demo")
     expect(page.locator("#pcFrame")).to_be_visible()
     expect(page.locator("#pcScenes")).to_contain_text("剪辑供稿")
+    expect(page.locator("#pcScenes")).to_contain_text("操作说明")
     expect(page.locator('[data-preview="pc"]')).to_have_text("全屏预览")
     page.goto(f"{demo_server}/fr-opc-yijian-daifa.html?tab=flow", wait_until="domcontentloaded")
     expect(page.locator("#fe-flow")).to_be_visible()
@@ -364,14 +368,18 @@ def test_covers_banner_poster_and_claim_detail(page, demo_server):
     expect(page.locator("#copyTitle")).to_have_text("添加水印")
     expect(page.locator("#editWork")).to_have_text("下载稿件")
     expect(page.locator("#footClaimed")).not_to_have_class("hidden")
-    expect(page.locator("#detailBody")).to_contain_text("作品发布技巧")
-    expect(page.locator("#detailBody")).to_contain_text("银发军官把我宠上天｜年代图集")
+    expect(page.locator("#pubTips")).to_be_visible()
+    expect(page.locator("#pubTips .tip-label")).to_have_text("发布技巧")
+    expect(page.locator("#detailBody")).not_to_contain_text("作品发布技巧")
+    expect(page.locator("#detailBody")).not_to_contain_text("发布标题")
+    expect(page.locator("#detailBody")).not_to_contain_text("发布描述")
+    expect(page.locator("#pubTips textarea")).to_have_value(re.compile(r"银发军官把我宠上天｜年代图集"))
     expect(page.locator("#detailBody")).to_contain_text("书籍 ID")
     expect(page.locator("#detailBody")).to_contain_text("7482019356")
     expect(page.locator("#detailBody .pills")).to_contain_text("年代")
     expect(page.locator("#detailNotice")).to_be_visible()
-    page.locator("#pubTips [data-copy='desc']").click()
-    expect(page.locator("#toast")).to_contain_text("已复制发布描述")
+    page.locator("#pubTips [data-copy='tips']").click()
+    expect(page.locator("#toast")).to_contain_text("已复制发布技巧")
     page.locator("#copyTitle").click()
     expect(page.locator("#screen-watermark")).to_have_class("screen active")
     expect(page.locator("#wmMark")).to_contain_text("年代甜宠")
@@ -466,7 +474,7 @@ def test_admin_editors_works_projects(page, demo_server):
     expect(page.locator("#detailBody")).to_contain_text("书籍 ID")
     expect(page.locator("#detailBody")).to_contain_text("文件大小")
     expect(page.locator("#detailBody")).to_contain_text("18.6 MB (12)")
-    expect(page.locator("#detailBody")).to_contain_text("作品标题")
+    expect(page.locator("#detailBody")).to_contain_text("发布技巧")
     page.locator("#detailDrawer .drawer-close").click()
 
     page.locator('.admin-tab-bar button[data-admin="admin-projects"]').click()
@@ -554,6 +562,13 @@ def test_pc_recruit_board_and_upload_list(page, demo_server):
     expect(page.locator("#authChips")).to_contain_text("番茄小说")
     expect(page.locator("#authChips")).to_contain_text("红果漫剧")
     expect(page.locator("#boardEmpty")).to_be_hidden()
+    expect(page.locator("#goGuide")).to_be_visible()
+    page.locator("#goGuide").click()
+    expect(page.locator("#view-guide")).to_have_class("view on")
+    expect(page.locator("#guideBody")).to_contain_text("怎样算传完")
+    expect(page.locator("#guideBody")).to_contain_text("操作说明")
+    page.locator("#guideBack").click()
+    expect(page.locator("#view-home")).to_have_class("view on")
     expect(page.locator("#recentBox")).to_contain_text("项目名称")
     expect(page.locator("#recentBox")).to_contain_text("书籍信息")
     expect(page.locator("#recentBox")).to_contain_text("稿件类型")
@@ -583,6 +598,10 @@ def test_pc_recruit_board_and_upload_list(page, demo_server):
     expect(page.locator("#boardEmpty")).to_contain_text("还不是剪辑手")
     expect(page.locator("#boardReady")).to_be_hidden()
     expect(page.locator("#goUpload")).to_be_hidden()
+    expect(page.locator("#goGuide")).to_be_visible()
+    page.locator("#boardEmpty button", has_text="查看操作说明").click()
+    expect(page.locator("#view-guide")).to_have_class("view on")
+    expect(page.locator("#guideBody")).to_contain_text("未录入也能看")
 
     page.goto(f"{demo_server}/yijian-daifa-pc.html?screen=list", wait_until="domcontentloaded")
     expect(page.locator("#listBox")).to_contain_text("书籍 ID")
@@ -630,20 +649,46 @@ def test_admin_fe_store_loop(page, demo_server):
     expect(page.locator("#upPackSum")).to_contain_text("解压中")
     expect(page.locator("#upExcel")).to_contain_text("闭环测试书", timeout=5000)
     expect(page.locator("#upExcelMeta")).to_contain_text("共 3 条")
+    expect(page.locator("#upExcel .tip-edit")).to_have_count(3)
+    expect(page.locator("#upExcel .tip-edit").first).to_have_value("")
     page.locator("#upAiTips").click()
+    expect(page.locator("#pcConfirm")).to_have_class(re.compile(r"\bopen\b"))
+    expect(page.locator("#pcConfirm")).to_contain_text("你是代发文案助手")
+    expect(page.locator("#pcConfirm")).to_contain_text("【约束】")
+    expect(page.locator("#pcConfirm")).to_contain_text("【规则】")
+    expect(page.locator("#upExcel .tip-edit").first).to_have_value("")
+    page.locator("#pcConfirmCancel").click()
+    expect(page.locator("#pcConfirm")).not_to_have_class(re.compile(r"\bopen\b"))
+    expect(page.locator("#upExcel .tip-edit").first).to_have_value("")
+    page.locator("#upAiTips").click()
+    page.locator("#pcConfirmOk").click()
     expect(page.locator("#toast")).to_contain_text("已为全表生成发布技巧")
+    expect(page.locator("#upExcel .tip-edit").first).to_have_value(re.compile(r"闭环测试书"))
+    expect(page.locator("#upExcel .tip-edit").first).to_have_value(re.compile(r"#"))
+    fail_tip = page.locator("#upExcel .tip-edit").nth(2).input_value()
     page.locator("#doPublish").click()
     expect(page.locator("#toast")).to_contain_text("已加入上传队列")
     expect(page.locator("#listBox")).to_contain_text("闭环测试书")
     loop_row = page.locator("#listBox tbody tr").filter(has=page.locator("td:nth-child(2)", has_text="闭环测试书"))
     expect(loop_row).to_contain_text("已上传", timeout=8000)
     expect(loop_row).to_contain_text("审核中")
+    expect(loop_row).to_contain_text("不另编情节")
     expect(page.locator("#listBox")).to_contain_text("B-LOOP")
     expect(page.locator("#listBox")).not_to_contain_text("ybdd.demo/ms")
     fail_row = page.locator("#listBox tbody tr").filter(has=page.locator("td:nth-child(2)", has_text="失败样例"))
     expect(fail_row).to_contain_text("上传失败", timeout=8000)
     fail_row.locator("button", has_text="重新上传").click()
     expect(fail_row).to_contain_text("已上传", timeout=5000)
+    tip_kept = page.evaluate(
+        """() => {
+          var data = JSON.parse(localStorage.getItem('fr014-yjd-v4'));
+          var w = (data.works || []).find(function (x) {
+            return x.title === '失败样例' && x.bookId === 'B-LOOP';
+          });
+          return w ? (w.pubTips || '') : '';
+        }"""
+    )
+    assert tip_kept == fail_tip
 
     page.goto(f"{demo_server}/yijian-daifa-demo.html?embed=1", wait_until="domcontentloaded")
     expect(page.locator("#feedList")).not_to_contain_text("闭环测试书")
@@ -652,6 +697,7 @@ def test_admin_fe_store_loop(page, demo_server):
     page.locator('.admin-tab-bar button[data-admin="admin-works"]').click()
     expect(page.locator("#wkBody")).to_contain_text("闭环测试书")
     expect(page.locator("#wkBody")).to_contain_text("审核中")
+    expect(page.locator('#wkBody tr[data-title="闭环测试书"]')).to_contain_text("不另编情节")
     page.locator('#wkBody tr[data-title="闭环测试书"]').locator("button", has_text="通过").click()
     expect(page.locator("#toast")).to_contain_text("已通过")
 
@@ -939,6 +985,7 @@ def test_skip_review_editor_upload_auto_pass(page, demo_server):
     expect(skip_row).to_contain_text("已上传", timeout=8000)
     expect(skip_row).to_contain_text("已通过")
     expect(skip_row).not_to_contain_text("审核中")
+    expect(skip_row).to_contain_text("—")
     night_row = page.locator("#listBox tbody tr").filter(has_text="B-SKIP").filter(has_text="夜色切片")
     expect(night_row).to_contain_text("已上传", timeout=8000)
     expect(night_row).to_contain_text("已通过")
@@ -946,3 +993,85 @@ def test_skip_review_editor_upload_auto_pass(page, demo_server):
     page.goto(f"{demo_server}/yijian-daifa-demo.html?embed=1", wait_until="domcontentloaded")
     expect(page.locator("#feedList")).to_contain_text("闭环测试书")
     expect(page.locator("#feedList")).to_contain_text("夜色切片")
+
+
+def test_publish_tips_single_block(page, demo_server):
+    custom = "手改技巧正文给闭环验收用 #手改"
+    page.goto(f"{demo_server}/yijian-daifa-pc.html?embed=1&screen=upload", wait_until="domcontentloaded")
+    page.evaluate("askAiTips()")
+    expect(page.locator("#toast")).to_contain_text("请先解析成片")
+    page.locator("#upBook").fill("手改技巧书")
+    page.locator("#upBookId").fill("B-EDIT")
+    page.locator("#upBookLink").fill("https://ybdd.demo/book/B-EDIT")
+    page.locator("#upNext").click()
+    page.locator("#upPackZip").click()
+    page.locator("#upUseDemo").click()
+    expect(page.locator("#upExcel .tip-edit").first).to_have_value("", timeout=5000)
+    page.locator("#upExcel .tip-edit").first.fill(custom)
+    page.locator("#doPublish").click()
+    expect(page.locator("#toast")).to_contain_text("已加入上传队列")
+    edit_row = page.locator("#listBox tbody tr").filter(has=page.locator("td:nth-child(2)", has_text="闭环测试书")).filter(has_text="B-EDIT")
+    expect(edit_row).to_contain_text("已上传", timeout=8000)
+    expect(edit_row).to_contain_text(custom)
+
+    page.goto(f"{demo_server}/fr-opc-yijian-daifa.html?tab=admin", wait_until="domcontentloaded")
+    page.locator('.admin-tab-bar button[data-admin="admin-works"]').click()
+    expect(page.locator('#wkBody tr[data-title="闭环测试书"]').filter(has_text="B-EDIT")).to_contain_text(custom)
+    page.locator('#wkBody tr[data-title="闭环测试书"]').filter(has_text="B-EDIT").locator("button", has_text="详情").click()
+    expect(page.locator("#detailBody")).to_contain_text("发布技巧")
+    expect(page.locator("#detailBody")).to_contain_text(custom)
+    expect(page.locator("#detailBody")).not_to_contain_text("作品标题")
+    expect(page.locator("#detailBody")).not_to_contain_text("作品描述")
+    page.locator("#detailDrawer .drawer-close").click()
+    page.locator('#wkBody tr[data-title="闭环测试书"]').filter(has_text="B-EDIT").locator("button", has_text="通过").click()
+
+    page.goto(f"{demo_server}/yijian-daifa-demo.html?embed=1", wait_until="domcontentloaded")
+    page.evaluate(
+        """() => {
+          var w = STORE.works.find(function (x) { return x.bookId === 'B-EDIT' && x.title === '闭环测试书'; });
+          if (!w) return;
+          w.occupied = true;
+          w.occ = '占用中';
+          state.claims.unshift(makeClaim(w, { id: 'C-edit', kw: '掌心宠溺', status: '未回填' }));
+          persistFe();
+          state.current = w.id;
+          showScreen('detail');
+        }"""
+    )
+    expect(page.locator("#pubTips textarea")).to_have_value(custom)
+    expect(page.locator("#pubTips .tip-label")).to_have_text("发布技巧")
+    expect(page.locator("#detailBody")).not_to_contain_text("作品发布技巧")
+    expect(page.locator("#detailBody")).not_to_contain_text("发布标题")
+    expect(page.locator("#detailBody")).not_to_contain_text("发布描述")
+    page.locator("#pubTips [data-copy='tips']").click()
+    expect(page.locator("#toast")).to_contain_text("已复制发布技巧")
+
+    page.evaluate(
+        """() => {
+          var w = item(state.current);
+          w.pubTips = '';
+          w.pubTitle = '不应回落的旧标题';
+          w.pubDesc = '不应回落的旧描述';
+          persistFe();
+          renderDetail();
+        }"""
+    )
+    expect(page.locator("#pubTips textarea")).to_have_value("")
+    expect(page.locator("#pubTips .tip-label")).to_have_text("发布技巧")
+    page.locator("#pubTips [data-copy='tips']").click()
+    expect(page.locator("#toast")).to_contain_text("暂无发布技巧")
+
+    page.evaluate(
+        """() => {
+          var w = STORE.works.find(function (x) { return x.id === 'M-06'; });
+          delete w.pubTips;
+          w.pubTitle = '旧标题段';
+          w.pubDesc = '旧描述段';
+          persistFe();
+          state.current = 'M-06';
+          showScreen('detail');
+        }"""
+    )
+    expect(page.locator("#pubTips textarea")).to_have_value("旧标题段\n旧描述段")
+    expect(page.locator("#detailBody")).not_to_contain_text("发布标题")
+    expect(page.locator("#detailBody")).not_to_contain_text("发布描述")

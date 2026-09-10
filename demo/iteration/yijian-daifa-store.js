@@ -129,6 +129,38 @@
 
   function pad2(n) { return n < 10 ? '0' + n : '' + n; }
 
+  function tipText(w) {
+    if (w && w.pubTips != null) return String(w.pubTips);
+    return [w && w.pubTitle, w && w.pubDesc].filter(Boolean).join('\n');
+  }
+
+  function tipPrompt(vars) {
+    vars = vars || {};
+    function slot(key) {
+      var val = vars[key];
+      return val != null && String(val) !== '' ? String(val) : '{' + key + '}';
+    }
+    return '你是代发文案助手。只根据给定书籍与稿件写一条发布技巧，不要拆标题和描述。\n' +
+      '【输入】书名：' + slot('book') + '；书籍ID：' + slot('book_id') + '；稿件：' + slot('title') +
+      '；类型：' + slot('kind') + '；素材：' + slot('mat') + '\n' +
+      '【约束】一段连续正文，无标签/序号/「标题」「描述」。30–180 字。必须出现书名和稿件名。文末 1–2 个 #话题（从书名或稿件名截取，禁止平台名）。简介没有的情节不准编。\n' +
+      '【规则】禁涉黄涉政暴力歧视；不号召下载站外 App；不得输出解释或 JSON。';
+  }
+
+  function topicTag(s) {
+    return String(s || '').replace(/[#\s]/g, '').slice(0, 8);
+  }
+
+  function makeTip(input) {
+    var book = String((input && input.book) || '本书');
+    var title = String((input && input.title) || '成片');
+    var t1 = topicTag(book);
+    var t2 = topicTag(title);
+    var tags = '#' + (t1 || '成片');
+    if (t2 && t2 !== t1) tags += ' #' + t2;
+    return '发布「' + title + '」时写明书名「' + book + '」，只根据书和成片已有内容写一段，不另编情节。' + tags;
+  }
+
   function workQty(w) {
     if (!w) return 1;
     return w.kind === '视频' ? 1 : (Number(w.imgs) || 1);
@@ -144,7 +176,9 @@
   }
 
   function mockPendingEarn(data, claim) {
-    return Math.round(180 * sharePct(editorByName(data, claim.editor)) / 100);
+    var snap = claim && claim.shareSnapshot;
+    var pct = snap ? sharePct({ share: snap }) : sharePct(editorByName(data, claim && claim.editor));
+    return Math.round(180 * pct / 100);
   }
 
   function readRaw() {
@@ -182,6 +216,7 @@
       if (!w.fileName) w.fileName = w.title;
       if (!w.uploadStatus) w.uploadStatus = '已上传';
       if (!w.bookLink && w.bookId) w.bookLink = 'https://ybdd.demo/book/' + w.bookId;
+      if (w.pubTips == null) w.pubTips = tipText(w);
       if (w.kind === '图集') {
         var list = Array.isArray(w.preview) ? w.preview.filter(Boolean) : [];
         w.preview = (list.length ? list : albumPreview(w.cover)).slice(0, 3);
@@ -200,9 +235,14 @@
         if (!c.project) c.project = w.project;
         if (!c.editor) c.editor = w.editor;
       }
+      if (!c.shareSnapshot && c.editor) {
+        var ed = editorByName(data, c.editor);
+        if (ed && ed.share) c.shareSnapshot = ed.share;
+      }
       if (c.status === '已回填') {
         if (!c.fillVideo) c.fillVideo = 'https://channels.weixin.qq.com/demo/' + c.id;
         c.pendingEarn = 0;
+        if (!c.filledAt) c.filledAt = c.time || '';
       } else if (c.status === '未回填' || c.status === '待回填') {
         if (c.fillVideo == null) c.fillVideo = '';
         if (c.pendingEarn == null) c.pendingEarn = mockPendingEarn(data, c);
@@ -366,6 +406,9 @@
     projectByName: projectByName,
     editorByName: editorByName,
     workById: workById,
+    tipText: tipText,
+    tipPrompt: tipPrompt,
+    makeTip: makeTip,
     editorNeedsReview: editorNeedsReview,
     workAuditAfterUpload: workAuditAfterUpload,
     onSaleCount: onSaleCount,

@@ -61,9 +61,9 @@
       width: 36px; height: 36px; border: none; background: none; font-size: 22px; cursor: pointer; color: #222;
     }
     .nav-bar .title { font-size: 17px; font-weight: 700; flex: 1; text-align: center; margin-right: 36px; }
-    .form-scroll { flex: 1; overflow-y: auto; padding: 0 16px 20px; }
+    .form-scroll { flex: 1; overflow-y: auto; padding: 0 16px 16px; }
     .card {
-      background: #fff; border-radius: 12px; padding: 14px; margin-bottom: 12px;
+      background: #fff; border-radius: 12px; padding: 12px; margin-bottom: 10px;
     }
     .card-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; gap: 8px; }
     .card-head h3 { font-size: 15px; font-weight: 700; }
@@ -80,22 +80,49 @@
       background-repeat: no-repeat; background-position: right 12px center;
     }
     .field textarea {
-      min-height: 88px; padding: 10px 12px; resize: none; line-height: 1.5;
+      min-height: 40px; height: 48px; max-height: 56px; padding: 8px 12px; resize: none; line-height: 1.4;
     }
     .field select:focus, .field textarea:focus, .field input:focus { outline: none; border-color: #ffc09a; }
     .field-hint { margin-top: 6px; font-size: 11px; color: var(--text-muted); line-height: 1.5; }
-    .id-row { display: flex; gap: 8px; align-items: flex-start; }
-    .id-row textarea { flex: 1; }
-    .btn-add {
-      height: 40px; padding: 0 14px; border: none; border-radius: 8px; flex-shrink: 0; margin-top: 0;
-      background: var(--orange); color: #fff; font-size: 13px; font-weight: 600; cursor: pointer;
+    .src-tabs { display: flex; gap: 20px; margin-bottom: 12px; border-bottom: 1px solid #f0f0f0; }
+    .src-tab {
+      border: none; background: none; padding: 0 0 10px; font-size: 15px; color: #9aa3af; cursor: pointer;
     }
+    .src-tab.active { color: var(--text); font-weight: 700; box-shadow: inset 0 -2px 0 var(--orange); }
+    .src-pane { display: none; }
+    .src-pane.active { display: block; }
+    .src-pane textarea {
+      width: 100%; min-height: 40px; height: 48px; max-height: 56px;
+      padding: 8px 12px; resize: none; line-height: 1.4;
+      border: 1px solid #e6e8eb; border-radius: 8px; background: #fff;
+      font-size: 13px; color: var(--text); font-family: inherit;
+    }
+    .src-pane textarea:focus { outline: none; border-color: #ffc09a; }
+    .qty-input {
+      width: 100%; height: 40px; padding: 0 12px; border: 1px solid #e6e8eb; border-radius: 8px;
+      background: #fff; font-size: 15px; font-weight: 700; color: var(--text); font-family: inherit;
+    }
+    .rec-search {
+      width: 100%; height: 36px; padding: 0 12px; margin-bottom: 8px;
+      border: 1px solid #e6e8eb; border-radius: 8px; background: #fff;
+      font-size: 13px; color: var(--text); font-family: inherit;
+    }
+    .rec-search:focus { outline: none; border-color: #ffc09a; }
+    .rec-toolbar {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px;
+    }
+    .rec-meta { font-size: 11px; color: var(--text-muted); }
+    .rec-swap {
+      border: none; background: none; color: var(--orange); font-size: 13px; font-weight: 600;
+      cursor: pointer; padding: 0;
+    }
+    .rec-swap:disabled { color: #c5c9d0; cursor: not-allowed; }
     .rec-empty {
       padding: 18px 8px; text-align: center; font-size: 12px; color: var(--text-muted); line-height: 1.6;
     }
-    .rec-list { display: flex; flex-direction: column; gap: 8px; max-height: 220px; overflow-y: auto; }
+    .rec-list { display: flex; flex-direction: column; gap: 0; max-height: 156px; overflow-y: auto; }
     .rec-item {
-      display: flex; align-items: flex-start; gap: 10px; padding: 8px 4px;
+      display: flex; align-items: flex-start; gap: 8px; padding: 6px 2px;
       border-bottom: 1px solid #f3f3f3; cursor: pointer;
     }
     .rec-item:last-child { border-bottom: none; }
@@ -118,20 +145,6 @@
     .row-del {
       border: none; background: none; color: #ef4444; font-size: 12px; cursor: pointer; padding: 0;
     }
-    .ai-row { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
-    .ai-qty {
-      flex: 1; display: flex; align-items: center; height: 42px; padding: 0 12px;
-      border: 1px solid #e6e8eb; border-radius: 8px; background: #fff;
-    }
-    .ai-qty span { font-size: 13px; color: #6b7280; margin-right: 8px; white-space: nowrap; }
-    .ai-qty input {
-      width: 48px; border: none; outline: none; font-size: 15px; font-weight: 700; color: var(--text);
-    }
-    .ai-qty em { font-style: normal; font-size: 12px; color: var(--text-muted); }
-    .btn-swap {
-      height: 42px; padding: 0 16px; border: 1px solid var(--orange); border-radius: 8px;
-      background: #fff; color: var(--orange); font-size: 13px; font-weight: 600; cursor: pointer;
-    }
     .ai-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; min-height: 28px; }
     .ai-chip {
       padding: 5px 10px; border-radius: 6px; background: var(--orange-soft);
@@ -139,11 +152,17 @@
     }
     .ai-empty { font-size: 12px; color: var(--text-muted); padding: 4px 0; }
     .rows-empty { font-size: 12px; color: var(--text-muted); padding: 8px 0 0; }
-    .submit-btn {
-      width: 100%; height: 46px; margin-top: 4px; border: none; border-radius: 10px;
-      background: var(--orange); color: #fff; font-size: 16px; font-weight: 700; cursor: pointer;
+    .result-card { max-height: 240px; overflow-y: auto; }
+    .action-btns {
+      display: flex; align-items: stretch; gap: 10px; margin-top: 2px;
     }
-    .submit-btn:disabled { opacity: .45; cursor: not-allowed; }
+    .submit-btn, .apply-btn {
+      flex: 1; height: 46px; min-height: 46px; border: none; border-radius: 10px;
+      font-size: 16px; font-weight: 700; cursor: pointer;
+    }
+    .apply-btn { background: var(--orange); color: #fff; }
+    .submit-btn { background: #1a2332; color: #fff; }
+    .submit-btn:disabled, .apply-btn:disabled { opacity: .45; cursor: not-allowed; }
     .toast {
       position: absolute; left: 50%; bottom: 36px; transform: translateX(-50%) translateY(12px);
       background: rgba(0,0,0,.78); color: #fff; padding: 10px 16px; border-radius: 999px;
@@ -164,7 +183,7 @@
   <div class="demo-shell">
     <div class="demo-header">
       <h1>AI申词 · 前端交互 Demo</h1>
-      <p>已知书籍 ID 或只要选书中心已上架书时，批量 AI 申词：选项目 / 类型，手填 ID 和/或勾选官方推荐，每本 1–10 词后一次提交。</p>
+      <p>选项目 / 类型后，用 Tab 选手填 ID 或官方推荐（最多 10 本，可更换），填一次申请数量；申词结果独立成块，「立即申词 / 立即题词」左右并排。</p>
       <div class="demo-nav" id="screenNav"></div>
     </div>
     <div class="phone-frame">
@@ -187,8 +206,8 @@
       { id: 'recommend', label: '官方推荐' },
       { id: 'manual', label: '手填 ID' },
       { id: 'preview', label: '预览出词' },
-      { id: 'empty', label: '空推荐' },
-      { id: 'no-type', label: '无类型' }
+      { id: 'empty', label: '番茄漫剧' },
+      { id: 'no-type', label: '番茄短剧' }
     ];
     const STORAGE_KEY = 'ybdd-fr013-batches';
     const AI_POOL = [
@@ -197,9 +216,9 @@
       '穿书女配', '银发救赎', '世情暖文', '异能觉醒'
     ];
     const PROJECTS = [
-      { id: 'buming', name: '不鸣推文', ownLibrary: false, types: ['真人出镜', '图文', '解压TTS', '解说混剪', 'AIGC'] },
-      { id: 'xinghe', name: '星河小说', ownLibrary: true, types: ['真人出镜', '图文', '解压TTS', '解说混剪', 'AIGC'] },
-      { id: 'unconfigured', name: '未配置项目', ownLibrary: false, types: [] }
+      { id: 'fanqie-novel', name: '番茄小说', ownLibrary: false, types: ['真人出镜', '图文', '解压TTS', '解说混剪', 'AIGC'] },
+      { id: 'fanqie-comic', name: '番茄漫剧', ownLibrary: false, types: ['真人出镜', '图文', '解压TTS', '解说混剪', 'AIGC'] },
+      { id: 'fanqie-short', name: '番茄短剧', ownLibrary: false, types: ['真人出镜', '图文', '解压TTS', '解说混剪', 'AIGC'] }
     ];
     const CATALOG = [
       { id: 'BK-1001', title: '我成了老公掌心宠', listed: true },
@@ -218,13 +237,18 @@
       { id: 'BK-1014', title: '我给反派当了三年白月光', listed: true }
     ];
     const RECOMMENDED = CATALOG.filter(function (b) { return b.listed; });
+    const REC_PAGE_SIZE = 10;
 
     const state = {
       screen: 'form',
       projectId: '',
       promo: '',
+      sourceTab: 'manual',
       rawIds: '',
       recChecked: {},
+      recQuery: '',
+      recPage: 0,
+      qty: 3,
       rows: []
     };
 
@@ -259,32 +283,34 @@
     function rowLabel(row) {
       return row.unmatched ? (row.id + '（未匹配书名）') : (row.title || row.id);
     }
-    function makeRow(id) {
+    function makeRow(id, words) {
       var book = lookupBook(id);
       return {
         id: normalizeId(id),
         title: book ? book.title : '未匹配书名',
         unmatched: !book,
-        qty: 3,
-        words: []
+        words: words || []
       };
     }
-    function addIds(ids, fromRecommend) {
-      var added = 0;
+    function collectIds() {
+      if (state.sourceTab === 'recommend') {
+        return Object.keys(state.recChecked).filter(function (id) { return state.recChecked[id]; }).map(normalizeId);
+      }
+      return parseIds(state.rawIds);
+    }
+    function uniqueIds(ids) {
+      var seen = {};
+      var out = [];
       var dup = 0;
       ids.forEach(function (id) {
         var nid = normalizeId(id);
         if (!nid) return;
-        if (state.rows.some(function (r) { return r.id.toUpperCase() === nid.toUpperCase(); })) {
-          dup += 1;
-          return;
-        }
-        state.rows.push(makeRow(nid));
-        added += 1;
+        var key = nid.toUpperCase();
+        if (seen[key]) { dup += 1; return; }
+        seen[key] = true;
+        out.push(nid);
       });
-      if (!added && dup) toast('已添加');
-      else if (dup) toast('已添加');
-      return added;
+      return { ids: out, dup: dup };
     }
     function clampQty(raw) {
       if (raw == null) return null;
@@ -309,6 +335,45 @@
       clearTimeout(toast._t);
       toast._t = setTimeout(function () { el.classList.remove('show'); }, 1800);
     }
+    function filteredRec() {
+      var q = String(state.recQuery || '').trim().toLowerCase();
+      return RECOMMENDED.filter(function (b) {
+        if (!q) return true;
+        return b.title.toLowerCase().indexOf(q) !== -1 || b.id.toLowerCase().indexOf(q) !== -1;
+      });
+    }
+    function recPages(total) {
+      return Math.max(1, Math.ceil(Math.max(total, 0) / REC_PAGE_SIZE));
+    }
+    function pagedRec() {
+      var list = filteredRec();
+      var pages = recPages(list.length);
+      if (state.recPage >= pages) state.recPage = 0;
+      var start = state.recPage * REC_PAGE_SIZE;
+      return list.slice(start, start + REC_PAGE_SIZE);
+    }
+    function recToolbarHtml() {
+      var total = filteredRec().length;
+      var pages = recPages(total);
+      var canSwap = total > REC_PAGE_SIZE;
+      return '<div class="rec-toolbar">' +
+        '<span class="rec-meta" id="recMeta">最多 ' + REC_PAGE_SIZE + ' 本 · 第 ' + (state.recPage + 1) + '/' + pages + ' 批 · 共 ' + total + ' 本</span>' +
+        '<button type="button" class="rec-swap" id="recRefresh"' + (canSwap ? '' : ' disabled') + '>更换</button>' +
+      '</div>';
+    }
+    function recListInnerHtml() {
+      var list = pagedRec();
+      if (!list.length) {
+        return '<div class="rec-empty" id="recommendEmpty">' +
+          (String(state.recQuery || '').trim() ? '没有找到符合的书' : '暂无官方推荐') +
+        '</div>';
+      }
+      return '<div class="rec-list" id="recommendList">' + list.map(function (b) {
+        var checked = !!state.recChecked[b.id];
+        return '<label class="rec-item"><input type="checkbox" data-id="' + b.id + '"' + (checked ? ' checked' : '') + ' />' +
+          '<span><div class="rec-title">' + esc(b.title) + '</div><div class="rec-id">' + b.id + '</div></span></label>';
+      }).join('') + '</div>';
+    }
     function persistBatch(batch) {
       var list = [];
       try {
@@ -327,7 +392,6 @@
     function render() {
       var project = currentProject();
       var types = project ? project.types : [];
-      var showRec = !!(project && !project.ownLibrary && types.length);
       var recEmptyOwn = !!(project && project.ownLibrary);
       var promoOpts = '<option value="">请选择推广类型</option>' + types.map(function (t) {
         return '<option value="' + esc(t) + '"' + (state.promo === t ? ' selected' : '') + '>' + esc(t) + '</option>';
@@ -344,31 +408,23 @@
       } else if (!types.length) {
         recHtml = '<div class="rec-empty" id="recommendEmpty">项目未配置推广类型，无法使用推荐</div>';
       } else {
-        recHtml = '<div class="rec-list" id="recommendList">' + RECOMMENDED.map(function (b) {
-          var checked = !!state.recChecked[b.id];
-          return '<label class="rec-item"><input type="checkbox" data-id="' + b.id + '"' + (checked ? ' checked' : '') + ' />' +
-            '<span><div class="rec-title">' + esc(b.title) + '</div><div class="rec-id">' + b.id + '</div></span></label>';
-        }).join('') + '</div>' +
-          '<button class="btn-rec" type="button" id="addRecommend">加入待申</button>';
+        recHtml = '<input class="rec-search" id="recSearch" type="text" placeholder="搜索书名 / 书籍ID" value="' + esc(state.recQuery) + '" />' +
+          '<div id="recHost">' + recToolbarHtml() + recListInnerHtml() + '</div>';
       }
 
       var rowsHtml = state.rows.length ? state.rows.map(function (row, idx) {
         var chips = row.words.length
           ? row.words.map(function (w) { return '<span class="ai-chip">' + esc(w) + '</span>'; }).join('')
-          : '<div class="ai-empty">输入数量后点「更换」，一次最多 10 个</div>';
+          : '<div class="ai-empty">尚未出词</div>';
         return '<div class="kw-row" data-id="' + esc(row.id) + '" data-idx="' + idx + '">' +
           '<div class="row-top">' +
             '<div><div class="row-id">' + esc(row.id) + '</div>' +
             '<div class="row-title' + (row.unmatched ? ' unmatched' : '') + '">' + esc(row.title) + '</div></div>' +
             '<button class="row-del" type="button" data-idx="' + idx + '">移除</button>' +
           '</div>' +
-          '<div class="ai-row">' +
-            '<label class="ai-qty"><span>申请数量</span><input class="row-qty" type="number" min="1" max="10" value="' + esc(row.qty) + '" /><em>最多 10 个</em></label>' +
-            '<button class="btn-swap row-swap" type="button">更换</button>' +
-          '</div>' +
           '<div class="ai-chips">' + chips + '</div>' +
         '</div>';
-      }).join('') : '<div class="rows-empty" id="rowsEmpty">还没有待申词的书，手填 ID 或从官方推荐勾选</div>';
+      }).join('') : '<div class="rows-empty" id="rowsEmpty">填写基础信息后点「立即申词」，结果会显示在这里</div>';
 
       document.getElementById('formScroll').innerHTML =
         '<div class="card">' +
@@ -377,21 +433,31 @@
             (project && !types.length ? '<div class="field-hint">该项目未配置推广类型</div>' : '') +
           '</div>' +
         '</div>' +
-        '<div class="card">' +
-          '<div class="card-head"><h3>手填书籍 ID</h3></div>' +
-          '<div class="field"><div class="id-row">' +
-            '<textarea id="bookIds" placeholder="BK-1001, BK-1002&#10;换行 / 逗号 / 空格分隔">' + esc(state.rawIds) + '</textarea>' +
-            '<button class="btn-add" type="button" id="addIds">添加</button>' +
-          '</div><div class="field-hint">不要求命中书库；未匹配仍可申。按 ID 去重。</div></div>' +
+        '<div class="card" id="srcBlock">' +
+          '<div class="src-tabs" role="tablist">' +
+            '<button class="src-tab' + (state.sourceTab === 'manual' ? ' active' : '') + '" type="button" data-src="manual" role="tab">手填书籍 ID</button>' +
+            '<button class="src-tab' + (state.sourceTab === 'recommend' ? ' active' : '') + '" type="button" data-src="recommend" role="tab">官方推荐</button>' +
+          '</div>' +
+          '<div class="src-pane' + (state.sourceTab === 'manual' ? ' active' : '') + '" id="pane-manual">' +
+            '<textarea id="bookIds" rows="2" placeholder="BK-1001, BK-1002">' + esc(state.rawIds) + '</textarea>' +
+            '<div class="field-hint">换行 / 逗号 / 空格分隔。未匹配书库仍可申，按 ID 去重。</div>' +
+          '</div>' +
+          '<div class="src-pane' + (state.sourceTab === 'recommend' ? ' active' : '') + '" id="pane-recommend">' + recHtml + '</div>' +
         '</div>' +
-        '<div class="card" id="recBlock">' +
-          '<div class="card-head"><h3>官方推荐</h3></div>' + recHtml +
-        '</div>' +
         '<div class="card">' +
-          '<div class="card-head"><h3>待申词</h3></div>' +
+          '<div class="field"><label>申请数量</label>' +
+            '<input class="qty-input" id="applyQty" type="number" min="1" max="10" value="' + esc(state.qty) + '" />' +
+            '<div class="field-hint">一次填写，对本次全部书籍生效，最多 10 个。</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="card result-card" id="resultBlock">' +
+          '<div class="card-head"><h3>申词结果</h3></div>' +
           '<div id="rowList">' + rowsHtml + '</div>' +
         '</div>' +
-        '<button class="submit-btn" type="button" id="submitKw">立即提交</button>';
+        '<div class="action-btns">' +
+          '<button class="apply-btn" type="button" id="applyKw">立即申词</button>' +
+          '<button class="submit-btn" type="button" id="submitKw">立即题词</button>' +
+        '</div>';
 
       bindForm();
       document.querySelectorAll('#screenNav button').forEach(function (btn) {
@@ -399,7 +465,7 @@
       });
       if (state.rows.length && (state.screen === 'preview' || state.screen === 'manual')) {
         var scroll = document.getElementById('formScroll');
-        var list = document.getElementById('rowList');
+        var list = document.getElementById('resultBlock');
         if (scroll && list) scroll.scrollTop = Math.max(0, list.offsetTop - 8);
       }
     }
@@ -410,49 +476,82 @@
         var p = currentProject();
         if (!p || p.types.indexOf(state.promo) === -1) state.promo = '';
         state.recChecked = {};
+        state.recQuery = '';
+        state.recPage = 0;
         render();
       };
       document.getElementById('promoSelect').onchange = function (e) { state.promo = e.target.value; };
       document.getElementById('bookIds').oninput = function (e) { state.rawIds = e.target.value; };
-      document.getElementById('addIds').onclick = function () {
-        var ids = parseIds(state.rawIds);
-        if (!ids.length) { toast('请输入有效书籍 ID'); return; }
-        addIds(ids, false);
-        state.rawIds = '';
-        render();
-      };
+      document.getElementById('applyQty').oninput = function (e) { state.qty = e.target.value; };
+      document.querySelectorAll('.src-tab').forEach(function (btn) {
+        btn.onclick = function () {
+          state.sourceTab = btn.dataset.src;
+          render();
+        };
+      });
+      var recSearch = document.getElementById('recSearch');
+      if (recSearch) {
+        recSearch.oninput = function (e) {
+          state.recQuery = e.target.value;
+          state.recPage = 0;
+          paintRecList();
+        };
+      }
+      bindRecHost();
+      document.querySelectorAll('.kw-row .row-del').forEach(function (btn) {
+        btn.onclick = function () {
+          state.rows.splice(Number(btn.dataset.idx), 1);
+          render();
+        };
+      });
+      document.getElementById('applyKw').onclick = applyWords;
+      document.getElementById('submitKw').onclick = submitApply;
+    }
+
+    function paintRecList() {
+      var host = document.getElementById('recHost');
+      if (!host) return;
+      host.innerHTML = recToolbarHtml() + recListInnerHtml();
+      bindRecHost();
+    }
+    function bindRecHost() {
       var recList = document.getElementById('recommendList');
       if (recList) {
         recList.querySelectorAll('input[type="checkbox"]').forEach(function (box) {
           box.onchange = function () { state.recChecked[box.dataset.id] = box.checked; };
         });
       }
-      var addRec = document.getElementById('addRecommend');
-      if (addRec) addRec.onclick = function () {
-        var ids = Object.keys(state.recChecked).filter(function (id) { return state.recChecked[id]; });
-        if (!ids.length) { toast('请先勾选推荐书'); return; }
-        addIds(ids, true);
-        ids.forEach(function (id) { state.recChecked[id] = false; });
-        render();
-      };
-      document.querySelectorAll('.kw-row').forEach(function (el) {
-        var idx = Number(el.dataset.idx);
-        var row = state.rows[idx];
-        el.querySelector('.row-qty').oninput = function (e) { row.qty = e.target.value; };
-        el.querySelector('.row-swap').onclick = function () {
-          var n = clampQty(row.qty);
-          if (n == null) { toast('请输入申请数量'); return; }
-          row.qty = n;
-          row.words = pickAiWords(n);
-          render();
-          toast('已更换一批关键词');
+      var recRefresh = document.getElementById('recRefresh');
+      if (recRefresh) {
+        recRefresh.onclick = function () {
+          var total = filteredRec().length;
+          if (total <= REC_PAGE_SIZE) return;
+          state.recPage = (state.recPage + 1) % recPages(total);
+          paintRecList();
         };
-        el.querySelector('.row-del').onclick = function () {
-          state.rows.splice(idx, 1);
-          render();
-        };
-      });
-      document.getElementById('submitKw').onclick = submitApply;
+      }
+    }
+    function applyWords() {
+      var project = currentProject();
+      if (!state.projectId || !project) { toast('请先选择项目'); return; }
+      if (!project.types.length) { toast('该项目未配置推广类型'); return; }
+      if (!state.promo) { toast('请先选择推广类型'); return; }
+      var n = clampQty(state.qty);
+      if (n == null) { toast('请输入申请数量'); return; }
+      state.qty = n;
+      var picked = uniqueIds(collectIds());
+      if (!picked.ids.length) {
+        toast(state.sourceTab === 'recommend' ? '请先勾选推荐书' : '请添加有效书籍 ID');
+        return;
+      }
+      state.rows = picked.ids.map(function (id) { return makeRow(id, pickAiWords(n)); });
+      render();
+      toast(picked.dup
+        ? ('已申词 · ' + state.rows.length + ' 本书（已去重）')
+        : ('已申词 · ' + state.rows.length + ' 本书 · 各 ' + n + ' 个'));
+      var scroll = document.getElementById('formScroll');
+      var list = document.getElementById('resultBlock');
+      if (scroll && list) scroll.scrollTop = Math.max(0, list.offsetTop - 8);
     }
 
     function submitApply() {
@@ -460,11 +559,9 @@
       if (!state.projectId || !project) { toast('请先选择项目'); return; }
       if (!project.types.length) { toast('该项目未配置推广类型'); return; }
       if (!state.promo) { toast('请先选择推广类型'); return; }
-      if (!state.rows.length) { toast('请添加有效书籍 ID'); return; }
+      if (!state.rows.length) { toast('请先立即申词'); return; }
       var missing = state.rows.find(function (r) { return !r.words.length; });
-      if (missing) { toast('请先为「' + rowLabel(missing) + '」更换关键词'); return; }
-      var stale = state.rows.find(function (r) { return clampQty(r.qty) !== r.words.length; });
-      if (stale) { toast('请先按新数量更换'); return; }
+      if (missing) { toast('请先立即申词'); return; }
       var batch = {
         id: 'BAT-' + Date.now(),
         user: 'U-10086',
@@ -478,16 +575,19 @@
       };
       if (!persistBatch(batch)) { toast('保存失败'); return; }
       state.rows = [];
-      state.recChecked = {};
       render();
-      toast('已提交批次 · ' + batch.books.length + ' 本书');
+      toast('已题词 · ' + batch.books.length + ' 本书');
     }
 
     function resetBase() {
       state.projectId = '';
       state.promo = '';
+      state.sourceTab = 'manual';
       state.rawIds = '';
       state.recChecked = {};
+      state.recQuery = '';
+      state.recPage = 0;
+      state.qty = 3;
       state.rows = [];
     }
     function applyScene(id) {
@@ -495,27 +595,27 @@
       state.screen = known ? id : 'form';
       resetBase();
       if (state.screen === 'recommend') {
-        state.projectId = 'buming';
+        state.projectId = 'fanqie-novel';
         state.promo = '图文';
+        state.sourceTab = 'recommend';
       } else if (state.screen === 'manual') {
-        state.projectId = 'buming';
+        state.projectId = 'fanqie-novel';
         state.promo = '图文';
+        state.sourceTab = 'manual';
         state.rawIds = 'BK-1001,BK-1003';
-        addIds(parseIds(state.rawIds), false);
-        state.rawIds = '';
       } else if (state.screen === 'preview') {
-        state.projectId = 'buming';
+        state.projectId = 'fanqie-novel';
         state.promo = '图文';
-        addIds(['BK-1001', 'BK-1002'], true);
-        state.rows.forEach(function (r) {
-          r.qty = 3;
-          r.words = pickAiWords(3);
-        });
+        state.sourceTab = 'recommend';
+        state.recChecked = { 'BK-1001': true, 'BK-1002': true };
+        state.qty = 3;
+        state.rows = ['BK-1001', 'BK-1002'].map(function (id) { return makeRow(id, pickAiWords(3)); });
       } else if (state.screen === 'empty') {
-        state.projectId = 'xinghe';
+        state.projectId = 'fanqie-comic';
         state.promo = '图文';
+        state.sourceTab = 'recommend';
       } else if (state.screen === 'no-type') {
-        state.projectId = 'unconfigured';
+        state.projectId = 'fanqie-short';
       }
       render();
       notifyScreen(state.screen);

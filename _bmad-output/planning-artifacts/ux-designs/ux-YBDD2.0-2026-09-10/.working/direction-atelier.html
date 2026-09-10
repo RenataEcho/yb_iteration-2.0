@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>方向 · 工坊 · 上传稿件</title>
+  <style>
+    /* paper #f4efe6 · ink #2c261e · mute #7a7268 · rule #d8cfc0 */
+    /* shell-nav #1a2332 · shell-bg #f4f5f7 · exist #94a3b8 · product #ff6b1a */
+    /* fail-ink #8a3b2a · fail-wash #f6ebe6 · ok-ink #3d5a45 */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Songti SC", "STSong", "SimSun", "PingFang SC", serif;
+      background: #e8e2d6;
+      color: #2c261e;
+      padding: 36px 28px 72px;
+    }
+    .rationale {
+      max-width: 1100px;
+      margin: 0 auto 28px;
+      font-size: 16px;
+      line-height: 1.75;
+      font-weight: 400;
+    }
+    .cap {
+      max-width: 1100px;
+      margin: 0 auto 10px;
+      font-family: -apple-system, "PingFang SC", sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      color: #7a7268;
+    }
+    .browser {
+      max-width: 1100px;
+      margin: 0 auto 40px;
+      background: #1a2332;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 18px 50px rgba(44, 38, 30, 0.18);
+    }
+    .chrome {
+      height: 36px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 12px;
+      font-family: -apple-system, "PingFang SC", sans-serif;
+    }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: #5b6573; }
+    .url {
+      flex: 1;
+      height: 22px;
+      border-radius: 4px;
+      background: #243044;
+      color: #94a3b8;
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+    }
+    .pc {
+      height: 720px;
+      background: #fff;
+      display: grid;
+      grid-template-rows: 52px 1fr;
+      position: relative;
+    }
+    .topbar {
+      background: #1a2332;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 14px; }
+    .brand i {
+      width: 26px; height: 26px; border-radius: 6px; background: #ff6b1a;
+      display: grid; place-items: center; font-style: normal; font-size: 12px;
+    }
+    .who { font-size: 12px; color: #cbd5e1; font-weight: 400; }
+    .layout { display: grid; grid-template-columns: 200px 1fr; min-height: 0; }
+    .side {
+      background: #f8fafc;
+      border-right: 1px solid #e6e8eb;
+      padding: 14px 8px;
+      font-family: -apple-system, "PingFang SC", sans-serif;
+    }
+    .hint { font-size: 10px; color: #94a3b8; padding: 6px 10px 8px; }
+    .nav { display: block; padding: 9px 12px; border-radius: 8px; font-size: 13px; color: #94a3b8; }
+    .nav.on { background: #fff3eb; color: #ff6b1a; font-weight: 700; }
+    .main { background: #f4f5f7; padding: 18px 20px; font-family: -apple-system, "PingFang SC", sans-serif; }
+    .main h1 { font-size: 18px; color: #1a2332; }
+    .desc { font-size: 12px; color: #8a93a0; margin: 4px 0 14px; }
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .stat { background: #fff; border: 1px solid #e6e8eb; border-radius: 10px; padding: 12px; }
+    .stat span { font-size: 12px; color: #8a93a0; }
+    .stat b { display: block; margin-top: 6px; font-size: 20px; color: #1a2332; }
+    .veil { position: absolute; inset: 52px 0 0; background: rgba(44, 38, 30, 0.28); }
+    .modal {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 820px;
+      height: 560px;
+      background: #f4efe6;
+      display: grid;
+      grid-template-columns: 148px 1fr;
+      box-shadow: 0 24px 64px rgba(44, 38, 30, 0.28);
+    }
+    .spine {
+      border-right: 1px solid #d8cfc0;
+      padding: 28px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+    .sp {
+      font-size: 13px;
+      line-height: 1.35;
+      color: #7a7268;
+    }
+    .sp em {
+      display: block;
+      font-style: normal;
+      font-family: -apple-system, "PingFang SC", sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      margin-bottom: 4px;
+    }
+    .sp.on { color: #2c261e; }
+    .sp.on em { color: #c45c2a; }
+    .panel { display: flex; flex-direction: column; min-width: 0; }
+    .head {
+      padding: 26px 28px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    .head h2 { font-size: 22px; font-weight: 600; letter-spacing: 0.04em; }
+    .head p { margin-top: 8px; font-size: 14px; color: #7a7268; line-height: 1.6; max-width: 460px; }
+    .x {
+      width: 28px; height: 28px; border: 0; background: transparent;
+      font-size: 18px; color: #7a7268; cursor: default;
+    }
+    .body { padding: 22px 28px 8px; flex: 1; overflow: hidden; }
+    .block + .block { margin-top: 26px; }
+    .k {
+      font-family: -apple-system, "PingFang SC", sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      color: #7a7268;
+      margin-bottom: 12px;
+    }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 28px; }
+    .field label {
+      display: block;
+      font-size: 13px;
+      color: #7a7268;
+      margin-bottom: 6px;
+    }
+    .field input, .field select {
+      width: 100%;
+      height: 38px;
+      border: 0;
+      border-bottom: 1px solid #d8cfc0;
+      background: transparent;
+      font: inherit;
+      font-size: 15px;
+      color: #2c261e;
+      padding: 0 2px;
+    }
+    .field input[readonly] { color: #7a7268; }
+    .wide { grid-column: 1 / -1; }
+    .foot {
+      padding: 16px 28px 22px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      align-items: center;
+    }
+    .btn {
+      height: 36px;
+      padding: 0 18px;
+      border: 0;
+      background: transparent;
+      font: inherit;
+      font-size: 14px;
+      color: #7a7268;
+      cursor: default;
+    }
+    .btn-go {
+      color: #fff;
+      background: #c45c2a;
+      padding: 0 22px;
+    }
+    .meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 14px;
+      gap: 16px;
+    }
+    .meta p { font-size: 15px; }
+    .ghost {
+      font-family: -apple-system, "PingFang SC", sans-serif;
+      height: 32px;
+      padding: 0 12px;
+      border: 1px solid #d8cfc0;
+      background: transparent;
+      font-size: 12px;
+      color: #2c261e;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th {
+      text-align: left;
+      font-weight: 400;
+      color: #7a7268;
+      font-size: 12px;
+      padding: 0 8px 10px;
+      border-bottom: 1px solid #d8cfc0;
+    }
+    td {
+      padding: 14px 8px;
+      border-bottom: 1px solid #ece6db;
+      vertical-align: top;
+    }
+    .empty-tip { color: #b3aaa0; }
+    .fail td { background: #f6ebe6; }
+    .fail-note { display: block; margin-top: 4px; font-size: 12px; color: #8a3b2a; }
+    .sec .pc { height: 640px; }
+    .sec .modal { height: 500px; }
+  </style>
+</head>
+<body>
+  <p class="rationale">工坊把弹窗当成一张校样：步骤靠左侧章节号推进，不靠胶囊条。字段按「投向」和「书」两段编排，中间留出呼吸，避免后台表单一摊到底。确认表用细线分栏、行距拉开；空技巧写破折号，失败行只加一行说明，不另做彩条。</p>
+
+  <div class="cap">步骤1 · 填字段</div>
+  <div class="browser">
+    <div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><div class="url">右豹创作者中心</div></div>
+    <div class="pc">
+      <header class="topbar">
+        <div class="brand"><i>右</i>右豹 创作者中心</div>
+        <div class="who">庭宇</div>
+      </header>
+      <div class="layout">
+        <aside class="side">
+          <div class="hint">已有业务线，本增量不改</div>
+          <span class="nav">项目中心</span>
+          <span class="nav">作品管理</span>
+          <span class="nav">收益中心</span>
+          <div class="hint" style="margin-top:12px">本增量</div>
+          <span class="nav on">剪辑供稿</span>
+        </aside>
+        <main class="main">
+          <h1>剪辑手看板</h1>
+          <p class="desc">已授权项目与供稿结果</p>
+          <div class="stats">
+            <div class="stat"><span>已授权项目</span><b>2</b></div>
+            <div class="stat"><span>上传的稿件</span><b>6</b></div>
+            <div class="stat"><span>已被领取</span><b>3</b></div>
+            <div class="stat"><span>已经产生的收益</span><b>128</b></div>
+          </div>
+        </main>
+      </div>
+      <div class="veil"></div>
+      <div class="modal" role="dialog" aria-labelledby="t1">
+        <aside class="spine">
+          <div class="sp on"><em>01</em>填字段</div>
+          <div class="sp"><em>02</em>选成片</div>
+          <div class="sp"><em>03</em>确认上传</div>
+        </aside>
+        <div class="panel">
+          <div class="head">
+            <div>
+              <h2 id="t1">上传稿件</h2>
+              <p>先填这一批共用的字段。标题和大小等解析成片后再看。</p>
+            </div>
+            <button class="x" type="button" aria-label="关闭">×</button>
+          </div>
+          <div class="body">
+            <div class="block">
+              <div class="k">投向</div>
+              <div class="grid2">
+                <div class="field">
+                  <label>选择项目</label>
+                  <select><option selected>番茄小说</option></select>
+                </div>
+                <div class="field">
+                  <label>稿件类型</label>
+                  <select><option selected>图集</option><option>视频</option></select>
+                </div>
+                <div class="field">
+                  <label>素材类型</label>
+                  <select><option selected>图文切片</option></select>
+                </div>
+                <div class="field">
+                  <label>剪辑手</label>
+                  <input value="庭宇" readonly />
+                </div>
+              </div>
+            </div>
+            <div class="block">
+              <div class="k">对应书籍</div>
+              <div class="grid2">
+                <div class="field wide">
+                  <label>书籍名称</label>
+                  <input value="我成了老公掌心宠" />
+                </div>
+                <div class="field">
+                  <label>书籍 ID</label>
+                  <input value="7128491023" />
+                </div>
+                <div class="field">
+                  <label>书籍链接</label>
+                  <input value="https://ybdd.demo/book/7128491023" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="foot">
+            <button class="btn btn-go" type="button">下一步</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cap">步骤3 · 确认表 · 变体：上传失败行</div>
+  <div class="browser sec">
+    <div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><div class="url">右豹创作者中心</div></div>
+    <div class="pc">
+      <header class="topbar">
+        <div class="brand"><i>右</i>右豹 创作者中心</div>
+        <div class="who">庭宇</div>
+      </header>
+      <div class="layout">
+        <aside class="side">
+          <div class="hint">已有业务线，本增量不改</div>
+          <span class="nav">项目中心</span>
+          <span class="nav">作品管理</span>
+          <span class="nav">收益中心</span>
+          <div class="hint" style="margin-top:12px">本增量</div>
+          <span class="nav on">剪辑供稿</span>
+        </aside>
+        <main class="main">
+          <h1>剪辑手看板</h1>
+          <p class="desc">已授权项目与供稿结果</p>
+        </main>
+      </div>
+      <div class="veil"></div>
+      <div class="modal" role="dialog" aria-labelledby="t3">
+        <aside class="spine">
+          <div class="sp"><em>01</em>填字段</div>
+          <div class="sp"><em>02</em>选成片</div>
+          <div class="sp on"><em>03</em>确认上传</div>
+        </aside>
+        <div class="panel">
+          <div class="head">
+            <div>
+              <h2 id="t3">上传稿件</h2>
+              <p>按文件名作标题，图集一个文件夹为一组。空技巧也可以入队。</p>
+            </div>
+            <button class="x" type="button" aria-label="关闭">×</button>
+          </div>
+          <div class="body">
+            <div class="meta">
+              <p>共 3 条数据，大小 0.02G</p>
+              <button class="ghost" type="button">AI生产发布技巧</button>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>稿件ID</th>
+                  <th>稿件名称</th>
+                  <th>稿件大小</th>
+                  <th>发布技巧</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>M-01</td>
+                  <td>闭环测试书</td>
+                  <td>8.2 MB</td>
+                  <td class="empty-tip">—</td>
+                </tr>
+                <tr>
+                  <td>M-02</td>
+                  <td>夜色切片</td>
+                  <td>6.4 MB</td>
+                  <td>夜色切片｜图文切片</td>
+                </tr>
+                <tr class="fail">
+                  <td>M-03</td>
+                  <td>失败样例<span class="fail-note">上传失败，只重传这个文件</span></td>
+                  <td>4.1 MB</td>
+                  <td class="empty-tip">—</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="foot">
+            <button class="btn" type="button">上一步</button>
+            <button class="btn btn-go" type="button">开始上传</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

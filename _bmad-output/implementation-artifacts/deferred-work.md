@@ -37,3 +37,11 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-014-3-admin-surfaces.md`
   summary: 批量审核的驳回支路（空原因拦截、只驳审核中且空闲）没有 e2e
   evidence: test_admin_batch_audit_and_delete 只走默认通过；属并行审核增量，不在本 I/O 矩阵
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-014-5-show-publish-tips-field.md`
+  summary: 发布技巧为空时只读框没有占位，用户要点复制才看到「暂无发布技巧」
+  evidence: 本改动只补字段名；空态 toast 是既有复制逻辑，未改正文区空态
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-014-5-show-publish-tips-field.md`
+  summary: 复制未处理 clipboard 失败，接口不可用时仍 toast「已复制发布技巧」
+  evidence: `navigator.clipboard.writeText` 无 catch；属领取详情既有复制实现
