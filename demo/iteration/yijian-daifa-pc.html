@@ -60,11 +60,45 @@
     .stat span { font-size: 12px; color: var(--muted); }
     .stat b { display: block; margin-top: 8px; font-size: 22px; }
     .stat em { display: block; margin-top: 4px; font-size: 11px; color: var(--muted); font-style: normal; }
+    .stat-hit { width: 100%; text-align: left; cursor: pointer; font: inherit; color: inherit; }
+    .stat-hit:hover { border-color: #ffd4b8; box-shadow: 0 0 0 3px rgba(255,107,26,.08); }
+    .board-split { display: grid; grid-template-columns: minmax(280px, .9fr) minmax(360px, 1.2fr); gap: 12px; align-items: start; }
+    .board-split .card { margin-bottom: 0; min-width: 0; }
+    .board-split #recentBox table { min-width: 640px; }
+    .earn-table { min-width: 0 !important; }
+    .grain-bar { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+    .grain-bar button {
+      height: 28px; padding: 0 10px; border-radius: 999px; border: 1px solid var(--border);
+      background: #fff; color: #64748b; font-size: 12px; cursor: pointer;
+    }
+    .grain-bar button.on { color: var(--orange); font-weight: 700; border-color: #ffd4b8; background: var(--orange-light); }
+    .range-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 10px; }
+    .range-row[hidden] { display: none !important; }
+    .range-row input[type="date"] {
+      height: 32px; padding: 0 8px; border: 1px solid var(--border); border-radius: 8px; font: inherit; font-size: 12px;
+    }
+    .range-row span { font-size: 12px; color: var(--muted); }
+    .drawer.wide { width: min(520px, 100%); }
+    .drawer-header .head-actions { display: flex; align-items: center; gap: 8px; }
+    .auth-list { display: flex; flex-direction: column; gap: 8px; }
+    .auth-item { padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; font-weight: 600; }
+    @media (max-width: 980px) { .board-split { grid-template-columns: 1fr; } }
     .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; margin-bottom: 12px; }
     .card h2 { font-size: 14px; margin-bottom: 10px; }
     .chips { display: flex; flex-wrap: wrap; gap: 8px; }
     .chip { padding: 4px 10px; border-radius: 999px; background: var(--orange-light); color: var(--orange); font-size: 12px; font-weight: 600; }
     .chip.off { background: #f1f5f9; color: var(--muted); }
+    .channel-tab-bar {
+      display: flex; gap: 0; margin: 0 0 12px; border-bottom: 1px solid var(--border);
+    }
+    .channel-tab-bar button {
+      padding: 8px 16px; border: none; background: none; cursor: pointer;
+      font-size: 13px; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px;
+    }
+    .channel-tab-bar button.on { color: var(--orange); font-weight: 700; border-bottom-color: var(--orange); }
+    .folder-ico { display: inline-block; margin-right: 6px; }
+    .qr-pop { width: 140px; height: 140px; margin: 8px auto; border-radius: 8px;
+      background: repeating-conic-gradient(#1a2332 0 25%, #fff 0 50%) 0 0 / 14px 14px; border: 6px solid #eee; }
     .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 12px; }
     .toolbar-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
     .btn { height: 34px; padding: 0 14px; border-radius: 8px; border: none; cursor: pointer; font-size: 13px; font-weight: 600; }
@@ -196,6 +230,7 @@
     }
     .confirm-box.open { display: block; }
     .confirm-box.is-prompt { width: 560px; }
+    .confirm-box.is-alert #pcConfirmCancel { display: none; }
     .confirm-box h3 { font-size: 15px; margin-bottom: 8px; }
     .confirm-box p { font-size: 13px; color: #475569; line-height: 1.6; margin-bottom: 16px; }
     .confirm-box .confirm-body { font-size: 13px; color: #475569; line-height: 1.6; margin-bottom: 16px; max-height: 52vh; overflow: auto; }
@@ -276,18 +311,32 @@
           </div>
           <div id="boardReady">
             <div class="stats">
-              <div class="stat"><span>已授权项目</span><b id="stAuth">0</b><em>录入时可上传 ∩ 已启用</em></div>
+              <button class="stat stat-hit" type="button" id="stAuthCard">
+                <span>已授权项目</span><b id="stAuth">0</b><em>点击查看授权名单</em>
+              </button>
               <div class="stat"><span>上传的稿件</span><b id="stUp">0</b><em>我传到平台的全部</em></div>
               <div class="stat"><span>已被领取</span><b id="stClaim">0</b><em>占用中 + 已回填完成</em></div>
               <div class="stat"><span>已经产生的收益</span><b id="stEarn">0</b><em>仅已回填完成稿件已记收益</em></div>
             </div>
-            <div class="card">
-              <h2>已授权项目</h2>
-              <div class="chips" id="authChips"></div>
-            </div>
-            <div class="card">
-              <div class="toolbar"><h2>最近上传</h2><button class="btn btn-ghost" type="button" data-go="list">查看全部 list</button></div>
-              <div class="table-scroll" id="recentBox"></div>
+            <div class="board-split">
+              <div class="card" id="earnCard">
+                <div class="toolbar">
+                  <h2>收益数据</h2>
+                  <button class="btn btn-ghost" type="button" data-go="earn">查看全部</button>
+                </div>
+                <div class="grain-bar" id="boardGrain"></div>
+                <div class="range-row" id="boardRange" hidden>
+                  <input type="date" id="boardFrom" />
+                  <span>至</span>
+                  <input type="date" id="boardTo" />
+                  <button class="btn btn-ghost" type="button" id="boardRangeGo">查询</button>
+                </div>
+                <div class="table-scroll" id="earnBox"></div>
+              </div>
+              <div class="card">
+                <div class="toolbar"><h2>最近上传</h2><button class="btn btn-ghost" type="button" data-go="list">查看全部</button></div>
+                <div class="table-scroll" id="recentBox"></div>
+              </div>
             </div>
           </div>
           <div id="boardEmpty" class="empty" hidden>
@@ -297,16 +346,42 @@
           </div>
         </section>
 
+        <section class="view" id="view-earn">
+          <div class="toolbar">
+            <div>
+              <h1>收益数据</h1>
+              <p class="desc">仅统计右豹端内稿件的已结算收益。站外稿不计入本表。</p>
+            </div>
+            <div class="toolbar-actions">
+              <button class="btn btn-ghost" type="button" data-go="home">返回看板</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="grain-bar" id="earnGrainBar"></div>
+            <div class="range-row" id="earnRange" hidden>
+              <input type="date" id="earnFrom" />
+              <span>至</span>
+              <input type="date" id="earnTo" />
+              <button class="btn btn-ghost" type="button" id="earnRangeGo">查询</button>
+            </div>
+            <div class="table-scroll" id="earnFullBox"></div>
+          </div>
+        </section>
+
         <section class="view" id="view-list">
           <div class="toolbar">
             <div>
               <h1>上传 list</h1>
-              <p class="desc">字段与后台稿件表一致，不展示下载链接。另列上传状态；失败只重传失败文件。仅未占用稿件可删。</p>
+              <p class="desc" id="listDesc">右豹稿件与后台同字段，不展示下载链接。站外稿件以文件夹呈现，可分享链接 / 二维码。</p>
             </div>
             <div class="toolbar-actions">
               <button class="btn btn-ghost" type="button" data-go="guide">操作说明</button>
               <button class="btn btn-primary" type="button" data-go="upload">上传稿件</button>
             </div>
+          </div>
+          <div class="channel-tab-bar" id="listChannelBar">
+            <button type="button" class="on" data-listch="右豹">右豹稿件</button>
+            <button type="button" data-listch="站外">站外稿件</button>
           </div>
           <div class="card table-scroll" id="listBox"></div>
         </section>
@@ -351,6 +426,27 @@
       </div>
     </aside>
 
+    <div class="drawer-overlay" id="authOverlay"></div>
+    <div class="confirm-box" id="authModal" role="dialog" aria-labelledby="authTitle">
+      <h3 id="authTitle">已授权项目</h3>
+      <div class="confirm-body" id="authModalBody"></div>
+      <div class="up-foot">
+        <button class="btn btn-primary" type="button" id="authModalClose">知道了</button>
+      </div>
+    </div>
+
+    <div class="drawer-overlay" id="earnOverlay"></div>
+    <aside class="drawer wide" id="earnDrawer" role="dialog" aria-labelledby="earnTitle">
+      <div class="drawer-header">
+        <h2 id="earnTitle">收益明细</h2>
+        <div class="head-actions">
+          <button class="btn btn-ghost" type="button" id="earnExport">导出</button>
+          <button class="drawer-close" type="button" id="earnClose">×</button>
+        </div>
+      </div>
+      <div class="drawer-body" id="earnDetailBody"></div>
+    </aside>
+
     <div class="drawer-overlay up-overlay" id="upOverlay"></div>
     <div class="up-modal" id="upModal" role="dialog" aria-labelledby="upTitle">
       <div class="up-head">
@@ -376,7 +472,7 @@
               <div class="field"><label>稿件类型</label><select id="upKind"><option>图集</option><option>视频</option></select></div>
             </div>
             <div class="field-row">
-              <div class="field"><label>素材类型</label><select id="upMat"></select></div>
+              <div class="field" id="upMatField"><label>素材类型</label><select id="upMat"></select></div>
               <div class="field"><label>剪辑手</label><input id="upEditor" readonly /></div>
             </div>
           </div>
@@ -440,9 +536,11 @@
     var SCREENS = [
       { id: 'home', label: '剪辑供稿' },
       { id: 'guest', label: '非剪辑手缺省' },
+      { id: 'revoked', label: '已停用拦截' },
       { id: 'recruit', label: '招募详情抽屉' },
       { id: 'upload', label: '上传入口' },
       { id: 'list', label: '上传 list' },
+      { id: 'earn', label: '收益数据' },
       { id: 'guide', label: '操作说明' }
     ];
     var embedMode = /(?:^|[?&])embed=1(?:&|$)/.test(location.search);
@@ -450,6 +548,7 @@
     var scene = 'home';
     var reportScene = 'home';
     var forceGuest = false;
+    var forceRevoked = false;
     var upStep = 1;
     var upPackType = '文件夹';
     var upPack = null;
@@ -459,6 +558,12 @@
     var pendingDeleteId = '';
     var confirmMode = 'delete';
     var guideFrom = 'home';
+    var earnGrain = 'day';
+    var earnFrom = '';
+    var earnTo = '';
+    var earnDetailRows = [];
+    var earnDetailPeriod = '';
+    var listChannel = '右豹';
 
     function toast(msg) {
       var el = document.getElementById('toast');
@@ -477,13 +582,61 @@
 
     function currentEditor() {
       if (forceGuest) return null;
-      return YJD.editorByName(STORE, '庭宇') || YJD.enrolledEditors(STORE)[0] || null;
+      var ed = YJD.editorByName(STORE, '庭宇') || YJD.enrolledEditors(STORE)[0] || null;
+      if (forceRevoked && ed) return Object.assign({}, ed, { status: '已停用' });
+      return ed;
     }
     function canUpload(ed) { return !!(ed && ed.status === '已录入'); }
+    function isRevoked(ed) { return !!(ed && ed.status === '已停用'); }
+    function showRevokedUpload() {
+      setConfirm(true, {
+        title: '无法上传',
+        body: '剪辑供稿权限已被收回，不能上传稿件',
+        okText: '知道了',
+        mode: 'revoked'
+      });
+    }
 
     function setRecruitDrawer(open) {
       document.getElementById('recruitOverlay').classList.toggle('open', open);
       document.getElementById('recruitDrawer').classList.toggle('open', open);
+    }
+    function setAuthModal(open) {
+      document.getElementById('authOverlay').classList.toggle('open', open);
+      document.getElementById('authModal').classList.toggle('open', open);
+    }
+    function setEarnDrawer(open) {
+      document.getElementById('earnOverlay').classList.toggle('open', open);
+      document.getElementById('earnDrawer').classList.toggle('open', open);
+    }
+    function earnOpts() {
+      var opts = { channel: '右豹' };
+      if (earnGrain === 'custom') {
+        if (earnFrom) opts.from = earnFrom;
+        if (earnTo) opts.to = earnTo;
+      }
+      return opts;
+    }
+    function earnSeriesGrain() {
+      return earnGrain === 'month' ? 'month' : 'day';
+    }
+    function isOffUpload() { return listChannel === '站外'; }
+    function syncUploadChannelUi() {
+      var off = isOffUpload();
+      document.getElementById('upTitle').textContent = off ? '上传站外稿件' : '上传稿件';
+      document.querySelector('#upModal .up-head p').textContent = off
+        ? '站外以文件夹交稿：先填项目和书，再选文件夹。不要素材类型，不要发布技巧，不用审核。'
+        : '先填投向和书籍，再选成片。压缩包会先解压。';
+      document.getElementById('upMatField').hidden = off;
+      document.getElementById('upAiTips').hidden = off;
+      document.getElementById('upPackZip').hidden = off;
+    }
+    function setListChannel(ch) {
+      listChannel = ch === '站外' ? '站外' : '右豹';
+      document.querySelectorAll('#listChannelBar button').forEach(function (b) {
+        b.classList.toggle('on', b.dataset.listch === listChannel);
+      });
+      render();
     }
     function setUpModal(open) {
       document.getElementById('upOverlay').classList.toggle('open', open);
@@ -492,6 +645,7 @@
         upStep = 1;
         upUnpacking = false;
         if (!upPack) renderPackSum();
+        syncUploadChannelUi();
         paintUpStep();
         fillUploadFields();
       }
@@ -506,6 +660,7 @@
       document.getElementById('pcConfirmOk').textContent = opts.okText || '确认删除';
       confirmMode = opts.mode || 'delete';
       box.classList.toggle('is-prompt', open && confirmMode === 'aiTips');
+      box.classList.toggle('is-alert', open && confirmMode === 'revoked');
       document.getElementById('pcConfirmOverlay').classList.toggle('open', open);
       box.classList.toggle('open', open);
     }
@@ -513,18 +668,25 @@
     function showView(id) {
       var openDrawer = false;
       var openUpload = false;
-      if (id === 'guest') { forceGuest = true; id = 'home'; }
+      if (id === 'guest') { forceGuest = true; forceRevoked = false; id = 'home'; }
+      else if (id === 'revoked') { forceRevoked = true; forceGuest = false; id = 'home'; }
       else if (id === 'recruit') { openDrawer = true; id = 'home'; }
       else if (id === 'board' || id === 'home') {
         if (!(scene === 'guide' && forceGuest)) forceGuest = false;
+        if (scene !== 'revoked' && reportScene !== 'revoked') forceRevoked = false;
         id = 'home';
       }
       else if (id === 'guide') {
-        if (scene === 'list' || scene === 'home') guideFrom = forceGuest ? 'guest' : scene;
+        if (scene === 'list' || scene === 'home' || scene === 'earn') guideFrom = forceGuest ? 'guest' : scene;
       }
       else if (id === 'upload') {
+        if (isRevoked(currentEditor())) {
+          showRevokedUpload();
+          return;
+        }
         if (!canUpload(currentEditor())) {
           forceGuest = true;
+          forceRevoked = false;
           id = 'home';
           toast('未录入剪辑手，无法上传发布');
         } else {
@@ -533,13 +695,14 @@
           forceGuest = false;
         }
       }
-      if ((id === 'list') && !canUpload(currentEditor())) {
+      if ((id === 'list' || id === 'earn') && !canUpload(currentEditor()) && !isRevoked(currentEditor())) {
         forceGuest = true;
+        forceRevoked = false;
         id = 'home';
         toast('未录入剪辑手，无法上传发布');
       }
       scene = id;
-      reportScene = forceGuest ? 'guest' : (openDrawer ? 'recruit' : (openUpload ? 'upload' : id));
+      reportScene = forceGuest ? 'guest' : (forceRevoked ? 'revoked' : (openDrawer ? 'recruit' : (openUpload ? 'upload' : id)));
       document.querySelectorAll('.view').forEach(function (v) { v.classList.remove('on'); });
       var el = document.getElementById('view-' + id);
       if (!el) { id = 'home'; scene = 'home'; el = document.getElementById('view-home'); }
@@ -553,6 +716,8 @@
       render();
       if (id === 'guide' && window.YJD_GUIDE) YJD_GUIDE.mount(document.getElementById('guideBody'));
       setRecruitDrawer(openDrawer);
+      setAuthModal(false);
+      setEarnDrawer(false);
       if (openUpload) setUpModal(true);
       else setUpModal(false);
       if (window.parent !== window) window.parent.postMessage({ type: 'yijianDaifaPcScreen', screen: reportScene }, '*');
@@ -560,7 +725,7 @@
 
     function occTag(occ) {
       if (occ === '空闲') return '<span class="tag tag-ok">空闲</span>';
-      if (occ === '占用中') return '<span class="tag tag-warn">占用中</span>';
+      if (occ === '占用中' || occ === '部分领取') return '<span class="tag tag-warn">' + esc(occ) + '</span>';
       return '<span class="tag tag-muted">' + esc(occ) + '</span>';
     }
     function auditTag(w) {
@@ -614,6 +779,24 @@
             '<td>' + occTag(w.occ) + '</td><td>' + uploadTag(w) + '</td><td>' + auditTag(w) + '</td><td>' + esc(w.time) + '</td><td>' + del + '</td></tr>';
         }).join('') + '</tbody></table>';
     }
+    function offsiteTable(rows) {
+      if (!rows.length) return '<div class="empty">还没有站外文件夹。点「上传稿件」按文件夹交稿。</div>';
+      return '<table><thead><tr><th>ID</th><th>标题</th><th>项目</th><th>书</th><th>稿件信息</th><th>类型</th><th>状态</th><th>上传</th><th>上传时间</th><th>操作</th></tr></thead><tbody>' +
+        rows.map(function (w) {
+          var idle = w.uploadStatus !== '上传中';
+          var del = idle
+            ? '<button class="link link-danger" type="button" data-del="' + esc(w.id) + '">删除</button>'
+            : '<button class="link" type="button" disabled>删除</button>';
+          return '<tr><td>' + esc(w.id) + '</td>' +
+            '<td><span class="folder-ico">📁</span>' + esc(w.title) + '</td><td>' + esc(w.project) + '</td>' +
+            '<td>' + esc(w.book) + '<div class="cell-sub">书籍 ID ' + esc(w.bookId || '—') + '</div></td>' +
+            '<td>' + esc(YJD.offsiteInfoLabel(w)) + '</td><td>' + esc(w.kind) + '</td>' +
+            '<td>' + occTag(YJD.offsiteStatus(w)) + '</td><td>' + uploadTag(w) + '</td><td>' + esc(w.time) + '</td>' +
+            '<td>' + del +
+            '<button class="link" type="button" data-share="' + esc(w.id) + '">分享链接</button>' +
+            '<button class="link" type="button" data-qr="' + esc(w.id) + '">二维码</button></td></tr>';
+        }).join('') + '</tbody></table>';
+    }
     function fillSelect(id, names) {
       var el = document.getElementById(id);
       el.innerHTML = names.length
@@ -655,9 +838,21 @@
     }
     function renderExcel() {
       var total = upRows.reduce(function (n, r) { return n + (r.bytes || 0); }, 0);
-      document.getElementById('upExcelMeta').textContent = '共 ' + upRows.length + ' 条数据，大小 ' + fmtG(total);
+      var off = isOffUpload();
+      document.getElementById('upExcelMeta').textContent = off
+        ? '共 ' + upRows.length + ' 个文件夹，大小 ' + fmtG(total)
+        : '共 ' + upRows.length + ' 条数据，大小 ' + fmtG(total);
       if (!upRows.length) {
         document.getElementById('upExcel').innerHTML = '<div class="empty">未解析到数据</div>';
+        return;
+      }
+      if (off) {
+        document.getElementById('upExcel').innerHTML =
+          '<table><thead><tr><th>ID</th><th>标题</th><th>素材数</th><th>大小</th></tr></thead><tbody>' +
+          upRows.map(function (r) {
+            return '<tr><td>' + esc(r.id) + '</td><td>📁 ' + esc(r.title) + '</td>' +
+              '<td>' + (r.assets || 1) + '</td><td>' + esc(r.size) + '</td></tr>';
+          }).join('') + '</tbody></table>';
         return;
       }
       document.getElementById('upExcel').innerHTML =
@@ -695,9 +890,21 @@
       return String(name || '').replace(/\.[^.]+$/, '');
     }
     function nextWorkId(i) {
-      return 'M-' + Date.now() + '-' + i;
+      return (isOffUpload() ? 'X-' : 'M-') + Date.now() + '-' + i;
     }
     function demoSeedRows(kind) {
+      if (isOffUpload()) {
+        return [{
+          id: nextWorkId(0),
+          title: '站外演示文件夹',
+          fileName: '站外演示文件夹',
+          bytes: 24 * 1024 * 1024,
+          size: fmtSize(24 * 1024 * 1024),
+          assets: 8,
+          pubTips: '',
+          fail: false
+        }];
+      }
       var items = [
         { title: '闭环测试书', bytes: 8.2 * 1024 * 1024, fail: false },
         { title: '夜色切片', bytes: 6.4 * 1024 * 1024, fail: false },
@@ -718,6 +925,20 @@
     function parseFolderFiles(files, kind) {
       var list = Array.prototype.slice.call(files || []);
       if (!list.length) return [];
+      if (isOffUpload()) {
+        var root = String(list[0].webkitRelativePath || list[0].name).split('/')[0];
+        var bytes = list.reduce(function (n, f) { return n + (f.size || 0); }, 0);
+        return [{
+          id: nextWorkId(0),
+          title: root,
+          fileName: root,
+          bytes: bytes,
+          size: fmtSize(bytes),
+          assets: list.length,
+          pubTips: '',
+          fail: false
+        }];
+      }
       var videoRe = /\.(mp4|mov|m4v|webm|mkv|avi)$/i;
       if (kind === '视频') {
         return list.filter(function (f) { return videoRe.test(f.name); }).map(function (f, i) {
@@ -782,35 +1003,149 @@
       }, 800);
     }
 
+    function paintGrain(id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      el.innerHTML = [
+        { id: 'day', label: '按日' },
+        { id: 'month', label: '按月' },
+        { id: 'custom', label: '自定义' }
+      ].map(function (g) {
+        return '<button type="button" data-grain="' + g.id + '"' + (earnGrain === g.id ? ' class="on"' : '') + '>' + g.label + '</button>';
+      }).join('');
+      el.querySelectorAll('[data-grain]').forEach(function (btn) {
+        btn.addEventListener('click', function () { setEarnGrain(btn.dataset.grain); });
+      });
+    }
+    function syncRangeInputs() {
+      var custom = earnGrain === 'custom';
+      ['boardRange', 'earnRange'].forEach(function (id) {
+        var row = document.getElementById(id);
+        if (row) row.hidden = !custom;
+      });
+      [['boardFrom', earnFrom], ['boardTo', earnTo], ['earnFrom', earnFrom], ['earnTo', earnTo]].forEach(function (pair) {
+        var el = document.getElementById(pair[0]);
+        if (el && el.value !== pair[1]) el.value = pair[1];
+      });
+    }
+    function setEarnGrain(grain) {
+      earnGrain = grain === 'month' ? 'month' : (grain === 'custom' ? 'custom' : 'day');
+      if (earnGrain !== 'custom') { earnFrom = ''; earnTo = ''; }
+      renderEarn();
+    }
+    function applyEarnRange(fromId, toId) {
+      earnFrom = (document.getElementById(fromId).value || '').trim();
+      earnTo = (document.getElementById(toId).value || '').trim();
+      if (earnFrom && earnTo && earnFrom > earnTo) { toast('开始日期不能晚于结束日期'); return; }
+      renderEarn();
+    }
+    function earnTable(rows, limit) {
+      var list = limit ? rows.slice(0, limit) : rows;
+      if (!list.length) return '<div class="empty">暂无右豹端已结算收益</div>';
+      var dateLabel = earnGrain === 'month' ? '月份' : '日期';
+      return '<table class="earn-table"><thead><tr><th>' + dateLabel + '</th><th>已结算收益</th><th>操作</th></tr></thead><tbody>' +
+        list.map(function (r) {
+          return '<tr><td>' + esc(r.label) + '</td><td>' + esc(r.amount) + '</td>' +
+            '<td><button class="link" type="button" data-earn-period="' + esc(r.label) + '">明细</button></td></tr>';
+        }).join('') + '</tbody></table>';
+    }
+    function bindEarnLinks(box) {
+      if (!box) return;
+      box.querySelectorAll('[data-earn-period]').forEach(function (btn) {
+        btn.addEventListener('click', function () { openEarnDetail(btn.dataset.earnPeriod); });
+      });
+    }
+    function renderEarn() {
+      var ed = currentEditor();
+      if (!ed) return;
+      paintGrain('boardGrain');
+      paintGrain('earnGrainBar');
+      syncRangeInputs();
+      var rows = YJD.earnSeries(STORE, ed.name, earnSeriesGrain(), earnOpts());
+      document.getElementById('earnBox').innerHTML = earnTable(rows, 5);
+      bindEarnLinks(document.getElementById('earnBox'));
+      if (scene === 'earn') {
+        document.getElementById('earnFullBox').innerHTML = earnTable(rows);
+        bindEarnLinks(document.getElementById('earnFullBox'));
+      }
+    }
+    function openAuthModal() {
+      var ed = currentEditor();
+      var auth = YJD.authorizedProjects(STORE, ed);
+      document.getElementById('authModalBody').innerHTML = auth.length
+        ? '<div class="auth-list">' + auth.map(function (n) { return '<div class="auth-item">' + esc(n) + '</div>'; }).join('') + '</div>'
+        : '<div class="empty">暂无已启用的授权项目</div>';
+      setAuthModal(true);
+    }
+    function openEarnDetail(period) {
+      var ed = currentEditor();
+      if (!ed) return;
+      earnDetailPeriod = period || '';
+      earnDetailRows = YJD.earnDetails(STORE, ed.name, earnDetailPeriod, earnSeriesGrain(), earnOpts());
+      document.getElementById('earnTitle').textContent = (earnDetailPeriod || '全部') + ' · 收益明细';
+      document.getElementById('earnDetailBody').innerHTML = earnDetailRows.length
+        ? '<table class="earn-table"><thead><tr><th>日期</th><th>稿件ID</th><th>书信息</th><th>结算收益</th></tr></thead><tbody>' +
+          earnDetailRows.map(function (r) {
+            return '<tr><td>' + esc(r.date) + '</td><td>' + esc(r.mid) + '</td>' +
+              '<td>' + esc(r.book) + '<div class="cell-sub">ID ' + esc(r.bookId) + '</div></td>' +
+              '<td>' + esc(r.amount) + '</td></tr>';
+          }).join('') + '</tbody></table>'
+        : '<div class="empty">该周期没有右豹端结算明细</div>';
+      setEarnDrawer(true);
+    }
+    function exportEarnDetail() {
+      if (!earnDetailRows.length) { toast('没有可导出的明细'); return; }
+      var lines = ['日期,稿件ID,书信息,结算收益'].concat(earnDetailRows.map(function (r) {
+        var book = String(r.book || '—') + ' / ' + String(r.bookId || '—');
+        return [r.date, r.mid, '"' + book.replace(/"/g, '""') + '"', r.amount].join(',');
+      }));
+      var blob = new Blob(['\ufeff' + lines.join('\n')], { type: 'text/csv;charset=utf-8' });
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = '收益明细-' + (earnDetailPeriod || '全部') + '.csv';
+      a.click();
+      URL.revokeObjectURL(a.href);
+      toast('已导出明细');
+    }
+
     function render() {
       var ed = currentEditor();
       var ok = canUpload(ed);
+      var known = !!ed;
       document.getElementById('whoLine').textContent = ok
         ? (ed.name + ' · ' + ed.ybId + ' · 分成 ' + ed.share)
-        : '未录入剪辑手';
-      document.getElementById('boardReady').hidden = !ok;
-      document.getElementById('boardEmpty').hidden = ok;
-      document.getElementById('goUpload').hidden = !ok;
-      document.getElementById('boardDesc').textContent = ok ? (ed.name + ' 的供稿看板') : '需已录入剪辑手权限';
-      if (ok) {
+        : (isRevoked(ed) ? (ed.name + ' · 已停用') : '未录入剪辑手');
+      document.getElementById('boardReady').hidden = !known;
+      document.getElementById('boardEmpty').hidden = known;
+      document.getElementById('goUpload').hidden = !known;
+      document.getElementById('boardDesc').textContent = ok
+        ? (ed.name + ' 的供稿看板')
+        : (isRevoked(ed) ? '剪辑供稿权限已收回，不能上传' : '需已录入剪辑手权限');
+      if (known) {
         var works = YJD.worksByEditor(STORE, ed.name);
+        var ybWorks = YJD.worksByChannel(STORE, '右豹', ed.name);
         var auth = YJD.authorizedProjects(STORE, ed);
         document.getElementById('stAuth').textContent = auth.length;
         document.getElementById('stUp').textContent = works.length;
         document.getElementById('stClaim').textContent = YJD.claimedWorksByEditor(STORE, ed.name).length;
         document.getElementById('stEarn').textContent = YJD.earnByEditor(STORE, ed.name);
-        document.getElementById('authChips').innerHTML = auth.length
-          ? auth.map(function (n) { return '<span class="chip">' + n + '</span>'; }).join('')
-          : '<span class="chip off">暂无已启用的授权项目</span>';
-        document.getElementById('recentBox').innerHTML = recentTable(works.slice(0, 4));
+        document.getElementById('recentBox').innerHTML = recentTable(ybWorks.slice(0, 4));
+        renderEarn();
       }
-      if (scene === 'list' && ok) {
-        document.getElementById('listBox').innerHTML = fullTable(YJD.worksByEditor(STORE, ed.name));
+      if (scene === 'list' && known) {
+        var rows = YJD.worksByChannel(STORE, listChannel, ed.name);
+        document.getElementById('listBox').innerHTML = listChannel === '站外' ? offsiteTable(rows) : fullTable(rows);
         document.getElementById('listBox').querySelectorAll('[data-del]').forEach(function (btn) {
           btn.addEventListener('click', function () { askDelete(btn.dataset.del); });
         });
         document.getElementById('listBox').querySelectorAll('[data-retry]').forEach(function (btn) {
           btn.addEventListener('click', function () { retryUpload(btn.dataset.retry); });
+        });
+        document.getElementById('listBox').querySelectorAll('[data-share]').forEach(function (btn) {
+          btn.addEventListener('click', function () { copyOffsiteShare(btn.dataset.share); });
+        });
+        document.getElementById('listBox').querySelectorAll('[data-qr]').forEach(function (btn) {
+          btn.addEventListener('click', function () { showOffsiteQr(btn.dataset.qr); });
         });
       }
     }
@@ -838,36 +1173,62 @@
       render();
     }
 
+    function copyOffsiteShare(id) {
+      var url = YJD.offsiteSharePath(id);
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url);
+      toast('已复制站外下载链接');
+    }
+    function showOffsiteQr(id) {
+      var w = STORE.works.find(function (x) { return x.id === id; });
+      if (!w) return;
+      setConfirm(true, {
+        title: '站外下载二维码',
+        html: '<p>站外用户扫码即可下载，无需登录。</p><div class="qr-pop"></div><p class="cell-sub">' + esc(YJD.offsiteSharePath(w.id)) + '</p>',
+        okText: '复制链接',
+        mode: 'share'
+      });
+      pendingDeleteId = id;
+    }
     function goNext() {
       var f = readForm();
       var ed = currentEditor();
       var allowed = YJD.authorizedProjects(STORE, ed);
+      var off = isOffUpload();
       if (upStep === 1) {
-        if (!f.project || !f.book || !f.bookId || !f.bookLink || !f.mat) {
-          toast('请填齐项目、书籍名称、书籍 ID、书籍链接、素材类型');
+        if (!YJD.editorHasPlatform(ed, off ? '站外' : '右豹')) {
+          toast(off ? '该剪辑手未开通站外发布' : '该剪辑手未开通右豹发布');
+          return;
+        }
+        if (!f.project || !f.book || !f.bookId || !f.bookLink || (!off && !f.mat)) {
+          toast(off ? '请填齐项目、书籍名称、书籍 ID、书籍链接' : '请填齐项目、书籍名称、书籍 ID、书籍链接、素材类型');
           return;
         }
         if (allowed.indexOf(f.project) === -1) { toast('该项目未授权或已禁用，不可上传'); return; }
-        if (!YJD.enabledMats(STORE).some(function (m) { return m.name === f.mat; })) { toast('请选择启用中的素材类型'); return; }
+        if (!off && !YJD.enabledMats(STORE).some(function (m) { return m.name === f.mat; })) { toast('请选择启用中的素材类型'); return; }
         upStep = 2;
       } else if (upStep === 2) {
         if (upUnpacking) { toast('正在解压中'); return; }
-        if (!upPack || !upRows.length) { toast('请先选择文件夹或压缩包'); return; }
+        if (!upPack || !upRows.length) { toast(off ? '请先选择文件夹' : '请先选择文件夹或压缩包'); return; }
         upStep = 3;
       }
       paintUpStep();
     }
     function makeWork(ed, f, row, status) {
+      var off = isOffUpload();
+      var assets = row.assets || (off ? 8 : (f.kind === '图集' ? 8 : 1));
       return {
         id: row.id, title: row.title, project: f.project, book: f.book, bookId: f.bookId,
         bookLink: f.bookLink, size: row.size, fileName: row.fileName || row.title,
-        dl: 'https://ybdd.demo/ms/' + row.id, editor: ed.name, kind: f.kind, mat: f.mat,
+        dl: off ? YJD.offsiteSharePath(row.id) : ('https://ybdd.demo/ms/' + row.id),
+        editor: ed.name, kind: f.kind, mat: off ? '' : f.mat,
         occ: '空闲', occupied: false, time: '刚刚', share: ed.share,
         cover: 'assets/fr014/cover-m01.jpg', genre: f.kind === '视频' ? '视频' : '小说',
-        tags: [], imgs: f.kind === '图集' ? 8 : 0, duration: f.kind === '视频' ? 15 : 0,
-        pubTips: YJD.tipText(row), earn: 0,
-        audit: status === '已上传' ? YJD.workAuditAfterUpload(ed) : '—', rejectReason: '',
-        uploadStatus: status, failDemo: !!row.fail
+        tags: [], imgs: assets, duration: f.kind === '视频' ? 15 : 0,
+        pubTips: off ? '' : YJD.tipText(row), earn: 0,
+        audit: off ? '已通过' : (status === '已上传' ? YJD.workAuditAfterUpload(ed) : '—'),
+        rejectReason: '', uploadStatus: status, failDemo: !!row.fail,
+        channel: off ? '站外' : '右豹', folder: !!off,
+        assets: off ? assets : undefined, claimedAssets: off ? 0 : undefined
       };
     }
     function settleRow(id, ok) {
@@ -885,11 +1246,16 @@
     }
     function doPublish() {
       var ed = currentEditor();
+      if (isRevoked(ed)) { showRevokedUpload(); return; }
       if (!canUpload(ed)) { toast('未录入剪辑手，无法上传发布'); showView('guest'); return; }
       if (!upRows.length) { toast('请先选择文件夹或压缩包'); upStep = 2; paintUpStep(); return; }
       var f = readForm();
       if (YJD.authorizedProjects(STORE, ed).indexOf(f.project) === -1) { toast('该项目未授权或已禁用，不可上传'); return; }
-      if (!YJD.enabledMats(STORE).some(function (m) { return m.name === f.mat; })) { toast('请选择启用中的素材类型'); return; }
+      if (!isOffUpload() && !YJD.enabledMats(STORE).some(function (m) { return m.name === f.mat; })) { toast('请选择启用中的素材类型'); return; }
+      if (!YJD.editorHasPlatform(ed, isOffUpload() ? '站外' : '右豹')) {
+        toast(isOffUpload() ? '该剪辑手未开通站外发布' : '该剪辑手未开通右豹发布');
+        return;
+      }
       var batch = upRows.slice();
       batch.forEach(function (row) {
         STORE.works.unshift(makeWork(ed, f, row, '上传中'));
@@ -988,17 +1354,32 @@
     document.getElementById('upOverlay').onclick = function () { setUpModal(false); };
     document.getElementById('pcConfirmOk').onclick = function () {
       if (confirmMode === 'aiTips') applyAiTips();
+      else if (confirmMode === 'share') { copyOffsiteShare(pendingDeleteId); setConfirm(false); }
+      else if (confirmMode === 'revoked') setConfirm(false);
       else doDelete();
     };
+    document.querySelectorAll('#listChannelBar button').forEach(function (btn) {
+      btn.addEventListener('click', function () { setListChannel(btn.dataset.listch); });
+    });
     document.getElementById('pcConfirmCancel').onclick = function () { setConfirm(false); };
     document.getElementById('pcConfirmOverlay').onclick = function () { setConfirm(false); };
     document.getElementById('guideBack').onclick = function () { showView(forceGuest ? 'guest' : guideFrom); };
     document.getElementById('recruitBn').onclick = function () { setRecruitDrawer(true); };
     document.getElementById('recruitClose').onclick = function () { setRecruitDrawer(false); };
     document.getElementById('recruitOverlay').onclick = function () { setRecruitDrawer(false); };
+    document.getElementById('stAuthCard').onclick = openAuthModal;
+    document.getElementById('authModalClose').onclick = function () { setAuthModal(false); };
+    document.getElementById('authOverlay').onclick = function () { setAuthModal(false); };
+    document.getElementById('earnClose').onclick = function () { setEarnDrawer(false); };
+    document.getElementById('earnOverlay').onclick = function () { setEarnDrawer(false); };
+    document.getElementById('earnExport').onclick = exportEarnDetail;
+    document.getElementById('boardRangeGo').onclick = function () { applyEarnRange('boardFrom', 'boardTo'); };
+    document.getElementById('earnRangeGo').onclick = function () { applyEarnRange('earnFrom', 'earnTo'); };
     document.addEventListener('keydown', function (e) {
       if (e.key !== 'Escape') return;
       setRecruitDrawer(false);
+      setAuthModal(false);
+      setEarnDrawer(false);
       setUpModal(false);
       setConfirm(false);
     });

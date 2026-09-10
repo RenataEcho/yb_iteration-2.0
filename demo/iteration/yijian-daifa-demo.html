@@ -178,7 +178,38 @@
       width: 58px; height: 46px; border: 1px solid #ffd4b8; border-radius: 12px;
       background: var(--orange-light); color: var(--orange); font-size: 11px; font-weight: 700; cursor: pointer;
     }
-    .foot-claim .btn-primary, .foot-claim .btn-ghost { flex: 1; width: auto; }
+    .foot-claim .btn-primary, .foot-claim .btn-ghost { flex: 1; width: auto; font-size: 13px; line-height: 1.2; padding: 0 8px; }
+    .wm-dl { font-size: 14px; line-height: 1.25; padding: 0 10px; }
+    .dy-sheet {
+      position: absolute; inset: 0; z-index: 40; background: #111; color: #fff;
+      display: none; flex-direction: column;
+    }
+    .dy-sheet.show { display: flex; }
+    .dy-bar {
+      height: 48px; display: flex; align-items: center; justify-content: space-between;
+      padding: 0 12px; background: #161616; flex-shrink: 0;
+    }
+    .dy-bar b { font-size: 15px; }
+    .dy-bar button { border: none; background: none; color: #fff; font-size: 20px; cursor: pointer; }
+    .dy-hint { padding: 8px 14px 4px; font-size: 12px; color: #a3a3a3; }
+    .dy-grid {
+      flex: 1; overflow: auto; display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 2px; padding: 2px; background: #000;
+    }
+    .dy-cell { position: relative; aspect-ratio: 1; overflow: hidden; background: #222; }
+    .dy-cell img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .dy-cell.on { outline: 2px solid #fe2c55; outline-offset: -2px; }
+    .dy-cell .ck {
+      position: absolute; top: 6px; right: 6px; width: 18px; height: 18px; border-radius: 50%;
+      background: #fe2c55; color: #fff; font-size: 11px; display: grid; place-items: center; font-weight: 700;
+    }
+    .dy-foot {
+      padding: 10px 14px 18px; background: #161616; display: flex; gap: 8px; flex-shrink: 0;
+    }
+    .dy-foot .btn-ghost {
+      flex: 1; background: #2a2a2a; color: #fff; border-color: #3a3a3a; font-size: 14px;
+    }
+    .dy-foot .btn-primary { flex: 2; background: #fe2c55; font-size: 14px; }
     .seg {
       display: flex; margin: 0 12px 12px; padding: 4px; background: #eceef2;
       border-radius: 10px; flex-shrink: 0;
@@ -284,7 +315,9 @@
     .sku { display: flex; justify-content: space-between; align-items: center; padding: 12px 10px; border: none; border-bottom: 1px solid #f4f4f4; background: none; width: 100%; cursor: pointer; text-align: left; font-size: 14px; color: #222; }
     .sku.on { color: var(--orange); }
     .sku .sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .sku .orig { text-decoration: line-through; color: #c4c4c4; margin-right: 6px; font-weight: 400; }
     .sku.on .sub { color: #c2410c; }
+    .sku.on .orig { color: #e7b8a0; }
     .c-card {
       background: #fff; border-radius: 14px; margin-bottom: 12px;
       border: 1px solid #eee; box-shadow: 0 2px 8px rgba(20,24,32,.05);
@@ -675,7 +708,7 @@
           </div>
           <div class="foot-claim hidden" id="footClaimed">
             <button class="btn-ghost" type="button" id="copyTitle">添加水印</button>
-            <button class="btn-primary" type="button" id="editWork">下载稿件</button>
+            <button class="btn-primary" type="button" id="editWork">下载并发布到抖音</button>
           </div>
         </div>
       </section>
@@ -748,6 +781,20 @@
         <div class="wm-panel" id="wmPanel"></div>
       </section>
 
+      <div class="dy-sheet" id="dySheet" role="dialog" aria-label="抖音相册">
+        <div class="dy-bar">
+          <button type="button" id="dyClose">×</button>
+          <b>抖音相册</b>
+          <span style="width:24px"></span>
+        </div>
+        <div class="dy-hint" id="dyHint">稿件已保存，正在拉起相册选片发布</div>
+        <div class="dy-grid" id="dyGrid"></div>
+        <div class="dy-foot">
+          <button class="btn-ghost" type="button" id="dyCancel">取消</button>
+          <button class="btn-primary" type="button" id="dyPublish">用所选内容发布</button>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -762,11 +809,13 @@
       { id: 'claims', label: '我的领取' },
       { id: 'fillback', label: '项目回填' },
       { id: 'watermark', label: '添加水印' },
+      { id: 'douyin', label: '跳转抖音相册' },
       { id: 'timeout', label: '24h 超时释放' },
       { id: 'banned', label: '停权无法领' }
     ];
     var embedMode = /(?:^|[?&])embed=1(?:&|$)/.test(location.search);
     var STORE = YJD.open({ reset: !embedMode });
+    YJD.applyFreeDay(STORE);
     var ITEMS = STORE.works;
     var BANNERS = STORE.banners;
     var SKUS = STORE.skus;
@@ -846,6 +895,7 @@
 
     function rebindFe() {
       STORE = YJD.open();
+      YJD.applyFreeDay(STORE);
       ITEMS = STORE.works;
       BANNERS = STORE.banners;
       SKUS = STORE.skus;
@@ -1020,8 +1070,7 @@
     function downloadBlockToast(c) {
       var cd = dlCountdown(c);
       if (cd.taken) return '稿件已被他人领取，无法再下载';
-      if (cd.expired) return '领取已超过 7 天，无法再下载';
-      return '';
+      return YJD.downloadBlockReason(c, item(c && c.mid));
     }
     function renderProjects() {
       renderProjectRow('projectRow', state.filters.project, function (id) {
@@ -1254,11 +1303,19 @@
     function renderClaim() {
       openKwSheet('claim');
     }
+    function skuPriceLine(s) {
+      var now = (Number(s.points) || 0) + ' 积分';
+      var orig = Number(s.origPoints);
+      if (orig > Number(s.points)) {
+        return '<s class="orig">' + orig + ' 积分</s>' + now;
+      }
+      return now;
+    }
     function renderBuy() {
       var list = SKUS.filter(function (s) { return s.on; }).slice(0, 4);
       document.getElementById('skuList').innerHTML = list.map(function (s, i) {
         return '<button class="sku' + (state.skuPick === i ? ' on' : '') + '" type="button" data-i="' + i + '">' +
-          '<div><strong>' + s.times + ' 次</strong><div class="sub">' + s.points + ' 积分</div></div>' +
+          '<div><strong>' + s.times + ' 次</strong><div class="sub">' + skuPriceLine(s) + '</div></div>' +
           '<i class="kw-check"' + (state.skuPick === i ? ' style="display:flex"' : '') + '>✓</i></button>';
       }).join('');
       document.querySelectorAll('#skuList .sku').forEach(function (btn) {
@@ -1387,7 +1444,7 @@
         status: extra.status || '未回填',
         link: extra.link || ('https://ybdd.demo/ms/' + it.id),
         claimedAt: now,
-        expireAt: extra.expireAt || (now + 7 * 86400000),
+        expireAt: extra.expireAt || YJD.clientExpireAt(now),
         downloadedAt: extra.downloadedAt !== undefined ? extra.downloadedAt : now,
         shareSnapshot: extra.shareSnapshot || (function () {
           var ed = YJD.editorByName(STORE, it.editor);
@@ -1395,6 +1452,11 @@
         })(),
         filledAt: extra.filledAt || ''
       };
+    }
+    function attachClaim(it, extra) {
+      var c = makeClaim(it, extra);
+      YJD.bindClaimOss(it, c.claimedAt);
+      return c;
     }
     function hexA(hex, a) {
       if (!hex) return 'transparent';
@@ -1597,7 +1659,7 @@
           return '<button type="button" data-tab="' + t[0] + '" class="' + (wm.tab === t[0] ? 'on' : '') + '">' + t[1] + '</button>';
         }).join('') + '</div>' +
         wmAllPanes() + '</div>' +
-        '<button class="btn-primary wm-dl" type="button" id="dlWm">下载水印稿件</button></div>';
+        '<button class="btn-primary wm-dl" type="button" id="dlWm">下载水印稿件并发布到抖音</button></div>';
       var input = document.getElementById('wmText');
       input.oninput = function (e) {
         state.wm.text = e.target.value;
@@ -1645,6 +1707,41 @@
     function currentClaim() {
       return myClaimOf(state.current);
     }
+    function tryOpenDouyinScheme() {
+      var schemes = ['snssdk1128://openRecord', 'aweme://openRecord', 'snssdk1128://'];
+      schemes.forEach(function (url, i) {
+        setTimeout(function () {
+          var iframe = document.createElement('iframe');
+          iframe.style.display = 'none';
+          iframe.src = url;
+          document.body.appendChild(iframe);
+          setTimeout(function () { iframe.remove(); }, 800);
+        }, i * 120);
+      });
+    }
+    function closeDouyinAlbum() {
+      document.getElementById('dySheet').classList.remove('show');
+    }
+    function openDouyinAlbum(it, watermarked) {
+      it = it || item(state.current);
+      var grid = document.getElementById('dyGrid');
+      var shots = [];
+      if (it && it.kind === '图集') {
+        shots = (it.preview && it.preview.length ? it.preview : YJD.albumPreview(it.cover)).slice(0, 6);
+      } else if (it) {
+        shots = [it.cover];
+      }
+      if (!shots.length) shots = ['assets/fr014/cover-m01.jpg'];
+      document.getElementById('dyHint').textContent = watermarked
+        ? '水印稿已进相册，抖音正在拉起相册选片'
+        : '稿件已进相册，抖音正在拉起相册选片';
+      grid.innerHTML = shots.map(function (src, i) {
+        return '<div class="dy-cell' + (i === 0 ? ' on' : '') + '">' +
+          '<img src="' + src + '" alt="" /><span class="ck">' + (i === 0 ? '1' : '') + '</span></div>';
+      }).join('');
+      document.getElementById('dySheet').classList.add('show');
+      tryOpenDouyinScheme();
+    }
     function downloadManuscript(watermarked) {
       var mine = currentClaim();
       var it = item(state.current);
@@ -1681,6 +1778,7 @@
             mine.downloadedAt = Date.now();
             persistFe();
             toast(watermarked ? '水印稿件已保存到相册' : '稿件已保存到相册');
+            openDouyinAlbum(it, watermarked);
           }, 280);
         }
       }
@@ -1722,7 +1820,7 @@
       it.occ = '占用中';
       it.occupied = true;
       state.current = it.id;
-      STORE.claims.unshift(makeClaim(it));
+      STORE.claims.unshift(attachClaim(it));
       persistFe();
       document.getElementById('claimQuotaFoot').textContent = quota();
       toast('领取成功，次数已扣且不退');
@@ -1804,9 +1902,11 @@
         state.strikes = Math.max(state.strikes, 1);
         if (state.free + state.bought === 3) { if (state.free > 0) state.free -= 1; else state.bought -= 1; }
         if (!myClaims().some(function (c) { return c.mid === 'M-01' && c.status === '已超时'; })) {
-          STORE.claims.unshift(makeClaim(it, {
-            id: 'C-to', kw: '掌心宠溺', time: '8天前', status: '已超时',
-            claimedAt: Date.now() - 8 * 86400000, expireAt: Date.now() - 86400000, downloadedAt: null
+          var claimedAt = Date.now() - 4 * 86400000;
+          YJD.bindClaimOss(it, claimedAt);
+          STORE.claims.unshift(attachClaim(it, {
+            id: 'C-to', kw: '掌心宠溺', time: '4天前', status: '已超时',
+            claimedAt: claimedAt, expireAt: Date.now() - 86400000, downloadedAt: null
           }));
         }
         if (state.strikes > 3) {
@@ -1843,7 +1943,7 @@
           var fillIt = item('M-01');
           fillIt.occ = '占用中';
           fillIt.occupied = true;
-          STORE.claims.unshift(makeClaim(fillIt, { id: 'C-fill', kw: '掌心宠溺', status: '未回填' }));
+          STORE.claims.unshift(attachClaim(fillIt, { id: 'C-fill', kw: '掌心宠溺', status: '未回填' }));
           persistFe();
         }
         state.claimFilters.status = '未回填';
@@ -1853,6 +1953,10 @@
           state.current = 'M-06';
         }
         state.wm = defaultWm(myClaimOf(state.current));
+      } else if (id === 'douyin') {
+        state.current = 'M-06';
+        id = 'detail';
+        state.pendingDouyin = true;
       }
       showScreen(id);
     }
@@ -1860,6 +1964,7 @@
       if (id === 'timeout' || id === 'banned') { applyScene(id); return; }
       if (id === 'claim') { id = 'detail'; state.pendingSheet = state.pendingSheet || 'claim'; }
       if (id === 'buy') { id = 'detail'; state.pendingBuy = true; }
+      if (id === 'douyin') { id = 'detail'; state.pendingDouyin = true; }
       if (!state.pendingSheet && !state.pendingBuy) closeKwSheet();
       if (document.getElementById('previewMask').classList.contains('show')) closeAlbumPreview();
       document.querySelectorAll('.screen').forEach(function (s) { s.classList.remove('active'); });
@@ -1871,6 +1976,11 @@
       if (id === 'detail') renderDetail();
       if (id === 'claims' || id === 'fillback') renderClaims();
       if (id === 'watermark') renderWatermark();
+      if (id !== 'detail' && id !== 'watermark') closeDouyinAlbum();
+      if (state.pendingDouyin) {
+        state.pendingDouyin = false;
+        openDouyinAlbum(item(state.current), false);
+      }
       if (state.pendingBuy) {
         state.pendingBuy = false;
         openBuySheet();
@@ -1904,6 +2014,12 @@
     };
     document.getElementById('copyTitle').onclick = openWatermark;
     document.getElementById('editWork').onclick = function () { downloadManuscript(false); };
+    document.getElementById('dyClose').onclick = closeDouyinAlbum;
+    document.getElementById('dyCancel').onclick = closeDouyinAlbum;
+    document.getElementById('dyPublish').onclick = function () {
+      closeDouyinAlbum();
+      toast('已选中相册成片，可在抖音继续发布');
+    };
     document.getElementById('confirmKw').onclick = confirmKw;
     document.getElementById('kwClose').onclick = closeKwSheet;
     document.getElementById('kwMask').onclick = function () { closeKwSheet(); closeBuySheet(); };

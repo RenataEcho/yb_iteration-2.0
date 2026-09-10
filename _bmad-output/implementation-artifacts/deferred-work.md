@@ -45,3 +45,11 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-014-5-show-publish-tips-field.md`
   summary: 复制未处理 clipboard 失败，接口不可用时仍 toast「已复制发布技巧」
   evidence: `navigator.clipboard.writeText` 无 catch；属领取详情既有复制实现
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-014-6-sku-orig-price.md`
+  summary: 数据交互表没有独立的在售档 GET，C 端 origPoints 只能从实体清单推断
+  evidence: 本改动只补 sku 字段与兑换校验句；既有契约本来就没有 `GET /api/yjd/skus`
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-014-6-sku-orig-price.md`
+  summary: 兑换浮层划线价没有「原价」字样，选中态灰色对比度偏低
+  evidence: 本改动按常见划线价只出示数字；未改文案层级和对比度

@@ -13,6 +13,10 @@ def test_feed_hides_occupied_and_claim_requires_keyword(page, demo_server):
     expect(page.locator("#feedList")).not_to_contain_text("银发军官")
     expect(page.locator("#feedList")).not_to_contain_text("待审口播样例")
     expect(page.locator("#feedList")).not_to_contain_text("驳回混剪样例")
+    expect(page.locator("#feedList")).not_to_contain_text("掌心宠 · 站外合集")
+    expect(page.locator("#feedList")).not_to_contain_text("末世切片包")
+    expect(page.locator("#feedList")).not_to_contain_text("漫剧夜色")
+    expect(page.locator("#feedList")).not_to_contain_text("已领完样例")
     expect(page.locator("#feedList")).not_to_contain_text("¥")
     expect(page.locator("#feedList")).not_to_contain_text("收益")
     expect(page.locator("#plazaBanner")).to_be_visible()
@@ -65,7 +69,7 @@ def test_feed_hides_occupied_and_claim_requires_keyword(page, demo_server):
     expect(page.locator("#detailBody")).not_to_contain_text("发布描述")
     expect(page.locator("#detailBody")).not_to_contain_text("领取步骤")
     expect(page.locator("#copyTitle")).to_have_text("添加水印")
-    expect(page.locator("#editWork")).to_have_text("下载稿件")
+    expect(page.locator("#editWork")).to_have_text("下载并发布到抖音")
     page.locator("#pubTips [data-copy='tips']").click()
     expect(page.locator("#toast")).to_contain_text("已复制发布技巧")
 
@@ -88,6 +92,9 @@ def test_buy_then_claim_and_fillback(page, demo_server):
     expect(page.locator("#screen-detail")).to_have_class("screen active")
     expect(page.locator("#buySheet")).to_have_class("kw-sheet show")
     expect(page.locator("#skuList .sku")).to_have_count(3)
+    expect(page.locator("#skuList .sku").first.locator("s.orig")).to_have_text("80 积分")
+    expect(page.locator("#skuList .sku").first).to_contain_text("50 积分")
+    expect(page.locator("#skuList .sku").nth(1).locator("s.orig")).to_have_text("180 积分")
     page.locator("#skuList .sku").nth(1).click()
     page.locator("#confirmBuy").click()
     expect(page.locator("#toast")).to_contain_text("兑换成功")
@@ -99,7 +106,7 @@ def test_buy_then_claim_and_fillback(page, demo_server):
     page.locator("#confirmKw").click()
     expect(page.locator("#toast")).to_contain_text("领取成功")
     expect(page.locator("#copyTitle")).to_have_text("添加水印")
-    expect(page.locator("#editWork")).to_have_text("下载稿件")
+    expect(page.locator("#editWork")).to_have_text("下载并发布到抖音")
     page.locator("#screenNav button", has_text="我的领取").click()
     page.locator("[data-fill]").first.click()
     expect(page.locator("#screen-fillback")).to_have_class("screen active")
@@ -115,13 +122,201 @@ def test_buy_then_claim_and_fillback(page, demo_server):
     expect(page.locator("#toast")).to_contain_text("该稿件已回填")
 
 
+def test_sku_orig_price_admin_to_fe(page, demo_server):
+    page.goto(f"{demo_server}/fr-opc-yijian-daifa.html?tab=admin", wait_until="domcontentloaded")
+    page.locator('.admin-tab-bar button[data-admin="admin-skus"]').click()
+    page.locator("#skuBody tr", has_text="S-1").locator("button", has_text="编辑").click()
+    expect(page.locator("#mO")).to_have_value("80")
+    page.locator("#mO").fill("99")
+    page.locator("#modalOk").click()
+    expect(page.locator("#toast")).to_contain_text("已改价")
+    expect(page.locator("#skuBody")).to_contain_text("99")
+
+    page.goto(f"{demo_server}/yijian-daifa-demo.html?embed=1&screen=buy", wait_until="domcontentloaded")
+    expect(page.locator("#skuList .sku").first.locator("s.orig")).to_have_text("99 积分")
+    expect(page.locator("#skuList .sku").first).to_contain_text("50 积分")
+
+    page.goto(f"{demo_server}/fr-opc-yijian-daifa.html?tab=admin", wait_until="domcontentloaded")
+    page.locator('.admin-tab-bar button[data-admin="admin-skus"]').click()
+    page.locator("#skuBody tr", has_text="S-1").locator("button", has_text="编辑").click()
+    page.locator("#mO").fill("10")
+    page.locator("#modalOk").click()
+    expect(page.locator("#toast")).to_contain_text("原价须不小于当前积分")
+    expect(page.locator("#appModal")).to_have_class(re.compile(r"\bopen\b"))
+    page.locator("#mO").fill("50")
+    page.locator("#modalOk").click()
+    expect(page.locator("#toast")).to_contain_text("已改价")
+
+    page.goto(f"{demo_server}/yijian-daifa-demo.html?embed=1&screen=buy", wait_until="domcontentloaded")
+    expect(page.locator("#skuList .sku").first.locator("s.orig")).to_have_count(0)
+    expect(page.locator("#skuList .sku").first).to_contain_text("50 积分")
+
+
+WEEKDAY_NOW = "2026-09-10T12:00:00+08:00"
+HOLIDAY_NOW = "2026-10-01T12:00:00+08:00"
+MAKEUP_NOW = "2026-10-10T12:00:00+08:00"
+
+
+def _open_admin_skus(page, demo_server):
+    page.goto(f"{demo_server}/fr-opc-yijian-daifa.html?tab=admin", wait_until="domcontentloaded")
+    page.locator('.admin-tab-bar button[data-admin="admin-skus"]').click()
+
+
+def _save_free_quota(page, weekday, holiday):
+    page.locator("#freeQuotaWeekday").fill(str(weekday))
+    page.locator("#freeQuotaHoliday").fill(str(holiday))
+    page.locator("button", has_text="保存免费次数").click()
+
+
+def _stored_quota(page):
+    return page.evaluate(
+        """() => {
+          var d = JSON.parse(localStorage.getItem('fr014-yjd-v6'));
+          return { q: d.freeQuota, free: d.user.free, bought: d.user.bought, freeDate: d.user.freeDate };
+        }"""
+    )
+
+
+def test_weekday_free_quota_save_passthrough(page, demo_server):
+    page.clock.set_fixed_time(WEEKDAY_NOW)
+    _open_admin_skus(page, demo_server)
+    expect(page.locator("#freeQuotaDayType")).to_have_text("今日按：工作日")
+    page.goto(f"{demo_server}/yijian-daifa-demo.html?embed=1&screen=detail", wait_until="domcontentloaded")
+    expect(page.locator("#claimQuotaFoot")).to_contain_text("3")
+
+    _open_admin_skus(page, demo_server)
+    _save_free_quota(page, 4, 0)
+    expect(page.locator("#toast")).to_contain_text("免费次数已保存")
+    stored = _stored_quota(page)
+    assert stored["q"] == {"weekday": 4, "holiday": 0}
+    assert stored["free"] == 4
+    page.goto(f"{demo_server}/yijian-daifa-demo.html?embed=1&screen=detail", wait_until="domcontentloaded")
+    expect(page.locator("#claimQuotaFoot")).to_have_text("6")
+
+
+def test_holiday_quota_does_not_change_weekday_remaining(page, demo_server):
+    page.clock.set_fixed_time(WEEKDAY_NOW)
+    _open_admin_skus(page, demo_server)
+    _save_free_quota(page, 1, 9)
+    expect(page.locator("#toast")).to_contain_text("免费次数已保存")
+    stored = _stored_quota(page)
+    assert stored["q"]["holiday"] == 9
+    assert stored["free"] == 1
+    page.goto(f"{demo_server}/yijian-daifa-demo.html?embed=1&screen=detail", wait_until="domcontentloaded")
+    expect(page.locator("#claimQuotaFoot")).to_have_text("3")
+
+
+def test_invalid_free_quota_not_saved(page, demo_server):
+    page.clock.set_fixed_time(WEEKDAY_NOW)
+    _open_admin_skus(page, demo_server)
+    before = _stored_quota(page)
+    page.locator("#freeQuotaWeekday").fill("-1")
+    page.locator("#freeQuotaHoliday").fill("2")
+    page.locator("button", has_text="保存免费次数").click()
+    expect(page.locator("#toast")).to_contain_text("须为不小于 0")
+    assert _stored_quota(page) == before
+    page.locator("#freeQuotaWeekday").fill("x")
+    page.locator("#freeQuotaHoliday").fill("2")
+    page.locator("button", has_text="保存免费次数").click()
+    expect(page.locator("#toast")).to_contain_text("须为不小于 0")
+    assert _stored_quota(page) == before
+
+
+def test_cross_day_resets_free_quota_keeps_bought(page, demo_server):
+    page.clock.set_fixed_time(HOLIDAY_NOW)
+    page.goto(f"{demo_server}/fr-opc-yijian-daifa.html?tab=admin", wait_until="domcontentloaded")
+    page.evaluate(
+        """() => {
+          STORE.freeQuota = { weekday: 1, holiday: 5 };
+          STORE.user.free = 1;
+          STORE.user.bought = 2;
+          STORE.user.freeDate = '2026-09-30';
+          YJD.applyFreeDay(STORE);
+          YJD.save(STORE);
+        }"""
+    )
+    stored = _stored_quota(page)
+    assert stored["free"] == 5
+    assert stored["bought"] == 2
+    assert stored["freeDate"] == "2026-10-01"
+
+
+def test_national_day_uses_holiday_quota_and_deducts_free(page, demo_server):
+    page.clock.set_fixed_time(HOLIDAY_NOW)
+    _open_admin_skus(page, demo_server)
+    expect(page.locator("#freeQuotaDayType")).to_have_text("今日按：节假日")
+    _save_free_quota(page, 1, 2)
+    expect(page.locator("#toast")).to_contain_text("免费次数已保存")
+    stored = _stored_quota(page)
+    assert stored["free"] == 2
+    page.goto(f"{demo_server}/yijian-daifa-demo.html?embed=1&screen=detail", wait_until="domcontentloaded")
+    expect(page.locator("#claimQuotaFoot")).to_have_text("4")
+    page.locator("#goClaim").click()
+    expect(page.locator("#kwSheet")).to_have_class("kw-sheet show")
+    page.locator("#kwList .kw-row").first.click()
+    page.locator("#confirmKw").click()
+    expect(page.locator("#toast")).to_contain_text("领取成功")
+    leftover = page.evaluate("() => ({ free: STORE.user.free, bought: STORE.user.bought })")
+    assert leftover == {"free": 1, "bought": 2}
+
+    page.evaluate(
+        """() => {
+          state.current = 'M-02';
+          state.free = 0;
+          state.bought = 0;
+          persistFe();
+          renderDetail();
+        }"""
+    )
+    page.locator("#goClaim").click()
+    expect(page.locator("#buySheet")).to_have_class("kw-sheet show")
+    expect(page.locator("#kwSheet")).not_to_have_class("kw-sheet show")
+
+
+def test_makeup_saturday_uses_weekday_quota(page, demo_server):
+    page.clock.set_fixed_time(MAKEUP_NOW)
+    _open_admin_skus(page, demo_server)
+    expect(page.locator("#freeQuotaDayType")).to_have_text("今日按：工作日")
+    _save_free_quota(page, 4, 9)
+    stored = _stored_quota(page)
+    assert stored["free"] == 4
+    page.goto(f"{demo_server}/yijian-daifa-demo.html?embed=1&screen=detail", wait_until="domcontentloaded")
+    expect(page.locator("#claimQuotaFoot")).to_have_text("6")
+
+
+def test_v6_pack_backfills_free_quota(page, demo_server):
+    page.goto(f"{demo_server}/fr-opc-yijian-daifa.html?tab=admin", wait_until="domcontentloaded")
+    page.evaluate(
+        """() => {
+          var data = JSON.parse(localStorage.getItem('fr014-yjd-v6'));
+          delete data.freeQuota;
+          delete data.user.freeDate;
+          localStorage.setItem('fr014-yjd-v6', JSON.stringify(data));
+        }"""
+    )
+    page.reload(wait_until="domcontentloaded")
+    page.locator('.admin-tab-bar button[data-admin="admin-skus"]').click()
+    stored = page.evaluate(
+        """() => {
+          var d = JSON.parse(localStorage.getItem('fr014-yjd-v6'));
+          return { q: d.freeQuota, v: d.v, editors: d.editors.length, skus: d.skus.length };
+        }"""
+    )
+    assert stored["q"] == {"weekday": 1, "holiday": 1}
+    assert stored["v"] == 6
+    assert stored["editors"] >= 4
+    assert stored["skus"] >= 4
+    expect(page.locator("#freeQuotaWeekday")).to_have_value("1")
+    expect(page.locator("#freeQuotaHoliday")).to_have_value("1")
+
+
 def test_timeout_and_banned_scenes(page, demo_server):
     page.goto(f"{demo_server}/yijian-daifa-demo.html?screen=timeout", wait_until="domcontentloaded")
     expect(page.locator("#claimTabs .on")).to_contain_text("已超时")
     expect(page.locator("#claimList")).to_contain_text("掌心宠溺")
     expect(page.locator("#claimList")).to_contain_text("下载已过期")
     page.locator("[data-dl]").first.click()
-    expect(page.locator("#toast")).to_contain_text("领取已超过 7 天，无法再下载")
+    expect(page.locator("#toast")).to_contain_text("领取已超过 3 天，无法再下载")
     page.locator("[data-fill]").first.click()
     expect(page.locator("#toast")).to_contain_text("已超时，无法回填")
     page.goto(f"{demo_server}/yijian-daifa-demo.html?screen=banned", wait_until="domcontentloaded")
@@ -181,6 +376,7 @@ def test_fr_shell_admin_and_flow(page, demo_server):
     expect(page.locator("#view-data")).to_contain_text("状态与异常")
     expect(page.locator("#view-data")).to_contain_text("用户收益入账")
     expect(page.locator("#view-data")).to_contain_text("交互清单")
+    expect(page.locator("#view-data")).to_contain_text("阿里云存储")
     page.locator('[data-ix="ix-api"]').click()
     expect(page.locator("#ix-api")).to_contain_text("GET /api/yjd/feed")
     expect(page.locator("#ix-api")).to_contain_text("页面初始化数据流")
@@ -201,6 +397,24 @@ def test_fr_shell_admin_and_flow(page, demo_server):
     expect(page.locator("#ix-payout-flow")).to_contain_text("代发关键词?")
     expect(page.locator("#ix-payout-flow")).to_contain_text("原子写入成功?")
     expect(page.locator("#ix-payout-flow")).to_contain_text("整笔回滚")
+    page.locator('[data-ix="ix-oss"]').click()
+    expect(page.locator("#ix-oss")).to_be_visible()
+    expect(page.locator("#ix-oss")).to_contain_text("3 天")
+    expect(page.locator("#ix-oss")).to_contain_text("7 天")
+    expect(page.locator("#ix-oss")).to_contain_text("恢复一次")
+    expect(page.locator("#ix-oss")).to_contain_text("领完一个删一个")
+    page.locator('#ix-oss [data-sub="ix-oss-flow"]').click()
+    expect(page.locator("#ix-oss-flow")).to_be_visible()
+    expect(page.locator("#ix-oss-flow-on")).to_be_visible()
+    expect(page.locator("#ix-oss-flow-on")).to_contain_text("C端 3 天内?")
+    expect(page.locator("#ix-oss-flow-on")).to_contain_text("系统满 7 天?")
+    expect(page.locator("#ix-oss-flow-on")).to_contain_text("已恢复过一次?")
+    expect(page.locator("#ix-oss-flow-on")).to_contain_text("删OSS不可恢复")
+    page.locator('#ix-oss-flow [data-sub="ix-oss-flow-off"]').click()
+    expect(page.locator("#ix-oss-flow-off")).to_be_visible()
+    expect(page.locator("#ix-oss-flow-off")).to_contain_text("领一个删一个")
+    expect(page.locator("#ix-oss-flow-off")).to_contain_text("该素材云端已删除")
+    expect(page.locator("#ix-oss-flow-off")).not_to_contain_text("余量已领完?")
     page.locator('[data-ix="ix-list"]').click()
     expect(page.locator("#ix-list")).to_be_visible()
     expect(page.locator("#ix-list")).to_contain_text("联调矩阵")
@@ -223,12 +437,10 @@ def test_fr_shell_admin_and_flow(page, demo_server):
     expect(page.locator("#admin-works-flow")).to_contain_text("审核通过?")
     page.locator("#toggleRuleDrawer").click()
     expect(page.locator("#ruleDrawer")).to_have_class("drawer open")
-    expect(page.locator("#rule-fe")).to_contain_text("作品广场")
-    expect(page.locator("#rule-fe")).to_contain_text("前端交互 → 业务流程")
-    expect(page.locator("#rule-fe")).to_contain_text("plazaEligible")
-    expect(page.locator("#ruleSubBar")).to_contain_text("稿件管理")
-    expect(page.locator(".badge-version")).to_contain_text("v9")
+    expect(page.locator(".badge-version")).to_contain_text("v13")
     page.locator('.rule-tab-bar button[data-rule="rule-fe"]').click()
+    expect(page.locator("#rule-fe.rule-panel.active")).to_contain_text("作品广场")
+    expect(page.locator("#rule-fe.rule-panel.active")).to_contain_text("plazaEligible")
     expect(page.locator("#ruleSubBar")).to_contain_text("作品广场")
     expect(page.locator("#ruleSubBar")).to_contain_text("稿件详情")
     expect(page.locator("#rule-fe.rule-panel.active")).to_contain_text("本场景需求细则")
@@ -366,7 +578,7 @@ def test_covers_banner_poster_and_claim_detail(page, demo_server):
     expect(page.locator("#detailBody img.cover-img")).to_be_visible()
     expect(page.locator("#detailBody .art")).to_have_count(0)
     expect(page.locator("#copyTitle")).to_have_text("添加水印")
-    expect(page.locator("#editWork")).to_have_text("下载稿件")
+    expect(page.locator("#editWork")).to_have_text("下载并发布到抖音")
     expect(page.locator("#footClaimed")).not_to_have_class("hidden")
     expect(page.locator("#pubTips")).to_be_visible()
     expect(page.locator("#pubTips .tip-label")).to_have_text("发布技巧")
@@ -400,17 +612,22 @@ def test_covers_banner_poster_and_claim_detail(page, demo_server):
     expect(page.locator("#wmText")).to_be_in_viewport()
     expect(page.locator("#wmTabs")).to_be_in_viewport()
     expect(page.locator("#dlWm")).to_be_in_viewport()
+    expect(page.locator("#dlWm")).to_have_text("下载水印稿件并发布到抖音")
     page.locator("#dlWm").click()
     expect(page.locator("#loadText")).to_contain_text("正在打水印")
     expect(page.locator("#loadText")).to_contain_text("正在下载")
     expect(page.locator("#loadSub")).to_contain_text("张")
     expect(page.locator("#toast")).to_contain_text("水印稿件已保存到相册")
+    expect(page.locator("#dySheet")).to_have_class(re.compile(r"\bshow\b"))
+    page.locator("#dyClose").click()
     page.locator("#screen-watermark .back").click()
     expect(page.locator("#screen-detail")).to_have_class("screen active")
     page.locator("#editWork").click()
     expect(page.locator("#loadText")).to_contain_text("正在下载")
     expect(page.locator("#loadSub")).to_contain_text("张")
     expect(page.locator("#toast")).to_contain_text("稿件已保存到相册")
+    expect(page.locator("#dySheet")).to_have_class(re.compile(r"\bshow\b"))
+    page.locator("#dyClose").click()
     page.locator("#screen-detail .back").click()
     expect(page.locator("#screen-claims")).to_have_class("screen active")
 
@@ -427,12 +644,27 @@ def test_admin_editors_works_projects(page, demo_server):
     expect(page.locator('.admin-tab-bar button[data-admin="admin-banners"]')).to_have_count(0)
     expect(page.locator("#edBody")).to_contain_text("YB10086")
     expect(page.locator("#edBody")).to_contain_text("50%")
-    expect(page.locator("#edBody")).to_contain_text("主力口播")
+    expect(page.locator("#admin-editors thead")).to_contain_text("发布平台")
+    expect(page.locator("#admin-editors thead")).not_to_contain_text("备注")
+    expect(page.locator("#admin-editors thead")).not_to_contain_text("来源")
+    expect(page.locator("#edBody")).not_to_contain_text("主力口播")
+    expect(page.locator("#edBody")).not_to_contain_text("客服二维码")
+    expect(page.locator("#edStats")).to_contain_text("剪辑手数量")
+    expect(page.locator("#edStats")).to_contain_text("累计稿件数量")
+    expect(page.locator("#edStats")).to_contain_text("累计稿件大小")
+    expect(page.locator("#edStats")).to_contain_text("累计结算收益")
+    expect(page.locator("#edBody")).to_contain_text("右豹")
+    expect(page.locator("#edBody")).to_contain_text("站外")
+    expect(page.locator("#edBody tr", has_text="林夏")).to_contain_text("右豹")
+    expect(page.locator("#edBody tr", has_text="庭宇")).to_contain_text("站外")
     page.locator("#admin-editors button", has_text="录入").click()
     expect(page.locator("#appModal")).to_contain_text("右豹 ID")
     expect(page.locator("#appModal")).to_contain_text("分成比例")
     expect(page.locator("#appModal")).to_contain_text("备注")
     expect(page.locator("#appModal")).to_contain_text("稿件需要审核")
+    expect(page.locator("#appModal")).to_contain_text("发布平台")
+    expect(page.locator('input[name="mPlat"][value="右豹"]')).to_be_checked()
+    expect(page.locator('input[name="mPlat"][value="站外"]')).to_be_visible()
     expect(page.locator('input[name="mNeedReview"][value="1"]')).to_be_checked()
     page.locator("#modalOk").click()
     expect(page.locator("#toast")).to_contain_text("请填写右豹 ID、分成比例、备注")
@@ -445,22 +677,59 @@ def test_admin_editors_works_projects(page, demo_server):
 
     expect(page.locator("#edBody tr", has_text="庭宇")).to_contain_text("已上传")
     expect(page.locator("#edBody tr", has_text="庭宇")).to_contain_text("已被领取")
-    expect(page.locator("#edBody tr", has_text="庭宇")).to_contain_text("已结算")
-    expect(page.locator("#edBody tr", has_text="庭宇")).to_contain_text("待结算")
-    expect(page.locator("#edBody tr", has_text="庭宇")).to_contain_text("186")
-    expect(page.locator("#edBody tr", has_text="林夏")).to_contain_text("待结算 90")
-    page.locator("#edBody tr", has_text="庭宇").locator("button", has_text="收益").click()
-    expect(page.locator("#detailDrawer")).to_have_class("drawer open")
-    expect(page.locator("#detailTitle")).to_contain_text("庭宇")
-    expect(page.locator("#detailBody")).to_contain_text("按日")
-    expect(page.locator("#detailBody")).to_contain_text("按月")
-    expect(page.locator("#detailBody")).to_contain_text("186")
-    expect(page.locator("#detailBody tbody td").first).to_have_text(re.compile(r"^\d{4}-\d{2}-\d{2}$"))
-    page.locator("#detailBody button", has_text="按月").click()
-    expect(page.locator("#detailBody")).to_contain_text("月份")
-    expect(page.locator("#detailBody")).to_contain_text("186")
-    expect(page.locator("#detailBody tbody td").first).to_have_text(re.compile(r"^\d{4}-\d{2}$"))
+    expect(page.locator("#edBody tr", has_text="庭宇")).to_contain_text("累计")
+    expect(page.locator("#edBody tr", has_text="庭宇")).to_contain_text("MB")
+    expect(page.locator("#edBody tr", has_text="庭宇")).to_contain_text("站内稿件收益")
+    expect(page.locator("#edBody tr", has_text="庭宇")).to_contain_text("站外稿件收益")
+    expect(page.locator("#edBody")).not_to_contain_text("待结算")
+    expect(page.locator("#edKpi")).to_be_visible()
+    kpi_bottom = page.locator("#edKpi").bounding_box()["y"]
+    filter_top = page.locator("#admin-editors .filter-bar").bounding_box()["y"]
+    assert kpi_bottom < filter_top
+    page.locator("#edBody tr", has_text="林夏").locator("button", has_text="详情").click()
+    expect(page.locator("#detailBody")).to_contain_text("主力口播")
+    expect(page.locator("#detailBody")).to_contain_text("客服二维码")
     page.locator("#detailDrawer .drawer-close").click()
+    page.locator("#edBody tr", has_text="庭宇").locator("button", has_text="站内稿件收益").click()
+    expect(page.locator("#detailDrawer")).to_have_class(re.compile(r"\bopen\b"))
+    expect(page.locator("#detailTitle")).to_contain_text("庭宇")
+    expect(page.locator("#detailTitle")).to_contain_text("站内稿件收益")
+    expect(page.locator("#detailBody")).to_contain_text("累计收益")
+    expect(page.locator("#detailBody")).to_contain_text("收益明细")
+    expect(page.locator("#detailBody")).to_contain_text("项目名称")
+    expect(page.locator("#detailBody")).to_contain_text("累计已结算收益")
+    expect(page.locator("#detailBody")).to_contain_text("领取后")
+    expect(page.locator("#detailBody")).to_contain_text("番茄小说")
+    expect(page.locator("#detailBody")).to_contain_text("红果漫剧")
+    expect(page.locator("#detailBody tbody td").first).to_have_text(re.compile(r"^\d{4}-\d{2}-\d{2}$"))
+    page.locator("#detailBody button", has_text="收益明细").click()
+    expect(page.locator("#detailBody")).to_contain_text("书籍信息")
+    expect(page.locator("#detailBody")).to_contain_text("关键词（领取人）")
+    expect(page.locator("#detailBody")).to_contain_text("年代甜宠")
+    expect(page.locator("#detailBody")).to_contain_text("U-10086")
+    expect(page.locator("#earnFrom")).to_be_visible()
+    page.locator("#earnFrom").fill("2026-09-10")
+    page.locator("#earnTo").fill("2026-09-10")
+    page.locator("#detailBody button", has_text="查询").click()
+    expect(page.locator("#detailBody")).to_contain_text("2026-09-10")
+    expect(page.locator("#detailBody")).not_to_contain_text("2026-08-21")
+    page.locator("#detailDrawer .drawer-close").click()
+    page.locator("#edBody tr", has_text="庭宇").locator("button", has_text="站外稿件收益").click()
+    expect(page.locator("#detailTitle")).to_contain_text("站外稿件收益")
+    expect(page.locator("#detailBody")).to_contain_text("书籍信息")
+    expect(page.locator("#detailBody")).to_contain_text("自产关键词")
+    expect(page.locator("#detailBody")).to_contain_text("我成了老公掌心宠")
+    page.locator("#detailBody button", has_text="收益明细").click()
+    expect(page.locator("#detailBody thead")).to_contain_text("关键词")
+    expect(page.locator("#detailBody thead")).not_to_contain_text("领取人")
+    expect(page.locator("#detailBody")).to_contain_text("掌心宠溺")
+    expect(page.locator("#detailBody")).not_to_contain_text("U-10086")
+    page.locator("#detailDrawer .drawer-close").click()
+    page.locator("#edBody tr", has_text="林夏").locator("button", has_text="停用").click()
+    expect(page.locator("#appModal")).to_contain_text("占用中稿件也不拦截停用")
+    page.locator("#modalOk").click()
+    expect(page.locator("#toast")).to_contain_text("已停用")
+    expect(page.locator("#edBody tr", has_text="林夏")).to_contain_text("已停用")
 
     page.locator('.admin-tab-bar button[data-admin="admin-works"]').click()
     expect(page.locator("#wkBody")).to_contain_text("番茄小说")
@@ -470,12 +739,24 @@ def test_admin_editors_works_projects(page, demo_server):
     expect(page.locator("#wkBody")).to_contain_text("被偏爱的感觉藏不住｜掌心宠口播")
     expect(page.locator("#wkBody tr", has_text="末世囤货混剪")).to_contain_text("(1)")
     page.locator("#wkBody button", has_text="详情").first.click()
-    expect(page.locator("#detailDrawer")).to_have_class("drawer open")
+    expect(page.locator("#detailDrawer")).to_have_class(re.compile(r"\bopen\b"))
     expect(page.locator("#detailBody")).to_contain_text("书籍 ID")
-    expect(page.locator("#detailBody")).to_contain_text("文件大小")
+    expect(page.locator("#detailBody")).to_contain_text("稿件信息")
     expect(page.locator("#detailBody")).to_contain_text("18.6 MB (12)")
     expect(page.locator("#detailBody")).to_contain_text("发布技巧")
     page.locator("#detailDrawer .drawer-close").click()
+    expect(page.locator("#wkHead")).to_contain_text("发布技巧")
+    expect(page.locator("#wkAuditField")).to_be_visible()
+    page.locator('#wkChannelBar button[data-wkch="站外"]').click()
+    expect(page.locator("#wkBody")).to_contain_text("掌心宠 · 站外合集")
+    expect(page.locator("#wkBody")).to_contain_text("8个素材(已领3个)")
+    expect(page.locator("#wkBody")).to_contain_text("已领完样例")
+    expect(page.locator("#wkHead")).not_to_contain_text("发布技巧")
+    expect(page.locator("#wkHead")).not_to_contain_text("素材类型")
+    expect(page.locator("#wkAuditField")).to_be_hidden()
+    expect(page.locator("#wkOccField")).to_be_hidden()
+    expect(page.locator("#wkOffStField")).to_be_visible()
+    page.locator('#wkChannelBar button[data-wkch="右豹"]').click()
 
     page.locator('.admin-tab-bar button[data-admin="admin-projects"]').click()
     expect(page.locator("#pjBody")).to_contain_text("番茄小说")
@@ -506,7 +787,9 @@ def test_admin_editors_works_projects(page, demo_server):
 
     page.locator('.admin-tab-bar button[data-admin="admin-skus"]').click()
     expect(page.locator("#admin-skus thead")).to_contain_text("购买人数")
+    expect(page.locator("#admin-skus thead")).to_contain_text("原价")
     expect(page.locator("#skuBody")).to_contain_text("128")
+    expect(page.locator("#skuBody")).to_contain_text("180")
 
     page.locator('.admin-tab-bar button[data-admin="admin-claims"]').click()
     expect(page.locator("#admin-claims thead")).to_contain_text("项目名称")
@@ -518,11 +801,20 @@ def test_admin_editors_works_projects(page, demo_server):
     expect(page.locator("#clBody button").filter(has_text=re.compile(r"^详情$"))).to_have_count(0)
     expect(page.locator("#clBody button", has_text="稿件详情")).not_to_have_count(0)
     page.locator("#clBody button", has_text="稿件详情").first.click()
-    expect(page.locator("#detailDrawer")).to_have_class("drawer open")
+    expect(page.locator("#detailDrawer")).to_have_class(re.compile(r"\bopen\b"))
     expect(page.locator("#detailTitle")).to_contain_text("稿件详情")
     expect(page.locator("#detailBody")).to_contain_text("银发军官")
     expect(page.locator("#detailBody")).to_contain_text("番茄小说")
+    expect(page.locator("#detailBody")).to_contain_text("阿里云 OSS")
     page.locator("#detailDrawer .drawer-close").click()
+    page.locator("#clBody tr", has_text="C-05").locator("button", has_text="稿件详情").click()
+    expect(page.locator("#detailBody")).to_contain_text("已过期（3 天）")
+    expect(page.locator("#restoreClientDl")).to_have_text("恢复C端下载")
+    page.locator("#restoreClientDl").click()
+    expect(page.locator("#toast")).to_contain_text("已恢复C端下载，用户重新计时 3 天")
+    expect(page.locator("#detailBody")).to_contain_text("已恢复过（仅一次）")
+    expect(page.locator("#detailBody")).to_contain_text("有效至")
+    expect(page.locator("#restoreClientDl")).to_have_count(0)
 
 
 def test_watermark_video_progress(page, demo_server):
@@ -556,11 +848,51 @@ def test_pc_recruit_board_and_upload_list(page, demo_server):
     page.goto(f"{demo_server}/yijian-daifa-pc.html?screen=home", wait_until="domcontentloaded")
     expect(page.locator("#recruitBn")).to_be_visible()
     expect(page.locator("#stAuth")).to_contain_text("2")
-    expect(page.locator("#stUp")).to_contain_text("2")
+    expect(page.locator("#stUp")).to_contain_text("5")
     expect(page.locator("#stClaim")).to_contain_text("1")
     expect(page.locator("#stEarn")).to_contain_text("186")
-    expect(page.locator("#authChips")).to_contain_text("番茄小说")
-    expect(page.locator("#authChips")).to_contain_text("红果漫剧")
+    expect(page.locator("#authChips")).to_have_count(0)
+    expect(page.locator("#stAuthCard")).to_be_visible()
+    page.locator("#stAuthCard").click()
+    expect(page.locator("#authModal")).to_have_class("confirm-box open")
+    expect(page.locator("#authModalBody")).to_contain_text("番茄小说")
+    expect(page.locator("#authModalBody")).to_contain_text("红果漫剧")
+    page.locator("#authModalClose").click()
+    expect(page.locator("#authModal")).not_to_have_class("confirm-box open")
+    expect(page.locator("#earnBox")).to_contain_text("日期")
+    expect(page.locator("#earnBox")).to_contain_text("已结算收益")
+    expect(page.locator("#earnBox")).to_contain_text("2026-09-10")
+    expect(page.locator("#earnBox")).to_contain_text("96")
+    expect(page.locator("#earnBox")).not_to_contain_text("50")
+    page.locator("#boardGrain button", has_text="按月").click()
+    expect(page.locator("#earnBox")).to_contain_text("2026-09")
+    expect(page.locator("#earnBox")).to_contain_text("2026-08")
+    page.locator("#boardGrain button", has_text="按日").click()
+    expect(page.locator("#boardRange")).to_be_hidden()
+    page.locator("#boardGrain button", has_text="自定义").click()
+    expect(page.locator("#boardRange")).to_be_visible()
+    page.locator("#boardFrom").fill("2026-09-01")
+    page.locator("#boardTo").fill("2026-09-10")
+    page.locator("#boardRangeGo").click()
+    expect(page.locator("#earnBox")).to_contain_text("2026-09-10")
+    expect(page.locator("#earnBox")).not_to_contain_text("2026-08-21")
+    page.locator("#boardGrain button", has_text="按日").click()
+    expect(page.locator("#earnBox")).to_contain_text("2026-08-21")
+    page.locator("#earnBox button", has_text="明细").first.click()
+    expect(page.locator("#earnDrawer")).to_have_class("drawer wide open")
+    expect(page.locator("#earnDetailBody")).to_contain_text("稿件ID")
+    expect(page.locator("#earnDetailBody")).to_contain_text("M-06")
+    expect(page.locator("#earnDetailBody")).to_contain_text("银发军官把我宠上天")
+    expect(page.locator("#earnDetailBody")).to_contain_text("7482019356")
+    expect(page.locator("#earnExport")).to_be_visible()
+    page.locator("#earnClose").click()
+    expect(page.locator("#earnDrawer")).not_to_have_class("drawer wide open")
+    page.locator("#earnCard button", has_text="查看全部").click()
+    expect(page.locator("#view-earn")).to_have_class("view on")
+    expect(page.locator("#earnFullBox")).to_contain_text("已结算收益")
+    expect(page.locator("#earnFullBox")).to_contain_text("2026-08-21")
+    page.locator("#view-earn button", has_text="返回看板").click()
+    expect(page.locator("#view-home")).to_have_class("view on")
     expect(page.locator("#boardEmpty")).to_be_hidden()
     expect(page.locator("#goGuide")).to_be_visible()
     page.locator("#goGuide").click()
@@ -592,6 +924,16 @@ def test_pc_recruit_board_and_upload_list(page, demo_server):
     page.locator("#recruitClose").click()
     expect(page.locator("#recruitDrawer")).not_to_have_class("drawer open")
 
+    page.goto(f"{demo_server}/yijian-daifa-pc.html?screen=revoked", wait_until="domcontentloaded")
+    expect(page.locator("#boardReady")).to_be_visible()
+    expect(page.locator("#goUpload")).to_be_visible()
+    expect(page.locator("#boardDesc")).to_contain_text("权限已收回")
+    page.locator("#goUpload").click()
+    expect(page.locator("#pcConfirm")).to_have_class(re.compile(r"\bopen\b"))
+    expect(page.locator("#pcConfirm")).to_contain_text("剪辑供稿权限已被收回，不能上传稿件")
+    expect(page.locator("#upModal")).not_to_have_class(re.compile(r"\bopen\b"))
+    page.locator("#pcConfirmOk").click()
+
     page.goto(f"{demo_server}/yijian-daifa-pc.html?screen=guest", wait_until="domcontentloaded")
     expect(page.locator("#recruitBn")).to_be_visible()
     expect(page.locator("#boardEmpty")).to_be_visible()
@@ -608,6 +950,13 @@ def test_pc_recruit_board_and_upload_list(page, demo_server):
     expect(page.locator("#listBox")).to_contain_text("已通过")
     expect(page.locator("#listBox")).not_to_contain_text("ybdd.demo/ms")
     expect(page.locator("#listBox tr", has_text="银发军官图集").locator("button", has_text="删除")).to_be_disabled()
+    expect(page.locator("#listChannelBar")).to_contain_text("右豹稿件")
+    expect(page.locator("#listChannelBar")).to_contain_text("站外稿件")
+    page.locator('#listChannelBar button[data-listch="站外"]').click()
+    expect(page.locator("#listBox")).to_contain_text("掌心宠 · 站外合集")
+    expect(page.locator("#listBox")).to_contain_text("8个素材(已领3个)")
+    expect(page.locator("#listBox")).to_contain_text("分享链接")
+    expect(page.locator("#listBox")).not_to_contain_text("发布技巧")
 
 
 def test_admin_fe_store_loop(page, demo_server):
@@ -681,7 +1030,7 @@ def test_admin_fe_store_loop(page, demo_server):
     expect(fail_row).to_contain_text("已上传", timeout=5000)
     tip_kept = page.evaluate(
         """() => {
-          var data = JSON.parse(localStorage.getItem('fr014-yjd-v4'));
+          var data = JSON.parse(localStorage.getItem('fr014-yjd-v6'));
           var w = (data.works || []).find(function (x) {
             return x.title === '失败样例' && x.bookId === 'B-LOOP';
           });
@@ -769,8 +1118,6 @@ def test_plaza_hides_disabled_mat_and_editor(page, demo_server):
     expect(page.locator("#feedList")).to_contain_text("掌心宠")
 
     page.goto(f"{demo_server}/fr-opc-yijian-daifa.html?tab=admin", wait_until="domcontentloaded")
-    page.locator("#edBody tr", has_text="林夏").locator("button", has_text="停用").click()
-    expect(page.locator("#toast")).to_contain_text("占用中")
     page.locator("#edBody tr", has_text="阿凯").locator("button", has_text="停用").click()
     page.locator("#modalOk").click()
     expect(page.locator("#toast")).to_contain_text("已停用")
@@ -800,12 +1147,12 @@ def test_project_keywords_editor_checks_and_timeout_guard(page, demo_server):
     page.goto(f"{demo_server}/fr-opc-yijian-daifa.html?tab=admin", wait_until="domcontentloaded")
     page.locator('.admin-tab-bar button[data-admin="admin-projects"]').click()
     page.locator("#pjBody tr", has_text="番茄小说").locator("button", has_text="编辑").click()
-    before = page.evaluate("() => JSON.parse(localStorage.getItem('fr014-yjd-v4')).keywords['番茄小说']")
+    before = page.evaluate("() => JSON.parse(localStorage.getItem('fr014-yjd-v6')).keywords['番茄小说']")
     expect(page.locator("#pjKw")).to_have_count(0)
     page.locator("#pjOn").select_option("启用")
     page.locator("#modalOk").click()
     expect(page.locator("#toast")).to_contain_text("已更新项目")
-    after = page.evaluate("() => JSON.parse(localStorage.getItem('fr014-yjd-v4')).keywords['番茄小说']")
+    after = page.evaluate("() => JSON.parse(localStorage.getItem('fr014-yjd-v6')).keywords['番茄小说']")
     assert after == before
 
     page.goto(f"{demo_server}/yijian-daifa-demo.html?embed=1&screen=detail", wait_until="domcontentloaded")
@@ -865,7 +1212,7 @@ def test_project_keywords_editor_checks_and_timeout_guard(page, demo_server):
     expect(page.locator("#edBody")).to_contain_text("YB17701")
     multi = page.evaluate(
         """() => {
-          var data = JSON.parse(localStorage.getItem('fr014-yjd-v4'));
+          var data = JSON.parse(localStorage.getItem('fr014-yjd-v6'));
           return (data.editors.find(function (e) { return e.ybId === 'YB17701'; }) || {}).projects;
         }"""
     )
@@ -879,7 +1226,7 @@ def test_project_keywords_editor_checks_and_timeout_guard(page, demo_server):
     page.locator("#modalOk").click()
     zero = page.evaluate(
         """() => {
-          var data = JSON.parse(localStorage.getItem('fr014-yjd-v4'));
+          var data = JSON.parse(localStorage.getItem('fr014-yjd-v6'));
           return (data.editors.find(function (e) { return e.ybId === 'YB17702'; }) || {}).projects;
         }"""
     )
@@ -896,7 +1243,7 @@ def test_project_keywords_editor_checks_and_timeout_guard(page, demo_server):
     page.locator("#modalOk").click()
     kept = page.evaluate(
         """() => {
-          var data = JSON.parse(localStorage.getItem('fr014-yjd-v4'));
+          var data = JSON.parse(localStorage.getItem('fr014-yjd-v6'));
           return (data.editors.find(function (e) { return e.name === '庭宇'; }) || {}).projects;
         }"""
     )
@@ -1075,3 +1422,45 @@ def test_publish_tips_single_block(page, demo_server):
     expect(page.locator("#pubTips textarea")).to_have_value("旧标题段\n旧描述段")
     expect(page.locator("#detailBody")).not_to_contain_text("发布标题")
     expect(page.locator("#detailBody")).not_to_contain_text("发布描述")
+
+
+def test_offsite_h5_download_no_login(page, demo_server):
+    page.goto(f"{demo_server}/yijian-daifa-offsite.html?id=X-01", wait_until="domcontentloaded")
+    expect(page.locator("#page")).to_contain_text("掌心宠 · 站外合集")
+    expect(page.locator("#page")).to_contain_text("无需登录")
+    expect(page.locator("#page")).to_contain_text("剩余 5 / 8 个")
+    expect(page.locator("#dlBtn")).to_have_text("下载稿件")
+    expect(page.locator("input[type='password']")).to_have_count(0)
+    expect(page.locator("form")).to_have_count(0)
+    page.locator("#dlBtn").click()
+    expect(page.locator("#page")).to_contain_text("剩余 4 / 8 个")
+    expect(page.locator("#toast")).to_contain_text("已下载，该素材云端副本已删除")
+
+
+def test_offsite_h5_exhausted_empty(page, demo_server):
+    page.goto(f"{demo_server}/yijian-daifa-offsite.html?id=X-04", wait_until="domcontentloaded")
+    expect(page.locator("#offEmpty")).to_contain_text("素材已领完")
+    expect(page.locator("#dlBtn")).to_have_count(0)
+    expect(page.locator("#page")).not_to_contain_text("下载稿件")
+
+    page.goto(f"{demo_server}/yijian-daifa-offsite.html?id=X-03", wait_until="domcontentloaded")
+    page.evaluate(
+        """() => {
+          var w = YJD.workById(STORE, 'X-03');
+          w.claimedAssets = YJD.offsiteAssetCount(w) - 1;
+          YJD.save(STORE);
+        }"""
+    )
+    expect(page.locator("#dlBtn")).to_be_visible()
+    page.locator("#dlBtn").click()
+    expect(page.locator("#offEmpty")).to_contain_text("素材已领完")
+    expect(page.locator("#dlBtn")).to_have_count(0)
+
+
+def test_fr_page_h5_tab(page, demo_server):
+    page.goto(f"{demo_server}/fr-opc-yijian-daifa.html?tab=h5", wait_until="domcontentloaded")
+    expect(page.locator("#view-h5")).to_have_class(re.compile(r"\bactive\b"))
+    frame = page.frame_locator("#h5Frame")
+    expect(frame.locator("#dlBtn")).to_have_text("下载稿件")
+    expect(frame.locator("#page")).to_contain_text("掌心宠 · 站外合集")
+    expect(frame.locator("#page")).to_contain_text("无需登录")

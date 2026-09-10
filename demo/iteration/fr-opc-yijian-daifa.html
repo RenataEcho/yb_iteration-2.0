@@ -76,6 +76,20 @@
     .module-tab-bar button.active { color: var(--primary); font-weight: 600; border-bottom-color: var(--primary); }
     .admin-pane > .module-tab-bar { margin: 8px 16px 0; }
     #ix-payout > .module-tab-bar { margin: 0 0 12px; }
+    .channel-tab-bar {
+      display: flex; gap: 0; margin: 0 16px 0; border-bottom: 1px solid var(--border);
+    }
+    .channel-tab-bar button {
+      padding: 8px 16px; border: none; background: none; cursor: pointer;
+      font-size: 13px; color: var(--text-secondary); border-bottom: 2px solid transparent; margin-bottom: -1px;
+    }
+    .channel-tab-bar button.active { color: var(--primary); font-weight: 600; border-bottom-color: var(--primary); }
+    .qr-box {
+      width: 160px; height: 160px; margin: 8px auto; border-radius: 8px;
+      background: repeating-conic-gradient(#1a2332 0 25%, #fff 0 50%) 0 0 / 16px 16px;
+      border: 6px solid #eee;
+    }
+    .share-url { font-size: 12px; color: var(--text-muted); word-break: break-all; text-align: center; }
     .explain-layout {
       display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 16px; align-items: start;
     }
@@ -331,6 +345,7 @@
     .radio-list label { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
     .filter-bar { display: flex; flex-wrap: wrap; gap: 10px; padding: 14px 16px; align-items: flex-end; border-bottom: 1px solid var(--border); }
     .filter-field { display: flex; flex-direction: column; gap: 4px; }
+    .filter-field[hidden], .batch-btns [hidden] { display: none !important; }
     .filter-field label { font-size: 11px; color: var(--text-muted); font-weight: 500; }
     .filter-field input, .filter-field select { height: 32px; padding: 0 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 12px; min-width: 130px; }
     .filter-actions { display: flex; gap: 8px; margin-left: auto; align-items: center; flex-wrap: wrap; }
@@ -425,6 +440,7 @@
     }
     .kv { display: grid; grid-template-columns: 88px 1fr; gap: 8px 10px; font-size: 13px; }
     .kv dt { color: var(--text-muted); }
+    .kv-act { margin-left: 8px; }
     .modal {
       position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(.96);
       width: 400px; max-width: calc(100vw - 32px); background: #fff; border-radius: 14px;
@@ -454,6 +470,31 @@
     .brand-item .muted { margin-left: auto; font-size: 11px; color: var(--text-muted); }
     .grain-bar { display: flex; gap: 8px; margin-bottom: 12px; }
     .grain-bar button.on { color: var(--primary); font-weight: 600; border-color: var(--primary); }
+    .drawer.wide { width: min(860px, 96vw); }
+    .range-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 12px 0; }
+    .range-row input[type="date"] {
+      height: 32px; padding: 0 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); font: inherit; font-size: 12px;
+    }
+    .range-row span { font-size: 12px; color: var(--text-muted); }
+    .ed-kpi { padding: 14px 16px 4px; border-bottom: 1px solid var(--border); background: linear-gradient(180deg, #f8fafc 0%, #fff 100%); }
+    .ed-kpi-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+    .ed-kpi-head span { font-size: 12px; font-weight: 700; color: var(--text-primary); }
+    .ed-kpi-head em { font-style: normal; font-size: 11px; color: var(--text-muted); }
+    .ed-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; padding-bottom: 12px; }
+    .ed-stat {
+      display: flex; flex-direction: column; gap: 8px; min-height: 76px;
+      padding: 12px 14px; border-radius: 12px; background: #fff; border: 1px solid var(--border);
+    }
+    .ed-stat span { font-size: 12px; color: var(--text-muted); line-height: 1.3; }
+    .ed-stat strong {
+      font-size: 22px; font-weight: 700; color: var(--text-primary); line-height: 1.1;
+      font-variant-numeric: tabular-nums; letter-spacing: -0.02em;
+    }
+    .ed-stat.earn { border-color: var(--primary-border); background: var(--primary-light); }
+    .ed-stat.earn strong { color: var(--primary); }
+    .drawer-body .table-wrap { margin-top: 10px; }
+    .drawer-body table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .drawer-body th, .drawer-body td { border-bottom: 1px solid var(--border); padding: 8px 6px; text-align: left; vertical-align: top; }
     .kv { grid-template-columns: 96px 1fr; }
     .flow-page-intro { padding: 16px 18px 0; font-size: 12px; color: var(--text-muted); line-height: 1.55; }
     .flow-svg-wrap { overflow: auto; padding: 16px 18px 24px; max-height: 72vh; }
@@ -495,7 +536,7 @@
         <h1>
           一键代发
           <span class="badge badge-fr">FR-014</span>
-          <span class="badge badge-version">v9 当前</span>
+          <span class="badge badge-version">v14 当前</span>
         </h1>
         <p class="page-desc">C 端只领取。剪辑手在已有 PC 创作者中心用文件夹或压缩包上传，先走平台审核。招募、看板、上传弹窗与 list 都在 PC。后台与 C/PC 共用同一份演示数据。</p>
       </div>
@@ -507,6 +548,7 @@
     <div class="page-tab-bar" role="tablist">
       <button type="button" data-page="view-explain" role="tab">业务解释</button>
       <button type="button" class="active" data-page="view-fe" role="tab">前端交互</button>
+      <button type="button" data-page="view-h5" role="tab">H5端</button>
       <button type="button" data-page="view-pc" role="tab">PC端</button>
       <button type="button" data-page="view-admin" role="tab">管理后台</button>
       <button type="button" data-page="view-data" role="tab">前后端数据交互</button>
@@ -692,8 +734,8 @@
                   <tbody>
                     <tr><td>C</td><td>作品广场</td><td>启用项目图标、搜索、筛选项、已通过空闲稿封面。无金额。</td><td>点卡片进详情；点招募帧进海报。</td></tr>
                     <tr><td>C</td><td>稿件详情</td><td>素材铺满、标签、书籍 ID、注意事项。未领=领取步骤；已领=发布技巧。</td><td>次数够→选词；不够→兑换。</td></tr>
-                    <tr><td>C</td><td>我的领取</td><td>未回填 / 已回填 / 已超时。7 天下载倒计时。立即回填始终高亮。</td><td>回填页；或点信息区回该稿详情。</td></tr>
-                    <tr><td>PC</td><td>剪辑供稿</td><td>招募 BN + 看板（已授权项目 / 上传数 / 被领数 / 收益）。「操作说明」在标题旁。</td><td>点 BN 开招募抽屉；点操作说明看手册；点上传走三步。</td></tr>
+                    <tr><td>C</td><td>我的领取</td><td>未回填 / 已回填 / 已超时。3 天 C 端下载倒计时。立即回填始终高亮。</td><td>回填页；或点信息区回该稿详情。</td></tr>
+                    <tr><td>PC</td><td>剪辑供稿</td><td>招募 BN + 四格统计（授权数字点开弹窗）+ 左收益数据（仅右豹）/ 右最近上传。「操作说明」在标题旁。</td><td>点 BN 开招募抽屉；点授权数字看名单；点收益「查看全部」进下一页；点明细开抽屉可导出。</td></tr>
                     <tr><td>后台</td><td>七页</td><td>剪辑手 / 稿件 / 领取 / 黑名单 / 项目 / 素材 / 次数。</td><td>录入、审核、恢复、改配置即时影响广场。</td></tr>
                   </tbody>
                 </table>
@@ -738,7 +780,7 @@
               <ul>
                 <li>禁用项目不可上传、不进广场。停用剪辑手或禁用素材的已通过空闲稿也不进广场。</li>
                 <li>审核中 / 已驳回不进广场。已通过不可再驳回。</li>
-                <li>领取后 7 天内可下载，超时未下不可再下。</li>
+                <li>领取后 3 天内可下载；系统对象保留 7 天，后台可恢复 C 端下载一次。</li>
                 <li>图集预览最多 3 张；角标仍显示真实张数。防截屏=禁右键/长按保存 + 用户水印 + 切后台模糊；真机系统截屏禁不掉。</li>
                 <li>任何列表不展示金额。Demo 无真实 HTTP，数据在 localStorage 闭环。</li>
               </ul>
@@ -758,7 +800,7 @@
               <div class="faq-item"><div class="faq-q">Q4. 停权了怎么办？</div><div class="faq-a">终身未回填超过 3 次。只能后台黑名单手动恢复，没有自助解禁。</div></div>
               <div class="faq-item"><div class="faq-q">Q5. 图集详情为什么只能看 3 张？</div><div class="faq-a">预览上限 3 张，角标仍是真实张数。领取前预览不扣次、不能保存。完整稿领取后再下。演示预览用现有封面凑 3 张，不是书内页。</div></div>
               <div class="faq-item"><div class="faq-q">Q6. 用户能在 App 里当剪辑手上传吗？</div><div class="faq-a">不能。C 端只领取。上传只在 PC 创作者中心。广场招募帧只看海报。</div></div>
-              <div class="faq-item"><div class="faq-q">Q7. 领取后怎么下载？水印必做吗？</div><div class="faq-a">底栏「下载稿件」7 天内有效。加水印可选，下载会先打当前水印再出文件。超时未下不能再下，但回填不受 7 天下载影响，只受 24h 回填窗影响。</div></div>
+              <div class="faq-item"><div class="faq-q">Q7. 领取后怎么下载？水印必做吗？</div><div class="faq-a">底栏「下载并发布到抖音」C 端 3 天内有效。点完先保存到相册，再拉起抖音相册选片。加水印可选。C 端过期后，运营可在领取记录稿件详情点「恢复C端下载」（每稿仅一次），用户重新计时 3 天。系统满 7 天删除阿里云对象后不可再恢复。回填只受 24h 窗影响。</div></div>
               <div class="faq-item"><div class="faq-q">Q8. 非剪辑手打开 PC「剪辑供稿」会怎样？</div><div class="faq-a">不跳走。招募 BN 仍在，点开抽屉可看海报。看板走缺省，上传入口不可用。「操作说明」仍可打开。</div></div>
               <div class="faq-item"><div class="faq-q">Q9. 用剪辑手稿件回填后，关键词收益怎么入账？</div><div class="faq-a">订单已结算时先判该词是不是代发。是则按分成拆成用户实结和剪辑手分账，两边都进项目收益明细，状态「已结算」。不是则全额给用户。对账看「前后端数据交互 → 用户收益入账」。</div></div>
             </div>
@@ -785,12 +827,13 @@
           <div class="scene-list" id="feScenes">
             <button class="scene-btn active" type="button" data-screen="feed" data-desc="项目图标直选 + 搜索在下方 + 其余下拉 + 最多 5 条 BN 轮播；点招募帧进海报；不展示收益">作品广场</button>
             <button class="scene-btn" type="button" data-screen="poster" data-desc="点广场招募帧进入；卖点 / 适合谁 / 客服二维码；无申请表">招募海报</button>
-            <button class="scene-btn" type="button" data-screen="detail" data-desc="领取后出示「发布技巧」字段 + 一段可复制；底栏添加水印 / 下载稿件">稿件详情</button>
+            <button class="scene-btn" type="button" data-screen="detail" data-desc="领取后出示「发布技巧」字段 + 一段可复制；底栏添加水印 / 下载并发布到抖音">稿件详情</button>
             <button class="scene-btn" type="button" data-screen="claim" data-desc="对照场景：选词浮层仍可打开；主路径点击领取即成功">浮层选词</button>
-            <button class="scene-btn" type="button" data-screen="buy" data-desc="详情浮层选档，按钮为兑换；最多 4 档">浮层兑换</button>
-            <button class="scene-btn" type="button" data-screen="claims" data-desc="有记录才出项目；7 天下载倒计时；立即回填始终高亮">我的领取</button>
+            <button class="scene-btn" type="button" data-screen="buy" data-desc="详情浮层选档，现价旁出示原价划线；按钮为兑换；最多 4 档">浮层兑换</button>
+            <button class="scene-btn" type="button" data-screen="claims" data-desc="有记录才出项目；3 天 C 端下载倒计时；立即回填始终高亮">我的领取</button>
             <button class="scene-btn" type="button" data-screen="fillback" data-desc="复用该项目已有回填页">项目回填</button>
-            <button class="scene-btn" type="button" data-screen="watermark" data-desc="底部编辑坞一屏内完成全部操作；文字可拖动">添加水印</button>
+            <button class="scene-btn" type="button" data-screen="watermark" data-desc="底部编辑坞一屏内完成；按钮为下载水印稿件并发布到抖音">添加水印</button>
+            <button class="scene-btn" type="button" data-screen="douyin" data-desc="下载完成后跳转抖音并拉起相册选片">跳转抖音相册</button>
             <button class="scene-btn" type="button" data-screen="timeout" data-desc="记 1 次未回填，稿件回 feed，次数不退">24h超时释放</button>
             <button class="scene-btn" type="button" data-screen="banned" data-desc="终身未回填超过 3 次">停权无法领</button>
           </div>
@@ -905,6 +948,32 @@
       </div>
     </div>
 
+    <div id="view-h5" class="page-view">
+      <div class="demo-layout" id="h5Demo">
+        <div class="glass-card scene-panel">
+          <div class="scene-head">
+            <div>
+              <h2>一键代发 · H5 站外下载</h2>
+              <p class="scene-lead">站外稿件生成链接或二维码。用户扫码打开落地页，无需登录。点下载立即扣 1 个素材余量；已领完走缺省态。</p>
+            </div>
+          </div>
+          <div class="scene-list" id="h5Scenes">
+            <button class="scene-btn active" type="button" data-offid="X-01" data-desc="图集合集：8 个素材，已领 3 个">掌心宠 · 站外合集</button>
+            <button class="scene-btn" type="button" data-offid="X-02" data-desc="视频文件夹：5 个素材，已领 1 个">末世切片包</button>
+            <button class="scene-btn" type="button" data-offid="X-03" data-desc="空闲文件夹：6 个素材，尚未被下">漫剧夜色文件夹</button>
+            <button class="scene-btn" type="button" data-offid="X-04" data-desc="已领完：打开链接只看出缺省，无下载按钮">已领完样例</button>
+            <button class="scene-btn" type="button" data-offid="X-04" data-desc="已领完：扫码进入缺省态，无下载按钮">素材已领完</button>
+          </div>
+          <p class="scene-hint" id="h5SceneHint">图集合集：8 个素材，已领 3 个</p>
+        </div>
+        <div class="glass-card mockup-panel">
+          <div class="mockup-frame-wrap">
+            <iframe id="h5Frame" title="站外下载落地页" src="about:blank"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div id="view-pc" class="page-view">
       <div class="module-tab-bar" role="tablist">
         <button type="button" class="active" data-sub="pc-scene" role="tab">场景</button>
@@ -921,11 +990,13 @@
             <button class="btn-preview" type="button" data-preview="pc" aria-pressed="false">全屏预览</button>
           </div>
           <div class="scene-list" id="pcScenes">
-            <button class="scene-btn active" type="button" data-pcscreen="home" data-desc="同一入口：顶部招募 BN + 下方看板">剪辑供稿</button>
+            <button class="scene-btn active" type="button" data-pcscreen="home" data-desc="招募 BN + 四格统计（授权数字可点弹窗）+ 左收益数据 / 右最近上传">剪辑供稿</button>
             <button class="scene-btn" type="button" data-pcscreen="recruit" data-desc="点 BN 侧栏展开卖点 / 适合谁 / 二维码">招募详情抽屉</button>
             <button class="scene-btn" type="button" data-pcscreen="guest" data-desc="无权限时看板走缺省，招募 BN 仍在">非剪辑手缺省</button>
+            <button class="scene-btn" type="button" data-pcscreen="revoked" data-desc="已停用：看板只读，点上传弹出权限收回">已停用拦截</button>
             <button class="scene-btn" type="button" data-pcscreen="upload" data-desc="弹窗三步：先填字段 → 选文件夹/压缩包 → 表格确认后队列上传">上传入口</button>
-            <button class="scene-btn" type="button" data-pcscreen="list" data-desc="与后台同字段，无下载链接；另列上传状态；仅空闲可删">上传 list</button>
+            <button class="scene-btn" type="button" data-pcscreen="list" data-desc="右豹 / 站外 Tab；右豹同后台字段；站外以文件夹出示分享链接与二维码">上传 list</button>
+            <button class="scene-btn" type="button" data-pcscreen="earn" data-desc="仅右豹端已结算；按日/按月/自定义；明细抽屉可导出">收益数据</button>
             <button class="scene-btn" type="button" data-pcscreen="guide" data-desc="看板/清单入口；页内手册；未录入也可看">操作说明</button>
           </div>
           <p class="scene-hint" id="pcSceneHint">同一入口：顶部招募 BN + 下方看板</p>
@@ -1032,6 +1103,10 @@
           </div>
           <div id="admin-editors-list" class="sub-view active">
           <div class="table-toolbar"><h3>剪辑手</h3><button class="btn btn-primary" type="button" onclick="openEditorModal()">录入</button></div>
+          <div class="ed-kpi" id="edKpi">
+            <div class="ed-kpi-head"><span>数据统计</span><em>按当前筛选汇总，查询后刷新</em></div>
+            <div class="ed-stats" id="edStats"></div>
+          </div>
           <div class="filter-bar">
             <div class="filter-field"><label>右豹 ID / 昵称</label><input id="edQ" placeholder="YB10086 / 林夏" /></div>
             <div class="filter-field"><label>状态</label><select id="edS"><option value="">全部</option><option>已录入</option><option>已停用</option></select></div>
@@ -1040,7 +1115,7 @@
               <button class="btn btn-primary" type="button" onclick="renderEditors()">查询</button>
             </div>
           </div>
-          <div class="table-wrap"><table><thead><tr><th>ID</th><th>右豹 ID</th><th>昵称</th><th>分成比例</th><th>稿件需要审核</th><th>备注</th><th>来源</th><th>可上传项目</th><th>稿件数据</th><th>收益数据</th><th>状态</th><th>录入时间</th><th>操作</th></tr></thead><tbody id="edBody"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>ID</th><th>右豹 ID</th><th>昵称</th><th>分成比例</th><th>发布平台</th><th>稿件需要审核</th><th>可上传项目</th><th>稿件数据</th><th>收益数据</th><th>状态</th><th>录入时间</th><th>操作</th></tr></thead><tbody id="edBody"></tbody></table></div>
           </div>
           <div id="admin-editors-flow" class="sub-view">
       <div class="glass-card flow-page">
@@ -1064,7 +1139,7 @@
               <text x="460" y="41" text-anchor="middle" font-size="12" fill="#1e40af">客服二维码招募接入</text>
               <rect x="280" y="80" width="360" height="80" rx="6" fill="#dcfce7" stroke="#16a34a" />
               <text x="460" y="108" text-anchor="middle" font-size="12" fill="#166534">后台录入剪辑手</text>
-              <text x="460" y="128" text-anchor="middle" font-size="10" fill="#64748b">必填右豹 ID / 分成 / 备注 / 稿件需要审核</text>
+              <text x="460" y="128" text-anchor="middle" font-size="10" fill="#64748b">必填右豹 ID / 分成 / 备注 / 发布平台 / 稿件需要审核</text>
               <text x="460" y="146" text-anchor="middle" font-size="10" fill="#64748b">无站内申请表 · 免审则上传默认已通过</text>
               <polygon points="460,184 540,224 460,264 380,224" fill="#fef9c3" stroke="#ca8a04" />
               <text x="460" y="228" text-anchor="middle" font-size="11" fill="#854d0e">已录入且未停用?</text>
@@ -1096,8 +1171,12 @@
             <button type="button" data-sub="admin-works-flow" role="tab">业务流程</button>
           </div>
           <div id="admin-works-list" class="sub-view active">
+          <div class="channel-tab-bar" id="wkChannelBar" role="tablist">
+            <button type="button" class="active" data-wkch="右豹">右豹稿件</button>
+            <button type="button" data-wkch="站外">站外稿件</button>
+          </div>
           <div class="table-toolbar">
-            <h3>稿件</h3>
+            <h3 id="wkTitle">右豹稿件</h3>
             <div class="toolbar-actions">
               <button class="btn btn-primary" type="button" onclick="openWorkModal()">录入</button>
             </div>
@@ -1105,24 +1184,25 @@
           <div class="batch-bar" id="wkBatchBar">
             <span class="batch-info" id="wkBatchInfo">已选 0 项</span>
             <div class="batch-btns">
-              <button class="btn btn-success-ghost btn-sm" type="button" onclick="openBatchAudit()">批量审核</button>
+              <button class="btn btn-success-ghost btn-sm" type="button" id="wkBatchAudit" onclick="openBatchAudit()">批量审核</button>
               <button class="btn btn-danger-ghost btn-sm" type="button" onclick="openBatchDeleteWorks()">批量删除</button>
               <button class="btn-ghost-sm" type="button" onclick="clearWorkSelection()">取消</button>
             </div>
           </div>
           <div class="filter-bar">
             <div class="filter-field"><label>标题 / ID</label><input id="wkQ" placeholder="掌心宠" /></div>
-            <div class="filter-field"><label>占用</label><select id="wkO"><option value="">全部</option><option>空闲</option><option>占用中</option><option>已完成</option></select></div>
-            <div class="filter-field"><label>审核</label><select id="wkA"><option value="">全部</option><option>审核中</option><option>已通过</option><option>已驳回</option></select></div>
+            <div class="filter-field" id="wkOccField"><label>占用</label><select id="wkO"><option value="">全部</option><option>空闲</option><option>占用中</option><option>已完成</option></select></div>
+            <div class="filter-field" id="wkAuditField"><label>审核</label><select id="wkA"><option value="">全部</option><option>审核中</option><option>已通过</option><option>已驳回</option></select></div>
+            <div class="filter-field" id="wkOffStField" hidden><label>状态</label><select id="wkOffS"><option value="">全部</option><option>空闲</option><option>部分领取</option><option>已领完</option></select></div>
             <div class="filter-actions">
-              <button class="btn-ghost-sm" type="button" onclick="document.getElementById('wkQ').value='';document.getElementById('wkO').value='';document.getElementById('wkA').value='';renderWorks()">重置</button>
+              <button class="btn-ghost-sm" type="button" onclick="resetWorksFilter()">重置</button>
               <button class="btn btn-primary" type="button" onclick="renderWorks()">查询</button>
             </div>
           </div>
-          <div class="table-wrap"><table><thead><tr>
-            <th class="col-check"><input type="checkbox" id="wkCheckAll" onclick="toggleWorkCheckAll(this.checked)" /></th>
-            <th>ID</th><th>标题</th><th>项目</th><th>书</th><th>稿件信息</th><th>发布技巧</th><th>剪辑手</th><th>类型</th><th>素材类型</th><th>占用</th><th>审核</th><th>上传时间</th><th>操作</th>
-          </tr></thead><tbody id="wkBody"></tbody></table></div>
+          <div class="table-wrap"><table>
+            <thead id="wkHead"></thead>
+            <tbody id="wkBody"></tbody>
+          </table></div>
           </div>
           <div id="admin-works-flow" class="sub-view">
       <div class="glass-card flow-page">
@@ -1438,20 +1518,23 @@
           <div class="table-toolbar">
             <div>
               <h3>次数商品</h3>
-              <span class="cell-sub">同时在售最多 4 档 · 免费次数挂本页</span>
+              <span class="cell-sub">同时在售最多 4 档 · 工作日/节假日免费次数挂本页</span>
             </div>
             <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-              <label class="cell-sub" for="freeQuota">免费次数</label>
-              <input id="freeQuota" type="number" min="0" style="width:72px;height:30px;padding:0 8px;border:1px solid var(--border);border-radius:7px" />
+              <label class="cell-sub" for="freeQuotaWeekday">工作日免费次数</label>
+              <input id="freeQuotaWeekday" type="text" inputmode="decimal" style="width:72px;height:30px;padding:0 8px;border:1px solid var(--border);border-radius:7px" />
+              <label class="cell-sub" for="freeQuotaHoliday">节假日免费次数</label>
+              <input id="freeQuotaHoliday" type="text" inputmode="decimal" style="width:72px;height:30px;padding:0 8px;border:1px solid var(--border);border-radius:7px" />
+              <span class="cell-sub" id="freeQuotaDayType">今日按：—</span>
               <button class="btn-ghost-sm" type="button" onclick="saveFreeQuota()">保存免费次数</button>
               <button class="btn btn-primary" type="button" onclick="openSkuModal()">新增档位</button>
             </div>
           </div>
-          <div class="table-wrap"><table><thead><tr><th>档位</th><th>次数</th><th>积分</th><th>购买人数</th><th>状态</th><th>操作</th></tr></thead><tbody id="skuBody"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>档位</th><th>次数</th><th>积分</th><th>原价</th><th>购买人数</th><th>状态</th><th>操作</th></tr></thead><tbody id="skuBody"></tbody></table></div>
           </div>
           <div id="admin-skus-flow" class="sub-view">
       <div class="glass-card flow-page">
-        <p class="flow-page-intro">次数商品：免费次数挂本页；在售最多 4 档，可改价下架。</p>
+        <p class="flow-page-intro">次数商品：工作日/节假日免费次数挂本页；在售最多 4 档，可改价下架；原价必填，仅大于现价时 C 端划线。</p>
         <div class="flow-svg-wrap">
           <svg width="920" height="420" viewBox="0 0 920 420" xmlns="http://www.w3.org/2000/svg">
             <defs>
@@ -1467,8 +1550,8 @@
             </g>
             <g class="flow-nodes" font-family="Inter, PingFang SC, sans-serif">
               <rect x="280" y="16" width="360" height="56" rx="6" fill="#dbeafe" stroke="#2563eb" />
-              <text x="460" y="40" text-anchor="middle" font-size="12" fill="#1e40af">配置免费次数 + 次数商品</text>
-              <text x="460" y="58" text-anchor="middle" font-size="10" fill="#64748b">形态：x 次需要 y 积分</text>
+              <text x="460" y="40" text-anchor="middle" font-size="12" fill="#1e40af">配置工作日/节假日免费次数 + 次数商品</text>
+              <text x="460" y="58" text-anchor="middle" font-size="10" fill="#64748b">形态：x 次 / y 积分 + 原价；原价&gt;现价才划线</text>
               <polygon points="460,100 540,140 460,180 380,140" fill="#fef9c3" stroke="#ca8a04" />
               <text x="460" y="144" text-anchor="middle" font-size="11" fill="#854d0e">在售档位数≤4?</text>
               <text x="256" y="132" font-size="10" fill="#dc2626">否</text>
@@ -1479,7 +1562,7 @@
               <text x="460" y="232" text-anchor="middle" font-size="12" fill="#166534">C 端兑换浮层可见在售档</text>
               <text x="460" y="250" text-anchor="middle" font-size="10" fill="#64748b">下架立即不可新购 · 已购保留</text>
               <rect x="280" y="288" width="360" height="40" rx="6" fill="#dbeafe" stroke="#2563eb" />
-              <text x="460" y="313" text-anchor="middle" font-size="12" fill="#1e40af">改价 / 下架 / 保存免费次数</text>
+              <text x="460" y="313" text-anchor="middle" font-size="12" fill="#1e40af">改价 / 下架 / 保存工作日或节假日额度</text>
             </g>
           </svg>
         </div>
@@ -1507,13 +1590,14 @@
             <button type="button" data-ix="ix-api">接口契约</button>
             <button type="button" data-ix="ix-state">状态与异常</button>
             <button type="button" data-ix="ix-payout">用户收益入账</button>
+            <button type="button" data-ix="ix-oss">阿里云存储</button>
             <button type="button" data-ix="ix-list">交互清单</button>
           </div>
           <div id="ix-fe" class="ix-pane active">
             <div class="ix-rule">
               <strong>本页只挂唯一 FR，不再复述场景细则</strong>
               <ul>
-                <li>WHAT 以 FR-014-01 … FR-014-27 为准。字段、toast、状态机在页头「需求规则」对应场景卡。</li>
+                <li>WHAT 以 FR-014-01 … FR-014-32 为准。字段、toast、状态机在页头「需求规则」对应场景卡。</li>
                 <li>领取门禁（FR-014-11）：停权 → 次数 → 选词浮层 → 资格/占用。次数不足只开兑换，不扣次。</li>
                 <li>广场只返回 <code>plazaEligible</code> 为真的稿（FR-014-08）。领取成功必须同时写占用、扣次、未回填（FR-014-12）。</li>
                 <li>任何列表响应不得带金额。接口、状态机、入账文案见本 Tab 其余子页。</li>
@@ -1548,6 +1632,10 @@
                   <tr><td><strong>审核</strong></td><td><code>POST /api/yjd/admin/works/:id/audit</code></td><td>pass | reject + reason</td><td>已通过进广场；驳回不进；已通过不可再驳</td></tr>
                   <tr><td><strong>黑名单恢复</strong></td><td><code>POST /api/yjd/admin/bans/:user/restore</code></td><td>userId</td><td>已恢复，可再领</td></tr>
                   <tr><td><strong>结算入账</strong></td><td><code>POST /api/yjd/settlements/apply</code></td><td>keywordId / orderId / settledAt / amount</td><td>代发则拆用户实结+剪辑手分账；详见「用户收益入账」</td></tr>
+                  <tr><td><strong>OSS 上传</strong></td><td><code>PUT /api/yjd/oss/works/:id</code></td><td>file / channel</td><td>ossKey；站内未领不起算 7 天</td></tr>
+                  <tr><td><strong>C端下载</strong></td><td><code>GET /api/yjd/claims/:id/file</code></td><td>claimId</td><td>3 天内签链；过期 403</td></tr>
+                  <tr><td><strong>恢复C端下载</strong></td><td><code>POST /api/yjd/admin/works/:id/restore-dl</code></td><td>mid / claimId</td><td>每稿一次；重计 3 天；7 天已删则失败</td></tr>
+                  <tr><td><strong>OSS 清理</strong></td><td><code>POST /api/yjd/oss/purge</code></td><td>job / cron</td><td>站内满 7 天删对象；站外下载成功即删</td></tr>
                 </tbody>
               </table>
             </div>
@@ -1562,10 +1650,10 @@
             <h3>4. 字段清单</h3>
             <ul>
               <li><strong>user</strong>：userId、free、bought、strikes、banned、remainQuota=free+bought。</li>
-              <li><strong>work</strong>：id、title、project、book、bookId、kind、mat、occ、audit、rejectReason、imgs、preview[≤3]、pubTips、cover、tags、share。</li>
-              <li><strong>claim</strong>：id、user、mid、kw、status（未回填|已回填|已超时）、claimedAt、downloadedAt、expireAt、fill。</li>
+              <li><strong>work</strong>：id、title、project、book、bookId、kind、mat、occ、audit、rejectReason、imgs、preview[≤3]、pubTips、cover、tags、share、ossKey、ossDeleted、ossRestoreUsed、ossExpireAt。</li>
+              <li><strong>claim</strong>：id、user、mid、kw、status（未回填|已回填|已超时）、claimedAt、downloadedAt、expireAt（C端 3 天）、restoredAt、fill。</li>
               <li><strong>editor</strong>：id、ybId、name、share、needReview、note、projects[]、status。</li>
-              <li><strong>sku</strong>：id、times、points、on。</li>
+              <li><strong>sku</strong>：id、times、points、origPoints（原价，正整数积分，≥ 现价）、on、buyers。</li>
               <li><strong>settlement</strong>：orderId、keywordId、mid、project、settledAt、gross、editorShare、userNet、status=已结算。</li>
             </ul>
             <div class="callout warn">Demo 不发起上述请求。联调时按此契约落地，不要用 Demo 的 localStorage 当接口。</div>
@@ -1586,7 +1674,7 @@
             <h3>2. 校验规则</h3>
             <ul>
               <li>领取必须带 mid + keywordId，且关键词属于该稿项目且已通过。</li>
-              <li>兑换必须校验档位在售、次数与积分&gt;0；前端不得自己加次数。</li>
+              <li>兑换必须校验档位在售、次数与积分&gt;0、原价为正数且 ≥ 积分；前端不得自己加次数。</li>
               <li>回填只接受 status=未回填 的领取；已回填 / 已超时由后端拒绝。</li>
               <li>PC 上传先填字段再选文件夹或压缩包，项目 ∈ 剪辑手授权 ∩ 启用项目。</li>
               <li>驳回必须有原因；已通过禁止再驳。</li>
@@ -1602,7 +1690,8 @@
                   <tr><td><strong>未审核通过</strong></td><td>审核中 / 已驳回</td><td>不进广场；详情不可领</td><td>否</td></tr>
                   <tr><td>未选词</td><td>浮层未点关键词</td><td>Toast 拦截领取</td><td>否</td></tr>
                   <tr><td>项目禁用</td><td>项目状态=禁用</td><td>不进广场；PC 不可传到该项目</td><td>否</td></tr>
-                  <tr><td>下载过期</td><td>领取超过 7 天</td><td>Toast「领取已超过 7 天，无法再下载」</td><td>—</td></tr>
+                  <tr><td>C端下载过期</td><td>领取超过 3 天且云端未删</td><td>Toast「领取已超过 3 天，无法再下载」；后台可恢复一次</td><td>—</td></tr>
+                  <tr><td>云端失效</td><td>站内领取满 7 天；站外该份已下</td><td>Toast「云端资源已失效/已删除，无法再下载」；站外只删当份，不判整夹</td><td>—</td></tr>
                 </tbody>
               </table>
             </div>
@@ -1806,6 +1895,194 @@
       </div>
             </div>
           </div>
+          <div id="ix-oss" class="ix-pane">
+            <div class="module-tab-bar" role="tablist">
+              <button type="button" class="active" data-sub="ix-oss-doc" role="tab">规则说明</button>
+              <button type="button" data-sub="ix-oss-flow" role="tab">业务流程</button>
+            </div>
+            <div id="ix-oss-doc" class="sub-view active">
+            <div class="ix-rule">
+              <strong>所有稿件资源上传到阿里云 OSS</strong>
+              <ul>
+                <li>PC 上传与后台录入的成片对象都落 OSS。Demo 用 <code>ossKey=oss://ybdd-yjd/works/{id}</code> 示意，不发真实 PUT。</li>
+                <li>C 端 / H5 下载只拿短时签链，不把永久 URL 写进客户端。</li>
+                <li>预览图 ≤3 张可走 CDN 小图，不走成片下载对象。</li>
+              </ul>
+            </div>
+            <h3>1. 站内稿件（右豹）</h3>
+            <div class="ix-flow">
+              <div class="ix-step"><i>1</i><div><b>上传入桶</b><span>PC / 后台写入 works.ossKey。未领取不起算系统 7 天，对象一直保留供广场领取。</span></div></div>
+              <div class="ix-step"><i>2</i><div><b>领取签发</b><span>领取成功写 claim.expireAt = claimedAt + 3 天，work.ossExpireAt = 首次领取 + 7 天。C 端 3 天内可下。</span></div></div>
+              <div class="ix-step"><i>3</i><div><b>C 端过期</b><span>满 3 天 toast「领取已超过 3 天，无法再下载」。对象未删，后台可恢复。</span></div></div>
+              <div class="ix-step"><i>4</i><div><b>恢复C端下载</b><span>领取记录 → 稿件详情 → 下载链接旁「恢复C端下载」。每条稿件只能恢复一次。用户重新计时 3 天，且不得超过系统 7 天。</span></div></div>
+              <div class="ix-step"><i>5</i><div><b>系统满 7 天</b><span>任务删阿里云对象，ossDeleted=true。此后不可下载、不可恢复。</span></div></div>
+            </div>
+            <div class="table-wrap">
+              <table class="explain-table">
+                <thead><tr><th>时钟</th><th>起点</th><th>时长</th><th>过期后果</th></tr></thead>
+                <tbody>
+                  <tr><td>C 端下载窗</td><td>领取成功；或后台恢复成功</td><td>3 天</td><td>用户不可下；对象仍在</td></tr>
+                  <tr><td>系统失效</td><td>该稿首次领取</td><td>7 天</td><td>删除 OSS 对象；不可恢复</td></tr>
+                  <tr><td>恢复次数</td><td>稿件维度</td><td>1 次</td><td>再用 toast「该稿件下载链接已恢复过一次」</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <h3>2. 站外稿件</h3>
+            <p>文件夹内领完一个删一个。下载链路不判定整夹是否领完。不走站内 3/7 天窗，不能「恢复C端下载」。</p>
+            <div class="ix-flow">
+              <div class="ix-step"><i>1</i><div><b>文件夹入桶</b><span>整夹一条，assets=文件数。夹内每个素材各有一份 OSS 副本。</span></div></div>
+              <div class="ix-step"><i>2</i><div><b>领一个删一个</b><span>点下载 claimedAssets + 1，立刻删除<strong>该份</strong> OSS。下一份再走同一条链。</span></div></div>
+              <div class="ix-step"><i>3</i><div><b>落地页无余量</b><span>只是没有下一份可下（缺省「素材已领完」），不是整夹清桶步骤。</span></div></div>
+            </div>
+            <h3>3. 落地接口</h3>
+            <div class="table-wrap">
+              <table class="explain-table">
+                <thead><tr><th>能力</th><th>方法 / 路径</th><th>请求</th><th>响应</th></tr></thead>
+                <tbody>
+                  <tr><td>上传对象</td><td><code>PUT /api/yjd/oss/works/:id</code></td><td>file / channel</td><td>ossKey</td></tr>
+                  <tr><td>C 端取文件</td><td><code>GET /api/yjd/claims/:id/file</code></td><td>claimId</td><td>3 天内 302 签链；过期 403 CLIENT_DL_EXPIRED</td></tr>
+                  <tr><td>站外取文件</td><td><code>GET /api/yjd/offsite/:id/file</code></td><td>id</td><td>成功后删<strong>该份</strong>对象；无余量 410</td></tr>
+                  <tr><td>恢复C端下载</td><td><code>POST /api/yjd/admin/works/:id/restore-dl</code></td><td>mid / claimId</td><td>expireAt 重计；已用/已删失败</td></tr>
+                  <tr><td>到期清理</td><td><code>POST /api/yjd/oss/purge</code></td><td>cron</td><td>站内 ossExpireAt≤now 删对象</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="callout warn">Demo 不连真实阿里云。C / PC / 后台 / H5 共一份 store：<code>ossKey / ossDeleted / ossRestoreUsed / ossExpireAt / claim.expireAt</code>。</div>
+            </div>
+            <div id="ix-oss-flow" class="sub-view">
+              <div class="module-tab-bar" role="tablist">
+                <button type="button" class="active" data-sub="ix-oss-flow-on" role="tab">站内生命周期</button>
+                <button type="button" data-sub="ix-oss-flow-off" role="tab">站外下载即删</button>
+              </div>
+              <div id="ix-oss-flow-on" class="sub-view active">
+      <div class="glass-card flow-page">
+        <p class="flow-page-intro">站内闭环：上传入桶 → 首次领取才起算系统 7 天 → C 端 3 天可下。过期后对象未删则可恢复一次；系统满 7 天删 OSS，不可再恢复。恢复不重置系统钟。</p>
+        <div class="flow-svg-wrap">
+          <svg width="920" height="860" viewBox="0 0 920 860" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <marker id="flow-arrow-oss-on" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                <path d="M0,0 L8,4 L0,8 Z" fill="#94a3b8" />
+              </marker>
+            </defs>
+            <g class="flow-edges" marker-end="url(#flow-arrow-oss-on)">
+              <line x1="460" y1="72" x2="460" y2="96" />
+              <line x1="540" y1="136" x2="700" y2="136" />
+              <line x1="460" y1="176" x2="460" y2="206" />
+              <line x1="460" y1="262" x2="460" y2="292" />
+              <line x1="540" y1="332" x2="700" y2="332" />
+              <line x1="460" y1="372" x2="460" y2="402" />
+              <line x1="380" y1="442" x2="200" y2="442" />
+              <line x1="460" y1="482" x2="460" y2="512" />
+              <line x1="540" y1="552" x2="700" y2="552" />
+              <line x1="460" y1="592" x2="460" y2="622" />
+              <line x1="460" y1="678" x2="460" y2="702" />
+              <polyline points="460,758 460,784 904,784 904,292 460,292" />
+            </g>
+            <g class="flow-nodes" font-family="Inter, PingFang SC, sans-serif">
+              <rect x="280" y="16" width="360" height="56" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="460" y="40" text-anchor="middle" font-size="12" fill="#1e40af">PC / 后台上传入桶</text>
+              <text x="460" y="58" text-anchor="middle" font-size="10" fill="#64748b">写入 ossKey · 未领不起算 7 天</text>
+
+              <polygon points="460,96 540,136 460,176 380,136" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="460" y="140" text-anchor="middle" font-size="11" fill="#854d0e">已有首次领取?</text>
+              <text x="556" y="124" font-size="10" fill="#dc2626">否</text>
+              <rect x="700" y="116" width="180" height="40" rx="6" fill="#e2e8f0" stroke="#94a3b8" />
+              <text x="790" y="141" text-anchor="middle" font-size="11" fill="#475569">对象保留供广场</text>
+              <text x="472" y="188" font-size="10" fill="#16a34a">是</text>
+
+              <rect x="280" y="206" width="360" height="56" rx="6" fill="#dcfce7" stroke="#16a34a" />
+              <text x="460" y="230" text-anchor="middle" font-size="12" fill="#166534">签发 C端3天 + 系统7天</text>
+              <text x="460" y="248" text-anchor="middle" font-size="10" fill="#64748b">expireAt / 首次 ossExpireAt</text>
+
+              <polygon points="460,292 540,332 460,372 380,332" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="460" y="336" text-anchor="middle" font-size="11" fill="#854d0e">C端 3 天内?</text>
+              <text x="556" y="320" font-size="10" fill="#16a34a">是</text>
+              <rect x="700" y="304" width="180" height="56" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="790" y="328" text-anchor="middle" font-size="11" fill="#1e40af">下载签链成功</text>
+              <text x="790" y="346" text-anchor="middle" font-size="10" fill="#64748b">GET claims/:id/file</text>
+              <text x="472" y="384" font-size="10" fill="#dc2626">否</text>
+
+              <polygon points="460,402 540,442 460,482 380,442" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="460" y="446" text-anchor="middle" font-size="11" fill="#854d0e">系统满 7 天?</text>
+              <text x="256" y="430" font-size="10" fill="#dc2626">是</text>
+              <rect x="40" y="422" width="160" height="40" rx="6" fill="#fecaca" stroke="#dc2626" />
+              <text x="120" y="447" text-anchor="middle" font-size="11" fill="#991b1b">删OSS不可恢复</text>
+              <text x="472" y="494" font-size="10" fill="#16a34a">否</text>
+
+              <polygon points="460,512 540,552 460,592 380,552" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="460" y="556" text-anchor="middle" font-size="11" fill="#854d0e">已恢复过一次?</text>
+              <text x="556" y="540" font-size="10" fill="#dc2626">是</text>
+              <rect x="700" y="532" width="180" height="40" rx="6" fill="#fecaca" stroke="#dc2626" />
+              <text x="790" y="557" text-anchor="middle" font-size="11" fill="#991b1b">不可再恢复</text>
+              <text x="472" y="604" font-size="10" fill="#16a34a">否</text>
+
+              <rect x="280" y="622" width="360" height="56" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="460" y="646" text-anchor="middle" font-size="12" fill="#1e40af">后台恢复C端下载</text>
+              <text x="460" y="664" text-anchor="middle" font-size="10" fill="#64748b">领取记录 · 稿件详情 · 每稿一次</text>
+
+              <rect x="280" y="702" width="360" height="56" rx="6" fill="#dcfce7" stroke="#16a34a" />
+              <text x="460" y="726" text-anchor="middle" font-size="12" fill="#166534">重计 3 天</text>
+              <text x="460" y="744" text-anchor="middle" font-size="10" fill="#64748b">min(now+3d, ossExpireAt) · 不重置系统钟</text>
+            </g>
+          </svg>
+        </div>
+        <div class="flow-legend">
+          <span><i style="background:#dbeafe;border:1px solid #2563eb"></i>前端 / 用户操作</span>
+          <span><i style="background:#dcfce7;border:1px solid #16a34a"></i>后端判定 / 写入</span>
+          <span><i style="background:#ffedd5;border:1px solid #ea580c"></i>异步 / 超时</span>
+          <span><i style="background:#fef9c3;border:1px solid #ca8a04"></i>校验</span>
+          <span><i style="background:#fecaca;border:1px solid #dc2626"></i>阻断</span>
+          <span><i style="background:#e2e8f0;border:1px solid #94a3b8"></i>跳过 / 再领</span>
+        </div>
+      </div>
+              </div>
+              <div id="ix-oss-flow-off" class="sub-view">
+      <div class="glass-card flow-page">
+        <p class="flow-page-intro">站外下载链：文件夹入桶后，每点一次下载只删<strong>当份</strong> OSS。不判定整夹是否领完。夹内下一份再走同一条链。不走 3/7 天窗，不能恢复。</p>
+        <div class="flow-svg-wrap">
+          <svg width="920" height="420" viewBox="0 0 920 420" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <marker id="flow-arrow-oss-off" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                <path d="M0,0 L8,4 L0,8 Z" fill="#94a3b8" />
+              </marker>
+            </defs>
+            <g class="flow-edges" marker-end="url(#flow-arrow-oss-off)">
+              <line x1="460" y1="72" x2="460" y2="96" />
+              <line x1="460" y1="152" x2="460" y2="176" />
+              <line x1="460" y1="232" x2="460" y2="256" />
+              <polyline points="640,284 700,284 700,96 460,96" stroke-dasharray="4 3" />
+            </g>
+            <g class="flow-nodes" font-family="Inter, PingFang SC, sans-serif">
+              <rect x="280" y="16" width="360" height="56" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="460" y="40" text-anchor="middle" font-size="12" fill="#1e40af">文件夹入桶</text>
+              <text x="460" y="58" text-anchor="middle" font-size="10" fill="#64748b">夹内每个素材各有一份 OSS</text>
+
+              <rect x="280" y="96" width="360" height="56" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="460" y="120" text-anchor="middle" font-size="12" fill="#1e40af">H5 点下载</text>
+              <text x="460" y="138" text-anchor="middle" font-size="10" fill="#64748b">无登录 · 无选词 · 不写 claims</text>
+
+              <rect x="280" y="176" width="360" height="56" rx="6" fill="#dcfce7" stroke="#16a34a" />
+              <text x="460" y="200" text-anchor="middle" font-size="12" fill="#166534">领一个删一个</text>
+              <text x="460" y="218" text-anchor="middle" font-size="10" fill="#64748b">claimedAssets+1 · 立刻删该份 OSS</text>
+
+              <rect x="280" y="256" width="360" height="56" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="460" y="280" text-anchor="middle" font-size="12" fill="#1e40af">该素材云端已删除</text>
+              <text x="460" y="298" text-anchor="middle" font-size="10" fill="#64748b">虚线：夹内下一份再点下载</text>
+            </g>
+          </svg>
+        </div>
+        <div class="flow-legend">
+          <span><i style="background:#dbeafe;border:1px solid #2563eb"></i>前端 / 用户操作</span>
+          <span><i style="background:#dcfce7;border:1px solid #16a34a"></i>后端判定 / 写入</span>
+          <span><i style="background:#ffedd5;border:1px solid #ea580c"></i>异步 / 超时</span>
+          <span><i style="background:#fef9c3;border:1px solid #ca8a04"></i>校验</span>
+          <span><i style="background:#fecaca;border:1px solid #dc2626"></i>阻断</span>
+          <span><i style="background:#e2e8f0;border:1px solid #94a3b8"></i>跳过 / 再领</span>
+        </div>
+      </div>
+              </div>
+            </div>
+          </div>
           <div id="ix-list" class="ix-pane">
           <p>用于产品、前端、后端联调时逐项确认。</p>
           <div class="ix-tab-bar" role="tablist">
@@ -1829,6 +2106,7 @@
                   <tr><td>审核</td><td>单条或批量 通过 / 驳回</td><td>改 audit；驳回写原因</td><td>广场、PC list</td><td>已通过不可再驳；批量跳过不合资格行</td></tr>
                   <tr><td>黑名单恢复</td><td>后台确认</td><td>banned=false</td><td>详情领取按钮</td><td>无自助解禁</td></tr>
                   <tr><td>用户收益入账</td><td>关键词订单已结算回调</td><td>先判代发，再按分成写用户账+剪辑手账</td><td>双方项目收益明细</td><td>非代发全额给用户；失败整笔回滚</td></tr>
+                  <tr><td>阿里云存储</td><td>上传 / C端下载 / 恢复 / 站外下载</td><td>入桶签发 3/7 天；恢复一次；站外领一个删一个</td><td>下载窗、云端状态、余量</td><td>C端过期可恢复；满7天不可恢复；站外只删当份</td></tr>
                 </tbody>
               </table>
             </div>
@@ -1839,8 +2117,9 @@
               <li><strong>works</strong>：id / title / project / book / bookId / size / dl / editor / kind / mat / occ / time / share / cover / genre / tags / imgs / preview(≤3) / pubTips / duration / audit / rejectReason / fileName / occupied / earn</li>
               <li><strong>projects</strong>：id / name / logo / status / sort / updated。新增从 BRAND_CATALOG 点选，不手填、不写 keywords</li>
               <li><strong>mats</strong>：id / name / status</li>
-              <li><strong>skus</strong>：id / times / points / on / buyers（只读购买人数）</li>
-              <li><strong>claims</strong>：id / user / mid / title / work / project / book / bookId / editor / cover / kind / kw / fill / fillVideo / pendingEarn / status / time / link / claimedAt / downloadedAt / expireAt</li>
+              <li><strong>skus</strong>：id / times / points / origPoints（原价） / on / buyers（只读购买人数）</li>
+              <li><strong>claims</strong>：id / user / mid / title / work / project / book / bookId / editor / cover / kind / kw / fill / fillVideo / pendingEarn / status / time / link / claimedAt / downloadedAt / expireAt / restoredAt</li>
+              <li><strong>works OSS</strong>：ossKey / ossDeleted / ossRestoreUsed / ossExpireAt</li>
               <li><strong>keywords</strong>：STORE.keywords[项目名] = 该用户在该项目已通过申词 mock，不由项目管理维护</li>
               <li><strong>bans</strong>：user / strikes / time / status</li>
               <li><strong>user</strong>：id / free / bought / strikes / banned</li>
@@ -1882,7 +2161,7 @@
   <aside class="drawer" id="ruleDrawer" role="dialog" aria-labelledby="ruleTitle">
     <div class="drawer-header">
       <div>
-        <h2 id="ruleTitle">FR-014 · v9 需求规则</h2>
+        <h2 id="ruleTitle">FR-014 · v14 需求规则</h2>
         <p class="drawer-sub">按场景分列 · 页内 Tab 只放 Demo</p>
       </div>
       <button class="drawer-close" type="button" onclick="setRuleDrawer(false)">×</button>
@@ -1959,7 +2238,7 @@
     }
     function stTag(s) {
       if (s === '已录入' || s === '空闲' || s === '已回填' || s === '已恢复' || s === '启用' || s === '已通过' || s === true) return '<span class="tag tag-ok">' + (s === true ? '在售' : s) + '</span>';
-      if (s === '待回填' || s === '未回填' || s === '占用中' || s === '审核中') return '<span class="tag tag-warn">' + (s === '未回填' ? '待回填' : s) + '</span>';
+      if (s === '待回填' || s === '未回填' || s === '占用中' || s === '审核中' || s === '部分领取') return '<span class="tag tag-warn">' + (s === '未回填' ? '待回填' : s) + '</span>';
       if (s === '停权中' || s === '已超时释放' || s === '已超时' || s === '已驳回') return '<span class="tag tag-del">' + (s === '已超时' ? '已超时释放' : s) + '</span>';
       return '<span class="tag tag-muted">' + s + '</span>';
     }
@@ -1983,24 +2262,47 @@
       function p(n) { return n < 10 ? '0' + n : '' + n; }
       return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
     }
-    function renderEditors() {
+    function filteredEditors() {
       var q = (document.getElementById('edQ').value || '').trim();
       var s = document.getElementById('edS').value;
-      document.getElementById('edBody').innerHTML = EDITORS.filter(function (e) {
+      return EDITORS.filter(function (e) {
         if (q && e.name.indexOf(q) === -1 && e.id.indexOf(q) === -1 && String(e.ybId || '').indexOf(q) === -1) return false;
         if (s && e.status !== s) return false;
         return true;
-      }).map(function (e) {
+      });
+    }
+    function renderEditorStats(rows) {
+      var workCount = 0;
+      var sizeMb = 0;
+      var earn = 0;
+      rows.forEach(function (e) {
+        workCount += YJD.worksByEditor(STORE, e.name).length;
+        sizeMb += YJD.worksSizeMBByEditor(STORE, e.name);
+        earn += YJD.onsiteEarnByEditor(STORE, e.name) + YJD.offsiteEarnByEditor(STORE, e.name);
+      });
+      document.getElementById('edStats').innerHTML =
+        '<div class="ed-stat"><span>剪辑手数量</span><strong>' + rows.length + '</strong></div>' +
+        '<div class="ed-stat"><span>累计稿件数量</span><strong>' + workCount + '</strong></div>' +
+        '<div class="ed-stat"><span>累计稿件大小</span><strong>' + esc(YJD.formatSizeMB(sizeMb)) + '</strong></div>' +
+        '<div class="ed-stat earn"><span>累计结算收益</span><strong>' + earn + '</strong></div>';
+    }
+    function renderEditors() {
+      var rows = filteredEditors();
+      renderEditorStats(rows);
+      document.getElementById('edBody').innerHTML = rows.map(function (e) {
         var uploaded = YJD.worksByEditor(STORE, e.name).length;
         var claimed = YJD.claimedWorksByEditor(STORE, e.name).length;
-        var settled = YJD.earnByEditor(STORE, e.name);
-        var pending = YJD.pendingEarnByEditor(STORE, e.name);
+        var onsite = YJD.onsiteEarnByEditor(STORE, e.name);
+        var offsite = YJD.offsiteEarnByEditor(STORE, e.name);
         return '<tr><td>' + esc(e.id) + '</td><td>' + esc(e.ybId) + '</td><td>' + esc(e.name) + '</td><td>' + esc(e.share) + '</td>' +
+          '<td>' + esc(YJD.platformsLabel(e)) + '</td>' +
           '<td>' + (e.needReview === false ? '<span class="tag tag-muted">否</span>' : '<span class="tag tag-warn">是</span>') + '</td>' +
-          '<td class="cell-agg" title="' + esc(e.note) + '">' + esc(e.note) + '</td><td>' + esc(e.src) + '</td><td>' + esc(e.projects) + '</td>' +
-          '<td class="cell-agg">已上传 ' + uploaded + '<div class="cell-sub">已被领取 ' + claimed + '</div></td>' +
-          '<td class="cell-agg">已结算 ' + settled + '<div class="cell-sub">待结算 ' + pending + '</div>' +
-          '<button class="link" type="button" onclick="openEarnDrawer(\'' + e.id + '\')">收益</button></td>' +
+          '<td>' + esc(e.projects) + '</td>' +
+          '<td class="cell-agg">已上传 ' + uploaded + '<div class="cell-sub">已被领取 ' + claimed + '</div>' +
+          '<div class="cell-sub">累计 ' + esc(YJD.worksSizeByEditor(STORE, e.name)) + '</div></td>' +
+          '<td class="cell-agg">' +
+            '<button class="link" type="button" onclick="openEarnDrawer(\'' + e.id + '\',\'onsite\')">站内稿件收益 ' + onsite + '</button>' +
+            '<div><button class="link" type="button" onclick="openEarnDrawer(\'' + e.id + '\',\'offsite\')">站外稿件收益 ' + offsite + '</button></div></td>' +
           '<td>' + stTag(e.status) + '</td><td>' + esc(e.time) + '</td>' +
           '<td><button class="link" type="button" onclick="openEditorDetail(\'' + e.id + '\')">详情</button>' +
           '<button class="link" type="button" onclick="openEditorModal(\'' + e.id + '\')">编辑</button>' +
@@ -2008,16 +2310,44 @@
             ? '<button class="link" type="button" onclick="toggleEditor(\'' + e.id + '\',false)">停用</button>'
             : '<button class="link" type="button" onclick="toggleEditor(\'' + e.id + '\',true)">启用</button>') +
           '<button class="link link-danger" type="button" onclick="deleteEditor(\'' + e.id + '\')">删除</button></td></tr>';
-      }).join('') || '<tr><td colspan="13" style="text-align:center;color:#9aa5b4">无匹配</td></tr>';
+      }).join('') || '<tr><td colspan="12" style="text-align:center;color:#9aa5b4">无匹配</td></tr>';
     }
     function resetEd() { document.getElementById('edQ').value = ''; document.getElementById('edS').value = ''; renderEditors(); }
     var wkSelected = {};
+    var wkChannel = '右豹';
+    function setWorkChannel(ch) {
+      wkChannel = ch === '站外' ? '站外' : '右豹';
+      document.querySelectorAll('#wkChannelBar button').forEach(function (b) {
+        b.classList.toggle('active', b.dataset.wkch === wkChannel);
+      });
+      var off = wkChannel === '站外';
+      document.getElementById('wkTitle').textContent = off ? '站外稿件' : '右豹稿件';
+      document.getElementById('wkOccField').hidden = off;
+      document.getElementById('wkAuditField').hidden = off;
+      document.getElementById('wkOffStField').hidden = !off;
+      document.getElementById('wkBatchAudit').hidden = off;
+      wkSelected = {};
+      renderWorks();
+    }
+    function resetWorksFilter() {
+      document.getElementById('wkQ').value = '';
+      document.getElementById('wkO').value = '';
+      document.getElementById('wkA').value = '';
+      document.getElementById('wkOffS').value = '';
+      renderWorks();
+    }
     function filteredWorks() {
       var q = (document.getElementById('wkQ').value || '').trim();
       var o = document.getElementById('wkO').value;
       var a = document.getElementById('wkA').value;
+      var os = document.getElementById('wkOffS').value;
       return WORKS.filter(function (w) {
+        if (YJD.workChannel(w) !== wkChannel) return false;
         if (q && w.title.indexOf(q) === -1 && w.id.indexOf(q) === -1) return false;
+        if (wkChannel === '站外') {
+          if (os && YJD.offsiteStatus(w) !== os) return false;
+          return true;
+        }
         if (o && w.occ !== o) return false;
         if (a && (w.audit || '已通过') !== a) return false;
         return true;
@@ -2059,7 +2389,27 @@
       renderWorks();
     }
     function renderWorks() {
+      var off = wkChannel === '站外';
+      document.getElementById('wkHead').innerHTML = off
+        ? '<tr><th class="col-check"><input type="checkbox" id="wkCheckAll" onclick="toggleWorkCheckAll(this.checked)" /></th><th>ID</th><th>标题</th><th>项目</th><th>书</th><th>稿件信息</th><th>剪辑手</th><th>类型</th><th>状态</th><th>上传时间</th><th>操作</th></tr>'
+        : '<tr><th class="col-check"><input type="checkbox" id="wkCheckAll" onclick="toggleWorkCheckAll(this.checked)" /></th><th>ID</th><th>标题</th><th>项目</th><th>书</th><th>稿件信息</th><th>发布技巧</th><th>剪辑手</th><th>类型</th><th>素材类型</th><th>占用</th><th>审核</th><th>上传时间</th><th>操作</th></tr>';
       document.getElementById('wkBody').innerHTML = filteredWorks().map(function (w) {
+        var checked = wkSelected[w.id] ? ' checked' : '';
+        var rowStart = '<tr data-mid="' + esc(w.id) + '" data-title="' + esc(w.title) + '" class="' + (wkSelected[w.id] ? 'selected' : '') + '">' +
+          '<td class="col-check"><input type="checkbox" data-wk="' + esc(w.id) + '"' + checked + ' onclick="toggleWorkCheck(\'' + w.id + '\', this.checked)" /></td>' +
+          '<td>' + esc(w.id) + '</td><td>' + esc(w.title) + '</td><td>' + esc(w.project) + '</td>' +
+          '<td class="cell-agg">' + esc(w.book) + '<div class="cell-sub">书籍 ID ' + esc(w.bookId) + '</div></td>';
+        if (off) {
+          return rowStart +
+            '<td class="cell-agg">' + esc(YJD.offsiteInfoLabel(w)) + '<div class="cell-sub">' + esc(w.dl) + '</div></td>' +
+            '<td>' + esc(w.editor) + '</td><td>' + esc(w.kind) + '</td><td>' + stTag(YJD.offsiteStatus(w)) + '</td>' +
+            '<td>' + esc(w.time) + '</td>' +
+            '<td><button class="link" type="button" onclick="openWorkDetail(\'' + w.id + '\')">详情</button>' +
+            '<button class="link" type="button" onclick="openWorkModal(\'' + w.id + '\')">编辑</button>' +
+            '<button class="link" type="button" onclick="copyOffsiteLink(\'' + w.id + '\')">分享链接</button>' +
+            '<button class="link" type="button" onclick="openOffsiteQr(\'' + w.id + '\')">二维码</button>' +
+            '<button class="link link-danger" type="button" onclick="deleteWork(\'' + w.id + '\')">删除</button></td></tr>';
+        }
         var audit = w.audit || '已通过';
         var auditCell = stTag(audit) + (audit === '已驳回' && w.rejectReason ? '<div class="cell-sub">原因：' + esc(w.rejectReason) + '</div>' : '');
         var auditBtns = '';
@@ -2069,11 +2419,7 @@
         if (audit === '审核中' && w.occ === '空闲') {
           auditBtns += '<button class="link link-danger" type="button" onclick="rejectWork(\'' + w.id + '\')">驳回</button>';
         }
-        var checked = wkSelected[w.id] ? ' checked' : '';
-        return '<tr data-mid="' + esc(w.id) + '" data-title="' + esc(w.title) + '" class="' + (wkSelected[w.id] ? 'selected' : '') + '">' +
-          '<td class="col-check"><input type="checkbox" data-wk="' + esc(w.id) + '"' + checked + ' onclick="toggleWorkCheck(\'' + w.id + '\', this.checked)" /></td>' +
-          '<td>' + esc(w.id) + '</td><td>' + esc(w.title) + '</td><td>' + esc(w.project) + '</td>' +
-          '<td class="cell-agg">' + esc(w.book) + '<div class="cell-sub">书籍 ID ' + esc(w.bookId) + '</div></td>' +
+        return rowStart +
           '<td class="cell-agg">' + esc(YJD.workInfoLabel(w)) + '<div class="cell-sub">' + esc(w.dl) + '</div></td>' +
           '<td class="cell-agg" title="' + esc(YJD.tipText(w)) + '">' + esc(YJD.tipText(w) || '—') + '</td>' +
           '<td>' + esc(w.editor) + '</td><td>' + esc(w.kind) + '</td><td>' + esc(w.mat) + '</td><td>' + stTag(w.occ) + '</td>' +
@@ -2082,7 +2428,7 @@
           '<button class="link" type="button" onclick="openWorkModal(\'' + w.id + '\')">编辑</button>' +
           auditBtns +
           '<button class="link link-danger" type="button" onclick="deleteWork(\'' + w.id + '\')">删除</button></td></tr>';
-      }).join('') || '<tr><td colspan="14" style="text-align:center;color:#9aa5b4">无匹配</td></tr>';
+      }).join('') || '<tr><td colspan="' + (off ? 11 : 14) + '" style="text-align:center;color:#9aa5b4">无匹配</td></tr>';
       syncWkBatchBar();
     }
     function renderProjects() {
@@ -2128,7 +2474,7 @@
           '<td class="cell-agg">' + esc(c.book || w.book || '—') + '<div class="cell-sub">书籍 ID ' + esc(c.bookId || w.bookId || '—') + '</div></td>' +
           '<td class="cell-agg">' + esc(ed.ybId || '—') + ' ' + esc(c.editor || '—') + '</td>' +
           '<td>' + esc(c.kw) + '</td><td class="cell-agg">' + fillCell + '</td><td>' + stTag(st) + '</td><td>' + esc(c.time) + '</td>' +
-          '<td><button class="link" type="button" onclick="openWorkDetail(\'' + c.mid + '\')">稿件详情</button></td></tr>';
+          '<td><button class="link" type="button" onclick="openWorkDetail(\'' + c.mid + '\',\'' + c.id + '\')">稿件详情</button></td></tr>';
       }).join('') || '<tr><td colspan="11" style="text-align:center;color:#9aa5b4">无匹配</td></tr>';
     }
     function renderBan() {
@@ -2148,43 +2494,93 @@
         act += s.on
           ? '<button class="link link-danger" type="button" onclick="toggleSku(\'' + s.id + '\',false)">下架</button>'
           : '<button class="link" type="button" onclick="toggleSku(\'' + s.id + '\',true)">上架</button>';
-        return '<tr><td>' + s.id + '</td><td>' + s.times + ' 次</td><td>' + s.points + '</td><td>' + (s.buyers == null ? 0 : s.buyers) + '</td><td>' + (s.on ? stTag(true) : '<span class="tag tag-muted">下架</span>') + '</td><td>' + act + '</td></tr>';
+        return '<tr><td>' + s.id + '</td><td>' + s.times + ' 次</td><td>' + s.points + '</td><td>' + (s.origPoints == null ? '—' : s.origPoints) + '</td><td>' + (s.buyers == null ? 0 : s.buyers) + '</td><td>' + (s.on ? stTag(true) : '<span class="tag tag-muted">下架</span>') + '</td><td>' + act + '</td></tr>';
       }).join('');
     }
     function openKv(title, body) {
       document.getElementById('detailTitle').textContent = title;
       document.getElementById('detailBody').innerHTML = '<p>' + body + '</p>';
       document.getElementById('detailOverlay').classList.add('open');
+      document.getElementById('detailDrawer').classList.remove('wide');
       document.getElementById('detailDrawer').classList.add('open');
     }
-    function openWorkDetail(mid) {
+    function fmtOssTime(ts) {
+      if (!ts) return '—';
+      var d = new Date(ts);
+      function p(n) { return n < 10 ? '0' + n : '' + n; }
+      return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+    }
+    function restoreActionHtml(w, claimId) {
+      if (YJD.isOffsite(w)) return '';
+      if (!YJD.ossAlive(w)) return '<span class="cell-sub">云端已失效，无法恢复</span>';
+      if (w.ossRestoreUsed) return '<span class="cell-sub">已恢复过（仅一次）</span>';
+      var cid = claimId ? (',\'' + claimId + '\'') : '';
+      return '<button class="link kv-act" type="button" id="restoreClientDl" onclick="restoreClientDl(\'' + w.id + '\'' + cid + ')">恢复C端下载</button>';
+    }
+    function openWorkDetail(mid, claimId) {
       var w = WORKS.find(function (x) { return x.id === mid; });
       if (!w) { showToast('稿件已不存在'); return; }
-      document.getElementById('detailTitle').textContent = '稿件详情';
+      YJD.sweepOss(STORE);
+      var off = YJD.isOffsite(w);
+      var claim = claimId ? CLAIMS.find(function (c) { return c.id === claimId; }) : YJD.latestClaimForWork(STORE, mid);
+      document.getElementById('detailTitle').textContent = off ? '站外稿件详情' : '稿件详情';
       document.getElementById('detailBody').innerHTML =
         '<dl class="kv">' +
         '<dt>稿件 ID</dt><dd>' + esc(w.id) + '</dd>' +
         '<dt>标题</dt><dd>' + esc(w.title) + '</dd>' +
+        '<dt>发布渠道</dt><dd>' + esc(YJD.workChannel(w)) + '</dd>' +
         '<dt>项目</dt><dd>' + esc(w.project) + '</dd>' +
         '<dt>书籍名称</dt><dd>' + esc(w.book) + '</dd>' +
         '<dt>书籍 ID</dt><dd>' + esc(w.bookId) + '</dd>' +
-        '<dt>文件大小</dt><dd>' + esc(YJD.workInfoLabel(w)) + '</dd>' +
-        '<dt>下载链接</dt><dd>' + esc(w.dl) + '</dd>' +
-        '<dt>发布技巧</dt><dd>' + esc(YJD.tipText(w) || '—') + '</dd>' +
+        '<dt>稿件信息</dt><dd>' + esc(off ? YJD.offsiteInfoLabel(w) : YJD.workInfoLabel(w)) + '</dd>' +
+        (off ? '' : '<dt>下载链接</dt><dd>' + esc(w.dl) + restoreActionHtml(w, claim && claim.id) + '</dd>') +
+        (off ? '<dt>分享链接</dt><dd>' + esc(w.dl) + '</dd>' : '<dt>发布技巧</dt><dd>' + esc(YJD.tipText(w) || '—') + '</dd>') +
+        '<dt>云端存储</dt><dd>阿里云 OSS · ' + esc(w.ossKey || YJD.ossObjectKey(w.id)) + '</dd>' +
+        '<dt>云端状态</dt><dd>' + esc(YJD.ossStatusLabel(w)) + '</dd>' +
+        (off ? '' : '<dt>系统失效</dt><dd>' + esc(fmtOssTime(w.ossExpireAt)) + '（领取后 7 天删对象）</dd>') +
+        (off ? '' : '<dt>恢复次数</dt><dd>' + (w.ossRestoreUsed ? '已用 1/1' : '未恢复 0/1') + '</dd>') +
+        (off ? '' : '<dt>C端下载窗</dt><dd>' + (claim ? ((claim.expireAt || 0) > Date.now() ? '有效至 ' + fmtOssTime(claim.expireAt) : '已过期（3 天）') : '无领取记录') + '</dd>') +
         '<dt>剪辑手</dt><dd>' + esc(w.editor) + '</dd>' +
         '<dt>稿件类型</dt><dd>' + esc(w.kind) + '</dd>' +
-        '<dt>素材类型</dt><dd>' + esc(w.mat) + '</dd>' +
-        '<dt>占用</dt><dd>' + esc(w.occ) + '</dd>' +
-        '<dt>平台审核</dt><dd>' + esc(w.audit || '已通过') + '</dd>' +
-        (w.audit === '已驳回' && w.rejectReason ? '<dt>驳回原因</dt><dd>' + esc(w.rejectReason) + '</dd>' : '') +
+        (off ? '<dt>状态</dt><dd>' + esc(YJD.offsiteStatus(w)) + '</dd>' : '<dt>素材类型</dt><dd>' + esc(w.mat) + '</dd>') +
+        (off ? '' : '<dt>占用</dt><dd>' + esc(w.occ) + '</dd>') +
+        (off ? '' : '<dt>平台审核</dt><dd>' + esc(w.audit || '已通过') + '</dd>') +
+        (!off && w.audit === '已驳回' && w.rejectReason ? '<dt>驳回原因</dt><dd>' + esc(w.rejectReason) + '</dd>' : '') +
         '<dt>上传时间</dt><dd>' + esc(w.time) + '</dd>' +
         '</dl>';
       document.getElementById('detailOverlay').classList.add('open');
       document.getElementById('detailDrawer').classList.add('open');
     }
+    function restoreClientDl(mid, claimId) {
+      var res = YJD.restoreClientDownload(STORE, mid, claimId);
+      if (!res.ok) { showToast(res.reason); return; }
+      YJD.save(STORE);
+      showToast('已恢复C端下载，用户重新计时 3 天');
+      openWorkDetail(mid, claimId);
+    }
+    function copyOffsiteLink(id) {
+      var w = WORKS.find(function (x) { return x.id === id; });
+      if (!w) return;
+      var url = YJD.offsiteSharePath(w.id);
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url);
+      showToast('已复制站外下载链接');
+    }
+    function openOffsiteQr(id) {
+      var w = WORKS.find(function (x) { return x.id === id; });
+      if (!w) return;
+      document.getElementById('detailTitle').textContent = '站外下载二维码';
+      document.getElementById('detailBody').innerHTML =
+        '<p class="cell-sub">站外用户扫码即可打开下载落地页，无需登录。</p>' +
+        '<div class="qr-box" aria-label="下载二维码"></div>' +
+        '<p class="share-url">' + esc(YJD.offsiteSharePath(w.id)) + '</p>' +
+        '<p style="text-align:center;margin-top:12px"><button class="link" type="button" onclick="copyOffsiteLink(\'' + w.id + '\')">复制链接</button>' +
+        '<a class="link" href="' + esc(YJD.offsiteSharePath(w.id)) + '" target="_blank" rel="noopener">打开落地页</a></p>';
+      document.getElementById('detailOverlay').classList.add('open');
+      document.getElementById('detailDrawer').classList.add('open');
+    }
     function closeDetail() {
       document.getElementById('detailOverlay').classList.remove('open');
-      document.getElementById('detailDrawer').classList.remove('open');
+      document.getElementById('detailDrawer').classList.remove('open', 'wide');
     }
     function openModal(title, html, onOk, danger) {
       document.getElementById('modalTitle').textContent = title;
@@ -2209,18 +2605,22 @@
         '<dt>右豹 ID</dt><dd>' + esc(e.ybId) + '</dd>' +
         '<dt>昵称</dt><dd>' + esc(e.name) + '</dd>' +
         '<dt>分成比例</dt><dd>' + esc(e.share) + '</dd>' +
+        '<dt>发布平台</dt><dd>' + esc(YJD.platformsLabel(e)) + '</dd>' +
         '<dt>稿件需要审核</dt><dd>' + (e.needReview === false ? '否' : '是') + '</dd>' +
         '<dt>备注</dt><dd>' + esc(e.note) + '</dd>' +
         '<dt>来源</dt><dd>' + esc(e.src) + '</dd>' +
         '<dt>可上传项目</dt><dd>' + esc(e.projects) + '</dd>' +
         '<dt>已上传</dt><dd>' + YJD.worksByEditor(STORE, e.name).length + '</dd>' +
         '<dt>已被领取</dt><dd>' + YJD.claimedWorksByEditor(STORE, e.name).length + '</dd>' +
-        '<dt>已结算</dt><dd>' + YJD.earnByEditor(STORE, e.name) + '</dd>' +
+        '<dt>稿件累计大小</dt><dd>' + esc(YJD.worksSizeByEditor(STORE, e.name)) + '</dd>' +
+        '<dt>站内稿件收益</dt><dd>' + YJD.onsiteEarnByEditor(STORE, e.name) + '</dd>' +
+        '<dt>站外稿件收益</dt><dd>' + YJD.offsiteEarnByEditor(STORE, e.name) + '</dd>' +
         '<dt>待结算</dt><dd>' + YJD.pendingEarnByEditor(STORE, e.name) + '</dd>' +
         '<dt>状态</dt><dd>' + esc(e.status) + '</dd>' +
         '<dt>录入时间</dt><dd>' + esc(e.time) + '</dd>' +
         '</dl>';
       document.getElementById('detailOverlay').classList.add('open');
+      document.getElementById('detailDrawer').classList.remove('wide');
       document.getElementById('detailDrawer').classList.add('open');
     }
     function editorFormHtml(e) {
@@ -2228,12 +2628,27 @@
       return '<div class="field"><label>右豹 ID<span class="req">*</span></label><input id="mYb" placeholder="YB10086" value="' + esc(e.ybId || '') + '" /></div>' +
         '<div class="field"><label>昵称<span class="req">*</span></label><input id="mName" placeholder="剪辑手昵称" value="' + esc(e.name || '') + '" /></div>' +
         '<div class="field"><label>分成比例<span class="req">*</span></label><input id="mShare" placeholder="50%" value="' + esc(e.share || '') + '" /></div>' +
+        '<div class="field"><label>发布平台<span class="req">*</span></label><div id="mPlat" class="chk-list">' + editorPlatformChecks(e.platforms) + '</div>' +
+        '<p class="cell-sub">可多选。只勾站外时，其稿件不进右豹广场，靠分享链接 / 二维码给站外用户下载。</p></div>' +
         '<div class="field"><label>稿件需要审核<span class="req">*</span></label><div class="radio-list">' +
           '<label><input type="radio" name="mNeedReview" value="1"' + (e.needReview !== false ? ' checked' : '') + ' />是</label>' +
           '<label><input type="radio" name="mNeedReview" value="0"' + (e.needReview === false ? ' checked' : '') + ' />否</label>' +
         '</div><p class="cell-sub">选「否」时，该剪辑手 PC 上传默认已通过，空闲即进广场。</p></div>' +
         '<div class="field"><label>可上传项目</label><div id="mProj" class="chk-list">' + editorProjectChecks(e.projects) + '</div></div>' +
         '<div class="field"><label>备注<span class="req">*</span></label><textarea id="mNote" placeholder="合作说明 / 对接备注">' + esc(e.note || '') + '</textarea></div>';
+    }
+    function editorPlatformChecks(raw) {
+      var picked = YJD.editorPlatforms({ platforms: raw });
+      return YJD.PLATFORM_OPTS.map(function (p) {
+        return '<label><input type="checkbox" name="mPlat" value="' + esc(p) + '"' +
+          (picked.indexOf(p) >= 0 ? ' checked' : '') + ' />' + esc(p) + '</label>';
+      }).join('');
+    }
+    function readEditorPlatforms() {
+      return Array.prototype.map.call(
+        document.querySelectorAll('#mPlat input[name="mPlat"]:checked'),
+        function (el) { return el.value; }
+      );
     }
     function editorProjectChecks(raw) {
       var picked = YJD.parseProjectNames(raw);
@@ -2257,7 +2672,9 @@
         var share = (document.getElementById('mShare').value || '').trim();
         var note = (document.getElementById('mNote').value || '').trim();
         var needReview = (document.querySelector('input[name="mNeedReview"]:checked') || {}).value !== '0';
+        var platforms = readEditorPlatforms();
         if (!ybId || !share || !note) { showToast('请填写右豹 ID、分成比例、备注'); return true; }
+        if (!platforms.length) { showToast('请至少选择一个发布平台'); return true; }
         if (EDITORS.some(function (x) { return x.ybId === ybId && (!row || x.id !== row.id); })) {
           showToast('右豹 ID 已存在'); return true;
         }
@@ -2268,6 +2685,7 @@
           row.share = share;
           row.note = note;
           row.needReview = needReview;
+          row.platforms = platforms;
           row.projects = readEditorProjects();
           WORKS.forEach(function (w) {
             if (w.editor === oldEd) { w.editor = row.name; w.share = share; }
@@ -2283,6 +2701,7 @@
             share: share,
             note: note,
             needReview: needReview,
+            platforms: platforms,
             src: '客服二维码',
             projects: readEditorProjects(),
             status: '已录入',
@@ -2359,34 +2778,99 @@
         });
       bindBrandPicker();
     }
-    function openEarnDrawer(id) {
+    var earnUi = { id: '', tab: 'sum', from: '', to: '', channel: 'onsite' };
+    function openEarnDrawer(id, channel) {
       var e = EDITORS.find(function (x) { return x.id === id; });
       if (!e) return;
-      document.getElementById('detailTitle').textContent = e.name + ' · 收益';
-      paintEarnDrawer(id, 'day');
+      earnUi = { id: id, tab: 'sum', from: '', to: '', channel: channel === 'offsite' ? 'offsite' : 'onsite' };
+      document.getElementById('detailTitle').textContent = e.name + ' · ' + (earnUi.channel === 'offsite' ? '站外稿件收益' : '站内稿件收益');
+      document.getElementById('detailDrawer').classList.add('wide');
+      paintEarnDrawer();
       document.getElementById('detailOverlay').classList.add('open');
       document.getElementById('detailDrawer').classList.add('open');
     }
-    function paintEarnDrawer(id, grain) {
-      var e = EDITORS.find(function (x) { return x.id === id; });
+    function setEarnTab(tab) {
+      earnUi.tab = tab === 'detail' ? 'detail' : 'sum';
+      paintEarnDrawer();
+    }
+    function applyEarnRange() {
+      var fromEl = document.getElementById('earnFrom');
+      var toEl = document.getElementById('earnTo');
+      var from = fromEl ? fromEl.value : '';
+      var to = toEl ? toEl.value : '';
+      if (from && to && from > to) { showToast('请选择有效日期范围'); return; }
+      earnUi.from = from;
+      earnUi.to = to;
+      paintEarnDrawer();
+    }
+    function paintEarnDrawer() {
+      var e = EDITORS.find(function (x) { return x.id === earnUi.id; });
       if (!e) return;
-      grain = grain === 'month' ? 'month' : 'day';
-      var rows = YJD.earnSeries(STORE, e.name, grain);
-      var settled = YJD.earnByEditor(STORE, e.name);
-      var pending = YJD.pendingEarnByEditor(STORE, e.name);
-      var body = rows.length
-        ? rows.map(function (r) {
-          return '<tr><td>' + esc(r.label) + '</td><td>' + r.amount + '</td><td>' + r.count + '</td></tr>';
-        }).join('')
-        : '<tr><td colspan="3" style="text-align:center;color:#9aa5b4">暂无已结算记录</td></tr>';
+      var tab = earnUi.tab === 'detail' ? 'detail' : 'sum';
+      var off = earnUi.channel === 'offsite';
+      var opts = {};
+      if (earnUi.from) opts.from = earnUi.from;
+      if (earnUi.to) opts.to = earnUi.to;
+      if (!off) opts.channel = '右豹';
+      var settled = off ? YJD.offsiteEarnByEditor(STORE, e.name) : YJD.onsiteEarnByEditor(STORE, e.name);
+      var pending = off ? 0 : YJD.pendingEarnByEditor(STORE, e.name);
+      var hint = off
+        ? '站外：按右豹 ID × 项目-书籍 ID，统计剪辑手自产关键词收益。'
+        : '站内：用户领取后产生的结算收益分账。';
+      var table;
+      if (tab === 'detail') {
+        var details = off ? YJD.offsiteEarnDetails(STORE, e.name, opts) : YJD.earnDetails(STORE, e.name, '', 'day', opts);
+        var kwHead = off ? '关键词' : '关键词（领取人）';
+        table = '<table><thead><tr><th>日期</th><th>项目名称</th><th>书籍信息</th><th>' + kwHead + '</th><th>结算收益</th></tr></thead><tbody>' +
+          (details.length
+            ? details.map(function (r) {
+              var who;
+              if (off) who = r.kw && r.kw !== '—' ? r.kw : '—';
+              else {
+                var kw = r.kw && r.kw !== '—' ? r.kw : '';
+                var user = r.user && r.user !== '—' ? r.user : '';
+                who = kw && user ? (kw + '（' + user + '）') : (kw || user || '—');
+              }
+              return '<tr><td>' + esc(r.date) + '</td><td>' + esc(r.project) + '</td>' +
+                '<td>' + esc(r.bookId) + ' / ' + esc(r.book) + '</td>' +
+                '<td>' + esc(who) + '</td>' +
+                '<td>' + r.amount + '</td></tr>';
+            }).join('')
+            : '<tr><td colspan="5" style="text-align:center;color:#9aa5b4">该日期范围暂无收益明细</td></tr>') +
+          '</tbody></table>';
+      } else if (off) {
+        var offRows = YJD.offsiteEarnDaily(STORE, e.name, opts);
+        table = '<table><thead><tr><th>日期</th><th>项目名称</th><th>书籍信息</th><th>累计已结算收益</th></tr></thead><tbody>' +
+          (offRows.length
+            ? offRows.map(function (r) {
+              return '<tr><td>' + esc(r.date) + '</td><td>' + esc(r.project) + '</td>' +
+                '<td>' + esc(r.bookId) + ' / ' + esc(r.book) + '</td><td>' + r.amount + '</td></tr>';
+            }).join('')
+            : '<tr><td colspan="4" style="text-align:center;color:#9aa5b4">该日期范围暂无累计收益</td></tr>') +
+          '</tbody></table>';
+      } else {
+        var rows = YJD.earnDailyByProject(STORE, e.name, opts);
+        table = '<table><thead><tr><th>日期</th><th>项目名称</th><th>累计已结算收益</th></tr></thead><tbody>' +
+          (rows.length
+            ? rows.map(function (r) {
+              return '<tr><td>' + esc(r.date) + '</td><td>' + esc(r.project) + '</td><td>' + r.amount + '</td></tr>';
+            }).join('')
+            : '<tr><td colspan="3" style="text-align:center;color:#9aa5b4">该日期范围暂无累计收益</td></tr>') +
+          '</tbody></table>';
+      }
       document.getElementById('detailBody').innerHTML =
-        '<div class="grain-bar">' +
-        '<button type="button" class="btn-ghost-sm' + (grain === 'day' ? ' on' : '') + '" onclick="paintEarnDrawer(\'' + id + '\',\'day\')">按日</button>' +
-        '<button type="button" class="btn-ghost-sm' + (grain === 'month' ? ' on' : '') + '" onclick="paintEarnDrawer(\'' + id + '\',\'month\')">按月</button>' +
+        '<div class="module-tab-bar" role="tablist">' +
+          '<button type="button" class="' + (tab === 'sum' ? 'active' : '') + '" onclick="setEarnTab(\'sum\')">累计收益</button>' +
+          '<button type="button" class="' + (tab === 'detail' ? 'active' : '') + '" onclick="setEarnTab(\'detail\')">收益明细</button>' +
         '</div>' +
-        '<p class="cell-sub">已结算 ' + settled + ' · 待结算 ' + pending + '</p>' +
-        '<table><thead><tr><th>' + (grain === 'month' ? '月份' : '日期') + '</th><th>结算金额</th><th>笔数</th></tr></thead><tbody>' +
-        body + '</tbody></table>';
+        '<div class="range-row">' +
+          '<input type="date" id="earnFrom" value="' + esc(earnUi.from) + '" />' +
+          '<span>至</span>' +
+          '<input type="date" id="earnTo" value="' + esc(earnUi.to) + '" />' +
+          '<button type="button" class="btn-ghost-sm" onclick="applyEarnRange()">查询</button>' +
+        '</div>' +
+        '<p class="cell-sub">' + hint + (off ? '' : ' 待结算 ' + pending + '。') + ' 已结算 ' + settled + '。</p>' +
+        '<div class="table-wrap">' + table + '</div>';
     }
     function confirmRestore(user) {
       openModal('恢复领取权限', '<p>确认手动恢复 <strong>' + user + '</strong>？恢复后可再次领取。</p>', function () {
@@ -2401,13 +2885,18 @@
     function editSku(id) {
       var s = SKUS.find(function (x) { return x.id === id; });
       openModal('改价',
-        '<div class="field"><label>次数</label><input id="mT" type="number" value="' + s.times + '" /></div><div class="field"><label>积分</label><input id="mP" type="number" value="' + s.points + '" /></div>',
+        '<div class="field"><label>次数<span class="req">*</span></label><input id="mT" type="number" min="1" step="1" value="' + s.times + '" /></div>' +
+        '<div class="field"><label>积分<span class="req">*</span></label><input id="mP" type="number" min="1" step="1" value="' + s.points + '" /></div>' +
+        '<div class="field"><label>原价<span class="req">*</span></label><input id="mO" type="number" min="1" step="1" value="' + (s.origPoints == null ? '' : s.origPoints) + '" /></div>',
         function () {
           var t = Number(document.getElementById('mT').value);
           var p = Number(document.getElementById('mP').value);
-          if (!(t > 0) || !(p > 0)) { showToast('次数与积分须为正数'); return true; }
+          var o = Number(document.getElementById('mO').value);
+          if (!(t > 0) || !(p > 0) || !(o > 0)) { showToast('次数、积分与原价须为正数'); return true; }
+          if (o < p) { showToast('原价须不小于当前积分'); return true; }
           s.times = t;
           s.points = p;
+          s.origPoints = o;
           persist();
           renderSkus();
           showToast('已改价');
@@ -2434,12 +2923,8 @@
     function toggleEditor(id, on) {
       var row = EDITORS.find(function (x) { return x.id === id; });
       if (!row) return;
-      if (!on && WORKS.some(function (w) { return w.editor === row.name && w.occ === '占用中'; })) {
-        showToast('该剪辑手有占用中稿件，不能停用');
-        return;
-      }
       openModal(on ? '启用剪辑手' : '停用剪辑手',
-        '<p>' + (on ? '启用后可再次上传发布。' : '停用后不能上传发布，已有稿件仍保留。') + '</p>',
+        '<p>' + (on ? '启用后可再次上传发布。' : '停用后立即收回剪辑供稿权限，PC 不能再上传。已有稿件仍保留，占用中稿件也不拦截停用。') + '</p>',
         function () {
           row.status = on ? '已录入' : '已停用';
           persist();
@@ -2567,7 +3052,7 @@
         showToast('仍有未超时领取记录，不能删除');
         return;
       }
-      openModal('确认删除？', '<p>即将删除稿件「' + esc(w.title) + '」，广场将不再展示。</p>', function () {
+      openModal('确认删除？', '<p>即将删除稿件「' + esc(w.title) + '」' + (YJD.isOffsite(w) ? '，分享链接将失效。' : '，广场将不再展示。') + '</p>', function () {
         STORE.works = WORKS = WORKS.filter(function (x) { return x.id !== id; });
         delete wkSelected[id];
         persist();
@@ -2707,30 +3192,59 @@
     }
     function openSkuModal() {
       openModal('新增档位',
-        '<div class="field"><label>次数<span class="req">*</span></label><input id="mT" type="number" value="5" /></div>' +
-        '<div class="field"><label>积分<span class="req">*</span></label><input id="mP" type="number" value="200" /></div>',
+        '<div class="field"><label>次数<span class="req">*</span></label><input id="mT" type="number" min="1" step="1" value="5" /></div>' +
+        '<div class="field"><label>积分<span class="req">*</span></label><input id="mP" type="number" min="1" step="1" value="200" /></div>' +
+        '<div class="field"><label>原价<span class="req">*</span></label><input id="mO" type="number" min="1" step="1" value="280" /></div>',
         function () {
           var t = Number(document.getElementById('mT').value);
           var p = Number(document.getElementById('mP').value);
-          if (!(t > 0) || !(p > 0)) { showToast('次数与积分须为正数'); return true; }
+          var o = Number(document.getElementById('mO').value);
+          if (!(t > 0) || !(p > 0) || !(o > 0)) { showToast('次数、积分与原价须为正数'); return true; }
+          if (o < p) { showToast('原价须不小于当前积分'); return true; }
           SKUS.push({
             id: nextPrefixedId('S-', SKUS),
             times: t,
             points: p,
-            on: false
+            origPoints: o,
+            on: false,
+            buyers: 0
           });
           persist();
           renderSkus();
           showToast('已新增，默认下架');
         });
     }
+    function fillFreeQuotaInputs() {
+      var q = STORE.freeQuota || { weekday: 1, holiday: 1 };
+      var w = document.getElementById('freeQuotaWeekday');
+      var h = document.getElementById('freeQuotaHoliday');
+      var t = document.getElementById('freeQuotaDayType');
+      if (w) w.value = q.weekday;
+      if (h) h.value = q.holiday;
+      if (t) t.textContent = '今日按：' + (YJD.dayType(new Date()) === 'holiday' ? '节假日' : '工作日');
+    }
+    function readQuotaField(id) {
+      var raw = String(document.getElementById(id).value).trim();
+      var n = Number(raw);
+      if (raw === '' || !isFinite(n) || n < 0) return NaN;
+      return n;
+    }
     function saveFreeQuota() {
-      var n = Number(document.getElementById('freeQuota').value);
-      if (isNaN(n) || n < 0) { showToast('免费次数须为不小于 0 的数字'); return; }
-      STORE.user.free = n;
+      var w = readQuotaField('freeQuotaWeekday');
+      var h = readQuotaField('freeQuotaHoliday');
+      if (isNaN(w) || isNaN(h)) {
+        showToast('工作日/节假日免费次数须为不小于 0 的数字');
+        return;
+      }
+      STORE.freeQuota = { weekday: w, holiday: h };
+      STORE.user.free = YJD.dayType(new Date()) === 'holiday' ? h : w;
       persist();
+      fillFreeQuotaInputs();
       showToast('免费次数已保存，C 端剩余次数立即生效');
     }
+    document.querySelectorAll('#wkChannelBar button').forEach(function (btn) {
+      btn.addEventListener('click', function () { setWorkChannel(btn.dataset.wkch); });
+    });
     function renderAllAdmin() {
       renderEditors();
       renderWorks();
@@ -2739,8 +3253,7 @@
       renderSkus();
       renderProjects();
       renderMats();
-      var fq = document.getElementById('freeQuota');
-      if (fq) fq.value = STORE.user.free;
+      fillFreeQuotaInputs();
     }
 
     function syncSceneHint(scope, hintId) {
@@ -2787,7 +3300,7 @@
     }
     function currentTabKey() {
       var id = document.querySelector('.page-view.active')?.id;
-      return { 'view-explain': 'explain', 'view-fe': 'fe', 'view-pc': 'pc', 'view-admin': 'admin', 'view-data': 'data' }[id] || 'fe';
+      return { 'view-explain': 'explain', 'view-fe': 'fe', 'view-h5': 'h5', 'view-pc': 'pc', 'view-admin': 'admin', 'view-data': 'data' }[id] || 'fe';
     }
     function syncPageUrl() {
       var params = new URLSearchParams();
@@ -2795,7 +3308,14 @@
       history.replaceState(null, '', '?' + params.toString());
     }
     function buildMockupSrc(screen) {
-      return 'yijian-daifa-demo.html?embed=1&v=23&screen=' + screen;
+      return 'yijian-daifa-demo.html?embed=1&v=25&screen=' + screen;
+    }
+    function getActiveOffsiteId() {
+      return document.querySelector('#h5Scenes .scene-btn.active')?.dataset.offid || 'X-01';
+    }
+    function loadH5Frame() {
+      var frame = document.getElementById('h5Frame');
+      if (frame) frame.src = 'yijian-daifa-offsite.html?embed=1&v=5&id=' + getActiveOffsiteId();
     }
     function loadMockupFrame() {
       document.getElementById('mockupFrame').src = buildMockupSrc(getActiveScreen());
@@ -2804,7 +3324,7 @@
       return document.querySelector('#pcScenes .scene-btn.active')?.dataset.pcscreen || 'home';
     }
     function loadPcFrame() {
-      document.getElementById('pcFrame').src = 'yijian-daifa-pc.html?embed=1&v=8&screen=' + getActivePcScreen();
+      document.getElementById('pcFrame').src = 'yijian-daifa-pc.html?embed=1&v=11&screen=' + getActivePcScreen();
     }
     function switchRuleTab(ruleId, btn) {
       document.querySelectorAll('.rule-tab-bar button').forEach(function (b) { b.classList.remove('active'); });
@@ -2825,7 +3345,11 @@
       var page = document.querySelector('.page-view.active')?.id;
       var R = YJD_RULES;
       if (page === 'view-explain') return 'explain-frs';
-      if (page === 'view-data') return 'data-main';
+      if (page === 'view-h5') return 'fe-offsite';
+      if (page === 'view-data') {
+        var ix = document.querySelector('[data-ix].active')?.dataset.ix;
+        return ix === 'ix-oss' ? 'data-oss' : 'data-main';
+      }
       if (page === 'view-pc') {
         return R.pcSceneMap[getActivePcScreen()] || 'pc-home';
       }
@@ -2937,6 +3461,7 @@
           if (pcScene) pcScene.click();
           else loadPcFrame();
         }
+        if (btn.dataset.page === 'view-h5') loadH5Frame();
         syncPageUrl();
         syncRuleTabToPage();
         syncStoryPlayer();
@@ -2968,7 +3493,7 @@
     document.querySelectorAll('[data-ix]').forEach(function (btn) {
       btn.addEventListener('click', function () {
         document.querySelectorAll('[data-ix]').forEach(function (b) { b.classList.remove('active'); });
-        ['ix-fe', 'ix-api', 'ix-state', 'ix-payout', 'ix-list'].forEach(function (id) {
+        ['ix-fe', 'ix-api', 'ix-state', 'ix-payout', 'ix-oss', 'ix-list'].forEach(function (id) {
           var el = document.getElementById(id);
           if (el) el.classList.toggle('active', id === btn.dataset.ix);
         });
@@ -2990,7 +3515,7 @@
       { t: '2 后台录入', d: '运营在「剪辑手管理」写入右豹 ID、分成、备注、稿件需要审核和可上传项目。未录入不能上传。', say: { op: '右豹 ID 写上，他才能传', cs: '我把人转给运营录入' } },
       { t: '3 PC 上传', d: '已录入剪辑手先填字段再选文件夹或压缩包，按命名约定解析确认后队列上传。需审则审核中，免审默认已通过。', say: { pc: '我先填书和项目，再选成片上传', op: '要审的先审核中；免审的空闲就能进广场' } },
       { t: '4 运营审核', d: '后台可单条或批量通过/驳回。通过后空闲稿才具备进广场资格；驳回必须填原因，已通过不可再驳。', say: { op: '勾几条一起审；驳回写原因' } },
-      { t: '5 进入广场', d: '五条同时成立才可见：已通过、空闲、项目启用、剪辑手已录入、素材启用。列表不展示金额。', say: { c: '我只看到能领的成片，没有金额' } },
+      { t: '5 进入广场', d: '六条同时成立才可见：已通过、空闲、项目启用、剪辑手已录入且开通右豹、素材启用、非站外。列表不展示金额。', say: { c: '我只看到能领的成片，没有金额' } },
       { t: '6 选词领取', d: '门禁：停权 → 次数 → 选词浮层 → 资格/占用。次数不足只开兑换。成功即扣次、占用、对他人隐藏。', say: { c: '先看次数，再选词，领了就扣次' } },
       { t: '7 回填或超时', d: '24h 内从我的领取回填则稿件已完成。超时记 1 次未回填、不退次、稿件回广场。', say: { c: '24 小时内回填；超时次数不退' } },
       { t: '8 完成或停权', d: '回填后不再回广场。终身未回填超过 3 次进黑名单，仅后台手动恢复。原领取人未停权可再领，再领再扣次。', say: { op: '超 3 次我来黑名单恢复', c: '回填完这稿不再回广场' } }
@@ -3079,6 +3604,7 @@
         var pageGroup = {
           'view-explain': 'explain',
           'view-fe': 'fe',
+          'view-h5': 'fe',
           'view-pc': 'pc',
           'view-admin': 'admin',
           'view-data': 'data'
@@ -3097,7 +3623,7 @@
 
     var params = new URLSearchParams(location.search);
     var tab = params.get('tab');
-    var tabPageMap = { admin: 'view-admin', fe: 'view-fe', pc: 'view-pc', explain: 'view-explain', data: 'view-data' };
+    var tabPageMap = { admin: 'view-admin', fe: 'view-fe', h5: 'view-h5', pc: 'view-pc', explain: 'view-explain', data: 'view-data' };
     if (tab === 'flow') {
       var feBtn = document.querySelector('.page-tab-bar button[data-page="view-fe"]');
       if (feBtn) feBtn.click();
@@ -3126,10 +3652,21 @@
         if (ruleDrawer.classList.contains('open')) syncRuleTabToPage();
       });
     });
+    document.querySelectorAll('#h5Scenes .scene-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('#h5Scenes .scene-btn').forEach(function (b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        syncSceneHint('#view-h5', 'h5SceneHint');
+        syncPageUrl();
+        loadH5Frame();
+        if (ruleDrawer.classList.contains('open')) syncRuleTabToPage();
+      });
+    });
     mountRuleDrawer();
     syncRuleTabToPage();
     if (document.querySelector('.page-view.active')?.id === 'view-fe') loadMockupFrame();
     if (document.querySelector('.page-view.active')?.id === 'view-pc') loadPcFrame();
+    if (document.querySelector('.page-view.active')?.id === 'view-h5') loadH5Frame();
   </script>
   <script src="sidebar-nav.js"></script>
 </body>
