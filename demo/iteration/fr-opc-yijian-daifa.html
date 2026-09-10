@@ -12,7 +12,7 @@
       --danger: #dc2626; --danger-bg: #fef2f2;
       --surface: #fff; --surface-glass: rgba(255,255,255,0.72); --surface-hover: #f8fafc; --border: #e8edf3;
       --text-primary: #18222f; --text-secondary: #4a5568; --text-muted: #9aa5b4;
-      --sidebar-w: 240px; --drawer-w: 480px; --radius-sm: 7px; --radius-lg: 14px;
+      --sidebar-w: 240px; --drawer-w: 560px; --radius-sm: 7px; --radius-lg: 14px;
       --shadow: 0 8px 32px rgba(30,40,80,0.10);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -75,6 +75,7 @@
     }
     .module-tab-bar button.active { color: var(--primary); font-weight: 600; border-bottom-color: var(--primary); }
     .admin-pane > .module-tab-bar { margin: 8px 16px 0; }
+    #ix-payout > .module-tab-bar { margin: 0 0 12px; }
     .explain-layout {
       display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 16px; align-items: start;
     }
@@ -150,6 +151,92 @@
     .data-block + .data-block { border-top: 1px solid var(--border); }
     .data-block h2 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
     .data-block p { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+    .data-block h3 { font-size: 14px; font-weight: 700; margin: 18px 0 8px; }
+    .data-block ul { padding-left: 18px; margin: 6px 0 12px; }
+    .data-block li { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 5px; }
+    .ix-tab-bar {
+      display: flex; flex-wrap: wrap; gap: 0; margin: 14px 0 0; border-bottom: 1px solid var(--border);
+    }
+    .ix-tab-bar button {
+      padding: 9px 16px; border: none; background: none; cursor: pointer;
+      font-size: 13px; color: var(--text-secondary); border-bottom: 2px solid transparent; margin-bottom: -1px;
+    }
+    .ix-tab-bar button.active { color: var(--primary); font-weight: 600; border-bottom-color: var(--primary); }
+    .ix-pane { display: none; padding: 16px 0 4px; }
+    .ix-pane.active { display: block; }
+    .ix-rule {
+      background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px;
+      padding: 12px 14px; margin: 0 0 16px; font-size: 13px; line-height: 1.7; color: #92400e;
+    }
+    .ix-rule strong { color: #78350f; }
+    .ix-flow { display: grid; gap: 8px; margin: 8px 0 16px; }
+    .ix-step {
+      display: grid; grid-template-columns: 36px 1fr; gap: 10px; align-items: start;
+      padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; background: #fff;
+    }
+    .ix-step i {
+      width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      background: var(--primary-light); color: var(--primary); font-style: normal; font-size: 12px; font-weight: 700;
+    }
+    .ix-step b { display: block; font-size: 13px; margin-bottom: 2px; }
+    .ix-step span { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+    .ledger-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 10px 0 16px; }
+    @media (max-width: 860px) { .ledger-grid { grid-template-columns: 1fr; } }
+    .ledger-card {
+      border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; background: #fff;
+    }
+    .ledger-card .ledger-side { font-size: 11px; font-weight: 700; color: var(--primary); margin-bottom: 8px; }
+    .ledger-card .ledger-head { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
+    .ledger-card .ledger-title { font-size: 13px; font-weight: 700; line-height: 1.5; }
+    .ledger-card .ledger-amt { font-size: 16px; font-weight: 700; color: #16a34a; white-space: nowrap; }
+    .ledger-card .ledger-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.65; margin: 8px 0; }
+    .ledger-card .ledger-meta { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--text-muted); }
+    .story-board {
+      border-radius: 12px; background: #fff; border: 1px solid var(--border);
+      padding: 18px 18px 16px;
+    }
+    .story-cast {
+      display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px;
+    }
+    @media (max-width: 720px) { .story-cast { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    .story-person {
+      position: relative; text-align: center; padding: 12px 8px 10px;
+      border-radius: 12px; border: 1px solid var(--border); background: #f8fafc;
+      opacity: .42; transform: scale(.96); transition: .35s ease;
+    }
+    .story-person.on { opacity: 1; transform: scale(1); background: #fff; box-shadow: 0 8px 24px rgba(30,40,80,.08); }
+    .story-person.on-c { border-color: #fdba74; }
+    .story-person.on-pc { border-color: #7dd3fc; }
+    .story-person.on-op { border-color: #6ee7b7; }
+    .story-person.on-cs { border-color: #c4b5fd; }
+    .story-avatar { width: 64px; height: 72px; margin: 0 auto 8px; }
+    .story-person b { display: block; font-size: 13px; }
+    .story-person span { display: block; font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .story-bubble {
+      display: none; margin-top: 8px; padding: 7px 8px; border-radius: 8px;
+      font-size: 12px; line-height: 1.5; color: var(--text-primary); background: #fffbeb; border: 1px solid #fde68a;
+    }
+    .story-person.on .story-bubble { display: block; animation: storyPop .35s ease; }
+    @keyframes storyPop { from { transform: translateY(6px); opacity: 0; } to { transform: none; opacity: 1; } }
+    .story-caption {
+      margin-top: 14px; padding: 14px 16px; border-radius: 10px;
+      background: linear-gradient(135deg, #eff6ff, #ecfeff); border: 1px solid #bfdbfe;
+    }
+    .story-caption strong { display: block; font-size: 15px; margin-bottom: 6px; color: var(--text-primary); }
+    .story-caption p { font-size: 13px; line-height: 1.7; color: var(--text-secondary); margin: 0; }
+    .story-controls { display: flex; align-items: center; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+    .story-dots { display: flex; gap: 6px; flex-wrap: wrap; }
+    .story-dots button {
+      height: 28px; padding: 0 10px; border: 1px solid var(--border); border-radius: 999px;
+      background: #fff; color: var(--text-secondary); font-size: 12px; cursor: pointer;
+    }
+    .story-dots button.on { background: var(--primary); border-color: var(--primary); color: #fff; font-weight: 600; }
+    .gate-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 4px; }
+    .gate-item {
+      flex: 1 1 120px; min-width: 110px; padding: 10px 10px 8px; border-radius: 8px;
+      background: #f8fafc; border: 1px solid var(--border); font-size: 12px; line-height: 1.5;
+    }
+    .gate-item b { display: block; color: var(--primary); font-size: 11px; margin-bottom: 4px; }
     .btn {
       display: inline-flex; align-items: center; height: 34px; padding: 0 14px;
       border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid transparent;
@@ -223,6 +310,25 @@
     }
     .table-toolbar { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--border); gap: 10px; flex-wrap: wrap; }
     .table-toolbar h3 { font-size: 14px; font-weight: 700; }
+    .toolbar-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .batch-bar {
+      display: none; align-items: center; gap: 12px; flex-wrap: wrap;
+      padding: 10px 16px; background: var(--primary-light); border-bottom: 1px solid var(--primary-border);
+      font-size: 12px;
+    }
+    .batch-bar.show { display: flex; }
+    .batch-bar .batch-info { color: var(--primary); font-weight: 600; }
+    .batch-bar .batch-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-left: auto; }
+    .btn-sm { height: 30px; padding: 0 12px; font-size: 12px; }
+    .btn-success-ghost { background: var(--success-bg); color: var(--success); border: 1px solid #bbf7d0; }
+    .btn-success-ghost:hover { background: #dcfce7; }
+    .btn-danger-ghost { background: var(--danger-bg); color: var(--danger); border: 1px solid #fecaca; }
+    .btn-danger-ghost:hover { background: #fee2e2; }
+    th.col-check, td.col-check { width: 40px; text-align: center; padding-left: 16px; }
+    th.col-check input, td.col-check input { cursor: pointer; width: 15px; height: 15px; }
+    tr.selected td { background: rgba(37,99,235,0.06); }
+    .radio-list { display: flex; flex-wrap: wrap; gap: 8px 16px; padding: 6px 0; }
+    .radio-list label { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
     .filter-bar { display: flex; flex-wrap: wrap; gap: 10px; padding: 14px 16px; align-items: flex-end; border-bottom: 1px solid var(--border); }
     .filter-field { display: flex; flex-direction: column; gap: 4px; }
     .filter-field label { font-size: 11px; color: var(--text-muted); font-weight: 500; }
@@ -275,6 +381,43 @@
     .rule-content { font-size: 13px; color: var(--text-secondary); line-height: 1.65; }
     .rule-content ul { padding-left: 18px; margin-top: 6px; }
     .rule-content li { margin-bottom: 5px; }
+    .rule-content p { margin-bottom: 6px; }
+    .rule-content code { font-size: 11px; background: #f1f5f9; padding: 1px 4px; border-radius: 4px; }
+    .drawer-header { align-items: flex-start; }
+    .drawer-header h2 { margin-bottom: 2px; }
+    .drawer-sub { font-size: 12px; color: var(--text-muted); font-weight: 400; }
+    .rule-tab-bar { flex-wrap: wrap; }
+    .rule-sub-bar {
+      display: flex; flex-wrap: wrap; gap: 6px;
+      padding: 10px 16px; border-bottom: 1px solid var(--border);
+      background: #f8fafc;
+    }
+    .rule-sub-bar[hidden] { display: none; }
+    .rule-sub-btn {
+      border: 1px solid var(--border); background: #fff; color: var(--text-secondary);
+      border-radius: 999px; padding: 4px 10px; font-size: 12px; cursor: pointer;
+    }
+    .rule-sub-btn.active {
+      background: #ecfeff; border-color: var(--accent-rule); color: var(--accent-rule); font-weight: 600;
+    }
+    .rule-sub { display: none; }
+    .rule-sub.active { display: block; }
+    .rule-scene-head {
+      display: flex; align-items: baseline; justify-content: space-between; gap: 8px;
+      margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border);
+    }
+    .rule-scene-head strong { font-size: 16px; color: var(--text-primary); }
+    .rule-scene-head span { font-size: 12px; color: var(--accent-rule); font-weight: 600; }
+    .rule-fields { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 6px; }
+    .rule-fields th, .rule-fields td {
+      border: 1px solid var(--border); padding: 6px 8px; text-align: left; vertical-align: top;
+    }
+    .rule-fields thead th { background: #f8fafc; color: var(--text-muted); font-weight: 600; }
+    .rule-fields tbody th { width: 92px; color: var(--text-primary); font-weight: 600; background: #fafafa; }
+    .rule-note {
+      background: #fffbeb; border-left: 3px solid #f59e0b;
+      padding: 8px 10px; margin: 8px 0; font-size: 12px; line-height: 1.55; color: #92400e;
+    }
     .kv { display: grid; grid-template-columns: 88px 1fr; gap: 8px 10px; font-size: 13px; }
     .kv dt { color: var(--text-muted); }
     .modal {
@@ -299,6 +442,13 @@
     .logo-cell { display: flex; align-items: center; gap: 8px; }
     .logo-cell img { width: 28px; height: 28px; border-radius: 6px; object-fit: cover; background: #f1f5f9; flex-shrink: 0; }
     .cell-agg { max-width: 220px; line-height: 1.45; word-break: break-all; }
+    .brand-list { display: flex; flex-direction: column; gap: 6px; max-height: 220px; overflow: auto; border: 1px solid var(--border); border-radius: 7px; padding: 6px; }
+    .brand-item { display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; padding: 8px 10px; border: 1px solid var(--border); border-radius: 7px; background: #fff; cursor: pointer; font: inherit; }
+    .brand-item.on { border-color: var(--primary); background: #fff7ed; }
+    .brand-item img { width: 28px; height: 28px; border-radius: 6px; object-fit: cover; background: #f1f5f9; flex-shrink: 0; }
+    .brand-item .muted { margin-left: auto; font-size: 11px; color: var(--text-muted); }
+    .grain-bar { display: flex; gap: 8px; margin-bottom: 12px; }
+    .grain-bar button.on { color: var(--primary); font-weight: 600; border-color: var(--primary); }
     .kv { grid-template-columns: 96px 1fr; }
     .flow-page-intro { padding: 16px 18px 0; font-size: 12px; color: var(--text-muted); line-height: 1.55; }
     .flow-svg-wrap { overflow: auto; padding: 16px 18px 24px; max-height: 72vh; }
@@ -340,7 +490,7 @@
         <h1>
           一键代发
           <span class="badge badge-fr">FR-014</span>
-          <span class="badge badge-version">v7 当前</span>
+          <span class="badge badge-version">v8 当前</span>
         </h1>
         <p class="page-desc">C 端只领取。剪辑手在已有 PC 创作者中心用文件夹或压缩包上传，先走平台审核。招募、看板、上传弹窗与 list 都在 PC。后台与 C/PC 共用同一份演示数据。</p>
       </div>
@@ -360,24 +510,133 @@
       <div class="explain-layout">
         <nav class="glass-card explain-nav" aria-label="业务解释章节">
           <div class="nav-caption">研发 / 运营手册</div>
-          <button type="button" class="active" data-explain="exp-overview">1 背景与一句话<small>为什么做一键代发</small></button>
+          <button type="button" class="active" data-explain="exp-story">0 一张图看懂<small>四个人物图文讲解</small></button>
+          <button type="button" data-explain="exp-overview">1 背景与一句话<small>为什么做一键代发</small></button>
           <button type="button" data-explain="exp-roles">2 角色怎么分工<small>用户 / 剪辑手 / 运营</small></button>
           <button type="button" data-explain="exp-path">3 主路径<small>供稿 → 领取 → 回填</small></button>
           <button type="button" data-explain="exp-bound">4 边界<small>门禁、占用、停权</small></button>
           <button type="button" data-explain="exp-faq">5 FAQ<small>客诉与对内口径</small></button>
         </nav>
         <div class="glass-card">
-          <section id="exp-overview" class="explain-panel active">
+          <section id="exp-story" class="explain-panel active">
+            <div class="explain-kicker">一张图看懂</div>
+            <div class="explain-hero">
+              <h2>四个人物把主路径讲清楚：谁出面、谁说话、这一步在干什么</h2>
+              <p>橙=用户，蓝=剪辑手，绿=运营，紫=客服。高亮的人正在做事，气泡是他们的原话。校验菱形仍看各端「业务流程」。</p>
+            </div>
+            <div class="story-board" id="storyBoard">
+              <div class="story-cast">
+                <div class="story-person" data-actor="c" id="chipC">
+                  <svg class="story-avatar" viewBox="0 0 64 72" aria-hidden="true">
+                    <circle cx="32" cy="20" r="12" fill="#fdba74"/>
+                    <path d="M18 36c0-8 6-12 14-12s14 4 14 12v8c0 8-6 16-14 16s-14-8-14-16z" fill="#fb923c"/>
+                    <circle cx="28" cy="18" r="1.6" fill="#7c2d12"/><circle cx="36" cy="18" r="1.6" fill="#7c2d12"/>
+                    <path d="M28 24c2 2 6 2 8 0" stroke="#7c2d12" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+                  </svg>
+                  <b>用户</b><span>C 端 · 只领取</span>
+                  <div class="story-bubble" data-say="c"></div>
+                </div>
+                <div class="story-person" data-actor="pc" id="chipPc">
+                  <svg class="story-avatar" viewBox="0 0 64 72" aria-hidden="true">
+                    <circle cx="32" cy="20" r="12" fill="#7dd3fc"/>
+                    <path d="M18 36c0-8 6-12 14-12s14 4 14 12v8c0 8-6 16-14 16s-14-8-14-16z" fill="#38bdf8"/>
+                    <rect x="20" y="40" width="24" height="14" rx="2" fill="#0ea5e9"/>
+                    <circle cx="28" cy="18" r="1.6" fill="#0c4a6e"/><circle cx="36" cy="18" r="1.6" fill="#0c4a6e"/>
+                    <path d="M28 24c2 2 6 2 8 0" stroke="#0c4a6e" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+                  </svg>
+                  <b>剪辑手</b><span>PC · 只上传</span>
+                  <div class="story-bubble" data-say="pc"></div>
+                </div>
+                <div class="story-person" data-actor="op" id="chipOp">
+                  <svg class="story-avatar" viewBox="0 0 64 72" aria-hidden="true">
+                    <circle cx="32" cy="20" r="12" fill="#6ee7b7"/>
+                    <path d="M18 36c0-8 6-12 14-12s14 4 14 12v8c0 8-6 16-14 16s-14-8-14-16z" fill="#34d399"/>
+                    <rect x="26" y="38" width="12" height="16" rx="2" fill="#059669"/>
+                    <circle cx="28" cy="18" r="1.6" fill="#064e3b"/><circle cx="36" cy="18" r="1.6" fill="#064e3b"/>
+                    <path d="M28 24c2 2 6 2 8 0" stroke="#064e3b" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+                  </svg>
+                  <b>运营</b><span>后台 · 审与管</span>
+                  <div class="story-bubble" data-say="op"></div>
+                </div>
+                <div class="story-person" data-actor="cs" id="chipCs">
+                  <svg class="story-avatar" viewBox="0 0 64 72" aria-hidden="true">
+                    <circle cx="32" cy="20" r="12" fill="#c4b5fd"/>
+                    <path d="M18 36c0-8 6-12 14-12s14 4 14 12v8c0 8-6 16-14 16s-14-8-14-16z" fill="#a78bfa"/>
+                    <circle cx="46" cy="42" r="8" fill="#7c3aed"/>
+                    <path d="M43 42h6M46 39v6" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
+                    <circle cx="28" cy="18" r="1.6" fill="#4c1d95"/><circle cx="36" cy="18" r="1.6" fill="#4c1d95"/>
+                    <path d="M28 24c2 2 6 2 8 0" stroke="#4c1d95" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+                  </svg>
+                  <b>客服</b><span>海报二维码</span>
+                  <div class="story-bubble" data-say="cs"></div>
+                </div>
+              </div>
+              <div class="story-caption">
+                <strong id="storyStepTitle">1 扫码招募</strong>
+                <p id="storyStepBody">有制作能力的人扫 PC「剪辑供稿」或广场招募帧上的客服二维码。站内没有申请表，也不能在 App 里当剪辑手上传。</p>
+              </div>
+            </div>
+            <div class="story-controls">
+              <button class="btn-ghost-sm" type="button" id="storyToggle">暂停</button>
+              <div class="story-dots" id="storyDots"></div>
+            </div>
+            <div class="explain-section">
+              <h3>这张图在说什么</h3>
+              <ul>
+                <li>两条闭环只在「已通过且空闲」汇合：PC 供稿进来，C 端领取出去。</li>
+                <li>审核中、已驳回、占用中、已完成都不进广场。列表不展示金额。</li>
+                <li>领取先看次数，再选该项目已通过关键词。次数不足只开兑换，不开选词。</li>
+                <li>24h 未回填记 1 次、不退次、稿件回广场。终身未回填超过 3 次进黑名单，仅后台恢复。</li>
+              </ul>
+            </div>
+          </section>
+          <section id="exp-overview" class="explain-panel">
             <div class="explain-kicker">FR-014 · 一键代发</div>
             <div class="explain-hero">
               <h2>不会剪辑也能做项目：剪辑手供稿，用户领取后回填变现</h2>
               <p>没有制作能力的用户进不了项目。平台用客服招募剪辑手，在已有 PC 创作者中心上传图集/视频；用户只在 C 端领取，再走该项目已有回填页发布。本手册给研发和运营对齐口径，不写迭代平台通用规范。</p>
             </div>
             <div class="explain-section">
+              <h3>这一句怎么对外讲</h3>
+              <div class="table-wrap">
+                <table class="explain-table">
+                  <thead><tr><th>对象</th><th>口径</th><th>不要讲</th></tr></thead>
+                  <tbody>
+                    <tr><td>用户</td><td>广场领成片，选词后下载，24 小时内回填。</td><td>FR 编号、审核队列、分成金额。</td></tr>
+                    <tr><td>剪辑手</td><td>加客服录入后，在电脑「剪辑供稿」传文件夹或压缩包。</td><td>App 里上传、站内申请表。</td></tr>
+                    <tr><td>客服 / 运营</td><td>先问卡在上传、领取、回填还是停权，再对状态。</td><td>让用户自己去 PC 传，或承诺截不了屏。</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="explain-section">
+              <h3>做 / 不做</h3>
+              <div class="explain-grid">
+                <div class="explain-card">
+                  <h4>做</h4>
+                  <ul>
+                    <li>C 端广场 / 详情 / 选词领取 / 购次 / 我的领取 / 回填 / 水印。</td>
+                    <li>PC 已有创作者中心加「剪辑供稿」：招募、看板、上传、list。</td>
+                    <li>后台七页：剪辑手、稿件、领取、黑名单、项目、素材、次数。</li>
+                    <li>图集预览最多 3 张；视频仍试看 5 秒。</li>
+                  </ul>
+                </div>
+                <div class="explain-card">
+                  <h4>不做</h4>
+                  <ul>
+                    <li>不新造 PC 产品，不改项目中心 / 作品管理 / 收益中心。</li>
+                    <li>C 端不做剪辑手工作台或上传。</li>
+                    <li>广场 Banner 复用平台已有能力，本 FR 不另开配置页。</li>
+                    <li>Demo 无真实 HTTP、不真扣积分、不落权限库。</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="explain-section">
               <h3>30 秒故事</h3>
               <ol class="step-list">
                 <li>有制作能力的人扫 PC / 广场招募海报的客服二维码，后台录入后才是剪辑手。</li>
-                <li>已录入剪辑手在电脑选授权且启用的项目，用文件夹或压缩包上传，提交平台审核。</li>
+                <li>已录入剪辑手在电脑选授权且启用的项目，用文件夹或压缩包上传。稿件需要审核=是则审核中，=否则默认已通过。</li>
                 <li>审核通过且空闲的稿件出现在作品广场；审核中、已驳回、占用中、已完成都不进广场。</li>
                 <li>用户先看剩余次数，再浮层选该项目已通过关键词，才能领取；成功即扣次、占用、对他人隐藏。</li>
                 <li>24 小时内从「我的领取」回填则占用结束；超时记 1 次未回填、不退次、稿件回广场。终身未回填超过 3 次进黑名单，仅后台可恢复。</li>
@@ -394,9 +653,23 @@
             <div class="explain-section">
               <div class="explain-grid">
                 <div class="explain-card"><h4>用户</h4><p>浏览已通过且空闲的稿件，先校验次数再选词领取，24h 内回填。无剪辑能力，不做上传。</p></div>
-                <div class="explain-card"><h4>剪辑手</h4><p>客服接入、后台录入（右豹 ID / 分成 / 备注）。电脑上传，默认审核中。仅可删空闲稿。</p></div>
+                <div class="explain-card"><h4>剪辑手</h4><p>客服接入、后台录入（右豹 ID / 分成 / 备注 / 稿件需要审核）。电脑上传：需审则审核中，免审默认已通过。仅可删空闲稿。</p></div>
                 <div class="explain-card"><h4>运营</h4><p>管剪辑手、稿件审核、领取、黑名单、项目、素材、次数商品。后台录入稿件视为已审通过。</p></div>
                 <div class="explain-card"><h4>客服</h4><p>海报二维码接入剪辑手，不提供站内申请表或自助审核。</p></div>
+              </div>
+            </div>
+            <div class="explain-section">
+              <h3>能做 / 不能做</h3>
+              <div class="table-wrap">
+                <table class="explain-table">
+                  <thead><tr><th>角色</th><th>能做</th><th>不能做</th></tr></thead>
+                  <tbody>
+                    <tr><td>用户</td><td>广场浏览、预览 3 张、购次、选词领取、加水印、下载、回填。</td><td>上传、改审核、自助解禁、看他人占用中的稿、看金额。</td></tr>
+                    <tr><td>剪辑手</td><td>PC 看板、传到授权∩启用项目、看 list 审核态、删空闲稿。</td><td>未录入/停用后上传；删占用中/已完成稿；在 C 端工作台操作。</td></tr>
+                    <tr><td>运营</td><td>录入剪辑手与稿、审稿、恢复黑名单、改项目/素材/次数档。</td><td>替用户回填；把已通过再驳回；有占用中稿时停用该剪辑手。</td></tr>
+                    <tr><td>客服</td><td>收二维码、转运营录入。</td><td>站内通过申请、改次数、改占用。</td></tr>
+                  </tbody>
+                </table>
               </div>
             </div>
           </section>
@@ -407,11 +680,26 @@
               <p>流程图挂在各端「业务流程」子 Tab：前端=用户领取；PC=剪辑手上传；后台七菜单各一张。旧顶层「业务流程」已取消。</p>
             </div>
             <div class="explain-section">
+              <h3>页面对照</h3>
+              <div class="table-wrap">
+                <table class="explain-table">
+                  <thead><tr><th>端</th><th>页面</th><th>用户看见什么</th><th>下一步</th></tr></thead>
+                  <tbody>
+                    <tr><td>C</td><td>作品广场</td><td>启用项目图标、搜索、筛选项、已通过空闲稿封面。无金额。</td><td>点卡片进详情；点招募帧进海报。</td></tr>
+                    <tr><td>C</td><td>稿件详情</td><td>素材铺满、标签、书籍 ID、注意事项。未领=领取步骤；已领=发布技巧。</td><td>次数够→选词；不够→兑换。</td></tr>
+                    <tr><td>C</td><td>我的领取</td><td>未回填 / 已回填 / 已超时。7 天下载倒计时。立即回填始终高亮。</td><td>回填页；或点信息区回该稿详情。</td></tr>
+                    <tr><td>PC</td><td>剪辑供稿</td><td>招募 BN + 看板（已授权项目 / 上传数 / 被领数 / 收益）。</td><td>点 BN 开招募抽屉；点上传走三步。</td></tr>
+                    <tr><td>后台</td><td>七页</td><td>剪辑手 / 稿件 / 领取 / 黑名单 / 项目 / 素材 / 次数。</td><td>录入、审核、恢复、改配置即时影响广场。</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="explain-section">
               <h3>剪辑手（仅 PC）</h3>
               <ol class="step-list">
                 <li>打开已有创作者中心 → 单一菜单「剪辑供稿」（招募 BN + 看板）。</li>
                 <li>未录入 / 已停用：看板缺省，不能上传。</li>
-                <li>已录入：选授权∩启用项目 → 文件夹或压缩包 → 填齐字段 → 提交审核。</li>
+                <li>已录入：先填字段（含书籍链接）→ 文件夹或压缩包（压缩包先解压中）→ 解析确认 → 队列上传。</li>
                 <li>后台通过后，空闲稿进广场；驳回 list 出示原因。</li>
               </ol>
             </div>
@@ -429,7 +717,17 @@
             <div class="explain-kicker">边界</div>
             <div class="explain-hero">
               <h2>门禁顺序、占用和停权不能改口</h2>
-              <p>先次数，后浮层选词，后占用。次数不足不得打开选词浮层。一稿同时一人占用。超时不退次。终身未回填超过 3 次停权，只能后台恢复。</p>
+              <p>先停权，再次数，再资格，再占用，最后选词。次数不足不得打开选词浮层。一稿同时一人占用。超时不退次。终身未回填超过 3 次停权，只能后台恢复。</p>
+            </div>
+            <div class="explain-section">
+              <h3>领取门禁（按这个顺序拦）</h3>
+              <div class="gate-row">
+                <div class="gate-item"><b>1 停权</b>黑名单停权中：按钮「已被停权，无法领取」。</div>
+                <div class="gate-item"><b>2 次数</b>免费+已购=0：只开兑换浮层，不开选词。</div>
+                <div class="gate-item"><b>3 资格</b>审核/项目/剪辑手/素材任一不合格：当前不可领，不扣次。</div>
+                <div class="gate-item"><b>4 占用</b>占用中或已完成：领取失败，回广场。</div>
+                <div class="gate-item"><b>5 选词</b>必须点该项目已通过关键词，才能确认领取。</div>
+              </div>
             </div>
             <div class="explain-section">
               <ul>
@@ -449,12 +747,15 @@
               <p>对用户不要讲 FR 编号。对研发指到对应端的「业务流程」和「前后端数据交互」。</p>
             </div>
             <div class="explain-section">
-              <div class="faq-item"><div class="faq-q">Q1. 为什么广场看不到刚传的稿？</div><div class="faq-a">PC 新稿默认审核中。后台通过且空闲才进广场。占用中、已完成、已驳回、禁用项目、停用剪辑手、禁用素材都不可见。</div></div>
+              <div class="faq-item"><div class="faq-q">Q1. 为什么广场看不到刚传的稿？</div><div class="faq-a">该剪辑手「稿件需要审核=是」时，PC 新稿默认审核中，后台通过且空闲才进广场。免审剪辑手上传后空闲即可进。占用中、已完成、已驳回、禁用项目、停用剪辑手、禁用素材都不可见。</div></div>
               <div class="faq-item"><div class="faq-q">Q2. 次数够了为什么还领不了？</div><div class="faq-a">还要选该项目已通过关键词，且稿件当时空闲。未选词、已被占用、未审核通过、项目禁用、已停权都会失败。</div></div>
               <div class="faq-item"><div class="faq-q">Q3. 超时了次数能退吗？</div><div class="faq-a">不退。记 1 次未回填，稿件回广场。原领取人未进黑名单可再领，再领再扣次。</div></div>
               <div class="faq-item"><div class="faq-q">Q4. 停权了怎么办？</div><div class="faq-a">终身未回填超过 3 次。只能后台黑名单手动恢复，没有自助解禁。</div></div>
               <div class="faq-item"><div class="faq-q">Q5. 图集详情为什么只能看 3 张？</div><div class="faq-a">预览上限 3 张，角标仍是真实张数。领取前预览不扣次、不能保存。完整稿领取后再下。演示预览用现有封面凑 3 张，不是书内页。</div></div>
               <div class="faq-item"><div class="faq-q">Q6. 用户能在 App 里当剪辑手上传吗？</div><div class="faq-a">不能。C 端只领取。上传只在 PC 创作者中心。广场招募帧只看海报。</div></div>
+              <div class="faq-item"><div class="faq-q">Q7. 领取后怎么下载？水印必做吗？</div><div class="faq-a">底栏「下载稿件」7 天内有效。加水印可选，下载会先打当前水印再出文件。超时未下不能再下，但回填不受 7 天下载影响，只受 24h 回填窗影响。</div></div>
+              <div class="faq-item"><div class="faq-q">Q8. 非剪辑手打开 PC「剪辑供稿」会怎样？</div><div class="faq-a">不跳走。招募 BN 仍在，点开抽屉可看海报。看板走缺省，上传入口不可用。</div></div>
+              <div class="faq-item"><div class="faq-q">Q9. 用剪辑手稿件回填后，关键词收益怎么入账？</div><div class="faq-a">订单已结算时先判该词是不是代发。是则按分成拆成用户实结和剪辑手分账，两边都进项目收益明细，状态「已结算」。不是则全额给用户。对账看「前后端数据交互 → 用户收益入账」。</div></div>
             </div>
           </section>
         </div>
@@ -618,8 +919,8 @@
             <button class="scene-btn active" type="button" data-pcscreen="home" data-desc="同一入口：顶部招募 BN + 下方看板">剪辑供稿</button>
             <button class="scene-btn" type="button" data-pcscreen="recruit" data-desc="点 BN 侧栏展开卖点 / 适合谁 / 二维码">招募详情抽屉</button>
             <button class="scene-btn" type="button" data-pcscreen="guest" data-desc="无权限时看板走缺省，招募 BN 仍在">非剪辑手缺省</button>
-            <button class="scene-btn" type="button" data-pcscreen="upload" data-desc="弹窗三步：文件夹/压缩包 → 填齐字段 → 提交审核">上传入口</button>
-            <button class="scene-btn" type="button" data-pcscreen="list" data-desc="与后台同字段，无下载链接；仅空闲可删">上传 list</button>
+            <button class="scene-btn" type="button" data-pcscreen="upload" data-desc="弹窗三步：先填字段 → 选文件夹/压缩包 → 表格确认后队列上传">上传入口</button>
+            <button class="scene-btn" type="button" data-pcscreen="list" data-desc="与后台同字段，无下载链接；另列上传状态；仅空闲可删">上传 list</button>
           </div>
           <p class="scene-hint" id="pcSceneHint">同一入口：顶部招募 BN + 下方看板</p>
         </div>
@@ -632,7 +933,7 @@
       </div>
       <div id="pc-flow" class="sub-view">
       <div class="glass-card flow-page">
-        <p class="flow-page-intro">剪辑手上传闭环：招募 → 录入校验 → 文件夹/压缩包上传 → 项目启用 → 平台审核。C 端不做上传。</p>
+        <p class="flow-page-intro">剪辑手上传闭环：招募 → 录入校验 → 文件夹/压缩包上传 → 项目启用 → 按「稿件需要审核」落审核态。C 端不做上传。</p>
         <div class="flow-svg-wrap">
           <svg width="920" height="700" viewBox="0 0 920 700" xmlns="http://www.w3.org/2000/svg">
             <defs>
@@ -666,9 +967,9 @@
               <text x="472" y="176" font-size="10" fill="#16a34a">是</text>
 
               <rect x="280" y="184" width="360" height="72" rx="6" fill="#dbeafe" stroke="#2563eb" />
-              <text x="460" y="212" text-anchor="middle" font-size="12" fill="#1e40af">PC 弹窗上传 · 文件夹或压缩包</text>
-              <text x="460" y="232" text-anchor="middle" font-size="10" fill="#64748b">填齐后台同款字段 · 必选素材类型</text>
-              <text x="460" y="248" text-anchor="middle" font-size="10" fill="#64748b">只列授权 ∩ 启用项目</text>
+              <text x="460" y="212" text-anchor="middle" font-size="12" fill="#1e40af">先填字段再选成片 · 文件夹或压缩包</text>
+              <text x="460" y="232" text-anchor="middle" font-size="10" fill="#64748b">压缩包先解压中 · 命名约定解析出表</text>
+              <text x="460" y="248" text-anchor="middle" font-size="10" fill="#64748b">队列上传 · 失败只重传文件</text>
 
               <polygon points="460,280 540,320 460,360 380,320" fill="#fef9c3" stroke="#ca8a04" />
               <text x="460" y="324" text-anchor="middle" font-size="11" fill="#854d0e">项目已启用?</text>
@@ -678,8 +979,8 @@
               <text x="472" y="376" font-size="10" fill="#16a34a">是</text>
 
               <rect x="280" y="384" width="360" height="56" rx="6" fill="#dcfce7" stroke="#16a34a" />
-              <text x="460" y="408" text-anchor="middle" font-size="12" fill="#166534">提交平台审核</text>
-              <text x="460" y="426" text-anchor="middle" font-size="10" fill="#64748b">审核中不进广场；驳回出示原因</text>
+              <text x="460" y="408" text-anchor="middle" font-size="12" fill="#166534">提交上传结果</text>
+              <text x="460" y="426" text-anchor="middle" font-size="10" fill="#64748b">需审=审核中 · 免审=已通过</text>
 
               <polygon points="460,464 540,504 460,544 380,504" fill="#fef9c3" stroke="#ca8a04" />
               <text x="460" y="508" text-anchor="middle" font-size="11" fill="#854d0e">审核通过?</text>
@@ -733,7 +1034,7 @@
               <button class="btn btn-primary" type="button" onclick="renderEditors()">查询</button>
             </div>
           </div>
-          <div class="table-wrap"><table><thead><tr><th>ID</th><th>右豹 ID</th><th>昵称</th><th>分成比例</th><th>备注</th><th>来源</th><th>可上传项目</th><th>状态</th><th>录入时间</th><th>操作</th></tr></thead><tbody id="edBody"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>ID</th><th>右豹 ID</th><th>昵称</th><th>分成比例</th><th>稿件需要审核</th><th>备注</th><th>来源</th><th>可上传项目</th><th>稿件数据</th><th>收益数据</th><th>状态</th><th>录入时间</th><th>操作</th></tr></thead><tbody id="edBody"></tbody></table></div>
           </div>
           <div id="admin-editors-flow" class="sub-view">
       <div class="glass-card flow-page">
@@ -757,8 +1058,8 @@
               <text x="460" y="41" text-anchor="middle" font-size="12" fill="#1e40af">客服二维码招募接入</text>
               <rect x="280" y="80" width="360" height="80" rx="6" fill="#dcfce7" stroke="#16a34a" />
               <text x="460" y="108" text-anchor="middle" font-size="12" fill="#166534">后台录入剪辑手</text>
-              <text x="460" y="128" text-anchor="middle" font-size="10" fill="#64748b">必填右豹 ID / 分成比例 / 备注</text>
-              <text x="460" y="146" text-anchor="middle" font-size="10" fill="#64748b">无站内申请表</text>
+              <text x="460" y="128" text-anchor="middle" font-size="10" fill="#64748b">必填右豹 ID / 分成 / 备注 / 稿件需要审核</text>
+              <text x="460" y="146" text-anchor="middle" font-size="10" fill="#64748b">无站内申请表 · 免审则上传默认已通过</text>
               <polygon points="460,184 540,224 460,264 380,224" fill="#fef9c3" stroke="#ca8a04" />
               <text x="460" y="228" text-anchor="middle" font-size="11" fill="#854d0e">已录入且未停用?</text>
               <text x="256" y="216" font-size="10" fill="#dc2626">否</text>
@@ -789,7 +1090,20 @@
             <button type="button" data-sub="admin-works-flow" role="tab">业务流程</button>
           </div>
           <div id="admin-works-list" class="sub-view active">
-          <div class="table-toolbar"><h3>稿件</h3><button class="btn btn-primary" type="button" onclick="openWorkModal()">录入</button></div>
+          <div class="table-toolbar">
+            <h3>稿件</h3>
+            <div class="toolbar-actions">
+              <button class="btn btn-primary" type="button" onclick="openWorkModal()">录入</button>
+            </div>
+          </div>
+          <div class="batch-bar" id="wkBatchBar">
+            <span class="batch-info" id="wkBatchInfo">已选 0 项</span>
+            <div class="batch-btns">
+              <button class="btn btn-success-ghost btn-sm" type="button" onclick="openBatchAudit()">批量审核</button>
+              <button class="btn btn-danger-ghost btn-sm" type="button" onclick="openBatchDeleteWorks()">批量删除</button>
+              <button class="btn-ghost-sm" type="button" onclick="clearWorkSelection()">取消</button>
+            </div>
+          </div>
           <div class="filter-bar">
             <div class="filter-field"><label>标题 / ID</label><input id="wkQ" placeholder="掌心宠" /></div>
             <div class="filter-field"><label>占用</label><select id="wkO"><option value="">全部</option><option>空闲</option><option>占用中</option><option>已完成</option></select></div>
@@ -799,11 +1113,14 @@
               <button class="btn btn-primary" type="button" onclick="renderWorks()">查询</button>
             </div>
           </div>
-          <div class="table-wrap"><table><thead><tr><th>ID</th><th>标题</th><th>项目</th><th>书</th><th>稿件信息</th><th>发布技巧</th><th>剪辑手</th><th>类型</th><th>素材类型</th><th>占用</th><th>审核</th><th>上传时间</th><th>操作</th></tr></thead><tbody id="wkBody"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr>
+            <th class="col-check"><input type="checkbox" id="wkCheckAll" onclick="toggleWorkCheckAll(this.checked)" /></th>
+            <th>ID</th><th>标题</th><th>项目</th><th>书</th><th>稿件信息</th><th>发布技巧</th><th>剪辑手</th><th>类型</th><th>素材类型</th><th>占用</th><th>审核</th><th>上传时间</th><th>操作</th>
+          </tr></thead><tbody id="wkBody"></tbody></table></div>
           </div>
           <div id="admin-works-flow" class="sub-view">
       <div class="glass-card flow-page">
-        <p class="flow-page-intro">稿件：PC 新稿审核中，后台录入已通过；通过后空闲进广场。</p>
+        <p class="flow-page-intro">稿件：PC 新稿看剪辑手「稿件需要审核」——是则审核中，否则默认已通过。后台录入视为已通过。列表可单条或批量审核 / 删除。</p>
         <div class="flow-svg-wrap">
           <svg width="920" height="620" viewBox="0 0 920 620" xmlns="http://www.w3.org/2000/svg">
             <defs>
@@ -825,7 +1142,7 @@
             <g class="flow-nodes" font-family="Inter, PingFang SC, sans-serif">
               <rect x="40" y="16" width="360" height="56" rx="6" fill="#dbeafe" stroke="#2563eb" />
               <text x="220" y="40" text-anchor="middle" font-size="12" fill="#1e40af">PC 新上传</text>
-              <text x="220" y="58" text-anchor="middle" font-size="10" fill="#64748b">默认审核中</text>
+              <text x="220" y="58" text-anchor="middle" font-size="10" fill="#64748b">需审=审核中 · 免审=已通过</text>
               <rect x="520" y="16" width="360" height="56" rx="6" fill="#dcfce7" stroke="#16a34a" />
               <text x="700" y="40" text-anchor="middle" font-size="12" fill="#166534">后台录入稿件</text>
               <text x="700" y="58" text-anchor="middle" font-size="10" fill="#64748b">视为已审 · 默认已通过</text>
@@ -836,8 +1153,8 @@
               <text x="120" y="229" text-anchor="middle" font-size="11" fill="#475569">已通过不可再驳</text>
               <text x="472" y="280" font-size="10" fill="#16a34a">是</text>
               <rect x="280" y="288" width="360" height="56" rx="6" fill="#dbeafe" stroke="#2563eb" />
-              <text x="460" y="312" text-anchor="middle" font-size="12" fill="#1e40af">通过 / 驳回</text>
-              <text x="460" y="330" text-anchor="middle" font-size="10" fill="#64748b">驳回原因必填</text>
+              <text x="460" y="312" text-anchor="middle" font-size="12" fill="#1e40af">单条或批量审核</text>
+              <text x="460" y="330" text-anchor="middle" font-size="10" fill="#64748b">通过 / 驳回 · 驳回原因必填</text>
               <polygon points="460,368 540,408 460,448 380,408" fill="#fef9c3" stroke="#ca8a04" />
               <text x="460" y="412" text-anchor="middle" font-size="11" fill="#854d0e">审核通过?</text>
               <text x="256" y="400" font-size="10" fill="#dc2626">否</text>
@@ -877,11 +1194,11 @@
               <button class="btn btn-primary" type="button" onclick="renderClaimsAdm()">查询</button>
             </div>
           </div>
-          <div class="table-wrap"><table><thead><tr><th>ID</th><th>用户</th><th>稿件</th><th>关键词</th><th>回填信息</th><th>状态</th><th>领取时间</th><th>操作</th></tr></thead><tbody id="clBody"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>ID</th><th>用户</th><th>稿件</th><th>项目名称</th><th>书籍信息</th><th>剪辑手</th><th>关键词</th><th>回填信息</th><th>状态</th><th>领取时间</th><th>操作</th></tr></thead><tbody id="clBody"></tbody></table></div>
           </div>
           <div id="admin-claims-flow" class="sub-view">
       <div class="glass-card flow-page">
-        <p class="flow-page-intro">领取记录：待回填 / 已回填 / 已超时释放。详情看回填，稿件详情走抽屉。</p>
+        <p class="flow-page-intro">领取记录：待回填 / 已回填 / 已超时释放。操作只留稿件详情抽屉。</p>
         <div class="flow-svg-wrap">
           <svg width="920" height="420" viewBox="0 0 920 420" xmlns="http://www.w3.org/2000/svg">
             <defs>
@@ -911,7 +1228,7 @@
               <text x="830" y="224" text-anchor="middle" font-size="11" fill="#9a3412">已超时释放</text>
               <text x="830" y="242" text-anchor="middle" font-size="10" fill="#64748b">不退次</text>
               <rect x="280" y="288" width="360" height="56" rx="6" fill="#dbeafe" stroke="#2563eb" />
-              <text x="460" y="312" text-anchor="middle" font-size="12" fill="#1e40af">详情看回填 · 稿件详情抽屉</text>
+              <text x="460" y="312" text-anchor="middle" font-size="12" fill="#1e40af">操作只留稿件详情抽屉</text>
               <text x="460" y="330" text-anchor="middle" font-size="10" fill="#64748b">不改领取门禁 / 占用规则</text>
             </g>
           </svg>
@@ -1124,7 +1441,7 @@
               <button class="btn btn-primary" type="button" onclick="openSkuModal()">新增档位</button>
             </div>
           </div>
-          <div class="table-wrap"><table><thead><tr><th>档位</th><th>次数</th><th>积分</th><th>状态</th><th>操作</th></tr></thead><tbody id="skuBody"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>档位</th><th>次数</th><th>积分</th><th>购买人数</th><th>状态</th><th>操作</th></tr></thead><tbody id="skuBody"></tbody></table></div>
           </div>
           <div id="admin-skus-flow" class="sub-view">
       <div class="glass-card flow-page">
@@ -1177,87 +1494,427 @@
     <div id="view-data" class="page-view">
       <div class="glass-card">
         <div class="data-block">
-          <h2>将落地契约</h2>
-          <p>下列方法 / 路径 / 请求 / 响应是研发对照用的落地契约。<strong>本 Demo 无真实 HTTP</strong>，C / PC / 后台共用 <code>yijian-daifa-store.js</code> 的 localStorage 逻辑闭环。</p>
-          <div class="table-wrap">
-            <table class="explain-table">
-              <thead><tr><th>能力</th><th>方法 / 路径</th><th>请求</th><th>响应</th></tr></thead>
-              <tbody>
-                <tr><td><strong>广场列表</strong></td><td><code>GET /api/yjd/feed</code></td><td>project / editor / mat / kind / q</td><td>已通过且空闲稿件；不含金额</td></tr>
-                <tr><td><strong>稿件详情</strong></td><td><code>GET /api/yjd/works/:id</code></td><td>id</td><td>七字段 + preview≤3 + imgs + 试看标记</td></tr>
-                <tr><td><strong>预览图集</strong></td><td><code>GET /api/yjd/works/:id/preview</code></td><td>id</td><td>最多 3 张 URL；不扣次、不占用</td></tr>
-                <tr><td><strong>领取</strong></td><td><code>POST /api/yjd/claims</code></td><td>mid / keywordId</td><td>占用 + 扣次；或 次数不足 / 未选词 / 已占用 / 停权 / 未通过</td></tr>
-                <tr><td><strong>兑换次数</strong></td><td><code>POST /api/yjd/skus/:id/redeem</code></td><td>skuId</td><td>已购次数 +n；下架不可兑</td></tr>
-                <tr><td><strong>回填</strong></td><td><code>POST /api/yjd/claims/:id/fill</code></td><td>复用项目回填字段</td><td>已回填；稿件已完成</td></tr>
-                <tr><td><strong>超时释放</strong></td><td><code>POST /api/yjd/claims/:id/timeout</code></td><td>job / cron</td><td>未回填 +1、释放、不退次</td></tr>
-                <tr><td><strong>PC 上传</strong></td><td><code>POST /api/yjd/pc/works</code></td><td>文件夹或压缩包 + 后台同款字段</td><td>审核中；未录入 / 项目禁用拦截</td></tr>
-                <tr><td><strong>审核</strong></td><td><code>POST /api/yjd/admin/works/:id/audit</code></td><td>pass | reject + reason</td><td>已通过进广场；驳回不进；已通过不可再驳</td></tr>
-                <tr><td><strong>黑名单恢复</strong></td><td><code>POST /api/yjd/admin/bans/:user/restore</code></td><td>userId</td><td>已恢复，可再领</td></tr>
-              </tbody>
-            </table>
+          <h2>前端需求与前后端数据交互</h2>
+          <p>基于 C 端广场/详情/领取、PC 上传和后台七页，对齐展示规则、字段校验、接口入参出参、状态流转与异常处理。下列路径是研发对照用的<strong>将落地契约</strong>。<strong>本 Demo 无真实 HTTP</strong>，C / PC / 后台共用 <code>yijian-daifa-store.js</code> 的 localStorage 逻辑闭环。</p>
+          <div class="ix-tab-bar" role="tablist">
+            <button type="button" class="active" data-ix="ix-fe">前端需求</button>
+            <button type="button" data-ix="ix-api">接口契约</button>
+            <button type="button" data-ix="ix-state">状态与异常</button>
+            <button type="button" data-ix="ix-payout">用户收益入账</button>
+            <button type="button" data-ix="ix-list">交互清单</button>
           </div>
-          <div class="callout warn">Demo 不发起上述请求。联调时按此契约落地，不要用 Demo 的 localStorage 当接口。</div>
-        </div>
-        <div class="data-block">
-          <h2>状态机</h2>
-          <div class="table-wrap">
-            <table class="explain-table">
-              <thead><tr><th>域</th><th>状态</th><th>谁改</th><th>后果</th></tr></thead>
-              <tbody>
-                <tr><td><strong>审核</strong></td><td>审核中 → 已通过 / 已驳回</td><td>运营审 PC 新稿；后台录入直接已通过</td><td>仅已通过且空闲进广场；已通过不可再驳回</td></tr>
-                <tr><td><strong>占用</strong></td><td>空闲 → 占用中 → 已完成 / 空闲</td><td>领取成功占用；回填完成；24h 超时释放</td><td>占用中对他人隐藏；已完成不回广场</td></tr>
-                <tr><td><strong>领取</strong></td><td>未回填 / 已回填 / 已超时</td><td>用户回填；超时任务</td><td>后台展示待回填 / 已回填 / 已超时释放</td></tr>
-                <tr><td><strong>黑名单</strong></td><td>停权中 / 已恢复</td><td>终身未回填&gt;3 写入；仅后台恢复</td><td>停权中不可再领</td></tr>
-              </tbody>
-            </table>
+          <div id="ix-fe" class="ix-pane active">
+            <div class="ix-rule">
+              <strong>重要规则：领取门禁与广场可见性</strong>
+              <ul>
+                <li>门禁顺序固定：停权 → 次数 → 选词浮层 → 资格/占用。</li>
+                <li>次数不足只打开兑换浮层，不打开选词浮层，不扣次。</li>
+                <li>广场只返回 <code>plazaEligible</code> 为真的稿：已通过 + 空闲 + 项目启用 + 剪辑手已录入 + 素材启用。</li>
+                <li>领取成功必须同时写：占用中、扣次、领取记录未回填。三者同一业务关联编号（claimId）。</li>
+                <li>任何列表响应不得带金额、收益、积分售价以外的收益字段。</li>
+              </ul>
+            </div>
+            <h3>1. 作品广场</h3>
+            <ul>
+              <li>项目图标只列<strong>启用</strong>项目，按 sort 横滑直选；点图标即筛该项目。</li>
+              <li>搜索在项目图标下方，按标题模糊匹配；下拉筛剪辑师 / 启用素材 / 图集或视频。</li>
+              <li>封面必须是图片 URL，禁止纯色块。图集出示 <code>imgs</code> 张数角标，视频不出张数。</li>
+              <li>广场 Banner 复用平台已有 0–5 条能力；本 FR 后台不单开配置。点招募帧进海报，不进申请表。</li>
+              <li>空态：「没有可领取的稿件；占用中的稿件已对他人隐藏。」</li>
+            </ul>
+            <h3>2. 稿件详情与图集预览</h3>
+            <ul>
+              <li>标题下展示标签；书籍名称下为书籍 ID。内容底、按钮上展示注意事项。</li>
+              <li>未领取展示领取步骤；领取成功后改为作品发布技巧（发布标题 / 发布描述可复制）。</li>
+              <li>未领底栏：剩余次数、快捷提词、领取。已领底栏：添加水印、下载稿件。</li>
+              <li>图集可点开预览，最多 3 张，可左右切；<code>imgs</code> 角标仍是真实张数。预览不扣次、不占用、不能保存。</li>
+              <li>预览禁右键/长按保存，叠用户水印，切后台模糊。规则写明真机系统截屏禁不掉。</li>
+              <li>视频仍 5 秒试看，不进图集浮层。</li>
+            </ul>
+            <h3>3. 领取与选词浮层</h3>
+            <ul>
+              <li>次数足够后才打开选词浮层，只列该项目已通过关键词，不进下级页。</li>
+              <li>未选词点确认：Toast「请先选择该项目已通过的关键关键词」，浮层不关。</li>
+              <li>确认后 loading：正在下载稿件 → 正在保存到相册 → 已保存到相册。成功停在详情。</li>
+              <li>停权中按钮文案「已被停权，无法领取」，不打开浮层。</li>
+            </ul>
+            <h3>4. 兑换次数</h3>
+            <ul>
+              <li>只展示 <code>on=true</code> 的档位，最多 4 档。下架/草稿不返回。</li>
+              <li>选档后点「兑换」。Demo 不真扣积分；落地时以后端扣减结果为准。</li>
+              <li>兑换成功关浮层、刷新剩余次数，<strong>不自动打开选词</strong>。</li>
+            </ul>
+            <h3>5. 我的领取与回填</h3>
+            <ul>
+              <li>项目图标只展示有领取记录的项目。胶囊：未回填 / 已回填 / 已超时。</li>
+              <li>卡片含关键词标题、封面、作品标题、项目、作者、领取时间、下载时间、7 天下载倒计时。</li>
+              <li>立即回填始终高亮。已回填 toast「该稿件已回填」；已超时 toast「已超时，无法回填」。</li>
+              <li>回填复用该项目已有回填页字段，提交后领取→已回填，稿件→已完成，不再回广场。</li>
+            </ul>
+            <h3>6. PC 上传</h3>
+            <ul>
+              <li>未录入 / 已停用：看板缺省，不能上传；招募 BN 仍可点开。</li>
+              <li>先填共享字段（含书籍链接，不含标题/大小），再选文件夹或压缩包。压缩包先解压中。</li>
+              <li>按命名约定解析（文件名=标题；图集一夹一组），表格确认后队列上传。失败只重传失败文件。</li>
+              <li>已上传后按剪辑手「稿件需要审核」落态：是=审核中，否=已通过。list 不展示下载链接。已驳回出示原因。仅空闲可删。</li>
+            </ul>
+            <h3>7. 后台审核与黑名单</h3>
+            <ul>
+              <li>PC 新稿：剪辑手需审则审核中，免审则已通过。后台可单条或批量审核 / 删除。已通过不可再驳回。驳回必须填原因。</li>
+              <li>后台录入稿视为已通过。停权恢复只能手动，没有自助解禁。</li>
+            </ul>
           </div>
-        </div>
-        <div class="data-block">
-          <h2>异常</h2>
-          <div class="table-wrap">
-            <table class="explain-table">
-              <thead><tr><th>场景</th><th>条件</th><th>前端表现</th><th>是否扣次</th></tr></thead>
-              <tbody>
-                <tr><td><strong>次数不足</strong></td><td>免费+已购 = 0</td><td>详情浮层兑换，不打开选词</td><td>否</td></tr>
-                <tr><td><strong>占用</strong></td><td>稿件占用中 / 已完成</td><td>领取失败，回广场</td><td>否</td></tr>
-                <tr><td><strong>停权</strong></td><td>黑名单停权中</td><td>按钮「已被停权，无法领取」</td><td>否</td></tr>
-                <tr><td><strong>未审核通过</strong></td><td>审核中 / 已驳回</td><td>不进广场；详情不可领</td><td>否</td></tr>
-                <tr><td>未选词</td><td>浮层未点关键词</td><td>Toast 拦截领取</td><td>否</td></tr>
-                <tr><td>项目禁用</td><td>项目状态=禁用</td><td>不进广场；PC 不可传到该项目</td><td>否</td></tr>
-              </tbody>
-            </table>
+          <div id="ix-api" class="ix-pane">
+            <h3>1. 页面初始化数据流</h3>
+            <div class="ix-flow">
+              <div class="ix-step"><i>1</i><div><b>进入作品广场</b><span>并行请求启用项目、广场列表、Banner。前端用 plazaEligible 结果渲染宫格，不本地再算金额。</span></div></div>
+              <div class="ix-step"><i>2</i><div><b>打开详情</b><span>请求稿件七字段 + preview≤3 + 剩余次数 + 用户停权态。预览另走 preview 接口，不走下载。</span></div></div>
+              <div class="ix-step"><i>3</i><div><b>发起领取</b><span>先读次数与停权。次数不足走兑换；足够后拉该项目已通过关键词，提交 mid + keywordId。</span></div></div>
+              <div class="ix-step"><i>4</i><div><b>后端落账</b><span>校验门禁后写占用、扣次、领取记录，返回 claimId。失败返回错误码，不写占用。</span></div></div>
+              <div class="ix-step"><i>5</i><div><b>刷新结果</b><span>详情改已领底栏；广场该稿对他人消失；我的领取出现未回填。超时由任务写回，不靠前端倒计时做准。</span></div></div>
+            </div>
+            <h3>2. 前端需要的核心接口</h3>
+            <div class="table-wrap">
+              <table class="explain-table">
+                <thead><tr><th>能力</th><th>方法 / 路径</th><th>请求</th><th>响应</th></tr></thead>
+                <tbody>
+                  <tr><td><strong>广场列表</strong></td><td><code>GET /api/yjd/feed</code></td><td>project / editor / mat / kind / q</td><td>已通过且空闲稿件；不含金额</td></tr>
+                  <tr><td><strong>启用项目</strong></td><td><code>GET /api/yjd/projects</code></td><td>—</td><td>启用项目图标、sort、已通过关键词数</td></tr>
+                  <tr><td><strong>稿件详情</strong></td><td><code>GET /api/yjd/works/:id</code></td><td>id</td><td>七字段 + preview≤3 + imgs + 试看标记</td></tr>
+                  <tr><td><strong>预览图集</strong></td><td><code>GET /api/yjd/works/:id/preview</code></td><td>id</td><td>最多 3 张 URL；不扣次、不占用</td></tr>
+                  <tr><td><strong>项目关键词</strong></td><td><code>GET /api/yjd/projects/:id/keywords</code></td><td>projectId</td><td>仅已通过关键词</td></tr>
+                  <tr><td><strong>领取</strong></td><td><code>POST /api/yjd/claims</code></td><td>mid / keywordId / idempotencyKey</td><td>占用 + 扣次；或错误码</td></tr>
+                  <tr><td><strong>兑换次数</strong></td><td><code>POST /api/yjd/skus/:id/redeem</code></td><td>skuId</td><td>已购次数 +n；下架不可兑</td></tr>
+                  <tr><td><strong>回填</strong></td><td><code>POST /api/yjd/claims/:id/fill</code></td><td>复用项目回填字段</td><td>已回填；稿件已完成</td></tr>
+                  <tr><td><strong>超时释放</strong></td><td><code>POST /api/yjd/claims/:id/timeout</code></td><td>job / cron</td><td>未回填 +1、释放、不退次</td></tr>
+                  <tr><td><strong>PC 上传</strong></td><td><code>POST /api/yjd/pc/works</code></td><td>先字段后成片；解析条数后队列上传稿件+技巧</td><td>上传中/已上传/失败；需审=审核中，免审=已通过</td></tr>
+                  <tr><td><strong>审核</strong></td><td><code>POST /api/yjd/admin/works/:id/audit</code></td><td>pass | reject + reason</td><td>已通过进广场；驳回不进；已通过不可再驳</td></tr>
+                  <tr><td><strong>黑名单恢复</strong></td><td><code>POST /api/yjd/admin/bans/:user/restore</code></td><td>userId</td><td>已恢复，可再领</td></tr>
+                  <tr><td><strong>结算入账</strong></td><td><code>POST /api/yjd/settlements/apply</code></td><td>keywordId / orderId / settledAt / amount</td><td>代发则拆用户实结+剪辑手分账；详见「用户收益入账」</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <h3>3. 后台配置到前端的映射</h3>
+            <ul>
+              <li>项目 / 素材 / 剪辑手状态变更后，广场列表即时按 plazaEligible 过滤，前端不缓存「永远可见」。</li>
+              <li>次数商品仅返回在售档；下架立即不可新购，已购次数保留。</li>
+              <li>项目已通过关键词为空时，选词浮层为空，领取必须失败并提示。</li>
+              <li>后台录入稿件视为已通过。PC 新上传看剪辑手 <code>needReview</code>：是=审核中，否=已通过。</li>
+              <li>黑名单恢复后才可再领；前端不得根据本地 strikes 自行解禁。</li>
+            </ul>
+            <h3>4. 字段清单</h3>
+            <ul>
+              <li><strong>user</strong>：userId、free、bought、strikes、banned、remainQuota=free+bought。</li>
+              <li><strong>work</strong>：id、title、project、book、bookId、kind、mat、occ、audit、rejectReason、imgs、preview[≤3]、pubTitle、pubDesc、cover、tags、share。</li>
+              <li><strong>claim</strong>：id、user、mid、kw、status（未回填|已回填|已超时）、claimedAt、downloadedAt、expireAt、fill。</li>
+              <li><strong>editor</strong>：id、ybId、name、share、needReview、note、projects[]、status。</li>
+              <li><strong>sku</strong>：id、times、points、on。</li>
+              <li><strong>settlement</strong>：orderId、keywordId、mid、project、settledAt、gross、editorShare、userNet、status=已结算。</li>
+            </ul>
+            <div class="callout warn">Demo 不发起上述请求。联调时按此契约落地，不要用 Demo 的 localStorage 当接口。</div>
           </div>
+          <div id="ix-state" class="ix-pane">
+            <h3>1. 状态机</h3>
+            <div class="table-wrap">
+              <table class="explain-table">
+                <thead><tr><th>域</th><th>状态</th><th>谁改</th><th>后果</th></tr></thead>
+                <tbody>
+                  <tr><td><strong>审核</strong></td><td>审核中 → 已通过 / 已驳回</td><td>运营单条或批量审；免审剪辑手上传直接已通过；后台录入直接已通过</td><td>仅已通过且空闲进广场；已通过不可再驳回</td></tr>
+                  <tr><td><strong>占用</strong></td><td>空闲 → 占用中 → 已完成 / 空闲</td><td>领取成功占用；回填完成；24h 超时释放</td><td>占用中对他人隐藏；已完成不回广场</td></tr>
+                  <tr><td><strong>领取</strong></td><td>未回填 / 已回填 / 已超时</td><td>用户回填；超时任务</td><td>后台展示待回填 / 已回填 / 已超时释放</td></tr>
+                  <tr><td><strong>黑名单</strong></td><td>停权中 / 已恢复</td><td>终身未回填&gt;3 写入；仅后台恢复</td><td>停权中不可再领</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <h3>2. 校验规则</h3>
+            <ul>
+              <li>领取必须带 mid + keywordId，且关键词属于该稿项目且已通过。</li>
+              <li>兑换必须校验档位在售、次数与积分&gt;0；前端不得自己加次数。</li>
+              <li>回填只接受 status=未回填 的领取；已回填 / 已超时由后端拒绝。</li>
+              <li>PC 上传先填字段再选文件夹或压缩包，项目 ∈ 剪辑手授权 ∩ 启用项目。</li>
+              <li>驳回必须有原因；已通过禁止再驳。</li>
+            </ul>
+            <h3>3. 异常与提示</h3>
+            <div class="table-wrap">
+              <table class="explain-table">
+                <thead><tr><th>场景</th><th>条件</th><th>前端表现</th><th>是否扣次</th></tr></thead>
+                <tbody>
+                  <tr><td><strong>次数不足</strong></td><td>免费+已购 = 0</td><td>详情浮层兑换，不打开选词</td><td>否</td></tr>
+                  <tr><td><strong>占用</strong></td><td>稿件占用中 / 已完成</td><td>领取失败，回广场</td><td>否</td></tr>
+                  <tr><td><strong>停权</strong></td><td>黑名单停权中</td><td>按钮「已被停权，无法领取」</td><td>否</td></tr>
+                  <tr><td><strong>未审核通过</strong></td><td>审核中 / 已驳回</td><td>不进广场；详情不可领</td><td>否</td></tr>
+                  <tr><td>未选词</td><td>浮层未点关键词</td><td>Toast 拦截领取</td><td>否</td></tr>
+                  <tr><td>项目禁用</td><td>项目状态=禁用</td><td>不进广场；PC 不可传到该项目</td><td>否</td></tr>
+                  <tr><td>下载过期</td><td>领取超过 7 天</td><td>Toast「领取已超过 7 天，无法再下载」</td><td>—</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <h3>4. 刷新与幂等</h3>
+            <ul>
+              <li>领取、兑换、回填、审核都要带幂等键，避免连点重复扣次或重复占用。</li>
+              <li>按钮提交后进入 loading，不允许重复点击。确认领取的三段 loading 未结束前不可返回重提。</li>
+              <li>成功后必须刷新：详情底栏、剩余次数、广场列表、我的领取、PC list / 后台表。</li>
+              <li>失败不改占用和次数，但可刷新稿件最新 occ / audit，避免继续点已失效稿。</li>
+              <li>网络超时前端展示处理中，用 claimId / order 查询接口轮询终态，禁止前端本地假成功。</li>
+              <li>24h 超时只由后端任务写，前端倒计时仅展示，不准点「到时」自己释放。</li>
+            </ul>
+          </div>
+          <div id="ix-payout" class="ix-pane">
+            <div class="module-tab-bar" role="tablist">
+              <button type="button" class="active" data-sub="ix-payout-doc" role="tab">规则说明</button>
+              <button type="button" data-sub="ix-payout-flow" role="tab">业务流程</button>
+            </div>
+            <div id="ix-payout-doc" class="sub-view active">
+            <div class="ix-rule">
+              <strong>重要规则：关键词结算入账必须先判代发</strong>
+              <ul>
+                <li>用户用剪辑手稿件完成作品回填后，领取时所选关键词产生的订单收益，在<strong>入账</strong>时必须校验该词是否为代发关键词。</li>
+                <li>代发关键词：按剪辑手分成比例自动拆成用户侧实结 + 剪辑手侧分账，两笔同时写入既有「项目收益明细」。</li>
+                <li>非代发关键词：走既有全额用户入账，不写剪辑手分账，不套用本页文案。</li>
+                <li>只在平台关键词订单<strong>已结算</strong>时落账；待结算只累计，不写明细。状态固定为「已结算」。必须带秒级时间戳与金额。</li>
+              </ul>
+            </div>
+            <h3>1. 背景与触发</h3>
+            <div class="ix-flow">
+              <div class="ix-step"><i>1</i><div><b>回填完成</b><span>用户领取剪辑手稿件并走该项目回填页提交。领取记录 → 已回填，稿件 → 已完成。此时还不入账。</span></div></div>
+              <div class="ix-step"><i>2</i><div><b>关键词出单</b><span>回填所用关键词产生平台订单收益。结算态沿用既有关键词订单：待结算 / 已结算。</span></div></div>
+              <div class="ix-step"><i>3</i><div><b>入账前回检</b><span>订单转为已结算时，后端先查该关键词是否绑定一条已回填的一键代发领取（claim.status=已回填，且 mid 为剪辑手稿件）。</span></div></div>
+              <div class="ix-step"><i>4</i><div><b>按比例分账</b><span>判定为代发后：应结算总额 × 分成比例 = 剪辑手分账；用户实结 = 应结算 − 剪辑手分账。同一结算事件原子写入用户账 + 剪辑手账。</span></div></div>
+            </div>
+            <h3>2. 代发判定</h3>
+            <div class="table-wrap">
+              <table class="explain-table">
+                <thead><tr><th>条件</th><th>结果</th><th>入账</th></tr></thead>
+                <tbody>
+                  <tr><td>关键词绑定已回填的一键代发领取（用户用剪辑手稿件回填）</td><td>代发关键词</td><td>按分成比例拆用户实结 + 剪辑手分账；文案用本页模板</td></tr>
+                  <tr><td>关键词无已回填代发领取，或领取已超时释放</td><td>非代发</td><td>既有全额用户入账；不写剪辑手分账</td></tr>
+                  <tr><td>订单仍为待结算</td><td>不入账</td><td>只累计；明细不出现「已结算」记录</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <h3>3. 分账口径</h3>
+            <ul>
+              <li><strong>应结算总额</strong> = 该关键词本笔已结算订单收益。</li>
+              <li><strong>分成比例</strong> = 领取稿件对应剪辑手录入时的 <code>share</code>（如 50%）。</li>
+              <li><strong>剪辑手分账</strong> = 应结算总额 × 分成比例（代发作品分账）。</li>
+              <li><strong>用户实结</strong> = 应结算总额 − 剪辑手分账。</li>
+              <li>用户实结 + 剪辑手分账必须等于应结算总额。复用既有项目收益明细，不另建账本，不改 FR-002。</li>
+            </ul>
+            <h3>4. 入账文案（已结算）</h3>
+            <p>两边都写既有「项目收益明细」。标题、描述、时间戳、金额、状态均必出。时间用 <code>YYYY-MM-DD HH:mm:ss</code>；标题里的时间加方括号。</p>
+            <div class="table-wrap">
+              <table class="explain-table">
+                <thead><tr><th>侧</th><th>字段</th><th>模板</th></tr></thead>
+                <tbody>
+                  <tr><td rowspan="5"><strong>用户侧</strong></td><td>标题</td><td>您的账户于[{时间}]{项目名称}结算收益到账{用户实结}元</td></tr>
+                  <tr><td>描述</td><td>「{项目名称}」(关键词「{关键词ID}」)于{时间}应结算到账收益{应结算}元,产生代发作品分账{剪辑手分账}元,实际结算{用户实结}元</td></tr>
+                  <tr><td>金额</td><td>用户实结（正数）</td></tr>
+                  <tr><td>时间戳</td><td>该笔结算的具体时间，精确到秒</td></tr>
+                  <tr><td>状态</td><td>已结算</td></tr>
+                  <tr><td rowspan="5"><strong>剪辑手侧</strong></td><td>标题</td><td>您的账户于[{时间}]{项目名称}作品代发收益到账{剪辑手分账}元</td></tr>
+                  <tr><td>描述</td><td>「{项目名称}」(作品稿件「{稿件ID}」)于{时间}获得代发作品分账{剪辑手分账}元</td></tr>
+                  <tr><td>金额</td><td>剪辑手分账（正数）</td></tr>
+                  <tr><td>时间戳</td><td>与用户侧同一结算时间</td></tr>
+                  <tr><td>状态</td><td>已结算</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p>示例：应结算 10 元、分成 50%、时间 <code>2026-09-10 02:43:53</code>、关键词 <code>100253691479</code>、稿件 <code>M-06</code>。</p>
+            <div class="ledger-grid">
+              <div class="ledger-card">
+                <div class="ledger-side">用户侧 · 项目收益明细</div>
+                <div class="ledger-head">
+                  <div class="ledger-title">您的账户于[2026-09-10 02:43:53]项目名称结算收益到账5元</div>
+                  <div class="ledger-amt">+5.00</div>
+                </div>
+                <div class="ledger-desc">「项目名称」(关键词「100253691479」)于2026-09-10 02:43:53应结算到账收益10元,产生代发作品分账5元,实际结算5元</div>
+                <div class="ledger-meta"><span>2026-09-10 02:43:53</span><span class="tag tag-ok">已结算</span></div>
+              </div>
+              <div class="ledger-card">
+                <div class="ledger-side">剪辑手侧 · 项目收益明细</div>
+                <div class="ledger-head">
+                  <div class="ledger-title">您的账户于[2026-09-10 02:43:53]项目名称作品代发收益到账5元</div>
+                  <div class="ledger-amt">+5.00</div>
+                </div>
+                <div class="ledger-desc">「项目名称」(作品稿件「M-06」)于2026-09-10 02:43:53获得代发作品分账5元</div>
+                <div class="ledger-meta"><span>2026-09-10 02:43:53</span><span class="tag tag-ok">已结算</span></div>
+              </div>
+            </div>
+            <h3>5. 接口与落账</h3>
+            <div class="table-wrap">
+              <table class="explain-table">
+                <thead><tr><th>能力</th><th>方法 / 路径</th><th>请求</th><th>响应</th></tr></thead>
+                <tbody>
+                  <tr><td><strong>结算入账</strong></td><td><code>POST /api/yjd/settlements/apply</code></td><td>keywordId / orderId / settledAt / amount / idempotencyKey</td><td>isDaifa、用户账、剪辑手账；非代发只回用户账</td></tr>
+                  <tr><td><strong>代发判定</strong></td><td>结算回调内查</td><td>keywordId</td><td>已回填 claim + mid + editor.share；无则非代发</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <ul>
+              <li>触发点挂在平台关键词订单「已结算」回调，不由 C 端回填页直接打款。</li>
+              <li>同一 <code>orderId + keywordId</code> 只落一次用户账 + 一次剪辑手账。重复回调原样返回已有记录。</li>
+              <li>用户描述带<strong>关键词 ID</strong>；剪辑手描述带<strong>稿件 ID</strong>。两边时间戳必须同一秒。</li>
+              <li>失败整笔回滚，禁止只写成一侧。</li>
+            </ul>
+            <h3>6. 边界</h3>
+            <ul>
+              <li>不是 FR-002「代发收益」。本页是一键代发稿件回填后的关键词分账，不走主子协议，不改代发收益页。</li>
+              <li>广场、稿件详情、我的领取仍不展示金额。入账只出现在既有项目收益明细。</li>
+              <li>未回填 / 已超时的领取不把该词标成代发，不给剪辑手分账。</li>
+              <li>Demo 不发起真实结算；联调按本契约落地。</li>
+            </ul>
+            <div class="callout info">客诉对账：先看订单是否已结算，再看该词有没有已回填代发领取，再核用户实结 + 剪辑手分账是否等于应结算。</div>
+            </div>
+            <div id="ix-payout-flow" class="sub-view">
+      <div class="glass-card flow-page">
+        <p class="flow-page-intro">收益闭环：回填完成还不入账 → 关键词出单 → 已结算回调先判代发 → 拆账原子写入双方明细。失败整笔回滚，回到结算回调。</p>
+        <div class="flow-svg-wrap">
+          <svg width="920" height="780" viewBox="0 0 920 780" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <marker id="flow-arrow-pay" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                <path d="M0,0 L8,4 L0,8 Z" fill="#94a3b8" />
+              </marker>
+            </defs>
+            <g class="flow-edges" marker-end="url(#flow-arrow-pay)">
+              <line x1="460" y1="72" x2="460" y2="96" />
+              <line x1="460" y1="152" x2="460" y2="176" />
+              <line x1="380" y1="216" x2="200" y2="216" />
+              <line x1="460" y1="256" x2="460" y2="280" />
+              <line x1="460" y1="336" x2="460" y2="360" />
+              <line x1="540" y1="400" x2="700" y2="400" />
+              <polyline points="880,428 904,428 904,696 640,696" />
+              <line x1="460" y1="440" x2="460" y2="464" />
+              <line x1="460" y1="520" x2="460" y2="544" />
+              <line x1="380" y1="584" x2="200" y2="584" />
+              <polyline points="40,604 16,604 16,176 460,176" />
+              <line x1="460" y1="624" x2="460" y2="648" />
+              <line x1="460" y1="704" x2="460" y2="728" />
+            </g>
+            <g class="flow-nodes" font-family="Inter, PingFang SC, sans-serif">
+              <rect x="280" y="16" width="360" height="56" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="460" y="40" text-anchor="middle" font-size="12" fill="#1e40af">用户回填完成</text>
+              <text x="460" y="58" text-anchor="middle" font-size="10" fill="#64748b">领取已回填 · 稿件已完成 · 此时不入账</text>
+
+              <rect x="280" y="96" width="360" height="56" rx="6" fill="#ffedd5" stroke="#ea580c" />
+              <text x="460" y="120" text-anchor="middle" font-size="12" fill="#9a3412">关键词出单</text>
+              <text x="460" y="138" text-anchor="middle" font-size="10" fill="#64748b">待结算只累计 · 不写明细</text>
+
+              <polygon points="460,176 540,216 460,256 380,216" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="460" y="220" text-anchor="middle" font-size="11" fill="#854d0e">订单已结算?</text>
+              <text x="256" y="208" font-size="10" fill="#dc2626">否</text>
+              <rect x="40" y="196" width="160" height="40" rx="6" fill="#e2e8f0" stroke="#94a3b8" />
+              <text x="120" y="221" text-anchor="middle" font-size="11" fill="#475569">待结算不入账</text>
+              <text x="472" y="272" font-size="10" fill="#16a34a">是</text>
+
+              <rect x="280" y="280" width="360" height="56" rx="6" fill="#dcfce7" stroke="#16a34a" />
+              <text x="460" y="304" text-anchor="middle" font-size="12" fill="#166534">结算回调 apply</text>
+              <text x="460" y="322" text-anchor="middle" font-size="10" fill="#64748b">同一 orderId+keywordId 幂等</text>
+
+              <polygon points="460,360 540,400 460,440 380,400" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="460" y="404" text-anchor="middle" font-size="11" fill="#854d0e">代发关键词?</text>
+              <text x="556" y="388" font-size="10" fill="#dc2626">否</text>
+              <rect x="700" y="372" width="180" height="56" rx="6" fill="#e2e8f0" stroke="#94a3b8" />
+              <text x="790" y="396" text-anchor="middle" font-size="11" fill="#475569">全额用户入账</text>
+              <text x="790" y="414" text-anchor="middle" font-size="10" fill="#64748b">不写剪辑手分账</text>
+              <text x="472" y="456" font-size="10" fill="#16a34a">是</text>
+
+              <rect x="280" y="464" width="360" height="56" rx="6" fill="#dcfce7" stroke="#16a34a" />
+              <text x="460" y="488" text-anchor="middle" font-size="12" fill="#166534">按分成拆用户实结+剪辑手分账</text>
+              <text x="460" y="506" text-anchor="middle" font-size="10" fill="#64748b">两边金额之和必须等于应结算</text>
+
+              <polygon points="460,544 540,584 460,624 380,584" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="460" y="588" text-anchor="middle" font-size="11" fill="#854d0e">原子写入成功?</text>
+              <text x="256" y="576" font-size="10" fill="#dc2626">否</text>
+              <rect x="40" y="564" width="160" height="40" rx="6" fill="#fecaca" stroke="#dc2626" />
+              <text x="120" y="589" text-anchor="middle" font-size="11" fill="#991b1b">整笔回滚</text>
+              <text x="472" y="640" font-size="10" fill="#16a34a">是</text>
+
+              <rect x="280" y="648" width="360" height="56" rx="6" fill="#dcfce7" stroke="#16a34a" />
+              <text x="460" y="672" text-anchor="middle" font-size="12" fill="#166534">双方项目收益明细</text>
+              <text x="460" y="690" text-anchor="middle" font-size="10" fill="#64748b">状态已结算 · 同一秒时间戳</text>
+
+              <rect x="280" y="728" width="360" height="36" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="460" y="751" text-anchor="middle" font-size="12" fill="#1e40af">入账完成 · 可对账</text>
+            </g>
+          </svg>
         </div>
-        <div class="data-block">
-          <h2>字段清单（按 store 实体）</h2>
-          <ul>
-            <li><strong>editors</strong>：id / ybId / name / share / note / src / projects / status / time</li>
-            <li><strong>works</strong>：id / title / project / book / bookId / size / dl / editor / kind / mat / occ / time / share / cover / genre / tags / imgs / preview(≤3) / pubTitle / pubDesc / duration / audit / rejectReason / fileName / occupied / earn</li>
-            <li><strong>projects</strong>：id / name / logo / status / sort / updated</li>
-            <li><strong>mats</strong>：id / name / status</li>
-            <li><strong>skus</strong>：id / times / points / on</li>
-            <li><strong>claims</strong>：id / user / mid / title / work / project / editor / cover / kind / kw / fill / status / time / link / claimedAt / downloadedAt / expireAt</li>
-            <li><strong>bans</strong>：user / strikes / time / status</li>
-            <li><strong>user</strong>：id / free / bought / strikes / banned</li>
-          </ul>
+        <div class="flow-legend">
+          <span><i style="background:#dbeafe;border:1px solid #2563eb"></i>前端 / 用户操作</span>
+          <span><i style="background:#dcfce7;border:1px solid #16a34a"></i>后端判定 / 写入</span>
+          <span><i style="background:#ffedd5;border:1px solid #ea580c"></i>异步 / 超时</span>
+          <span><i style="background:#fef9c3;border:1px solid #ca8a04"></i>校验</span>
+          <span><i style="background:#fecaca;border:1px solid #dc2626"></i>阻断</span>
+          <span><i style="background:#e2e8f0;border:1px solid #94a3b8"></i>跳过 / 再领</span>
         </div>
-        <div class="data-block">
-          <h2>接口清单</h2>
-          <p>与上方契约表同一组路径。Demo 全部短路为 <code>YJD.open / YJD.save</code>，无 fetch、无鉴权头。</p>
-        </div>
-        <div class="data-block">
-          <h2>状态清单</h2>
-          <ul>
-            <li>剪辑手：已录入 / 已停用</li>
-            <li>稿件占用：空闲 / 占用中 / 已完成</li>
-            <li>平台审核：审核中 / 已通过 / 已驳回</li>
-            <li>领取（C 端）：未回填 / 已回填 / 已超时</li>
-            <li>领取（后台）：待回填 / 已回填 / 已超时释放</li>
-            <li>黑名单：停权中 / 已恢复</li>
-            <li>项目 / 素材：启用 / 禁用</li>
-            <li>次数商品：在售 / 下架</li>
-          </ul>
-          <div class="callout info">状态枚举与门禁顺序（次数 → 选词 → 占用）本轮不改。</div>
+      </div>
+            </div>
+          </div>
+          <div id="ix-list" class="ix-pane">
+          <p>用于产品、前端、后端联调时逐项确认。</p>
+          <div class="ix-tab-bar" role="tablist">
+            <button type="button" class="active" data-list="list-matrix">联调矩阵</button>
+            <button type="button" data-list="list-fields">字段清单</button>
+            <button type="button" data-list="list-apis">接口清单</button>
+            <button type="button" data-list="list-states">状态规则</button>
+          </div>
+          <div id="list-matrix" class="ix-pane active">
+            <div class="table-wrap">
+              <table class="explain-table">
+                <thead><tr><th>模块</th><th>前端触发</th><th>后端交互</th><th>成功后刷新</th><th>失败处理</th></tr></thead>
+                <tbody>
+                  <tr><td>作品广场</td><td>进入页面 / 筛项目</td><td>项目列表 + feed 并行查询</td><td>宫格、空态、Banner</td><td>空态和重试</td></tr>
+                  <tr><td>稿件详情</td><td>点宫格</td><td>详情 + 次数 + 停权态</td><td>底栏、领取步骤/发布技巧</td><td>不可领文案，不扣次</td></tr>
+                  <tr><td>图集预览</td><td>点封面</td><td>preview≤3，不走下载</td><td>浮层 1/3</td><td>缺图用封面补齐</td></tr>
+                  <tr><td>选词领取</td><td>确认关键词</td><td>门禁 + 占用 + 扣次 + 写领取</td><td>详情已领、广场隐藏、领取列表</td><td>Toast 错误码，浮层策略见上表</td></tr>
+                  <tr><td>兑换次数</td><td>选档兑换</td><td>校验在售并加 bought</td><td>剩余次数</td><td>下架提示，不打开选词</td></tr>
+                  <tr><td>回填</td><td>提交回填页</td><td>领取已回填、稿件已完成</td><td>领取 Tab、广场不再出现</td><td>已回填/已超时 toast</td></tr>
+                  <tr><td>PC 上传</td><td>字段→成片→确认→队列</td><td>按条上传中/已上传/失败；需审=审核中，免审=已通过</td><td>PC list、后台稿件</td><td>未录入/项目禁用拦截；失败可重传文件</td></tr>
+                  <tr><td>审核</td><td>单条或批量 通过 / 驳回</td><td>改 audit；驳回写原因</td><td>广场、PC list</td><td>已通过不可再驳；批量跳过不合资格行</td></tr>
+                  <tr><td>黑名单恢复</td><td>后台确认</td><td>banned=false</td><td>详情领取按钮</td><td>无自助解禁</td></tr>
+                  <tr><td>用户收益入账</td><td>关键词订单已结算回调</td><td>先判代发，再按分成写用户账+剪辑手账</td><td>双方项目收益明细</td><td>非代发全额给用户；失败整笔回滚</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div id="list-fields" class="ix-pane">
+            <ul>
+              <li><strong>editors</strong>：id / ybId / name / share / needReview / note / src / projects / status / time；统计派生 worksByEditor / claimedWorksByEditor / earnByEditor / pendingEarnByEditor</li>
+              <li><strong>works</strong>：id / title / project / book / bookId / size / dl / editor / kind / mat / occ / time / share / cover / genre / tags / imgs / preview(≤3) / pubTitle / pubDesc / duration / audit / rejectReason / fileName / occupied / earn</li>
+              <li><strong>projects</strong>：id / name / logo / status / sort / updated。新增从 BRAND_CATALOG 点选，不手填、不写 keywords</li>
+              <li><strong>mats</strong>：id / name / status</li>
+              <li><strong>skus</strong>：id / times / points / on / buyers（只读购买人数）</li>
+              <li><strong>claims</strong>：id / user / mid / title / work / project / book / bookId / editor / cover / kind / kw / fill / fillVideo / pendingEarn / status / time / link / claimedAt / downloadedAt / expireAt</li>
+              <li><strong>keywords</strong>：STORE.keywords[项目名] = 该用户在该项目已通过申词 mock，不由项目管理维护</li>
+              <li><strong>bans</strong>：user / strikes / time / status</li>
+              <li><strong>user</strong>：id / free / bought / strikes / banned</li>
+              <li><strong>settlements</strong>：orderId / keywordId / mid / project / settledAt / gross / editorShare / userNet / status=已结算 / userTitle / userDesc / editorTitle / editorDesc</li>
+            </ul>
+          </div>
+          <div id="list-apis" class="ix-pane">
+            <p>与上方契约表同一组路径。Demo 全部短路为 <code>YJD.open / YJD.save</code>，无 fetch、无鉴权头。</p>
+            <ul>
+              <li><code>GET /api/yjd/feed</code> · <code>GET /api/yjd/projects</code> · <code>GET /api/yjd/works/:id</code> · <code>GET /api/yjd/works/:id/preview</code></li>
+              <li><code>GET /api/yjd/projects/:id/keywords</code> · <code>POST /api/yjd/claims</code> · <code>POST /api/yjd/skus/:id/redeem</code></li>
+              <li><code>POST /api/yjd/claims/:id/fill</code> · <code>POST /api/yjd/claims/:id/timeout</code></li>
+              <li><code>POST /api/yjd/pc/works</code> · <code>POST /api/yjd/admin/works/:id/audit</code> · <code>POST /api/yjd/admin/bans/:user/restore</code></li>
+              <li><code>POST /api/yjd/settlements/apply</code>（关键词已结算回调；代发分账见「用户收益入账」）</li>
+            </ul>
+          </div>
+          <div id="list-states" class="ix-pane">
+            <ul>
+              <li>剪辑手：已录入 / 已停用</li>
+              <li>稿件占用：空闲 / 占用中 / 已完成</li>
+              <li>平台审核：审核中 / 已通过 / 已驳回</li>
+              <li>领取（C 端）：未回填 / 已回填 / 已超时</li>
+              <li>领取（后台）：待回填 / 已回填 / 已超时释放</li>
+              <li>黑名单：停权中 / 已恢复</li>
+              <li>项目 / 素材：启用 / 禁用</li>
+              <li>次数商品：在售 / 下架</li>
+              <li>关键词订单：待结算 / 已结算（入账只写已结算）</li>
+            </ul>
+            <div class="callout info">领取门禁：停权 → 次数 → 选词浮层 → 资格/占用。次数不足只开兑换。</div>
+          </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1267,135 +1924,26 @@
   <div class="drawer-overlay" id="ruleOverlay" onclick="setRuleDrawer(false)"></div>
   <aside class="drawer" id="ruleDrawer" role="dialog" aria-labelledby="ruleTitle">
     <div class="drawer-header">
-      <h2 id="ruleTitle">FR-014 · v7 需求规则</h2>
+      <div>
+        <h2 id="ruleTitle">FR-014 · v8 需求规则</h2>
+        <p class="drawer-sub">按场景分列 · 页内 Tab 只放 Demo</p>
+      </div>
       <button class="drawer-close" type="button" onclick="setRuleDrawer(false)">×</button>
     </div>
     <div class="rule-tab-bar">
+      <button type="button" data-rule="rule-explain">业务解释</button>
       <button type="button" class="active" data-rule="rule-fe">前端需求</button>
       <button type="button" data-rule="rule-pc">PC端需求</button>
       <button type="button" data-rule="rule-admin">后台需求</button>
+      <button type="button" data-rule="rule-data">数据交互</button>
     </div>
+    <div class="rule-sub-bar" id="ruleSubBar"></div>
     <div class="drawer-body">
-      <div id="rule-fe" class="rule-panel active">
-        <div class="rule-section">
-          <h3><span>1</span>业务目标</h3>
-          <div class="rule-content"><p>没有剪辑能力的用户，通过领取剪辑手已发布的图集/视频稿件做项目变现；剪辑手只走客服招募，不走站内申请。</p></div>
-        </div>
-        <div class="rule-section">
-          <h3><span>2</span>页面与入口</h3>
-          <div class="rule-content">
-            <ul>
-              <li><strong>作品广场</strong>：宫格；项目图标横滑直选；搜索在项目下方；下拉筛剪辑师 / 素材类型 / 稿件类型；封面为本地图片（小说/漫画/视频题材）。广场 Banner 复用平台已有能力（0–5 条轮播已实现），本 FR 不另做后台配置。只列启用项目、已录入剪辑手、启用素材、平台已通过且空闲的稿件；审核中 / 已驳回 / 占用中 / 已回填完成均不回广场。不展示收益金额。底栏切「已领」。</li>
-              <li><strong>稿件详情</strong>：素材铺满。标题下展示标签；书籍名称下为书籍 ID。内容底、按钮上展示注意事项。未领取展示领取步骤；领取后改为作品发布技巧（发布标题 / 发布描述可复制）。未领取底栏：剩余次数、快捷提词、领取。领取后底栏：添加水印、下载稿件。不展示收益金额。</li>
-              <li><strong>添加水印</strong>：底部坞按四组功能最高高度锁死，预览吃剩余空间。文本可点出键盘。字体 / 字色 / 背景 / 水印横向 Tab；四组叠同一高度，切 Tab 浮层不跳动。字色/背景的颜色与透明度上下分行，选项换行露出。水印文字可拖动。下载先打水印再下载。</li>
-              <li><strong>我的领取</strong>：项目图标只展示有领取记录的项目。胶囊 Tab：未回填 / 已回填 / 已超时。卡片：关键词标题；封面、作品标题、项目名称、作者、领取时间、下载时间、7 天下载倒计时（超时不可再下）。下载/复制链接为次级；立即回填始终高亮，已回填/已超时点按提示。点信息区（不含灰底三按钮）进该 mid 稿件详情，底栏为已领取；返回回到领取页。「立即回填」仍只去回填页。</li>
-              <li>C 端不承载剪辑手上传或工作台。广场招募帧进海报详情；上传只在 PC。</li>
-            </ul>
-          </div>
-        </div>
-        <div class="rule-section">
-          <h3><span>3</span>交互规则</h3>
-          <div class="rule-content">
-            <ul>
-              <li>领取门禁：先校验剩余次数（按钮旁可见），次数足够后浮层选该项目已通过关键词，不进下级页。确认后 loading：正在下载稿件 → 正在保存到相册 → 已保存到相册。</li>
-              <li>次数不足弹出兑换浮层，选档后点「兑换」；在售最多 4 档，下架不可兑。</li>
-              <li>领取成功即扣次，超时释放不退。原领取人未停权可再领同一稿，再领再扣次。</li>
-            </ul>
-          </div>
-        </div>
-        <div class="rule-section">
-          <h3><span>4</span>边界规则</h3>
-          <div class="rule-content">
-            <ul>
-              <li>一稿同时一人占用；占用中对他人 feed 隐藏。</li>
-              <li>领取成功后 24h 未完成回填 = 1 次未回填，并释放回 feed。</li>
-              <li>终身未回填超过 3 次停权，仅后台黑名单手动恢复。</li>
-              <li>禁用项目不出现在作品广场。</li>
-              <li>广场只列启用项目、已录入剪辑手、启用素材、已通过且空闲的稿。</li>
-            </ul>
-          </div>
-        </div>
-        <div class="rule-section">
-          <h3><span>5</span>业务流程</h3>
-          <div class="rule-content"><p>见本页「前端交互 → 业务流程」。</p></div>
-        </div>
-      </div>
-      <div id="rule-pc" class="rule-panel">
-        <div class="rule-section">
-          <h3><span>1</span>业务目标</h3>
-          <div class="rule-content"><p>剪辑手用电脑在<strong>已有</strong>右豹创作者中心供稿。本 FR 不新造 PC 产品，只在现有业务线增加剪辑供稿闭环。</p></div>
-        </div>
-        <div class="rule-section">
-          <h3><span>2</span>页面与入口</h3>
-          <div class="rule-content">
-            <ul>
-              <li><strong>已有导航</strong>：项目中心 / 作品管理 / 收益中心保持原样，本 FR 不改。</li>
-              <li><strong>剪辑供稿（单一菜单）</strong>：顶部招募 BN，下方剪辑手看板。点 BN 用侧栏抽屉展开招募详情（卖点 / 适合谁 / 客服二维码），无站内申请表。</li>
-              <li><strong>剪辑手看板</strong>：已录入才出数。已授权项目、上传的稿件、已被领取的稿件、已经产生的收益。非剪辑手（未录入 / 已停用）看板走缺省，不跳走。</li>
-              <li><strong>最近上传</strong>：出示书籍 ID、稿件信息（稿件大小 + 稿件名称）。</li>
-              <li><strong>上传入口</strong>：弹窗三步。① 选文件夹或压缩包；② 填齐后台同款字段（标题、项目、书名、书籍 ID、大小、稿件名称、发布标题/描述、图集或视频、素材类型；剪辑手=当前登录人）；③ 确认后提交平台审核。</li>
-              <li><strong>上传 list</strong>：与后台稿件表同字段，不展示稿件下载链接。出示平台审核：审核中 / 已通过 / 已驳回（驳回出示原因）。</li>
-            </ul>
-          </div>
-        </div>
-        <div class="rule-section">
-          <h3><span>3</span>边界</h3>
-          <div class="rule-content">
-            <ul>
-              <li>未录入或已停用：看板缺省；不能上传。招募 BN 仍可点开抽屉。</li>
-              <li>只可传到录入时的可上传项目，且项目须启用。</li>
-              <li>必须用文件夹或压缩包上传，不能只选单文件。</li>
-              <li>提交后为审核中，不进广场；后台通过后才可见。已驳回 list 出示原因。</li>
-              <li>剪辑手个人删除仅支持未占用（空闲）稿件；占用中与已完成不能删。</li>
-              <li>发布写入与 C 端 / 后台同一份演示数据。</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-      <div id="rule-admin" class="rule-panel">
-        <div class="rule-section">
-          <h3><span>1</span>业务目标</h3>
-          <div class="rule-content"><p>运营在右豹后台管剪辑手、稿件、领取/回填、停权恢复、项目、素材类型和次数商品。广场 Banner 复用平台已有能力，本 FR 不单开配置页。</p></div>
-        </div>
-        <div class="rule-section">
-          <h3><span>2</span>数据表与字段</h3>
-          <div class="rule-content">
-            <ul>
-              <li><strong>剪辑手</strong>：录入必填右豹 ID、分成比例、备注；可上传项目只能勾选项目表；另有昵称、客服来源、状态、录入时间。未录右豹 ID 不能上传发布。</li>
-              <li><strong>稿件</strong>：项目与书分列。书聚合书籍名称 + 书籍 ID。稿件信息聚合文件大小 + 下载链接。发布技巧聚合作品标题 + 作品描述。另有剪辑手、图集或视频、素材类型、占用态、平台审核（审核中 / 已通过 / 已驳回，驳回出示原因）、上传时间。PC 端 list 同字段但不展示下载链接。</li>
-              <li><strong>领取记录</strong>：用户、稿件、关键词、回填信息、待回填/已回填/已超时释放。操作列「详情」看出回填；「稿件详情」抽屉出示稿件字段。</li>
-              <li><strong>项目</strong>：支持添加 / 编辑。字段：项目名称、Logo 信息、状态（启用 / 禁用）、排序、更新时间、已通过关键词（至少 1 条）。禁用项目不可上传、不进广场。</li>
-              <li><strong>黑名单</strong>：用户、未回填次数、停权时间；支持手动恢复。</li>
-              <li><strong>次数商品</strong>：x 次 / y 积分，最多 4 档在售，可改价、下架。免费次数挂本页。</li>
-            </ul>
-          </div>
-        </div>
-        <div class="rule-section">
-          <h3><span>3</span>列表与筛选</h3>
-          <div class="rule-content">
-            <ul>
-              <li>详情用 Drawer，录入/编辑/改价用 Modal，恢复/下架用 Confirm。</li>
-              <li>领取记录必须能看出回填信息与三种状态。</li>
-              <li>剪辑手列表可按右豹 ID / 昵称筛选；项目列表可按名称 / 启用禁用筛选。</li>
-            </ul>
-          </div>
-        </div>
-        <div class="rule-section">
-          <h3><span>4</span>边界规则</h3>
-          <div class="rule-content">
-            <ul>
-              <li>停权恢复只能后台手动，没有自助解禁。恢复后回广场，可再领。</li>
-              <li>禁用项目不可上传、不出现在作品广场。</li>
-              <li>下架商品立即不可新购；已购次数保留。</li>
-              <li>剪辑手停用后不能上传；有占用中稿件不能停用；有稿件不能硬删只能停用。</li>
-              <li>占用中稿件不能删；有未超时领取不能删；回填后稿件为已完成，不回广场。</li>
-              <li>PC 新上传稿件默认审核中；后台通过后进广场，驳回须填原因且不进广场。</li>
-              <li>前后端共用同一份演示数据：后台启用/停用/改次即时影响广场、上传与领取次数。本 Demo 是逻辑闭环，不是真实接口闭环。</li>
-              <li>本 Demo 不做真实积分扣减或权限落库。</li>
-            </ul>
-          </div>
-        </div>
-      </div>
+      <div id="rule-explain" class="rule-panel"></div>
+      <div id="rule-fe" class="rule-panel active"></div>
+      <div id="rule-pc" class="rule-panel"></div>
+      <div id="rule-admin" class="rule-panel"></div>
+      <div id="rule-data" class="rule-panel"></div>
     </div>
   </aside>
 
@@ -1421,6 +1969,7 @@
   <div class="toast" id="toast"></div>
 
   <script src="yijian-daifa-store.js"></script>
+  <script src="yijian-daifa-rules.js"></script>
   <script>
     var STORE = YJD.open();
     var EDITORS = STORE.editors;
@@ -1441,12 +1990,8 @@
       SKUS = STORE.skus;
       MATS = STORE.mats;
     }
-    var LOGO_OPTS = [
-      { name: '番茄小说', src: 'assets/fr014/logo-fanqie.jpg' },
-      { name: '红果短剧', src: 'assets/fr014/logo-hongguo-drama.jpg' },
-      { name: '知乎故事', src: 'assets/fr014/logo-zhihu.jpg' },
-      { name: '红果漫剧', src: 'assets/fr014/logo-hongguo-comic.jpg' }
-    ];
+    var LOGO_OPTS = YJD.LOGO_OPTS;
+    var BRAND_CATALOG = YJD.BRAND_CATALOG;
 
     function showToast(msg) {
       var el = document.getElementById('toast');
@@ -1489,27 +2034,75 @@
         if (s && e.status !== s) return false;
         return true;
       }).map(function (e) {
+        var uploaded = YJD.worksByEditor(STORE, e.name).length;
+        var claimed = YJD.claimedWorksByEditor(STORE, e.name).length;
+        var settled = YJD.earnByEditor(STORE, e.name);
+        var pending = YJD.pendingEarnByEditor(STORE, e.name);
         return '<tr><td>' + esc(e.id) + '</td><td>' + esc(e.ybId) + '</td><td>' + esc(e.name) + '</td><td>' + esc(e.share) + '</td>' +
-          '<td class="cell-agg" title="' + esc(e.note) + '">' + esc(e.note) + '</td><td>' + esc(e.src) + '</td><td>' + esc(e.projects) + '</td><td>' + stTag(e.status) + '</td><td>' + esc(e.time) + '</td>' +
+          '<td>' + (e.needReview === false ? '<span class="tag tag-muted">否</span>' : '<span class="tag tag-warn">是</span>') + '</td>' +
+          '<td class="cell-agg" title="' + esc(e.note) + '">' + esc(e.note) + '</td><td>' + esc(e.src) + '</td><td>' + esc(e.projects) + '</td>' +
+          '<td class="cell-agg">已上传 ' + uploaded + '<div class="cell-sub">已被领取 ' + claimed + '</div></td>' +
+          '<td class="cell-agg">已结算 ' + settled + '<div class="cell-sub">待结算 ' + pending + '</div>' +
+          '<button class="link" type="button" onclick="openEarnDrawer(\'' + e.id + '\')">收益</button></td>' +
+          '<td>' + stTag(e.status) + '</td><td>' + esc(e.time) + '</td>' +
           '<td><button class="link" type="button" onclick="openEditorDetail(\'' + e.id + '\')">详情</button>' +
           '<button class="link" type="button" onclick="openEditorModal(\'' + e.id + '\')">编辑</button>' +
           (e.status === '已录入'
             ? '<button class="link" type="button" onclick="toggleEditor(\'' + e.id + '\',false)">停用</button>'
             : '<button class="link" type="button" onclick="toggleEditor(\'' + e.id + '\',true)">启用</button>') +
           '<button class="link link-danger" type="button" onclick="deleteEditor(\'' + e.id + '\')">删除</button></td></tr>';
-      }).join('') || '<tr><td colspan="10" style="text-align:center;color:#9aa5b4">无匹配</td></tr>';
+      }).join('') || '<tr><td colspan="13" style="text-align:center;color:#9aa5b4">无匹配</td></tr>';
     }
     function resetEd() { document.getElementById('edQ').value = ''; document.getElementById('edS').value = ''; renderEditors(); }
-    function renderWorks() {
+    var wkSelected = {};
+    function filteredWorks() {
       var q = (document.getElementById('wkQ').value || '').trim();
       var o = document.getElementById('wkO').value;
       var a = document.getElementById('wkA').value;
-      document.getElementById('wkBody').innerHTML = WORKS.filter(function (w) {
+      return WORKS.filter(function (w) {
         if (q && w.title.indexOf(q) === -1 && w.id.indexOf(q) === -1) return false;
         if (o && w.occ !== o) return false;
         if (a && (w.audit || '已通过') !== a) return false;
         return true;
-      }).map(function (w) {
+      });
+    }
+    function selectedWorkRows() {
+      return WORKS.filter(function (w) { return wkSelected[w.id]; });
+    }
+    function syncWkBatchBar() {
+      var n = selectedWorkRows().length;
+      var bar = document.getElementById('wkBatchBar');
+      if (bar) bar.classList.toggle('show', n > 0);
+      var info = document.getElementById('wkBatchInfo');
+      if (info) info.textContent = '已选 ' + n + ' 项';
+      var all = document.getElementById('wkCheckAll');
+      var vis = filteredWorks();
+      if (all) {
+        var visSel = vis.filter(function (w) { return wkSelected[w.id]; }).length;
+        all.checked = vis.length > 0 && visSel === vis.length;
+        all.indeterminate = visSel > 0 && visSel < vis.length;
+      }
+    }
+    function toggleWorkCheck(id, on) {
+      if (on) wkSelected[id] = true;
+      else delete wkSelected[id];
+      var row = document.querySelector('#wkBody tr[data-mid="' + id + '"]');
+      if (row) row.classList.toggle('selected', !!on);
+      syncWkBatchBar();
+    }
+    function toggleWorkCheckAll(on) {
+      filteredWorks().forEach(function (w) {
+        if (on) wkSelected[w.id] = true;
+        else delete wkSelected[w.id];
+      });
+      renderWorks();
+    }
+    function clearWorkSelection() {
+      wkSelected = {};
+      renderWorks();
+    }
+    function renderWorks() {
+      document.getElementById('wkBody').innerHTML = filteredWorks().map(function (w) {
         var audit = w.audit || '已通过';
         var auditCell = stTag(audit) + (audit === '已驳回' && w.rejectReason ? '<div class="cell-sub">原因：' + esc(w.rejectReason) + '</div>' : '');
         var auditBtns = '';
@@ -1519,9 +2112,12 @@
         if (audit === '审核中' && w.occ === '空闲') {
           auditBtns += '<button class="link link-danger" type="button" onclick="rejectWork(\'' + w.id + '\')">驳回</button>';
         }
-        return '<tr><td>' + esc(w.id) + '</td><td>' + esc(w.title) + '</td><td>' + esc(w.project) + '</td>' +
+        var checked = wkSelected[w.id] ? ' checked' : '';
+        return '<tr data-mid="' + esc(w.id) + '" data-title="' + esc(w.title) + '" class="' + (wkSelected[w.id] ? 'selected' : '') + '">' +
+          '<td class="col-check"><input type="checkbox" data-wk="' + esc(w.id) + '"' + checked + ' onclick="toggleWorkCheck(\'' + w.id + '\', this.checked)" /></td>' +
+          '<td>' + esc(w.id) + '</td><td>' + esc(w.title) + '</td><td>' + esc(w.project) + '</td>' +
           '<td class="cell-agg">' + esc(w.book) + '<div class="cell-sub">书籍 ID ' + esc(w.bookId) + '</div></td>' +
-          '<td class="cell-agg">' + esc(w.size) + '<div class="cell-sub">' + esc(w.dl) + '</div></td>' +
+          '<td class="cell-agg">' + esc(YJD.workInfoLabel(w)) + '<div class="cell-sub">' + esc(w.dl) + '</div></td>' +
           '<td class="cell-agg" title="' + esc(w.pubDesc) + '">' + esc(w.pubTitle) + '<div class="cell-sub">' + esc(w.pubDesc) + '</div></td>' +
           '<td>' + esc(w.editor) + '</td><td>' + esc(w.kind) + '</td><td>' + esc(w.mat) + '</td><td>' + stTag(w.occ) + '</td>' +
           '<td>' + auditCell + '</td><td>' + esc(w.time) + '</td>' +
@@ -1529,7 +2125,8 @@
           '<button class="link" type="button" onclick="openWorkModal(\'' + w.id + '\')">编辑</button>' +
           auditBtns +
           '<button class="link link-danger" type="button" onclick="deleteWork(\'' + w.id + '\')">删除</button></td></tr>';
-      }).join('') || '<tr><td colspan="13" style="text-align:center;color:#9aa5b4">无匹配</td></tr>';
+      }).join('') || '<tr><td colspan="14" style="text-align:center;color:#9aa5b4">无匹配</td></tr>';
+      syncWkBatchBar();
     }
     function renderProjects() {
       var q = (document.getElementById('pjQ').value || '').trim();
@@ -1540,7 +2137,9 @@
         return true;
       }).slice().sort(function (a, b) { return a.sort - b.sort; });
       document.getElementById('pjBody').innerHTML = rows.map(function (p) {
-        var logoName = (LOGO_OPTS.find(function (o) { return o.src === p.logo; }) || {}).name || p.logo;
+        var logoName = (BRAND_CATALOG.find(function (o) { return o.src === p.logo && o.name === p.name; }) ||
+          BRAND_CATALOG.find(function (o) { return o.name === p.name; }) ||
+          LOGO_OPTS.find(function (o) { return o.src === p.logo; }) || {}).name || p.name;
         return '<tr><td>' + esc(p.name) + '</td>' +
           '<td><div class="logo-cell"><img src="' + esc(p.logo) + '" alt="" /><div>' + esc(logoName) + '<div class="cell-sub">' + esc(p.logo) + '</div></div></div></td>' +
           '<td>' + (p.status === '启用' ? stTag('启用') : '<span class="tag tag-muted">禁用</span>') + '</td>' +
@@ -1561,10 +2160,19 @@
       }).map(function (c) {
         var st = YJD.admClaimSt(c.status);
         var title = c.work || c.title || '';
-        return '<tr><td>' + esc(c.id) + '</td><td>' + esc(c.user || STORE.user.id) + '</td><td>' + esc(title) + '</td><td>' + esc(c.kw) + '</td><td>' + esc(c.fill || '—') + '</td><td>' + stTag(st) + '</td><td>' + esc(c.time) + '</td>' +
-          '<td><button class="link" type="button" onclick="openKv(\'' + c.id + '\',\'回填：' + esc(c.fill || '—') + '\')">详情</button>' +
-          '<button class="link" type="button" onclick="openWorkDetail(\'' + c.mid + '\')">稿件详情</button></td></tr>';
-      }).join('') || '<tr><td colspan="8" style="text-align:center;color:#9aa5b4">无匹配</td></tr>';
+        var w = WORKS.find(function (x) { return x.id === c.mid; }) || {};
+        var ed = EDITORS.find(function (x) { return x.name === c.editor; }) || {};
+        var filled = c.status === '已回填';
+        var fillCell = filled
+          ? esc(c.fill || '—') + '<div class="cell-sub">' + esc(c.fillVideo || '—') + '</div>'
+          : '—';
+        return '<tr><td>' + esc(c.id) + '</td><td>' + esc(c.user || STORE.user.id) + '</td><td>' + esc(title) + '</td>' +
+          '<td>' + esc(c.project || w.project || '—') + '</td>' +
+          '<td class="cell-agg">' + esc(c.book || w.book || '—') + '<div class="cell-sub">书籍 ID ' + esc(c.bookId || w.bookId || '—') + '</div></td>' +
+          '<td class="cell-agg">' + esc(ed.ybId || '—') + ' ' + esc(c.editor || '—') + '</td>' +
+          '<td>' + esc(c.kw) + '</td><td class="cell-agg">' + fillCell + '</td><td>' + stTag(st) + '</td><td>' + esc(c.time) + '</td>' +
+          '<td><button class="link" type="button" onclick="openWorkDetail(\'' + c.mid + '\')">稿件详情</button></td></tr>';
+      }).join('') || '<tr><td colspan="11" style="text-align:center;color:#9aa5b4">无匹配</td></tr>';
     }
     function renderBan() {
       var q = (document.getElementById('bnQ').value || '').trim();
@@ -1583,7 +2191,7 @@
         act += s.on
           ? '<button class="link link-danger" type="button" onclick="toggleSku(\'' + s.id + '\',false)">下架</button>'
           : '<button class="link" type="button" onclick="toggleSku(\'' + s.id + '\',true)">上架</button>';
-        return '<tr><td>' + s.id + '</td><td>' + s.times + ' 次</td><td>' + s.points + '</td><td>' + (s.on ? stTag(true) : '<span class="tag tag-muted">下架</span>') + '</td><td>' + act + '</td></tr>';
+        return '<tr><td>' + s.id + '</td><td>' + s.times + ' 次</td><td>' + s.points + '</td><td>' + (s.buyers == null ? 0 : s.buyers) + '</td><td>' + (s.on ? stTag(true) : '<span class="tag tag-muted">下架</span>') + '</td><td>' + act + '</td></tr>';
       }).join('');
     }
     function openKv(title, body) {
@@ -1603,7 +2211,7 @@
         '<dt>项目</dt><dd>' + esc(w.project) + '</dd>' +
         '<dt>书籍名称</dt><dd>' + esc(w.book) + '</dd>' +
         '<dt>书籍 ID</dt><dd>' + esc(w.bookId) + '</dd>' +
-        '<dt>文件大小</dt><dd>' + esc(w.size) + '</dd>' +
+        '<dt>文件大小</dt><dd>' + esc(YJD.workInfoLabel(w)) + '</dd>' +
         '<dt>下载链接</dt><dd>' + esc(w.dl) + '</dd>' +
         '<dt>作品标题</dt><dd>' + esc(w.pubTitle) + '</dd>' +
         '<dt>作品描述</dt><dd>' + esc(w.pubDesc) + '</dd>' +
@@ -1645,9 +2253,14 @@
         '<dt>右豹 ID</dt><dd>' + esc(e.ybId) + '</dd>' +
         '<dt>昵称</dt><dd>' + esc(e.name) + '</dd>' +
         '<dt>分成比例</dt><dd>' + esc(e.share) + '</dd>' +
+        '<dt>稿件需要审核</dt><dd>' + (e.needReview === false ? '否' : '是') + '</dd>' +
         '<dt>备注</dt><dd>' + esc(e.note) + '</dd>' +
         '<dt>来源</dt><dd>' + esc(e.src) + '</dd>' +
         '<dt>可上传项目</dt><dd>' + esc(e.projects) + '</dd>' +
+        '<dt>已上传</dt><dd>' + YJD.worksByEditor(STORE, e.name).length + '</dd>' +
+        '<dt>已被领取</dt><dd>' + YJD.claimedWorksByEditor(STORE, e.name).length + '</dd>' +
+        '<dt>已结算</dt><dd>' + YJD.earnByEditor(STORE, e.name) + '</dd>' +
+        '<dt>待结算</dt><dd>' + YJD.pendingEarnByEditor(STORE, e.name) + '</dd>' +
         '<dt>状态</dt><dd>' + esc(e.status) + '</dd>' +
         '<dt>录入时间</dt><dd>' + esc(e.time) + '</dd>' +
         '</dl>';
@@ -1659,6 +2272,10 @@
       return '<div class="field"><label>右豹 ID<span class="req">*</span></label><input id="mYb" placeholder="YB10086" value="' + esc(e.ybId || '') + '" /></div>' +
         '<div class="field"><label>昵称<span class="req">*</span></label><input id="mName" placeholder="剪辑手昵称" value="' + esc(e.name || '') + '" /></div>' +
         '<div class="field"><label>分成比例<span class="req">*</span></label><input id="mShare" placeholder="50%" value="' + esc(e.share || '') + '" /></div>' +
+        '<div class="field"><label>稿件需要审核<span class="req">*</span></label><div class="radio-list">' +
+          '<label><input type="radio" name="mNeedReview" value="1"' + (e.needReview !== false ? ' checked' : '') + ' />是</label>' +
+          '<label><input type="radio" name="mNeedReview" value="0"' + (e.needReview === false ? ' checked' : '') + ' />否</label>' +
+        '</div><p class="cell-sub">选「否」时，该剪辑手 PC 上传默认已通过，空闲即进广场。</p></div>' +
         '<div class="field"><label>可上传项目</label><div id="mProj" class="chk-list">' + editorProjectChecks(e.projects) + '</div></div>' +
         '<div class="field"><label>备注<span class="req">*</span></label><textarea id="mNote" placeholder="合作说明 / 对接备注">' + esc(e.note || '') + '</textarea></div>';
     }
@@ -1683,6 +2300,7 @@
         var name = (document.getElementById('mName').value || '').trim();
         var share = (document.getElementById('mShare').value || '').trim();
         var note = (document.getElementById('mNote').value || '').trim();
+        var needReview = (document.querySelector('input[name="mNeedReview"]:checked') || {}).value !== '0';
         if (!ybId || !share || !note) { showToast('请填写右豹 ID、分成比例、备注'); return true; }
         if (EDITORS.some(function (x) { return x.ybId === ybId && (!row || x.id !== row.id); })) {
           showToast('右豹 ID 已存在'); return true;
@@ -1693,6 +2311,7 @@
           row.name = name || row.name;
           row.share = share;
           row.note = note;
+          row.needReview = needReview;
           row.projects = readEditorProjects();
           WORKS.forEach(function (w) {
             if (w.editor === oldEd) { w.editor = row.name; w.share = share; }
@@ -1707,6 +2326,7 @@
             name: name || '新剪辑手',
             share: share,
             note: note,
+            needReview: needReview,
             src: '客服二维码',
             projects: readEditorProjects(),
             status: '已录入',
@@ -1718,62 +2338,99 @@
         renderEditors();
       });
     }
-    function logoSelectHtml(selected) {
-      return LOGO_OPTS.map(function (o) {
-        return '<option value="' + esc(o.src) + '"' + (o.src === selected ? ' selected' : '') + '>' + esc(o.name) + '</option>';
+    function brandAlreadyAdded(name) {
+      return PROJECTS.some(function (p) { return p.name === name; });
+    }
+    function brandListHtml(selected) {
+      return BRAND_CATALOG.map(function (o) {
+        var added = brandAlreadyAdded(o.name);
+        return '<button class="brand-item' + (selected === o.name ? ' on' : '') + '" type="button" data-name="' + esc(o.name) + '" data-src="' + esc(o.src) + '">' +
+          '<img src="' + esc(o.src) + '" alt="" /><span>' + esc(o.name) + '</span>' +
+          (added ? '<span class="muted">已添加</span>' : '') + '</button>';
       }).join('');
+    }
+    function bindBrandPicker() {
+      document.querySelectorAll('#pjBrandList .brand-item').forEach(function (btn) {
+        btn.onclick = function () {
+          document.querySelectorAll('#pjBrandList .brand-item').forEach(function (x) { x.classList.remove('on'); });
+          btn.classList.add('on');
+          document.getElementById('pjName').value = btn.dataset.name;
+          document.getElementById('pjLogo').value = btn.dataset.src;
+          document.getElementById('pjLogoPreview').innerHTML = '<img src="' + esc(btn.dataset.src) + '" alt="" /><div>' + esc(btn.dataset.name) + '</div>';
+        };
+      });
     }
     function openProjectModal(id) {
       var row = id ? PROJECTS.find(function (x) { return x.id === id; }) : null;
-      var kwText = row ? (STORE.keywords[row.name] || []).join('\n') : '';
-      openModal(row ? '编辑项目' : '添加项目',
-        '<div class="field"><label>项目名称<span class="req">*</span></label><input id="pjName" placeholder="项目名称" value="' + esc(row ? row.name : '') + '" /></div>' +
-        '<div class="field"><label>Logo 信息<span class="req">*</span></label><select id="pjLogo">' + logoSelectHtml(row ? row.logo : LOGO_OPTS[0].src) + '</select></div>' +
-        '<div class="field"><label>状态</label><select id="pjOn"><option' + (!row || row.status === '启用' ? ' selected' : '') + '>启用</option><option' + (row && row.status === '禁用' ? ' selected' : '') + '>禁用</option></select></div>' +
-        '<div class="field"><label>排序<span class="req">*</span></label><input id="pjSort" type="number" value="' + (row ? row.sort : PROJECTS.length + 1) + '" /></div>' +
-        '<div class="field"><label>已通过关键词<span class="req">*</span></label><textarea id="pjKw" placeholder="一行一个已通过关键词">' + esc(kwText) + '</textarea></div>',
+      if (row) {
+        openModal('编辑项目',
+          '<div class="field"><label>项目名称</label><input id="pjName" value="' + esc(row.name) + '" disabled /></div>' +
+          '<div class="field"><label>Logo 信息</label><div class="logo-cell"><img src="' + esc(row.logo) + '" alt="" /><div>' + esc(row.name) + '<div class="cell-sub">' + esc(row.logo) + '</div></div></div></div>' +
+          '<div class="field"><label>状态</label><select id="pjOn"><option' + (row.status === '启用' ? ' selected' : '') + '>启用</option><option' + (row.status === '禁用' ? ' selected' : '') + '>禁用</option></select></div>' +
+          '<div class="field"><label>排序<span class="req">*</span></label><input id="pjSort" type="number" value="' + row.sort + '" /></div>',
+          function () {
+            var status = document.getElementById('pjOn').value;
+            var sort = Number(document.getElementById('pjSort').value);
+            if (!Number.isInteger(sort) || sort < 1) { showToast('排序须为正整数'); return true; }
+            row.status = status;
+            row.sort = sort;
+            row.updated = nowStamp();
+            persist();
+            showToast('已更新项目');
+            renderProjects();
+          });
+        return;
+      }
+      openModal('添加项目',
+        '<div class="field"><label>品牌项目库<span class="req">*</span></label><div id="pjBrandList" class="brand-list">' + brandListHtml('') + '</div></div>' +
+        '<div class="field"><label>项目名称</label><input id="pjName" readonly placeholder="点选品牌后带出" value="" /></div>' +
+        '<input type="hidden" id="pjLogo" value="" />' +
+        '<div class="field"><label>Logo 信息</label><div id="pjLogoPreview" class="logo-cell">请先点选品牌</div></div>' +
+        '<div class="field"><label>状态</label><select id="pjOn"><option selected>启用</option><option>禁用</option></select></div>' +
+        '<div class="field"><label>排序<span class="req">*</span></label><input id="pjSort" type="number" value="' + (PROJECTS.length + 1) + '" /></div>',
         function () {
           var name = (document.getElementById('pjName').value || '').trim();
           var logo = document.getElementById('pjLogo').value;
           var status = document.getElementById('pjOn').value;
           var sort = Number(document.getElementById('pjSort').value);
-          var kws = (document.getElementById('pjKw').value || '').split(/\n/).map(function (s) { return s.trim(); }).filter(Boolean);
-          if (!name || !logo) { showToast('请填写项目名称、Logo、排序'); return true; }
+          if (!name || !logo) { showToast('请先点选品牌项目'); return true; }
           if (!Number.isInteger(sort) || sort < 1) { showToast('排序须为正整数'); return true; }
-          if (!kws.length) { showToast('请至少填写 1 个已通过关键词'); return true; }
-          if (PROJECTS.some(function (p) { return p.name === name && (!row || p.id !== row.id); })) {
-            showToast('项目名称已存在'); return true;
-          }
-          if (row) {
-            var oldName = row.name;
-            row.name = name;
-            row.logo = logo;
-            row.status = status;
-            row.sort = sort;
-            row.updated = nowStamp();
-            if (oldName !== name) {
-              WORKS.forEach(function (w) { if (w.project === oldName) w.project = name; });
-              CLAIMS.forEach(function (c) { if (c.project === oldName) c.project = name; });
-              EDITORS.forEach(function (e) {
-                var names = YJD.parseProjectNames(e.projects).map(function (n) { return n === oldName ? name : n; });
-                e.projects = names.length ? names.join(' / ') : '—';
-              });
-              if (STORE.keywords[oldName]) {
-                STORE.keywords[name] = STORE.keywords[oldName];
-                delete STORE.keywords[oldName];
-              }
-            }
-            STORE.keywords[name] = kws;
-            persist();
-            showToast('已更新项目');
-          } else {
-            PROJECTS.push({ id: nextPrefixedId('P-', PROJECTS), name: name, logo: logo, status: status, sort: sort, updated: nowStamp() });
-            STORE.keywords[name] = kws;
-            persist();
-            showToast('已添加项目');
-          }
+          if (brandAlreadyAdded(name)) { showToast('该品牌项目已添加'); return true; }
+          PROJECTS.push({ id: nextPrefixedId('P-', PROJECTS), name: name, logo: logo, status: status, sort: sort, updated: nowStamp() });
+          persist();
+          showToast('已添加项目');
           renderProjects();
         });
+      bindBrandPicker();
+    }
+    function openEarnDrawer(id) {
+      var e = EDITORS.find(function (x) { return x.id === id; });
+      if (!e) return;
+      document.getElementById('detailTitle').textContent = e.name + ' · 收益';
+      paintEarnDrawer(id, 'day');
+      document.getElementById('detailOverlay').classList.add('open');
+      document.getElementById('detailDrawer').classList.add('open');
+    }
+    function paintEarnDrawer(id, grain) {
+      var e = EDITORS.find(function (x) { return x.id === id; });
+      if (!e) return;
+      grain = grain === 'month' ? 'month' : 'day';
+      var rows = YJD.earnSeries(STORE, e.name, grain);
+      var settled = YJD.earnByEditor(STORE, e.name);
+      var pending = YJD.pendingEarnByEditor(STORE, e.name);
+      var body = rows.length
+        ? rows.map(function (r) {
+          return '<tr><td>' + esc(r.label) + '</td><td>' + r.amount + '</td><td>' + r.count + '</td></tr>';
+        }).join('')
+        : '<tr><td colspan="3" style="text-align:center;color:#9aa5b4">暂无已结算记录</td></tr>';
+      document.getElementById('detailBody').innerHTML =
+        '<div class="grain-bar">' +
+        '<button type="button" class="btn-ghost-sm' + (grain === 'day' ? ' on' : '') + '" onclick="paintEarnDrawer(\'' + id + '\',\'day\')">按日</button>' +
+        '<button type="button" class="btn-ghost-sm' + (grain === 'month' ? ' on' : '') + '" onclick="paintEarnDrawer(\'' + id + '\',\'month\')">按月</button>' +
+        '</div>' +
+        '<p class="cell-sub">已结算 ' + settled + ' · 待结算 ' + pending + '</p>' +
+        '<table><thead><tr><th>' + (grain === 'month' ? '月份' : '日期') + '</th><th>结算金额</th><th>笔数</th></tr></thead><tbody>' +
+        body + '</tbody></table>';
     }
     function confirmRestore(user) {
       openModal('恢复领取权限', '<p>确认手动恢复 <strong>' + user + '</strong>？恢复后可再次领取。</p>', function () {
@@ -1944,6 +2601,10 @@
         showToast('已驳回');
       });
     }
+    function workCanDelete(w) {
+      if (!w || w.occ === '占用中') return false;
+      return !CLAIMS.some(function (c) { return c.mid === w.id && c.status !== '已超时'; });
+    }
     function deleteWork(id) {
       var w = WORKS.find(function (x) { return x.id === id; });
       if (!w) return;
@@ -1954,10 +2615,78 @@
       }
       openModal('确认删除？', '<p>即将删除稿件「' + esc(w.title) + '」，广场将不再展示。</p>', function () {
         STORE.works = WORKS = WORKS.filter(function (x) { return x.id !== id; });
+        delete wkSelected[id];
         persist();
         renderWorks();
         showToast('已删除');
       }, true);
+    }
+    function openBatchAudit() {
+      var rows = selectedWorkRows();
+      if (!rows.length) { showToast('请先勾选稿件'); return; }
+      var passable = rows.filter(function (w) {
+        var a = w.audit || '已通过';
+        return a === '审核中' || a === '已驳回';
+      });
+      var rejectable = rows.filter(function (w) {
+        return (w.audit || '已通过') === '审核中' && w.occ === '空闲';
+      });
+      if (!passable.length && !rejectable.length) {
+        showToast('所选稿件均无需审核');
+        return;
+      }
+      openModal('批量审核',
+        '<p>已选 <strong>' + rows.length + '</strong> 条。通过适用于审核中 / 已驳回；驳回仅审核中且空闲，原因必填。</p>' +
+        '<div class="field"><label>审核结论<span class="req">*</span></label><div class="radio-list">' +
+          '<label><input type="radio" name="batchAuditAct" value="pass" checked />通过</label>' +
+          '<label><input type="radio" name="batchAuditAct" value="reject" />驳回</label>' +
+        '</div></div>' +
+        '<div class="field"><label>驳回原因</label><textarea id="batchRjReason" placeholder="选择驳回时必填"></textarea></div>',
+        function () {
+          var act = (document.querySelector('input[name="batchAuditAct"]:checked') || {}).value;
+          if (act === 'reject') {
+            var reason = (document.getElementById('batchRjReason').value || '').trim();
+            if (!reason) { showToast('请填写驳回原因'); return true; }
+            if (!rejectable.length) { showToast('所选稿件均不可驳回'); return true; }
+            rejectable.forEach(function (w) {
+              w.audit = '已驳回';
+              w.rejectReason = reason;
+            });
+            persist();
+            clearWorkSelection();
+            showToast('已驳回 ' + rejectable.length + ' 条' + (rows.length > rejectable.length ? '，跳过 ' + (rows.length - rejectable.length) + ' 条' : ''));
+            return;
+          }
+          if (!passable.length) { showToast('所选稿件均无需通过'); return true; }
+          passable.forEach(function (w) {
+            w.audit = '已通过';
+            w.rejectReason = '';
+          });
+          persist();
+          clearWorkSelection();
+          showToast('已通过 ' + passable.length + ' 条' + (rows.length > passable.length ? '，跳过 ' + (rows.length - passable.length) + ' 条' : ''));
+        });
+    }
+    function openBatchDeleteWorks() {
+      var rows = selectedWorkRows();
+      if (!rows.length) { showToast('请先勾选稿件'); return; }
+      var deletable = rows.filter(workCanDelete);
+      if (!deletable.length) {
+        showToast('所选稿件均不能删除');
+        return;
+      }
+      var skip = rows.length - deletable.length;
+      openModal('确认删除？',
+        '<p>即将删除 <strong>' + deletable.length + '</strong> 条记录，此操作不可撤销。' +
+        (skip ? '另有 ' + skip + ' 条占用中或仍有未超时领取，将跳过。' : '') + '</p>',
+        function () {
+          var ids = {};
+          deletable.forEach(function (w) { ids[w.id] = true; delete wkSelected[w.id]; });
+          STORE.works = WORKS = WORKS.filter(function (w) { return !ids[w.id]; });
+          persist();
+          renderWorks();
+          showToast('已删除 ' + deletable.length + ' 条' + (skip ? '，跳过 ' + skip + ' 条' : ''));
+        }, true);
     }
     function deleteProject(id) {
       var p = PROJECTS.find(function (x) { return x.id === id; });
@@ -2112,7 +2841,7 @@
       history.replaceState(null, '', '?' + params.toString());
     }
     function buildMockupSrc(screen) {
-      return 'yijian-daifa-demo.html?embed=1&v=20&screen=' + screen;
+      return 'yijian-daifa-demo.html?embed=1&v=21&screen=' + screen;
     }
     function loadMockupFrame() {
       document.getElementById('mockupFrame').src = buildMockupSrc(getActiveScreen());
@@ -2121,19 +2850,81 @@
       return document.querySelector('#pcScenes .scene-btn.active')?.dataset.pcscreen || 'home';
     }
     function loadPcFrame() {
-      document.getElementById('pcFrame').src = 'yijian-daifa-pc.html?embed=1&v=5&screen=' + getActivePcScreen();
+      document.getElementById('pcFrame').src = 'yijian-daifa-pc.html?embed=1&v=6&screen=' + getActivePcScreen();
     }
     function switchRuleTab(ruleId, btn) {
       document.querySelectorAll('.rule-tab-bar button').forEach(function (b) { b.classList.remove('active'); });
       document.querySelectorAll('.rule-panel').forEach(function (p) { p.classList.remove('active'); });
-      btn.classList.add('active');
-      document.getElementById(ruleId).classList.add('active');
+      if (btn) btn.classList.add('active');
+      var panel = document.getElementById(ruleId);
+      if (panel) panel.classList.add('active');
+    }
+    function drawerGroupOf(key) {
+      return key === 'flow-main' ? 'fe' : (YJD_RULES.groupOf(key) || 'fe');
+    }
+    function keysOf(groupName) {
+      var keys = (YJD_RULES.groups[groupName] && YJD_RULES.groups[groupName].keys) ? YJD_RULES.groups[groupName].keys.slice() : [];
+      if (groupName === 'fe') keys.push('flow-main');
+      return keys;
+    }
+    function currentRuleKey() {
+      var page = document.querySelector('.page-view.active')?.id;
+      var R = YJD_RULES;
+      if (page === 'view-explain') return 'explain-main';
+      if (page === 'view-data') return 'data-main';
+      if (page === 'view-pc') {
+        return R.pcSceneMap[getActivePcScreen()] || 'pc-home';
+      }
+      if (page === 'view-admin') {
+        var admin = document.querySelector('.admin-tab-bar button.active')?.dataset.admin || 'admin-editors';
+        return R.adminMap[admin] || 'admin-editors';
+      }
+      var feSub = document.querySelector('#view-fe .module-tab-bar button.active')?.dataset.sub;
+      if (feSub === 'fe-flow') return 'flow-main';
+      return R.feSceneMap[getActiveScreen()] || 'fe-feed';
+    }
+    function renderRuleSubBar(groupName, activeKey) {
+      var bar = document.getElementById('ruleSubBar');
+      var keys = keysOf(groupName);
+      if (!bar) return;
+      if (keys.length <= 1) {
+        bar.innerHTML = '';
+        bar.hidden = true;
+        return;
+      }
+      bar.hidden = false;
+      bar.innerHTML = keys.map(function (key) {
+        var on = key === activeKey ? ' active' : '';
+        return '<button type="button" class="rule-sub-btn' + on + '" data-rule-key="' + key + '">' +
+          YJD_RULES.titleOf(key) + '</button>';
+      }).join('');
+    }
+    function showRuleKey(key) {
+      var groupName = drawerGroupOf(key);
+      var group = YJD_RULES.groups[groupName];
+      if (!group) return;
+      var btn = document.querySelector('.rule-tab-bar button[data-rule="' + group.id + '"]');
+      switchRuleTab(group.id, btn);
+      document.querySelectorAll('.rule-sub').forEach(function (el) {
+        el.classList.toggle('active', el.dataset.ruleKey === key);
+      });
+      renderRuleSubBar(groupName, key);
     }
     function syncRuleTabToPage() {
-      var activePage = document.querySelector('.page-view.active')?.id;
-      var ruleId = activePage === 'view-admin' ? 'rule-admin' : (activePage === 'view-pc' ? 'rule-pc' : 'rule-fe');
-      var btn = document.querySelector('.rule-tab-bar button[data-rule="' + ruleId + '"]');
-      if (btn) switchRuleTab(ruleId, btn);
+      showRuleKey(currentRuleKey());
+    }
+    function mountRuleDrawer() {
+      ['explain', 'fe', 'pc', 'admin', 'data'].forEach(function (g) {
+        var group = YJD_RULES.groups[g];
+        var panel = document.getElementById(group.id);
+        if (!panel) return;
+        var kind = (g === 'fe' || g === 'pc' || g === 'admin') ? '本场景需求细则' : '本页需求细则';
+        panel.innerHTML = keysOf(g).map(function (key) {
+          return '<div class="rule-sub" data-rule-key="' + key + '">' +
+            '<div class="rule-scene-head"><strong>' + YJD_RULES.titleOf(key) + '</strong><span>' + kind + '</span></div>' +
+            YJD_RULES.htmlOf(key) + '</div>';
+        }).join('');
+      });
     }
     var ruleDrawer = document.getElementById('ruleDrawer');
     var toggleRuleBtn = document.getElementById('toggleRuleDrawer');
@@ -2144,6 +2935,10 @@
       if (open) syncRuleTabToPage();
     }
     toggleRuleBtn.onclick = function () { setRuleDrawer(!ruleDrawer.classList.contains('open')); };
+    document.getElementById('ruleSubBar').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-rule-key]');
+      if (b) showRuleKey(b.dataset.ruleKey);
+    });
 
     document.querySelectorAll('#view-fe .scene-btn').forEach(function (btn) {
       btn.addEventListener('click', function () {
@@ -2152,6 +2947,7 @@
         syncSceneHint('#view-fe', 'feSceneHint');
         syncPageUrl();
         loadMockupFrame();
+        if (ruleDrawer.classList.contains('open')) syncRuleTabToPage();
       });
     });
     document.querySelectorAll('[data-preview]').forEach(function (btn) {
@@ -2187,6 +2983,7 @@
         }
         syncPageUrl();
         syncRuleTabToPage();
+        syncStoryPlayer();
       });
     });
     document.querySelectorAll('.module-tab-bar button').forEach(function (btn) {
@@ -2200,6 +2997,7 @@
         if (target) target.classList.add('active');
         if (btn.dataset.sub === 'fe-scene') loadMockupFrame();
         if (btn.dataset.sub === 'pc-scene') loadPcFrame();
+        if (ruleDrawer.classList.contains('open')) syncRuleTabToPage();
       });
     });
     document.querySelectorAll('.explain-nav button').forEach(function (btn) {
@@ -2208,8 +3006,97 @@
         document.querySelectorAll('.explain-panel').forEach(function (p) { p.classList.remove('active'); });
         btn.classList.add('active');
         document.getElementById(btn.dataset.explain).classList.add('active');
+        syncStoryPlayer();
       });
     });
+    document.querySelectorAll('[data-ix]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('[data-ix]').forEach(function (b) { b.classList.remove('active'); });
+        ['ix-fe', 'ix-api', 'ix-state', 'ix-payout', 'ix-list'].forEach(function (id) {
+          var el = document.getElementById(id);
+          if (el) el.classList.toggle('active', id === btn.dataset.ix);
+        });
+        btn.classList.add('active');
+      });
+    });
+    document.querySelectorAll('[data-list]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('[data-list]').forEach(function (b) { b.classList.remove('active'); });
+        ['list-matrix', 'list-fields', 'list-apis', 'list-states'].forEach(function (id) {
+          var el = document.getElementById(id);
+          if (el) el.classList.toggle('active', id === btn.dataset.list);
+        });
+        btn.classList.add('active');
+      });
+    });
+    var STORY_STEPS = [
+      { t: '1 扫码招募', d: '有制作能力的人扫 PC「剪辑供稿」或广场招募帧上的客服二维码。站内没有申请表，也不能在 App 里当剪辑手上传。', say: { cs: '海报只有卖点和二维码', pc: '我加客服，不填站内表', c: '我只看海报，不去上传' } },
+      { t: '2 后台录入', d: '运营在「剪辑手管理」写入右豹 ID、分成、备注、稿件需要审核和可上传项目。未录入不能上传。', say: { op: '右豹 ID 写上，他才能传', cs: '我把人转给运营录入' } },
+      { t: '3 PC 上传', d: '已录入剪辑手先填字段再选文件夹或压缩包，按命名约定解析确认后队列上传。需审则审核中，免审默认已通过。', say: { pc: '我先填书和项目，再选成片上传', op: '要审的先审核中；免审的空闲就能进广场' } },
+      { t: '4 运营审核', d: '后台可单条或批量通过/驳回。通过后空闲稿才具备进广场资格；驳回必须填原因，已通过不可再驳。', say: { op: '勾几条一起审；驳回写原因' } },
+      { t: '5 进入广场', d: '五条同时成立才可见：已通过、空闲、项目启用、剪辑手已录入、素材启用。列表不展示金额。', say: { c: '我只看到能领的成片，没有金额' } },
+      { t: '6 选词领取', d: '门禁：停权 → 次数 → 选词浮层 → 资格/占用。次数不足只开兑换。成功即扣次、占用、对他人隐藏。', say: { c: '先看次数，再选词，领了就扣次' } },
+      { t: '7 回填或超时', d: '24h 内从我的领取回填则稿件已完成。超时记 1 次未回填、不退次、稿件回广场。', say: { c: '24 小时内回填；超时次数不退' } },
+      { t: '8 完成或停权', d: '回填后不再回广场。终身未回填超过 3 次进黑名单，仅后台手动恢复。原领取人未停权可再领，再领再扣次。', say: { op: '超 3 次我来黑名单恢复', c: '回填完这稿不再回广场' } }
+    ];
+    var storyIdx = 0;
+    var storyTimer = null;
+    var storyPlaying = false;
+    function renderStory(i) {
+      storyIdx = i;
+      var step = STORY_STEPS[i];
+      document.querySelectorAll('#storyDots button').forEach(function (b, idx) {
+        b.classList.toggle('on', idx === i);
+      });
+      document.getElementById('storyStepTitle').textContent = step.t;
+      document.getElementById('storyStepBody').textContent = step.d;
+      document.querySelectorAll('.story-person').forEach(function (el) {
+        var who = el.dataset.actor;
+        var talking = !!(step.say && step.say[who]);
+        el.classList.toggle('on', talking);
+        el.classList.toggle('on-' + who, talking);
+        var bubble = el.querySelector('.story-bubble');
+        if (bubble) bubble.textContent = talking ? step.say[who] : '';
+      });
+    }
+    function stopStory() {
+      storyPlaying = false;
+      if (storyTimer) { clearInterval(storyTimer); storyTimer = null; }
+      var toggle = document.getElementById('storyToggle');
+      if (toggle) toggle.textContent = '播放';
+    }
+    function startStory() {
+      stopStory();
+      storyPlaying = true;
+      document.getElementById('storyToggle').textContent = '暂停';
+      renderStory(storyIdx);
+      storyTimer = setInterval(function () {
+        renderStory((storyIdx + 1) % STORY_STEPS.length);
+      }, 2200);
+    }
+    function syncStoryPlayer() {
+      var onExplain = document.querySelector('.page-view.active')?.id === 'view-explain';
+      var onStory = document.getElementById('exp-story')?.classList.contains('active');
+      if (onExplain && onStory) startStory();
+      else stopStory();
+    }
+    (function initStory() {
+      var dots = document.getElementById('storyDots');
+      if (!dots) return;
+      var labels = ['招募', '录入', '上传', '审核', '广场', '领取', '回填', '完成'];
+      STORY_STEPS.forEach(function (_, i) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.textContent = (i + 1) + ' ' + labels[i];
+        b.addEventListener('click', function () { renderStory(i); });
+        dots.appendChild(b);
+      });
+      document.getElementById('storyToggle').addEventListener('click', function () {
+        if (storyPlaying) stopStory();
+        else startStory();
+      });
+      renderStory(0);
+    })();
     document.querySelectorAll('.admin-tab-bar button').forEach(function (btn) {
       btn.addEventListener('click', function () {
         document.querySelectorAll('.admin-tab-bar button').forEach(function (b) { b.classList.remove('active'); });
@@ -2219,10 +3106,30 @@
         pane.classList.add('active');
         var first = pane.querySelector('.module-tab-bar button');
         if (first) first.click();
+        if (ruleDrawer.classList.contains('open')) syncRuleTabToPage();
       });
     });
     document.querySelectorAll('.rule-tab-bar button').forEach(function (btn) {
-      btn.addEventListener('click', function () { switchRuleTab(btn.dataset.rule, btn); });
+      btn.addEventListener('click', function () {
+        var ruleId = btn.dataset.rule;
+        var groupName = {
+          'rule-explain': 'explain',
+          'rule-fe': 'fe',
+          'rule-pc': 'pc',
+          'rule-admin': 'admin',
+          'rule-data': 'data'
+        }[ruleId];
+        var page = document.querySelector('.page-view.active')?.id;
+        var pageGroup = {
+          'view-explain': 'explain',
+          'view-fe': 'fe',
+          'view-pc': 'pc',
+          'view-admin': 'admin',
+          'view-data': 'data'
+        }[page];
+        var key = (groupName === pageGroup) ? currentRuleKey() : keysOf(groupName)[0];
+        showRuleKey(key);
+      });
     });
     document.addEventListener('keydown', function (e) {
       if (e.key !== 'Escape') return;
@@ -2244,6 +3151,10 @@
       var tbtn = document.querySelector('.page-tab-bar button[data-page="' + tabPageMap[tab] + '"]');
       if (tbtn) tbtn.click();
     }
+    var ix = params.get('ix');
+    if (ix && document.querySelector('[data-ix="' + ix + '"]')) {
+      document.querySelector('[data-ix="' + ix + '"]').click();
+    }
     renderAllAdmin();
     YJD.onChange(function () {
       rebind();
@@ -2256,8 +3167,11 @@
         syncSceneHint('#pcScenes', 'pcSceneHint');
         syncPageUrl();
         loadPcFrame();
+        if (ruleDrawer.classList.contains('open')) syncRuleTabToPage();
       });
     });
+    mountRuleDrawer();
+    syncRuleTabToPage();
     if (document.querySelector('.page-view.active')?.id === 'view-fe') loadMockupFrame();
     if (document.querySelector('.page-view.active')?.id === 'view-pc') loadPcFrame();
   </script>

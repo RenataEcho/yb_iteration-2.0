@@ -7,10 +7,10 @@
     return {
       v: VER,
       editors: [
-        { id: 'E-01', ybId: 'YB10086', name: '林夏', share: '50%', note: '主力口播', src: '客服二维码', projects: '番茄小说', status: '已录入', time: '2026-09-01 10:12' },
-        { id: 'E-02', ybId: 'YB10221', name: '阿凯', share: '40%', note: '短剧混剪', src: '客服二维码', projects: '红果短剧 / 知乎故事', status: '已录入', time: '2026-09-02 15:40' },
-        { id: 'E-03', ybId: 'YB10801', name: '小禾', share: '35%', note: '已停用，暂不接稿', src: '客服二维码', projects: '—', status: '已停用', time: '2026-08-20 09:03' },
-        { id: 'E-04', ybId: 'YB10330', name: '庭宇', share: '50%', note: '图文切片', src: '客服二维码', projects: '番茄小说 / 红果漫剧', status: '已录入', time: '2026-09-03 11:08' }
+        { id: 'E-01', ybId: 'YB10086', name: '林夏', share: '50%', note: '主力口播', src: '客服二维码', projects: '番茄小说', status: '已录入', time: '2026-09-01 10:12', needReview: true },
+        { id: 'E-02', ybId: 'YB10221', name: '阿凯', share: '40%', note: '短剧混剪', src: '客服二维码', projects: '红果短剧 / 知乎故事', status: '已录入', time: '2026-09-02 15:40', needReview: false },
+        { id: 'E-03', ybId: 'YB10801', name: '小禾', share: '35%', note: '已停用，暂不接稿', src: '客服二维码', projects: '—', status: '已停用', time: '2026-08-20 09:03', needReview: true },
+        { id: 'E-04', ybId: 'YB10330', name: '庭宇', share: '50%', note: '图文切片', src: '客服二维码', projects: '番茄小说 / 红果漫剧', status: '已录入', time: '2026-09-03 11:08', needReview: true }
       ],
       works: [
         work('M-01', '掌心宠 · 口播切片', '番茄小说', '我成了老公掌心宠', '7128491023', '18.6 MB', '林夏', '图集', '口播', '空闲', '1小时前', '50%', 'cover-m01.jpg', '小说', ['甜宠', '年代'], 12, '被偏爱的感觉藏不住｜掌心宠口播', '一口气看完这篇年代甜宠，评论区扣1告诉我你嗑哪对#掌心宠溺 #年代甜宠'),
@@ -35,23 +35,27 @@
         { id: 'T-04', name: '解压', status: '启用' }
       ],
       skus: [
-        { id: 'S-1', times: 1, points: 50, on: true },
-        { id: 'S-2', times: 3, points: 120, on: true },
-        { id: 'S-3', times: 10, points: 350, on: true },
-        { id: 'S-4', times: 30, points: 900, on: false }
+        { id: 'S-1', times: 1, points: 50, on: true, buyers: 128 },
+        { id: 'S-2', times: 3, points: 120, on: true, buyers: 64 },
+        { id: 'S-3', times: 10, points: 350, on: true, buyers: 21 },
+        { id: 'S-4', times: 30, points: 900, on: false, buyers: 8 }
       ],
       claims: [
         {
           id: 'C-01', user: 'U-10086', mid: 'M-06', title: '银发军官图集', work: '银发军官图集',
           project: '番茄小说', editor: '庭宇', cover: 'assets/fr014/cover-m06.jpg', kind: '图集',
-          kw: '年代甜宠', fill: '视频号 / @北城', status: '已回填', time: '今天 10:21',
+          book: '银发军官把我宠上天', bookId: '7482019356',
+          kw: '年代甜宠', fill: '视频号 / @北城', fillVideo: 'https://channels.weixin.qq.com/demo/C-01',
+          status: '已回填', time: '今天 10:21', pendingEarn: 0,
           link: 'https://ybdd.demo/ms/M-06', claimedAt: Date.now() - 2 * 86400000,
           downloadedAt: Date.now() - 3600000, expireAt: Date.now() + 5 * 86400000
         },
         {
           id: 'C-03', user: 'U-10221', mid: 'M-03', title: '团宠解压图集', work: '团宠解压图集',
           project: '番茄小说', editor: '林夏', cover: 'assets/fr014/cover-m03.jpg', kind: '图集',
-          kw: '全村团宠', fill: '—', status: '未回填', time: '昨天 09:40',
+          book: '被偷听心声后我成了全村团宠', bookId: '7093312840',
+          kw: '全村团宠', fill: '—', fillVideo: '',
+          status: '未回填', time: '昨天 09:40', pendingEarn: 90,
           link: 'https://ybdd.demo/ms/M-03', claimedAt: Date.now() - 86400000,
           downloadedAt: Date.now() - 80000000, expireAt: Date.now() + 6 * 86400000
         }
@@ -100,6 +104,8 @@
       audit: audit || '已通过',
       rejectReason: rejectReason || '',
       fileName: title,
+      uploadStatus: '已上传',
+      bookLink: 'https://ybdd.demo/book/' + bookId,
       preview: kind === '图集' ? albumPreview(cover) : []
     };
   }
@@ -108,6 +114,37 @@
     var d = new Date();
     function p(n) { return n < 10 ? '0' + n : '' + n; }
     return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+  }
+
+  var LOGO_OPTS = [
+    { name: '番茄小说', src: 'assets/fr014/logo-fanqie.jpg' },
+    { name: '红果短剧', src: 'assets/fr014/logo-hongguo-drama.jpg' },
+    { name: '知乎故事', src: 'assets/fr014/logo-zhihu.jpg' },
+    { name: '红果漫剧', src: 'assets/fr014/logo-hongguo-comic.jpg' }
+  ];
+  var BRAND_CATALOG = LOGO_OPTS.concat([
+    { name: '点众小说', src: 'assets/fr014/logo-zhihu.jpg' }
+  ]);
+  var SKU_BUYERS = { 'S-1': 128, 'S-2': 64, 'S-3': 21, 'S-4': 8 };
+
+  function pad2(n) { return n < 10 ? '0' + n : '' + n; }
+
+  function workQty(w) {
+    if (!w) return 1;
+    return w.kind === '视频' ? 1 : (Number(w.imgs) || 1);
+  }
+
+  function workInfoLabel(w) {
+    return (w && w.size ? w.size : '—') + ' (' + workQty(w) + ')';
+  }
+
+  function sharePct(editor) {
+    var n = parseInt(String(editor && editor.share || '50'), 10);
+    return n > 0 ? n : 50;
+  }
+
+  function mockPendingEarn(data, claim) {
+    return Math.round(180 * sharePct(editorByName(data, claim.editor)) / 100);
   }
 
   function readRaw() {
@@ -132,19 +169,46 @@
   }
 
   function syncFlags(data) {
+    (data.editors || []).forEach(function (e) {
+      if (e.needReview == null) e.needReview = true;
+    });
     (data.works || []).forEach(function (w) {
       if (!w.occ) w.occ = w.occupied ? '占用中' : '空闲';
       w.occupied = w.occ === '占用中';
       if (!w.dl) w.dl = 'https://ybdd.demo/ms/' + w.id;
       if (w.earn == null) w.earn = (w.occ === '已完成' && w.id === 'M-06') ? 186 : 0;
-      if (!w.audit) w.audit = '已通过';
+      if (!('audit' in w) || w.audit == null) w.audit = '已通过';
       if (w.rejectReason == null) w.rejectReason = '';
       if (!w.fileName) w.fileName = w.title;
+      if (!w.uploadStatus) w.uploadStatus = '已上传';
+      if (!w.bookLink && w.bookId) w.bookLink = 'https://ybdd.demo/book/' + w.bookId;
       if (w.kind === '图集') {
         var list = Array.isArray(w.preview) ? w.preview.filter(Boolean) : [];
         w.preview = (list.length ? list : albumPreview(w.cover)).slice(0, 3);
       } else {
         w.preview = [];
+      }
+    });
+    (data.skus || []).forEach(function (s) {
+      if (s.buyers == null) s.buyers = SKU_BUYERS[s.id] != null ? SKU_BUYERS[s.id] : 0;
+    });
+    (data.claims || []).forEach(function (c) {
+      var w = workById(data, c.mid);
+      if (w) {
+        if (!c.book) c.book = w.book;
+        if (!c.bookId) c.bookId = w.bookId;
+        if (!c.project) c.project = w.project;
+        if (!c.editor) c.editor = w.editor;
+      }
+      if (c.status === '已回填') {
+        if (!c.fillVideo) c.fillVideo = 'https://channels.weixin.qq.com/demo/' + c.id;
+        c.pendingEarn = 0;
+      } else if (c.status === '未回填' || c.status === '待回填') {
+        if (c.fillVideo == null) c.fillVideo = '';
+        if (c.pendingEarn == null) c.pendingEarn = mockPendingEarn(data, c);
+      } else {
+        if (c.fillVideo == null) c.fillVideo = '';
+        if (c.pendingEarn == null) c.pendingEarn = 0;
       }
     });
   }
@@ -188,7 +252,8 @@
   }
 
   function plazaEligible(data, w) {
-    if (!w || (w.audit || '已通过') !== '已通过') return false;
+    if (!w || (w.uploadStatus && w.uploadStatus !== '已上传')) return false;
+    if ((w.audit || '已通过') !== '已通过') return false;
     if (w.occ === '占用中' || w.occ === '已完成' || w.occupied) return false;
     var p = projectByName(data, w.project);
     var e = editorByName(data, w.editor);
@@ -213,6 +278,32 @@
     }, 0);
   }
 
+  function pendingEarnByEditor(data, editorName) {
+    return (data.claims || []).reduce(function (n, c) {
+      if (c.editor !== editorName) return n;
+      if (c.status !== '未回填' && c.status !== '待回填') return n;
+      return n + (Number(c.pendingEarn) || 0);
+    }, 0);
+  }
+
+  function earnSeries(data, editorName, grain) {
+    grain = grain === 'month' ? 'month' : 'day';
+    var buckets = {};
+    (data.claims || []).forEach(function (c) {
+      if (c.editor !== editorName || c.status !== '已回填') return;
+      var w = workById(data, c.mid);
+      var amt = w ? (Number(w.earn) || 0) : 0;
+      var d = new Date(c.claimedAt || Date.now());
+      var key = grain === 'month'
+        ? d.getFullYear() + '-' + pad2(d.getMonth() + 1)
+        : d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate());
+      if (!buckets[key]) buckets[key] = { label: key, amount: 0, count: 0 };
+      buckets[key].amount += amt;
+      buckets[key].count += 1;
+    });
+    return Object.keys(buckets).sort().reverse().map(function (k) { return buckets[k]; });
+  }
+
   function projectByName(data, name) {
     return (data.projects || []).find(function (p) { return p.name === name; });
   }
@@ -223,6 +314,14 @@
 
   function workById(data, id) {
     return (data.works || []).find(function (w) { return w.id === id; });
+  }
+
+  function editorNeedsReview(editor) {
+    return !editor || editor.needReview !== false;
+  }
+
+  function workAuditAfterUpload(editor) {
+    return editorNeedsReview(editor) ? '审核中' : '已通过';
   }
 
   function onSaleCount(data) {
@@ -258,9 +357,17 @@
     worksByEditor: worksByEditor,
     claimedWorksByEditor: claimedWorksByEditor,
     earnByEditor: earnByEditor,
+    pendingEarnByEditor: pendingEarnByEditor,
+    earnSeries: earnSeries,
+    workQty: workQty,
+    workInfoLabel: workInfoLabel,
+    LOGO_OPTS: LOGO_OPTS,
+    BRAND_CATALOG: BRAND_CATALOG,
     projectByName: projectByName,
     editorByName: editorByName,
     workById: workById,
+    editorNeedsReview: editorNeedsReview,
+    workAuditAfterUpload: workAuditAfterUpload,
     onSaleCount: onSaleCount,
     admClaimSt: admClaimSt,
     feClaimSt: feClaimSt

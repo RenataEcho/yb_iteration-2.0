@@ -29,3 +29,11 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-fr014-yijian-daifa-v7.md`
   summary: Sprint 概览 framework-shell 仍标 FR-014 v6 与旧 Tab 文案
   evidence: 规格未要求改框架壳，属入口文档漂移
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-014-3-admin-surfaces.md`
+  summary: plazaEligible 比已提交基线多了 uploadStatus 门槛，规则抽屉仍写五条可见性
+  evidence: 本 story Never 禁止重写 plazaEligible；该行来自并行 PC 上传队列，规则/FAQ 未同步
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-014-3-admin-surfaces.md`
+  summary: 批量审核的驳回支路（空原因拦截、只驳审核中且空闲）没有 e2e
+  evidence: test_admin_batch_audit_and_delete 只走默认通过；属并行审核增量，不在本 I/O 矩阵

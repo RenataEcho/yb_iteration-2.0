@@ -119,23 +119,53 @@
       repeating-conic-gradient(#1a2332 0 25%, #fff 0 50%) 0 0 / 12px 12px; border: 4px solid #eee; }
     .up-overlay { z-index: 30; }
     .up-modal {
-      position: absolute; left: 50%; top: 50%; width: min(680px, calc(100% - 40px)); max-height: calc(100% - 48px);
+      position: absolute; left: 50%; top: 50%; width: min(920px, calc(100% - 40px)); max-height: calc(100% - 48px);
       transform: translate(-50%, -46%) scale(.98); z-index: 31; background: #fff; border-radius: 12px;
       box-shadow: 0 24px 64px rgba(0,0,0,.22); display: none; flex-direction: column; overflow: hidden;
     }
     .up-modal.open { display: flex; transform: translate(-50%, -50%) scale(1); }
-    .up-head { padding: 16px 18px 12px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
-    .up-head h2 { font-size: 16px; }
-    .up-head p { font-size: 12px; color: var(--muted); margin-top: 4px; }
-    .steps { display: flex; gap: 8px; padding: 12px 18px 0; }
-    .step {
-      flex: 1; height: 32px; border-radius: 999px; background: #f1f5f9; color: var(--muted);
-      display: grid; place-items: center; font-size: 12px; font-weight: 600;
+    .up-head { padding: 22px 28px 4px; border-bottom: none; display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+    .up-head h2 { font-size: 17px; letter-spacing: -0.02em; }
+    .up-head p { font-size: 12px; color: var(--muted); margin-top: 6px; line-height: 1.5; }
+    .steps {
+      display: flex; align-items: flex-start; padding: 18px 28px 4px; gap: 0;
     }
-    .step.on { background: var(--orange-light); color: var(--orange); }
-    .step.done { background: #f0fdf4; color: #16a34a; }
-    .up-body { padding: 16px 18px; overflow-y: auto; flex: 1; }
-    .up-foot { padding: 12px 18px 16px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; }
+    .step {
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      min-width: 72px; height: auto; background: none; border-radius: 0;
+      color: var(--muted); font-size: 12px; font-weight: 500;
+    }
+    .step i {
+      width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid var(--border);
+      display: grid; place-items: center; font-style: normal; font-weight: 700; font-size: 12px;
+      background: #fff; color: var(--muted);
+    }
+    .step span { white-space: nowrap; }
+    .step.on { background: none; color: var(--text); font-weight: 600; }
+    .step.on i { border-color: var(--orange); background: var(--orange); color: #fff; }
+    .step.done { background: none; color: var(--text); }
+    .step.done i { border-color: #ffd4b8; background: var(--orange-light); color: var(--orange); }
+    .step-line { flex: 1; height: 1.5px; background: var(--border); margin: 13px 10px 0; }
+    .step.done + .step-line { background: #ffd4b8; }
+    .up-body { padding: 8px 28px 20px; overflow-y: auto; flex: 1; }
+    .up-foot { padding: 14px 28px 18px; border-top: 1px solid #f1f5f9; display: flex; justify-content: flex-end; gap: 8px; }
+    .up-group { padding: 16px 0 2px; }
+    .up-group + .up-group { border-top: 1px solid #f1f5f9; margin-top: 4px; }
+    .up-group-title {
+      font-size: 11px; font-weight: 700; letter-spacing: .08em; color: #94a3b8;
+      margin-bottom: 12px;
+    }
+    .up-modal .field { margin-bottom: 0; }
+    .up-modal .field-row { gap: 16px; margin-bottom: 14px; }
+    .up-modal .field label { font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 6px; }
+    .up-modal .field input, .up-modal .field select {
+      height: 40px; border-radius: 10px; border-color: #e2e8f0; background: #f8fafc; padding: 0 12px;
+    }
+    .up-modal .field input:focus, .up-modal .field select:focus {
+      outline: none; border-color: var(--orange); background: #fff;
+      box-shadow: 0 0 0 3px rgba(255, 107, 26, .12);
+    }
+    .up-modal .field input[readonly] { background: #f1f5f9; color: #64748b; }
     .pack-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .pack-card {
       border: 1px solid var(--border); border-radius: 10px; padding: 16px; text-align: left;
@@ -145,6 +175,11 @@
     .pack-card b { display: block; font-size: 14px; margin-bottom: 6px; }
     .pack-card span { font-size: 12px; color: var(--muted); line-height: 1.5; }
     .pack-sum { margin-top: 14px; padding: 12px; border-radius: 8px; background: #f8fafc; font-size: 13px; line-height: 1.7; }
+    .excel-bar { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
+    .excel-bar p { font-size: 13px; color: var(--text); margin: 0; }
+    .excel-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; }
+    .excel-wrap table { min-width: 640px; }
+    .unzip-box { padding: 28px 12px; text-align: center; color: var(--muted); line-height: 1.7; }
     .sum-row { display: grid; grid-template-columns: 88px 1fr; gap: 8px; font-size: 13px; margin-bottom: 8px; }
     .sum-row span { color: var(--muted); }
     .confirm-box {
@@ -221,7 +256,7 @@
           <div class="toolbar">
             <div>
               <h1>上传 list</h1>
-              <p class="desc">字段与后台稿件表一致，不展示下载链接。仅未占用稿件可删。提交后先走平台审核。</p>
+              <p class="desc">字段与后台稿件表一致，不展示下载链接。另列上传状态；失败只重传失败文件。仅未占用稿件可删。</p>
             </div>
             <button class="btn btn-primary" type="button" data-go="upload">上传稿件</button>
           </div>
@@ -260,25 +295,48 @@
       <div class="up-head">
         <div>
           <h2 id="upTitle">上传稿件</h2>
-          <p>必须用文件夹或压缩包。字段与后台一致。提交后进入平台审核，通过才进广场。</p>
+          <p>先填投向和书籍，再选成片。压缩包会先解压。</p>
         </div>
         <button class="drawer-close" type="button" id="upClose">×</button>
       </div>
       <div class="steps">
-        <div class="step on" id="step1">1 选成片</div>
-        <div class="step" id="step2">2 填字段</div>
-        <div class="step" id="step3">3 确认提交</div>
+        <div class="step on" id="step1"><i>1</i><span>填字段</span></div>
+        <div class="step-line" aria-hidden="true"></div>
+        <div class="step" id="step2"><i>2</i><span>选成片</span></div>
+        <div class="step-line" aria-hidden="true"></div>
+        <div class="step" id="step3"><i>3</i><span>确认上传</span></div>
       </div>
       <div class="up-body">
         <div id="upStep1">
+          <div class="up-group">
+            <div class="up-group-title">投向</div>
+            <div class="field-row">
+              <div class="field"><label>选择项目</label><select id="upProject"></select></div>
+              <div class="field"><label>稿件类型</label><select id="upKind"><option>图集</option><option>视频</option></select></div>
+            </div>
+            <div class="field-row">
+              <div class="field"><label>素材类型</label><select id="upMat"></select></div>
+              <div class="field"><label>剪辑手</label><input id="upEditor" readonly /></div>
+            </div>
+          </div>
+          <div class="up-group">
+            <div class="up-group-title">书籍</div>
+            <div class="field-row">
+              <div class="field"><label>书籍名称</label><input id="upBook" value="我成了老公掌心宠" /></div>
+              <div class="field"><label>书籍 ID</label><input id="upBookId" value="7128491023" /></div>
+            </div>
+            <div class="field"><label>书籍链接</label><input id="upBookLink" value="https://ybdd.demo/book/7128491023" placeholder="对应书籍链接" /></div>
+          </div>
+        </div>
+        <div id="upStep2" hidden>
           <div class="pack-grid">
             <button class="pack-card on" type="button" id="upPackFolder">
               <b>文件夹</b>
-              <span>选择整夹成片。演示会读取夹名、文件数和总大小。</span>
+              <span>批量文件夹。图集一个文件夹为一组，文件名作标题。</span>
             </button>
             <button class="pack-card" type="button" id="upPackZip">
               <b>压缩包</b>
-              <span>支持 zip。演示读取包名和大小，不真实解压。</span>
+              <span>支持 zip。先解压中，再按同一命名约定解析。</span>
             </button>
           </div>
           <input id="upFolder" type="file" webkitdirectory multiple hidden />
@@ -289,36 +347,18 @@
           </div>
           <div class="pack-sum" id="upPackSum">尚未选择文件夹或压缩包。</div>
         </div>
-        <div id="upStep2" hidden>
-          <div class="field-row">
-            <div class="field"><label>标题</label><input id="upTitleField" /></div>
-            <div class="field"><label>选择项目</label><select id="upProject"></select></div>
-          </div>
-          <div class="field-row">
-            <div class="field"><label>书籍名称</label><input id="upBook" value="我成了老公掌心宠" /></div>
-            <div class="field"><label>书籍 ID</label><input id="upBookId" value="7128491023" /></div>
-          </div>
-          <div class="field-row">
-            <div class="field"><label>稿件类型</label><select id="upKind"><option>图集</option><option>视频</option></select></div>
-            <div class="field"><label>素材类型</label><select id="upMat"></select></div>
-          </div>
-          <div class="field-row">
-            <div class="field"><label>稿件名称</label><input id="upFileName" /></div>
-            <div class="field"><label>稿件大小</label><input id="upSize" /></div>
-          </div>
-          <div class="field"><label>作品标题</label><input id="upPubT" /></div>
-          <div class="field"><label>作品描述</label><textarea id="upPubD" placeholder="给领取用户看的发布描述"></textarea></div>
-          <div class="field"><label>剪辑手</label><input id="upEditor" readonly /></div>
-        </div>
         <div id="upStep3" hidden>
-          <p class="desc">核对后提交审核。审核中不进用户广场；驳回后 list 出示原因。</p>
-          <div id="upConfirmSum"></div>
+          <div class="excel-bar">
+            <p id="upExcelMeta">解析后确认条数与总大小</p>
+            <button class="btn btn-ghost" type="button" id="upAiTips">AI生产发布技巧</button>
+          </div>
+          <div class="excel-wrap" id="upExcel"></div>
         </div>
       </div>
       <div class="up-foot">
         <button class="btn btn-ghost" type="button" id="upBack" hidden>上一步</button>
         <button class="btn btn-primary" type="button" id="upNext">下一步</button>
-        <button class="btn btn-primary" type="button" id="doPublish" hidden>提交审核</button>
+        <button class="btn btn-primary" type="button" id="doPublish" hidden>开始上传</button>
       </div>
     </div>
 
@@ -350,6 +390,9 @@
     var upStep = 1;
     var upPackType = '文件夹';
     var upPack = null;
+    var upRows = [];
+    var upUnpacking = false;
+    var upTimer = 0;
     var pendingDeleteId = '';
 
     function toast(msg) {
@@ -382,6 +425,7 @@
       document.getElementById('upModal').classList.toggle('open', open);
       if (open) {
         upStep = 1;
+        upUnpacking = false;
         if (!upPack) renderPackSum();
         paintUpStep();
         fillUploadFields();
@@ -441,34 +485,54 @@
       return '<span class="tag tag-muted">' + esc(occ) + '</span>';
     }
     function auditTag(w) {
-      var a = w.audit || '已通过';
+      var a = w.audit || '';
+      if (w.uploadStatus && w.uploadStatus !== '已上传') a = a || '—';
+      if (!a) a = '已通过';
       if (a === '已通过') return '<span class="tag tag-ok">已通过</span>';
       if (a === '审核中') return '<span class="tag tag-warn">审核中</span>';
+      if (a === '—') return '<span class="tag tag-muted">—</span>';
       var reason = w.rejectReason ? '<div class="cell-sub">原因：' + esc(w.rejectReason) + '</div>' : '';
       return '<span class="tag tag-del">已驳回</span>' + reason;
     }
+    function bookLinkOf(w) {
+      return w.bookLink || (w.bookId ? 'https://ybdd.demo/book/' + w.bookId : '');
+    }
     function recentTable(rows) {
       if (!rows.length) return '<div class="empty">还没有上传记录</div>';
-      return '<table><thead><tr><th>书籍 ID</th><th>稿件信息</th></tr></thead><tbody>' +
+      return '<table><thead><tr><th>项目名称</th><th>书籍信息</th><th>稿件信息</th><th>稿件类型</th><th>审核状态</th><th>上传时间</th></tr></thead><tbody>' +
         rows.map(function (w) {
-          return '<tr><td>' + esc(w.bookId || '—') + '</td>' +
-            '<td>' + esc(w.size || '—') + '<div class="cell-sub">' + esc(w.fileName || w.title) + '</div></td></tr>';
+          var href = bookLinkOf(w);
+          return '<tr><td>' + esc(w.project) + '</td>' +
+            '<td>' + esc(w.book || '—') +
+              '<div class="cell-sub">ID ' + esc(w.bookId || '—') + '</div>' +
+              (href ? '<div class="cell-sub">' + esc(href) + '</div>' : '') + '</td>' +
+            '<td>' + esc(YJD.workInfoLabel(w)) + '<div class="cell-sub">' + esc(w.fileName || w.title) + '</div></td>' +
+            '<td>' + esc(w.kind) + '</td>' +
+            '<td>' + auditTag(w) + '</td>' +
+            '<td>' + esc(w.time) + '</td></tr>';
         }).join('') + '</tbody></table>';
+    }
+    function uploadTag(w) {
+      var s = w.uploadStatus || '已上传';
+      if (s === '已上传') return '<span class="tag tag-ok">已上传</span>';
+      if (s === '上传中') return '<span class="tag tag-warn">上传中</span>';
+      var retry = '<div class="cell-sub"><button class="link" type="button" data-retry="' + esc(w.id) + '">重新上传</button></div>';
+      return '<span class="tag tag-del">上传失败</span>' + retry;
     }
     function fullTable(rows) {
       if (!rows.length) return '<div class="empty">还没有上传记录</div>';
-      return '<table><thead><tr><th>ID</th><th>标题</th><th>项目</th><th>书</th><th>稿件信息</th><th>发布技巧</th><th>剪辑手</th><th>类型</th><th>素材类型</th><th>占用</th><th>审核</th><th>上传时间</th><th>操作</th></tr></thead><tbody>' +
+      return '<table><thead><tr><th>ID</th><th>标题</th><th>项目</th><th>书</th><th>稿件信息</th><th>发布技巧</th><th>剪辑手</th><th>类型</th><th>素材类型</th><th>占用</th><th>上传</th><th>审核</th><th>上传时间</th><th>操作</th></tr></thead><tbody>' +
         rows.map(function (w) {
-          var idle = w.occ === '空闲';
+          var idle = w.occ === '空闲' && w.uploadStatus !== '上传中';
           var del = idle
             ? '<button class="link link-danger" type="button" data-del="' + esc(w.id) + '">删除</button>'
             : '<button class="link" type="button" disabled title="仅未占用可删">删除</button>';
           return '<tr><td>' + esc(w.id) + '</td><td>' + esc(w.title) + '</td><td>' + esc(w.project) + '</td>' +
             '<td>' + esc(w.book) + '<div class="cell-sub">书籍 ID ' + esc(w.bookId || '—') + '</div></td>' +
-            '<td>' + esc(w.size || '—') + '<div class="cell-sub">' + esc(w.fileName || w.title) + '</div></td>' +
+            '<td>' + esc(YJD.workInfoLabel(w)) + '<div class="cell-sub">' + esc(w.fileName || w.title) + '</div></td>' +
             '<td>' + esc(w.pubTitle || '—') + '<div class="cell-sub">' + esc(w.pubDesc || '') + '</div></td>' +
             '<td>' + esc(w.editor) + '</td><td>' + esc(w.kind) + '</td><td>' + esc(w.mat) + '</td>' +
-            '<td>' + occTag(w.occ) + '</td><td>' + auditTag(w) + '</td><td>' + esc(w.time) + '</td><td>' + del + '</td></tr>';
+            '<td>' + occTag(w.occ) + '</td><td>' + uploadTag(w) + '</td><td>' + auditTag(w) + '</td><td>' + esc(w.time) + '</td><td>' + del + '</td></tr>';
         }).join('') + '</tbody></table>';
     }
     function fillSelect(id, names) {
@@ -483,18 +547,17 @@
       fillSelect('upProject', YJD.authorizedProjects(STORE, ed));
       fillSelect('upMat', YJD.enabledMats(STORE).map(function (m) { return m.name; }));
       document.getElementById('upEditor').value = ed.name;
-      if (upPack) {
-        if (!document.getElementById('upFileName').value) document.getElementById('upFileName').value = upPack.fileName;
-        if (!document.getElementById('upSize').value) document.getElementById('upSize').value = upPack.size;
-        if (!document.getElementById('upTitleField').value) document.getElementById('upTitleField').value = upPack.fileName;
-        if (!document.getElementById('upPubT').value) document.getElementById('upPubT').value = upPack.fileName;
-      }
     }
     function renderPackSum() {
       var el = document.getElementById('upPackSum');
+      document.getElementById('upUseDemo').textContent = upPackType === '压缩包' ? '使用演示压缩包' : '使用演示文件夹';
+      if (upUnpacking) {
+        el.innerHTML = '<div class="unzip-box"><b>解压中</b><br />正在解压压缩包，完成后按命名约定解析。</div>';
+        return;
+      }
       if (!upPack) { el.textContent = '尚未选择文件夹或压缩包。'; return; }
       el.innerHTML = '已选 <b>' + esc(upPack.type) + '</b> · ' + esc(upPack.fileName) +
-        '<div class="cell-sub">大小 ' + esc(upPack.size) + (upPack.count ? ' · ' + upPack.count + ' 个文件' : '') + '</div>';
+        '<div class="cell-sub">解析 ' + (upRows.length || 0) + ' 条 · 总大小 ' + esc(fmtG(upPack.bytes || 0)) + '</div>';
     }
     function paintUpStep() {
       [1, 2, 3].forEach(function (n) {
@@ -508,32 +571,33 @@
       document.getElementById('doPublish').hidden = upStep !== 3;
       document.getElementById('upPackFolder').classList.toggle('on', upPackType === '文件夹');
       document.getElementById('upPackZip').classList.toggle('on', upPackType === '压缩包');
-      if (upStep === 3) renderConfirm();
+      if (upStep === 2) renderPackSum();
+      if (upStep === 3) renderExcel();
     }
-    function renderConfirm() {
-      var f = readForm();
-      document.getElementById('upConfirmSum').innerHTML =
-        '<div class="sum-row"><span>成片</span><b>' + esc(upPack ? upPack.type + ' · ' + upPack.fileName : '—') + '</b></div>' +
-        '<div class="sum-row"><span>标题</span><b>' + esc(f.title) + '</b></div>' +
-        '<div class="sum-row"><span>项目</span><b>' + esc(f.project) + '</b></div>' +
-        '<div class="sum-row"><span>书</span><b>' + esc(f.book) + ' / ' + esc(f.bookId) + '</b></div>' +
-        '<div class="sum-row"><span>稿件信息</span><b>' + esc(f.size) + ' · ' + esc(f.fileName) + '</b></div>' +
-        '<div class="sum-row"><span>发布技巧</span><b>' + esc(f.pubTitle) + '<div class="cell-sub">' + esc(f.pubDesc) + '</div></b></div>' +
-        '<div class="sum-row"><span>类型 / 素材</span><b>' + esc(f.kind) + ' / ' + esc(f.mat) + '</b></div>' +
-        '<div class="sum-row"><span>剪辑手</span><b>' + esc(f.editor) + '</b></div>';
+    function renderExcel() {
+      var total = upRows.reduce(function (n, r) { return n + (r.bytes || 0); }, 0);
+      document.getElementById('upExcelMeta').textContent = '共 ' + upRows.length + ' 条数据，大小 ' + fmtG(total);
+      if (!upRows.length) {
+        document.getElementById('upExcel').innerHTML = '<div class="empty">未解析到数据</div>';
+        return;
+      }
+      document.getElementById('upExcel').innerHTML =
+        '<table><thead><tr><th>稿件ID</th><th>稿件名称</th><th>稿件大小</th><th>发布技巧</th></tr></thead><tbody>' +
+        upRows.map(function (r) {
+          var tip = r.pubTitle || r.pubDesc
+            ? esc(r.pubTitle || '—') + '<div class="cell-sub">' + esc(r.pubDesc || '') + '</div>'
+            : '';
+          return '<tr><td>' + esc(r.id) + '</td><td>' + esc(r.title) + '</td><td>' + esc(r.size) + '</td><td>' + tip + '</td></tr>';
+        }).join('') + '</tbody></table>';
     }
     function readForm() {
       return {
-        title: (document.getElementById('upTitleField').value || '').trim(),
         project: document.getElementById('upProject').value,
         book: (document.getElementById('upBook').value || '').trim(),
         bookId: (document.getElementById('upBookId').value || '').trim(),
+        bookLink: (document.getElementById('upBookLink').value || '').trim(),
         kind: document.getElementById('upKind').value,
         mat: document.getElementById('upMat').value,
-        fileName: (document.getElementById('upFileName').value || '').trim(),
-        size: (document.getElementById('upSize').value || '').trim(),
-        pubTitle: (document.getElementById('upPubT').value || '').trim(),
-        pubDesc: (document.getElementById('upPubD').value || '').trim(),
         editor: document.getElementById('upEditor').value
       };
     }
@@ -541,10 +605,101 @@
       if (!bytes) return '0 MB';
       return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
     }
-    function setPack(pack) {
+    function fmtG(bytes) {
+      return ((bytes || 0) / (1024 * 1024 * 1024)).toFixed(2) + 'G';
+    }
+    function stripExt(name) {
+      return String(name || '').replace(/\.[^.]+$/, '');
+    }
+    function nextWorkId(i) {
+      return 'M-' + Date.now() + '-' + i;
+    }
+    function demoSeedRows(kind) {
+      var items = [
+        { title: '闭环测试书', bytes: 8.2 * 1024 * 1024, fail: false },
+        { title: '夜色切片', bytes: 6.4 * 1024 * 1024, fail: false },
+        { title: '失败样例', bytes: 4.1 * 1024 * 1024, fail: true }
+      ];
+      return items.map(function (it, i) {
+        return {
+          id: nextWorkId(i),
+          title: it.title,
+          fileName: kind === '视频' ? it.title + '.mp4' : it.title,
+          bytes: it.bytes,
+          size: fmtSize(it.bytes),
+          pubTitle: '',
+          pubDesc: '',
+          fail: it.fail
+        };
+      });
+    }
+    function parseFolderFiles(files, kind) {
+      var list = Array.prototype.slice.call(files || []);
+      if (!list.length) return [];
+      var videoRe = /\.(mp4|mov|m4v|webm|mkv|avi)$/i;
+      if (kind === '视频') {
+        return list.filter(function (f) { return videoRe.test(f.name); }).map(function (f, i) {
+          return {
+            id: nextWorkId(i),
+            title: stripExt(f.name),
+            fileName: f.name,
+            bytes: f.size || 0,
+            size: fmtSize(f.size || 0),
+            pubTitle: '',
+            pubDesc: '',
+            fail: false
+          };
+        });
+      }
+      var groups = {};
+      var order = [];
+      list.forEach(function (f) {
+        var parts = String(f.webkitRelativePath || f.name).split('/').filter(Boolean);
+        var group = parts.length >= 3 ? parts[1] : parts[0];
+        if (!groups[group]) {
+          groups[group] = { title: group, bytes: 0 };
+          order.push(group);
+        }
+        groups[group].bytes += f.size || 0;
+      });
+      return order.map(function (name, i) {
+        var g = groups[name];
+        return {
+          id: nextWorkId(i),
+          title: g.title,
+          fileName: g.title,
+          bytes: g.bytes,
+          size: fmtSize(g.bytes),
+          pubTitle: '',
+          pubDesc: '',
+          fail: false
+        };
+      });
+    }
+    function applyRows(rows, pack) {
+      upRows = rows;
       upPack = pack;
+      upPack.bytes = rows.reduce(function (n, r) { return n + (r.bytes || 0); }, 0);
+      upPack.size = fmtG(upPack.bytes);
+      upPack.count = rows.length;
       renderPackSum();
-      fillUploadFields();
+    }
+    function finishParse(rows, pack) {
+      applyRows(rows, pack);
+      if (!rows.length) { toast('未按命名约定解析到数据'); return; }
+      upStep = 3;
+      paintUpStep();
+    }
+    function startUnpack(pack, rowsFn) {
+      upUnpacking = true;
+      upPack = pack;
+      upRows = [];
+      renderPackSum();
+      clearTimeout(upTimer);
+      upTimer = setTimeout(function () {
+        upUnpacking = false;
+        finishParse(rowsFn(), pack);
+      }, 800);
     }
 
     function render() {
@@ -574,6 +729,9 @@
         document.getElementById('listBox').querySelectorAll('[data-del]').forEach(function (btn) {
           btn.addEventListener('click', function () { askDelete(btn.dataset.del); });
         });
+        document.getElementById('listBox').querySelectorAll('[data-retry]').forEach(function (btn) {
+          btn.addEventListener('click', function () { retryUpload(btn.dataset.retry); });
+        });
       }
     }
 
@@ -596,51 +754,94 @@
     }
 
     function goNext() {
+      var f = readForm();
+      var ed = currentEditor();
+      var allowed = YJD.authorizedProjects(STORE, ed);
       if (upStep === 1) {
-        if (!upPack) { toast('请先选择文件夹或压缩包'); return; }
-        upStep = 2;
-        fillUploadFields();
-      } else if (upStep === 2) {
-        var f = readForm();
-        var ed = currentEditor();
-        var allowed = YJD.authorizedProjects(STORE, ed);
-        if (!f.title || !f.project || !f.book || !f.bookId || !f.mat || !f.fileName || !f.size || !f.pubTitle || !f.pubDesc) {
-          toast('请填齐标题、项目、书、书籍 ID、素材、稿件名称、大小、作品标题、作品描述');
+        if (!f.project || !f.book || !f.bookId || !f.bookLink || !f.mat) {
+          toast('请填齐项目、书籍名称、书籍 ID、书籍链接、素材类型');
           return;
         }
         if (allowed.indexOf(f.project) === -1) { toast('该项目未授权或已禁用，不可上传'); return; }
         if (!YJD.enabledMats(STORE).some(function (m) { return m.name === f.mat; })) { toast('请选择启用中的素材类型'); return; }
+        upStep = 2;
+      } else if (upStep === 2) {
+        if (upUnpacking) { toast('正在解压中'); return; }
+        if (!upPack || !upRows.length) { toast('请先选择文件夹或压缩包'); return; }
         upStep = 3;
       }
       paintUpStep();
     }
-    function doPublish() {
-      var ed = currentEditor();
-      if (!canUpload(ed)) { toast('未录入剪辑手，无法上传发布'); showView('guest'); return; }
-      if (!upPack) { toast('请先选择文件夹或压缩包'); upStep = 1; paintUpStep(); return; }
-      var f = readForm();
-      if (YJD.authorizedProjects(STORE, ed).indexOf(f.project) === -1) { toast('该项目未授权或已禁用，不可上传'); return; }
-      if (!YJD.enabledMats(STORE).some(function (m) { return m.name === f.mat; })) { toast('请选择启用中的素材类型'); return; }
-      if (!f.pubDesc) { toast('请填齐发布描述'); return; }
-      var nid = 'M-' + Date.now();
-      STORE.works.unshift({
-        id: nid, title: f.title, project: f.project, book: f.book, bookId: f.bookId,
-        size: f.size, fileName: f.fileName, dl: 'https://ybdd.demo/ms/' + nid,
-        editor: ed.name, kind: f.kind, mat: f.mat,
+    function makeWork(ed, f, row, status) {
+      return {
+        id: row.id, title: row.title, project: f.project, book: f.book, bookId: f.bookId,
+        bookLink: f.bookLink, size: row.size, fileName: row.fileName || row.title,
+        dl: 'https://ybdd.demo/ms/' + row.id, editor: ed.name, kind: f.kind, mat: f.mat,
         occ: '空闲', occupied: false, time: '刚刚', share: ed.share,
         cover: 'assets/fr014/cover-m01.jpg', genre: f.kind === '视频' ? '视频' : '小说',
         tags: [], imgs: f.kind === '图集' ? 8 : 0, duration: f.kind === '视频' ? 15 : 0,
-        pubTitle: f.pubTitle, pubDesc: f.pubDesc, earn: 0,
-        audit: '审核中', rejectReason: ''
+        pubTitle: row.pubTitle || '', pubDesc: row.pubDesc || '', earn: 0,
+        audit: status === '已上传' ? YJD.workAuditAfterUpload(ed) : '—', rejectReason: '',
+        uploadStatus: status, failDemo: !!row.fail
+      };
+    }
+    function settleRow(id, ok) {
+      var w = STORE.works.find(function (x) { return x.id === id; });
+      if (!w) return;
+      w.uploadStatus = ok ? '已上传' : '上传失败';
+      if (ok) w.audit = YJD.workAuditAfterUpload(YJD.editorByName(STORE, w.editor));
+      persist();
+      render();
+    }
+    function queueRows(rows, ed, f) {
+      rows.forEach(function (row, i) {
+        setTimeout(function () { settleRow(row.id, !row.fail); }, 280 + i * 320);
+      });
+    }
+    function doPublish() {
+      var ed = currentEditor();
+      if (!canUpload(ed)) { toast('未录入剪辑手，无法上传发布'); showView('guest'); return; }
+      if (!upRows.length) { toast('请先选择文件夹或压缩包'); upStep = 2; paintUpStep(); return; }
+      var f = readForm();
+      if (YJD.authorizedProjects(STORE, ed).indexOf(f.project) === -1) { toast('该项目未授权或已禁用，不可上传'); return; }
+      if (!YJD.enabledMats(STORE).some(function (m) { return m.name === f.mat; })) { toast('请选择启用中的素材类型'); return; }
+      var batch = upRows.slice();
+      batch.forEach(function (row) {
+        STORE.works.unshift(makeWork(ed, f, row, '上传中'));
       });
       persist();
       upPack = null;
-      document.getElementById('upTitleField').value = '';
-      document.getElementById('upFileName').value = '';
-      document.getElementById('upPubT').value = '';
-      document.getElementById('upPubD').value = '';
-      toast('已提交审核，通过后才会出现在用户广场');
+      upRows = [];
+      toast('已加入上传队列');
       showView('list');
+      queueRows(batch, ed, f);
+    }
+    function retryUpload(id) {
+      var w = STORE.works.find(function (x) { return x.id === id; });
+      if (!w || w.uploadStatus !== '上传失败') return;
+      var tips = { pubTitle: w.pubTitle, pubDesc: w.pubDesc };
+      w.uploadStatus = '上传中';
+      persist();
+      render();
+      setTimeout(function () {
+        var cur = STORE.works.find(function (x) { return x.id === id; });
+        if (!cur) return;
+        cur.pubTitle = tips.pubTitle;
+        cur.pubDesc = tips.pubDesc;
+        cur.failDemo = false;
+        settleRow(id, true);
+        toast('已重新上传文件');
+      }, 400);
+    }
+    function aiTips() {
+      var f = readForm();
+      if (!upRows.length) { toast('请先解析成片'); return; }
+      upRows.forEach(function (r) {
+        r.pubTitle = (f.book || '本书') + '｜' + r.title;
+        r.pubDesc = '根据书籍「' + (f.book || '') + '」与稿件「' + r.title + '」生成的发布描述';
+      });
+      renderExcel();
+      toast('已为全表生成发布技巧');
     }
 
     document.getElementById('upPackFolder').onclick = function () {
@@ -656,28 +857,31 @@
       else document.getElementById('upZip').click();
     };
     document.getElementById('upUseDemo').onclick = function () {
-      setPack({
+      var kind = readForm().kind;
+      var pack = {
         type: upPackType,
         fileName: upPackType === '压缩包' ? '闭环演示包.zip' : '闭环演示文件夹',
-        size: '18.6 MB',
-        count: upPackType === '压缩包' ? 1 : 12
-      });
+        bytes: 0
+      };
+      if (upPackType === '压缩包') startUnpack(pack, function () { return demoSeedRows(kind); });
+      else finishParse(demoSeedRows(kind), pack);
     };
     document.getElementById('upFolder').onchange = function () {
       var files = Array.prototype.slice.call(this.files || []);
       if (!files.length) return;
       var root = (files[0].webkitRelativePath || files[0].name).split('/')[0];
-      var bytes = files.reduce(function (n, f) { return n + (f.size || 0); }, 0);
-      setPack({ type: '文件夹', fileName: root, size: fmtSize(bytes), count: files.length });
+      finishParse(parseFolderFiles(files, readForm().kind), { type: '文件夹', fileName: root, bytes: 0 });
     };
     document.getElementById('upZip').onchange = function () {
       var f = this.files && this.files[0];
       if (!f) return;
-      setPack({ type: '压缩包', fileName: f.name, size: fmtSize(f.size), count: 1 });
+      var kind = readForm().kind;
+      startUnpack({ type: '压缩包', fileName: f.name, bytes: f.size || 0 }, function () { return demoSeedRows(kind); });
     };
     document.getElementById('upNext').onclick = goNext;
     document.getElementById('upBack').onclick = function () { upStep = Math.max(1, upStep - 1); paintUpStep(); };
     document.getElementById('doPublish').onclick = doPublish;
+    document.getElementById('upAiTips').onclick = aiTips;
     document.getElementById('upClose').onclick = function () { setUpModal(false); };
     document.getElementById('upOverlay').onclick = function () { setUpModal(false); };
     document.getElementById('pcConfirmOk').onclick = doDelete;

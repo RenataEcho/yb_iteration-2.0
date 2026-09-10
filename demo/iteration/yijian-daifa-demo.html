@@ -1200,14 +1200,14 @@
           return '<button class="kw-row' + (state.kwPick === k ? ' on' : '') + '" type="button" data-k="' + k + '">' +
             '<span>' + k + '</span><i class="kw-check">✓</i></button>';
         }).join('')
-        : '<p class="quota" style="padding:16px">该项目暂无已通过关键词</p>';
+        : '<p class="quota" style="padding:16px">暂无已通过申词</p>';
       document.querySelectorAll('#kwList .kw-row').forEach(function (el) {
         el.onclick = function () { state.kwPick = el.dataset.k; renderKwList(); };
       });
     }
     function openKwSheet(mode) {
       state.kwMode = mode || 'claim';
-      state.kwPick = state.kw;
+      state.kwPick = '';
       state.kwQuery = '';
       document.getElementById('kwSearch').value = '';
       renderKwList();
@@ -1355,10 +1355,14 @@
         work: it.title,
         project: it.project,
         editor: it.editor,
+        book: it.book || '',
+        bookId: it.bookId || '',
         cover: it.cover,
         kind: it.kind,
         kw: extra.kw || state.kw || '',
         fill: extra.fill || '—',
+        fillVideo: extra.fillVideo || '',
+        pendingEarn: extra.pendingEarn,
         time: extra.time || '刚刚',
         status: extra.status || '未回填',
         link: extra.link || ('https://ybdd.demo/ms/' + it.id),
@@ -1673,9 +1677,9 @@
     }
     function startClaim() {
       var it = item(state.current);
-      var reason = claimBlockReason(it);
-      if (reason === '次数不足') { toast(reason); openBuySheet(); return; }
-      if (reason) { toast(reason); return; }
+      if (!it) { toast('稿件已不存在'); return; }
+      if (state.banned) { toast('你已被停权，无法领取'); return; }
+      if (quota() <= 0) { toast('次数不足'); openBuySheet(); return; }
       openKwSheet('claim');
     }
     function finishClaim(mid, kw) {
@@ -1744,6 +1748,8 @@
       if (c) {
         c.status = '已回填';
         c.fill = c.fill && c.fill !== '—' ? c.fill : '已回填';
+        c.fillVideo = c.fillVideo || ('https://channels.weixin.qq.com/demo/' + c.id);
+        c.pendingEarn = 0;
         var it = item(c.mid);
         if (it) {
           it.occ = '已完成';
