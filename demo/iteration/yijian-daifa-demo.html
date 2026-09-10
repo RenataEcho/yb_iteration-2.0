@@ -922,10 +922,7 @@
     function visibleItems() {
       var q = state.search;
       return ITEMS.filter(function (it) {
-        if (it.audit && it.audit !== '已通过') return false;
-        if (it.occ === '占用中' || it.occ === '已完成' || it.occupied) return false;
-        var proj = YJD.projectByName(STORE, it.project);
-        if (proj && proj.status !== '启用') return false;
+        if (!YJD.plazaEligible(STORE, it)) return false;
         if (q && it.title.indexOf(q) === -1 && it.book.indexOf(q) === -1) return false;
         if (state.filters.project && it.project !== state.filters.project) return false;
         if (state.filters.editor && it.editor !== state.filters.editor) return false;
@@ -1588,9 +1585,8 @@
       if (!it) return '稿件已不存在';
       if (state.banned) return '你已被停权，无法领取';
       if (quota() <= 0) return '次数不足';
-      if ((it.audit || '已通过') !== '已通过') return '稿件当前不可领';
-      var proj = YJD.projectByName(STORE, it.project);
-      if (!proj || proj.status !== '启用') return '稿件当前不可领';
+      var idle = Object.assign({}, it, { occ: '空闲', occupied: false });
+      if (!YJD.plazaEligible(STORE, idle)) return '稿件当前不可领';
       if (it.occ === '已完成' || it.occ === '占用中' || it.occupied) return '稿件已被占用';
       return '';
     }
@@ -1682,6 +1678,11 @@
       closeDd();
       if (id === 'timeout') {
         var it = item('M-01');
+        if (!it) {
+          toast('演示稿件已删除');
+          showScreen('claims');
+          return;
+        }
         it.occ = '空闲';
         it.occupied = false;
         state.strikes = Math.max(state.strikes, 1);

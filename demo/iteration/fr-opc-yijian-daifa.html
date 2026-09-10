@@ -209,6 +209,8 @@
     .field input, .field select, .field textarea { padding: 0 10px; border: 1px solid var(--border); border-radius: 7px; font: inherit; }
     .field input, .field select { height: 34px; }
     .field textarea { min-height: 64px; padding: 8px 10px; resize: vertical; }
+    .chk-list { display: flex; flex-wrap: wrap; gap: 8px 14px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 7px; }
+    .chk-list label { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
     .req { color: var(--danger); margin-left: 2px; }
     .logo-cell { display: flex; align-items: center; gap: 8px; }
     .logo-cell img { width: 28px; height: 28px; border-radius: 6px; object-fit: cover; background: #f1f5f9; flex-shrink: 0; }
@@ -254,7 +256,7 @@
         <h1>
           一键代发
           <span class="badge badge-fr">FR-014</span>
-          <span class="badge badge-version">v6 当前</span>
+          <span class="badge badge-version">v7 当前</span>
         </h1>
         <p class="page-desc">C 端只领取。剪辑手在已有 PC 创作者中心用文件夹或压缩包上传，先走平台审核。招募、看板、上传弹窗与 list 都在 PC。后台与 C/PC 共用同一份演示数据。</p>
       </div>
@@ -600,7 +602,7 @@
           <h3><span>2</span>页面与入口</h3>
           <div class="rule-content">
             <ul>
-              <li><strong>作品广场</strong>：宫格；项目图标横滑直选；搜索在项目下方；下拉筛剪辑师 / 素材类型 / 稿件类型；封面为本地图片（小说/漫画/视频题材）。广场 Banner 复用平台已有能力（0–5 条轮播已实现），本 FR 不另做后台配置。只列启用项目、平台已通过且空闲的稿件；审核中 / 已驳回 / 占用中 / 已回填完成均不回广场。不展示收益金额。底栏切「已领」。</li>
+              <li><strong>作品广场</strong>：宫格；项目图标横滑直选；搜索在项目下方；下拉筛剪辑师 / 素材类型 / 稿件类型；封面为本地图片（小说/漫画/视频题材）。广场 Banner 复用平台已有能力（0–5 条轮播已实现），本 FR 不另做后台配置。只列启用项目、已录入剪辑手、启用素材、平台已通过且空闲的稿件；审核中 / 已驳回 / 占用中 / 已回填完成均不回广场。不展示收益金额。底栏切「已领」。</li>
               <li><strong>稿件详情</strong>：素材铺满。标题下展示标签；书籍名称下为书籍 ID。内容底、按钮上展示注意事项。未领取展示领取步骤；领取后改为作品发布技巧（发布标题 / 发布描述可复制）。未领取底栏：剩余次数、快捷提词、领取。领取后底栏：添加水印、下载稿件。不展示收益金额。</li>
               <li><strong>添加水印</strong>：底部坞按四组功能最高高度锁死，预览吃剩余空间。文本可点出键盘。字体 / 字色 / 背景 / 水印横向 Tab；四组叠同一高度，切 Tab 浮层不跳动。字色/背景的颜色与透明度上下分行，选项换行露出。水印文字可拖动。下载先打水印再下载。</li>
               <li><strong>我的领取</strong>：项目图标只展示有领取记录的项目。胶囊 Tab：未回填 / 已回填 / 已超时。卡片：关键词标题；封面、作品标题、项目名称、作者、领取时间、下载时间、7 天下载倒计时（超时不可再下）。下载/复制链接为次级；立即回填始终高亮，已回填/已超时点按提示。点信息区（不含灰底三按钮）进该 mid 稿件详情，底栏为已领取；返回回到领取页。「立即回填」仍只去回填页。</li>
@@ -626,6 +628,7 @@
               <li>领取成功后 24h 未完成回填 = 1 次未回填，并释放回 feed。</li>
               <li>终身未回填超过 3 次停权，仅后台黑名单手动恢复。</li>
               <li>禁用项目不出现在作品广场。</li>
+              <li>广场只列启用项目、已录入剪辑手、启用素材、已通过且空闲的稿。</li>
             </ul>
           </div>
         </div>
@@ -675,10 +678,10 @@
           <h3><span>2</span>数据表与字段</h3>
           <div class="rule-content">
             <ul>
-              <li><strong>剪辑手</strong>：录入必填右豹 ID、分成比例、备注；另有昵称、客服来源、可上传项目、状态、录入时间。未录右豹 ID 不能上传发布。</li>
+              <li><strong>剪辑手</strong>：录入必填右豹 ID、分成比例、备注；可上传项目只能勾选项目表；另有昵称、客服来源、状态、录入时间。未录右豹 ID 不能上传发布。</li>
               <li><strong>稿件</strong>：项目与书分列。书聚合书籍名称 + 书籍 ID。稿件信息聚合文件大小 + 下载链接。发布技巧聚合作品标题 + 作品描述。另有剪辑手、图集或视频、素材类型、占用态、平台审核（审核中 / 已通过 / 已驳回，驳回出示原因）、上传时间。PC 端 list 同字段但不展示下载链接。</li>
               <li><strong>领取记录</strong>：用户、稿件、关键词、回填信息、待回填/已回填/已超时释放。操作列「详情」看出回填；「稿件详情」抽屉出示稿件字段。</li>
-              <li><strong>项目</strong>：支持添加 / 编辑。字段：项目名称、Logo 信息、状态（启用 / 禁用）、排序、更新时间。禁用项目不可上传、不进广场。</li>
+              <li><strong>项目</strong>：支持添加 / 编辑。字段：项目名称、Logo 信息、状态（启用 / 禁用）、排序、更新时间、已通过关键词（至少 1 条）。禁用项目不可上传、不进广场。</li>
               <li><strong>黑名单</strong>：用户、未回填次数、停权时间；支持手动恢复。</li>
               <li><strong>次数商品</strong>：x 次 / y 积分，最多 4 档在售，可改价、下架。免费次数挂本页。</li>
             </ul>
@@ -973,8 +976,22 @@
       return '<div class="field"><label>右豹 ID<span class="req">*</span></label><input id="mYb" placeholder="YB10086" value="' + esc(e.ybId || '') + '" /></div>' +
         '<div class="field"><label>昵称<span class="req">*</span></label><input id="mName" placeholder="剪辑手昵称" value="' + esc(e.name || '') + '" /></div>' +
         '<div class="field"><label>分成比例<span class="req">*</span></label><input id="mShare" placeholder="50%" value="' + esc(e.share || '') + '" /></div>' +
-        '<div class="field"><label>可上传项目</label><input id="mProj" placeholder="番茄小说" value="' + esc(e.projects || '') + '" /></div>' +
+        '<div class="field"><label>可上传项目</label><div id="mProj" class="chk-list">' + editorProjectChecks(e.projects) + '</div></div>' +
         '<div class="field"><label>备注<span class="req">*</span></label><textarea id="mNote" placeholder="合作说明 / 对接备注">' + esc(e.note || '') + '</textarea></div>';
+    }
+    function editorProjectChecks(raw) {
+      var picked = YJD.parseProjectNames(raw);
+      return (STORE.projects || []).map(function (p) {
+        return '<label><input type="checkbox" name="mProj" value="' + esc(p.name) + '"' +
+          (picked.indexOf(p.name) >= 0 ? ' checked' : '') + ' />' + esc(p.name) + '</label>';
+      }).join('');
+    }
+    function readEditorProjects() {
+      var picked = Array.prototype.map.call(
+        document.querySelectorAll('#mProj input[name="mProj"]:checked'),
+        function (el) { return el.value; }
+      );
+      return picked.length ? picked.join(' / ') : '—';
     }
     function openEditorModal(id) {
       var row = id ? EDITORS.find(function (x) { return x.id === id; }) : null;
@@ -993,7 +1010,7 @@
           row.name = name || row.name;
           row.share = share;
           row.note = note;
-          row.projects = document.getElementById('mProj').value || '—';
+          row.projects = readEditorProjects();
           WORKS.forEach(function (w) {
             if (w.editor === oldEd) { w.editor = row.name; w.share = share; }
           });
@@ -1008,7 +1025,7 @@
             share: share,
             note: note,
             src: '客服二维码',
-            projects: document.getElementById('mProj').value || '—',
+            projects: readEditorProjects(),
             status: '已录入',
             time: nowStamp()
           });
@@ -1025,18 +1042,22 @@
     }
     function openProjectModal(id) {
       var row = id ? PROJECTS.find(function (x) { return x.id === id; }) : null;
+      var kwText = row ? (STORE.keywords[row.name] || []).join('\n') : '';
       openModal(row ? '编辑项目' : '添加项目',
         '<div class="field"><label>项目名称<span class="req">*</span></label><input id="pjName" placeholder="项目名称" value="' + esc(row ? row.name : '') + '" /></div>' +
         '<div class="field"><label>Logo 信息<span class="req">*</span></label><select id="pjLogo">' + logoSelectHtml(row ? row.logo : LOGO_OPTS[0].src) + '</select></div>' +
         '<div class="field"><label>状态</label><select id="pjOn"><option' + (!row || row.status === '启用' ? ' selected' : '') + '>启用</option><option' + (row && row.status === '禁用' ? ' selected' : '') + '>禁用</option></select></div>' +
-        '<div class="field"><label>排序<span class="req">*</span></label><input id="pjSort" type="number" value="' + (row ? row.sort : PROJECTS.length + 1) + '" /></div>',
+        '<div class="field"><label>排序<span class="req">*</span></label><input id="pjSort" type="number" value="' + (row ? row.sort : PROJECTS.length + 1) + '" /></div>' +
+        '<div class="field"><label>已通过关键词<span class="req">*</span></label><textarea id="pjKw" placeholder="一行一个已通过关键词">' + esc(kwText) + '</textarea></div>',
         function () {
           var name = (document.getElementById('pjName').value || '').trim();
           var logo = document.getElementById('pjLogo').value;
           var status = document.getElementById('pjOn').value;
           var sort = Number(document.getElementById('pjSort').value);
+          var kws = (document.getElementById('pjKw').value || '').split(/\n/).map(function (s) { return s.trim(); }).filter(Boolean);
           if (!name || !logo) { showToast('请填写项目名称、Logo、排序'); return true; }
           if (!Number.isInteger(sort) || sort < 1) { showToast('排序须为正整数'); return true; }
+          if (!kws.length) { showToast('请至少填写 1 个已通过关键词'); return true; }
           if (PROJECTS.some(function (p) { return p.name === name && (!row || p.id !== row.id); })) {
             showToast('项目名称已存在'); return true;
           }
@@ -1050,16 +1071,21 @@
             if (oldName !== name) {
               WORKS.forEach(function (w) { if (w.project === oldName) w.project = name; });
               CLAIMS.forEach(function (c) { if (c.project === oldName) c.project = name; });
+              EDITORS.forEach(function (e) {
+                var names = YJD.parseProjectNames(e.projects).map(function (n) { return n === oldName ? name : n; });
+                e.projects = names.length ? names.join(' / ') : '—';
+              });
               if (STORE.keywords[oldName]) {
                 STORE.keywords[name] = STORE.keywords[oldName];
                 delete STORE.keywords[oldName];
               }
             }
+            STORE.keywords[name] = kws;
             persist();
             showToast('已更新项目');
           } else {
             PROJECTS.push({ id: nextPrefixedId('P-', PROJECTS), name: name, logo: logo, status: status, sort: sort, updated: nowStamp() });
-            if (!STORE.keywords[name]) STORE.keywords[name] = [];
+            STORE.keywords[name] = kws;
             persist();
             showToast('已添加项目');
           }
@@ -1170,9 +1196,11 @@
     }
     function openWorkModal(id) {
       var row = id ? WORKS.find(function (x) { return x.id === id; }) : null;
-      if (!YJD.enrolledEditors(STORE).length) { showToast('请先录入剪辑手'); return; }
-      if (!YJD.enabledProjects(STORE).length) { showToast('请先启用至少一个项目'); return; }
-      if (!YJD.enabledMats(STORE).length) { showToast('请先启用至少一个素材类型'); return; }
+      if (!row) {
+        if (!YJD.enrolledEditors(STORE).length) { showToast('请先录入剪辑手'); return; }
+        if (!YJD.enabledProjects(STORE).length) { showToast('请先启用至少一个项目'); return; }
+        if (!YJD.enabledMats(STORE).length) { showToast('请先启用至少一个素材类型'); return; }
+      }
       openModal(row ? '编辑稿件' : '录入稿件', workFormHtml(row), function () {
         var title = (document.getElementById('wTitle').value || '').trim();
         var project = document.getElementById('wProj').value;
@@ -1401,7 +1429,7 @@
       history.replaceState(null, '', '?' + params.toString());
     }
     function buildMockupSrc(screen) {
-      return 'yijian-daifa-demo.html?embed=1&v=19&screen=' + screen;
+      return 'yijian-daifa-demo.html?embed=1&v=20&screen=' + screen;
     }
     function loadMockupFrame() {
       document.getElementById('mockupFrame').src = buildMockupSrc(getActiveScreen());
@@ -1410,7 +1438,7 @@
       return document.querySelector('#pcScenes .scene-btn.active')?.dataset.pcscreen || 'home';
     }
     function loadPcFrame() {
-      document.getElementById('pcFrame').src = 'yijian-daifa-pc.html?embed=1&v=4&screen=' + getActivePcScreen();
+      document.getElementById('pcFrame').src = 'yijian-daifa-pc.html?embed=1&v=5&screen=' + getActivePcScreen();
     }
     function switchRuleTab(ruleId, btn) {
       document.querySelectorAll('.rule-tab-bar button').forEach(function (b) { b.classList.remove('active'); });

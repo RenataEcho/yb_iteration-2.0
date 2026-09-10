@@ -160,7 +160,7 @@ def test_fr_shell_admin_and_flow(page, demo_server):
     page.locator("#toggleRuleDrawer").click()
     expect(page.locator("#ruleDrawer")).to_have_class("drawer open")
     expect(page.locator("#rule-fe")).to_contain_text("作品广场")
-    expect(page.locator(".badge-version")).to_contain_text("v6")
+    expect(page.locator(".badge-version")).to_contain_text("v7")
     page.locator("#ruleDrawer .drawer-close").click()
     expect(page.locator("#ruleDrawer")).not_to_have_class("drawer open")
     page.locator('.page-tab-bar button[data-page="view-pc"]').click()
@@ -320,6 +320,7 @@ def test_admin_editors_works_projects(page, demo_server):
     expect(page.locator("#pjBody")).to_contain_text("启用")
     page.locator("#admin-projects button", has_text="添加").click()
     page.locator("#pjName").fill("测试项目")
+    page.locator("#pjKw").fill("测试项目词")
     page.locator("#pjSort").fill("9")
     page.locator("#modalOk").click()
     expect(page.locator("#pjBody")).to_contain_text("测试项目")
@@ -503,3 +504,181 @@ def test_admin_fe_store_loop(page, demo_server):
     page.locator("#pcConfirmOk").click()
     expect(page.locator("#toast")).to_contain_text("已删除")
     expect(page.locator("#listBox")).not_to_contain_text("闭环测试书")
+
+
+def test_plaza_hides_disabled_mat_and_editor(page, demo_server):
+    page.goto(f"{demo_server}/fr-opc-yijian-daifa.html?tab=admin", wait_until="domcontentloaded")
+    page.locator('.admin-tab-bar button[data-admin="admin-mats"]').click()
+    page.locator("#matBody tr", has_text="口播").locator("button", has_text="停用").click()
+    expect(page.locator("#toast")).to_contain_text("广场筛选不再列出")
+
+    page.goto(f"{demo_server}/yijian-daifa-demo.html?embed=1", wait_until="domcontentloaded")
+    expect(page.locator("#feedList")).not_to_contain_text("掌心宠")
+    page.goto(f"{demo_server}/yijian-daifa-demo.html?embed=1&screen=detail", wait_until="domcontentloaded")
+    expect(page.locator("#goClaim")).to_have_text("当前不可领")
+    expect(page.locator("#goClaim")).to_be_disabled()
+    quota_before = page.locator("#claimQuotaFoot").inner_text()
+    page.evaluate("startClaim()")
+    expect(page.locator("#toast")).to_contain_text("稿件当前不可领")
+    expect(page.locator("#claimQuotaFoot")).to_have_text(quota_before)
+
+    page.goto(f"{demo_server}/fr-opc-yijian-daifa.html?tab=admin", wait_until="domcontentloaded")
+    page.locator('.admin-tab-bar button[data-admin="admin-mats"]').click()
+    page.locator("#matBody tr", has_text="口播").locator("button", has_text="启用").click()
+    page.goto(f"{demo_server}/yijian-daifa-demo.html?embed=1", wait_until="domcontentloaded")
+    expect(page.locator("#feedList")).to_contain_text("掌心宠")
+
+    page.goto(f"{demo_server}/fr-opc-yijian-daifa.html?tab=admin", wait_until="domcontentloaded")
+    page.locator("#edBody tr", has_text="林夏").locator("button", has_text="停用").click()
+    expect(page.locator("#toast")).to_contain_text("占用中")
+    page.locator("#edBody tr", has_text="阿凯").locator("button", has_text="停用").click()
+    page.locator("#modalOk").click()
+    expect(page.locator("#toast")).to_contain_text("已停用")
+
+    page.goto(f"{demo_server}/yijian-daifa-demo.html?embed=1", wait_until="domcontentloaded")
+    expect(page.locator("#feedList")).not_to_contain_text("末世囤货混剪")
+    page.evaluate("state.current = 'M-02'; showScreen('detail')")
+    expect(page.locator("#goClaim")).to_have_text("当前不可领")
+    expect(page.locator("#goClaim")).to_be_disabled()
+    quota_m02 = page.locator("#claimQuotaFoot").inner_text()
+    page.evaluate("startClaim()")
+    expect(page.locator("#toast")).to_contain_text("稿件当前不可领")
+    expect(page.locator("#claimQuotaFoot")).to_have_text(quota_m02)
+
+    page.goto(f"{demo_server}/fr-opc-yijian-daifa.html?tab=admin", wait_until="domcontentloaded")
+    page.locator("#edBody tr", has_text="阿凯").locator("button", has_text="启用").click()
+    page.locator("#modalOk").click()
+    page.goto(f"{demo_server}/yijian-daifa-demo.html?embed=1", wait_until="domcontentloaded")
+    expect(page.locator("#feedList")).to_contain_text("末世囤货混剪")
+
+
+def test_project_keywords_editor_checks_and_timeout_guard(page, demo_server):
+    page.goto(f"{demo_server}/fr-opc-yijian-daifa.html?tab=admin", wait_until="domcontentloaded")
+    page.locator('.admin-tab-bar button[data-admin="admin-projects"]').click()
+    page.locator("#pjBody tr", has_text="番茄小说").locator("button", has_text="编辑").click()
+    before = page.evaluate("() => JSON.parse(localStorage.getItem('fr014-yjd-v4')).keywords['番茄小说']")
+    page.locator("#pjKw").fill("")
+    page.locator("#modalOk").click()
+    expect(page.locator("#toast")).to_contain_text("请至少填写 1 个已通过关键词")
+    after = page.evaluate("() => JSON.parse(localStorage.getItem('fr014-yjd-v4')).keywords['番茄小说']")
+    assert after == before
+    page.locator("#appModal button", has_text="取消").click()
+
+    page.locator("#pjBody tr", has_text="番茄小说").locator("button", has_text="编辑").click()
+    page.locator("#pjKw").fill("改后通过词")
+    page.locator("#modalOk").click()
+    expect(page.locator("#toast")).to_contain_text("已更新项目")
+    page.goto(f"{demo_server}/yijian-daifa-demo.html?embed=1&screen=detail", wait_until="domcontentloaded")
+    page.locator("#goClaim").click()
+    expect(page.locator("#kwSheet")).to_have_class("kw-sheet show")
+    expect(page.locator("#kwList")).to_contain_text("改后通过词")
+    expect(page.locator("#kwList")).not_to_contain_text("掌心宠溺")
+
+    page.goto(f"{demo_server}/fr-opc-yijian-daifa.html?tab=admin", wait_until="domcontentloaded")
+    page.locator('.admin-tab-bar button[data-admin="admin-projects"]').click()
+    page.locator("#admin-projects button", has_text="添加").click()
+    page.locator("#pjName").fill("闭环词项")
+    page.locator("#pjKw").fill("测试通过词")
+    page.locator("#pjSort").fill("9")
+    page.locator("#modalOk").click()
+    expect(page.locator("#pjBody")).to_contain_text("闭环词项")
+
+    page.locator('.admin-tab-bar button[data-admin="admin-works"]').click()
+    page.locator("#admin-works button", has_text="录入").click()
+    page.locator("#wTitle").fill("闭环词项样例")
+    page.locator("#wProj").select_option("闭环词项")
+    page.locator("#wBook").fill("闭环测试书")
+    page.locator("#wBookId").fill("B-KW")
+    page.locator("#modalOk").click()
+    expect(page.locator("#toast")).to_contain_text("已录入")
+
+    page.goto(f"{demo_server}/yijian-daifa-demo.html?embed=1", wait_until="domcontentloaded")
+    page.locator(".feed-card").filter(has_text="闭环词项样例").click()
+    page.locator("#goClaim").click()
+    expect(page.locator("#kwSheet")).to_have_class("kw-sheet show")
+    expect(page.locator("#kwList")).to_contain_text("测试通过词")
+
+    page.goto(f"{demo_server}/fr-opc-yijian-daifa.html?tab=admin", wait_until="domcontentloaded")
+    page.locator("#admin-editors button", has_text="录入").click()
+    expect(page.locator("#mProj input[type='checkbox']")).not_to_have_count(0)
+    expect(page.locator("input#mProj")).to_have_count(0)
+    page.locator("#mYb").fill("YB17701")
+    page.locator("#mName").fill("多选剪辑")
+    page.locator("#mShare").fill("33%")
+    page.locator("#mNote").fill("勾选两项")
+    page.locator("#mProj input[value='番茄小说']").check()
+    page.locator("#mProj input[value='红果短剧']").check()
+    page.locator("#modalOk").click()
+    expect(page.locator("#edBody")).to_contain_text("YB17701")
+    multi = page.evaluate(
+        """() => {
+          var data = JSON.parse(localStorage.getItem('fr014-yjd-v4'));
+          return (data.editors.find(function (e) { return e.ybId === 'YB17701'; }) || {}).projects;
+        }"""
+    )
+    assert multi == "番茄小说 / 红果短剧"
+
+    page.locator("#admin-editors button", has_text="录入").click()
+    page.locator("#mYb").fill("YB17702")
+    page.locator("#mName").fill("零授权")
+    page.locator("#mShare").fill("20%")
+    page.locator("#mNote").fill("不勾选")
+    page.locator("#modalOk").click()
+    zero = page.evaluate(
+        """() => {
+          var data = JSON.parse(localStorage.getItem('fr014-yjd-v4'));
+          return (data.editors.find(function (e) { return e.ybId === 'YB17702'; }) || {}).projects;
+        }"""
+    )
+    assert zero == "—"
+
+    page.goto(f"{demo_server}/yijian-daifa-pc.html?embed=1&screen=upload", wait_until="domcontentloaded")
+    page.locator("#upUseDemo").click()
+    page.locator("#upNext").click()
+    expect(page.locator("#upProject")).to_contain_text("番茄小说")
+    expect(page.locator("#upProject")).to_contain_text("红果漫剧")
+
+    page.goto(f"{demo_server}/fr-opc-yijian-daifa.html?tab=admin", wait_until="domcontentloaded")
+    page.locator("#edBody tr", has_text="庭宇").locator("button", has_text="编辑").click()
+    expect(page.locator("#mProj input[value='番茄小说']")).to_be_checked()
+    expect(page.locator("#mProj input[value='红果漫剧']")).to_be_checked()
+    page.locator("#modalOk").click()
+    kept = page.evaluate(
+        """() => {
+          var data = JSON.parse(localStorage.getItem('fr014-yjd-v4'));
+          return (data.editors.find(function (e) { return e.name === '庭宇'; }) || {}).projects;
+        }"""
+    )
+    assert kept == "番茄小说 / 红果漫剧"
+    page.locator("#edBody tr", has_text="庭宇").locator("button", has_text="编辑").click()
+    boxes = page.locator("#mProj input[type='checkbox']")
+    for i in range(boxes.count()):
+        boxes.nth(i).uncheck()
+    page.locator("#modalOk").click()
+    page.goto(f"{demo_server}/yijian-daifa-pc.html?embed=1&screen=upload", wait_until="domcontentloaded")
+    page.locator("#upUseDemo").click()
+    page.locator("#upNext").click()
+    expect(page.locator("#upProject")).to_contain_text("暂无可用项")
+
+    page.goto(f"{demo_server}/fr-opc-yijian-daifa.html?tab=admin", wait_until="domcontentloaded")
+    page.evaluate(
+        """() => {
+          STORE.editors.forEach(function (e) { e.status = '已停用'; });
+          persist();
+          renderEditors();
+        }"""
+    )
+    page.locator('.admin-tab-bar button[data-admin="admin-works"]').click()
+    page.locator("#wkBody button", has_text="编辑").first.click()
+    expect(page.locator("#wTitle")).to_be_visible()
+    page.locator("#appModal button", has_text="取消").click()
+    page.locator("#admin-works button", has_text="录入").click()
+    expect(page.locator("#toast")).to_contain_text("请先录入剪辑手")
+
+    page.locator('.admin-tab-bar button[data-admin="admin-works"]').click()
+    page.locator("#wkBody tr", has_text="掌心宠 · 口播切片").locator("button", has_text="删除").click()
+    page.locator("#modalOk").click()
+    expect(page.locator("#toast")).to_contain_text("已删除")
+    page.goto(f"{demo_server}/yijian-daifa-demo.html?embed=1&screen=timeout", wait_until="domcontentloaded")
+    expect(page.locator("#toast")).to_contain_text("演示稿件已删除")
+    expect(page.locator("#screen-claims")).to_have_class("screen active")

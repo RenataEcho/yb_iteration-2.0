@@ -168,6 +168,15 @@
     });
   }
 
+  function plazaEligible(data, w) {
+    if (!w || (w.audit || '已通过') !== '已通过') return false;
+    if (w.occ === '占用中' || w.occ === '已完成' || w.occupied) return false;
+    var p = projectByName(data, w.project);
+    var e = editorByName(data, w.editor);
+    var m = (data.mats || []).find(function (x) { return x.name === w.mat; });
+    return !!(p && p.status === '启用' && e && e.status === '已录入' && m && m.status === '启用');
+  }
+
   function worksByEditor(data, editorName) {
     return (data.works || []).filter(function (w) { return w.editor === editorName; });
   }
@@ -223,7 +232,9 @@
     enabledProjects: enabledProjects,
     enabledMats: enabledMats,
     enrolledEditors: enrolledEditors,
+    parseProjectNames: parseProjectNames,
     authorizedProjects: authorizedProjects,
+    plazaEligible: plazaEligible,
     worksByEditor: worksByEditor,
     claimedWorksByEditor: claimedWorksByEditor,
     earnByEditor: earnByEditor,
