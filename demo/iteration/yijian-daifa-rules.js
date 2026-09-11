@@ -45,10 +45,11 @@
         ['稿件类型', '下拉。枚举：图集 / 视频。'],
         ['广场 Banner', '复用平台已有能力，0–5 条。≥2 自动轮播（指示点+循环），1 条静止，0 条隐藏。点招募帧进海报。本 FR 后台不单开配置页。']
       ])) +
-      sec(3, '可见性（plazaEligible）', p('六条同时成立才进广场，缺一即藏：') + ul([
+      sec(3, '可见性（plazaEligible）', p('七条同时成立才进广场，缺一即藏：') + ul([
         '渠道 ≠ <strong>站外</strong>。站外稿只走链接 / 二维码落地页，永不进右豹广场。',
         '平台审核 = <strong>已通过</strong>。审核中 / 已驳回不进。',
         '占用 ≠ <strong>占用中</strong>、≠ <strong>已完成</strong>。占用中对他人隐藏；回填完成后不再回广场。',
+        '稿件状态 = <strong>正常</strong>。已删除（未领满 15 天 / 已领满 7 天 / 主动删除）不进。',
         '项目状态 = <strong>启用</strong>。禁用项目整批不进。',
         '剪辑手 = <strong>已录入</strong>且开通<strong>右豹</strong>。停用或未开通右豹的已通过空闲稿也藏。',
         '素材类型 = <strong>启用</strong>。停用素材后对应空闲稿立刻藏，再启用后回来。'
@@ -279,31 +280,75 @@
       ]))
   };
 
-  items['fe-offsite'] = {
-    group: 'fe',
-    title: '站外下载落地页',
-    html: sec(1, '业务目标', p('站外稿件用链接或二维码发给站外用户。落地页<strong>无登录门槛</strong>，只看出基础信息后下载。')) +
+  items['h5-ready'] = {
+    group: 'h5',
+    title: '可下载落地页',
+    html: sec(1, '业务目标', p('站外用户扫码或打开链接即可下载。本页是<strong>无登录 H5</strong>，不是右豹 C 端领取。只看出基础信息后点「下载稿件」。')) +
       sec(2, '入口', fields([
         ['分享链接', '<code>yijian-daifa-offsite.html?id=X-xx</code>。后台 / PC 站外 list 可复制。'],
         ['二维码', '同一链接的棋盘格 mock，不接真实 QR 库。'],
         ['H5 端 Tab', '主 Demo 用 iframe 嵌本页，<code>embed=1</code>。']
       ])) +
-      sec(3, '字段', fields([
-        ['封面 / 标题 / 项目 / 书 / 书籍 ID / 类型', '只读。封面角标出剩余/总数。'],
-        ['说明', '一句「无需登录」。不得出现登录 / 注册。'],
-        ['不展示', '副标题「站外稿件 · 扫码即可下载，无需登录」、稿件信息、状态。后台 / PC 仍保留这些字段。'],
-        ['下载稿件', '主按钮。无选词、无次数、无回填、无水印。']
+      sec(3, '字段说明', fields([
+        ['封面', '只读。右上角标「剩余 x / n 个」。'],
+        ['标题', '稿件标题，主文案。'],
+        ['项目 / 书籍 / 书籍 ID / 类型', 'KV 只读。书籍 ID 必须可见。'],
+        ['说明', '一句「无需登录。点下载立即扣除 1 个素材余量」。不得出现登录 / 注册。'],
+        ['下载稿件', '主按钮。无选词、无次数、无回填、无水印。'],
+        ['不展示', '副标题、稿件信息（x个素材已领x个）、状态、发布技巧、素材类型、审核、收益。后台 / PC 仍保留这些字段。']
       ])) +
-      sec(4, '状态流转', states([
-        ['可下', '站外稿仍在且剩余素材 &gt; 0', '点下载<strong>立即</strong> <code>claimedAssets + 1</code>，立刻删除<strong>该份</strong> OSS（领一个删一个），再播保存；toast「已下载，该素材云端副本已删除」'],
-        ['素材已领完', '扫码进入时 <code>claimedAssets ≥ assets</code>，或最后一次下载刚扣完', '缺省态「素材已领完」，无下载按钮。这是余量空，不是整夹清桶判定'],
-        ['链接失效', '稿已删或不是站外稿', '缺省态「链接已失效」，无下载按钮']
+      sec(4, '下载交互', states([
+        ['可下', '站外稿仍在且剩余素材 &gt; 0', '点下载<strong>先</strong> <code>claimedAssets + 1</code> 并立刻删除<strong>该份</strong> OSS，再播「正在下载 → 已保存到相册」'],
+        ['扣次成功', '余量仍 &gt; 0', 'toast「已下载，该素材云端副本已删除」；角标剩余 −1；PC / 后台「x个素材(已领x个)」即时同步'],
+        ['最后一份', '本次扣完后 <code>claimedAssets ≥ assets</code>', '保存结束后切到「素材已领完」缺省态，不再给下载按钮']
       ])) +
       sec(5, '边界', ul([
-        '不进右豹作品广场，不占领取次数，不写 claims。',
-        '不展示收益金额、发布技巧、素材类型、审核。',
+        '不进右豹作品广场，不占 C 端领取次数，不写 claims。',
         '站外用户不是右豹登录态；本页不得出现登录/注册。',
-        '站外不走 3/7 天窗，不能「恢复C端下载」。'
+        '不走 3/7 天窗，不能「恢复C端下载」。',
+        '下载链路只删当份 OSS，不判定整夹是否领完。流程图见「前后端数据交互 → 阿里云存储 → 站外下载即删」。'
+      ]))
+  };
+
+  items['h5-empty'] = {
+    group: 'h5',
+    title: '素材已领完',
+    html: sec(1, '业务目标', p('余量空时只给出缺省态。扫码进入已领完、或本页刚下完最后一份，都必须走到这里。')) +
+      sec(2, '进入条件', ul([
+        '打开链接时 <code>claimedAssets ≥ assets</code>。',
+        '本页最后一次下载刚扣完余量。',
+        '这是<strong>余量空</strong>，不是整夹清桶判定，也不是稿件已删除。'
+      ])) +
+      sec(3, '界面', fields([
+        ['标题', '素材已领完'],
+        ['说明', '这份稿件的素材已被全部下载。请向剪辑手重新获取其他分享链接或二维码。'],
+        ['下载稿件', '<strong>不得出现</strong>。禁用按钮也不行，直接不渲染。']
+      ])) +
+      sec(4, '边界', ul([
+        '不得再给下载、重试、登录或回广场入口。',
+        'PC / 后台该夹状态 = 已领完；分享链接仍可打开，但永远是本缺省态。',
+        '不能走「恢复C端下载」。站外领完不可恢复。'
+      ]))
+  };
+
+  items['h5-invalid'] = {
+    group: 'h5',
+    title: '链接失效',
+    html: sec(1, '业务目标', p('稿已删或链接不是站外稿时，落地页只能看出失效，不能下载。')) +
+      sec(2, '进入条件', ul([
+        'id 对不上任何稿件。',
+        '稿已被后台 / PC 删除。',
+        '稿不是站外渠道（误开右豹稿链接）。'
+      ])) +
+      sec(3, '界面', fields([
+        ['标题', '链接已失效'],
+        ['说明', '链接已失效或稿件不存在。请向剪辑手重新获取分享链接或二维码。'],
+        ['下载稿件', '<strong>不得出现</strong>。']
+      ])) +
+      sec(4, '边界', ul([
+        '不得泄露稿件标题、项目、书籍或余量。',
+        '不得出现登录 / 注册 / 回广场。',
+        '点已失效链接上的残留按钮（若有）toast「稿件已不存在」，仍不下载。'
       ]))
   };
 
@@ -386,7 +431,13 @@
       sec(3, '交互', ul([
         '页内打开，不新造 PC 产品、不跳 App。',
         '未录入 / 已停用也能看。打开不改变上传权限。',
+        '正文只保留操作步骤和注意事项，不写后台口径。',
         '返回回到打开前的看板或上传清单。'
+      ])) +
+      sec(4, '必须写清的删除规则', ul([
+        '上传后一直没人领：阿里云只留 15 天，到期系统删，稿件状态=已删除。',
+        '有人领过：C 端 3 天可下，对象再留到首次领取后 7 天。',
+        '自己点删除：云端立刻一起删，不能恢复。占用中不能删。'
       ]))
   };
 
@@ -483,6 +534,7 @@
         ['发布技巧', '一段正文。读写 <code>YJD.tipText</code>：有 <code>pubTips</code>（含空串）就用它；缺字段才把旧两段换行拼接。'],
         ['类型 / 素材类型', '图集或视频 / 上传所选素材。'],
         ['占用', '空闲 / 占用中 / 已完成。'],
+        ['稿件状态', '正常 / 已删除。云端还在才是正常。'],
         ['上传状态', '上传中 / 已上传 / 上传失败。失败可「重新上传」，只重文件。'],
         ['平台审核', '审核中 / 已通过 / 已驳回。已驳回必须出示原因。未传完不出审核态。'],
         ['上传时间', '提交时刻。']
@@ -491,15 +543,20 @@
         ['呈现', '文件夹。ID 前缀 <code>X-</code>。'],
         ['稿件信息', '<code>x个素材(已领x个) · 大小</code>。'],
         ['类型 / 状态 / 上传', '图集或视频 / 空闲·部分领取·已领完 / 上传三态。'],
-        ['操作', '空闲可删；分享链接；二维码。无发布技巧、无审核。']
+        ['稿件状态', '正常 / 已删除。'],
+        ['操作', '正常且非上传中可删；分享链接；二维码。已删除不再给删除/分享。']
       ])) +
       sec(4, '删除', states([
-        ['可删', '右豹占用=空闲；站外未限制占用（无领取占用）', '确认后删除；右豹广场若曾可见则消失；站外分享链接失效'],
-        ['不可删', '右豹占用中或已完成', 'toast「仅未占用的稿件可删除」']
+        ['可删', '稿件状态=正常，且右豹占用=空闲、无未超时领取；站外非上传中', '确认后阿里云同步删除，稿件状态=已删除，<strong>不可恢复</strong>；行保留；广场消失；站外链接失效'],
+        ['不可删', '已删除 / 占用中 / 仍有未超时领取 / 上传中', 'toast 对应原因，不改 OSS']
       ])) +
-      sec(5, '边界', ul([
+      sec(5, '稿件状态', fields([
+        ['正常', '云端对象仍在。'],
+        ['已删除', '系统满 15 天未领、已领满 7 天、或主动删除。列表仍出这一行，不再给删除/分享。']
+      ])) +
+      sec(6, '边界', ul([
         '剪辑手不能改审核结论。',
-        '右豹：审核中不进广场；通过且空闲才进；驳回 list 出原因。',
+        '右豹：审核中不进广场；通过且空闲且稿件正常才进；驳回 list 出原因。',
         '站外永不进广场。看板「上传的稿件」含站外；「已被领取」不含站外。'
       ]))
   };
@@ -558,14 +615,16 @@
         ['剪辑手 / 类型 / 素材类型', '作者、图集或视频、上传素材。'],
         ['占用', '空闲 / 占用中 / 已完成。'],
         ['审核', '审核中 / 已通过 / 已驳回。已驳回下列原因。'],
+        ['稿件状态', '正常 / 已删除。筛选项独立于占用、审核。'],
         ['上传时间', '写入时刻。']
       ])) +
       sec(3, '站外列表', fields([
         ['ID / 标题', '前缀 <code>X-</code>。以文件夹呈现。'],
         ['稿件信息', '<code>x个素材(已领x个) · 大小</code> + 分享链接。'],
         ['状态', '空闲 / 部分领取 / 已领完。无占用三态。'],
+        ['稿件状态', '正常 / 已删除。与文件夹领取态分开。'],
         ['不出现', '发布技巧、素材类型、审核筛选、批量审核。'],
-        ['操作', '详情 / 编辑 / 分享链接 / 二维码 / 删除。删除后链接失效。']
+        ['操作', '详情 / 编辑 / 分享链接 / 二维码 / 删除。已删除不再给出后三项。']
       ])) +
       sec(4, '占用状态机', states([
         ['空闲', '新录入已通过；或 24h 超时释放', '过 plazaEligible 则进广场'],
@@ -581,10 +640,10 @@
         '新建门禁：无启用剪辑手 / 项目 / 素材 → 对应 toast，不打开弹窗。站外录入不要素材类型。',
         '编辑旧稿：即使当前没有启用剪辑手也允许打开，下拉会 unshift 原剪辑手/项目/素材。',
         '右豹必填：标题、项目、书名、书籍 ID、剪辑手、素材类型。站外必填：标题、项目、书名、书籍 ID、剪辑手、素材数。',
-        '删除拦截：占用中 →「占用中的稿件不能删除」；仍有未超时领取 →「仍有未超时领取记录，不能删除」。',
+        '删除拦截：已删除 / 占用中 / 仍有未超时领取。确认文案必须写「阿里云同步删除，不可恢复」。行不物理抹掉，稿件状态改已删除。',
         '批量审核：勾选后点「批量审核」。通过适用于审核中 / 已驳回；驳回仅审核中且空闲，原因必填。不合资格行跳过。',
-        '批量删除：勾选后确认。占用中或仍有未超时领取的行跳过。',
-        '详情 Drawer 出齐字段（含云端存储 / 状态 / 系统失效）；录入/编辑 Modal；删除 Confirm。站内下载链接旁的「恢复C端下载」只出现在领取记录打开的详情，见「领取记录」。'
+        '批量删除：勾选后确认。已删除、占用中或仍有未超时领取的行跳过。',
+        '详情 Drawer 出齐字段（含稿件状态 / 云端存储 / 未领 15 天或已领 7 天）；录入/编辑 Modal；删除 Confirm。主动删除后不能「恢复C端下载」。'
       ]))
   };
 
@@ -727,7 +786,7 @@
         ['FR-014-07', 'PC 上传 list', '右豹/站外 Tab；右豹同后台字段无下载链接；站外文件夹+分享/二维码']
       ])) +
       sec(3, 'B. C 端发现与领取', frs([
-        ['FR-014-08', '作品广场', '宫格+筛选+Banner；plazaEligible 六条（含非站外/开通右豹）；不展示金额'],
+        ['FR-014-08', '作品广场', '宫格+筛选+Banner；plazaEligible 七条（含非站外/开通右豹/稿件正常）；不展示金额'],
         ['FR-014-09', '稿件详情', '七字段+分成；已领底栏「下载并发布到抖音」；不展示金额'],
         ['FR-014-10', '预览与试看', '图集≤3 张不扣次；视频试看 5 秒'],
         ['FR-014-11', '领取门禁', '停权→次数→选词→资格/占用；词带书则须与稿件一致'],
@@ -757,7 +816,7 @@
         ['FR-014-29', '剪辑手发布平台', '右豹/站外多选；未开通右豹不进广场'],
         ['FR-014-30', '站外稿件', '后台+PC 双 Tab；无技巧/素材/审核；文件夹+分享/二维码'],
         ['FR-014-31', '站外下载落地页', '无登录；点下立即扣余量并删该素材OSS；已领完缺省态'],
-        ['FR-014-32', '阿里云存储', '全量上传OSS；站内C端3天/系统7天/恢复一次；站外领一个删一个']
+        ['FR-014-32', '阿里云存储', '全量上传OSS；已领走3/7且恢复一次；未领满15天删；主动删除同步清桶不可恢复；站外领一个删一个']
       ])) +
       note('场景字段、toast、状态机只写在对应场景卡。跨场景门禁只以 FR-014-11 / 16 / 17 / 27 为准。')
   };
@@ -788,7 +847,7 @@
     html:       sec(1, '业务目标', p('落地时的数据契约。Demo <strong>无真实 HTTP</strong>，C / PC / 后台 / H5 共一份 <code>localStorage</code>，key=<code>fr014-yjd-v6</code>。')) +
       sec(2, '实体与主键', fields([
         ['editors', 'id（E-xx）。ybId 唯一。status=已录入|已停用。needReview 默认 true。projects 为 <code>A / B</code> 或 —。platforms=右豹/站外多选。'],
-        ['works', 'id（右豹 M-xx / 站外 X-xx）。channel=右豹|站外。occ=空闲|占用中|已完成。audit=审核中|已通过|已驳回。站外无 mat/tips/审核，有 assets/claimedAssets。plazaEligible 读 project/editor/mat/channel/右豹开通。OSS：ossKey / ossDeleted / ossRestoreUsed / ossExpireAt。'],
+        ['works', 'id（右豹 M-xx / 站外 X-xx）。channel=右豹|站外。occ=空闲|占用中|已完成。fileStatus=正常|已删除。audit=审核中|已通过|已驳回。站外无 mat/tips/审核，有 assets/claimedAssets。plazaEligible 读 fileStatus/project/editor/mat/channel/右豹开通。OSS：ossKey / ossDeleted / ossDeletedReason / uploadedAt / ossRestoreUsed / ossExpireAt。'],
         ['claims', 'id（C-xx）。C 端 status=未回填|已回填|已超时；后台展示待回填|已回填|已超时释放。expireAt=C端3天；restoredAt=恢复时刻。'],
         ['projects', 'id（P-xx）。新增=品牌库点选。STORE.keywords[项目名] 是用户申词 mock，项目管理不读写。'],
         ['mats / skus / bans / freeQuota', '素材启用禁用；SKU on 最多 4，origPoints 原价，buyers 只读；freeQuota.weekday / holiday ≥ 0；黑名单停权中|已恢复。'],
@@ -801,7 +860,9 @@
         ['后台录入稿', 'works += 已通过+空闲', '过资格即进广场'],
         ['领取成功', 'claims += 未回填；work.occ=占用中；扣 free 或 bought；expireAt=+3天；首次领取写 ossExpireAt=+7天', '他人广场隐藏'],
         ['恢复C端下载', '后台稿件详情；每稿一次', 'expireAt 重计 3 天且不超过 ossExpireAt'],
-        ['OSS 满 7 天', '站内 ossExpireAt≤now', 'ossDeleted=true；不可下、不可恢复'],
+        ['OSS 满 15 天未领', '无领取且 uploadedAt+15d≤now', 'fileStatus=已删除；不可下、不可恢复'],
+        ['OSS 满 7 天', '已领取且 ossExpireAt≤now', 'fileStatus=已删除；不可下、不可恢复'],
+        ['主动删除', '后台 / PC 删除', '阿里云同步删；fileStatus=已删除；不可恢复'],
         ['站外下载成功', 'claimedAssets + 1；立刻删该份 OSS', '夹内下一份再走同一条链；不判整夹'],
         ['回填提交', 'claim=已回填；work.occ=已完成', '不回广场；此时不入账'],
         ['关键词已结算', '先判该词是否代发', '代发则按分成写用户实结+剪辑手分账'],
@@ -834,11 +895,12 @@
     title: '阿里云存储',
     html: sec(1, '业务目标', p('所有稿件资源上传到阿里云 OSS。页内「前后端数据交互 → 阿里云存储」与本卡同一口径。Demo 不连真实桶，用 store 字段模拟。')) +
       sec(2, '站内（右豹）', fields([
-        ['上传入桶', 'PC / 后台写入 <code>works.ossKey</code>。未领取不起算系统 7 天，对象一直保留供广场领取。'],
-        ['C 端 3 天', '领取成功写 <code>claim.expireAt = claimedAt + 3 天</code>。超时 toast「领取已超过 3 天，无法再下载」。'],
-        ['系统 7 天', '<code>work.ossExpireAt = 首次领取 + 7 天</code>。恢复不重置系统钟。满 7 天删对象，<code>ossDeleted=true</code>。'],
-        ['恢复C端下载', '领取记录 → 稿件详情 → 下载链接旁「恢复C端下载」。每条稿件只能一次。用户重新计时 3 天，且不得超过系统 7 天。'],
-        ['不可恢复', '云端已删 / 已恢复过一次 / C 端尚未过期 / 站外稿。']
+        ['上传入桶', 'PC / 后台写入 <code>works.ossKey</code> 与 <code>uploadedAt</code>。稿件状态=正常。'],
+        ['未领取 15 天', '从上传起一直无人领取：满 15 天删 OSS，稿件状态=已删除，不可恢复。'],
+        ['已领取走 3/7', '领取成功写 <code>claim.expireAt = claimedAt + 3 天</code>；<code>work.ossExpireAt = 首次领取 + 7 天</code>。不再走 15 天钟。'],
+        ['恢复C端下载', '仅已领取且对象仍在。每条稿件一次。用户重计 3 天，不超过系统 7 天。'],
+        ['主动删除', '后台或剪辑手删除：阿里云同步删除，稿件状态=已删除，<strong>不支持恢复</strong>。'],
+        ['不可恢复', '主动删除 / 未领满 15 天 / 已领满 7 天 / 已恢复过一次 / 站外稿。']
       ])) +
       sec(3, '站外', fields([
         ['领一个删一个', 'claimedAssets + 1，立刻删除<strong>该份</strong> OSS。不判定整夹是否领完。'],
@@ -848,10 +910,10 @@
         ['上传', '<code>PUT /api/yjd/oss/works/:id</code> → ossKey'],
         ['C 端取文件', '<code>GET /api/yjd/claims/:id/file</code>：3 天内 302 签链，过期 403 CLIENT_DL_EXPIRED'],
         ['恢复', '<code>POST /api/yjd/admin/works/:id/restore-dl</code>：每稿一次'],
-        ['清理', '<code>POST /api/yjd/oss/purge</code>：站内满 7 天删对象；站外按份删，不整夹清桶']
+        ['清理', '<code>POST /api/yjd/oss/purge</code>：未领满 15 天或已领满 7 天删对象；站外按份删']
       ])) +
       sec(5, '业务流程', p('图在页内「前后端数据交互 → 阿里云存储 → 业务流程」。站内与站外两条链互不汇合，用横向 Tab 切换。本卡不复述流程图。')) +
-      note('字段：ossKey / ossDeleted / ossRestoreUsed / ossExpireAt / claim.expireAt / claim.restoredAt。')
+      note('字段：ossKey / ossDeleted / ossDeletedReason / fileStatus / uploadedAt / ossRestoreUsed / ossExpireAt / claim.expireAt。')
   };
 
   items['flow-main'] = {
@@ -890,12 +952,17 @@
     fe: {
       id: 'rule-fe',
       label: '前端需求',
-      keys: ['fe-feed', 'fe-poster', 'fe-detail', 'fe-claim', 'fe-buy', 'fe-claims', 'fe-fillback', 'fe-watermark', 'fe-douyin', 'fe-offsite', 'fe-timeout', 'fe-banned']
+      keys: ['fe-feed', 'fe-poster', 'fe-detail', 'fe-claim', 'fe-buy', 'fe-claims', 'fe-fillback', 'fe-watermark', 'fe-douyin', 'fe-timeout', 'fe-banned']
+    },
+    h5: {
+      id: 'rule-h5',
+      label: 'H5端需求',
+      keys: ['h5-ready', 'h5-empty', 'h5-invalid']
     },
     pc: {
       id: 'rule-pc',
       label: 'PC端需求',
-      keys: ['pc-home', 'pc-recruit', 'pc-guest', 'pc-upload', 'pc-list']
+      keys: ['pc-home', 'pc-recruit', 'pc-guest', 'pc-upload', 'pc-list', 'pc-earn', 'pc-guide']
     },
     admin: {
       id: 'rule-admin',
@@ -918,6 +985,9 @@
     feed: 'fe-feed', poster: 'fe-poster', detail: 'fe-detail', claim: 'fe-claim',
     buy: 'fe-buy', claims: 'fe-claims', fillback: 'fe-fillback', watermark: 'fe-watermark',
     douyin: 'fe-douyin', timeout: 'fe-timeout', banned: 'fe-banned'
+  };
+  var h5SceneMap = {
+    ready: 'h5-ready', empty: 'h5-empty', invalid: 'h5-invalid'
   };
   var pcSceneMap = {
     home: 'pc-home', recruit: 'pc-recruit', guest: 'pc-guest', revoked: 'pc-home', upload: 'pc-upload', list: 'pc-list', earn: 'pc-earn', guide: 'pc-guide'
@@ -949,6 +1019,7 @@
     items: items,
     groups: groups,
     feSceneMap: feSceneMap,
+    h5SceneMap: h5SceneMap,
     pcSceneMap: pcSceneMap,
     adminMap: adminMap,
     htmlOf: htmlOf,

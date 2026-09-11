@@ -1892,7 +1892,7 @@
       closeDd();
       if (id === 'timeout') {
         var it = item('M-01');
-        if (!it) {
+        if (!it || (window.YJD && YJD.isFileDeleted && YJD.isFileDeleted(it))) {
           toast('演示稿件已删除');
           showScreen('claims');
           return;

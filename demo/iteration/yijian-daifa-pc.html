@@ -728,6 +728,10 @@
       if (occ === '占用中' || occ === '部分领取') return '<span class="tag tag-warn">' + esc(occ) + '</span>';
       return '<span class="tag tag-muted">' + esc(occ) + '</span>';
     }
+    function fileStatusTag(w) {
+      var s = YJD.fileStatusOf(w);
+      return s === '已删除' ? '<span class="tag tag-del">已删除</span>' : '<span class="tag tag-ok">正常</span>';
+    }
     function auditTag(w) {
       var a = w.audit || '';
       if (w.uploadStatus && w.uploadStatus !== '已上传') a = a || '—';
@@ -765,25 +769,27 @@
     }
     function fullTable(rows) {
       if (!rows.length) return '<div class="empty">还没有上传记录</div>';
-      return '<table><thead><tr><th>ID</th><th>标题</th><th>项目</th><th>书</th><th>稿件信息</th><th>发布技巧</th><th>剪辑手</th><th>类型</th><th>素材类型</th><th>占用</th><th>上传</th><th>审核</th><th>上传时间</th><th>操作</th></tr></thead><tbody>' +
+      return '<table><thead><tr><th>ID</th><th>标题</th><th>项目</th><th>书</th><th>稿件信息</th><th>发布技巧</th><th>剪辑手</th><th>类型</th><th>素材类型</th><th>占用</th><th>稿件状态</th><th>上传</th><th>审核</th><th>上传时间</th><th>操作</th></tr></thead><tbody>' +
         rows.map(function (w) {
-          var idle = w.occ === '空闲' && w.uploadStatus !== '上传中';
+          var gone = YJD.isFileDeleted(w);
+          var idle = !gone && w.occ === '空闲' && w.uploadStatus !== '上传中';
           var del = idle
             ? '<button class="link link-danger" type="button" data-del="' + esc(w.id) + '">删除</button>'
-            : '<button class="link" type="button" disabled title="仅未占用可删">删除</button>';
+            : '<button class="link" type="button" disabled title="' + (gone ? '已删除' : '仅未占用可删') + '">删除</button>';
           return '<tr><td>' + esc(w.id) + '</td><td>' + esc(w.title) + '</td><td>' + esc(w.project) + '</td>' +
             '<td>' + esc(w.book) + '<div class="cell-sub">书籍 ID ' + esc(w.bookId || '—') + '</div></td>' +
             '<td>' + esc(YJD.workInfoLabel(w)) + '<div class="cell-sub">' + esc(w.fileName || w.title) + '</div></td>' +
             '<td>' + esc(YJD.tipText(w) || '—') + '</td>' +
             '<td>' + esc(w.editor) + '</td><td>' + esc(w.kind) + '</td><td>' + esc(w.mat) + '</td>' +
-            '<td>' + occTag(w.occ) + '</td><td>' + uploadTag(w) + '</td><td>' + auditTag(w) + '</td><td>' + esc(w.time) + '</td><td>' + del + '</td></tr>';
+            '<td>' + occTag(w.occ) + '</td><td>' + fileStatusTag(w) + '</td><td>' + uploadTag(w) + '</td><td>' + auditTag(w) + '</td><td>' + esc(w.time) + '</td><td>' + del + '</td></tr>';
         }).join('') + '</tbody></table>';
     }
     function offsiteTable(rows) {
       if (!rows.length) return '<div class="empty">还没有站外文件夹。点「上传稿件」按文件夹交稿。</div>';
-      return '<table><thead><tr><th>ID</th><th>标题</th><th>项目</th><th>书</th><th>稿件信息</th><th>类型</th><th>状态</th><th>上传</th><th>上传时间</th><th>操作</th></tr></thead><tbody>' +
+      return '<table><thead><tr><th>ID</th><th>标题</th><th>项目</th><th>书</th><th>稿件信息</th><th>类型</th><th>状态</th><th>稿件状态</th><th>上传</th><th>上传时间</th><th>操作</th></tr></thead><tbody>' +
         rows.map(function (w) {
-          var idle = w.uploadStatus !== '上传中';
+          var gone = YJD.isFileDeleted(w);
+          var idle = !gone && w.uploadStatus !== '上传中';
           var del = idle
             ? '<button class="link link-danger" type="button" data-del="' + esc(w.id) + '">删除</button>'
             : '<button class="link" type="button" disabled>删除</button>';
@@ -791,10 +797,10 @@
             '<td><span class="folder-ico">📁</span>' + esc(w.title) + '</td><td>' + esc(w.project) + '</td>' +
             '<td>' + esc(w.book) + '<div class="cell-sub">书籍 ID ' + esc(w.bookId || '—') + '</div></td>' +
             '<td>' + esc(YJD.offsiteInfoLabel(w)) + '</td><td>' + esc(w.kind) + '</td>' +
-            '<td>' + occTag(YJD.offsiteStatus(w)) + '</td><td>' + uploadTag(w) + '</td><td>' + esc(w.time) + '</td>' +
+            '<td>' + occTag(YJD.offsiteStatus(w)) + '</td><td>' + fileStatusTag(w) + '</td><td>' + uploadTag(w) + '</td><td>' + esc(w.time) + '</td>' +
             '<td>' + del +
-            '<button class="link" type="button" data-share="' + esc(w.id) + '">分享链接</button>' +
-            '<button class="link" type="button" data-qr="' + esc(w.id) + '">二维码</button></td></tr>';
+            (gone ? '' : '<button class="link" type="button" data-share="' + esc(w.id) + '">分享链接</button>' +
+            '<button class="link" type="button" data-qr="' + esc(w.id) + '">二维码</button>') + '</td></tr>';
         }).join('') + '</tbody></table>';
     }
     function fillSelect(id, names) {
@@ -1129,7 +1135,7 @@
         document.getElementById('stUp').textContent = works.length;
         document.getElementById('stClaim').textContent = YJD.claimedWorksByEditor(STORE, ed.name).length;
         document.getElementById('stEarn').textContent = YJD.earnByEditor(STORE, ed.name);
-        document.getElementById('recentBox').innerHTML = recentTable(ybWorks.slice(0, 4));
+        document.getElementById('recentBox').innerHTML = recentTable(ybWorks.filter(function (w) { return !YJD.isFileDeleted(w); }).slice(0, 4));
         renderEarn();
       }
       if (scene === 'list' && known) {
@@ -1153,23 +1159,23 @@
     function askDelete(id) {
       var w = STORE.works.find(function (x) { return x.id === id; });
       if (!w) return;
-      if (w.occ !== '空闲') { toast('仅未占用的稿件可删除'); return; }
+      var gate = YJD.canSoftDelete(STORE, w);
+      if (!gate.ok) { toast(gate.reason); return; }
       pendingDeleteId = id;
       setConfirm(true, {
         title: '确认删除？',
-        body: '即将删除未占用稿件「' + w.title + '」。占用中与已完成不能删。',
+        body: '即将删除稿件「' + w.title + '」。阿里云文件会同步删除，不可恢复。占用中与已完成不能删。',
         okText: '确认删除',
         mode: 'delete'
       });
     }
     function doDelete() {
-      var w = STORE.works.find(function (x) { return x.id === pendingDeleteId; });
-      if (!w || w.occ !== '空闲') { toast('仅未占用的稿件可删除'); setConfirm(false); return; }
-      STORE.works = STORE.works.filter(function (x) { return x.id !== pendingDeleteId; });
+      var res = YJD.softDeleteWork(STORE, pendingDeleteId);
+      if (!res.ok) { toast(res.reason); setConfirm(false); return; }
       persist();
       pendingDeleteId = '';
       setConfirm(false);
-      toast('已删除');
+      toast('已删除，阿里云已同步删除');
       render();
     }
 

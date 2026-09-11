@@ -4,6 +4,7 @@
   var VER = 6;
   var CLIENT_DL_MS = 3 * 86400000;
   var OSS_TTL_MS = 7 * 86400000;
+  var UNCLAIMED_TTL_MS = 15 * 86400000;
 
   function pad2(n) { return (n < 10 ? '0' : '') + n; }
   function ymd(d) {
@@ -72,7 +73,12 @@
         offsiteWork('X-01', '掌心宠 · 站外合集', '番茄小说', '我成了老公掌心宠', '7128491023', '86.4 MB', '庭宇', '图集', 8, 3, '今天', '50%'),
         offsiteWork('X-02', '末世切片包', '红果短剧', '我在末世囤了亿万物资', '8301928471', '128.0 MB', '阿凯', '视频', 5, 1, '昨天', '40%'),
         offsiteWork('X-03', '漫剧夜色文件夹', '红果漫剧', '走入没有你的夜', '6641029385', '42.0 MB', '庭宇', '图集', 6, 0, '1小时前', '50%'),
-        offsiteWork('X-04', '已领完样例', '番茄小说', '我成了老公掌心宠', '7128491023', '24.0 MB', '庭宇', '图集', 4, 4, '昨天', '50%')
+        offsiteWork('X-04', '已领完样例', '番茄小说', '我成了老公掌心宠', '7128491023', '24.0 MB', '庭宇', '图集', 4, 4, '昨天', '50%'),
+        (function () {
+          var stale = work('M-09', '超期未领样例', '番茄小说', '我成了老公掌心宠', '7128491023', '8.0 MB', '林夏', '图集', '口播', '空闲', '16天前', '50%', 'cover-m01.jpg', '小说', ['甜宠'], 6, '超期未领｜系统已删', '上传后一直无人领取');
+          stale.uploadedAt = Date.now() - 16 * 86400000;
+          return stale;
+        })()
       ],
       projects: [
         { id: 'P-01', name: '番茄小说', logo: 'assets/fr014/logo-fanqie.jpg', status: '启用', sort: 1, updated: '2026-09-08 18:20' },
@@ -186,7 +192,10 @@
       ossKey: ossObjectKey(id),
       ossDeleted: false,
       ossRestoreUsed: false,
-      ossExpireAt: null
+      ossExpireAt: null,
+      uploadedAt: uploadedAtFromLabel(time),
+      fileStatus: '正常',
+      ossDeletedReason: ''
     };
   }
 
@@ -204,8 +213,66 @@
       ossKey: ossObjectKey(id),
       ossDeleted: (claimed || 0) >= (assets || 1),
       ossRestoreUsed: false,
-      ossExpireAt: null
+      ossExpireAt: null,
+      uploadedAt: uploadedAtFromLabel(time),
+      fileStatus: '正常',
+      ossDeletedReason: ''
     };
+  }
+
+  function uploadedAtFromLabel(time) {
+    var now = Date.now();
+    var raw = String(time || '');
+    var days = raw.match(/(\d+)\s*天前/);
+    if (days) return now - Number(days[1]) * 86400000;
+    if (raw.indexOf('昨天') >= 0) return now - 86400000;
+    if (raw.indexOf('小时') >= 0) {
+      var hours = raw.match(/(\d+)\s*小时/);
+      return now - (hours ? Number(hours[1]) : 1) * 3600000;
+    }
+    return now - 3600000;
+  }
+
+  function isFileDeleted(w) {
+    return !!(w && w.fileStatus === '已删除');
+  }
+
+  function fileStatusOf(w) {
+    return isFileDeleted(w) ? '已删除' : '正常';
+  }
+
+  function hasBeenClaimed(data, w) {
+    if (!w) return false;
+    if (isOffsite(w)) return offsiteClaimedCount(w) > 0;
+    if (w.ossExpireAt) return true;
+    return (data.claims || []).some(function (c) { return c.mid === w.id; });
+  }
+
+  function markFileDeleted(w, reason) {
+    if (!w) return w;
+    w.fileStatus = '已删除';
+    w.ossDeleted = true;
+    w.ossDeletedReason = reason || w.ossDeletedReason || 'manual';
+    return w;
+  }
+
+  function canSoftDelete(data, w) {
+    if (!w) return { ok: false, reason: '稿件已不存在' };
+    if (isFileDeleted(w)) return { ok: false, reason: '稿件已删除' };
+    if (w.uploadStatus === '上传中') return { ok: false, reason: '上传中的稿件不能删除' };
+    if (w.occ === '占用中') return { ok: false, reason: '占用中的稿件不能删除' };
+    if ((data.claims || []).some(function (c) { return c.mid === w.id && c.status !== '已超时'; })) {
+      return { ok: false, reason: '仍有未超时领取记录，不能删除' };
+    }
+    return { ok: true };
+  }
+
+  function softDeleteWork(data, id) {
+    var w = workById(data, id);
+    var gate = canSoftDelete(data, w);
+    if (!gate.ok) return gate;
+    markFileDeleted(w, 'manual');
+    return { ok: true, work: w };
   }
 
   function offsiteSharePath(id) {
@@ -230,11 +297,18 @@
     if (w.ossDeleted == null) w.ossDeleted = false;
     if (w.ossRestoreUsed == null) w.ossRestoreUsed = false;
     if (w.ossExpireAt === undefined) w.ossExpireAt = null;
+    if (!w.uploadedAt) w.uploadedAt = uploadedAtFromLabel(w.time);
+    if (w.ossDeletedReason == null) w.ossDeletedReason = '';
+    if (!w.fileStatus) {
+      w.fileStatus = (w.ossDeletedReason || (!isOffsite(w) && w.ossDeleted)) ? '已删除' : '正常';
+    }
+    if (w.ossDeletedReason) w.fileStatus = '已删除';
     return w;
   }
 
   function ossAlive(w) {
     if (!w) return false;
+    if (isFileDeleted(w)) return false;
     if (isOffsite(w)) return offsiteRemaining(w) > 0;
     if (w.ossDeleted) return false;
     if (w.ossExpireAt && w.ossExpireAt <= Date.now()) return false;
@@ -253,8 +327,12 @@
     var now = Date.now();
     (data.works || []).forEach(function (w) {
       ensureOssFields(w);
-      if (isOffsite(w)) return;
-      if (!w.ossDeleted && w.ossExpireAt && w.ossExpireAt <= now) w.ossDeleted = true;
+      if (isFileDeleted(w)) return;
+      if (hasBeenClaimed(data, w)) {
+        if (!isOffsite(w) && w.ossExpireAt && w.ossExpireAt <= now) markFileDeleted(w, 'ttl7');
+        return;
+      }
+      if (w.uploadedAt && (w.uploadedAt + UNCLAIMED_TTL_MS) <= now) markFileDeleted(w, 'ttl15');
     });
   }
 
@@ -304,9 +382,14 @@
       if (left > 0) return '部分已删（领一个删一个）';
       return '已按份删完';
     }
-    if (w.ossDeleted || (w.ossExpireAt && w.ossExpireAt <= Date.now())) return '已删除（系统满 7 天）';
-    if (w.ossExpireAt) return '有效（系统 7 天内）';
-    return '有效（未领取，未起算 7 天）';
+    if (isFileDeleted(w)) {
+      if (w.ossDeletedReason === 'manual') return '已删除（主动删除，不可恢复）';
+      if (w.ossDeletedReason === 'ttl15') return '已删除（上传未领满 15 天）';
+      if (w.ossDeletedReason === 'ttl7') return '已删除（已领取，系统满 7 天）';
+      return '已删除';
+    }
+    if (w.ossExpireAt) return '有效（已领取，系统 7 天内）';
+    return '有效（未领取，满 15 天删除）';
   }
 
   var PLATFORM_OPTS = ['右豹', '站外'];
@@ -420,7 +503,7 @@
   }
 
   function claimOffsiteAsset(data, work) {
-    if (!work || !isOffsite(work)) return false;
+    if (!work || !isOffsite(work) || isFileDeleted(work)) return false;
     if (offsiteRemaining(work) <= 0) return false;
     work.claimedAssets = offsiteClaimedCount(work) + 1;
     return true;
@@ -462,8 +545,10 @@
     var hadQuota = !!(data && data.freeQuota);
     var prevDate = data && data.user && data.user.freeDate;
     if (!data) data = seed();
+    var worksBefore = JSON.stringify(data.works || []);
     syncFlags(data);
-    if (fresh || !hadQuota || (data.user && data.user.freeDate !== prevDate)) {
+    var swept = worksBefore !== JSON.stringify(data.works || []);
+    if (fresh || !hadQuota || swept || (data.user && data.user.freeDate !== prevDate)) {
       localStorage.setItem(KEY, JSON.stringify(data));
     }
     return data;
@@ -600,7 +685,7 @@
   }
 
   function plazaEligible(data, w) {
-    if (!w || isOffsite(w)) return false;
+    if (!w || isOffsite(w) || isFileDeleted(w)) return false;
     if (w.uploadStatus && w.uploadStatus !== '已上传') return false;
     if ((w.audit || '已通过') !== '已通过') return false;
     if (w.occ === '占用中' || w.occ === '已完成' || w.occupied) return false;
@@ -934,11 +1019,18 @@
     feClaimSt: feClaimSt,
     CLIENT_DL_MS: CLIENT_DL_MS,
     OSS_TTL_MS: OSS_TTL_MS,
+    UNCLAIMED_TTL_MS: UNCLAIMED_TTL_MS,
     ossObjectKey: ossObjectKey,
     clientExpireAt: clientExpireAt,
     ossExpireAtFrom: ossExpireAtFrom,
     ossAlive: ossAlive,
     ossStatusLabel: ossStatusLabel,
+    isFileDeleted: isFileDeleted,
+    fileStatusOf: fileStatusOf,
+    hasBeenClaimed: hasBeenClaimed,
+    markFileDeleted: markFileDeleted,
+    canSoftDelete: canSoftDelete,
+    softDeleteWork: softDeleteWork,
     bindClaimOss: bindClaimOss,
     sweepOss: sweepOss,
     restoreClientDownload: restoreClientDownload,

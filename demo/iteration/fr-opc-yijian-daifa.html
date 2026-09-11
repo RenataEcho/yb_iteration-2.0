@@ -523,7 +523,7 @@
       <span class="sprint-pill">YBDD2.0 · 迭代 v1</span>
     </div>
     <div class="sidebar-scroll" data-iteration-sidebar></div>
-    <div class="sidebar-foot">FR-014 · 页内 Tab<br />解释 / 前端 / PC / 后台 / 数据交互</div>
+    <div class="sidebar-foot">FR-014 · 页内 Tab<br />解释 / 前端 / H5 / PC / 后台 / 数据交互</div>
   </aside>
 
   <main class="main">
@@ -780,7 +780,9 @@
               <ul>
                 <li>禁用项目不可上传、不进广场。停用剪辑手或禁用素材的已通过空闲稿也不进广场。</li>
                 <li>审核中 / 已驳回不进广场。已通过不可再驳回。</li>
-                <li>领取后 3 天内可下载；系统对象保留 7 天，后台可恢复 C 端下载一次。</li>
+                <li>领取后走 3 天 C 端下载 + 7 天系统对象；后台可恢复 C 端下载一次。满 7 天删 OSS，稿件状态=已删除，不可再恢复。</li>
+                <li>上传后一直没人领取：阿里云只留 15 天，到期系统删除，稿件状态=已删除，不可恢复。</li>
+                <li>后台或剪辑手主动删除：阿里云同步删除，稿件状态=已删除，<strong>不支持恢复</strong>。占用中或仍有未超时领取不能删。</li>
                 <li>图集预览最多 3 张；角标仍显示真实张数。防截屏=禁右键/长按保存 + 用户水印 + 切后台模糊；真机系统截屏禁不掉。</li>
                 <li>任何列表不展示金额。Demo 无真实 HTTP，数据在 localStorage 闭环。</li>
               </ul>
@@ -794,7 +796,7 @@
               <p>对用户不要讲 FR 编号。对研发指到对应端的「业务流程」和「前后端数据交互」。</p>
             </div>
             <div class="explain-section">
-              <div class="faq-item"><div class="faq-q">Q1. 为什么广场看不到刚传的稿？</div><div class="faq-a">该剪辑手「稿件需要审核=是」时，PC 新稿默认审核中，后台通过且空闲才进广场。免审剪辑手上传后空闲即可进。占用中、已完成、已驳回、禁用项目、停用剪辑手、禁用素材都不可见。</div></div>
+              <div class="faq-item"><div class="faq-q">Q1. 为什么广场看不到刚传的稿？</div><div class="faq-a">该剪辑手「稿件需要审核=是」时，PC 新稿默认审核中，后台通过且空闲才进广场。免审剪辑手上传后空闲即可进。占用中、已完成、已驳回、已删除、禁用项目、停用剪辑手、禁用素材都不可见。</div></div>
               <div class="faq-item"><div class="faq-q">Q2. 次数够了为什么还领不了？</div><div class="faq-a">还要选该项目已通过关键词，且稿件当时空闲。未选词、已被占用、未审核通过、项目禁用、已停权都会失败。</div></div>
               <div class="faq-item"><div class="faq-q">Q3. 超时了次数能退吗？</div><div class="faq-a">不退。记 1 次未回填，稿件回广场。原领取人未进黑名单可再领，再领再扣次。</div></div>
               <div class="faq-item"><div class="faq-q">Q4. 停权了怎么办？</div><div class="faq-a">终身未回填超过 3 次。只能后台黑名单手动恢复，没有自助解禁。</div></div>
@@ -803,6 +805,7 @@
               <div class="faq-item"><div class="faq-q">Q7. 领取后怎么下载？水印必做吗？</div><div class="faq-a">底栏「下载并发布到抖音」C 端 3 天内有效。点完先保存到相册，再拉起抖音相册选片。加水印可选。C 端过期后，运营可在领取记录稿件详情点「恢复C端下载」（每稿仅一次），用户重新计时 3 天。系统满 7 天删除阿里云对象后不可再恢复。回填只受 24h 窗影响。</div></div>
               <div class="faq-item"><div class="faq-q">Q8. 非剪辑手打开 PC「剪辑供稿」会怎样？</div><div class="faq-a">不跳走。招募 BN 仍在，点开抽屉可看海报。看板走缺省，上传入口不可用。「操作说明」仍可打开。</div></div>
               <div class="faq-item"><div class="faq-q">Q9. 用剪辑手稿件回填后，关键词收益怎么入账？</div><div class="faq-a">订单已结算时先判该词是不是代发。是则按分成拆成用户实结和剪辑手分账，两边都进项目收益明细，状态「已结算」。不是则全额给用户。对账看「前后端数据交互 → 用户收益入账」。</div></div>
+              <div class="faq-item"><div class="faq-q">Q10. 成片在阿里云会留多久？删了还能恢复吗？</div><div class="faq-a">有人领取过：C 端 3 天可下，对象再留到首次领取后 7 天。一直没人领：从上传起只留 15 天。后台或剪辑手点删除，云端立刻一起删。这三种删除后稿件状态都是「已删除」，都不能恢复。</div></div>
             </div>
           </section>
         </div>
@@ -958,11 +961,12 @@
             </div>
           </div>
           <div class="scene-list" id="h5Scenes">
-            <button class="scene-btn active" type="button" data-offid="X-01" data-desc="图集合集：8 个素材，已领 3 个">掌心宠 · 站外合集</button>
-            <button class="scene-btn" type="button" data-offid="X-02" data-desc="视频文件夹：5 个素材，已领 1 个">末世切片包</button>
-            <button class="scene-btn" type="button" data-offid="X-03" data-desc="空闲文件夹：6 个素材，尚未被下">漫剧夜色文件夹</button>
-            <button class="scene-btn" type="button" data-offid="X-04" data-desc="已领完：打开链接只看出缺省，无下载按钮">已领完样例</button>
-            <button class="scene-btn" type="button" data-offid="X-04" data-desc="已领完：扫码进入缺省态，无下载按钮">素材已领完</button>
+            <button class="scene-btn active" type="button" data-offid="X-01" data-h5scene="ready" data-desc="图集合集：8 个素材，已领 3 个；点下载立即扣 1 个余量">掌心宠 · 站外合集</button>
+            <button class="scene-btn" type="button" data-offid="X-02" data-h5scene="ready" data-desc="视频文件夹：5 个素材，已领 1 个">末世切片包</button>
+            <button class="scene-btn" type="button" data-offid="X-03" data-h5scene="ready" data-desc="空闲文件夹：6 个素材，尚未被下">漫剧夜色文件夹</button>
+            <button class="scene-btn" type="button" data-offid="X-04" data-h5scene="empty" data-desc="已领完：打开链接只看出缺省，无下载按钮">已领完样例</button>
+            <button class="scene-btn" type="button" data-offid="X-04" data-h5scene="empty" data-desc="已领完：扫码进入缺省态，无下载按钮">素材已领完</button>
+            <button class="scene-btn" type="button" data-offid="X-gone" data-h5scene="invalid" data-desc="稿已删或链接失效：缺省态「链接已失效」，无下载按钮">链接失效</button>
           </div>
           <p class="scene-hint" id="h5SceneHint">图集合集：8 个素材，已领 3 个</p>
         </div>
@@ -1194,6 +1198,7 @@
             <div class="filter-field" id="wkOccField"><label>占用</label><select id="wkO"><option value="">全部</option><option>空闲</option><option>占用中</option><option>已完成</option></select></div>
             <div class="filter-field" id="wkAuditField"><label>审核</label><select id="wkA"><option value="">全部</option><option>审核中</option><option>已通过</option><option>已驳回</option></select></div>
             <div class="filter-field" id="wkOffStField" hidden><label>状态</label><select id="wkOffS"><option value="">全部</option><option>空闲</option><option>部分领取</option><option>已领完</option></select></div>
+            <div class="filter-field"><label>稿件状态</label><select id="wkFileS"><option value="">全部</option><option>正常</option><option>已删除</option></select></div>
             <div class="filter-actions">
               <button class="btn-ghost-sm" type="button" onclick="resetWorksFilter()">重置</button>
               <button class="btn btn-primary" type="button" onclick="renderWorks()">查询</button>
@@ -1691,7 +1696,7 @@
                   <tr><td>未选词</td><td>浮层未点关键词</td><td>Toast 拦截领取</td><td>否</td></tr>
                   <tr><td>项目禁用</td><td>项目状态=禁用</td><td>不进广场；PC 不可传到该项目</td><td>否</td></tr>
                   <tr><td>C端下载过期</td><td>领取超过 3 天且云端未删</td><td>Toast「领取已超过 3 天，无法再下载」；后台可恢复一次</td><td>—</td></tr>
-                  <tr><td>云端失效</td><td>站内领取满 7 天；站外该份已下</td><td>Toast「云端资源已失效/已删除，无法再下载」；站外只删当份，不判整夹</td><td>—</td></tr>
+                  <tr><td>云端失效</td><td>站内已领满 7 天 / 未领满 15 天 / 主动删除；站外该份已下</td><td>Toast「云端资源已失效/已删除，无法再下载」；主动删除不可恢复</td><td>—</td></tr>
                 </tbody>
               </table>
             </div>
@@ -1911,19 +1916,22 @@
             </div>
             <h3>1. 站内稿件（右豹）</h3>
             <div class="ix-flow">
-              <div class="ix-step"><i>1</i><div><b>上传入桶</b><span>PC / 后台写入 works.ossKey。未领取不起算系统 7 天，对象一直保留供广场领取。</span></div></div>
-              <div class="ix-step"><i>2</i><div><b>领取签发</b><span>领取成功写 claim.expireAt = claimedAt + 3 天，work.ossExpireAt = 首次领取 + 7 天。C 端 3 天内可下。</span></div></div>
-              <div class="ix-step"><i>3</i><div><b>C 端过期</b><span>满 3 天 toast「领取已超过 3 天，无法再下载」。对象未删，后台可恢复。</span></div></div>
-              <div class="ix-step"><i>4</i><div><b>恢复C端下载</b><span>领取记录 → 稿件详情 → 下载链接旁「恢复C端下载」。每条稿件只能恢复一次。用户重新计时 3 天，且不得超过系统 7 天。</span></div></div>
-              <div class="ix-step"><i>5</i><div><b>系统满 7 天</b><span>任务删阿里云对象，ossDeleted=true。此后不可下载、不可恢复。</span></div></div>
+              <div class="ix-step"><i>1</i><div><b>上传入桶</b><span>PC / 后台写入 works.ossKey、uploadedAt。稿件状态=正常。</span></div></div>
+              <div class="ix-step"><i>2</i><div><b>一直未领取</b><span>从上传起算 15 天。满 15 天系统删 OSS，稿件状态=已删除，不可恢复。</span></div></div>
+              <div class="ix-step"><i>3</i><div><b>有人领取</b><span>改走 3/7：claim.expireAt = claimedAt + 3 天，work.ossExpireAt = 首次领取 + 7 天。不再走 15 天钟。</span></div></div>
+              <div class="ix-step"><i>4</i><div><b>C 端过期</b><span>满 3 天 toast「领取已超过 3 天，无法再下载」。对象未删，后台可恢复一次。</span></div></div>
+              <div class="ix-step"><i>5</i><div><b>系统满 7 天</b><span>任务删阿里云对象，稿件状态=已删除。此后不可下载、不可恢复。</span></div></div>
+              <div class="ix-step"><i>6</i><div><b>主动删除</b><span>后台或剪辑手删除：阿里云同步删除，稿件状态=已删除，<strong>不支持恢复</strong>。</span></div></div>
             </div>
             <div class="table-wrap">
               <table class="explain-table">
                 <thead><tr><th>时钟</th><th>起点</th><th>时长</th><th>过期后果</th></tr></thead>
                 <tbody>
+                  <tr><td>未领取保留</td><td>上传成功</td><td>15 天</td><td>删 OSS；稿件状态=已删除；不可恢复</td></tr>
                   <tr><td>C 端下载窗</td><td>领取成功；或后台恢复成功</td><td>3 天</td><td>用户不可下；对象仍在</td></tr>
-                  <tr><td>系统失效</td><td>该稿首次领取</td><td>7 天</td><td>删除 OSS 对象；不可恢复</td></tr>
-                  <tr><td>恢复次数</td><td>稿件维度</td><td>1 次</td><td>再用 toast「该稿件下载链接已恢复过一次」</td></tr>
+                  <tr><td>系统失效</td><td>该稿首次领取</td><td>7 天</td><td>删 OSS；稿件状态=已删除；不可恢复</td></tr>
+                  <tr><td>主动删除</td><td>后台 / 剪辑手点删除</td><td>即时</td><td>阿里云同步删除；不可恢复</td></tr>
+                  <tr><td>恢复次数</td><td>仅已领取且对象仍在</td><td>1 次</td><td>主动删除 / 满 7 天 / 满 15 天都不能恢复</td></tr>
                 </tbody>
               </table>
             </div>
@@ -1943,11 +1951,11 @@
                   <tr><td>C 端取文件</td><td><code>GET /api/yjd/claims/:id/file</code></td><td>claimId</td><td>3 天内 302 签链；过期 403 CLIENT_DL_EXPIRED</td></tr>
                   <tr><td>站外取文件</td><td><code>GET /api/yjd/offsite/:id/file</code></td><td>id</td><td>成功后删<strong>该份</strong>对象；无余量 410</td></tr>
                   <tr><td>恢复C端下载</td><td><code>POST /api/yjd/admin/works/:id/restore-dl</code></td><td>mid / claimId</td><td>expireAt 重计；已用/已删失败</td></tr>
-                  <tr><td>到期清理</td><td><code>POST /api/yjd/oss/purge</code></td><td>cron</td><td>站内 ossExpireAt≤now 删对象</td></tr>
+                  <tr><td>到期清理</td><td><code>POST /api/yjd/oss/purge</code></td><td>cron</td><td>未领满 15 天或已领满 7 天删对象</td></tr>
                 </tbody>
               </table>
             </div>
-            <div class="callout warn">Demo 不连真实阿里云。C / PC / 后台 / H5 共一份 store：<code>ossKey / ossDeleted / ossRestoreUsed / ossExpireAt / claim.expireAt</code>。</div>
+            <div class="callout warn">Demo 不连真实阿里云。C / PC / 后台 / H5 共一份 store：<code>ossKey / ossDeleted / ossDeletedReason / fileStatus / uploadedAt / ossRestoreUsed / ossExpireAt / claim.expireAt</code>。</div>
             </div>
             <div id="ix-oss-flow" class="sub-view">
               <div class="module-tab-bar" role="tablist">
@@ -1956,7 +1964,7 @@
               </div>
               <div id="ix-oss-flow-on" class="sub-view active">
       <div class="glass-card flow-page">
-        <p class="flow-page-intro">站内闭环：上传入桶 → 首次领取才起算系统 7 天 → C 端 3 天可下。过期后对象未删则可恢复一次；系统满 7 天删 OSS，不可再恢复。恢复不重置系统钟。</p>
+        <p class="flow-page-intro">站内闭环：上传入桶。一直未领取则满 15 天删 OSS。有人领取才走 C 端 3 天 + 系统 7 天。后台或剪辑手主动删除立即清桶，不可恢复。</p>
         <div class="flow-svg-wrap">
           <svg width="920" height="860" viewBox="0 0 920 860" xmlns="http://www.w3.org/2000/svg">
             <defs>
@@ -1981,13 +1989,14 @@
             <g class="flow-nodes" font-family="Inter, PingFang SC, sans-serif">
               <rect x="280" y="16" width="360" height="56" rx="6" fill="#dbeafe" stroke="#2563eb" />
               <text x="460" y="40" text-anchor="middle" font-size="12" fill="#1e40af">PC / 后台上传入桶</text>
-              <text x="460" y="58" text-anchor="middle" font-size="10" fill="#64748b">写入 ossKey · 未领不起算 7 天</text>
+              <text x="460" y="58" text-anchor="middle" font-size="10" fill="#64748b">写入 ossKey · 未领走 15 天</text>
 
               <polygon points="460,96 540,136 460,176 380,136" fill="#fef9c3" stroke="#ca8a04" />
               <text x="460" y="140" text-anchor="middle" font-size="11" fill="#854d0e">已有首次领取?</text>
               <text x="556" y="124" font-size="10" fill="#dc2626">否</text>
-              <rect x="700" y="116" width="180" height="40" rx="6" fill="#e2e8f0" stroke="#94a3b8" />
-              <text x="790" y="141" text-anchor="middle" font-size="11" fill="#475569">对象保留供广场</text>
+              <rect x="700" y="108" width="180" height="56" rx="6" fill="#fecaca" stroke="#dc2626" />
+              <text x="790" y="132" text-anchor="middle" font-size="11" fill="#991b1b">未领满 15 天?</text>
+              <text x="790" y="150" text-anchor="middle" font-size="10" fill="#64748b">是则删OSS不可恢复</text>
               <text x="472" y="188" font-size="10" fill="#16a34a">是</text>
 
               <rect x="280" y="206" width="360" height="56" rx="6" fill="#dcfce7" stroke="#16a34a" />
@@ -2106,7 +2115,7 @@
                   <tr><td>审核</td><td>单条或批量 通过 / 驳回</td><td>改 audit；驳回写原因</td><td>广场、PC list</td><td>已通过不可再驳；批量跳过不合资格行</td></tr>
                   <tr><td>黑名单恢复</td><td>后台确认</td><td>banned=false</td><td>详情领取按钮</td><td>无自助解禁</td></tr>
                   <tr><td>用户收益入账</td><td>关键词订单已结算回调</td><td>先判代发，再按分成写用户账+剪辑手账</td><td>双方项目收益明细</td><td>非代发全额给用户；失败整笔回滚</td></tr>
-                  <tr><td>阿里云存储</td><td>上传 / C端下载 / 恢复 / 站外下载</td><td>入桶签发 3/7 天；恢复一次；站外领一个删一个</td><td>下载窗、云端状态、余量</td><td>C端过期可恢复；满7天不可恢复；站外只删当份</td></tr>
+                  <tr><td>阿里云存储</td><td>上传 / C端下载 / 恢复 / 主动删除 / 站外下载</td><td>已领签发 3/7 天；未领满 15 天删；恢复一次；主动删除同步清桶；站外领一个删一个</td><td>下载窗、云端状态、稿件状态、余量</td><td>C端过期可恢复；满7天/满15天/主动删除不可恢复；站外只删当份</td></tr>
                 </tbody>
               </table>
             </div>
@@ -2119,7 +2128,7 @@
               <li><strong>mats</strong>：id / name / status</li>
               <li><strong>skus</strong>：id / times / points / origPoints（原价） / on / buyers（只读购买人数）</li>
               <li><strong>claims</strong>：id / user / mid / title / work / project / book / bookId / editor / cover / kind / kw / fill / fillVideo / pendingEarn / status / time / link / claimedAt / downloadedAt / expireAt / restoredAt</li>
-              <li><strong>works OSS</strong>：ossKey / ossDeleted / ossRestoreUsed / ossExpireAt</li>
+              <li><strong>works OSS</strong>：ossKey / ossDeleted / ossDeletedReason / fileStatus / uploadedAt / ossRestoreUsed / ossExpireAt</li>
               <li><strong>keywords</strong>：STORE.keywords[项目名] = 该用户在该项目已通过申词 mock，不由项目管理维护</li>
               <li><strong>bans</strong>：user / strikes / time / status</li>
               <li><strong>user</strong>：id / free / bought / strikes / banned</li>
@@ -2169,6 +2178,7 @@
     <div class="rule-tab-bar">
       <button type="button" data-rule="rule-explain">业务解释</button>
       <button type="button" class="active" data-rule="rule-fe">前端需求</button>
+      <button type="button" data-rule="rule-h5">H5端需求</button>
       <button type="button" data-rule="rule-pc">PC端需求</button>
       <button type="button" data-rule="rule-admin">后台需求</button>
       <button type="button" data-rule="rule-data">数据交互</button>
@@ -2177,6 +2187,7 @@
     <div class="drawer-body">
       <div id="rule-explain" class="rule-panel"></div>
       <div id="rule-fe" class="rule-panel active"></div>
+      <div id="rule-h5" class="rule-panel"></div>
       <div id="rule-pc" class="rule-panel"></div>
       <div id="rule-admin" class="rule-panel"></div>
       <div id="rule-data" class="rule-panel"></div>
@@ -2237,9 +2248,9 @@
       showToast._t = setTimeout(function () { el.classList.remove('show'); }, 1600);
     }
     function stTag(s) {
-      if (s === '已录入' || s === '空闲' || s === '已回填' || s === '已恢复' || s === '启用' || s === '已通过' || s === true) return '<span class="tag tag-ok">' + (s === true ? '在售' : s) + '</span>';
+      if (s === '已录入' || s === '空闲' || s === '已回填' || s === '已恢复' || s === '启用' || s === '已通过' || s === '正常' || s === true) return '<span class="tag tag-ok">' + (s === true ? '在售' : s) + '</span>';
       if (s === '待回填' || s === '未回填' || s === '占用中' || s === '审核中' || s === '部分领取') return '<span class="tag tag-warn">' + (s === '未回填' ? '待回填' : s) + '</span>';
-      if (s === '停权中' || s === '已超时释放' || s === '已超时' || s === '已驳回') return '<span class="tag tag-del">' + (s === '已超时' ? '已超时释放' : s) + '</span>';
+      if (s === '停权中' || s === '已超时释放' || s === '已超时' || s === '已驳回' || s === '已删除') return '<span class="tag tag-del">' + (s === '已超时' ? '已超时释放' : s) + '</span>';
       return '<span class="tag tag-muted">' + s + '</span>';
     }
     function nextPrefixedId(prefix, list) {
@@ -2334,6 +2345,7 @@
       document.getElementById('wkO').value = '';
       document.getElementById('wkA').value = '';
       document.getElementById('wkOffS').value = '';
+      document.getElementById('wkFileS').value = '';
       renderWorks();
     }
     function filteredWorks() {
@@ -2341,9 +2353,11 @@
       var o = document.getElementById('wkO').value;
       var a = document.getElementById('wkA').value;
       var os = document.getElementById('wkOffS').value;
+      var fs = document.getElementById('wkFileS').value;
       return WORKS.filter(function (w) {
         if (YJD.workChannel(w) !== wkChannel) return false;
         if (q && w.title.indexOf(q) === -1 && w.id.indexOf(q) === -1) return false;
+        if (fs && YJD.fileStatusOf(w) !== fs) return false;
         if (wkChannel === '站外') {
           if (os && YJD.offsiteStatus(w) !== os) return false;
           return true;
@@ -2391,10 +2405,12 @@
     function renderWorks() {
       var off = wkChannel === '站外';
       document.getElementById('wkHead').innerHTML = off
-        ? '<tr><th class="col-check"><input type="checkbox" id="wkCheckAll" onclick="toggleWorkCheckAll(this.checked)" /></th><th>ID</th><th>标题</th><th>项目</th><th>书</th><th>稿件信息</th><th>剪辑手</th><th>类型</th><th>状态</th><th>上传时间</th><th>操作</th></tr>'
-        : '<tr><th class="col-check"><input type="checkbox" id="wkCheckAll" onclick="toggleWorkCheckAll(this.checked)" /></th><th>ID</th><th>标题</th><th>项目</th><th>书</th><th>稿件信息</th><th>发布技巧</th><th>剪辑手</th><th>类型</th><th>素材类型</th><th>占用</th><th>审核</th><th>上传时间</th><th>操作</th></tr>';
+        ? '<tr><th class="col-check"><input type="checkbox" id="wkCheckAll" onclick="toggleWorkCheckAll(this.checked)" /></th><th>ID</th><th>标题</th><th>项目</th><th>书</th><th>稿件信息</th><th>剪辑手</th><th>类型</th><th>状态</th><th>稿件状态</th><th>上传时间</th><th>操作</th></tr>'
+        : '<tr><th class="col-check"><input type="checkbox" id="wkCheckAll" onclick="toggleWorkCheckAll(this.checked)" /></th><th>ID</th><th>标题</th><th>项目</th><th>书</th><th>稿件信息</th><th>发布技巧</th><th>剪辑手</th><th>类型</th><th>素材类型</th><th>占用</th><th>审核</th><th>稿件状态</th><th>上传时间</th><th>操作</th></tr>';
       document.getElementById('wkBody').innerHTML = filteredWorks().map(function (w) {
         var checked = wkSelected[w.id] ? ' checked' : '';
+        var gone = YJD.isFileDeleted(w);
+        var fileCell = stTag(YJD.fileStatusOf(w));
         var rowStart = '<tr data-mid="' + esc(w.id) + '" data-title="' + esc(w.title) + '" class="' + (wkSelected[w.id] ? 'selected' : '') + '">' +
           '<td class="col-check"><input type="checkbox" data-wk="' + esc(w.id) + '"' + checked + ' onclick="toggleWorkCheck(\'' + w.id + '\', this.checked)" /></td>' +
           '<td>' + esc(w.id) + '</td><td>' + esc(w.title) + '</td><td>' + esc(w.project) + '</td>' +
@@ -2403,32 +2419,32 @@
           return rowStart +
             '<td class="cell-agg">' + esc(YJD.offsiteInfoLabel(w)) + '<div class="cell-sub">' + esc(w.dl) + '</div></td>' +
             '<td>' + esc(w.editor) + '</td><td>' + esc(w.kind) + '</td><td>' + stTag(YJD.offsiteStatus(w)) + '</td>' +
-            '<td>' + esc(w.time) + '</td>' +
+            '<td>' + fileCell + '</td><td>' + esc(w.time) + '</td>' +
             '<td><button class="link" type="button" onclick="openWorkDetail(\'' + w.id + '\')">详情</button>' +
-            '<button class="link" type="button" onclick="openWorkModal(\'' + w.id + '\')">编辑</button>' +
+            (gone ? '' : '<button class="link" type="button" onclick="openWorkModal(\'' + w.id + '\')">编辑</button>' +
             '<button class="link" type="button" onclick="copyOffsiteLink(\'' + w.id + '\')">分享链接</button>' +
             '<button class="link" type="button" onclick="openOffsiteQr(\'' + w.id + '\')">二维码</button>' +
-            '<button class="link link-danger" type="button" onclick="deleteWork(\'' + w.id + '\')">删除</button></td></tr>';
+            '<button class="link link-danger" type="button" onclick="deleteWork(\'' + w.id + '\')">删除</button>') + '</td></tr>';
         }
         var audit = w.audit || '已通过';
         var auditCell = stTag(audit) + (audit === '已驳回' && w.rejectReason ? '<div class="cell-sub">原因：' + esc(w.rejectReason) + '</div>' : '');
         var auditBtns = '';
-        if (audit === '审核中' || audit === '已驳回') {
+        if (!gone && (audit === '审核中' || audit === '已驳回')) {
           auditBtns += '<button class="link" type="button" onclick="approveWork(\'' + w.id + '\')">通过</button>';
         }
-        if (audit === '审核中' && w.occ === '空闲') {
+        if (!gone && audit === '审核中' && w.occ === '空闲') {
           auditBtns += '<button class="link link-danger" type="button" onclick="rejectWork(\'' + w.id + '\')">驳回</button>';
         }
         return rowStart +
           '<td class="cell-agg">' + esc(YJD.workInfoLabel(w)) + '<div class="cell-sub">' + esc(w.dl) + '</div></td>' +
           '<td class="cell-agg" title="' + esc(YJD.tipText(w)) + '">' + esc(YJD.tipText(w) || '—') + '</td>' +
           '<td>' + esc(w.editor) + '</td><td>' + esc(w.kind) + '</td><td>' + esc(w.mat) + '</td><td>' + stTag(w.occ) + '</td>' +
-          '<td>' + auditCell + '</td><td>' + esc(w.time) + '</td>' +
+          '<td>' + auditCell + '</td><td>' + fileCell + '</td><td>' + esc(w.time) + '</td>' +
           '<td><button class="link" type="button" onclick="openWorkDetail(\'' + w.id + '\')">详情</button>' +
-          '<button class="link" type="button" onclick="openWorkModal(\'' + w.id + '\')">编辑</button>' +
+          (gone ? '' : '<button class="link" type="button" onclick="openWorkModal(\'' + w.id + '\')">编辑</button>' +
           auditBtns +
-          '<button class="link link-danger" type="button" onclick="deleteWork(\'' + w.id + '\')">删除</button></td></tr>';
-      }).join('') || '<tr><td colspan="' + (off ? 11 : 14) + '" style="text-align:center;color:#9aa5b4">无匹配</td></tr>';
+          '<button class="link link-danger" type="button" onclick="deleteWork(\'' + w.id + '\')">删除</button>') + '</td></tr>';
+      }).join('') || '<tr><td colspan="' + (off ? 12 : 15) + '" style="text-align:center;color:#9aa5b4">无匹配</td></tr>';
       syncWkBatchBar();
     }
     function renderProjects() {
@@ -2537,7 +2553,8 @@
         (off ? '<dt>分享链接</dt><dd>' + esc(w.dl) + '</dd>' : '<dt>发布技巧</dt><dd>' + esc(YJD.tipText(w) || '—') + '</dd>') +
         '<dt>云端存储</dt><dd>阿里云 OSS · ' + esc(w.ossKey || YJD.ossObjectKey(w.id)) + '</dd>' +
         '<dt>云端状态</dt><dd>' + esc(YJD.ossStatusLabel(w)) + '</dd>' +
-        (off ? '' : '<dt>系统失效</dt><dd>' + esc(fmtOssTime(w.ossExpireAt)) + '（领取后 7 天删对象）</dd>') +
+        '<dt>稿件状态</dt><dd>' + esc(YJD.fileStatusOf(w)) + '</dd>' +
+        (off ? '' : '<dt>系统失效</dt><dd>' + esc(YJD.hasBeenClaimed(STORE, w) ? (fmtOssTime(w.ossExpireAt) + '（领取后 7 天删对象）') : (fmtOssTime((w.uploadedAt || 0) + YJD.UNCLAIMED_TTL_MS) + '（上传未领满 15 天删对象）')) + '</dd>') +
         (off ? '' : '<dt>恢复次数</dt><dd>' + (w.ossRestoreUsed ? '已用 1/1' : '未恢复 0/1') + '</dd>') +
         (off ? '' : '<dt>C端下载窗</dt><dd>' + (claim ? ((claim.expireAt || 0) > Date.now() ? '有效至 ' + fmtOssTime(claim.expireAt) : '已过期（3 天）') : '无领取记录') + '</dd>') +
         '<dt>剪辑手</dt><dd>' + esc(w.editor) + '</dd>' +
@@ -3041,23 +3058,20 @@
       });
     }
     function workCanDelete(w) {
-      if (!w || w.occ === '占用中') return false;
-      return !CLAIMS.some(function (c) { return c.mid === w.id && c.status !== '已超时'; });
+      return YJD.canSoftDelete(STORE, w).ok;
     }
     function deleteWork(id) {
       var w = WORKS.find(function (x) { return x.id === id; });
       if (!w) return;
-      if (w.occ === '占用中') { showToast('占用中的稿件不能删除'); return; }
-      if (CLAIMS.some(function (c) { return c.mid === id && c.status !== '已超时'; })) {
-        showToast('仍有未超时领取记录，不能删除');
-        return;
-      }
-      openModal('确认删除？', '<p>即将删除稿件「' + esc(w.title) + '」' + (YJD.isOffsite(w) ? '，分享链接将失效。' : '，广场将不再展示。') + '</p>', function () {
-        STORE.works = WORKS = WORKS.filter(function (x) { return x.id !== id; });
+      var gate = YJD.canSoftDelete(STORE, w);
+      if (!gate.ok) { showToast(gate.reason); return; }
+      openModal('确认删除？', '<p>即将删除稿件「' + esc(w.title) + '」。阿里云文件会同步删除，<strong>不可恢复</strong>。' + (YJD.isOffsite(w) ? '分享链接将失效。' : '广场将不再展示。') + '</p>', function () {
+        var res = YJD.softDeleteWork(STORE, id);
+        if (!res.ok) { showToast(res.reason); return; }
         delete wkSelected[id];
         persist();
         renderWorks();
-        showToast('已删除');
+        showToast('已删除，阿里云已同步删除');
       }, true);
     }
     function openBatchAudit() {
@@ -3116,12 +3130,13 @@
       }
       var skip = rows.length - deletable.length;
       openModal('确认删除？',
-        '<p>即将删除 <strong>' + deletable.length + '</strong> 条记录，此操作不可撤销。' +
-        (skip ? '另有 ' + skip + ' 条占用中或仍有未超时领取，将跳过。' : '') + '</p>',
+        '<p>即将删除 <strong>' + deletable.length + '</strong> 条记录。阿里云文件同步删除，<strong>不可恢复</strong>。' +
+        (skip ? '另有 ' + skip + ' 条占用中、已删除或仍有未超时领取，将跳过。' : '') + '</p>',
         function () {
-          var ids = {};
-          deletable.forEach(function (w) { ids[w.id] = true; delete wkSelected[w.id]; });
-          STORE.works = WORKS = WORKS.filter(function (w) { return !ids[w.id]; });
+          deletable.forEach(function (w) {
+            YJD.softDeleteWork(STORE, w.id);
+            delete wkSelected[w.id];
+          });
           persist();
           renderWorks();
           showToast('已删除 ' + deletable.length + ' 条' + (skip ? '，跳过 ' + skip + ' 条' : ''));
@@ -3345,7 +3360,10 @@
       var page = document.querySelector('.page-view.active')?.id;
       var R = YJD_RULES;
       if (page === 'view-explain') return 'explain-frs';
-      if (page === 'view-h5') return 'fe-offsite';
+      if (page === 'view-h5') {
+        var h5 = document.querySelector('#h5Scenes .scene-btn.active')?.dataset.h5scene || 'ready';
+        return R.h5SceneMap[h5] || 'h5-ready';
+      }
       if (page === 'view-data') {
         var ix = document.querySelector('[data-ix].active')?.dataset.ix;
         return ix === 'ix-oss' ? 'data-oss' : 'data-main';
@@ -3392,11 +3410,11 @@
       showRuleKey(currentRuleKey());
     }
     function mountRuleDrawer() {
-      ['explain', 'fe', 'pc', 'admin', 'data'].forEach(function (g) {
+      ['explain', 'fe', 'h5', 'pc', 'admin', 'data'].forEach(function (g) {
         var group = YJD_RULES.groups[g];
         var panel = document.getElementById(group.id);
         if (!panel) return;
-        var kind = (g === 'fe' || g === 'pc' || g === 'admin') ? '本场景需求细则' : '本页需求细则';
+        var kind = (g === 'fe' || g === 'h5' || g === 'pc' || g === 'admin') ? '本场景需求细则' : '本页需求细则';
         panel.innerHTML = keysOf(g).map(function (key) {
           return '<div class="rule-sub" data-rule-key="' + key + '">' +
             '<div class="rule-scene-head"><strong>' + YJD_RULES.titleOf(key) + '</strong><span>' + kind + '</span></div>' +
@@ -3515,7 +3533,7 @@
       { t: '2 后台录入', d: '运营在「剪辑手管理」写入右豹 ID、分成、备注、稿件需要审核和可上传项目。未录入不能上传。', say: { op: '右豹 ID 写上，他才能传', cs: '我把人转给运营录入' } },
       { t: '3 PC 上传', d: '已录入剪辑手先填字段再选文件夹或压缩包，按命名约定解析确认后队列上传。需审则审核中，免审默认已通过。', say: { pc: '我先填书和项目，再选成片上传', op: '要审的先审核中；免审的空闲就能进广场' } },
       { t: '4 运营审核', d: '后台可单条或批量通过/驳回。通过后空闲稿才具备进广场资格；驳回必须填原因，已通过不可再驳。', say: { op: '勾几条一起审；驳回写原因' } },
-      { t: '5 进入广场', d: '六条同时成立才可见：已通过、空闲、项目启用、剪辑手已录入且开通右豹、素材启用、非站外。列表不展示金额。', say: { c: '我只看到能领的成片，没有金额' } },
+      { t: '5 进入广场', d: '七条同时成立才可见：已通过、空闲、稿件正常、项目启用、剪辑手已录入且开通右豹、素材启用、非站外。列表不展示金额。', say: { c: '我只看到能领的成片，没有金额' } },
       { t: '6 选词领取', d: '门禁：停权 → 次数 → 选词浮层 → 资格/占用。次数不足只开兑换。成功即扣次、占用、对他人隐藏。', say: { c: '先看次数，再选词，领了就扣次' } },
       { t: '7 回填或超时', d: '24h 内从我的领取回填则稿件已完成。超时记 1 次未回填、不退次、稿件回广场。', say: { c: '24 小时内回填；超时次数不退' } },
       { t: '8 完成或停权', d: '回填后不再回广场。终身未回填超过 3 次进黑名单，仅后台手动恢复。原领取人未停权可再领，再领再扣次。', say: { op: '超 3 次我来黑名单恢复', c: '回填完这稿不再回广场' } }
@@ -3596,6 +3614,7 @@
         var groupName = {
           'rule-explain': 'explain',
           'rule-fe': 'fe',
+          'rule-h5': 'h5',
           'rule-pc': 'pc',
           'rule-admin': 'admin',
           'rule-data': 'data'
@@ -3604,7 +3623,7 @@
         var pageGroup = {
           'view-explain': 'explain',
           'view-fe': 'fe',
-          'view-h5': 'fe',
+          'view-h5': 'h5',
           'view-pc': 'pc',
           'view-admin': 'admin',
           'view-data': 'data'

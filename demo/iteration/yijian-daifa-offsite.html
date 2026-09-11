@@ -95,7 +95,7 @@
     function render() {
       var w = current();
       var box = document.getElementById('page');
-      if (!w || !YJD.isOffsite(w)) {
+      if (!w || !YJD.isOffsite(w) || YJD.isFileDeleted(w)) {
         box.innerHTML = '<div class="empty" id="offEmpty"><b>链接已失效</b>链接已失效或稿件不存在。<br />请向剪辑手重新获取分享链接或二维码。</div>';
         return;
       }
