@@ -134,10 +134,17 @@
       freeQuota: { weekday: 1, holiday: 1 },
       user: { id: 'U-10086', free: 1, bought: 2, strikes: 0, banned: false },
       keywords: {
-        '番茄小说': ['掌心宠溺', '年代甜宠', '我是关键词最多十个字', '别暴躁别暴躁'],
-        '红果短剧': ['末世囤货', '逆袭短剧'],
-        '知乎故事': ['百日新娘', '都市脑洞'],
-        '红果漫剧': ['走入没有你的夜', '古风漫剧']
+        '番茄小说': [
+          kw('掌心宠溺', '审核通过待发布'),
+          kw('年代甜宠', '审核通过已回填'),
+          kw('我是关键词最多十个字', '审核通过待发布'),
+          kw('别暴躁别暴躁', '审核通过待发布'),
+          kw('待审核甜宠', '待审核'),
+          kw('已驳回口播', '已驳回')
+        ],
+        '红果短剧': [kw('末世囤货', '审核通过待发布'), kw('逆袭短剧', '审核通过已回填')],
+        '知乎故事': [kw('百日新娘', '审核通过待发布'), kw('都市脑洞', '审核通过待发布')],
+        '红果漫剧': [kw('走入没有你的夜', '审核通过待发布'), kw('古风漫剧', '审核通过已回填')]
       },
       settlements: [
         { id: 'ST-01', editor: '庭宇', mid: 'M-06', claimId: 'C-01', project: '番茄小说', book: '银发军官把我宠上天', bookId: '7482019356', kw: '年代甜宠', user: 'U-10086', amount: 72, settledAt: '2026-09-10 02:43:53', channel: '右豹' },
@@ -172,6 +179,33 @@
       if (out.indexOf(url) < 0 && out.length < 3) out.push(url);
     });
     return out.slice(0, 3);
+  }
+
+  var CLAIMABLE_KW_STATUS = ['审核通过待发布', '审核通过已回填'];
+  function kw(name, status) {
+    return { name: name, status: status || '审核通过待发布' };
+  }
+  function normalizeKeyword(item) {
+    if (typeof item === 'string') return kw(item, '审核通过待发布');
+    if (item && item.name) return kw(item.name, item.status);
+    return null;
+  }
+  function projectKeywords(data, project) {
+    return ((data && data.keywords && data.keywords[project]) || []).map(normalizeKeyword).filter(Boolean);
+  }
+  function claimableKeywords(data, project) {
+    return projectKeywords(data, project).filter(function (k) {
+      return CLAIMABLE_KW_STATUS.indexOf(k.status) >= 0;
+    }).map(function (k) { return k.name; });
+  }
+  function isClaimableKeyword(data, project, name) {
+    return !!name && claimableKeywords(data, project).indexOf(name) >= 0;
+  }
+  function normalizeKeywordsMap(data) {
+    if (!data || !data.keywords) return;
+    Object.keys(data.keywords).forEach(function (project) {
+      data.keywords[project] = projectKeywords(data, project);
+    });
   }
 
   function work(id, title, project, book, bookId, size, editor, kind, mat, occ, time, share, cover, genre, tags, imgs, pubTitle, pubDesc, duration, audit, rejectReason) {
@@ -362,14 +396,17 @@
     return { ok: true, expireAt: claim.expireAt };
   }
 
-  function downloadBlockReason(claim, work) {
+  function downloadBlockReason(claim, work, opts) {
+    opts = opts || {};
     if (!claim) return '稿件已不存在';
     if (work && isOffsite(work)) {
       if (offsiteRemaining(work) <= 0) return '云端资源已删除，无法再下载';
       return '';
     }
     if (work && !ossAlive(work)) return '云端资源已失效，无法再下载';
-    if ((claim.expireAt || 0) <= Date.now()) return '领取已超过 3 天，无法再下载';
+    if ((claim.expireAt || 0) <= Date.now()) return '当前稿件下载时效已过期';
+    if (opts.banned) return '您已违反平台规则，超过3次未回填；下载链接已失效';
+    if (claim.status === '已超时') return '当前任务未及时回填，下载链接已失效';
     return '';
   }
 
@@ -546,8 +583,9 @@
     var prevDate = data && data.user && data.user.freeDate;
     if (!data) data = seed();
     var worksBefore = JSON.stringify(data.works || []);
+    var kwsBefore = JSON.stringify(data.keywords || {});
     syncFlags(data);
-    var swept = worksBefore !== JSON.stringify(data.works || []);
+    var swept = worksBefore !== JSON.stringify(data.works || []) || kwsBefore !== JSON.stringify(data.keywords || {});
     if (fresh || !hadQuota || swept || (data.user && data.user.freeDate !== prevDate)) {
       localStorage.setItem(KEY, JSON.stringify(data));
     }
@@ -643,6 +681,7 @@
         if (c.pendingEarn == null) c.pendingEarn = 0;
       }
     });
+    normalizeKeywordsMap(data);
     sweepOss(data);
   }
 
@@ -1035,6 +1074,9 @@
     sweepOss: sweepOss,
     restoreClientDownload: restoreClientDownload,
     downloadBlockReason: downloadBlockReason,
+    CLAIMABLE_KW_STATUS: CLAIMABLE_KW_STATUS,
+    claimableKeywords: claimableKeywords,
+    isClaimableKeyword: isClaimableKeyword,
     latestClaimForWork: latestClaimForWork,
     dayType: dayType,
     todayFree: todayFree,

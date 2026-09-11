@@ -315,13 +315,44 @@ def test_timeout_and_banned_scenes(page, demo_server):
     page.goto(f"{demo_server}/yijian-daifa-demo.html?screen=timeout", wait_until="domcontentloaded")
     expect(page.locator("#claimTabs .on")).to_contain_text("已超时")
     expect(page.locator("#claimList")).to_contain_text("掌心宠溺")
-    expect(page.locator("#claimList")).to_contain_text("下载已过期")
+    expect(page.locator("#claimList")).to_contain_text("回填已超时")
+    expect(page.locator("#claimList")).not_to_contain_text("已被他人领取")
+    expect(page.locator("#claimList")).not_to_contain_text("下载已过期")
     page.locator("[data-dl]").first.click()
-    expect(page.locator("#toast")).to_contain_text("领取已超过 3 天，无法再下载")
+    expect(page.locator("#toast")).to_contain_text("当前任务未及时回填，下载链接已失效")
+    page.locator("[data-copy]").first.click()
+    expect(page.locator("#toast")).to_contain_text("当前任务未及时回填，下载链接已失效")
     page.locator("[data-fill]").first.click()
     expect(page.locator("#toast")).to_contain_text("已超时，无法回填")
+
+    page.locator("#claimTabs button", has_text="已回填").click()
+    page.evaluate(
+        """() => {
+          var c = STORE.claims.find(function (x) { return x.id === 'C-01'; });
+          if (c) c.expireAt = Date.now() - 60000;
+          renderClaims();
+        }"""
+    )
+    expect(page.locator("#claimList")).to_contain_text("下载已失效")
+    page.locator("[data-dl]").first.click()
+    expect(page.locator("#toast")).to_contain_text("当前稿件下载时效已过期")
+    page.locator("[data-copy]").first.click()
+    expect(page.locator("#toast")).to_contain_text("当前稿件下载时效已过期")
+
+    page.evaluate(
+        """() => {
+          var c = STORE.claims.find(function (x) { return x.id === 'C-01'; });
+          if (c) c.expireAt = Date.now() + 86400000;
+        }"""
+    )
     page.goto(f"{demo_server}/yijian-daifa-demo.html?screen=banned", wait_until="domcontentloaded")
     expect(page.locator("#goClaim")).to_have_text("已被停权，无法领取")
+    page.locator("#screenNav button", has_text="我的领取").click()
+    page.locator("#claimTabs button", has_text="已回填").click()
+    page.locator("[data-dl]").first.click()
+    expect(page.locator("#toast")).to_contain_text("您已违反平台规则，超过3次未回填；下载链接已失效")
+    page.locator("[data-copy]").first.click()
+    expect(page.locator("#toast")).to_contain_text("您已违反平台规则，超过3次未回填；下载链接已失效")
 
 
 def test_fr_shell_admin_and_flow(page, demo_server):
@@ -847,31 +878,31 @@ def test_admin_editors_works_projects(page, demo_server):
     expect(page.locator("#restoreClientDl")).to_have_count(0)
 
 
-def test_watermark_video_progress(page, demo_server):
+def test_watermark_video_blocked(page, demo_server):
     page.goto(f"{demo_server}/yijian-daifa-demo.html", wait_until="domcontentloaded")
     page.evaluate(
         """() => {
           var it = item('M-02');
           it.occupied = true;
+          it.occ = '占用中';
           state.claims.unshift(makeClaim(it, { id: 'C-v', kw: '末世囤货', status: '未回填' }));
+          persistFe();
           state.current = 'M-02';
+          showScreen('detail');
         }"""
     )
-    page.locator("#screenNav button", has_text="添加水印").click()
-    expect(page.locator("#screen-watermark")).to_have_class("screen active")
-    page.locator(".phone-frame").scroll_into_view_if_needed()
-    expect(page.locator("#wmMark")).to_contain_text("末世囤货")
-    expect(page.locator("#dlWm")).to_be_in_viewport()
-    expect(page.locator("#wmText")).to_be_in_viewport()
-    page.locator("#wmTabs button", has_text="字色").click()
-    expect(page.locator("#wmColors .wm-sw")).to_have_count(10)
-    page.locator("#wmTabs button", has_text="背景").click()
-    expect(page.locator("#wmBgs .wm-sw")).to_have_count(11)
-    page.locator("#dlWm").click()
-    expect(page.locator("#loadText")).to_contain_text("正在打水印")
+    expect(page.locator("#screen-detail")).to_have_class("screen active")
+    expect(page.locator("#copyTitle")).to_have_text("添加水印")
+    expect(page.locator("#footClaimed")).not_to_have_class("hidden")
+    page.locator("#copyTitle").click()
+    expect(page.locator("#toast")).to_contain_text("视频稿件暂不支持添加水印")
+    expect(page.locator("#screen-detail")).to_have_class("screen active")
+    expect(page.locator("#screen-watermark")).not_to_have_class(re.compile(r"\bactive\b"))
+    page.locator("#editWork").click()
+    expect(page.locator("#loadText")).to_contain_text("正在下载")
     expect(page.locator("#loadBarWrap")).to_have_class("load-bar show")
     expect(page.locator("#loadSub")).to_contain_text("%")
-    expect(page.locator("#toast")).to_contain_text("水印稿件已保存到相册")
+    expect(page.locator("#toast")).to_contain_text("稿件已保存到相册")
 
 
 def test_pc_recruit_board_and_upload_list(page, demo_server):
@@ -1195,6 +1226,9 @@ def test_project_keywords_editor_checks_and_timeout_guard(page, demo_server):
     expect(page.locator("#kwSheet")).to_have_class("kw-sheet show")
     expect(page.locator("#kwList .kw-row.on")).to_have_count(0)
     expect(page.locator("#kwList")).to_contain_text("掌心宠溺")
+    expect(page.locator("#kwList")).to_contain_text("年代甜宠")
+    expect(page.locator("#kwList")).not_to_contain_text("待审核甜宠")
+    expect(page.locator("#kwList")).not_to_contain_text("已驳回口播")
     quota_pref = page.locator("#claimQuotaFoot").inner_text()
     page.locator("#confirmKw").click()
     expect(page.locator("#toast")).to_contain_text("请先选择该项目已通过的关键关键词")

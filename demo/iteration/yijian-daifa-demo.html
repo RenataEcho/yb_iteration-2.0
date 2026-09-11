@@ -1051,26 +1051,16 @@
       var pad = function (n) { return n < 10 ? '0' + n : '' + n; };
       return (d.getMonth() + 1) + '月' + d.getDate() + '日 ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
     }
-    function workTakenAfterTimeout(c) {
-      if (!c || c.status !== '已超时') return false;
-      var w = item(c.mid);
-      if (w && (w.occ === '占用中' || w.occ === '已完成' || w.occupied)) return true;
-      return STORE.claims.some(function (x) {
-        return x.id !== c.id && x.mid === c.mid && (x.status === '未回填' || x.status === '已回填');
-      });
-    }
     function dlCountdown(c) {
-      if (workTakenAfterTimeout(c)) return { text: '已被他人领取', expired: true, taken: true };
+      if (c && c.status === '已超时') return { text: '回填已超时', expired: true };
       var left = (c.expireAt || 0) - Date.now();
-      if (left <= 0) return { text: '下载已过期', expired: true };
+      if (left <= 0) return { text: '下载已失效', expired: true };
       var d = Math.floor(left / 86400000);
       var h = Math.floor((left % 86400000) / 3600000);
       return { text: '还可下载 ' + d + '天' + h + '时', expired: false };
     }
     function downloadBlockToast(c) {
-      var cd = dlCountdown(c);
-      if (cd.taken) return '稿件已被他人领取，无法再下载';
-      return YJD.downloadBlockReason(c, item(c && c.mid));
+      return YJD.downloadBlockReason(c, item(c && c.mid), { banned: state.banned });
     }
     function renderProjects() {
       renderProjectRow('projectRow', state.filters.project, function (id) {
@@ -1257,7 +1247,7 @@
     }
     function currentKws() {
       var it = item(state.current);
-      var all = KEYWORDS[it.project] || [];
+      var all = YJD.claimableKeywords(STORE, it && it.project);
       var q = state.kwQuery;
       return q ? all.filter(function (k) { return k.indexOf(q) !== -1; }) : all;
     }
@@ -1416,7 +1406,10 @@
         btn.onclick = function (e) {
           e.stopPropagation();
           var c = state.claims.find(function (x) { return x.id === btn.dataset.copy; });
-          if (c && navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(c.link || c.title);
+          if (!c) return;
+          var block = downloadBlockToast(c);
+          if (block) { toast(block); return; }
+          if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(c.link || c.title);
           toast('已复制稿件链接');
         };
       });
@@ -1635,11 +1628,20 @@
         p.classList.toggle('on', p.dataset.pane === tab);
       });
     }
+    function watermarkVideoToast(it) {
+      return (it && it.kind === '视频') ? '视频稿件暂不支持添加水印' : '';
+    }
     function renderWatermark() {
       var it = item(state.current);
       var mine = myClaimOf(state.current);
       if (!it || !mine) {
         toast('请先领取稿件');
+        setScreen('detail', true);
+        return;
+      }
+      var videoBlock = watermarkVideoToast(it);
+      if (videoBlock) {
+        toast(videoBlock);
         setScreen('detail', true);
         return;
       }
@@ -1746,6 +1748,10 @@
       var mine = currentClaim();
       var it = item(state.current);
       if (!mine || !it) return;
+      if (watermarked) {
+        var videoBlock = watermarkVideoToast(it);
+        if (videoBlock) { toast(videoBlock); return; }
+      }
       var dlBlock = downloadBlockToast(mine);
       if (dlBlock) { toast(dlBlock); return; }
       if (state.loadTimer) clearTimeout(state.loadTimer);
@@ -1787,6 +1793,9 @@
     function openWatermark() {
       var mine = currentClaim();
       if (!mine) { toast('请先领取稿件'); return; }
+      var it = item(state.current);
+      var videoBlock = watermarkVideoToast(it);
+      if (videoBlock) { toast(videoBlock); return; }
       var wmBlock = downloadBlockToast(mine);
       if (wmBlock) { toast(wmBlock); return; }
       state.wm = defaultWm(mine);
@@ -1813,6 +1822,10 @@
       var it = item(mid || state.current);
       if (!(kw || state.kw)) { toast('请先选择该项目已通过的关键关键词'); return; }
       if (kw) state.kw = kw;
+      if (!YJD.isClaimableKeyword(STORE, it && it.project, state.kw)) {
+        toast('请先选择该项目已通过的关键关键词');
+        return;
+      }
       var reason = claimBlockReason(it);
       if (reason === '次数不足') { toast(reason); openBuySheet(); return; }
       if (reason) { toast(reason); return; }
@@ -1859,7 +1872,11 @@
       setTimeout(next, 700);
     }
     function confirmKw() {
-      if (!state.kwPick) { toast('请先选择该项目已通过的关键关键词'); return; }
+      var it = item(state.current);
+      if (!state.kwPick || !YJD.isClaimableKeyword(STORE, it && it.project, state.kwPick)) {
+        toast('请先选择该项目已通过的关键关键词');
+        return;
+      }
       state.kw = state.kwPick;
       closeKwSheet();
       if (state.kwMode === 'copy') {
@@ -1902,11 +1919,11 @@
         state.strikes = Math.max(state.strikes, 1);
         if (state.free + state.bought === 3) { if (state.free > 0) state.free -= 1; else state.bought -= 1; }
         if (!myClaims().some(function (c) { return c.mid === 'M-01' && c.status === '已超时'; })) {
-          var claimedAt = Date.now() - 4 * 86400000;
+          var claimedAt = Date.now() - 36 * 3600000;
           YJD.bindClaimOss(it, claimedAt);
           STORE.claims.unshift(attachClaim(it, {
-            id: 'C-to', kw: '掌心宠溺', time: '4天前', status: '已超时',
-            claimedAt: claimedAt, expireAt: Date.now() - 86400000, downloadedAt: null
+            id: 'C-to', kw: '掌心宠溺', time: '昨天', status: '已超时',
+            claimedAt: claimedAt, expireAt: claimedAt + 3 * 86400000, downloadedAt: null
           }));
         }
         if (state.strikes > 3) {
@@ -1949,7 +1966,8 @@
         state.claimFilters.status = '未回填';
         state.fillId = myClaims().find(function (c) { return c.status === '未回填'; }).id;
       } else if (id === 'watermark') {
-        if (!myClaimOf(state.current)) {
+        var wmIt = item(state.current);
+        if (!myClaimOf(state.current) || (wmIt && wmIt.kind === '视频')) {
           state.current = 'M-06';
         }
         state.wm = defaultWm(myClaimOf(state.current));

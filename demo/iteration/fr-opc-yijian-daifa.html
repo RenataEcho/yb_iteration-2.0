@@ -75,7 +75,32 @@
     }
     .module-tab-bar button.active { color: var(--primary); font-weight: 600; border-bottom-color: var(--primary); }
     .admin-pane > .module-tab-bar { margin: 8px 16px 0; }
-    #ix-payout > .module-tab-bar { margin: 0 0 12px; }
+    #ix-payout > .module-tab-bar,
+    #ix-oss > .module-tab-bar,
+    #ix-api > .module-tab-bar { margin: 0 0 12px; }
+    .impl-prompt { padding: 16px 18px 24px; }
+    .impl-prompt-head { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; margin-bottom: 14px; flex-wrap: wrap; }
+    .impl-prompt-head h2 { font-size: 16px; font-weight: 700; }
+    .impl-prompt-head p { font-size: 12px; color: var(--text-muted); line-height: 1.55; margin-top: 4px; max-width: 640px; }
+    .impl-prompt-actions { display: flex; align-items: center; gap: 10px; }
+    .impl-copied { font-size: 12px; color: var(--success); font-weight: 600; }
+    .impl-note { margin: 0 0 14px; padding: 10px 12px; border-radius: 8px; background: #fffbeb; border: 1px solid #fde68a; font-size: 12px; line-height: 1.55; color: #92400e; }
+    .impl-block { margin-bottom: 16px; }
+    .impl-block h4 { font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; letter-spacing: .04em; }
+    .impl-block p, .impl-block li { font-size: 13px; line-height: 1.6; color: var(--text-secondary); }
+    .impl-block ul { padding-left: 18px; }
+    .impl-step { border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; margin-bottom: 10px; background: #fff; }
+    .impl-step h3 { font-size: 13px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .impl-kind { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; }
+    .impl-kind.check { background: #fef9c3; color: #854d0e; }
+    .impl-kind.write { background: #dcfce7; color: #166534; }
+    .impl-kind.ui { background: #dbeafe; color: #1e40af; }
+    .impl-kind.async { background: #ffedd5; color: #9a3412; }
+    .impl-kind.block { background: #fecaca; color: #991b1b; }
+    .impl-kv { display: grid; grid-template-columns: 64px 1fr; gap: 6px 10px; font-size: 12px; margin-top: 8px; }
+    .impl-kv dt { color: var(--text-muted); }
+    .impl-kv dd { color: var(--text-primary); line-height: 1.5; word-break: break-word; }
+    .impl-kv code { font-size: 11px; background: #f1f5f9; padding: 1px 5px; border-radius: 4px; }
     .channel-tab-bar {
       display: flex; gap: 0; margin: 0 16px 0; border-bottom: 1px solid var(--border);
     }
@@ -523,7 +548,7 @@
       <span class="sprint-pill">YBDD2.0 · 迭代 v1</span>
     </div>
     <div class="sidebar-scroll" data-iteration-sidebar></div>
-    <div class="sidebar-foot">FR-014 · 页内 Tab<br />解释 / 前端 / H5 / PC / 后台 / 数据交互</div>
+    <div class="sidebar-foot">FR-014 · 页内 Tab<br />解释 / 前端 / H5 / PC / 后台 / 数据交互<br />各端「开发提示词」按节点复制</div>
   </aside>
 
   <main class="main">
@@ -536,9 +561,9 @@
         <h1>
           一键代发
           <span class="badge badge-fr">FR-014</span>
-          <span class="badge badge-version">v14 当前</span>
+          <span class="badge badge-version">v15 当前</span>
         </h1>
-        <p class="page-desc">C 端只领取。剪辑手在已有 PC 创作者中心用文件夹或压缩包上传，先走平台审核。招募、看板、上传弹窗与 list 都在 PC。后台与 C/PC 共用同一份演示数据。</p>
+        <p class="page-desc">C 端只领取。剪辑手在已有 PC 创作者中心用文件夹或压缩包上传，先走平台审核。各端「开发提示词」按业务流程节点复制给研发，不要另开规则。</p>
       </div>
       <div class="page-header-actions">
         <button class="btn btn-rule" id="toggleRuleDrawer" type="button">📋 需求规则</button>
@@ -840,7 +865,7 @@
             <div class="explain-kicker">FAQ</div>
             <div class="explain-hero">
               <h2>先问卡在上传、领取、回填还是停权，再对状态</h2>
-              <p>对用户不要讲 FR 编号。对研发指到对应端的「业务流程」和「前后端数据交互」。</p>
+              <p>对用户不要讲 FR 编号。对研发指到对应端的「业务流程」「开发提示词」和「前后端数据交互」。</p>
             </div>
             <div class="explain-section">
               <div class="faq-item"><div class="faq-q">Q1. 为什么广场看不到刚传的稿？</div><div class="faq-a">先确认是不是站外稿：站外永不进广场，只走链接 / 二维码。右豹稿在剪辑手「稿件需要审核=是」时默认审核中，后台通过且空闲才进。免审剪辑手上传后空闲即可进。占用中、已完成、已驳回、已删除、禁用项目、停用剪辑手、禁用素材都不可见。</div></div>
@@ -849,7 +874,7 @@
               <div class="faq-item"><div class="faq-q">Q4. 停权了怎么办？</div><div class="faq-a">终身未回填超过 3 次。只能后台黑名单手动恢复，没有自助解禁。</div></div>
               <div class="faq-item"><div class="faq-q">Q5. 图集详情为什么只能看 3 张？</div><div class="faq-a">预览上限 3 张，角标仍是真实张数。领取前预览不扣次、不能保存。完整稿领取后再下。演示预览用现有封面凑 3 张，不是书内页。</div></div>
               <div class="faq-item"><div class="faq-q">Q6. 用户能在 App 里当剪辑手上传吗？</div><div class="faq-a">不能。C 端只领取。上传只在 PC 创作者中心。广场招募帧只看海报。</div></div>
-              <div class="faq-item"><div class="faq-q">Q7. 领取后怎么下载？水印必做吗？</div><div class="faq-a">底栏「下载并发布到抖音」C 端 3 天内有效。点完先保存到相册，再拉起抖音相册选片。加水印可选。C 端过期后，运营可在领取记录稿件详情点「恢复C端下载」（每稿仅一次），用户重新计时 3 天。系统满 7 天删除阿里云对象后不可再恢复。回填只受 24h 窗影响。</div></div>
+              <div class="faq-item"><div class="faq-q">Q7. 领取后怎么下载？水印必做吗？</div><div class="faq-a">底栏「下载并发布到抖音」C 端 3 天内有效。点完先保存到相册，再拉起抖音相册选片。加水印可选，且本版仅图集；视频点「添加水印」toast「视频稿件暂不支持添加水印」。未回填/已回填倒计时结束出示「下载已失效」，toast「当前稿件下载时效已过期」。已超时只收录超时未回填，文案「回填已超时」。C 端过期后，运营可在领取记录稿件详情点「恢复C端下载」（每稿仅一次），用户重新计时 3 天。系统满 7 天删除阿里云对象后不可再恢复。回填只受 24h 窗影响。</div></div>
               <div class="faq-item"><div class="faq-q">Q8. 非剪辑手打开 PC「剪辑供稿」会怎样？</div><div class="faq-a">不跳走。招募 BN 仍在，点开抽屉可看海报。看板走缺省，上传入口不可用。「操作说明」仍可打开。</div></div>
               <div class="faq-item"><div class="faq-q">Q9. 用剪辑手稿件回填后，关键词收益怎么入账？</div><div class="faq-a">订单已结算时先判该词是不是代发。是则按分成拆成用户实结和剪辑手分账，两边都进项目收益明细，状态「已结算」。不是则全额给用户。对账看「前后端数据交互 → 用户收益入账」。</div></div>
               <div class="faq-item"><div class="faq-q">Q10. 成片在阿里云会留多久？删了还能恢复吗？</div><div class="faq-a">先分渠道。右豹有人领过：C 端 3 天可下，对象再留到首次领取后 7 天。右豹或站外一直没人领：从上传起只留 15 天。站外是领一份删一份，不走 3/7。后台或剪辑手点删除，云端立刻一起删。系统到期或主动删除后稿件状态都是「已删除」，都不能恢复。</div></div>
@@ -864,6 +889,7 @@
       <div class="module-tab-bar" role="tablist">
         <button type="button" class="active" data-sub="fe-scene" role="tab">场景</button>
         <button type="button" data-sub="fe-flow" role="tab">业务流程</button>
+        <button type="button" data-sub="fe-impl" role="tab">开发提示词</button>
       </div>
       <div id="fe-scene" class="sub-view active">
       <div class="demo-layout" id="feDemo">
@@ -883,7 +909,7 @@
             <button class="scene-btn" type="button" data-screen="buy" data-desc="详情浮层选档，现价旁出示原价划线；按钮为兑换；最多 4 档">浮层兑换</button>
             <button class="scene-btn" type="button" data-screen="claims" data-desc="有记录才出项目；3 天 C 端下载倒计时；立即回填始终高亮">我的领取</button>
             <button class="scene-btn" type="button" data-screen="fillback" data-desc="复用该项目已有回填页">项目回填</button>
-            <button class="scene-btn" type="button" data-screen="watermark" data-desc="底部编辑坞一屏内完成；按钮为下载水印稿件并发布到抖音">添加水印</button>
+            <button class="scene-btn" type="button" data-screen="watermark" data-desc="仅图集；视频 toast「视频稿件暂不支持添加水印」；底部编辑坞一屏内完成">添加水印</button>
             <button class="scene-btn" type="button" data-screen="douyin" data-desc="下载完成后跳转抖音并拉起相册选片">跳转抖音相册</button>
             <button class="scene-btn" type="button" data-screen="timeout" data-desc="记 1 次未回填，稿件回 feed，次数不退">24h超时释放</button>
             <button class="scene-btn" type="button" data-screen="banned" data-desc="终身未回填超过 3 次">停权无法领</button>
@@ -997,9 +1023,17 @@
         </div>
       </div>
       </div>
+      <div id="fe-impl" class="sub-view">
+        <div class="glass-card" data-impl-host="c"></div>
+      </div>
     </div>
 
     <div id="view-h5" class="page-view">
+      <div class="module-tab-bar" role="tablist">
+        <button type="button" class="active" data-sub="h5-scene" role="tab">场景</button>
+        <button type="button" data-sub="h5-impl" role="tab">开发提示词</button>
+      </div>
+      <div id="h5-scene" class="sub-view active">
       <div class="demo-layout" id="h5Demo">
         <div class="glass-card scene-panel">
           <div class="scene-head">
@@ -1024,12 +1058,17 @@
           </div>
         </div>
       </div>
+      </div>
+      <div id="h5-impl" class="sub-view">
+        <div class="glass-card" data-impl-host="h5"></div>
+      </div>
     </div>
 
     <div id="view-pc" class="page-view">
       <div class="module-tab-bar" role="tablist">
         <button type="button" class="active" data-sub="pc-scene" role="tab">场景</button>
         <button type="button" data-sub="pc-flow" role="tab">业务流程</button>
+        <button type="button" data-sub="pc-impl" role="tab">开发提示词</button>
       </div>
       <div id="pc-scene" class="sub-view active">
       <div class="demo-layout" id="pcDemo">
@@ -1134,6 +1173,9 @@
         </div>
       </div>
       </div>
+      <div id="pc-impl" class="sub-view">
+        <div class="glass-card" data-impl-host="pc"></div>
+      </div>
     </div>
 
     <div id="view-admin" class="page-view">
@@ -1152,6 +1194,7 @@
           <div class="module-tab-bar" role="tablist">
             <button type="button" class="active" data-sub="admin-editors-list" role="tab">列表</button>
             <button type="button" data-sub="admin-editors-flow" role="tab">业务流程</button>
+            <button type="button" data-sub="admin-editors-impl" role="tab">开发提示词</button>
           </div>
           <div id="admin-editors-list" class="sub-view active">
           <div class="table-toolbar"><h3>剪辑手</h3><button class="btn btn-primary" type="button" onclick="openEditorModal()">录入</button></div>
@@ -1215,12 +1258,16 @@
         </div>
       </div>
           </div>
+          <div id="admin-editors-impl" class="sub-view">
+            <div class="glass-card" data-impl-host="admin-editors"></div>
+          </div>
         </div>
 
         <div id="admin-works" class="admin-pane">
           <div class="module-tab-bar" role="tablist">
             <button type="button" class="active" data-sub="admin-works-list" role="tab">列表</button>
             <button type="button" data-sub="admin-works-flow" role="tab">业务流程</button>
+            <button type="button" data-sub="admin-works-impl" role="tab">开发提示词</button>
           </div>
           <div id="admin-works-list" class="sub-view active">
           <div class="channel-tab-bar" id="wkChannelBar" role="tablist">
@@ -1316,12 +1363,16 @@
         </div>
       </div>
           </div>
+          <div id="admin-works-impl" class="sub-view">
+            <div class="glass-card" data-impl-host="admin-works"></div>
+          </div>
         </div>
 
         <div id="admin-claims" class="admin-pane">
           <div class="module-tab-bar" role="tablist">
             <button type="button" class="active" data-sub="admin-claims-list" role="tab">列表</button>
             <button type="button" data-sub="admin-claims-flow" role="tab">业务流程</button>
+            <button type="button" data-sub="admin-claims-impl" role="tab">开发提示词</button>
           </div>
           <div id="admin-claims-list" class="sub-view active">
           <div class="table-toolbar"><h3>领取记录</h3></div>
@@ -1382,12 +1433,16 @@
         </div>
       </div>
           </div>
+          <div id="admin-claims-impl" class="sub-view">
+            <div class="glass-card" data-impl-host="admin-claims"></div>
+          </div>
         </div>
 
         <div id="admin-ban" class="admin-pane">
           <div class="module-tab-bar" role="tablist">
             <button type="button" class="active" data-sub="admin-ban-list" role="tab">列表</button>
             <button type="button" data-sub="admin-ban-flow" role="tab">业务流程</button>
+            <button type="button" data-sub="admin-ban-impl" role="tab">开发提示词</button>
           </div>
           <div id="admin-ban-list" class="sub-view active">
           <div class="table-toolbar"><h3>黑名单</h3></div>
@@ -1445,12 +1500,16 @@
         </div>
       </div>
           </div>
+          <div id="admin-ban-impl" class="sub-view">
+            <div class="glass-card" data-impl-host="admin-ban"></div>
+          </div>
         </div>
 
         <div id="admin-projects" class="admin-pane">
           <div class="module-tab-bar" role="tablist">
             <button type="button" class="active" data-sub="admin-projects-list" role="tab">列表</button>
             <button type="button" data-sub="admin-projects-flow" role="tab">业务流程</button>
+            <button type="button" data-sub="admin-projects-impl" role="tab">开发提示词</button>
           </div>
           <div id="admin-projects-list" class="sub-view active">
           <div class="table-toolbar"><h3>项目</h3><button class="btn btn-primary" type="button" onclick="openProjectModal()">添加</button></div>
@@ -1505,12 +1564,16 @@
         </div>
       </div>
           </div>
+          <div id="admin-projects-impl" class="sub-view">
+            <div class="glass-card" data-impl-host="admin-projects"></div>
+          </div>
         </div>
 
         <div id="admin-mats" class="admin-pane">
           <div class="module-tab-bar" role="tablist">
             <button type="button" class="active" data-sub="admin-mats-list" role="tab">列表</button>
             <button type="button" data-sub="admin-mats-flow" role="tab">业务流程</button>
+            <button type="button" data-sub="admin-mats-impl" role="tab">开发提示词</button>
           </div>
           <div id="admin-mats-list" class="sub-view active">
           <div class="table-toolbar"><h3>素材类型</h3><button class="btn btn-primary" type="button" onclick="openMatModal()">新增</button></div>
@@ -1560,12 +1623,16 @@
         </div>
       </div>
           </div>
+          <div id="admin-mats-impl" class="sub-view">
+            <div class="glass-card" data-impl-host="admin-mats"></div>
+          </div>
         </div>
 
         <div id="admin-skus" class="admin-pane">
           <div class="module-tab-bar" role="tablist">
             <button type="button" class="active" data-sub="admin-skus-list" role="tab">列表</button>
             <button type="button" data-sub="admin-skus-flow" role="tab">业务流程</button>
+            <button type="button" data-sub="admin-skus-impl" role="tab">开发提示词</button>
           </div>
           <div id="admin-skus-list" class="sub-view active">
           <div class="table-toolbar">
@@ -1629,6 +1696,9 @@
         </div>
       </div>
           </div>
+          <div id="admin-skus-impl" class="sub-view">
+            <div class="glass-card" data-impl-host="admin-skus"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -1659,11 +1729,16 @@
             <div id="ix-fe-frs"></div>
           </div>
           <div id="ix-api" class="ix-pane">
+            <div class="module-tab-bar" role="tablist">
+              <button type="button" class="active" data-sub="ix-api-doc" role="tab">契约表</button>
+              <button type="button" data-sub="ix-api-impl" role="tab">开发提示词</button>
+            </div>
+            <div id="ix-api-doc" class="sub-view active">
             <h3>1. 页面初始化数据流</h3>
             <div class="ix-flow">
               <div class="ix-step"><i>1</i><div><b>进入作品广场</b><span>并行请求启用项目、广场列表、Banner。前端用 plazaEligible 结果渲染宫格，不本地再算金额。</span></div></div>
               <div class="ix-step"><i>2</i><div><b>打开详情</b><span>请求稿件七字段 + preview≤3 + 剩余次数 + 用户停权态。预览另走 preview 接口，不走下载。</span></div></div>
-              <div class="ix-step"><i>3</i><div><b>发起领取</b><span>先读次数与停权。次数不足走兑换；足够后拉该项目已通过关键词，提交 mid + keywordId。</span></div></div>
+              <div class="ix-step"><i>3</i><div><b>发起领取</b><span>先读次数与停权。次数不足走兑换；足够后拉该项目审核通过待发布 / 审核通过已回填关键词，提交 mid + keywordId。</span></div></div>
               <div class="ix-step"><i>4</i><div><b>后端落账</b><span>校验门禁后写占用、扣次、领取记录，返回 claimId。失败返回错误码，不写占用。</span></div></div>
               <div class="ix-step"><i>5</i><div><b>刷新结果</b><span>详情改已领底栏；广场该稿对他人消失；我的领取出现未回填。超时由任务写回，不靠前端倒计时做准。</span></div></div>
             </div>
@@ -1676,7 +1751,7 @@
                   <tr><td><strong>启用项目</strong></td><td><code>GET /api/yjd/projects</code></td><td>—</td><td>启用项目图标、sort、已通过关键词数</td></tr>
                   <tr><td><strong>稿件详情</strong></td><td><code>GET /api/yjd/works/:id</code></td><td>id</td><td>七字段 + preview≤3 + imgs + 试看标记</td></tr>
                   <tr><td><strong>预览图集</strong></td><td><code>GET /api/yjd/works/:id/preview</code></td><td>id</td><td>最多 3 张 URL；不扣次、不占用</td></tr>
-                  <tr><td><strong>项目关键词</strong></td><td><code>GET /api/yjd/projects/:id/keywords</code></td><td>projectId</td><td>仅已通过关键词</td></tr>
+                  <tr><td><strong>项目关键词</strong></td><td><code>GET /api/yjd/projects/:id/keywords</code></td><td>projectId</td><td>仅审核通过待发布 / 审核通过已回填</td></tr>
                   <tr><td><strong>领取</strong></td><td><code>POST /api/yjd/claims</code></td><td>mid / keywordId / idempotencyKey</td><td>占用 + 扣次；或错误码</td></tr>
                   <tr><td><strong>兑换次数</strong></td><td><code>POST /api/yjd/skus/:id/redeem</code></td><td>skuId</td><td>已购次数 +n；下架不可兑</td></tr>
                   <tr><td><strong>回填</strong></td><td><code>POST /api/yjd/claims/:id/fill</code></td><td>复用项目回填字段</td><td>已回填；稿件已完成</td></tr>
@@ -1696,7 +1771,7 @@
             <ul>
               <li>项目 / 素材 / 剪辑手状态变更后，广场列表即时按 plazaEligible 过滤，前端不缓存「永远可见」。</li>
               <li>次数商品仅返回在售档；下架立即不可新购，已购次数保留。</li>
-              <li>项目已通过关键词为空时，选词浮层为空，领取必须失败并提示。</li>
+              <li>项目下没有审核通过待发布 / 审核通过已回填关键词时，选词浮层为空，领取必须失败并提示。</li>
               <li>后台录入稿件视为已通过。PC 新上传看剪辑手 <code>needReview</code>：是=审核中，否=已通过。</li>
               <li>黑名单恢复后才可再领；前端不得根据本地 strikes 自行解禁。</li>
             </ul>
@@ -1710,6 +1785,10 @@
               <li><strong>settlement</strong>：orderId、keywordId、mid、project、settledAt、gross、editorShare、userNet、status=已结算。</li>
             </ul>
             <div class="callout warn">Demo 不发起上述请求。联调时按此契约落地，不要用 Demo 的 localStorage 当接口。</div>
+            </div>
+            <div id="ix-api-impl" class="sub-view">
+              <div class="glass-card" data-impl-host="api"></div>
+            </div>
           </div>
           <div id="ix-state" class="ix-pane">
             <h3>1. 状态机</h3>
@@ -1726,7 +1805,7 @@
             </div>
             <h3>2. 校验规则</h3>
             <ul>
-              <li>领取必须带 mid + keywordId，且关键词属于该稿项目且已通过。</li>
+              <li>领取必须带 mid + keywordId，且关键词属于该稿项目且状态为审核通过待发布或审核通过已回填。</li>
               <li>兑换必须校验档位在售、次数与积分&gt;0、原价为正数且 ≥ 积分；前端不得自己加次数。</li>
               <li>回填只接受 status=未回填 的领取；已回填 / 已超时由后端拒绝。</li>
               <li>PC 上传先填字段再选文件夹或压缩包，项目 ∈ 剪辑手授权 ∩ 启用项目。</li>
@@ -1743,7 +1822,9 @@
                   <tr><td><strong>未审核通过</strong></td><td>审核中 / 已驳回</td><td>不进广场；详情不可领</td><td>否</td></tr>
                   <tr><td>未选词</td><td>浮层未点关键词</td><td>Toast 拦截领取</td><td>否</td></tr>
                   <tr><td>项目禁用</td><td>项目状态=禁用</td><td>不进广场；PC 不可传到该项目</td><td>否</td></tr>
-                  <tr><td>C端下载过期</td><td>领取超过 3 天且云端未删</td><td>Toast「领取已超过 3 天，无法再下载」；后台可恢复一次</td><td>—</td></tr>
+                  <tr><td>C端下载过期</td><td>未回填/已回填领取超过 3 天且云端未删</td><td>卡片「下载已失效」；Toast「当前稿件下载时效已过期」；后台可恢复一次</td><td>—</td></tr>
+                  <tr><td>24h 未回填</td><td>已超时且 3 天窗未过</td><td>卡片「回填已超时」；Toast「当前任务未及时回填，下载链接已失效」</td><td>—</td></tr>
+                  <tr><td>停权且窗未过</td><td>黑名单停权中且 3 天窗未过</td><td>Toast「您已违反平台规则，超过3次未回填；下载链接已失效」</td><td>—</td></tr>
                   <tr><td>云端失效</td><td>站内已领满 7 天 / 未领满 15 天 / 主动删除；站外该份已下</td><td>Toast「云端资源已失效/已删除，无法再下载」；主动删除不可恢复</td><td>—</td></tr>
                 </tbody>
               </table>
@@ -1762,6 +1843,7 @@
             <div class="module-tab-bar" role="tablist">
               <button type="button" class="active" data-sub="ix-payout-doc" role="tab">规则说明</button>
               <button type="button" data-sub="ix-payout-flow" role="tab">业务流程</button>
+              <button type="button" data-sub="ix-payout-impl" role="tab">开发提示词</button>
             </div>
             <div id="ix-payout-doc" class="sub-view active">
             <div class="ix-rule">
@@ -1947,11 +2029,15 @@
         </div>
       </div>
             </div>
+            <div id="ix-payout-impl" class="sub-view">
+              <div class="glass-card" data-impl-host="api-payout"></div>
+            </div>
           </div>
           <div id="ix-oss" class="ix-pane">
             <div class="module-tab-bar" role="tablist">
               <button type="button" class="active" data-sub="ix-oss-doc" role="tab">规则说明</button>
               <button type="button" data-sub="ix-oss-flow" role="tab">业务流程</button>
+              <button type="button" data-sub="ix-oss-impl" role="tab">开发提示词</button>
             </div>
             <div id="ix-oss-doc" class="sub-view active">
             <div class="ix-rule">
@@ -1967,7 +2053,7 @@
               <div class="ix-step"><i>1</i><div><b>上传入桶</b><span>PC / 后台写入 works.ossKey、uploadedAt。稿件状态=正常。</span></div></div>
               <div class="ix-step"><i>2</i><div><b>一直未领取</b><span>从上传起算 15 天。满 15 天系统删 OSS，稿件状态=已删除，不可恢复。</span></div></div>
               <div class="ix-step"><i>3</i><div><b>有人领取</b><span>改走 3/7：claim.expireAt = claimedAt + 3 天，work.ossExpireAt = 首次领取 + 7 天。不再走 15 天钟。</span></div></div>
-              <div class="ix-step"><i>4</i><div><b>C 端过期</b><span>满 3 天 toast「领取已超过 3 天，无法再下载」。对象未删，后台可恢复一次。</span></div></div>
+              <div class="ix-step"><i>4</i><div><b>C 端过期</b><span>未回填/已回填满 3 天出示「下载已失效」，toast「当前稿件下载时效已过期」。已超时出示「回填已超时」。对象未删，后台可恢复一次。</span></div></div>
               <div class="ix-step"><i>5</i><div><b>系统满 7 天</b><span>任务删阿里云对象，稿件状态=已删除。此后不可下载、不可恢复。</span></div></div>
               <div class="ix-step"><i>6</i><div><b>主动删除</b><span>后台或剪辑手删除：阿里云同步删除，稿件状态=已删除，<strong>不支持恢复</strong>。</span></div></div>
             </div>
@@ -2139,6 +2225,9 @@
       </div>
               </div>
             </div>
+            <div id="ix-oss-impl" class="sub-view">
+              <div class="glass-card" data-impl-host="api-oss"></div>
+            </div>
           </div>
           <div id="ix-list" class="ix-pane">
           <p>用于产品、前端、后端联调时逐项确认。</p>
@@ -2177,7 +2266,7 @@
               <li><strong>skus</strong>：id / times / points / origPoints（原价） / on / buyers（只读购买人数）</li>
               <li><strong>claims</strong>：id / user / mid / title / work / project / book / bookId / editor / cover / kind / kw / fill / fillVideo / pendingEarn / status / time / link / claimedAt / downloadedAt / expireAt / restoredAt</li>
               <li><strong>works OSS</strong>：ossKey / ossDeleted / ossDeletedReason / fileStatus / uploadedAt / ossRestoreUsed / ossExpireAt</li>
-              <li><strong>keywords</strong>：STORE.keywords[项目名] = 该用户在该项目已通过申词 mock，不由项目管理维护</li>
+              <li><strong>keywords</strong>：STORE.keywords[项目名] = 该用户申词 mock（name + status）；领取只出审核通过待发布 / 审核通过已回填，不由项目管理维护</li>
               <li><strong>bans</strong>：user / strikes / time / status</li>
               <li><strong>user</strong>：id / free / bought / strikes / banned</li>
               <li><strong>settlements</strong>：orderId / keywordId / mid / project / settledAt / gross / editorShare / userNet / status=已结算 / userTitle / userDesc / editorTitle / editorDesc</li>
@@ -2265,6 +2354,7 @@
 
   <script src="yijian-daifa-store.js"></script>
   <script src="yijian-daifa-rules.js"></script>
+  <script src="yijian-daifa-impl-prompts.js"></script>
   <script>
     var STORE = YJD.open();
     var EDITORS = STORE.editors;
@@ -3368,6 +3458,8 @@
     function syncPageUrl() {
       var params = new URLSearchParams();
       params.set('tab', currentTabKey());
+      var subBtn = document.querySelector('.page-view.active .module-tab-bar button.active');
+      if (subBtn && subBtn.dataset.sub) params.set('sub', subBtn.dataset.sub);
       history.replaceState(null, '', '?' + params.toString());
     }
     function buildMockupSrc(screen) {
@@ -3544,6 +3636,8 @@
         if (target) target.classList.add('active');
         if (btn.dataset.sub === 'fe-scene') loadMockupFrame();
         if (btn.dataset.sub === 'pc-scene') loadPcFrame();
+        if (btn.dataset.sub === 'h5-scene') loadH5Frame();
+        syncPageUrl();
         if (ruleDrawer.classList.contains('open')) syncRuleTabToPage();
       });
     });
@@ -3704,7 +3798,13 @@
     if (ix && document.querySelector('[data-ix="' + ix + '"]')) {
       document.querySelector('[data-ix="' + ix + '"]').click();
     }
+    var sub = params.get('sub');
+    if (sub) {
+      var subBtn = document.querySelector('.page-view.active .module-tab-bar button[data-sub="' + sub + '"]');
+      if (subBtn) subBtn.click();
+    }
     renderAllAdmin();
+    if (window.YJD_IMPL) YJD_IMPL.mountAll();
     YJD.onChange(function () {
       rebind();
       renderAllAdmin();
