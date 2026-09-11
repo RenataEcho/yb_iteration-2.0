@@ -8,6 +8,12 @@ Demo 可复制面：`fr-opc-yijian-daifa.html` 各端子 Tab「开发提示词�
 
 把对应切片整段复制给实现者（人或 AI）。一次只实现一个切片。改节点必须同步改本文件与 Demo 渲染源 `demo/iteration/yijian-daifa-impl-prompts.js`。
 
+开工包（一次一刀；禁止把合同扩成实现手册）：
+
+- 模板：`_bmad-output/specs/dev-prompt-template.md`
+- 样例：`_bmad-output/specs/spec-fr014-yijian-daifa/stories/STORY-014-C3-claim-gates.md`（C3 = 领取门禁 + 兑换）
+- 后续每刀按模板另开 `stories/STORY-….md`，不要把 Code Map / Tasks 写回本文件。
+
 ## 切片
 
 | ID | 端 / 接口 | 节点来源 |
