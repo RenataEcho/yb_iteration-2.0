@@ -347,6 +347,11 @@ def test_timeout_and_banned_scenes(page, demo_server):
     )
     page.goto(f"{demo_server}/yijian-daifa-demo.html?screen=banned", wait_until="domcontentloaded")
     expect(page.locator("#goClaim")).to_have_text("已被停权，无法领取")
+    quota_banned = page.locator("#claimQuotaFoot").inner_text()
+    page.evaluate("startClaim()")
+    expect(page.locator("#kwSheet")).not_to_have_class("kw-sheet show")
+    expect(page.locator("#buySheet")).not_to_have_class("kw-sheet show")
+    expect(page.locator("#claimQuotaFoot")).to_have_text(quota_banned)
     page.locator("#screenNav button", has_text="我的领取").click()
     page.locator("#claimTabs button", has_text="已回填").click()
     page.locator("[data-dl]").first.click()
@@ -1554,3 +1559,42 @@ def test_fr_page_h5_tab(page, demo_server):
     page.locator('#h5Scenes .scene-btn[data-h5scene="invalid"]').click()
     page.locator("#toggleRuleDrawer").click()
     expect(page.locator("#rule-h5.rule-panel.active .rule-sub.active .rule-scene-head strong")).to_have_text("链接失效")
+
+
+def test_claim_rejects_mismatched_keyword_book_id(page, demo_server):
+    page.goto(f"{demo_server}/yijian-daifa-demo.html?embed=1&screen=detail", wait_until="domcontentloaded")
+    page.evaluate(
+        """() => {
+          var list = STORE.keywords['番茄小说'] || [];
+          var k = list.find(function (x) { return x.name === '掌心宠溺'; });
+          if (k) k.bookId = '999';
+        }"""
+    )
+    quota_before = page.locator("#claimQuotaFoot").inner_text()
+    page.locator("#goClaim").click()
+    expect(page.locator("#kwSheet")).to_have_class("kw-sheet show")
+    page.locator("#kwList .kw-row").filter(has_text="掌心宠溺").click()
+    page.locator("#confirmKw").click()
+    expect(page.locator("#toast")).to_contain_text("请选择与该稿件书籍一致的已通过关键词")
+    expect(page.locator("#claimQuotaFoot")).to_have_text(quota_before)
+
+
+def test_claim_occupied_does_not_deduct(page, demo_server):
+    page.goto(f"{demo_server}/yijian-daifa-demo.html?embed=1&screen=detail", wait_until="domcontentloaded")
+    page.evaluate(
+        """() => {
+          var it = item('M-01');
+          it.occ = '占用中';
+          it.occupied = true;
+        }"""
+    )
+    quota_before = page.locator("#claimQuotaFoot").inner_text()
+    claims_before = page.evaluate("() => STORE.claims.length")
+    page.evaluate("startClaim()")
+    expect(page.locator("#kwSheet")).to_have_class("kw-sheet show")
+    page.locator("#kwList .kw-row").first.click()
+    page.locator("#confirmKw").click()
+    expect(page.locator("#toast")).to_contain_text("稿件已被占用")
+    expect(page.locator("#claimQuotaFoot")).to_have_text(quota_before)
+    assert page.evaluate("() => STORE.claims.length") == claims_before
+    assert page.evaluate("() => item('M-01').occ") == "占用中"

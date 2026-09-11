@@ -53,3 +53,7 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-014-6-sku-orig-price.md`
   summary: 兑换浮层划线价没有「原价」字样，选中态灰色对比度偏低
   evidence: 本改动按常见划线价只出示数字；未改文案层级和对比度
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-014-c3-claim-gates.md`
+  summary: `test_fr_shell_admin_and_flow` 仍断言外壳 `.badge-version` 含 v14，页已是 v15
+  evidence: 预存于 b9cb708；C3 Never 不许改外壳页，也不许删旧断言，整文件验证会红这一条

@@ -1810,22 +1810,47 @@
       if (it.occ === '已完成' || it.occ === '占用中' || it.occupied) return '稿件已被占用';
       return '';
     }
+    function syncClaimQuota() {
+      YJD.applyFreeDay(STORE);
+      state.free = STORE.user.free;
+    }
+    function keywordClaimToast(it, name) {
+      if (!name || !YJD.isClaimableKeyword(STORE, it && it.project, name)) {
+        return '请先选择该项目已通过的关键关键词';
+      }
+      if (YJD.keywordBookConflict(STORE, it && it.project, name, it && it.bookId)) {
+        return '请选择与该稿件书籍一致的已通过关键词';
+      }
+      return '';
+    }
     function startClaim() {
       var it = item(state.current);
       if (!it) { toast('稿件已不存在'); return; }
-      if (state.banned) { toast('你已被停权，无法领取'); return; }
+      syncClaimQuota();
+      if (state.banned) {
+        closeKwSheet();
+        closeBuySheet();
+        toast('你已被停权，无法领取');
+        return;
+      }
       if (quota() <= 0) { toast('次数不足'); openBuySheet(); return; }
+      closeBuySheet();
       openKwSheet('claim');
     }
     function finishClaim(mid, kw) {
       state.claiming = false;
       var it = item(mid || state.current);
-      if (!(kw || state.kw)) { toast('请先选择该项目已通过的关键关键词'); return; }
       if (kw) state.kw = kw;
-      if (!YJD.isClaimableKeyword(STORE, it && it.project, state.kw)) {
-        toast('请先选择该项目已通过的关键关键词');
+      syncClaimQuota();
+      if (state.banned) {
+        closeKwSheet();
+        closeBuySheet();
+        toast('你已被停权，无法领取');
         return;
       }
+      if (quota() <= 0) { toast('次数不足'); openBuySheet(); return; }
+      var kwToast = keywordClaimToast(it, state.kw);
+      if (kwToast) { toast(kwToast); return; }
       var reason = claimBlockReason(it);
       if (reason === '次数不足') { toast(reason); openBuySheet(); return; }
       if (reason) { toast(reason); return; }
@@ -1878,12 +1903,26 @@
         return;
       }
       state.kw = state.kwPick;
-      closeKwSheet();
       if (state.kwMode === 'copy') {
+        closeKwSheet();
         if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(state.kw);
         toast('已复制提词：' + state.kw);
         return;
       }
+      syncClaimQuota();
+      if (state.banned) {
+        closeKwSheet();
+        closeBuySheet();
+        toast('你已被停权，无法领取');
+        return;
+      }
+      if (quota() <= 0) { toast('次数不足'); closeKwSheet(); openBuySheet(); return; }
+      var kwToast = keywordClaimToast(it, state.kw);
+      if (kwToast) { toast(kwToast); return; }
+      var reason = claimBlockReason(it);
+      if (reason === '次数不足') { toast(reason); closeKwSheet(); openBuySheet(); return; }
+      if (reason) { toast(reason); return; }
+      closeKwSheet();
       runClaimLoading();
     }
     function doFill() {

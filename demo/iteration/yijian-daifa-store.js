@@ -182,13 +182,28 @@
   }
 
   var CLAIMABLE_KW_STATUS = ['审核通过待发布', '审核通过已回填'];
-  function kw(name, status) {
-    return { name: name, status: status || '审核通过待发布' };
+  function kw(name, status, bookId) {
+    var row = { name: name, status: status || '审核通过待发布' };
+    if (bookId != null && bookId !== '') row.bookId = bookId;
+    return row;
   }
   function normalizeKeyword(item) {
     if (typeof item === 'string') return kw(item, '审核通过待发布');
-    if (item && item.name) return kw(item.name, item.status);
+    if (item && item.name) return kw(item.name, item.status, item.bookId);
     return null;
+  }
+  function findProjectKeyword(data, project, name) {
+    if (!name) return null;
+    var list = projectKeywords(data, project);
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].name === name) return list[i];
+    }
+    return null;
+  }
+  function keywordBookConflict(data, project, name, workBookId) {
+    var k = findProjectKeyword(data, project, name);
+    if (!k || k.bookId == null || k.bookId === '') return false;
+    return String(k.bookId) !== String(workBookId == null ? '' : workBookId);
   }
   function projectKeywords(data, project) {
     return ((data && data.keywords && data.keywords[project]) || []).map(normalizeKeyword).filter(Boolean);
@@ -1077,6 +1092,7 @@
     CLAIMABLE_KW_STATUS: CLAIMABLE_KW_STATUS,
     claimableKeywords: claimableKeywords,
     isClaimableKeyword: isClaimableKeyword,
+    keywordBookConflict: keywordBookConflict,
     latestClaimForWork: latestClaimForWork,
     dayType: dayType,
     todayFree: todayFree,
