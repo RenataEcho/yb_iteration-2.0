@@ -163,6 +163,41 @@
 
   var KIND_LABEL = { check: '校验', write: '写入', ui: '端侧', async: '任务', block: '阻断' };
 
+  /* Demo 展示用：C 端 Tab 只出当前刀，不改上面 SLICES.c.steps 全表 */
+  var VIEW = {
+    c: {
+      title: 'C 端开发提示词 · C1 广场宫格 + 详情铺陈',
+      role: '你只做 C1。打开 _bmad-output/specs/spec-fr014-yijian-daifa/stories/STORY-014-C1-plaza-detail.md 的 §4/§6。不要把 FR / 合同全文贴进会话。',
+      scope: '宫格先 plazaEligible 再筛；封面是图；图集出张数角标；项目直选 / 搜索 / 空态；详情换区与预览缺口。',
+      nonGoals: ['C3 门禁 / 兑换 / 扣次', '回填 / 24h 超时', '水印 / 下载抖音', 'H5 / PC / 后台', '一次做完整 C 端'],
+      deps: [
+        'YJD.KEY=fr014-yjd-v6；VER=6 不 bump；资格只认 YJD.plazaEligible',
+        'GET /api/yjd/feed | /projects | /works/:id | /works/:id/preview',
+        '本刀不写 claims；点领取走已有 startClaim'
+      ],
+      note: '「发起领取」= 未领/已领换区与底栏出示。门禁已是 C3，不重做。',
+      nodes: ['作品广场宫格 + 项目直选', '详情铺满素材 · 发起领取'],
+      side: ['资格假的稿不进宫格', '预览 / 试看 / 提词不 persistFe'],
+      accept: 'FR-014-08 / 09 / 10 缺口点通。旧 e2e 只追加不删。'
+    }
+  };
+
+  function viewOf(id, base) {
+    var v = VIEW[id];
+    if (!v || !base) return base;
+    var out = {};
+    Object.keys(base).forEach(function (k) { out[k] = base[k]; });
+    ['title', 'role', 'scope', 'nonGoals', 'deps', 'note', 'side', 'accept'].forEach(function (k) {
+      if (v[k] != null) out[k] = v[k];
+    });
+    if (v.nodes) {
+      out.steps = (base.steps || []).filter(function (st) {
+        return v.nodes.indexOf(st.node) >= 0;
+      });
+    }
+    return out;
+  }
+
   function filterSlice(base, section) {
     if (!base) return null;
     if (!section) return base;
@@ -186,7 +221,7 @@
   }
 
   function textOf(id) {
-    var s = resolve(id);
+    var s = viewOf(id, resolve(id));
     if (!s) return '';
     var lines = [];
     lines.push('# FR-014 · ' + s.title);
@@ -228,7 +263,7 @@
   }
 
   function render(id) {
-    var s = resolve(id);
+    var s = viewOf(id, resolve(id));
     if (!s) return '<p class="impl-empty">没有这份提示词。</p>';
     var steps = (s.steps || []).map(function (st, i) {
       return '<article class="impl-step">' +

@@ -12,6 +12,8 @@ Demo 可复制面：`fr-opc-yijian-daifa.html` 各端子 Tab「开发提示词�
 
 - 模板：`_bmad-output/specs/dev-prompt-template.md`
 - 样例：`_bmad-output/specs/spec-fr014-yijian-daifa/stories/STORY-014-C3-claim-gates.md`（C3 = 领取门禁 + 兑换）
+- C1：`_bmad-output/specs/spec-fr014-yijian-daifa/stories/STORY-014-C1-plaza-detail.md`（广场宫格 + 详情铺陈）
+- Demo C 端「开发提示词」只渲染当前刀（C1 两节点），不展示整端节点表。
 - 后续每刀按模板另开 `stories/STORY-….md`，不要把 Code Map / Tasks 写回本文件。
 
 ## 切片

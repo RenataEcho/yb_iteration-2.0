@@ -1598,3 +1598,18 @@ def test_claim_occupied_does_not_deduct(page, demo_server):
     expect(page.locator("#claimQuotaFoot")).to_have_text(quota_before)
     assert page.evaluate("() => STORE.claims.length") == claims_before
     assert page.evaluate("() => item('M-01').occ") == "占用中"
+
+
+def test_c_impl_copies_c1_story_pack(page, demo_server):
+    page.goto(f"{demo_server}/fr-opc-yijian-daifa.html?tab=fe&sub=fe-impl", wait_until="domcontentloaded")
+    host = page.locator("#fe-impl [data-impl-host='c']")
+    expect(host).to_contain_text("C1 广场宫格 + 详情铺陈")
+    expect(host).to_contain_text("作品广场宫格 + 项目直选")
+    expect(host).to_contain_text("详情铺满素材 · 发起领取")
+    expect(host).not_to_contain_text("剩余次数>0?")
+    expect(host).not_to_contain_text("添加水印 / 下载并发布到抖音")
+    expect(host.locator(".impl-copy")).to_have_text("复制提示词")
+    text = page.evaluate("() => YJD_IMPL.textOf('c')")
+    assert "你只做 C1" in text
+    assert "剩余次数>0?" not in text
+    assert "作品广场宫格 + 项目直选" in text
