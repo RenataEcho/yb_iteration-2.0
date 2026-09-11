@@ -396,6 +396,77 @@
       opacity: 0; transition: all 0.25s; z-index: 600; pointer-events: none;
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .explain-layout {
+      display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 16px; align-items: start;
+    }
+    @media (max-width: 900px) { .explain-layout { grid-template-columns: 1fr; } }
+    .explain-nav {
+      position: sticky; top: 12px; padding: 12px; display: flex; flex-direction: column; gap: 4px;
+    }
+    .explain-nav .nav-caption {
+      font-size: 11px; font-weight: 600; color: var(--text-muted); padding: 4px 10px 8px;
+    }
+    .explain-nav button {
+      text-align: left; border: none; background: transparent; cursor: pointer;
+      padding: 9px 12px; border-radius: 8px; font-size: 13px; color: var(--text-secondary); line-height: 1.35;
+    }
+    .explain-nav button small { display: block; font-size: 11px; color: var(--text-muted); margin-top: 2px; font-weight: 400; }
+    .explain-nav button.active { background: var(--primary-light); color: var(--primary); font-weight: 600; }
+    .explain-nav button.active small { color: #3b82f6; }
+    .explain-panel { display: none; padding: 20px 22px 28px; }
+    .explain-panel.active { display: block; }
+    .explain-hero {
+      padding: 16px 18px; border-radius: var(--radius-sm); margin-bottom: 18px;
+      background: linear-gradient(135deg, #eff6ff, #ecfeff); border: 1px solid #bfdbfe;
+    }
+    .explain-hero h2 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .explain-hero p { font-size: 13px; color: var(--text-secondary); line-height: 1.7; }
+    .explain-kicker { font-size: 11px; font-weight: 700; letter-spacing: .04em; color: var(--primary); margin-bottom: 6px; }
+    .explain-section { margin-bottom: 22px; }
+    .explain-section:last-child { margin-bottom: 0; }
+    .explain-section h3 { font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+    .explain-section p, .explain-section li { font-size: 13px; color: var(--text-secondary); line-height: 1.7; }
+    .explain-section code, .explain-hero code {
+      font-family: ui-monospace, monospace; font-size: 12px; background: #f1f5f9; padding: 1px 5px; border-radius: 4px;
+    }
+    .explain-section ul, .explain-section ol { padding-left: 18px; }
+    .explain-section li { margin-bottom: 6px; }
+    .explain-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    @media (max-width: 720px) { .explain-grid { grid-template-columns: 1fr; } }
+    .explain-card {
+      background: rgba(248,250,252,.9); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 14px 14px 12px;
+    }
+    .explain-card h4 { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+    .explain-card p, .explain-card li { font-size: 12px; color: var(--text-secondary); line-height: 1.65; }
+    .explain-card ul { padding-left: 16px; }
+    .explain-table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 0; }
+    .explain-table th, .explain-table td {
+      padding: 8px 10px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; line-height: 1.55;
+    }
+    .explain-table th { font-size: 11px; color: var(--text-muted); background: rgba(248,250,252,.9); white-space: nowrap; }
+    .explain-table td strong { color: var(--text-primary); }
+    .callout {
+      margin: 12px 0 0; padding: 10px 12px; border-radius: var(--radius-sm);
+      font-size: 12px; line-height: 1.65; color: var(--text-secondary);
+    }
+    .callout.warn { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
+    .callout.ok { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
+    .callout.info { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }
+    .callout.danger { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+    .faq-item { padding: 12px 0; border-bottom: 1px solid var(--border); }
+    .faq-item:last-child { border-bottom: none; }
+    .faq-q { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+    .faq-a { font-size: 13px; color: var(--text-secondary); line-height: 1.7; }
+    .step-list { counter-reset: step; list-style: none; padding-left: 0; }
+    .step-list li { position: relative; padding-left: 36px; margin-bottom: 12px; }
+    .step-list li::before {
+      counter-increment: step; content: counter(step);
+      position: absolute; left: 0; top: 1px;
+      width: 22px; height: 22px; border-radius: 50%;
+      background: var(--primary-light); color: var(--primary);
+      font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center;
+    }
   </style>
 </head>
 <body>
@@ -412,7 +483,7 @@
       <span class="sprint-pill">YBDD2.0 · 迭代 v1</span>
     </div>
     <div class="sidebar-scroll" data-iteration-sidebar></div>
-    <div class="sidebar-foot">FR-005 · 页内 Tab<br />管理后台 / 业务流程</div>
+    <div class="sidebar-foot">FR-005 · 页内 Tab<br />业务解释 / 管理后台 / 业务流程</div>
   </aside>
 
   <main class="main">
@@ -436,8 +507,260 @@
     </header>
 
     <div class="page-tab-bar" role="tablist">
+      <button type="button" data-page="view-explain" role="tab">业务解释</button>
       <button type="button" class="active" data-page="view-admin" role="tab">管理后台</button>
       <button type="button" data-page="view-flow" role="tab">业务流程</button>
+    </div>
+
+    <!-- 业务解释 · 运营手册 -->
+    <div id="view-explain" class="page-view">
+      <div class="explain-layout">
+        <nav class="glass-card explain-nav" aria-label="业务解释章节">
+          <div class="nav-caption">运营手册 · 按章阅读</div>
+          <button type="button" class="active" data-explain="exp-overview">1 一句话看懂<small>这是什么、谁在用</small></button>
+          <button type="button" data-explain="exp-strategy">2 策略怎么配<small>各项共存，不是互斥</small></button>
+          <button type="button" data-explain="exp-check">3 校验怎么走<small>整单 ①②③，字段 ④⑤</small></button>
+          <button type="button" data-explain="exp-admin">4 后台怎么查<small>四张表与对账路径</small></button>
+          <button type="button" data-explain="exp-faq">5 对账怎么回<small>常见问法与口径</small></button>
+        </nav>
+        <div class="glass-card">
+          <section id="exp-overview" class="explain-panel active">
+            <div class="explain-kicker">FR-005 · 订单优化</div>
+            <div class="explain-hero">
+              <h2>把合作方原始订单，按策略改结算字段，再导出给内部用</h2>
+              <p>运营导入原始 Excel，选一条策略，系统按策略改拉新量、拉旧量、会员量等结算字段，生成一条优化记录，并给出可下载的优化后 Excel。<strong>没有 C 端页面</strong>。用户看不到「被优化过」。原始单留下对账，优化单给内部结算 / 下发。</p>
+            </div>
+            <div class="explain-section">
+              <h3>30 秒故事</h3>
+              <ol class="step-list">
+                <li>先配策略：选优化项目、各结算字段比例、要不要走白名单、Top N、书籍 / 短剧 ID 专属比例。</li>
+                <li>白名单单独维护：用户白名单全局生效；关键词白名单可限定所属项目。</li>
+                <li>导入时选策略 + 项目，系统按 ①→⑤ 跑完这一批。</li>
+                <li>看优化记录：优化前 / 后订单量与累计金额；可下载、可逐单对比、可删除。</li>
+              </ol>
+            </div>
+            <div class="explain-section">
+              <h3>谁在用</h3>
+              <div class="explain-grid">
+                <div class="explain-card">
+                  <h4>结算 / 运营（后台）</h4>
+                  <p>配策略、维护白名单、导入批次、下载优化后 Excel、用对比抽屉核对某一单为什么没变或为什么变了。</p>
+                </div>
+                <div class="explain-card">
+                  <h4>系统（自动）</h4>
+                  <p>导入当下按所选策略跑完。不需要再点「确认优化」。同一批次里每笔订单独立走校验链。</p>
+                </div>
+                <div class="explain-card">
+                  <h4>C 端用户</h4>
+                  <p>不是本需求的使用者。<strong>没有任何前端入口</strong>，也不展示「优化」标签。</p>
+                </div>
+                <div class="explain-card">
+                  <h4>对账同事</h4>
+                  <p>以原始订单为底。优化记录上的「优化前」对原始，「优化后」对导出文件。两套数都要留。</p>
+                </div>
+              </div>
+              <div class="callout info">对外口径：这是内部改结算字段的批次工具，不是改用户钱包、也不是给用户看的订单页。</div>
+            </div>
+          </section>
+
+          <section id="exp-strategy" class="explain-panel">
+            <div class="explain-kicker">核心规则 · 必须讲清楚</div>
+            <div class="explain-hero">
+              <h2>一条策略里的配置同时生效，不是五选一</h2>
+              <p>编辑抽屉副标题写的是「各配置项共存生效，非互斥」。勾了用户白名单，不等于关掉字段比例；配了 Top N，也不等于 ID 专属比例失效。真正决定某一单命运的，是校验顺序，不是「只开了哪一项」。</p>
+            </div>
+            <div class="explain-section">
+              <h3>抽屉里六块分别管什么</h3>
+              <div class="table-wrap">
+                <table class="explain-table">
+                  <thead>
+                    <tr><th>配置</th><th>作用</th><th>关掉 / 空着会怎样</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>策略名称</strong></td>
+                      <td>给人认的名字，导入时按名称选</td>
+                      <td>必填</td>
+                    </tr>
+                    <tr>
+                      <td><strong>优化项目</strong></td>
+                      <td>多选。这条策略只对选中项目生效；未选时结算字段表是空态</td>
+                      <td>不选项目就配不了字段表</td>
+                    </tr>
+                    <tr>
+                      <td><strong>结算字段比例 · 豁免权值</strong></td>
+                      <td>9 个结算字段各有比例；豁免权值留空=该字段不走 ④</td>
+                      <td>未配豁免权值的字段直接进 ⑤</td>
+                    </tr>
+                    <tr>
+                      <td><strong>白名单隔离</strong></td>
+                      <td>勾「用户」才走用户白名单；勾「关键词」才走关键词白名单</td>
+                      <td>名单里有人但策略没勾，<strong>不会豁免</strong></td>
+                    </tr>
+                    <tr>
+                      <td><strong>前几名不优化</strong></td>
+                      <td>在没被 ①② 整单豁免的池子里，按收益降序取 Top N，整单原样</td>
+                      <td><code>0</code> = 关，不做 Top N</td>
+                    </tr>
+                    <tr>
+                      <td><strong>书籍 / 短剧 ID 比例</strong></td>
+                      <td>命中 ID 用专属比例（可以 &gt;100%）；未命中用该字段的结算比例</td>
+                      <td>没有规则时，全部走结算字段比例</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="callout warn">白名单表是全局维护的，策略只决定「这次跑要不要用」。名单启用 + 策略勾选，两边同时满足才整单原样。</div>
+            </div>
+          </section>
+
+          <section id="exp-check" class="explain-panel">
+            <div class="explain-kicker">对账口径 · 最容易说错</div>
+            <div class="explain-hero">
+              <h2>先整单判定，命中就停；过了才逐字段改</h2>
+              <p>①→②→③ 是整单级：命中立刻跳过后面所有整单校验，这一单原样写出。通过整单后才进 ④→⑤。④ 只豁免<strong>当前字段</strong>，别的字段继续算。计算用 <code>floor(原始值 × 比例%)</code>，每个字段自己截断，互不挪用。</p>
+            </div>
+            <div class="explain-section">
+              <div class="table-wrap">
+                <table class="explain-table">
+                  <thead>
+                    <tr><th>步</th><th>判定</th><th>命中结果</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>① 用户白名单</strong></td>
+                      <td>策略勾了「用户」，且用户 ID 在<strong>启用</strong>名单里</td>
+                      <td>整单原样，不再看 ②③④⑤</td>
+                    </tr>
+                    <tr>
+                      <td><strong>② 关键词白名单</strong></td>
+                      <td>策略勾了「关键词」，且订单关键词命中该项目（或「全部项目」）下的启用词</td>
+                      <td>整单原样，不再看 ③④⑤</td>
+                    </tr>
+                    <tr>
+                      <td><strong>③ 前几名 Top N</strong></td>
+                      <td>在<strong>没被 ①② 豁免</strong>的订单池里按收益降序取前 N</td>
+                      <td>整单原样。白名单单不占名次</td>
+                    </tr>
+                    <tr>
+                      <td><strong>④ 特定单量</strong></td>
+                      <td>该字段配了豁免权值，且原值刚好等于这个数</td>
+                      <td>仅该字段原样；其他字段继续 ④/⑤</td>
+                    </tr>
+                    <tr>
+                      <td><strong>⑤ 比例</strong></td>
+                      <td>书籍 ID / 短剧 ID 命中 → 专属比例；否则用该字段结算比例</td>
+                      <td><code>floor(原值 × 比例%)</code>，字段独立取整</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="callout ok">Top N 在批次开始时预排一次，不是每单现场重排。N=0 整步跳过。批次里每单跑完后，有下一单就回到 ①。</div>
+            </div>
+            <div class="explain-section">
+              <h3>一张单上可能同时出现两种结果</h3>
+              <ul>
+                <li>拉新量原值 = 豁免权值 5 → 拉新量保持 5（④）。</li>
+                <li>同一单会员量没命中豁免 → 按比例截断（⑤）。</li>
+                <li>对比抽屉的「说明」会把字段豁免和所用比例写在一起。</li>
+              </ul>
+              <div class="callout info">优化前 / 后「订单量」通常一样：优化改的是结算字段值，不是删单。累计金额按各结算字段加总，所以金额会变、笔数可以不变。</div>
+            </div>
+          </section>
+
+          <section id="exp-admin" class="explain-panel">
+            <div class="explain-kicker">管理后台 · 四张表</div>
+            <div class="explain-hero">
+              <h2>策略决定怎么算，名单决定谁免，记录留下这一批的结果</h2>
+              <p>页内四个后台 Tab 各管一块。改策略不会自动重跑历史批次；要按新策略再算，必须重新导入。</p>
+            </div>
+            <div class="explain-section">
+              <div class="table-wrap">
+                <table class="explain-table">
+                  <thead>
+                    <tr><th>Tab</th><th>看什么</th><th>能做什么</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>优化策略</strong></td>
+                      <td>名称、绑定项目、白名单隔离、Top N、ID 规则数、字段豁免数</td>
+                      <td>新增（先起名再进编辑抽屉）、查看详情、编辑</td>
+                    </tr>
+                    <tr>
+                      <td><strong>用户白名单</strong></td>
+                      <td>用户 ID、状态、添加时间。<strong>没有所属项目</strong></td>
+                      <td>新增 / 编辑 / 删除 / 批量导入。禁用=不参与 ①</td>
+                    </tr>
+                    <tr>
+                      <td><strong>关键词白名单</strong></td>
+                      <td>所属项目、关键词、状态、添加时间</td>
+                      <td>同上。项目可写「全部项目」；匹配按包含判断</td>
+                    </tr>
+                    <tr>
+                      <td><strong>优化记录</strong></td>
+                      <td>项目、所用策略、优化前 / 后订单量与累计金额、优化时间</td>
+                      <td>导入并优化、下载优化后 Excel、查看对比、删除（需确认）</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="callout warn">详情用抽屉、编辑用抽屉、删除用确认弹窗。对比抽屉逐单看原始 vs 优化，并带说明（白名单 / Top N / 豁免权值 / 所用比例）。</div>
+            </div>
+          </section>
+
+          <section id="exp-faq" class="explain-panel">
+            <div class="explain-kicker">内部对账话术</div>
+            <div class="explain-hero">
+              <h2>先问：这一单该不该整单原样，还是某个字段不该动</h2>
+              <p>本需求没有用户端页面。外面的人问「我的订单被改了」时，先说明用户看不见优化结果；内部对账按下表回。</p>
+            </div>
+            <div class="explain-section">
+              <div class="faq-item">
+                <div class="faq-q">Q1. 用户在白名单里，为什么这一单还是被改了？</div>
+                <div class="faq-a">查三件事：名单状态是不是「启用」；策略有没有勾「用户」白名单隔离；导入时选的是不是这条策略。名单在、策略没勾，不会豁免。</div>
+              </div>
+              <div class="faq-item">
+                <div class="faq-q">Q2. 关键词明明在名单里，为什么没免？</div>
+                <div class="faq-a">策略要勾「关键词」。词要启用，且所属项目对得上本次导入项目（或「全部项目」）。匹配是包含关系：订单词里出现名单词才算。</div>
+              </div>
+              <div class="faq-item">
+                <div class="faq-q">Q3. 收益最高的那单为什么没进 Top N？</div>
+                <div class="faq-a">Top N 只在没被 ①② 整单豁免的池子里排名。白名单单不占名次。再确认策略的 N 不是 0，以及比的是收益降序，不是结算字段合计。</div>
+              </div>
+              <div class="faq-item">
+                <div class="faq-q">Q4. 拉新量没变，会员量变了，是不是算错了？</div>
+                <div class="faq-a">不是。④ 是字段级：拉新量原值等于豁免权值就只保住这一列，其他字段照常走 ⑤。</div>
+              </div>
+              <div class="faq-item">
+                <div class="faq-q">Q5. 书籍 ID 配了 120%，为什么有的字段还是按 80%？</div>
+                <div class="faq-a">先看该字段有没有命中 ④。命中豁免权值就原样，不再用 120%。没命中 ④ 时，整单命中 ID 的字段才共用这条专属比例。</div>
+              </div>
+              <div class="faq-item">
+                <div class="faq-q">Q6. 优化前后订单量一样，金额却少了？</div>
+                <div class="faq-a">正常。优化不删单，改的是结算字段；订单量按笔数，累计金额按字段加总。对比抽屉看每一单的字段差额。</div>
+              </div>
+              <div class="faq-item">
+                <div class="faq-q">Q7. 改完策略，历史记录会重算吗？</div>
+                <div class="faq-a">不会。已生成的优化记录冻结当时结果。要按新策略出数，重新导入一批。</div>
+              </div>
+              <div class="faq-item">
+                <div class="faq-q">Q8. 原始 Excel 还能不能找到？</div>
+                <div class="faq-a">原始单要留着对账。本需求交付的是优化后 Excel；不要用优化文件覆盖原始文件。</div>
+              </div>
+            </div>
+            <div class="explain-section">
+              <h3>对外不要承诺的事</h3>
+              <ul>
+                <li>没有 C 端「我的订单被优化」页面或标签。</li>
+                <li>改策略不会自动重跑旧批次。</li>
+                <li>白名单本身不会生效，必须策略勾选对应隔离项。</li>
+                <li>④ 不会整单豁免；只有 ①②③ 才会整单原样。</li>
+              </ul>
+              <div class="callout warn">流程图在页内「业务流程」Tab。和同事对口径以本手册 + 右上角需求规则抽屉为准。</div>
+            </div>
+          </section>
+        </div>
+      </div>
     </div>
 
     <!-- 管理后台 -->
@@ -610,6 +933,7 @@
               <line x1="480" y1="572" x2="480" y2="588"/>
               <line x1="480" y1="632" x2="480" y2="652"/>
               <line x1="480" y1="692" x2="480" y2="706"/>
+              <line x1="480" y1="742" x2="480" y2="748"/>
             </g>
 
             <!-- 逐单循环回指（左侧通道，不与旁路重叠） -->
@@ -1937,13 +2261,45 @@
       document.getElementById('toggleRuleDrawer').classList.toggle('active', open);
     }
 
+    function currentPageKey() {
+      var btn = document.querySelector('.page-tab-bar button.active');
+      var page = btn ? btn.dataset.page : 'view-admin';
+      if (page === 'view-explain') return 'explain';
+      if (page === 'view-flow') return 'flow';
+      return 'admin';
+    }
+
+    function currentExplainSec() {
+      var btn = document.querySelector('.explain-nav button.active');
+      var id = btn && btn.dataset.explain ? btn.dataset.explain : 'exp-overview';
+      return id.replace('exp-', '');
+    }
+
+    function syncPageUrl() {
+      var params = new URLSearchParams(location.search);
+      var key = currentPageKey();
+      params.set('tab', key);
+      if (key === 'explain') params.set('sec', currentExplainSec());
+      else params.delete('sec');
+      if (key !== 'admin') params.delete('sub');
+      history.replaceState(null, '', '?' + params.toString());
+    }
+
+    function switchExplainTab(explainId, btn) {
+      document.querySelectorAll('.explain-nav button').forEach(function (b) { b.classList.remove('active'); });
+      document.querySelectorAll('.explain-panel').forEach(function (p) { p.classList.remove('active'); });
+      btn.classList.add('active');
+      var panel = document.getElementById(explainId);
+      if (panel) panel.classList.add('active');
+      syncPageUrl();
+    }
+
     function switchPageTab(pageId, btn) {
       document.querySelectorAll('.page-tab-bar button').forEach(function (b) { b.classList.remove('active'); });
       document.querySelectorAll('.page-view').forEach(function (v) { v.classList.remove('active'); });
       btn.classList.add('active');
       document.getElementById(pageId).classList.add('active');
-      var tabMap = { 'view-admin': 'admin', 'view-flow': 'flow' };
-      history.replaceState(null, '', '?tab=' + (tabMap[pageId] || 'admin'));
+      syncPageUrl();
     }
 
     function switchAdminPanel(panelId, btn) {
@@ -2003,6 +2359,10 @@
         btn.addEventListener('click', function () { switchPageTab(btn.dataset.page, btn); });
       });
 
+      document.querySelectorAll('.explain-nav button').forEach(function (btn) {
+        btn.addEventListener('click', function () { switchExplainTab(btn.dataset.explain, btn); });
+      });
+
       document.querySelectorAll('#adminSubTabs [data-panel]').forEach(function (btn) {
         btn.addEventListener('click', function () { switchAdminPanel(btn.dataset.panel, btn); });
       });
@@ -2011,10 +2371,18 @@
       renderAll();
 
       var params = new URLSearchParams(location.search);
-      var tabPageMap = { admin: 'view-admin', flow: 'view-flow' };
+      var tabPageMap = { explain: 'view-explain', admin: 'view-admin', flow: 'view-flow' };
       var tab = params.get('tab') || 'admin';
       var pageBtn = document.querySelector('[data-page="' + (tabPageMap[tab] || 'view-admin') + '"]');
       if (pageBtn) switchPageTab(tabPageMap[tab] || 'view-admin', pageBtn);
+      if (tab === 'explain') {
+        var explainParam = params.get('sec');
+        if (explainParam) {
+          var explainId = explainParam.indexOf('exp-') === 0 ? explainParam : 'exp-' + explainParam;
+          var explainSecBtn = document.querySelector('.explain-nav button[data-explain="' + explainId + '"]');
+          if (explainSecBtn) switchExplainTab(explainId, explainSecBtn);
+        }
+      }
 
       var subPanelMap = {
         strategies: 'panel-strategies',
