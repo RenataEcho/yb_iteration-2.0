@@ -32,10 +32,12 @@
       background: var(--bg);
       color: var(--text);
       letter-spacing: 0;
+      overflow: hidden;
     }
 
     .app {
-      min-height: 100vh;
+      height: 100vh;
+      min-height: 0;
       display: grid;
       grid-template-columns: 248px minmax(0, 1fr);
     }
@@ -47,6 +49,10 @@
       display: flex;
       flex-direction: column;
       gap: 22px;
+      min-height: 0;
+      height: 100vh;
+      overflow-y: auto;
+      overscroll-behavior: contain;
     }
 
     .brand {
@@ -153,6 +159,18 @@
       padding-left: 10px;
     }
 
+    .nav-child button.nav-category {
+      height: 40px;
+      color: #fff;
+      font-weight: 750;
+      background: rgba(255, 255, 255, .05);
+    }
+
+    .nav-child button.nav-category svg {
+      width: 17px;
+      height: 17px;
+    }
+
     .nav button:hover,
     .nav button.active {
       background: rgba(255, 255, 255, .09);
@@ -177,11 +195,18 @@
 
     .main {
       min-width: 0;
+      min-height: 0;
+      height: 100vh;
       padding: 22px 28px 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      overflow: hidden;
     }
 
     .topbar {
-      height: 58px;
+      flex: 0 0 auto;
+      min-height: 58px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -227,6 +252,75 @@
       margin: 0;
       color: var(--muted);
       font-size: 13px;
+    }
+
+    .module-tabs {
+      display: none;
+      flex: 0 0 auto;
+      min-width: 0;
+      align-items: center;
+      gap: 6px;
+      min-height: 48px;
+      padding: 0 2px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .module-tabs.active {
+      display: flex;
+    }
+
+    .module-tabs-label {
+      flex: 0 0 auto;
+      margin-right: 10px;
+      color: #34435c;
+      font-size: 13px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .module-tabs-list {
+      display: flex;
+      min-width: 0;
+      gap: 4px;
+      overflow-x: auto;
+      scrollbar-width: thin;
+    }
+
+    .module-tabs button {
+      position: relative;
+      flex: 0 0 auto;
+      min-height: 46px;
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      padding: 0 14px;
+      cursor: pointer;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .module-tabs button::after {
+      content: "";
+      position: absolute;
+      right: 12px;
+      bottom: -1px;
+      left: 12px;
+      height: 2px;
+      background: transparent;
+      transition: background .18s ease;
+    }
+
+    .module-tabs button:hover,
+    .module-tabs button.active {
+      color: var(--primary);
+    }
+
+    .module-tabs button.active {
+      font-weight: 800;
+    }
+
+    .module-tabs button.active::after {
+      background: var(--primary);
     }
 
     .toolbar {
@@ -414,6 +508,40 @@
       color: var(--muted);
       font-weight: 650;
       background: #fbfcfe;
+    }
+
+    .table-sort {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .table-sort:hover,
+    .table-sort:focus-visible {
+      color: var(--text);
+    }
+
+    .sort-indicator {
+      display: inline-flex;
+      width: 14px;
+      justify-content: center;
+      color: #a4adbb;
+      font-size: 12px;
+      line-height: 1;
+    }
+
+    th[aria-sort="ascending"] .sort-indicator,
+    th[aria-sort="descending"] .sort-indicator {
+      color: var(--primary);
+      font-weight: 800;
     }
 
     td {
@@ -705,6 +833,10 @@
 
     .section.active {
       display: block;
+      min-height: 0;
+      flex: 1 1 auto;
+      overflow-y: auto;
+      overscroll-behavior: contain;
     }
 
     .hide-row {
@@ -1499,6 +1631,707 @@
       color: var(--muted);
       font-size: 12px;
       line-height: 1.55;
+    }
+
+    .business-page {
+      display: grid;
+      gap: 16px;
+    }
+
+    .business-hero {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: linear-gradient(135deg, #fff8f1 0%, #fff 48%, #eef8ff 100%);
+      padding: 20px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .business-hero h2 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    .business-hero p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+      max-width: 760px;
+    }
+
+    .business-audience {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .business-audience span,
+    .business-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      background: #fff;
+      border: 1px solid #ffd8ce;
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 750;
+    }
+
+    .business-hero-mark {
+      width: 92px;
+      height: 92px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      background: #fff;
+      border: 1px solid #ffd8ce;
+      color: var(--primary);
+      box-shadow: 0 12px 24px rgba(255, 75, 25, .12);
+    }
+
+    .business-hero-mark svg {
+      width: 42px;
+      height: 42px;
+    }
+
+    .business-kpis {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .business-kpi {
+      min-height: 96px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      background: var(--surface);
+      box-shadow: 0 10px 28px rgba(18, 28, 45, .04);
+    }
+
+    .business-kpi span {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .business-kpi strong {
+      display: block;
+      margin-top: 11px;
+      font-size: 24px;
+    }
+
+    .business-kpi em {
+      display: block;
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 11px;
+      font-style: normal;
+    }
+
+    .business-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 4px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #eef2f7;
+      width: fit-content;
+    }
+
+    .business-tabs button {
+      height: 34px;
+      border: 0;
+      border-radius: 6px;
+      padding: 0 14px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 750;
+    }
+
+    .business-tabs button.active {
+      background: #fff;
+      color: var(--primary);
+      box-shadow: 0 3px 10px rgba(18, 28, 45, .08);
+    }
+
+    .business-tab-panel {
+      display: none;
+    }
+
+    .business-tab-panel.active {
+      display: grid;
+      gap: 16px;
+    }
+
+    .business-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .business-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      box-shadow: 0 10px 28px rgba(18, 28, 45, .04);
+      overflow: hidden;
+    }
+
+    .business-card.full {
+      grid-column: 1 / -1;
+    }
+
+    .business-card-head {
+      min-height: 56px;
+      padding: 13px 16px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .business-card-head h3 {
+      margin: 0;
+      font-size: 15px;
+    }
+
+    .business-card-head p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .business-card-body {
+      padding: 16px;
+    }
+
+    .business-flow {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .business-flow-step {
+      position: relative;
+      min-height: 146px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfe;
+      padding: 13px;
+    }
+
+    .business-flow-step:not(:last-child)::after {
+      content: "→";
+      position: absolute;
+      right: -16px;
+      top: 50%;
+      color: #a8b3c3;
+      font-size: 18px;
+      font-weight: 800;
+      transform: translateY(-50%);
+      z-index: 1;
+    }
+
+    .business-flow-step > span {
+      display: inline-grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      background: var(--primary-soft);
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .business-flow-step strong {
+      display: block;
+      margin-top: 10px;
+      font-size: 13px;
+    }
+
+    .business-flow-step p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .business-entry-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .business-entry {
+      min-height: 120px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 13px;
+      background: #fff;
+    }
+
+    .business-entry > i {
+      display: inline-grid;
+      place-items: center;
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: #eef8ff;
+      color: var(--blue);
+    }
+
+    .business-entry strong {
+      display: block;
+      margin-top: 9px;
+      font-size: 13px;
+    }
+
+    .business-entry p {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .business-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .business-list-item {
+      display: grid;
+      grid-template-columns: 34px minmax(0, 1fr);
+      gap: 10px;
+      align-items: start;
+      padding: 11px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .business-list-item:last-child {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .business-list-item:first-child {
+      padding-top: 0;
+    }
+
+    .business-list-item > span {
+      display: grid;
+      place-items: center;
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: #fff3ec;
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .business-list-item strong {
+      display: block;
+      font-size: 13px;
+    }
+
+    .business-list-item p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .business-table-wrap {
+      overflow-x: auto;
+    }
+
+    .business-table {
+      width: 100%;
+      min-width: 760px;
+      border-collapse: collapse;
+    }
+
+    .business-table th,
+    .business-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .business-table th {
+      color: var(--muted);
+      background: #fbfcfe;
+      font-weight: 750;
+    }
+
+    .business-table tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .business-table td strong {
+      font-size: 12px;
+    }
+
+    .business-table td span {
+      color: var(--muted);
+    }
+
+    .business-issue-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .business-issue {
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--amber);
+      border-radius: 8px;
+      padding: 14px;
+      background: #fffdf7;
+    }
+
+    .business-issue strong {
+      display: block;
+      font-size: 13px;
+    }
+
+    .business-issue p {
+      margin: 7px 0 0;
+      color: #58667a;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .business-issue .path {
+      margin-top: 9px;
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 750;
+    }
+
+    .business-status-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .business-status-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 13px;
+      background: #fbfcfe;
+    }
+
+    .business-status-card strong {
+      display: block;
+      font-size: 13px;
+    }
+
+    .business-status-card p {
+      margin: 7px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .handbook {
+      display: grid;
+      grid-template-columns: 250px minmax(0, 1fr);
+      gap: 28px;
+      align-items: start;
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+    }
+
+    #businessExplain.section.active {
+      display: flex;
+      overflow: hidden;
+    }
+
+    #businessExplain > .business-page {
+      display: none;
+    }
+
+    #businessExplain > .business-page > .business-hero,
+    #businessExplain > .business-page > .business-kpis,
+    #businessExplain > .business-page > .business-tabs,
+    #businessExplain > .business-page > .business-tab-panel {
+      display: none;
+    }
+
+    .handbook-nav {
+      height: 100%;
+      min-height: 0;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      border: 1px solid #e5eaf3;
+      border-radius: 22px;
+      background: rgba(255, 255, 255, .82);
+      padding: 22px 14px;
+      box-shadow: 0 18px 40px rgba(87, 103, 133, .08);
+    }
+
+    .handbook-nav-title {
+      padding: 4px 14px 18px;
+      color: #95a2b6;
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .handbook-nav-list {
+      display: grid;
+      gap: 5px;
+    }
+
+    .handbook-nav button {
+      min-height: 62px;
+      border: 0;
+      border-radius: 14px;
+      background: transparent;
+      color: #4b5a73;
+      padding: 10px 14px;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .handbook-nav button strong,
+    .handbook-nav button span {
+      display: block;
+    }
+
+    .handbook-nav button strong {
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .handbook-nav button span {
+      margin-top: 5px;
+      color: #9aa7ba;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .handbook-nav button:hover,
+    .handbook-nav button.active {
+      background: #eef5ff;
+      color: #286fe8;
+    }
+
+    .handbook-nav button.active span {
+      color: #6e9cf0;
+    }
+
+    .handbook-content {
+      min-width: 0;
+      min-height: 0;
+      height: 100%;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scroll-behavior: smooth;
+      padding: 12px 20px 60px;
+    }
+
+    .handbook-code {
+      margin: 0 0 24px;
+      color: #286fe8;
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .handbook-callout {
+      border: 1px solid #b8d2ff;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #f1f7ff, #eefaff);
+      padding: 28px 32px;
+    }
+
+    .handbook-callout h2 {
+      margin: 0;
+      color: #1d2a3d;
+      font-size: 26px;
+      line-height: 1.45;
+    }
+
+    .handbook-callout p {
+      margin: 12px 0 0;
+      color: #53627a;
+      font-size: 16px;
+      line-height: 1.75;
+    }
+
+    .handbook-section {
+      margin-top: 30px;
+      scroll-margin-top: 18px;
+    }
+
+    .handbook-section h2 {
+      margin: 0 0 18px;
+      color: #1d2a3d;
+      font-size: 22px;
+    }
+
+    .handbook-steps {
+      display: grid;
+      gap: 15px;
+    }
+
+    .handbook-step {
+      display: grid;
+      grid-template-columns: 42px minmax(0, 1fr);
+      gap: 14px;
+      align-items: start;
+    }
+
+    .handbook-step > span {
+      display: grid;
+      place-items: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #eef5ff;
+      color: #286fe8;
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .handbook-step p {
+      margin: 5px 0 0;
+      color: #506078;
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    .handbook-card-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .handbook-card {
+      border: 1px solid #e3e9f2;
+      border-radius: 14px;
+      background: #fff;
+      padding: 18px;
+    }
+
+    .handbook-card h3 {
+      margin: 0;
+      color: #253249;
+      font-size: 16px;
+    }
+
+    .handbook-card p,
+    .handbook-card li {
+      color: #647189;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .handbook-card p {
+      margin: 8px 0 0;
+    }
+
+    .handbook-card ul {
+      margin: 10px 0 0;
+      padding-left: 18px;
+    }
+
+    .handbook-card li + li {
+      margin-top: 5px;
+    }
+
+    .handbook-card.full {
+      grid-column: 1 / -1;
+    }
+
+    .handbook-route {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .handbook-route span {
+      min-height: 32px;
+      display: inline-flex;
+      align-items: center;
+      border-radius: 8px;
+      background: #f3f6fb;
+      color: #4e5d75;
+      padding: 0 10px;
+      font-size: 12px;
+      font-weight: 750;
+    }
+
+    .handbook-route b {
+      color: #9aa7ba;
+      font-size: 15px;
+    }
+
+    .handbook-table-wrap {
+      overflow-x: auto;
+      border: 1px solid #e3e9f2;
+      border-radius: 12px;
+    }
+
+    .handbook-table {
+      width: 100%;
+      min-width: 720px;
+      border-collapse: collapse;
+    }
+
+    .handbook-table th,
+    .handbook-table td {
+      padding: 13px 14px;
+      border-bottom: 1px solid #e9edf4;
+      color: #53627a;
+      font-size: 13px;
+      line-height: 1.6;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .handbook-table th {
+      background: #f8faff;
+      color: #7e8ca2;
+      font-weight: 800;
+    }
+
+    .handbook-table tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .handbook-table td strong {
+      color: #253249;
+    }
+
+    .handbook-highlight {
+      margin-top: 14px;
+      border-left: 3px solid #286fe8;
+      border-radius: 0 10px 10px 0;
+      background: #f5f8ff;
+      padding: 12px 14px;
+      color: #506078;
+      font-size: 13px;
+      line-height: 1.65;
     }
 
     .identity-overview {
@@ -2316,16 +3149,152 @@
       font-size: 12px;
     }
 
-    .usage-fields.hidden {
-      display: none;
-    }
-
     .usage-note {
       min-height: auto;
       margin: 0;
       color: var(--muted);
       font-size: 12px;
       line-height: 1.5;
+    }
+
+    .radio-rule-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      min-height: 40px;
+    }
+
+    .radio-rule-card {
+      min-height: 40px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: #445064;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .radio-rule-card:has(input:checked) {
+      border-color: var(--primary);
+      background: #eef2ff;
+      color: var(--primary);
+    }
+
+    .radio-rule-card input[type="radio"] {
+      width: 14px;
+      height: 14px;
+      min-height: 14px;
+      margin: 0;
+      accent-color: var(--primary);
+    }
+
+    .radio-rule-card input[type="number"] {
+      width: 88px;
+      height: 28px;
+      min-height: 28px;
+      padding: 0 8px;
+      text-align: center;
+    }
+
+    .radio-rule-card input[type="number"]:disabled {
+      color: #9aa4b2;
+      background: #f6f8fb;
+    }
+
+    .usage-config-form {
+      display: grid;
+      gap: 16px;
+    }
+
+    .usage-config-hint {
+      margin: -4px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .pricing-mode-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .pricing-mode-card {
+      min-height: 40px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: #445064;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .pricing-mode-card:has(input:checked) {
+      border-color: var(--primary);
+      background: #eef2ff;
+      color: var(--primary);
+    }
+
+    .pricing-mode-card input[type="radio"] {
+      width: 14px;
+      height: 14px;
+      min-height: 14px;
+      margin: 0;
+      accent-color: var(--primary);
+    }
+
+    .tier-config {
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfe;
+    }
+
+    .tier-config-head,
+    .tier-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .tier-config-head {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .tier-row .field {
+      min-width: 0;
+    }
+
+    .tier-row .btn {
+      min-width: 60px;
+      align-self: end;
+      height: 40px;
+    }
+
+    .tier-add {
+      justify-self: start;
+    }
+
+    .usage-config-fields.hidden,
+    .tier-config.hidden {
+      display: none;
     }
 
     .tool-stat-grid {
@@ -3034,10 +4003,14 @@
     @media (max-width: 820px) {
       .app {
         grid-template-columns: 1fr;
+        height: auto;
       }
 
       .sidebar {
         position: static;
+        height: auto;
+        min-height: 0;
+        overflow: visible;
       }
 
       .nav {
@@ -3052,13 +4025,36 @@
       }
 
       .main {
+        height: auto;
+        min-height: 0;
         padding: 18px;
+        overflow: visible;
       }
 
       .topbar {
         height: auto;
         align-items: flex-start;
         flex-direction: column;
+      }
+
+      .module-tabs {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 0;
+        min-height: 0;
+        padding-top: 4px;
+      }
+
+      .module-tabs-label {
+        margin: 0 0 2px;
+      }
+
+      .module-tabs-list {
+        width: 100%;
+      }
+
+      .module-tabs button {
+        min-height: 42px;
       }
 
       .toolbar,
@@ -3087,6 +4083,13 @@
       .req-grid,
       .req-hero,
       .flow-steps,
+      .business-kpis,
+      .business-grid,
+      .business-flow,
+      .business-entry-grid,
+      .business-issue-grid,
+      .business-status-grid,
+      .business-hero,
       .mentor-preview-grid,
       .mentor-state-grid,
       .filter-bar,
@@ -3128,6 +4131,37 @@
         width: 100%;
       }
 
+      .handbook {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        height: auto;
+      }
+
+      .handbook-nav {
+        position: static;
+        height: auto;
+        overflow: visible;
+      }
+
+      .handbook-content {
+        height: auto;
+        overflow: visible;
+        padding: 0;
+      }
+
+      .section.active {
+        flex: none;
+        overflow: visible;
+      }
+
+      .business-flow-step:not(:last-child)::after {
+        display: none;
+      }
+
+      .business-hero-mark {
+        display: none;
+      }
+
       .rules-head {
         padding: 18px 18px 14px;
       }
@@ -3157,13 +4191,8 @@
         <div class="nav-group">
           <button class="nav-parent" type="button" aria-expanded="true"><i data-lucide="coins"></i>积分管理<i class="chevron" data-lucide="chevron-down"></i></button>
           <div class="nav-child">
-            <button class="active" data-section="dashboard"><i data-lucide="layout-dashboard"></i>数据看板</button>
-            <button data-section="goods"><i data-lucide="package-plus"></i>积分商品</button>
-            <button data-section="codes"><i data-lucide="ticket"></i>兑换码</button>
-            <button data-section="tasks"><i data-lucide="badge-check"></i>任务奖励</button>
-            <button data-section="users"><i data-lucide="users"></i>用户账户</button>
-            <button data-section="flows"><i data-lucide="list-filter"></i>流水订单</button>
-            <button data-section="wallet"><i data-lucide="wallet-cards"></i>钱包配置</button>
+            <button class="nav-category" data-nav-group="points-config" data-section="businessExplain"><i data-lucide="settings-2"></i>积分配置</button>
+            <button class="active nav-category" data-nav-group="points-data" data-section="dashboard"><i data-lucide="chart-no-axes-combined"></i>积分数据</button>
             <button data-section="frontendReq"><i data-lucide="braces"></i>前后端交互需求</button>
           </div>
         </div>
@@ -3219,6 +4248,26 @@
         </div>
       </header>
 
+      <div class="module-tabs" id="pointsConfigTabs" aria-label="积分配置菜单">
+        <span class="module-tabs-label">积分配置</span>
+        <div class="module-tabs-list" role="tablist">
+          <button type="button" role="tab" aria-selected="false" data-section="businessExplain">业务解释</button>
+          <button type="button" role="tab" aria-selected="false" data-section="goods">积分商品</button>
+          <button type="button" role="tab" aria-selected="false" data-section="tasks">任务奖励</button>
+          <button type="button" role="tab" aria-selected="false" data-section="codes">兑换码</button>
+          <button type="button" role="tab" aria-selected="false" data-section="wallet">钱包配置</button>
+        </div>
+      </div>
+
+      <div class="module-tabs" id="pointsDataTabs" aria-label="积分数据菜单">
+        <span class="module-tabs-label">积分数据</span>
+        <div class="module-tabs-list" role="tablist">
+          <button class="active" type="button" role="tab" aria-selected="true" data-section="dashboard">数据看板</button>
+          <button type="button" role="tab" aria-selected="false" data-section="flows">流水订单</button>
+          <button type="button" role="tab" aria-selected="false" data-section="users">用户账户</button>
+        </div>
+      </div>
+
       <section class="section active" id="dashboard">
         <div class="grid metrics">
           <div class="metric"><span><i data-lucide="sparkles"></i>今日发放积分</span><strong>128,800</strong><em>较昨日 +12.4%</em></div>
@@ -3251,6 +4300,354 @@
                 <div class="bar"><i style="height:86%"></i><span>周五</span></div>
                 <div class="bar"><i style="height:70%"></i><span>周六</span></div>
                 <div class="bar"><i style="height:92%"></i><span>周日</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="handbook">
+          <aside class="handbook-nav" aria-label="积分业务手册章节">
+            <div class="handbook-nav-title">运营手册・按章阅读</div>
+            <div class="handbook-nav-list">
+              <button class="active" type="button" data-handbook-target="chapter-overview"><strong>1 一句话看懂</strong><span>积分业务怎么串起来</span></button>
+              <button type="button" data-handbook-target="chapter-source"><strong>2 积分从哪里来</strong><span>四类来源和一类消耗</span></button>
+              <button type="button" data-handbook-target="chapter-config"><strong>3 运营怎么配置</strong><span>菜单入口与字段规则</span></button>
+              <button type="button" data-handbook-target="chapter-query"><strong>4 客服怎么查询</strong><span>按路径定位用户问题</span></button>
+              <button type="button" data-handbook-target="chapter-wallet"><strong>5 钱包怎么处理</strong><span>支付、组合支付和明细</span></button>
+              <button type="button" data-handbook-target="chapter-status"><strong>6 状态怎么判断</strong><span>字段、状态和统计口径</span></button>
+              <button type="button" data-handbook-target="chapter-faq"><strong>7 客诉怎么回应</strong><span>常见问题与处理边界</span></button>
+            </div>
+          </aside>
+
+          <article class="handbook-content">
+            <p class="handbook-code">积分管理 · 业务解释 V1.0</p>
+            <div class="handbook-callout">
+              <h2>先看懂积分怎么来，再按入口配置；用户反馈先查账户，再查流水和业务对象</h2>
+              <p>本页给运营和客服使用：运营负责配置和观察，客服负责查询和解释。配置只是规则入口，最终余额、扣款、发放、失败原因和处理状态均以后端已落库结果为准。</p>
+            </div>
+
+            <section class="handbook-section" id="chapter-overview">
+              <h2>30 秒故事</h2>
+              <div class="handbook-steps">
+                <div class="handbook-step"><span>1</span><p>用户通过积分商品购买、兑换码兑换、任务奖励或人工调账获得积分，积分成功变动后才会进入账户余额。</p></div>
+                <div class="handbook-step"><span>2</span><p>用户使用工具、权益或商品时可能消耗积分，支出是否成功要以流水状态为准，失败不影响余额。</p></div>
+                <div class="handbook-step"><span>3</span><p>后端会校验配置状态、用户资格、有效期、兑换次数、幂等键和支付结果，后台不直接改写最终交易结果。</p></div>
+                <div class="handbook-step"><span>4</span><p>每一次成功变动都会形成积分流水；订单、扣款流水、积分流水和钱包收益明细通过同一业务关联编号串起来。</p></div>
+                <div class="handbook-step"><span>5</span><p>运营通过数据看板观察累计发放、累计消耗、收入和核销；客服通过用户账户、流水订单和业务对象处理问题。</p></div>
+                <div class="handbook-step"><span>6</span><p>端内购买积分成功时，对应扣款钱包必须写入收益明细，客服需要同时核对扣款结果和明细写入情况。</p></div>
+              </div>
+            </section>
+
+            <section class="handbook-section" id="chapter-source">
+              <h2>积分从哪里来、到哪里去</h2>
+              <div class="handbook-card-grid">
+                <div class="handbook-card"><h3>积分商品购买</h3><p>用户选择上架的积分商品并支付，成功后积分入账，流水动账类型为“购买”。商品名称、积分数、售价、标签和购买人数来自积分商品配置。</p></div>
+                <div class="handbook-card"><h3>兑换码兑换</h3><p>兑换码主要用于惊人官网购买积分后的补充发放，也适用于活动奖励。用户在积分中心输入兑换码后，后端校验批次状态、有效期、剩余数量和单用户兑换次数，成功后积分入账，流水动账类型为“兑换”。</p></div>
+                <div class="handbook-card"><h3>任务奖励</h3><p>用户满足任务条件后领取奖励。有效拉新按“人”统计，项目出单按“元”统计，成功后积分入账，流水动账类型为“奖励”。</p></div>
+                <div class="handbook-card"><h3>人工调账</h3><p>客服或运营根据授权发起增加、扣减、冻结或解冻，必须填写原因，并保留操作审计记录。</p></div>
+                <div class="handbook-card full"><h3>积分消耗</h3><p>用户使用需要积分的工具、权益或商品时产生支出，流水类型为“支出”，动账类型为“消耗”。积分是否实际扣减、工具结果是否成功，要分别查看流水状态和业务结果。</p><div class="handbook-highlight">记忆方式：入账看“奖励、购买、兑换”，支出看“消耗”；失败记录不计入成功发放和成功消耗。</div></div>
+                <div class="handbook-card">
+                  <h3>运营实例：官网购买积分</h3>
+                  <p>当用户在惊人官网购买积分，但用户钱包余额不足以完成端内购买时，可通过兑换码完成补充发放。运营创建对应积分面额的兑换码批次，将兑换码发给已完成购买的用户；用户回到积分中心输入兑换码，核销成功后获得对应积分。</p>
+                  <ul>
+                    <li>批次面额应与用户购买的积分数一致。</li>
+                    <li>发码前确认用户身份、购买凭证和兑换码未被使用。</li>
+                    <li>用户兑换后核对积分余额、兑换流水和批次核销记录。</li>
+                  </ul>
+                </div>
+                <div class="handbook-card">
+                  <h3>运营实例：活动达标奖励</h3>
+                  <p>例如某活动规则为“用户达标后奖励 500 积分”，运营创建一个 500 积分的兑换码批次，按预计达标人数生成足量兑换码，再将兑换码定向发放给达标用户。用户输入兑换码后即可领取活动积分。</p>
+                  <ul>
+                    <li>批次名称建议写明活动名称和奖励面额，便于追踪。</li>
+                    <li>设置有效期和单用户兑换限制，避免重复领取。</li>
+                    <li>活动结束后关注已发放、已核销、剩余数量和失败原因。</li>
+                  </ul>
+                </div>
+                <div class="handbook-card full"><h3>运营判断：什么时候使用兑换码</h3><p>兑换码适合“先确认用户应获得积分，再通过批次发放”的场景，不替代端内钱包支付。官网购买积分补发时，重点核对购买凭证与用户身份；活动奖励时，重点核对达标名单与发码数量。两类场景都必须通过兑换码批次追踪发放、核销和剩余情况。</p><div class="handbook-highlight">标准路径：确认用户/活动名单 → 创建积分面额批次 → 生成兑换码 → 定向发放 → 用户兑换 → 核对余额、流水和核销记录。</div></div>
+              </div>
+            </section>
+
+            <section class="handbook-section" id="chapter-config">
+              <h2>运营怎么配置</h2>
+              <div class="handbook-steps">
+                <div class="handbook-step"><span>1</span><div><p>先明确目标：是上新积分商品、发放兑换码、配置任务奖励，还是调整支付钱包入口。</p><div class="handbook-route"><span>明确业务目标</span><b>→</b><span>进入对应菜单</span><b>→</b><span>填写规则</span><b>→</b><span>验证用户端</span></div></div></div>
+                <div class="handbook-step"><span>2</span><p>保存前检查状态、有效期、排序、积分数量、金额、次数和任务单位；保存后用测试账号确认展示和按钮行为。</p></div>
+                <div class="handbook-step"><span>3</span><p>验证通过后，去数据看板观察发放、消耗、收入和兑换码核销，不通过手工改流水来“修正”看板。</p></div>
+              </div>
+              <div class="handbook-table-wrap" style="margin-top:22px">
+                <table class="handbook-table">
+                  <thead><tr><th>业务场景</th><th>进入菜单</th><th>必须配置</th><th>配置后检查</th></tr></thead>
+                  <tbody>
+                    <tr><td><strong>上新积分商品</strong></td><td>积分管理 → 积分商品</td><td>积分数量、售价、标签、排序、状态</td><td>只有上架商品展示；标签为空不占位。</td></tr>
+                    <tr><td><strong>官网购买补发积分</strong></td><td>积分管理 → 兑换码</td><td>按用户购买积分配置面额、数量、有效期和兑换限制</td><td>核对购买凭证、用户身份、兑换结果和钱包余额不足场景。</td></tr>
+                    <tr><td><strong>活动达标奖励</strong></td><td>积分管理 → 兑换码</td><td>按活动奖励积分配置批次、数量、有效期和单用户限制</td><td>核对达标名单、发码数量、已核销数量和重复领取限制。</td></tr>
+                    <tr><td><strong>配置任务奖励</strong></td><td>积分管理 → 任务奖励</td><td>有效拉新/项目出单、阈值、单位、项目、奖励积分</td><td>检查启用状态、达标条件和领取状态。</td></tr>
+                    <tr><td><strong>调整支付入口</strong></td><td>积分管理 → 钱包配置</td><td>钱包来源和组合支付开关</td><td>检查余额不足置灰、组合支付和收益明细。</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="handbook-card-grid" style="margin-top:14px">
+                <div class="handbook-card"><h3>运营可以配置</h3><ul><li>积分商品、兑换码、任务、钱包展示来源。</li><li>商品/批次/任务状态、排序、有效期和业务文案。</li><li>用户端展示规则和可用入口。</li></ul></div>
+                <div class="handbook-card"><h3>运营不能配置</h3><ul><li>支付密码、失败次数、锁定时长和扣款重试。</li><li>后端最终余额、订单结果和流水状态。</li><li>通过后台直接改写历史成功或失败记录。</li></ul></div>
+              </div>
+            </section>
+
+            <section class="handbook-section" id="chapter-query">
+              <h2>客服怎么查询</h2>
+              <div class="handbook-steps">
+                <div class="handbook-step"><span>1</span><p>先获取 UID、问题发生时间，以及订单号、兑换码批次或任务名称中的至少一项。</p></div>
+                <div class="handbook-step"><span>2</span><p>先看用户账户：可用积分、冻结积分、累计获得、累计消耗和最近变动，判断余额有没有变化。</p></div>
+                <div class="handbook-step"><span>3</span><p>再看流水订单：流水类型、动账类型、描述、积分变动、支付金额、状态、失败原因、时间和关联编号。</p></div>
+                <div class="handbook-step"><span>4</span><p>最后看业务对象：购买查订单，兑换查批次和核销记录，任务查条件、项目、达标人数和领取状态，购买支付还要查钱包收益明细。</p></div>
+              </div>
+              <div class="handbook-highlight">标准查询路径：用户账户 → 流水订单 → 订单/兑换码批次/任务奖励 → 钱包收益明细 → 关联业务编号。</div>
+            </section>
+
+            <section class="handbook-section" id="chapter-wallet">
+              <h2>钱包与支付怎么处理</h2>
+              <div class="handbook-card-grid">
+                <div class="handbook-card"><h3>单钱包支付</h3><p>端内支付购买积分成功后，在对应扣款钱包收益明细增加记录。标题固定为“积分购买”，描述示例为“购买积分880”。</p></div>
+                <div class="handbook-card"><h3>组合支付</h3><p>每个参与扣款的钱包都要写入收益明细。描述示例为“组合支付购买积分880,与项目收益钱包组合购买”。</p></div>
+                <div class="handbook-card"><h3>后台职责</h3><p>后台只控制钱包来源和组合支付入口是否展示，不写入支付安全整体设置。</p></div>
+                <div class="handbook-card"><h3>后端职责</h3><p>支付密码、失败次数、锁定时长、重试、扣款、发放、补偿和最终状态由后端处理。</p></div>
+                <div class="handbook-card full"><h3>客服核对重点</h3><p>如果用户说“扣了钱但积分没到账”，必须同时查订单支付结果、积分流水、钱包收益明细和统一业务关联编号，不能只看其中一条记录。</p></div>
+              </div>
+            </section>
+
+            <section class="handbook-section" id="chapter-status">
+              <h2>状态和字段怎么判断</h2>
+              <div class="handbook-table-wrap">
+                <table class="handbook-table">
+                  <thead><tr><th>对象</th><th>状态/字段</th><th>怎么理解</th><th>异常时看什么</th></tr></thead>
+                  <tbody>
+                    <tr><td><strong>积分商品</strong></td><td>上架 / 下架 / 草稿</td><td>只有上架商品进入用户端，标签可为空。</td><td>检查状态、有效期、排序和前端刷新。</td></tr>
+                    <tr><td><strong>兑换码批次</strong></td><td>启用 / 冻结 / 已结束</td><td>启用且在有效期内才允许核销。</td><td>检查不存在、过期、用完、超次数和冻结原因。</td></tr>
+                    <tr><td><strong>任务奖励</strong></td><td>启用 / 禁用；达标人数</td><td>有效拉新单位为人，项目出单单位为元。</td><td>检查任务状态、项目、阈值、达标和重复领取。</td></tr>
+                    <tr><td><strong>流水订单</strong></td><td>入账 / 支出；成功 / 失败</td><td>动账类型为奖励、购买、兑换、消耗；来源字段叫描述。</td><td>失败状态悬浮查看失败原因，不计成功指标。</td></tr>
+                    <tr><td><strong>钱包支付</strong></td><td>单钱包 / 组合支付</td><td>成功购买必须写入钱包收益明细。</td><td>检查参与钱包、描述、积分数和关联编号。</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <section class="handbook-section" id="chapter-faq">
+              <h2>客诉怎么回应</h2>
+              <div class="handbook-card-grid">
+                <div class="handbook-card"><h3>购买成功但积分未到账</h3><p>查订单支付状态，再查积分流水；扣款成功且发放失败时按处理中/补偿流程跟进。</p><div class="handbook-highlight">回应重点：订单状态、积分流水状态、关联编号。</div></div>
+                <div class="handbook-card"><h3>兑换码无法使用</h3><p>查批次状态、有效期、剩余数量、单用户次数和失败原因，不存在审批字段。</p><div class="handbook-highlight">回应重点：失败原因和可重试条件。</div></div>
+                <div class="handbook-card"><h3>任务无法领取</h3><p>查任务是否启用、用户是否达标、项目是否匹配、是否已经领取；有效拉新看人数，项目出单看金额。</p><div class="handbook-highlight">回应重点：还差多少人或多少元。</div></div>
+                <div class="handbook-card"><h3>积分已扣但工具没结果</h3><p>查支出流水状态和工具结果；失败流水不计入成功消耗，必要时交后端排查。</p><div class="handbook-highlight">回应重点：扣减状态与业务结果分开判断。</div></div>
+                <div class="handbook-card full"><h3>统一解释边界</h3><p>成功：已完成积分变动，可提供流水号或订单号；失败：未完成积分变动，说明后台记录的失败原因；处理中：请求已受理但最终发放未确认，按关联编号继续跟进；配置问题：商品、任务或批次未满足展示/使用条件，先修正配置再让用户重试。</p></div>
+              </div>
+            </section>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="businessExplain">
+        <div class="business-page">
+          <div class="business-hero">
+            <div>
+              <h2>积分业务解释</h2>
+              <p>给运营和客服使用的积分业务地图。先理解积分如何产生、如何消费，再按配置路径操作或按查询路径处理用户问题。</p>
+              <div class="business-audience">
+                <span><i data-lucide="megaphone"></i>运营：配置与监控</span>
+                <span><i data-lucide="headphones"></i>客服：查询与排障</span>
+                <span><i data-lucide="link-2"></i>后台配置 → 用户端结果</span>
+              </div>
+            </div>
+            <div class="business-hero-mark" aria-hidden="true"><i data-lucide="map"></i></div>
+          </div>
+
+          <div class="business-kpis">
+            <div class="business-kpi"><span><i data-lucide="plus-circle"></i>积分来源</span><strong>4 类</strong><em>购买、兑换、任务、人工调账</em></div>
+            <div class="business-kpi"><span><i data-lucide="minus-circle"></i>积分去向</span><strong>2 类</strong><em>工具/权益消耗、订单扣减</em></div>
+            <div class="business-kpi"><span><i data-lucide="route"></i>客服查询入口</span><strong>4 个</strong><em>账户、流水、订单、兑换码</em></div>
+            <div class="business-kpi"><span><i data-lucide="shield-check"></i>最终口径</span><strong>以后端为准</strong><em>状态、余额、发放结果统一由后端确认</em></div>
+          </div>
+
+          <div class="business-tabs" aria-label="业务解释视图">
+            <button class="active" type="button" data-business-tab="overview">业务全景</button>
+            <button type="button" data-business-tab="operations">运营配置</button>
+            <button type="button" data-business-tab="support">客服排障</button>
+            <button type="button" data-business-tab="states">状态口径</button>
+          </div>
+
+          <div class="business-tab-panel active" data-business-panel="overview">
+            <div class="business-card">
+              <div class="business-card-head">
+                <div><h3>积分从产生到可追踪</h3><p>每一次积分变化都要能回到业务来源、账户余额和流水记录。</p></div>
+                <span class="business-status">全链路</span>
+              </div>
+              <div class="business-card-body">
+                <div class="business-flow">
+                  <div class="business-flow-step"><span>01</span><strong>业务触发</strong><p>用户购买积分、兑换兑换码、完成任务或客服发起调账。</p></div>
+                  <div class="business-flow-step"><span>02</span><strong>后端校验</strong><p>校验配置状态、用户资格、次数限制、幂等键和支付结果。</p></div>
+                  <div class="business-flow-step"><span>03</span><strong>积分变动</strong><p>成功后增加或扣减账户积分，失败不改变可用余额。</p></div>
+                  <div class="business-flow-step"><span>04</span><strong>写入流水</strong><p>记录流水类型、动账类型、描述、状态、时间和关联编号。</p></div>
+                  <div class="business-flow-step"><span>05</span><strong>同步明细</strong><p>端内购买成功时，同时写入对应钱包的收益明细。</p></div>
+                  <div class="business-flow-step"><span>06</span><strong>客服追踪</strong><p>通过 UID、订单号或关联编号定位完整处理结果。</p></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="business-card">
+              <div class="business-card-head">
+                <div><h3>积分从哪里来、到哪里去</h3><p>先按业务类型判断，再进入对应配置或查询菜单。</p></div>
+              </div>
+              <div class="business-card-body">
+                <div class="business-entry-grid">
+                  <div class="business-entry"><i data-lucide="shopping-bag"></i><strong>积分商品购买</strong><p>用户端选择档位并支付，成功后积分入账，动账类型为购买。</p></div>
+                  <div class="business-entry"><i data-lucide="ticket-check"></i><strong>兑换码兑换</strong><p>批次码校验通过后发放积分，动账类型为兑换。</p></div>
+                  <div class="business-entry"><i data-lucide="badge-check"></i><strong>任务奖励</strong><p>有效拉新或项目出单达标后领取，动账类型为奖励。</p></div>
+                  <div class="business-entry"><i data-lucide="wand-sparkles"></i><strong>工具与权益消耗</strong><p>用户使用需要积分的工具或权益，积分支出，动账类型为消耗。</p></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="business-grid">
+              <div class="business-card">
+                <div class="business-card-head"><div><h3>配置影响链路</h3><p>运营配置在哪里生效</p></div></div>
+                <div class="business-card-body">
+                  <div class="business-list">
+                    <div class="business-list-item"><span>1</span><div><strong>积分商品</strong><p>决定用户端可购买的积分档位、价格、标签、购买人数和上下架状态。</p></div></div>
+                    <div class="business-list-item"><span>2</span><div><strong>兑换码</strong><p>决定批次面额、有效期、总量和单用户兑换限制。</p></div></div>
+                    <div class="business-list-item"><span>3</span><div><strong>任务奖励</strong><p>决定任务条件、项目、阈值、奖励积分、达标人数和启停状态。</p></div></div>
+                    <div class="business-list-item"><span>4</span><div><strong>钱包配置</strong><p>决定用户支付时可看到哪些扣款来源；支付安全规则由后端控制。</p></div></div>
+                  </div>
+                </div>
+              </div>
+              <div class="business-card">
+                <div class="business-card-head"><div><h3>结果如何被记录</h3><p>运营和客服看到的字段来源</p></div></div>
+                <div class="business-card-body">
+                  <div class="business-list">
+                    <div class="business-list-item"><span><i data-lucide="wallet-cards"></i></span><div><strong>用户账户</strong><p>查看当前可用积分、冻结积分、累计获得、累计消耗。</p></div></div>
+                    <div class="business-list-item"><span><i data-lucide="list-filter"></i></span><div><strong>流水订单</strong><p>查看入账/支出、奖励/购买/兑换/消耗、描述和成功/失败状态。</p></div></div>
+                    <div class="business-list-item"><span><i data-lucide="bar-chart-3"></i></span><div><strong>数据看板</strong><p>查看累计发放、累计消耗、收入和兑换码核销等运营指标。</p></div></div>
+                    <div class="business-list-item"><span><i data-lucide="search-check"></i></span><div><strong>关联编号</strong><p>订单、扣款流水、积分流水和钱包收益明细使用同一业务关联编号。</p></div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="business-tab-panel" data-business-panel="operations">
+            <div class="business-card">
+              <div class="business-card-head">
+                <div><h3>运营配置路径</h3><p>按照“配置 → 验证 → 观察”的顺序使用后台。</p></div>
+                <span class="business-status">建议流程</span>
+              </div>
+              <div class="business-card-body">
+                <div class="business-flow">
+                  <div class="business-flow-step"><span>01</span><strong>先定业务目的</strong><p>明确是发放积分、促进消费、拉新奖励还是支付来源调整。</p></div>
+                  <div class="business-flow-step"><span>02</span><strong>配置规则</strong><p>进入积分商品、兑换码、任务奖励或钱包配置完成字段填写。</p></div>
+                  <div class="business-flow-step"><span>03</span><strong>检查状态</strong><p>确认商品上架、批次启用、任务启用，以及数值和有效期正确。</p></div>
+                  <div class="business-flow-step"><span>04</span><strong>验证用户端</strong><p>用测试账号检查展示、可用状态、按钮和错误提示是否符合预期。</p></div>
+                  <div class="business-flow-step"><span>05</span><strong>观察数据</strong><p>在数据看板查看发放、消耗、收入、核销和异常趋势。</p></div>
+                  <div class="business-flow-step"><span>06</span><strong>复盘调整</strong><p>根据购买、领取、消耗和核销表现调整配置，不直接修改流水结果。</p></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="business-card">
+              <div class="business-card-head"><div><h3>配置场景速查</h3><p>每个场景的入口、关键字段和完成后的验证动作。</p></div></div>
+              <div class="business-table-wrap">
+                <table class="business-table">
+                  <thead><tr><th>场景</th><th>进入菜单</th><th>重点配置</th><th>保存后检查</th></tr></thead>
+                  <tbody>
+                    <tr><td><strong>上新积分商品</strong></td><td>积分管理 → 积分商品</td><td>积分数量、售价、标签、排序、状态</td><td><span>用户端仅展示上架商品；标签为空不占位。</span></td></tr>
+                    <tr><td><strong>发放活动兑换码</strong></td><td>积分管理 → 兑换码</td><td>面额方式、批次、数量、有效期、兑换限制</td><td><span>用测试码验证成功、过期和超次数提示。</span></td></tr>
+                    <tr><td><strong>配置任务奖励</strong></td><td>积分管理 → 任务奖励</td><td>有效拉新/项目出单、阈值、单位、项目、奖励积分</td><td><span>检查启用状态、用户达标条件和领取状态。</span></td></tr>
+                    <tr><td><strong>调整支付钱包</strong></td><td>积分管理 → 钱包配置</td><td>钱包来源和组合支付开关</td><td><span>检查余额不足时的置灰、组合支付和收益明细写入。</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="business-grid">
+              <div class="business-card">
+                <div class="business-card-head"><div><h3>运营操作边界</h3><p>哪些事情在后台做，哪些事情交给后端。</p></div></div>
+                <div class="business-card-body">
+                  <div class="business-list">
+                    <div class="business-list-item"><span>可</span><div><strong>可配置</strong><p>商品、兑换码、任务、钱包展示来源、状态、排序和文案。</p></div></div>
+                    <div class="business-list-item"><span>查</span><div><strong>可查询</strong><p>账户余额、积分流水、订单结果、失败原因和兑换码核销情况。</p></div></div>
+                    <div class="business-list-item"><span>后</span><div><strong>后端负责</strong><p>支付安全、密码校验、幂等、余额扣减、最终发放和补偿。</p></div></div>
+                  </div>
+                </div>
+              </div>
+              <div class="business-card">
+                <div class="business-card-head"><div><h3>发布前检查清单</h3><p>避免配置已保存但用户端表现不符合预期。</p></div></div>
+                <div class="business-card-body">
+                  <div class="business-list">
+                    <div class="business-list-item"><span>✓</span><div><strong>状态和时间</strong><p>确认上架/启用状态、有效期、排序和活动窗口。</p></div></div>
+                    <div class="business-list-item"><span>✓</span><div><strong>数值和单位</strong><p>确认积分、金额、次数、阈值与任务单位一致。</p></div></div>
+                    <div class="business-list-item"><span>✓</span><div><strong>用户端验证</strong><p>确认商品展示、任务按钮、兑换限制和支付入口都符合规则。</p></div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="business-tab-panel" data-business-panel="support">
+            <div class="business-card">
+              <div class="business-card-head">
+                <div><h3>客服查询路径</h3><p>先确定用户和业务编号，再按“账户 → 流水 → 订单/批次”逐层确认。</p></div>
+                <span class="business-status">客服 SOP</span>
+              </div>
+              <div class="business-card-body">
+                <div class="business-flow">
+                  <div class="business-flow-step"><span>01</span><strong>确认用户</strong><p>获取 UID、手机号或订单号，确认用户和问题发生时间。</p></div>
+                  <div class="business-flow-step"><span>02</span><strong>查账户</strong><p>查看可用、冻结、累计获得和累计消耗，判断余额是否变化。</p></div>
+                  <div class="business-flow-step"><span>03</span><strong>查流水</strong><p>按用户和时间筛选，核对入账/支出、动账类型、描述和状态。</p></div>
+                  <div class="business-flow-step"><span>04</span><strong>查业务对象</strong><p>购买查订单，兑换查批次，任务查奖励规则和用户达标状态。</p></div>
+                  <div class="business-flow-step"><span>05</span><strong>查钱包明细</strong><p>端内购买需要核对对应扣款钱包是否写入“积分购买”收益明细。</p></div>
+                  <div class="business-flow-step"><span>06</span><strong>记录结论</strong><p>向用户说明成功、失败或处理中，并保留失败原因和关联编号。</p></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="business-card">
+              <div class="business-card-head"><div><h3>常见问题判断</h3><p>按照现象进入对应菜单，避免只看账户余额下结论。</p></div></div>
+              <div class="business-card-body">
+                <div class="business-issue-grid">
+                  <div class="business-issue"><strong>用户购买成功但积分未到账</strong><p>先查订单支付状态，再查积分流水和发放状态；若扣款成功、发放失败，按处理中/补偿流程跟进。</p><div class="path">账户 → 流水订单 → 订单 → 关联编号</div></div>
+                  <div class="business-issue"><strong>用户反馈钱包扣款异常</strong><p>核对扣款钱包、支付金额和钱包收益明细；组合支付要检查每个参与扣款的钱包。</p><div class="path">流水订单 → 钱包收益明细</div></div>
+                  <div class="business-issue"><strong>兑换码无法使用</strong><p>查看批次状态、有效期、剩余数量、单用户限制和失败原因，后台不设置审批字段。</p><div class="path">兑换码 → 批次明细 → 核销记录</div></div>
+                  <div class="business-issue"><strong>任务无法领取奖励</strong><p>确认任务启用、用户是否达标、项目是否匹配、是否已领取；有效拉新看人数，项目出单看金额。</p><div class="path">任务奖励 → 用户账户 → 流水订单</div></div>
+                  <div class="business-issue"><strong>积分被扣但工具没有结果</strong><p>查支出流水状态和工具业务结果；失败流水不计入成功消耗，必要时保留失败原因交后端排查。</p><div class="path">流水订单 → 描述/状态/失败原因</div></div>
+                  <div class="business-issue"><strong>用户看不到商品或任务</strong><p>检查商品是否上架、任务是否启用、排序和有效期，以及前端是否读取最新配置。</p><div class="path">积分商品/任务奖励 → 用户端验证</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="business-tab-panel" data-business-panel="states">
+            <div class="business-card">
+              <div class="business-card-head"><div><h3>业务字段与状态口径</h3><p>客服对外解释、运营看板和研发接口应使用同一套定义。</p></div></div>
+              <div class="business-table-wrap">
+                <table class="business-table">
+                  <thead><tr><th>对象</th><th>关键状态/字段</th><th>业务解释</th><th>异常处理</th></tr></thead>
+                  <tbody>
+                    <tr><td><strong>积分商品</strong></td><td>上架 / 下架 / 草稿</td><td><span>只有上架商品进入用户端；标签可为空。</span></td><td><span>下架或草稿不展示，不影响历史订单。</span></td></tr>
+                    <tr><td><strong>兑换码批次</strong></td><td>启用 / 冻结 / 已结束</td><td><span>启用且在有效期内才允许核销。</span></td><td><span>失败需展示不存在、过期、用完、超次数或冻结原因。</span></td></tr>
+                    <tr><td><strong>任务奖励</strong></td><td>启用 / 禁用；达标人数</td><td><span>有效拉新按人，项目出单按元；达标人数是当前满足条件的用户数。</span></td><td><span>未达标不可领取，已领取不可重复发放。</span></td></tr>
+                    <tr><td><strong>流水订单</strong></td><td>入账 / 支出；成功 / 失败</td><td><span>动账类型为奖励、购买、兑换、消耗；来源字段统一叫描述。</span></td><td><span>失败状态悬浮显示失败原因，失败不计入成功统计。</span></td></tr>
+                    <tr><td><strong>钱包支付</strong></td><td>单钱包 / 组合支付</td><td><span>支付安全、密码和重试策略由后端处理；成功后写钱包收益明细。</span></td><td><span>组合支付描述需包含参与钱包和购买积分数。</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="business-card">
+              <div class="business-card-head"><div><h3>客服对外说明模板</h3><p>基于后台结果给用户反馈时，优先说明事实、状态和下一步。</p></div></div>
+              <div class="business-card-body">
+                <div class="business-status-grid">
+                  <div class="business-status-card"><strong>成功</strong><p>已完成对应积分变动，可提供积分流水号或订单号。</p></div>
+                  <div class="business-status-card"><strong>失败</strong><p>未完成积分变动，说明后台记录的失败原因，不承诺未确认的补发。</p></div>
+                  <div class="business-status-card"><strong>处理中</strong><p>扣款或请求已受理但最终发放未确认，建议按关联编号继续跟进。</p></div>
+                  <div class="business-status-card"><strong>配置问题</strong><p>商品、任务或批次未满足展示/使用条件，先修正配置再让用户重试。</p></div>
+                </div>
               </div>
             </div>
           </div>
@@ -3323,7 +4720,17 @@
             <div><span>余额不一致</span><strong style="color:var(--danger)">3</strong></div>
           </div>
           <table>
-            <thead><tr><th>用户</th><th>可用积分</th><th>冻结积分</th><th>累计获得</th><th>累计消耗</th><th>最近变动</th><th>操作</th></tr></thead>
+            <thead>
+              <tr>
+                <th>用户</th>
+                <th data-user-sort-header="available" aria-sort="none"><button class="table-sort" type="button" data-user-sort="available">可用积分<span class="sort-indicator" aria-hidden="true">↕</span></button></th>
+                <th data-user-sort-header="frozen" aria-sort="none"><button class="table-sort" type="button" data-user-sort="frozen">冻结积分<span class="sort-indicator" aria-hidden="true">↕</span></button></th>
+                <th data-user-sort-header="gained" aria-sort="none"><button class="table-sort" type="button" data-user-sort="gained">累计获得<span class="sort-indicator" aria-hidden="true">↕</span></button></th>
+                <th data-user-sort-header="spent" aria-sort="none"><button class="table-sort" type="button" data-user-sort="spent">累计消耗<span class="sort-indicator" aria-hidden="true">↕</span></button></th>
+                <th>最近变动</th>
+                <th>操作</th>
+              </tr>
+            </thead>
             <tbody>
               <tr><td>UID 826173<br><span class="muted">138****9021</span></td><td>12,000</td><td>0</td><td>58,800</td><td>46,800</td><td>2026.08.17 13:22</td><td><button class="link-btn">流水</button><button class="link-btn">调账</button></td></tr>
               <tr><td>UID 791204<br><span class="muted">186****3499</span></td><td>880</td><td>300</td><td>14,680</td><td>13,500</td><td>2026.08.17 12:08</td><td><button class="link-btn">解冻</button><button class="link-btn">订单</button></td></tr>
@@ -3573,6 +4980,7 @@
           <div class="filter-item"><label>名称</label><input id="toolNameFilter" placeholder="请输入工具名称"></div>
           <div class="filter-item"><label>区域</label><select id="toolRegionFilter"><option>全部</option><option>国内工具</option><option>海外工具</option></select></div>
           <div class="filter-item"><label>所属平台</label><select id="toolPlatformFilter"><option>全部</option><option>右豹</option><option>小程序</option></select></div>
+          <div class="filter-item"><label>工具来源</label><select id="toolSourceFilter"><option>全部</option><option>端内自研</option><option>OPC工具</option></select></div>
           <div class="filter-item"><label>赛道</label><select id="toolTrackFilter"><option>全部</option><option>短剧推广</option><option>工具应用</option><option>内容创作</option></select></div>
           <div class="filter-item"><label>状态</label><select id="toolStatusFilter"><option>全部</option><option>上架</option><option>下架</option></select></div>
           <button class="btn primary" data-action="search-tools"><i data-lucide="search"></i>搜索</button>
@@ -3585,7 +4993,7 @@
             <div><h2>工具列表</h2><p>管理工具基础信息、平台、区域、赛道、标签、评分、热度、可见范围和上下架状态。</p></div>
           </div>
           <table>
-            <thead><tr><th>序号</th><th>图标</th><th>名称</th><th>所属平台</th><th>区域</th><th>赛道</th><th>标签</th><th>评分</th><th>热度</th><th>状态</th><th>可见范围</th><th>使用门槛</th><th>排序</th><th>更新时间</th><th>操作</th></tr></thead>
+            <thead><tr><th>序号</th><th>图标</th><th>名称</th><th>所属平台</th><th>工具来源</th><th>区域</th><th>赛道</th><th>标签</th><th>评分</th><th>热度</th><th>状态</th><th>可见范围</th><th>使用门槛</th><th>排序</th><th>更新时间</th><th>操作</th></tr></thead>
             <tbody></tbody>
           </table>
         </div>
@@ -3612,7 +5020,7 @@
       <section class="section" id="frontendInteractionReq">
         <div class="panel">
           <div class="panel-head">
-            <div><h2>工具使用门槛交互原型</h2><p>演示工具完全免费、免费次数、积分消耗、积分不足和充值引导的用户端交互流程。</p></div>
+            <div><h2>工具使用门槛交互原型</h2><p>演示完全免费、免费次数、积分消耗、积分不足和充值引导的用户端交互流程。</p></div>
             <a class="btn" data-tool-demo-link target="_blank" rel="noopener"><i data-lucide="external-link"></i>新窗口打开</a>
           </div>
           <div class="demo-link-row">
@@ -4328,6 +5736,7 @@
   <script>
     const labels = {
       dashboard: ["数据看板", "监控积分发放、消耗、收入和兑换码核销情况。"],
+      businessExplain: ["业务解释", "面向运营和客服说明积分业务流程、配置方法、查询路径和异常处理。"],
       goods: ["积分商品", "管理用户端兑换档位、售价、标签、购买人数和上架状态。"],
       codes: ["兑换码", "批量生成、导入、发放、核销、冻结和导出兑换码。"],
       tasks: ["任务奖励", "配置有效拉新、项目出单等积分奖励任务。"],
@@ -4335,7 +5744,7 @@
       flows: ["流水订单", "追踪积分获得、消耗、钱包扣款订单和异常补偿。"],
       wallet: ["钱包配置", "配置钱包扣款来源和组合支付展示规则，支付安全由后端逻辑处理。"],
       frontendReq: ["前后端交互需求", "说明用户端积分功能的前端页面规则、接口字段、状态流转和异常处理。"],
-      toolList: ["工具列表", "管理工具基础信息、图标、标签、跳转、可见范围、排序和上下架状态。"],
+      toolList: ["工具列表", "管理工具基础信息、图标、标签、跳转、可见范围、排序、上下架状态和独立使用配置。"],
       toolData: ["工具数据", "查看各工具点击量、使用量和运营表现。"],
       frontendInteractionReq: ["前端交互需求", "查看工具使用门槛交互原型，演示免费、积分和充值引导流程。"],
       trackingOverview: ["统计总览", "面向运营和数据分析师查看核心埋点趋势、事件排行和业务转化概况。"],
@@ -4349,12 +5758,37 @@
       mentorOptimizeReq: ["导师优化", "承接导师换绑审核与前端换绑申请、审核通过和驳回状态展示。"]
     };
 
+    const pointsModuleSections = {
+      config: ["businessExplain", "goods", "tasks", "codes", "wallet"],
+      data: ["dashboard", "flows", "users"]
+    };
+
+    const pointsModuleDefaults = {
+      config: "businessExplain",
+      data: "dashboard"
+    };
+
+    function pointsModuleForSection(section) {
+      if (pointsModuleSections.config.includes(section)) return "config";
+      if (pointsModuleSections.data.includes(section)) return "data";
+      return null;
+    }
+
     const requirementRules = {
       dashboard: [
         { title: "1. 业务目标", items: ["聚合积分发放、消耗、收入与兑换码核销数据。", "帮助运营判断积分规模、消耗效率、兑换转化和异常趋势。", "看板只做运营监控，不承载商品、任务、兑换码等配置操作。"] },
         { title: "2. 字段规则", items: ["今日发放积分：统计当日所有入账类积分。", "今日消耗积分：统计当日所有支出类积分。", "累计发放积分和累计消耗积分按平台历史总量统计。", "兑换收入按积分商品购买支付金额统计；兑换码核销按成功核销次数统计。"] },
         { title: "3. 交互规则", items: ["趋势图支持 7日、30日和自定义口径切换。", "点击导出按钮导出当前看板汇总数据。", "不展示用户端预览、任务领取率和待处理异常统计。"] },
         { title: "4. 数据口径", items: ["统计数据需按自然日归集。", "失败流水不计入成功发放或成功消耗。", "金额类指标保留人民币符号和两位小数口径。"] }
+      ],
+      businessExplain: [
+        { title: "1. 页面目标", items: ["面向运营和客服解释积分业务从产生、校验、变动、记录到查询的完整链路。", "通过业务全景、运营配置、客服排障和状态口径四个视图，降低后台使用和问题定位成本。", "业务解释页只做规则说明和操作指引，不直接修改商品、兑换码、任务、账户或流水数据。"] },
+        { title: "2. 角色与使用方式", items: ["运营优先使用“运营配置”视图，按业务目的进入积分商品、兑换码、任务奖励或钱包配置。", "客服优先使用“客服排障”视图，按 UID、订单号或关联编号依次查询账户、流水和业务对象。", "客服对外解释以后台成功/失败/处理中状态和后端最终结果为准，不根据前端按钮状态推断发放成功。"] },
+        { title: "3. 积分业务全景", items: ["积分来源包括积分商品购买、兑换码兑换、任务奖励和人工调账。", "积分消耗包括用户端工具、权益或商品使用产生的支出。", "后端完成资格、状态、次数、幂等和支付校验后，才允许写入账户变动。", "成功结果需要写入积分流水；端内购买成功还需要写入对应钱包收益明细。", "订单、扣款流水、积分流水和钱包收益明细使用同一业务关联编号，便于完整追踪。"] },
+        { title: "4. 运营配置规则", items: ["积分商品重点配置积分数量、售价、标签、排序和上架状态；只有上架商品进入用户端。", "兑换码重点配置面额方式、批次、数量、有效期和兑换限制；兑换限制开启时配置每个用户可兑换 X 次。", "任务奖励完成条件为有效拉新或项目出单；单位分别为人、元；项目出单必须选择项目；状态只有启用和禁用。", "钱包配置只控制可展示的钱包来源和组合支付入口，支付密码、失败次数、锁定和重试由后端处理。", "配置保存后需要用测试账号验证用户端展示、可用状态、按钮反馈和失败提示，再通过数据看板观察结果。"] },
+        { title: "5. 客服查询与排障规则", items: ["先确认用户 UID、问题发生时间和订单号/兑换码/任务名称，再进入用户账户查看余额变化。", "流水订单核对流水类型、动账类型、描述、积分变动、状态、失败原因和时间。", "购买问题继续查订单和钱包收益明细；兑换问题继续查兑换码批次和核销记录；任务问题继续查任务条件、项目和达标状态。", "失败流水只展示失败原因，不计入成功发放或成功消耗统计。", "扣款成功但积分未到账时，按处理中或发放失败流程交后端补偿，不直接手工修改成功结果。"] },
+        { title: "6. 字段与状态口径", items: ["流水类型只有入账和支出；动账类型只有奖励、购买、兑换和消耗；来源字段统一称为描述。", "积分商品状态为上架、下架、草稿；兑换码批次状态为启用、冻结、已结束；任务状态为启用、禁用。", "流水订单状态只有成功和失败；失败记录悬浮状态标签查看失败原因。", "累计发放和累计消耗只统计成功流水；失败记录不影响账户余额和看板成功指标。", "组合支付收益明细标题为“积分购买”，描述需包含组合支付、积分数量和参与钱包。"] },
+        { title: "7. 交互与边界", items: ["业务解释采用左侧手册章节导航和右侧连续阅读布局，点击章节只滚动右侧正文并同步高亮当前章节。", "业务解释不再使用旧版四个视图，也不直接修改后台业务数据。", "本页不提供支付安全配置、不提供人工改流水、不替代前后端交互需求和实际操作菜单。", "当页面规则与后端最终状态不一致时，以后端接口返回和已落库的流水/订单记录为准。"] }
       ],
       goods: [
         { title: "1. 业务目标", items: ["管理用户端积分兑换商品档位。", "支持运营配置售价、标签、购买人数和上下架状态。", "为后续活动运营提供可复制、可快速上下架的商品配置能力。"] },
@@ -4380,7 +5814,8 @@
         { title: "1. 业务目标", items: ["支持客服和运营查询用户积分账户。", "追踪可用积分、冻结积分、累计获得、累计消耗和最近变动。", "处理用户积分异常、冻结和调账。"] },
         { title: "2. 字段规则", items: ["用户字段展示 UID 和脱敏手机号。", "可用积分表示当前可消费积分。", "冻结积分表示被限制使用的积分。", "累计获得和累计消耗用于账户历史统计。", "最近变动时间取最近一笔积分流水时间。"] },
         { title: "3. 交互规则", items: ["点击流水跳转到流水订单并按当前用户筛选。", "点击订单打开用户最近兑换订单详情。", "点击调账打开调账弹窗。", "冻结和解冻按钮根据当前冻结积分动态切换。"] },
-        { title: "4. 调账规则", items: ["调账类型包含增加、扣减、冻结、解冻。", "调账必须填写原因。", "冻结积分不可用于用户端消费。", "解冻后积分回到可用积分。"] }
+        { title: "4. 排序规则", items: ["可用积分、冻结积分、累计获得、累计消耗四个字段支持点击表头排序。", "首次点击某字段按数值从高到低降序排列；再次点击按从低到高升序排列；第三次点击恢复默认数据顺序。", "同一时间只保留一个排序字段，切换其他字段后从降序开始。", "排序仅改变当前列表展示顺序，不修改用户账户数据、统计值和后端存储。", "调账、冻结和解冻后按当前排序条件重新渲染列表，操作按钮仍对应原用户。"] },
+        { title: "5. 调账规则", items: ["调账类型包含增加、扣减、冻结、解冻。", "调账必须填写原因。", "冻结积分不可用于用户端消费。", "解冻后积分回到可用积分。"] }
       ],
       flows: [
         { title: "1. 业务目标", items: ["追踪所有积分入账和支出记录。", "为客服查询、财务对账和异常排查提供依据。", "统一流水描述口径，降低来源字段歧义。"] },
@@ -4405,10 +5840,11 @@
       ],
       toolList: [
         { title: "1. 业务目标", items: ["管理右豹工具入口的基础信息、图标、标签、跳转和上下架状态。", "支持运营通过筛选快速定位工具，并对工具进行新增、编辑、删除和状态维护。", "列表字段和操作参考截图，保持紧凑表格形态。"] },
-        { title: "2. 字段规则", items: ["列表字段包含序号、图标、名称、所属平台、区域、赛道、标签、评分、热度、状态、可见范围、使用门槛、排序、更新时间和操作。", "工具名称必填，最多 100 字。", "所属平台、区域、一级赛道、状态、图标为必填。", "区域当前包含国内工具和海外工具。", "状态包含上架和下架。", "可见范围包含全部、团等级、个人等级和指定用户 ID。", "团等级支持 V1、V2、V3 多选；个人等级支持 L1-L7 多选；指定用户 ID 支持录入多个 UID。"] },
-        { title: "3. 新增/编辑规则", items: ["点击新增打开新增推广工具弹窗。", "弹窗调整为基础信息和数据跳转 2 个板块。", "弹窗内文字输入、下拉选择、数字输入等基础组件宽高需保持一致。", "基础信息用于配置所属平台、工具名称、区域、一级赛道、状态、图标、排序和标签。", "标签使用下拉选择组件。", "金句、简介和详情使用横向 Tab 切换配置，每个 Tab 内只展示对应组件，不重复展示字段标题。", "图标为图片上传字段。", "数据跳转包含评分、热度、NEW 角标、开发者、开发者等级、跳转类型、跳转链接、是否可见和使用门槛。", "使用门槛选择完全免费时，必须继续选择免费规则：不限次免费或每日免费x次。", "选择不限次免费时，用户每天可无限次使用该工具，不展示次数限制。", "选择每日免费x次时，必须配置每日免费次数 X；用户当日使用次数达到 X 后，前端需置灰使用按钮并提示今日免费次数已用完，工具不再支持继续使用，次日重置后恢复。", "使用门槛选择积分使用时，需要配置每日可免费次数和单次消耗积分。", "保存后新增工具进入列表并刷新工具数据。", "编辑时回填当前工具字段。"] },
+        { title: "2. 字段规则", items: ["列表字段包含序号、图标、名称、所属平台、工具来源、区域、赛道、标签、评分、热度、状态、可见范围、使用门槛、排序、更新时间和操作。", "工具名称必填，最多 100 字。", "所属平台、工具来源、区域、一级赛道、状态、图标为必填。", "工具来源包含端内自研和 OPC工具，用于区分右豹自研能力和 OPC 接入工具。", "区域当前包含国内工具和海外工具。", "状态包含上架和下架。", "可见范围包含全部、团等级、个人等级和指定用户 ID。", "团等级支持 V1、V2、V3 多选；个人等级支持 L1-L7 多选；指定用户 ID 支持录入多个 UID。"] },
+        { title: "3. 新增/编辑规则", items: ["点击新增打开新增推广工具弹窗。", "弹窗调整为基础信息和数据跳转 2 个板块。", "弹窗内文字输入、下拉选择、数字输入等基础组件宽高需保持一致。", "基础信息用于配置所属平台、工具来源、工具名称、区域、一级赛道、状态、图标、排序和标签。", "工具来源使用下拉选择组件，选项为端内自研和 OPC工具，默认端内自研。", "标签使用下拉选择组件。", "金句、简介和详情使用横向 Tab 切换配置，每个 Tab 内只展示对应组件，不重复展示字段标题。", "图标为图片上传字段。", "数据跳转包含评分、热度、NEW 角标、开发者、开发者等级、跳转类型、跳转链接和是否可见。", "使用门槛不在工具新增/编辑弹窗内配置，工具列表操作列增加“使用配置”操作。", "保存工具基础信息时，不得覆盖已有使用门槛配置；新建工具默认使用门槛为完全免费/不限次免费。", "保存后新增工具进入列表并刷新工具数据；编辑时回填当前工具基础信息。"] },
+        { title: "4. 使用配置规则", items: ["点击列表操作“使用配置”打开独立使用配置弹窗，弹窗标题带工具名称，保存后立即更新列表中的使用门槛摘要。", "使用门槛包含完全免费和积分使用。", "进入未配置工具的使用配置时默认选中完全免费；完全免费模式下只展示免费规则，不展示或挂载任何积分字段。", "弹窗字段随当前使用门槛动态渲染：切换积分使用后才展示工作日免费次数、节假日免费次数和积分计费方式；按次使用展示单次消耗积分，阶梯付费展示阶梯配置；切回完全免费时立即移除积分字段和临时输入状态。", "完全免费时，免费规则单选为不限次免费或每日免费；选择每日免费时必须配置每日免费次数 X，X 为大于 0 的整数；次数用完后当天不可继续使用，次日重置。", "积分使用时分别配置工作日免费次数和节假日免费次数，均允许为 0；当前日期命中对应日历类型时使用对应次数；两者均为 0 时默认每次使用都消耗积分。", "积分使用的计费方式包含按次使用和阶梯付费，二者互斥。", "按次使用沿用单次消耗积分字段，单次消耗积分必须为大于 0 的整数。", "阶梯付费支持多个阶梯，每个阶梯包含使用次数 X、原价积分 Y 和消耗积分 Z，表示达到该使用次数时，原价积分用于展示标准价格，消耗积分用于实际扣减。", "阶梯使用次数、原价积分和消耗积分都必须为大于 0 的整数；阶梯使用次数不可重复，保存时按使用次数从小到大排序。", "用户端免费次数用完后，按当日已完成的付费使用次数匹配阶梯，取不大于本次付费使用序号的最大阶梯；原价积分用于展示优惠对比，实际扣减使用消耗积分；确认成功后付费使用次数加 1，次日重新计算。", "阶梯至少保留一行，支持新增和删除；删除最后一行时需要阻止删除并提示至少保留一个阶梯。", "切换工具基础信息弹窗不会修改使用配置；使用配置保存失败时保留弹窗输入内容并提示具体校验原因。"] },
         { title: "4. 标签管理规则", items: ["点击标签管理打开标签管理弹窗。", "标签字段包含名称、排序、状态和操作。", "支持新增标签、编辑标签、删除标签。", "启用标签可在工具新增/编辑时选择。"] },
-        { title: "5. 交互规则", items: ["筛选条件包含名称、区域、所属平台、赛道和状态。", "点击搜索按条件过滤当前列表；点击重置恢复全部。", "删除工具需弹窗确认，确认后从列表移除。", "工具数据页按工具名称、图标、今日、近7日和累计维度展示点击量、使用量、累计获得积分和累计变现。"] }
+        { title: "5. 交互规则", items: ["筛选条件包含名称、区域、所属平台、工具来源、赛道和状态。", "点击搜索按条件过滤当前列表；点击重置恢复全部。", "删除工具需弹窗确认，确认后从列表移除。", "操作列包含编辑、使用配置、上下架和删除；使用配置独立于编辑操作。", "工具数据页按工具名称、图标、今日、近7日和累计维度展示点击量、使用量、累计获得积分和累计变现。"] }
       ],
       toolData: [
         { title: "1. 业务目标", items: ["按工具维度查看点击量、使用量、积分收益和变现表现。", "帮助运营判断工具曝光后的访问、实际使用、积分消耗和商业化表现。", "数据页只做统计展示和导出，不承载工具配置。"] },
@@ -4417,8 +5853,9 @@
       ],
       frontendInteractionReq: [
         { title: "1. 页面目标", items: ["作为工具管理下的二级菜单页面，用于展示工具使用门槛的前端交互 demo。", "聚焦文本检测工具页的完整交互流程，便于产品、前端和测试对齐。", "页面以预览为主，不承载后台配置表单。"] },
-        { title: "2. 交互范围", items: ["覆盖完全免费、固定免费次数、积分扣减、积分不足和充值引导五种状态。", "支持示例文本填充、一键演示、重置状态和演示模式切换。", "支持以独立页面或内嵌预览方式打开。"] },
-        { title: "3. 规则说明", items: ["demo 保持原有独立 HTML 交互逻辑，不并入其他后台表单。", "如后续需要扩展工具门槛规则，可在该页面继续迭代。"] }
+        { title: "2. 交互范围", items: ["覆盖完全免费、每日免费 X 次、积分扣减、积分不足和充值引导状态。", "工具免费或积分使用逻辑不区分工具来源，所有工具共用同一套使用门槛判断。", "支持示例文本填充、一键演示、重置状态和演示模式切换。", "支持以独立页面或内嵌预览方式打开。"] },
+        { title: "3. 使用门槛规则", items: ["完全免费且不限次免费时，不展示额度和积分信息，点击主按钮直接执行。", "完全免费且每日免费 X 次时，前端需展示今日剩余次数；次数用完后主按钮置灰并提示今日免费次数已用完。", "积分使用时，前端展示当前日期对应的工作日/节假日免费剩余次数和当前积分余额。", "积分使用下工作日和节假日免费次数均为 0 时，默认每次使用都需要消耗积分。", "免费次数用完且积分充足时，点击主按钮弹出积分消耗确认；确认后扣减积分并执行工具。", "积分不足时，点击主按钮弹出积分不足提示，引导去充值或完成任务获取积分。", "阶梯付费时，前端可同时展示当前阶梯原价积分和实际消耗积分，实际扣减以消耗积分字段为准。"] },
+        { title: "4. 数据交互规则", items: ["进入工具页时前端需请求工具详情接口，获取工具状态、可见范围、跳转配置和使用门槛配置。", "点击主按钮时先调用使用资格校验接口，由后端返回可免费使用、需消耗积分、积分不足、不可见、已下架等结果。", "执行工具成功后需调用使用结果回传接口，记录工具使用状态、消耗积分和免费次数扣减。", "工具来源仅作为后台配置字段，不影响免费或积分使用门槛的前端判断逻辑。"] }
       ],
       trackingOverview: [
         { title: "1. 页面目标", items: ["作为埋点统计一级菜单的默认页，服务运营日常巡盘和数据分析师快速定位趋势变化。", "展示事件触发次数、触发用户数、新用户激活率和埋点成功率。", "提供核心事件趋势、运营关注事件和事件排行。"] },
@@ -4500,6 +5937,7 @@
       activeSection: "dashboard",
       activeFlowFilter: "全部",
       activeTrend: "7日",
+      userSort: { key: "", direction: "" },
       projects: ["番茄小说", "红果短剧", "红果漫剧", "知乎故事", "知乎知识"],
       goods: [
         { name: "右豹积分 880", points: 880, price: "¥8.80", tag: "推荐", buyers: 8216, status: "上架" },
@@ -4539,11 +5977,11 @@
         { name: "行业神器", sort: 1, status: "启用" }
       ],
       tools: [
-        { iconText: "豹", iconColor: "blue", name: "豹赞数据", platform: "右豹", region: "国内工具", track: "短剧推广", tags: ["AI工具"], score: 5.0, heat: 5, status: "上架", visible: "L2", sort: 1, updated: "2026-08-13 19:50:46", slogan: "短剧推广数据分析", intro: "聚合短剧推广数据，辅助投放复盘。", detail: "支持推广数据查看、转化表现分析和异常数据定位。", developer: "右豹团队", developerLevel: "L3", newTag: true, jumpType: "内链", jumpUrl: "/tools/baozan-data", usageMode: "积分使用", freeMode: "每日免费", freeDaily: 3, costPoints: 20, todayClicks: 286, todayUses: 96, weekClicks: 2140, weekUses: 760, clicks: 12860, uses: 4680, earnedPoints: 93600, monetized: 12880 },
-        { iconText: "T", iconColor: "purple", name: "文字处理", platform: "右豹", region: "国内工具", track: "工具应用", tags: ["文字工具"], score: 0.0, heat: 0, status: "上架", visible: "全部", sort: 0, updated: "2025-09-07 21:22:27", slogan: "批量处理文本", intro: "支持文案整理、格式化和批量替换。", detail: "可用于换行整理、空格清理和批量文案处理。", developer: "工具中台", developerLevel: "L2", newTag: false, jumpType: "内链", jumpUrl: "/tools/text", usageMode: "完全免费", freeMode: "不限次免费", freeDaily: 0, costPoints: 0, todayClicks: 118, todayUses: 44, weekClicks: 830, weekUses: 256, clicks: 3920, uses: 1188, earnedPoints: 0, monetized: 0 },
-        { iconText: "A", iconColor: "orange", name: "文章提取", platform: "右豹", region: "国内工具", track: "工具应用", tags: ["文字工具"], score: 0.0, heat: 0, status: "上架", visible: "全部", sort: 0, updated: "2025-09-07 21:22:02", slogan: "提取文章正文", intro: "从链接中提取文章标题、正文和封面。", detail: "输入文章链接后提取正文结构，便于二次编辑。", developer: "工具中台", developerLevel: "L2", newTag: false, jumpType: "内链", jumpUrl: "/tools/article", usageMode: "积分使用", freeMode: "每日免费", freeDaily: 1, costPoints: 10, todayClicks: 84, todayUses: 30, weekClicks: 620, weekUses: 210, clicks: 2660, uses: 904, earnedPoints: 9040, monetized: 1780 },
-        { iconText: "Q", iconColor: "cyan", name: "违禁词检测", platform: "右豹", region: "国内工具", track: "工具应用", tags: ["文字工具"], score: 0.0, heat: 0, status: "上架", visible: "全部", sort: 0, updated: "2025-09-07 21:22:36", slogan: "检测敏感词", intro: "检测文案中的违禁词和风险表达。", detail: "支持输入文案后标记疑似风险词，并给出替换建议。", developer: "工具中台", developerLevel: "L2", newTag: false, jumpType: "内链", jumpUrl: "/tools/risk-word", usageMode: "完全免费", freeMode: "每日免费", freeDaily: 5, costPoints: 0, todayClicks: 210, todayUses: 148, weekClicks: 1600, weekUses: 980, clicks: 5480, uses: 3312, earnedPoints: 0, monetized: 0 },
-        { iconText: "创", iconColor: "green", name: "爆款标题创作", platform: "右豹", region: "国内工具", track: "内容创作", tags: ["行业神器", "AI工具"], score: 4.8, heat: 4, status: "下架", visible: "团等级", sort: 2, updated: "2025-09-07 21:25:12", slogan: "快速生成标题", intro: "基于行业模板生成短剧推广标题。", detail: "选择行业和风格后生成标题候选，支持复制和收藏。", developer: "增长实验室", developerLevel: "L4", newTag: true, jumpType: "外链", jumpUrl: "https://example.com/title", usageMode: "积分使用", freeMode: "每日免费", freeDaily: 2, costPoints: 30, todayClicks: 24, todayUses: 8, weekClicks: 180, weekUses: 62, clicks: 890, uses: 320, earnedPoints: 9600, monetized: 2360 }
+        { iconText: "豹", iconColor: "blue", name: "豹赞数据", platform: "右豹", source: "端内自研", region: "国内工具", track: "短剧推广", tags: ["AI工具"], score: 5.0, heat: 5, status: "上架", visible: "L2", sort: 1, updated: "2026-08-13 19:50:46", slogan: "短剧推广数据分析", intro: "聚合短剧推广数据，辅助投放复盘。", detail: "支持推广数据查看、转化表现分析和异常数据定位。", developer: "右豹团队", developerLevel: "L3", newTag: true, jumpType: "内链", jumpUrl: "/tools/baozan-data", usageMode: "积分使用", freeMode: "每日免费", freeDaily: 3, workdayFree: 3, holidayFree: 5, costPoints: 20, pricingMode: "阶梯付费", pricingTiers: [{ uses: 1, originalPoints: 30, points: 20 }, { uses: 5, originalPoints: 100, points: 80 }, { uses: 10, originalPoints: 180, points: 140 }], todayClicks: 286, todayUses: 96, weekClicks: 2140, weekUses: 760, clicks: 12860, uses: 4680, earnedPoints: 93600, monetized: 12880 },
+        { iconText: "T", iconColor: "purple", name: "文字处理", platform: "右豹", source: "端内自研", region: "国内工具", track: "工具应用", tags: ["文字工具"], score: 0.0, heat: 0, status: "上架", visible: "全部", sort: 0, updated: "2025-09-07 21:22:27", slogan: "批量处理文本", intro: "支持文案整理、格式化和批量替换。", detail: "可用于换行整理、空格清理和批量文案处理。", developer: "工具中台", developerLevel: "L2", newTag: false, jumpType: "内链", jumpUrl: "/tools/text", usageMode: "完全免费", freeMode: "不限次免费", freeDaily: 0, workdayFree: 0, holidayFree: 0, costPoints: 0, todayClicks: 118, todayUses: 44, weekClicks: 830, weekUses: 256, clicks: 3920, uses: 1188, earnedPoints: 0, monetized: 0 },
+        { iconText: "A", iconColor: "orange", name: "文章提取", platform: "右豹", source: "OPC工具", region: "国内工具", track: "工具应用", tags: ["文字工具"], score: 0.0, heat: 0, status: "上架", visible: "全部", sort: 0, updated: "2025-09-07 21:22:02", slogan: "提取文章正文", intro: "从链接中提取文章标题、正文和封面。", detail: "输入文章链接后提取正文结构，便于二次编辑。", developer: "工具中台", developerLevel: "L2", newTag: false, jumpType: "内链", jumpUrl: "/tools/article", usageMode: "积分使用", freeMode: "每日免费", freeDaily: 1, workdayFree: 1, holidayFree: 2, costPoints: 10, todayClicks: 84, todayUses: 30, weekClicks: 620, weekUses: 210, clicks: 2660, uses: 904, earnedPoints: 9040, monetized: 1780 },
+        { iconText: "Q", iconColor: "cyan", name: "违禁词检测", platform: "右豹", source: "端内自研", region: "国内工具", track: "工具应用", tags: ["文字工具"], score: 0.0, heat: 0, status: "上架", visible: "全部", sort: 0, updated: "2025-09-07 21:22:36", slogan: "检测敏感词", intro: "检测文案中的违禁词和风险表达。", detail: "支持输入文案后标记疑似风险词，并给出替换建议。", developer: "工具中台", developerLevel: "L2", newTag: false, jumpType: "内链", jumpUrl: "/tools/risk-word", usageMode: "完全免费", freeMode: "每日免费", freeDaily: 5, workdayFree: 5, holidayFree: 5, costPoints: 0, todayClicks: 210, todayUses: 148, weekClicks: 1600, weekUses: 980, clicks: 5480, uses: 3312, earnedPoints: 0, monetized: 0 },
+        { iconText: "创", iconColor: "green", name: "爆款标题创作", platform: "右豹", source: "OPC工具", region: "国内工具", track: "内容创作", tags: ["行业神器", "AI工具"], score: 4.8, heat: 4, status: "下架", visible: "团等级", sort: 2, updated: "2025-09-07 21:25:12", slogan: "快速生成标题", intro: "基于行业模板生成短剧推广标题。", detail: "选择行业和风格后生成标题候选，支持复制和收藏。", developer: "增长实验室", developerLevel: "L4", newTag: true, jumpType: "外链", jumpUrl: "https://example.com/title", usageMode: "积分使用", freeMode: "每日免费", freeDaily: 2, workdayFree: 2, holidayFree: 3, costPoints: 30, todayClicks: 24, todayUses: 8, weekClicks: 180, weekUses: 62, clicks: 890, uses: 320, earnedPoints: 9600, monetized: 2360 }
       ],
       settlementAccounts: [
         {
@@ -5307,7 +6745,14 @@
     }
 
     function renderUsers() {
-      activeTableBody("users").innerHTML = state.users.map((item, index) => `
+      const rows = state.users
+        .map((item, index) => ({ item, index }))
+        .sort((a, b) => {
+          if (!state.userSort.key) return a.index - b.index;
+          const delta = Number(a.item[state.userSort.key]) - Number(b.item[state.userSort.key]);
+          return state.userSort.direction === "asc" ? delta : -delta;
+        });
+      activeTableBody("users").innerHTML = rows.map(({ item, index }) => `
         <tr>
           <td>${item.uid}<br><span class="muted">${item.phone}</span></td>
           <td>${fmt(item.available)}</td>
@@ -5324,6 +6769,29 @@
         </tr>
       `).join("");
       updateUserStats();
+    }
+
+    function updateUserSortHeaders() {
+      document.querySelectorAll("[data-user-sort-header]").forEach((header) => {
+        const key = header.dataset.userSortHeader;
+        const active = state.userSort.key === key && state.userSort.direction;
+        const direction = active ? state.userSort.direction : "none";
+        header.setAttribute("aria-sort", direction === "asc" ? "ascending" : direction === "desc" ? "descending" : "none");
+        const indicator = header.querySelector(".sort-indicator");
+        if (indicator) indicator.textContent = direction === "asc" ? "↑" : direction === "desc" ? "↓" : "↕";
+      });
+    }
+
+    function cycleUserSort(key) {
+      if (state.userSort.key !== key) {
+        state.userSort = { key, direction: "desc" };
+      } else if (state.userSort.direction === "desc") {
+        state.userSort.direction = "asc";
+      } else {
+        state.userSort = { key: "", direction: "" };
+      }
+      renderUsers();
+      updateUserSortHeaders();
     }
 
     function renderFlows(filter = state.activeFlowFilter) {
@@ -5357,11 +6825,261 @@
 
     function toolUsageText(item) {
       if (item.usageMode === "积分使用") {
-        return `积分使用 / 每日免费 ${fmt(item.freeDaily || 0)} 次 / 单次 ${fmt(item.costPoints || 0)} 积分`;
+        const pricingMode = item.pricingMode || "按次使用";
+        if (pricingMode === "阶梯付费") {
+          const tiers = Array.isArray(item.pricingTiers) ? item.pricingTiers.length : 0;
+          return `积分使用 / 工作日免费 ${fmt(item.workdayFree ?? item.freeDaily ?? 0)} 次 / 节假日免费 ${fmt(item.holidayFree ?? item.freeDaily ?? 0)} 次 / 阶梯付费 ${fmt(tiers)} 档`;
+        }
+        return `积分使用 / 工作日免费 ${fmt(item.workdayFree ?? item.freeDaily ?? 0)} 次 / 节假日免费 ${fmt(item.holidayFree ?? item.freeDaily ?? 0)} 次 / 单次 ${fmt(item.costPoints || 0)} 积分`;
       }
       const freeMode = item.freeMode || (item.freeDaily > 0 ? "每日免费" : "不限次免费");
       if (freeMode === "每日免费") return `完全免费 / 每日免费 ${fmt(item.freeDaily || 0)} 次`;
       return "完全免费 / 不限次免费";
+    }
+
+    function getToolUsageConfig(item) {
+      const freeDaily = Number(item.freeDaily || 0);
+      const pricingMode = item.pricingMode === "阶梯付费" ? "阶梯付费" : "按次使用";
+      const pricingTiers = Array.isArray(item.pricingTiers) && item.pricingTiers.length
+        ? item.pricingTiers.map((tier) => ({
+          uses: Number(tier.uses || 0),
+          originalPoints: Number(tier.originalPoints || tier.points || 0),
+          points: Number(tier.points || 0)
+        }))
+        : [{ uses: 1, originalPoints: Number(item.costPoints || 10), points: Number(item.costPoints || 10) }, { uses: 5, originalPoints: Number(item.costPoints || 10) * 5, points: Number(item.costPoints || 10) * 4 }];
+      return {
+        usageMode: item.usageMode === "积分使用" ? "积分使用" : "完全免费",
+        freeMode: item.freeMode || (freeDaily > 0 ? "每日免费" : "不限次免费"),
+        freeDaily,
+        workdayFree: Number(item.workdayFree ?? freeDaily),
+        holidayFree: Number(item.holidayFree ?? freeDaily),
+        costPoints: Number(item.costPoints || 0),
+        pricingMode,
+        pricingTiers
+      };
+    }
+
+    function renderUsageTierRows(tiers) {
+      return tiers.map((tier, index) => `
+        <div class="tier-row" data-tier-row="${index}">
+          <div class="field"><input type="number" min="1" data-tier-uses value="${tier.uses || 1}" aria-label="第${index + 1}档使用次数"></div>
+          <div class="field"><input type="number" min="1" data-tier-original-points value="${tier.originalPoints || tier.points || 1}" aria-label="第${index + 1}档原价积分"></div>
+          <div class="field"><input type="number" min="1" data-tier-points value="${tier.points || 1}" aria-label="第${index + 1}档消耗积分"></div>
+          <button class="btn" type="button" data-action="remove-usage-tier" data-index="${index}">删除</button>
+        </div>
+      `).join("");
+    }
+
+    function collectUsageTierRows() {
+      return [...document.querySelectorAll("#usageConfigForm [data-tier-row]")].map((row) => ({
+        uses: Number(row.querySelector("[data-tier-uses]")?.value || 0),
+        originalPoints: Number(row.querySelector("[data-tier-original-points]")?.value || 0),
+        points: Number(row.querySelector("[data-tier-points]")?.value || 0)
+      }));
+    }
+
+    function readUsageConfigDraft() {
+      const form = document.getElementById("usageConfigForm");
+      let draft = {};
+      try {
+        draft = JSON.parse(form?.dataset.usageConfig || "{}");
+      } catch {
+        draft = {};
+      }
+      const freeMode = document.querySelector("input[name='usageFreeMode']:checked")?.value;
+      const freeLimit = document.getElementById("usageFreeDailyLimit");
+      const workdayFreeLimit = document.getElementById("usageWorkdayFree");
+      const holidayFreeLimit = document.getElementById("usageHolidayFree");
+      const pricingMode = document.querySelector("input[name='usagePricingMode']:checked")?.value;
+      const costPoints = document.getElementById("usagePointCost");
+      const tierRows = document.querySelectorAll("#usageConfigForm [data-tier-row]");
+
+      if (freeMode) draft.freeMode = freeMode;
+      if (freeLimit) draft.freeDaily = Number(freeLimit.value || 0);
+      if (workdayFreeLimit) draft.workdayFree = Number(workdayFreeLimit.value || 0);
+      if (holidayFreeLimit) draft.holidayFree = Number(holidayFreeLimit.value || 0);
+      if (pricingMode) draft.pricingMode = pricingMode;
+      if (costPoints) draft.costPoints = Number(costPoints.value || 0);
+      if (tierRows.length) draft.pricingTiers = collectUsageTierRows();
+
+      return draft;
+    }
+
+    function renderUsageConfigFields(config) {
+      const container = document.getElementById("usageConfigFields");
+      if (!container) return;
+      const isFree = config.usageMode === "完全免费";
+
+      if (isFree) {
+        container.innerHTML = `
+          <div class="field">
+            <label>免费规则</label>
+            <div class="radio-rule-row">
+              <label class="radio-rule-card"><input type="radio" name="usageFreeMode" value="不限次免费" ${config.freeMode === "不限次免费" ? "checked" : ""}>不限次免费</label>
+              <label class="radio-rule-card"><input type="radio" name="usageFreeMode" value="每日免费" ${config.freeMode === "每日免费" ? "checked" : ""}>每日免费</label>
+            </div>
+          </div>
+          ${config.freeMode === "每日免费" ? `
+            <div class="field">
+              <label>每日免费次数</label>
+              <input id="usageFreeDailyLimit" type="number" min="1" value="${config.freeDaily || 1}">
+            </div>
+            <p class="usage-note">每日免费次数用完后，当天不可继续使用，次日自动重置。</p>
+          ` : ""}
+        `;
+        return;
+      }
+
+      container.innerHTML = `
+        <div class="field">
+          <label>工作日免费次数</label>
+          <input id="usageWorkdayFree" type="number" min="0" value="${config.workdayFree}">
+        </div>
+        <div class="field">
+          <label>节假日免费次数</label>
+          <input id="usageHolidayFree" type="number" min="0" value="${config.holidayFree}">
+        </div>
+        <div class="field">
+          <label>积分计费方式</label>
+          <div class="pricing-mode-row">
+            <label class="pricing-mode-card"><input type="radio" name="usagePricingMode" value="按次使用" ${config.pricingMode === "按次使用" ? "checked" : ""}>按次使用</label>
+            <label class="pricing-mode-card"><input type="radio" name="usagePricingMode" value="阶梯付费" ${config.pricingMode === "阶梯付费" ? "checked" : ""}>阶梯付费</label>
+          </div>
+        </div>
+        ${config.pricingMode === "按次使用" ? `
+          <div class="field">
+            <label>单次消耗积分</label>
+            <input id="usagePointCost" type="number" min="1" value="${config.costPoints || 1}">
+            <p class="usage-note">工作日和节假日免费次数均为 0 时，默认每次使用都消耗该积分。</p>
+          </div>
+        ` : `
+          <div class="tier-config">
+            <div class="tier-config-head"><span>使用次数</span><span>原价积分</span><span>消耗积分</span><span>操作</span></div>
+            <div id="usageTierRows">${renderUsageTierRows(config.pricingTiers)}</div>
+            <button class="btn tier-add" type="button" data-action="add-usage-tier"><i data-lucide="plus"></i>新增阶梯</button>
+            <p class="usage-config-hint">每行表示一个阶梯：使用 X 次，原价 X 积分，实际消耗 X 积分；可配置多个阶梯，使用次数不可重复。</p>
+          </div>
+        `}
+      `;
+      lucide.createIcons();
+    }
+
+    function syncToolUsageConfigFields() {
+      const mode = document.getElementById("usageConfigMode");
+      const form = document.getElementById("usageConfigForm");
+      if (!mode || !form) return;
+      const previousConfig = readUsageConfigDraft();
+      const previousMode = form.dataset.usageMode || previousConfig.usageMode || "完全免费";
+      const nextMode = mode.value === "积分使用" ? "积分使用" : "完全免费";
+      const config = {
+        ...previousConfig,
+        usageMode: nextMode,
+        freeMode: previousConfig.freeMode === "每日免费" ? "每日免费" : "不限次免费",
+        freeDaily: Number(previousConfig.freeDaily || 0),
+        workdayFree: Number(previousConfig.workdayFree ?? previousConfig.freeDaily ?? 0),
+        holidayFree: Number(previousConfig.holidayFree ?? previousConfig.freeDaily ?? 0),
+        costPoints: Number(previousConfig.costPoints || 1),
+        pricingMode: previousConfig.pricingMode === "阶梯付费" ? "阶梯付费" : "按次使用",
+        pricingTiers: Array.isArray(previousConfig.pricingTiers) && previousConfig.pricingTiers.length
+          ? previousConfig.pricingTiers
+          : [{ uses: 1, points: 1 }]
+      };
+
+      if (previousMode !== nextMode) {
+        if (nextMode === "完全免费") {
+          config.freeMode = "不限次免费";
+          config.freeDaily = 0;
+          config.workdayFree = 0;
+          config.holidayFree = 0;
+        } else {
+          config.freeDaily = 0;
+          config.workdayFree = 0;
+          config.holidayFree = 0;
+          config.pricingMode = "按次使用";
+        }
+      }
+
+      form.dataset.usageMode = nextMode;
+      form.dataset.usageConfig = JSON.stringify(config);
+      renderUsageConfigFields(config);
+    }
+
+    function openToolUsageConfig(index) {
+      const item = state.tools[Number(index)];
+      if (!item) return;
+      const config = getToolUsageConfig(item);
+      openModal(`${item.name} · 使用配置`, "单独配置工具使用门槛和积分计费规则，保存后立即同步用户端使用策略。", `
+        <div class="usage-config-form" id="usageConfigForm" data-tool-index="${index}">
+          <div class="field">
+            <label>使用门槛</label>
+            <select id="usageConfigMode">
+              <option ${config.usageMode === "完全免费" ? "selected" : ""}>完全免费</option>
+              <option ${config.usageMode === "积分使用" ? "selected" : ""}>积分使用</option>
+            </select>
+          </div>
+          <div id="usageConfigFields"></div>
+        </div>
+      `, `<button class="btn" data-modal-close>取消</button><button class="btn primary" data-action="save-tool-usage" data-index="${index}">保存配置</button>`);
+      const form = document.getElementById("usageConfigForm");
+      if (form) {
+        form.dataset.usageMode = config.usageMode;
+        form.dataset.usageConfig = JSON.stringify(config);
+      }
+      syncToolUsageConfigFields();
+    }
+
+    function saveToolUsage(index) {
+      const item = state.tools[Number(index)];
+      if (!item) return;
+      const mode = document.getElementById("usageConfigMode")?.value || "完全免费";
+      const freeMode = document.querySelector("input[name='usageFreeMode']:checked")?.value || "不限次免费";
+      const pricingMode = document.querySelector("input[name='usagePricingMode']:checked")?.value || "按次使用";
+      let freeDaily = 0;
+      let workdayFree = 0;
+      let holidayFree = 0;
+      let costPoints = 0;
+      let pricingTiers = [];
+
+      if (mode === "完全免费") {
+        if (freeMode === "每日免费") {
+          freeDaily = Number(document.getElementById("usageFreeDailyLimit")?.value || 0);
+          if (!Number.isInteger(freeDaily) || freeDaily < 1) return toast("配置未保存", "每日免费次数必须为大于 0 的整数。");
+        }
+        workdayFree = freeDaily;
+        holidayFree = freeDaily;
+      } else {
+        workdayFree = Number(document.getElementById("usageWorkdayFree")?.value || 0);
+        holidayFree = Number(document.getElementById("usageHolidayFree")?.value || 0);
+        if (!Number.isInteger(workdayFree) || workdayFree < 0) return toast("配置未保存", "工作日免费次数必须为大于等于 0 的整数。");
+        if (!Number.isInteger(holidayFree) || holidayFree < 0) return toast("配置未保存", "节假日免费次数必须为大于等于 0 的整数。");
+        freeDaily = workdayFree;
+        if (pricingMode === "按次使用") {
+          costPoints = Number(document.getElementById("usagePointCost")?.value || 0);
+          if (!Number.isInteger(costPoints) || costPoints < 1) return toast("配置未保存", "单次消耗积分必须为大于 0 的整数。");
+        } else {
+          pricingTiers = collectUsageTierRows();
+          if (!pricingTiers.length || pricingTiers.some((tier) => !Number.isInteger(tier.uses) || tier.uses < 1 || !Number.isInteger(tier.originalPoints) || tier.originalPoints < 1 || !Number.isInteger(tier.points) || tier.points < 1)) {
+            return toast("配置未保存", "每个阶梯的使用次数、原价积分和消耗积分都必须为大于 0 的整数。");
+          }
+          const usageCounts = pricingTiers.map((tier) => tier.uses);
+          if (new Set(usageCounts).size !== usageCounts.length) return toast("配置未保存", "阶梯使用次数不可重复。");
+          pricingTiers.sort((a, b) => a.uses - b.uses);
+          costPoints = pricingTiers[0].points;
+        }
+      }
+
+      item.usageMode = mode;
+      item.freeMode = mode === "完全免费" ? freeMode : "每日免费";
+      item.freeDaily = freeDaily;
+      item.workdayFree = workdayFree;
+      item.holidayFree = holidayFree;
+      item.pricingMode = mode === "积分使用" ? pricingMode : "按次使用";
+      item.costPoints = mode === "积分使用" && pricingMode === "按次使用" ? costPoints : 0;
+      item.pricingTiers = mode === "积分使用" && pricingMode === "阶梯付费" ? pricingTiers : [];
+      item.updated = "2026-09-10 14:30:00";
+      renderTools();
+      closeModal();
+      toast("使用配置已保存", `${item.name} 的使用门槛已更新。`);
     }
 
     function renderTools(rows = state.tools) {
@@ -5373,6 +7091,7 @@
             <td>${toolIcon(item)}</td>
             <td>${item.name}</td>
             <td>${item.platform}</td>
+            <td>${item.source || "端内自研"}</td>
             <td>${item.region}</td>
             <td>${item.track}</td>
             <td>${item.tags.map((tag) => `<span class="tag-chip">${tag}</span>`).join("") || "-"}</td>
@@ -5385,6 +7104,7 @@
             <td>${item.updated}</td>
             <td>
               <button class="link-btn" data-action="edit-tool" data-index="${originalIndex}">编辑</button>
+              <button class="link-btn" data-action="tool-usage-config" data-index="${originalIndex}">使用配置</button>
               <button class="link-btn" data-action="toggle-tool" data-index="${originalIndex}">${item.status === "上架" ? "下架" : "上架"}</button>
               <button class="link-btn" data-action="delete-tool" data-index="${originalIndex}" style="color:var(--danger)">删除</button>
             </td>
@@ -5448,11 +7168,78 @@
     }
 
     function switchSection(target) {
+      if (target === "points-config") target = pointsModuleDefaults.config;
+      if (target === "points-data") target = pointsModuleDefaults.data;
       state.activeSection = target;
       document.querySelectorAll(".nav button").forEach((item) => item.classList.toggle("active", item.dataset.section === target));
       document.querySelectorAll(".section").forEach((section) => section.classList.toggle("active", section.id === target));
       document.getElementById("pageTitle").textContent = labels[target][0];
       document.getElementById("pageDesc").textContent = labels[target][1];
+      const pointsModule = pointsModuleForSection(target);
+      document.querySelectorAll(".module-tabs").forEach((tabs) => {
+        const isCurrentModule = Boolean(pointsModule) && tabs.id === `points${pointsModule === "config" ? "Config" : "Data"}Tabs`;
+        tabs.classList.toggle("active", isCurrentModule);
+        tabs.querySelectorAll("button[data-section]").forEach((button) => {
+          const isActive = button.dataset.section === target;
+          button.classList.toggle("active", isActive);
+          button.setAttribute("aria-selected", String(isActive));
+        });
+      });
+      document.querySelectorAll("[data-nav-group]").forEach((item) => {
+        item.classList.toggle("active", item.dataset.navGroup === `points-${pointsModule}`);
+      });
+      const ruleButton = document.querySelector(".rule-btn");
+      if (ruleButton) ruleButton.style.display = target === "businessExplain" ? "none" : "inline-flex";
+      if (target === "businessExplain") {
+        requestAnimationFrame(() => {
+          const handbookContent = document.querySelector("#businessExplain .handbook-content");
+          handbookContent?.dispatchEvent(new Event("scroll"));
+        });
+      }
+    }
+
+    function setupBusinessHandbook() {
+      const handbook = document.querySelector("#dashboard > .handbook");
+      const businessSection = document.getElementById("businessExplain");
+      if (!handbook || !businessSection) return;
+      businessSection.innerHTML = "";
+      businessSection.appendChild(handbook);
+      const content = handbook.querySelector(".handbook-content");
+      const buttons = [...handbook.querySelectorAll("[data-handbook-target]")];
+      const sections = buttons
+        .map((button) => document.getElementById(button.dataset.handbookTarget))
+        .filter(Boolean);
+      const setActiveChapter = (activeSection) => {
+        buttons.forEach((button) => {
+          button.classList.toggle("active", button.dataset.handbookTarget === activeSection.id);
+        });
+      };
+
+      buttons.forEach((button) => {
+        button.addEventListener("click", () => {
+          const target = document.getElementById(button.dataset.handbookTarget);
+          if (!target || !content) return;
+          const contentRect = content.getBoundingClientRect();
+          const targetRect = target.getBoundingClientRect();
+          content.scrollTo({
+            top: Math.max(0, content.scrollTop + targetRect.top - contentRect.top - 18),
+            behavior: "smooth"
+          });
+          setActiveChapter(target);
+        });
+      });
+
+      if (!content || !sections.length) return;
+      const syncActiveChapter = () => {
+        const marker = content.getBoundingClientRect().top + 34;
+        let current = sections[0];
+        sections.forEach((section) => {
+          if (section.getBoundingClientRect().top <= marker) current = section;
+        });
+        setActiveChapter(current);
+      };
+      content.addEventListener("scroll", syncActiveChapter, { passive: true });
+      syncActiveChapter();
     }
 
     function formField(label, value, type = "text") {
@@ -5495,11 +7282,6 @@
           </div>
         </div>
       `;
-    }
-
-    function getToolFreeMode(item) {
-      if (item.usageMode !== "完全免费") return item.freeMode || "每日免费";
-      return item.freeMode || (item.freeDaily > 0 ? "每日免费" : "不限次免费");
     }
 
     function openGoodForm(index) {
@@ -5655,14 +7437,14 @@
     }
 
     function openToolForm(index) {
-      const item = state.tools[index] || { iconText: "+", iconColor: "blue", name: "", platform: "右豹", region: "国内工具", track: "工具应用", tags: [], score: 0, heat: 0, status: "上架", visible: "全部", sort: 0, updated: "", slogan: "", intro: "", detail: "", developer: "", developerLevel: "", newTag: false, jumpType: "内链", jumpUrl: "", usageMode: "完全免费", freeMode: "不限次免费", freeDaily: 0, costPoints: 0, todayClicks: 0, todayUses: 0, weekClicks: 0, weekUses: 0, clicks: 0, uses: 0 };
-      const freeMode = getToolFreeMode(item);
+      const item = state.tools[index] || { iconText: "+", iconColor: "blue", name: "", platform: "右豹", source: "端内自研", region: "国内工具", track: "工具应用", tags: [], score: 0, heat: 0, status: "上架", visible: "全部", sort: 0, updated: "", slogan: "", intro: "", detail: "", developer: "", developerLevel: "", newTag: false, jumpType: "内链", jumpUrl: "", todayClicks: 0, todayUses: 0, weekClicks: 0, weekUses: 0, clicks: 0, uses: 0 };
       openModal(index == null ? "新增推广工具" : "编辑推广工具", "配置工具基础信息和数据跳转，保存后同步工具列表和工具数据。", `
         <div class="form tool-form" id="toolForm">
           <section class="form-section">
             <h4>基础信息</h4>
             <div class="form-section-grid">
               <div class="field"><label>所属平台</label><select><option ${item.platform === "右豹" ? "selected" : ""}>右豹</option><option ${item.platform === "小程序" ? "selected" : ""}>小程序</option></select></div>
+              <div class="field"><label>工具来源</label><select><option ${item.source !== "OPC工具" ? "selected" : ""}>端内自研</option><option ${item.source === "OPC工具" ? "selected" : ""}>OPC工具</option></select></div>
               ${formField("工具名称", item.name || "数据助手")}
               <div class="field"><label>区域</label><select><option ${item.region === "国内工具" ? "selected" : ""}>国内工具</option><option ${item.region === "海外工具" ? "selected" : ""}>海外工具</option></select></div>
               <div class="field"><label>一级赛道</label><select><option ${item.track === "工具应用" ? "selected" : ""}>工具应用</option><option ${item.track === "短剧推广" ? "selected" : ""}>短剧推广</option><option ${item.track === "内容创作" ? "selected" : ""}>内容创作</option></select></div>
@@ -5687,17 +7469,10 @@
               <div class="field"><label>跳转类型</label><select><option ${item.jumpType === "内链" ? "selected" : ""}>内链</option><option ${item.jumpType === "外链" ? "selected" : ""}>外链</option></select></div>
               ${formField("跳转链接", item.jumpUrl)}
               ${renderToolVisibleControl(item.visible)}
-              <div class="field"><label>使用门槛</label><select id="toolUsageMode"><option ${item.usageMode === "完全免费" ? "selected" : ""}>完全免费</option><option ${item.usageMode === "积分使用" ? "selected" : ""}>积分使用</option></select></div>
-              <div class="field free-usage-fields"><label>免费规则</label><select id="toolFreeMode"><option ${freeMode === "不限次免费" ? "selected" : ""}>不限次免费</option><option ${freeMode === "每日免费" ? "selected" : ""}>每日免费x次</option></select></div>
-              <div class="field free-limit-fields"><label>每日免费次数</label><input id="toolFreeDailyLimit" type="number" min="1" value="${item.usageMode === "完全免费" && freeMode === "每日免费" ? item.freeDaily || 1 : 1}"></div>
-              <div class="field span-2 free-limit-fields"><p class="usage-note">每日免费次数用完后，前端需置灰使用按钮并提示“今日免费次数已用完，明日可继续使用”，该工具不再支持继续使用。</p></div>
-              <div class="field usage-fields"><label>每日可免费次数</label><input type="number" min="0" value="${item.usageMode === "积分使用" ? item.freeDaily || 0 : 0}"></div>
-              <div class="field usage-fields"><label>单次消耗积分</label><input type="number" min="0" value="${item.costPoints || 0}"></div>
             </div>
           </section>
         </div>
       `, `<button class="btn" data-modal-close>取消</button><button class="btn primary" data-action="save-tool" data-index="${index ?? ""}">保存</button>`);
-      syncToolUsageFields();
     }
 
     function saveTool(index) {
@@ -5708,8 +7483,10 @@
         if (control.multiple) return [...control.selectedOptions].map((option) => option.value);
         return control.value.trim();
       };
+      const previousItem = index === "" ? null : state.tools[Number(index)];
       const item = {
         platform: get("所属平台"),
+        source: get("工具来源") || "端内自研",
         name: get("工具名称") || "未命名工具",
         region: get("区域"),
         track: get("一级赛道"),
@@ -5729,14 +7506,20 @@
         jumpType: get("跳转类型"),
         jumpUrl: get("跳转链接"),
         visible: getToolVisibleValue(),
-        usageMode: get("使用门槛"),
-        freeMode: get("使用门槛") === "完全免费" ? get("免费规则") : "每日免费",
-        freeDaily: get("使用门槛") === "积分使用"
-          ? Number(get("每日可免费次数") || 0)
-          : get("免费规则") === "每日免费x次"
-            ? Number(document.getElementById("toolFreeDailyLimit")?.value || 0)
-            : 0,
-        costPoints: get("使用门槛") === "积分使用" ? Number(get("单次消耗积分") || 0) : 0,
+        usageMode: previousItem?.usageMode || "完全免费",
+        freeMode: previousItem?.freeMode || "不限次免费",
+        freeDaily: Number(previousItem?.freeDaily || 0),
+        workdayFree: Number(previousItem?.workdayFree ?? previousItem?.freeDaily ?? 0),
+        holidayFree: Number(previousItem?.holidayFree ?? previousItem?.freeDaily ?? 0),
+        costPoints: Number(previousItem?.costPoints || 0),
+        pricingMode: previousItem?.pricingMode || "按次使用",
+        pricingTiers: Array.isArray(previousItem?.pricingTiers)
+          ? previousItem.pricingTiers.map((tier) => ({
+            uses: Number(tier.uses || 0),
+            originalPoints: Number(tier.originalPoints || tier.points || 0),
+            points: Number(tier.points || 0)
+          }))
+          : [],
         updated: "2026-08-17 19:18:00",
         todayClicks: index === "" ? 0 : state.tools[Number(index)].todayClicks,
         todayUses: index === "" ? 0 : state.tools[Number(index)].todayUses,
@@ -5793,12 +7576,14 @@
       const name = document.getElementById("toolNameFilter").value.trim();
       const region = document.getElementById("toolRegionFilter").value;
       const platform = document.getElementById("toolPlatformFilter").value;
+      const source = document.getElementById("toolSourceFilter").value;
       const track = document.getElementById("toolTrackFilter").value;
       const status = document.getElementById("toolStatusFilter").value;
       const rows = state.tools.filter((item) => {
         return (!name || item.name.includes(name))
           && (region === "全部" || item.region === region)
           && (platform === "全部" || item.platform === platform)
+          && (source === "全部" || (item.source || "端内自研") === source)
           && (track === "全部" || item.track === track)
           && (status === "全部" || item.status === status);
       });
@@ -6254,23 +8039,6 @@
       limitField.style.display = limit.value === "开启" ? "grid" : "none";
     }
 
-    function syncToolUsageFields() {
-      const mode = document.getElementById("toolUsageMode");
-      if (!mode) return;
-      const freeMode = document.getElementById("toolFreeMode");
-      const isFree = mode.value === "完全免费";
-      const isPoint = mode.value === "积分使用";
-      document.querySelectorAll("#toolForm .usage-fields").forEach((field) => {
-        field.classList.toggle("hidden", !isPoint);
-      });
-      document.querySelectorAll("#toolForm .free-usage-fields").forEach((field) => {
-        field.classList.toggle("hidden", !isFree);
-      });
-      document.querySelectorAll("#toolForm .free-limit-fields").forEach((field) => {
-        field.classList.toggle("hidden", !isFree || freeMode?.value !== "每日免费x次");
-      });
-    }
-
     function syncToolVisibleMode(mode) {
       const control = document.getElementById("toolVisibleControl");
       if (!control) return;
@@ -6392,6 +8160,30 @@
       }
       if (action === "new-tool") return openToolForm();
       if (action === "edit-tool") return openToolForm(Number(index));
+      if (action === "tool-usage-config") return openToolUsageConfig(Number(index));
+      if (action === "save-tool-usage") return saveToolUsage(index);
+      if (action === "add-usage-tier") {
+        const rows = document.getElementById("usageTierRows");
+        if (!rows) return;
+        const nextIndex = rows.querySelectorAll("[data-tier-row]").length;
+        rows.insertAdjacentHTML("beforeend", `
+          <div class="tier-row" data-tier-row="${nextIndex}">
+            <div class="field"><input type="number" min="1" data-tier-uses value="${(nextIndex + 1) * 5}" aria-label="第${nextIndex + 1}档使用次数"></div>
+            <div class="field"><input type="number" min="1" data-tier-original-points value="${(nextIndex + 1) * 60}" aria-label="第${nextIndex + 1}档原价积分"></div>
+            <div class="field"><input type="number" min="1" data-tier-points value="${(nextIndex + 1) * 40}" aria-label="第${nextIndex + 1}档消耗积分"></div>
+            <button class="btn" type="button" data-action="remove-usage-tier" data-index="${nextIndex}">删除</button>
+          </div>
+        `);
+        return;
+      }
+      if (action === "remove-usage-tier") {
+        const rows = document.getElementById("usageTierRows");
+        const row = target.closest("[data-tier-row]");
+        if (!rows || !row) return;
+        if (rows.querySelectorAll("[data-tier-row]").length <= 1) return toast("无法删除", "至少保留一个阶梯配置。");
+        row.remove();
+        return;
+      }
       if (action === "save-tool") return saveTool(index);
       if (action === "toggle-tool") {
         const item = state.tools[Number(index)];
@@ -6499,6 +8291,14 @@
 
       document.querySelectorAll(".nav button").forEach((button) => {
         if (!button.dataset.section) return;
+        button.addEventListener("click", () => {
+          if (button.dataset.navGroup === "points-config") return switchSection("points-config");
+          if (button.dataset.navGroup === "points-data") return switchSection("points-data");
+          switchSection(button.dataset.section);
+        });
+      });
+
+      document.querySelectorAll(".module-tabs button[data-section]").forEach((button) => {
         button.addEventListener("click", () => switchSection(button.dataset.section));
       });
 
@@ -6562,7 +8362,9 @@
         if (event.target.id === "taskConditionType") syncTaskProjectField();
         if (["codePointsMode", "codeProduct"].includes(event.target.id)) syncCodePointsFields();
         if (event.target.id === "codeLimitEnabled") syncCodeLimitField();
-        if (["toolUsageMode", "toolFreeMode"].includes(event.target.id)) syncToolUsageFields();
+        if (event.target.id === "usageConfigMode"
+          || event.target.name === "usageFreeMode"
+          || event.target.name === "usagePricingMode") syncToolUsageConfigFields();
       });
 
       document.getElementById("modalBody").addEventListener("input", (event) => {
@@ -6573,6 +8375,10 @@
       document.querySelector("#codes .panel-head .btn").addEventListener("click", openCodeForm);
       document.querySelector("#tasks .panel-head .btn").addEventListener("click", () => openTaskForm());
       document.querySelector("#users .panel-head .btn").addEventListener("click", () => openAdjustForm(0));
+
+      document.querySelectorAll("[data-user-sort]").forEach((button) => {
+        button.addEventListener("click", () => cycleUserSort(button.dataset.userSort));
+      });
 
       document.querySelectorAll("#dashboard .tabs button").forEach((button) => {
         button.addEventListener("click", () => {
@@ -6653,6 +8459,7 @@
     renderCodes();
     renderTasks();
     renderUsers();
+    updateUserSortHeaders();
     renderFlows();
     renderTools();
     renderToolData();
@@ -6661,6 +8468,7 @@
     renderMentorReviews();
     document.querySelectorAll(".line-compare").forEach((chart) => renderLineCompare(chart, "day"));
     syncToolDemoLinks();
+    setupBusinessHandbook();
     bindEvents();
     lucide.createIcons();
   </script>
