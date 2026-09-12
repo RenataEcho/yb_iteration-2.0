@@ -600,7 +600,7 @@
     <!-- 左侧说明与场景切换 -->
     <div class="proto-panel">
       <h1>工具使用门槛 · 交互原型</h1>
-      <p class="subtitle">以「文本检测」工具页为例，演示两种计费模式下的完整交互流程</p>
+      <p class="subtitle">以「文本检测」工具页为例，演示免费和积分两种使用门槛的完整交互流程</p>
 
       <div class="rule-card">
         <h3><span class="tag tag-free">模式 A</span> 完全免费</h3>
@@ -615,9 +615,10 @@
         <h3><span class="tag tag-points">模式 B</span> 积分使用</h3>
         <ul>
           <li>后台可配置<strong>每日免费次数</strong>（如 3 次/天）和<strong>单次消耗积分</strong>（如 10 积分/次）</li>
+          <li>计费方式支持<strong>按次使用</strong>和<strong>阶梯付费</strong>，阶梯付费可配置多个「使用 X 次 / 消耗 Y 积分」规则</li>
           <li>顶部展示「今日免费剩余 X/Y」+ 当前积分余额</li>
           <li>有免费次数 → 直接检测，消耗 1 次免费额度</li>
-          <li>免费用完 → 点击检测弹出确认：「本次将消耗 N 积分」</li>
+          <li>免费用完 → 按次使用或匹配阶梯规则，点击检测弹出确认：「本次将消耗 N 积分」</li>
           <li>积分不足 → 按钮仍可点，弹窗引导充值/做任务</li>
         </ul>
       </div>
@@ -625,11 +626,12 @@
       <div class="scenario-group">
         <label>切换演示场景（点击后观察手机界面变化）</label>
         <div class="scenario-btns" id="scenarioBtns">
-          <button class="active" data-scenario="free-unlimited">A · 完全免费</button>
-          <button data-scenario="points-has-free">B · 有免费次数 (2/3)</button>
-          <button data-scenario="points-no-free">B · 免费已用完</button>
-          <button data-scenario="points-low">B · 积分不足</button>
-          <button data-scenario="points-zero-free">B · 无免费配置 (纯积分)</button>
+          <button class="active" data-scenario="free-unlimited">完全免费</button>
+          <button data-scenario="points-has-free">有免费次数 (2/3)</button>
+          <button data-scenario="points-no-free">免费已用完</button>
+          <button data-scenario="points-tiered">阶梯付费</button>
+          <button data-scenario="points-low">积分不足</button>
+          <button data-scenario="points-zero-free">无免费配置 (纯积分)</button>
         </div>
       </div>
 
@@ -638,7 +640,7 @@
         ① 进入页面 → 读取今日已用次数 & 积分余额 → 渲染额度条<br>
         ② 点击「立即检测」→ 校验输入 → 判断免费/付费路径<br>
         ③ 免费路径：直接检测 → Toast「检测完成，今日免费剩余 X 次」<br>
-        ④ 付费路径：弹窗确认消耗积分 → 确认后检测 → 扣积分 → 展示结果<br>
+        ④ 付费路径：按次或匹配阶梯 → 弹窗确认消耗积分 → 确认后检测 → 扣积分 → 展示结果<br>
         ⑤ 积分不足：弹窗「积分不足，去充值 / 做任务赚积分」
       </div>
 
@@ -688,6 +690,13 @@
               <a class="points-link" id="pointsLink">充值 ›</a>
             </div>
 
+            <div class="usage-bar" id="pricingBar" style="display:none">
+              <div class="left">
+                <span class="badge badge-points">阶梯付费</span>
+                <span class="detail" id="pricingDetail">1次 / 10积分 · 5次 / 40积分 · 10次 / 70积分</span>
+              </div>
+            </div>
+
             <!-- 完全免费标识（模式 A 显示） -->
             <div class="usage-bar" id="freeBar" style="display:none">
               <div class="left">
@@ -731,7 +740,7 @@
               <div class="modal-head">
                 <div class="icon icon-warn">💎</div>
                 <h3>确认消耗积分</h3>
-                <p>今日免费次数已用完，本次检测将消耗 <span class="highlight" id="confirmCost">10</span> 积分<br>当前余额：<span id="confirmBalance">128</span> 积分</p>
+                <p>今日免费次数已用完，本次检测将消耗 <span class="highlight" id="confirmCost">10</span> 积分<br><span id="confirmTierHint"></span><br>当前余额：<span id="confirmBalance">128</span> 积分</p>
               </div>
               <div class="modal-actions">
                 <button class="cancel" data-close="modalConfirm">取消</button>
@@ -799,6 +808,7 @@
       'free-unlimited': '<strong>当前场景：</strong>完全免费 — 点击「立即检测」直接出结果，无额度限制',
       'points-has-free': '<strong>当前场景：</strong>积分模式 · 有免费次数 — 直接检测，消耗 1 次今日免费额度',
       'points-no-free': '<strong>当前场景：</strong>积分模式 · 免费已用完 — 点击检测会弹出积分确认弹窗',
+      'points-tiered': '<strong>当前场景：</strong>积分模式 · 阶梯付费 — 免费次数优先，免费用完后按今日已付费使用次数匹配阶梯',
       'points-low': '<strong>当前场景：</strong>积分模式 · 积分不足 — 点击检测弹出充值引导',
       'points-zero-free': '<strong>当前场景：</strong>纯积分模式（无免费配置）— 每次检测均需确认消耗积分',
     };
@@ -807,6 +817,7 @@
       'free-unlimited': 1,
       'points-has-free': 2,
       'points-no-free': 3,
+      'points-tiered': 3,
       'points-low': 4,
       'points-zero-free': 3,
     };
@@ -822,13 +833,18 @@
         mode: 'points', dailyUsed: 1, points: 128, dailyFreeLimit: 3,
       },
       'points-no-free': {
-        mode: 'points', dailyUsed: 3, points: 128, dailyFreeLimit: 3,
+        mode: 'points', dailyUsed: 3, points: 128, dailyFreeLimit: 3, pricingMode: '按次使用',
+      },
+      'points-tiered': {
+        mode: 'points', dailyUsed: 3, points: 128, dailyFreeLimit: 3, pricingMode: '阶梯付费',
+        paidUses: 4,
+        pricingTiers: [{ uses: 1, points: 10 }, { uses: 5, points: 40 }, { uses: 10, points: 70 }],
       },
       'points-low': {
-        mode: 'points', dailyUsed: 3, points: 5, dailyFreeLimit: 3,
+        mode: 'points', dailyUsed: 3, points: 5, dailyFreeLimit: 3, pricingMode: '按次使用',
       },
       'points-zero-free': {
-        mode: 'points', dailyUsed: 0, points: 128, dailyFreeLimit: 0,
+        mode: 'points', dailyUsed: 0, points: 128, dailyFreeLimit: 0, pricingMode: '按次使用', paidUses: 0,
       },
     };
 
@@ -879,18 +895,24 @@
     function renderUI() {
       const usageBar = $('usageBar');
       const freeBar = $('freeBar');
+      const pricingBar = $('pricingBar');
       const costHint = $('costHint');
       const btnDetect = $('btnDetect');
 
       if (state.mode === 'free') {
         usageBar.style.display = 'none';
         freeBar.style.display = 'flex';
+        pricingBar.style.display = 'none';
         costHint.style.display = 'none';
         btnDetect.disabled = false;
         btnDetect.innerHTML = '立即检测';
       } else {
         freeBar.style.display = 'none';
         usageBar.style.display = 'flex';
+        pricingBar.style.display = state.pricingMode === '阶梯付费' ? 'flex' : 'none';
+        if (state.pricingMode === '阶梯付费') {
+          $('pricingDetail').textContent = (state.pricingTiers || []).map((tier) => `${tier.uses}次 / ${tier.points}积分`).join(' · ');
+        }
         const remaining = getFreeRemaining();
 
         if (state.dailyFreeLimit > 0) {
@@ -898,7 +920,9 @@
           $('usageBadge').textContent = remaining > 0 ? '免费剩余' : '积分模式';
           $('usageBadge').className = 'badge ' + (remaining > 0 ? 'badge-free' : 'badge-points');
         } else {
-          $('usageDetail').textContent = `每次 ${state.costPerUse} 积分 · 余额 ${state.points}`;
+          $('usageDetail').textContent = state.pricingMode === '阶梯付费'
+            ? `已付费使用 ${state.paidUses || 0} 次 · 本次 ${getCurrentCost()} 积分 · 余额 ${state.points}`
+            : `每次 ${state.costPerUse} 积分 · 余额 ${state.points}`;
           $('usageBadge').textContent = '积分模式';
           $('usageBadge').className = 'badge badge-points';
         }
@@ -907,17 +931,34 @@
         if (remaining > 0) {
           costHint.style.display = 'none';
           btnDetect.innerHTML = '立即检测';
-        } else if (state.points >= state.costPerUse) {
+        } else if (state.points >= getCurrentCost()) {
           costHint.style.display = 'block';
-          costHint.textContent = `本次消耗 ${state.costPerUse} 积分`;
-          btnDetect.innerHTML = `立即检测<span class="cost-hint">本次消耗 ${state.costPerUse} 积分</span>`;
+          const cost = getCurrentCost();
+          const tierHint = state.pricingMode === '阶梯付费' ? ` · 第${getCurrentTier().uses}次档` : '';
+          costHint.textContent = `本次消耗 ${cost} 积分${tierHint}`;
+          btnDetect.innerHTML = `立即检测<span class="cost-hint">本次消耗 ${cost} 积分${tierHint}</span>`;
         } else {
           costHint.style.display = 'block';
-          costHint.textContent = `积分不足（需 ${state.costPerUse} 积分）`;
-          btnDetect.innerHTML = `立即检测<span class="cost-hint">积分不足（需 ${state.costPerUse} 积分）</span>`;
+          const cost = getCurrentCost();
+          const tierHint = state.pricingMode === '阶梯付费' ? ` · 第${getCurrentTier().uses}次档` : '';
+          costHint.textContent = `积分不足（需 ${cost} 积分${tierHint}）`;
+          btnDetect.innerHTML = `立即检测<span class="cost-hint">积分不足（需 ${cost} 积分${tierHint}）</span>`;
         }
         btnDetect.disabled = false;
       }
+    }
+
+    function getCurrentTier() {
+      const tiers = (state.pricingTiers || [])
+        .filter((item) => Number(item.uses) > 0 && Number(item.points) > 0)
+        .sort((a, b) => Number(a.uses) - Number(b.uses));
+      if (!tiers.length) return { uses: 1, points: state.costPerUse };
+      const nextUse = Number(state.paidUses || 0) + 1;
+      return tiers.reduce((selected, tier) => nextUse >= Number(tier.uses) ? tier : selected, tiers[0]);
+    }
+
+    function getCurrentCost() {
+      return state.pricingMode === '阶梯付费' ? Number(getCurrentTier().points) : state.costPerUse;
     }
 
     function showToast(msg, duration = 1800) {
@@ -944,8 +985,12 @@
       if (state.mode === 'free') {
         meta = '免费检测 · 不限次数';
       } else if (paidViaPoints) {
-        state.points -= state.costPerUse;
-        meta = `消耗 ${state.costPerUse} 积分 · 余额 ${state.points}`;
+        const currentTier = getCurrentTier();
+        const cost = Number(currentTier.points);
+        state.points -= cost;
+        const tierLabel = state.pricingMode === '阶梯付费' ? ` · 阶梯${currentTier.uses}次档` : '';
+        state.paidUses = (state.paidUses || 0) + 1;
+        meta = `消耗 ${cost} 积分${tierLabel} · 余额 ${state.points}`;
       } else if (remaining > 0) {
         state.dailyUsed += 1;
         const left = getFreeRemaining();
@@ -981,15 +1026,18 @@
       }
 
       // 无免费 → 检查积分
-      if (state.points >= state.costPerUse) {
-        $('confirmCost').textContent = state.costPerUse;
+      if (state.points >= getCurrentCost()) {
+        $('confirmCost').textContent = getCurrentCost();
         $('confirmBalance').textContent = state.points;
+        $('confirmTierHint').textContent = state.pricingMode === '阶梯付费'
+          ? `当前为第${(state.paidUses || 0) + 1}次付费使用，匹配${getCurrentTier().uses}次档`
+          : '';
         showModal('modalConfirm');
         return;
       }
 
       // 积分不足
-      $('needPoints').textContent = state.costPerUse;
+      $('needPoints').textContent = getCurrentCost();
       $('currentPoints').textContent = state.points;
       showModal('modalInsufficient');
     }
@@ -1026,8 +1074,9 @@
 
     $('btnConfirmPay').addEventListener('click', () => {
       hideModal('modalConfirm');
+      const cost = getCurrentCost();
       runDetection(true);
-      showToast(`检测完成，已消耗 ${state.costPerUse} 积分`);
+      showToast(`检测完成，已消耗 ${cost} 积分`);
     });
 
     $('btnGoRecharge').addEventListener('click', () => {
