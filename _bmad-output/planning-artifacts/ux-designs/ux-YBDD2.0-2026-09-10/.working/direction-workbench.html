@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>方向 · 工作台 · 上传稿件</title>
+  <style>
+    /* bench #eef1f4 · ink #1a2332 · mute #64748b · line #cfd6de */
+    /* rail #d8dee6 · ticket #ffffff · product #ff6b1a · product-wash #fff3eb */
+    /* unzip #334155 · fail #dc2626 · shell-nav #1a2332 · exist #94a3b8 */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: #d5dbe3;
+      color: #1a2332;
+      padding: 32px 24px 64px;
+    }
+    .rationale {
+      max-width: 1120px;
+      margin: 0 auto 24px;
+      font-size: 14px;
+      line-height: 1.7;
+      font-weight: 500;
+    }
+    .variant { max-width: 1120px; margin: 0 auto; }
+    .cap {
+      max-width: 1120px;
+      margin: 0 auto 8px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: #64748b;
+    }
+    .browser {
+      max-width: 1120px;
+      margin: 0 auto 36px;
+      background: #111827;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 16px 40px rgba(15, 23, 42, 0.22);
+    }
+    .chrome {
+      height: 34px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 0 10px;
+    }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: #4b5563; }
+    .url {
+      flex: 1; height: 20px; border-radius: 3px; background: #1f2937;
+      color: #94a3b8; font-size: 11px; display: flex; align-items: center; padding: 0 8px;
+    }
+    .pc {
+      height: 700px;
+      background: #fff;
+      display: grid;
+      grid-template-rows: 52px 1fr;
+      position: relative;
+    }
+    .topbar {
+      background: #1a2332;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 14px; }
+    .brand i {
+      width: 26px; height: 26px; border-radius: 6px; background: #ff6b1a;
+      display: grid; place-items: center; font-style: normal; font-size: 12px; font-weight: 700;
+    }
+    .who { font-size: 12px; color: #cbd5e1; }
+    .layout { display: grid; grid-template-columns: 200px 1fr; min-height: 0; }
+    .side { background: #f8fafc; border-right: 1px solid #e6e8eb; padding: 14px 8px; }
+    .hint { font-size: 10px; color: #94a3b8; padding: 6px 10px 8px; }
+    .nav { display: block; padding: 9px 12px; border-radius: 8px; font-size: 13px; color: #94a3b8; }
+    .nav.on { background: #fff3eb; color: #ff6b1a; font-weight: 700; }
+    .main { background: #f4f5f7; padding: 18px 20px; }
+    .main h1 { font-size: 18px; }
+    .desc { font-size: 12px; color: #8a93a0; margin: 4px 0 14px; }
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .stat { background: #fff; border: 1px solid #e6e8eb; border-radius: 10px; padding: 12px; }
+    .stat span { font-size: 12px; color: #8a93a0; }
+    .stat b { display: block; margin-top: 6px; font-size: 20px; }
+    .veil { position: absolute; inset: 52px 0 0; background: rgba(15, 23, 42, 0.38); }
+    .modal {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 860px;
+      height: 540px;
+      background: #eef1f4;
+      display: grid;
+      grid-template-columns: 132px 1fr;
+      border: 1px solid #cfd6de;
+      box-shadow: 0 20px 48px rgba(15, 23, 42, 0.28);
+    }
+    .rail {
+      background: #d8dee6;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    .job {
+      padding: 16px 14px 12px;
+      border-bottom: 1px solid #cfd6de;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: #334155;
+    }
+    .st {
+      position: relative;
+      padding: 14px 14px 14px 28px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #64748b;
+      border-left: 3px solid transparent;
+    }
+    .st::before {
+      content: "";
+      position: absolute;
+      left: 14px;
+      top: 18px;
+      width: 7px;
+      height: 7px;
+      border: 1.5px solid #64748b;
+      background: #d8dee6;
+    }
+    .st + .st::after {
+      content: "";
+      position: absolute;
+      left: 17px;
+      top: -10px;
+      width: 1px;
+      height: 26px;
+      background: #94a3b8;
+    }
+    .st.on {
+      background: #eef1f4;
+      color: #1a2332;
+      border-left-color: #ff6b1a;
+    }
+    .st.on::before { background: #ff6b1a; border-color: #ff6b1a; }
+    .st small { display: block; font-weight: 500; color: #64748b; margin-top: 2px; }
+    .panel { display: flex; flex-direction: column; background: #fff; min-width: 0; }
+    .head {
+      height: 48px;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #cfd6de;
+    }
+    .head h2 { font-size: 15px; font-weight: 700; }
+    .head span { font-size: 12px; color: #64748b; font-weight: 500; margin-left: 10px; }
+    .x {
+      width: 26px; height: 26px; border: 1px solid #cfd6de; background: #eef1f4;
+      font-size: 14px; color: #334155; cursor: default;
+    }
+    .body { padding: 16px 18px 8px; flex: 1; }
+    .zones { display: grid; grid-template-columns: 1fr 1fr; gap: 0; min-height: 360px; }
+    .zone { padding: 0 16px 0 0; }
+    .zone + .zone { padding: 0 0 0 16px; border-left: 1px solid #e6e8eb; }
+    .zone h3 {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: #64748b;
+      margin-bottom: 12px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid #1a2332;
+      display: inline-block;
+    }
+    .row {
+      display: grid;
+      grid-template-columns: 72px 1fr;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .row label { font-size: 12px; font-weight: 600; color: #334155; }
+    .row input, .row select {
+      width: 100%;
+      height: 32px;
+      border: 1px solid #cfd6de;
+      background: #eef1f4;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 0 8px;
+    }
+    .row input[readonly] { color: #64748b; background: #f8fafc; }
+    .foot {
+      padding: 10px 16px;
+      border-top: 1px solid #cfd6de;
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      background: #eef1f4;
+    }
+    .btn {
+      height: 32px;
+      padding: 0 14px;
+      border: 1px solid #cfd6de;
+      background: #fff;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      color: #334155;
+      cursor: default;
+    }
+    .btn-go { background: #ff6b1a; border-color: #ff6b1a; color: #fff; }
+    .packs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .pack {
+      border: 1px solid #cfd6de;
+      background: #eef1f4;
+      padding: 12px 12px 14px;
+      text-align: left;
+      min-height: 96px;
+    }
+    .pack b { display: block; font-size: 13px; margin-bottom: 6px; }
+    .pack span { font-size: 12px; color: #64748b; line-height: 1.5; font-weight: 500; }
+    .pack.on { border-color: #1a2332; background: #fff; box-shadow: inset 3px 0 0 #ff6b1a; }
+    .unzip {
+      margin-top: 12px;
+      border: 1px solid #cfd6de;
+      background: #1a2332;
+      color: #e2e8f0;
+      padding: 18px 16px;
+    }
+    .unzip strong { display: block; font-size: 13px; margin-bottom: 8px; }
+    .unzip p { font-size: 12px; color: #94a3b8; line-height: 1.6; font-weight: 500; }
+    .bar { margin-top: 12px; height: 4px; background: #334155; }
+    .bar i { display: block; width: 42%; height: 4px; background: #ff6b1a; }
+    .meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .meta p { font-size: 13px; font-weight: 600; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; font-weight: 500; }
+    th, td { border: 1px solid #cfd6de; padding: 7px 8px; text-align: left; }
+    th { background: #eef1f4; font-size: 11px; color: #64748b; font-weight: 700; }
+    td.id { font-variant-numeric: tabular-nums; font-weight: 700; }
+    .empty-tip { color: #94a3b8; }
+    .fail td { background: #fff7f7; }
+    .fail .mark { color: #dc2626; font-weight: 700; }
+    .sec .pc { height: 640px; }
+    .sec .modal { height: 500px; }
+  </style>
+</head>
+<body>
+  <p class="rationale">工作台把弹窗当成工单：左侧步骤轨像工序卡，当前步用竖线钉住，不用胶囊。字段左标签右控件，投向与书籍分栏对齐，密但不挤。确认表是下料单——等宽编号、细网格、行高收紧；选压缩包时工位改报「解压中」，解完再解析。</p>
+
+  <div class="cap">步骤1 · 填字段</div>
+  <div class="browser">
+    <div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><div class="url">右豹创作者中心</div></div>
+    <div class="pc">
+      <header class="topbar">
+        <div class="brand"><i>右</i>右豹 创作者中心</div>
+        <div class="who">庭宇</div>
+      </header>
+      <div class="layout">
+        <aside class="side">
+          <div class="hint">已有业务线，本增量不改</div>
+          <span class="nav">项目中心</span>
+          <span class="nav">作品管理</span>
+          <span class="nav">收益中心</span>
+          <div class="hint" style="margin-top:12px">本增量</div>
+          <span class="nav on">剪辑供稿</span>
+        </aside>
+        <main class="main">
+          <h1>剪辑手看板</h1>
+          <p class="desc">已授权项目与供稿结果</p>
+          <div class="stats">
+            <div class="stat"><span>已授权项目</span><b>2</b></div>
+            <div class="stat"><span>上传的稿件</span><b>6</b></div>
+            <div class="stat"><span>已被领取</span><b>3</b></div>
+            <div class="stat"><span>已经产生的收益</span><b>128</b></div>
+          </div>
+        </main>
+      </div>
+      <div class="veil"></div>
+      <div class="modal" role="dialog" aria-labelledby="t1">
+        <aside class="rail">
+          <div class="job">工单</div>
+          <div class="st on">1 填字段<small>当前</small></div>
+          <div class="st">2 选成片</div>
+          <div class="st">3 确认上传</div>
+        </aside>
+        <div class="panel">
+          <div class="head">
+            <div><h2 id="t1">上传稿件</h2><span>共用字段先填完。标题、大小不在这一步。</span></div>
+            <button class="x" type="button" aria-label="关闭">×</button>
+          </div>
+          <div class="body">
+            <div class="zones">
+              <div class="zone">
+                <h3>投向</h3>
+                <div class="row"><label>选择项目</label><select><option selected>番茄小说</option></select></div>
+                <div class="row"><label>稿件类型</label><select><option selected>图集</option><option>视频</option></select></div>
+                <div class="row"><label>素材类型</label><select><option selected>图文切片</option></select></div>
+                <div class="row"><label>剪辑手</label><input value="庭宇" readonly /></div>
+              </div>
+              <div class="zone">
+                <h3>书籍</h3>
+                <div class="row"><label>书籍名称</label><input value="我成了老公掌心宠" /></div>
+                <div class="row"><label>书籍 ID</label><input value="7128491023" /></div>
+                <div class="row"><label>书籍链接</label><input value="https://ybdd.demo/book/7128491023" /></div>
+              </div>
+            </div>
+          </div>
+          <div class="foot">
+            <button class="btn btn-go" type="button">下一步</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cap">状态变体 · 步骤2 解压中</div>
+  <div class="variant">
+    <div class="modal" style="position:relative;left:auto;top:auto;transform:none;margin:0 auto 36px;box-shadow:0 12px 32px rgba(15,23,42,.18)" role="dialog" aria-labelledby="t2">
+      <aside class="rail">
+        <div class="job">工单</div>
+        <div class="st">1 填字段</div>
+        <div class="st on">2 选成片<small>当前</small></div>
+        <div class="st">3 确认上传</div>
+      </aside>
+      <div class="panel">
+        <div class="head">
+          <div><h2 id="t2">上传稿件</h2><span>文件名即标题。图集一个文件夹为一组。</span></div>
+          <button class="x" type="button" aria-label="关闭">×</button>
+        </div>
+        <div class="body">
+          <div class="packs">
+            <div class="pack"><b>文件夹</b><span>批量文件夹。图集一个文件夹为一组，文件名作标题。</span></div>
+            <div class="pack on"><b>压缩包</b><span>支持 zip。先解压中，再按同一命名约定解析。</span></div>
+          </div>
+          <div class="unzip">
+            <strong>解压中</strong>
+            <p>已选压缩包。解压完成后再按命名约定计算条数与总大小。</p>
+            <div class="bar"><i></i></div>
+          </div>
+        </div>
+        <div class="foot">
+          <button class="btn" type="button">上一步</button>
+          <button class="btn" type="button" disabled style="opacity:.45">下一步</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cap">步骤3 · 确认表</div>
+  <div class="browser sec">
+    <div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><div class="url">右豹创作者中心</div></div>
+    <div class="pc">
+      <header class="topbar">
+        <div class="brand"><i>右</i>右豹 创作者中心</div>
+        <div class="who">庭宇</div>
+      </header>
+      <div class="layout">
+        <aside class="side">
+          <div class="hint">已有业务线，本增量不改</div>
+          <span class="nav">项目中心</span>
+          <span class="nav">作品管理</span>
+          <span class="nav">收益中心</span>
+          <div class="hint" style="margin-top:12px">本增量</div>
+          <span class="nav on">剪辑供稿</span>
+        </aside>
+        <main class="main"><h1>剪辑手看板</h1></main>
+      </div>
+      <div class="veil"></div>
+      <div class="modal" role="dialog" aria-labelledby="t3">
+        <aside class="rail">
+          <div class="job">工单</div>
+          <div class="st">1 填字段</div>
+          <div class="st">2 选成片</div>
+          <div class="st on">3 确认上传<small>当前</small></div>
+        </aside>
+        <div class="panel">
+          <div class="head">
+            <div><h2 id="t3">上传稿件</h2><span>空发布技巧也可以入队。</span></div>
+            <button class="x" type="button" aria-label="关闭">×</button>
+          </div>
+          <div class="body">
+            <div class="meta">
+              <p>共 3 条数据，大小 0.02G</p>
+              <button class="btn" type="button">AI生产发布技巧</button>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>稿件ID</th>
+                  <th>稿件名称</th>
+                  <th>稿件大小</th>
+                  <th>发布技巧</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="id">M-01</td>
+                  <td>闭环测试书</td>
+                  <td>8.2 MB</td>
+                  <td class="empty-tip"></td>
+                </tr>
+                <tr>
+                  <td class="id">M-02</td>
+                  <td>夜色切片</td>
+                  <td>6.4 MB</td>
+                  <td>夜色切片｜图文切片</td>
+                </tr>
+                <tr>
+                  <td class="id">M-03</td>
+                  <td>失败样例</td>
+                  <td>4.1 MB</td>
+                  <td>失败样例｜图文切片</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="foot">
+            <button class="btn" type="button">上一步</button>
+            <button class="btn btn-go" type="button">开始上传</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

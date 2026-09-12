@@ -34,6 +34,7 @@ def browser_context_args(browser_context_args):
         **browser_context_args,
         "viewport": {"width": 1440, "height": 900},
         "locale": "zh-CN",
+        "timezone_id": "Asia/Shanghai",
     }
 
 

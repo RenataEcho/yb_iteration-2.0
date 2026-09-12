@@ -1,7 +1,8 @@
-"""FR-009 AI工作台 · 用户订单明细（FR-28）E2E。
+"""FR-009 AI工作台 · 用户订单明细（FR-28）与项目已结算榜（FR-29）E2E。
 
 覆盖 I/O 矩阵：单状态、组合状态、未点名状态、五个业务 title、
-缺槽位澄清、用户不存在、以及 FR-20 指定项目按日订单不被抢单。
+缺槽位澄清、用户不存在、FR-20 指定项目按日订单不被抢单，
+以及 FR-29 番茄小说日期范围内已结算 Top N。
 """
 
 from playwright.sync_api import expect
@@ -176,4 +177,77 @@ def test_fr20_project_daily_orders_not_stolen(ai_page):
     expect(result).to_contain_text("出单人数")
     expect(result).not_to_contain_text("订单ID")
     expect(result).not_to_contain_text("夏日护肤套装")
+    expect(result).not_to_contain_text("有效拉新量")
     expect(result.get_by_role("columnheader", name="关键词", exact=True)).to_have_count(0)
+
+
+def test_fr29_settled_top100_fanqie_august(ai_page):
+    result = ask(ai_page, "番茄小说 2026.8.1-2026.8.31 已结算订单前100名")
+
+    expect(result).to_contain_text("已结算订单 Top 100")
+    expect(result).to_contain_text("2026-08-01 至 2026-08-31")
+    expect(result).to_contain_text("结算字段随项目动态下发")
+    expect(result.get_by_role("columnheader", name="用户ID")).to_be_visible()
+    expect(result.get_by_role("columnheader", name="用户昵称")).to_be_visible()
+    expect(result.get_by_role("columnheader", name="有效拉新量")).to_be_visible()
+    expect(result.get_by_role("columnheader", name="拉失活量")).to_be_visible()
+    expect(result.get_by_role("columnheader", name="拉活量")).to_be_visible()
+    expect(result.get_by_role("columnheader", name="总收益")).to_be_visible()
+    expect(result.locator("tbody tr")).to_have_count(100)
+    expect(result.locator("tbody tr").first).to_contain_text("1001")
+    expect(result.locator("tbody tr").first).to_contain_text("林小北")
+    expect(result).not_to_contain_text("出单关键词数量")
+    expect(result).not_to_contain_text("订单ID")
+    expect(result).not_to_contain_text("项目明细")
+
+
+def test_fr29_iso_date_and_top10(ai_page):
+    result = ask(ai_page, "番茄小说 2026-08-01至2026-08-31 已结算订单前10名")
+    expect(result).to_contain_text("已结算订单 Top 10")
+    expect(result.locator("tbody tr")).to_have_count(10)
+    expect(result).to_contain_text("有效拉新量")
+    expect(result).to_contain_text("总收益")
+
+
+def test_fr29_missing_project_clarifies(ai_page):
+    result = ask(ai_page, "2026.8.1-2026.8.31 已结算订单前100名")
+    expect(result).to_contain_text("还缺项目名称")
+    expect(result).to_contain_text("番茄小说")
+    expect(result.locator("table")).to_have_count(0)
+
+
+def test_fr29_missing_range_clarifies(ai_page):
+    result = ask(ai_page, "番茄小说 已结算订单前100名")
+    expect(result).to_contain_text("还缺时间范围")
+    expect(result.locator("table")).to_have_count(0)
+
+
+def test_fr29_empty_window_no_fake_rows(ai_page):
+    result = ask(ai_page, "番茄小说 2026.7.1-2026.7.31 已结算订单前100名")
+    expect(result).to_contain_text("暂无数据")
+    expect(result.locator("tbody tr")).to_have_count(1)
+    expect(result).not_to_contain_text("林小北")
+
+
+def test_fr30_range_over_31_days_does_not_query(ai_page):
+    result = ask(ai_page, "番茄小说 2026.8.1-2026.9.30 已结算订单前100名")
+    expect(result).to_contain_text("日期范围不能超过 31 天")
+    expect(result).to_contain_text("61 天")
+    expect(result.locator("table")).to_have_count(0)
+    expect(result).not_to_contain_text("林小北")
+    expect(result).not_to_contain_text("有效拉新量")
+
+
+def test_fr30_user_orders_over_31_days_does_not_query(ai_page):
+    result = ask(ai_page, "用户 1001 2026-08-01至2026-12-31 品牌业务 已结算订单明细")
+    expect(result).to_contain_text("日期范围不能超过 31 天")
+    expect(result.locator("table")).to_have_count(0)
+    expect(result).not_to_contain_text("项目明细")
+    expect(result).not_to_contain_text("会员续费礼包")
+
+
+def test_fr30_exactly_31_days_still_queries(ai_page):
+    result = ask(ai_page, "番茄小说 2026.8.1-2026.8.31 已结算订单前100名")
+    expect(result).not_to_contain_text("日期范围不能超过 31 天")
+    expect(result).to_contain_text("已结算订单 Top 100")
+    expect(result.locator("tbody tr")).to_have_count(100)

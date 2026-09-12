@@ -15,6 +15,9 @@
 | FR-009 | AI工作台 | `demo/iteration/fr-ai-workbench.html` |
 | FR-010 | 代理迭代V1.0 | `demo/iteration/fr-agent-cert.html` |
 | FR-011 | 导师迭代V1.0 | `demo/iteration/fr-org-mentor-board.html` |
+| FR-012 | 选书中心 | `demo/iteration/fr-book-select.html` |
+| FR-013 | AI申词 | `demo/iteration/fr-ai-keyword.html` |
+| FR-014 | 一键代发 | `demo/iteration/fr-opc-yijian-daifa.html` |
 
 ## 归档需求
 

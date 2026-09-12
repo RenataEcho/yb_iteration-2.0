@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>导师优化 · 新增导师 Demo</title>
+  <style>
+    :root {
+      --orange: #ff5722;
+      --orange-light: #fff3eb;
+      --orange-border: #ffd4b8;
+      --bg: #f2f3f5;
+      --surface: #fff;
+      --text: #1a1a1a;
+      --muted: #999;
+      --border: #eee;
+      --ok-bg: #e9f8ef;
+      --ok-text: #1bb76e;
+      --warn-bg: #fff1e8;
+      --warn-text: #f06a2b;
+      --phone-w: 375px;
+      --phone-h: 812px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: #e8eaed; min-height: 100vh; color: var(--text);
+    }
+    .demo-shell { display: flex; flex-direction: column; align-items: center; padding: 20px 16px 40px; gap: 16px; }
+    .demo-header {
+      width: 100%; max-width: 960px; background: #fff; border-radius: 12px;
+      padding: 16px 20px; box-shadow: 0 2px 12px rgba(0,0,0,.06);
+    }
+    .demo-header h1 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+    .demo-header p { font-size: 13px; color: #6b7280; line-height: 1.55; }
+    .demo-nav { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .demo-nav button {
+      padding: 6px 12px; border-radius: 999px; border: 1px solid #ececec;
+      background: #fff; font-size: 12px; cursor: pointer; color: #6b7280;
+    }
+    .demo-nav button.active, .demo-nav button:hover {
+      background: var(--orange-light); border-color: var(--orange-border);
+      color: var(--orange); font-weight: 600;
+    }
+    .phone-frame {
+      width: var(--phone-w); height: var(--phone-h);
+      border-radius: 36px; overflow: hidden; position: relative;
+      box-shadow: 0 20px 60px rgba(0,0,0,.18), inset 0 0 0 8px #1a1a1a;
+      background: var(--bg);
+    }
+    .phone-notch {
+      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      width: 120px; height: 28px; background: #1a1a1a; border-radius: 0 0 16px 16px; z-index: 120;
+    }
+    .screen { display: none; flex-direction: column; height: 100%; overflow: hidden; }
+    .screen.active { display: flex; }
+    .status-bar {
+      height: 44px; padding: 14px 22px 0; display: flex; justify-content: space-between;
+      font-size: 14px; font-weight: 600; flex-shrink: 0;
+    }
+    .nav-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 4px 12px 10px; flex-shrink: 0;
+    }
+    .nav-bar .back {
+      width: 32px; height: 32px; border: none; background: none;
+      font-size: 24px; cursor: pointer; color: var(--text); line-height: 1;
+    }
+    .nav-bar .title { font-size: 17px; font-weight: 700; }
+    .nav-bar .action { width: 32px; height: 32px; }
+    .nav-bar .capsule {
+      display: flex; align-items: center; gap: 6px; padding: 4px 8px;
+      border: 1px solid rgba(0,0,0,.08); border-radius: 999px; background: rgba(255,255,255,.75);
+    }
+    .nav-bar .capsule span { width: 4px; height: 4px; border-radius: 50%; background: #333; }
+    .scroll { flex: 1; overflow-y: auto; padding: 4px 12px 24px; }
+    .user-card {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--surface); border-radius: 14px;
+      padding: 12px; margin-bottom: 10px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.03);
+      cursor: pointer;
+    }
+    .user-card:active { background: #fafafa; }
+    .avatar {
+      width: 48px; height: 48px; border-radius: 50%; flex-shrink: 0;
+      overflow: hidden; position: relative;
+    }
+    .avatar img, .avatar svg { width: 100%; height: 100%; display: block; }
+    .card-main { flex: 1; min-width: 0; }
+    .name-row {
+      display: flex; align-items: center; gap: 6px; min-width: 0;
+    }
+    .name {
+      font-size: 16px; font-weight: 700; line-height: 1.2;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0;
+    }
+    .name-id {
+      display: none; flex-shrink: 0;
+      font-size: 12px; font-weight: 500; color: #999;
+    }
+    body.show-id .name-id, .profile-info .name-id { display: inline; }
+    .tag {
+      display: inline-flex; align-items: center; flex-shrink: 0;
+      height: 18px; padding: 0 6px; border-radius: 4px;
+      font-size: 11px; font-weight: 600; line-height: 1;
+    }
+    .tag.ok { background: var(--ok-bg); color: var(--ok-text); }
+    .tag.warn { background: var(--warn-bg); color: var(--warn-text); }
+    .id-inline { display: none; }
+    body.show-id .id-inline { display: block; }
+    .id-inline .sep, .profile-extra .sep { color: #d0d0d0; margin: 0 5px; }
+    .empty { color: #c4c4c4; }
+    .meta {
+      margin-top: 3px; font-size: 11px; color: var(--muted); line-height: 1.4;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .metric {
+      flex-shrink: 0; text-align: right; padding: 0 2px 0 8px;
+    }
+    .metric .label { font-size: 11px; color: var(--muted); line-height: 1.2; }
+    .metric .value { font-size: 17px; font-weight: 700; line-height: 1.25; margin-top: 2px; }
+    .metric .value .yen { font-size: 13px; font-weight: 600; }
+    .chevron {
+      flex-shrink: 0; width: 16px; color: #c8c8c8; font-size: 18px;
+      display: grid; place-items: center; margin-left: 2px;
+    }
+    .toast {
+      position: absolute; left: 50%; bottom: 36px; transform: translateX(-50%) translateY(12px);
+      background: rgba(0,0,0,.78); color: #fff; padding: 10px 16px; border-radius: 999px;
+      font-size: 13px; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 200;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .profile-card {
+      background: var(--surface); border-radius: 14px; padding: 12px;
+      margin-bottom: 12px;
+    }
+    .profile-top { display: flex; align-items: flex-start; gap: 10px; }
+    .avatar-sq {
+      width: 48px; height: 48px; border-radius: 10px; flex-shrink: 0; overflow: hidden;
+    }
+    .avatar-sq svg { width: 100%; height: 100%; display: block; }
+    .profile-info { flex: 1; min-width: 0; }
+    .profile-sub { margin-top: 3px; font-size: 12px; color: var(--muted); line-height: 1.4; }
+    .profile-extra { margin-top: 3px; font-size: 12px; color: #8a8a8a; line-height: 1.45; }
+    .profile-extra .sep { color: #d0d0d0; margin: 0 5px; }
+    .profile-extra .empty { color: #c4c4c4; }
+    .range-bar {
+      display: flex; align-items: center; gap: 4px;
+      padding: 3px; margin-bottom: 12px; overflow-x: auto;
+    }
+    .range-bar button {
+      flex: 1; border: none; background: transparent; color: #666;
+      font-size: 13px; padding: 7px 0; border-radius: 999px; cursor: pointer; white-space: nowrap;
+    }
+    .range-bar button.active {
+      background: #fff; color: var(--text); font-weight: 700;
+      box-shadow: 0 1px 4px rgba(0,0,0,.06);
+    }
+    .range-bar .cal {
+      display: inline-block; width: 11px; height: 11px; margin-left: 2px;
+      vertical-align: -1px; border: 1.3px solid currentColor; border-radius: 2px;
+      position: relative;
+    }
+    .range-bar .cal::before {
+      content: ''; position: absolute; left: 1px; right: 1px; top: 3px; height: 1px; background: currentColor;
+    }
+    .kpi-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+    .kpi {
+      background: #fff; border-radius: 12px; padding: 12px 12px 14px;
+    }
+    .kpi.perf { background: #fff4eb; }
+    .kpi .k { font-size: 12px; color: #888; margin-bottom: 8px; }
+    .kpi .v { font-size: 20px; font-weight: 800; letter-spacing: -.02em; }
+    .kpi.perf .v { color: #ff6a00; }
+    .kpi .hint { margin-top: 8px; font-size: 11px; color: #aaa; line-height: 1.45; }
+    .trend-card {
+      background: #fff; border-radius: 12px; padding: 14px 12px 10px; margin-bottom: 12px;
+    }
+    .trend-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .trend-head h3 { font-size: 14px; font-weight: 700; }
+    .trend-svg { width: 100%; height: 132px; display: block; }
+    .sum-card {
+      display: grid; grid-template-columns: 1.4fr 0.8fr; background: #fff;
+      border-radius: 12px; margin-bottom: 14px; overflow: hidden;
+    }
+    .sum-cell { padding: 14px 12px; }
+    .sum-cell + .sum-cell { border-left: 1px solid #f0f0f0; }
+    .sum-cell .k { font-size: 12px; color: #888; line-height: 1.45; margin-bottom: 8px; }
+    .sum-cell .v { font-size: 20px; font-weight: 800; }
+    .sum-cell .v.orange { color: #ff6a00; }
+    .disclaimer {
+      font-size: 11px; color: #b0b0b0; text-align: center; line-height: 1.6; padding: 0 8px 8px;
+    }
+    body.embed-mode { background: var(--bg); margin: 0; }
+    body.embed-mode .demo-header, body.embed-mode .demo-nav { display: none !important; }
+    body.embed-mode .demo-shell { padding: 0; min-height: 100vh; }
+    body.embed-mode .phone-frame { width: 100%; max-width: 100%; height: 100vh; border-radius: 0; box-shadow: none; }
+    body.embed-mode .phone-notch { display: none; }
+    body.embed-mode .status-bar { height: 12px; padding: 0; }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body class="show-id">
+  <div class="demo-shell">
+    <div class="demo-header">
+      <h1>导师优化 · 新增导师 / 达人详情</h1>
+      <p>列表增加 <strong>ID</strong>、<strong>飞书昵称</strong>；详情页同步展示这两项，并增加 <strong>微信号</strong>。本页仅前端 Demo，尚未写入迭代需求后台。</p>
+      <div class="demo-nav">
+        <button type="button" class="active" data-screen="list" data-mode="after">列表 · 含 ID / 飞书昵称</button>
+        <button type="button" data-screen="list" data-mode="before">列表 · 原卡片</button>
+        <button type="button" data-screen="detail">达人详情 · 含 ID / 飞书 / 微信</button>
+      </div>
+    </div>
+    <div class="phone-frame">
+      <div class="phone-notch"></div>
+      <div class="screen active" id="screen-list">
+        <div class="status-bar"><span>9:41</span><span>100%</span></div>
+        <div class="nav-bar">
+          <button class="back" type="button" aria-label="返回">‹</button>
+          <div class="title">新增导师</div>
+          <div class="action"></div>
+        </div>
+        <div class="scroll" id="userList"></div>
+      </div>
+      <div class="screen" id="screen-detail">
+        <div class="status-bar"><span>9:41</span><span>100%</span></div>
+        <div class="nav-bar">
+          <button class="back" type="button" id="detailBack" aria-label="返回">‹</button>
+          <div class="title">达人详情</div>
+          <div class="capsule" aria-hidden="true"><span></span><span></span><span></span></div>
+        </div>
+        <div class="scroll" id="detailBody"></div>
+      </div>
+      <div class="toast" id="toast"></div>
+    </div>
+  </div>
+  <script>
+    const USERS = [
+      {
+        name: '用户57135442',
+        id: '57135442',
+        feishu: '阿豹小周',
+        wechat: 'zhou_yb5713',
+        tag: '出单中',
+        tagType: 'ok',
+        active: '2026.08.31 11:21',
+        days: 16,
+        output: '7.00',
+        project: '红果漫剧APP · 漫剧推广',
+        bindAt: '2026.08.15 09:12',
+        avatar: 'a',
+        outputByRange: { today: '7.00', yesterday: '12.00', d7: '86.00', d30: '312.00', custom: '186.00' },
+        perfByRange: { today: '0.00', yesterday: '0.00', d7: '0.00', d30: '0.00', custom: '0.00' },
+        trend: [18, 42, 26, 55, 31, 48, 7]
+      },
+      {
+        name: '老野',
+        id: '57136018',
+        feishu: '老野',
+        wechat: 'laoye_wx',
+        tag: '流失预警',
+        tagType: 'warn',
+        active: '2026.08.31 11:21',
+        days: 16,
+        output: '0.00',
+        project: '红果漫剧APP · 漫剧推广',
+        bindAt: '2026.08.15 18:40',
+        avatar: 'b',
+        outputByRange: { today: '0.00', yesterday: '0.00', d7: '0.00', d30: '0.00', custom: '0.00' },
+        perfByRange: { today: '0.00', yesterday: '0.00', d7: '0.00', d30: '0.00', custom: '0.00' },
+        trend: [6, 3, 0, 2, 0, 0, 0]
+      },
+      {
+        name: '用户57135278',
+        id: '57135278',
+        feishu: '',
+        wechat: '',
+        tag: '出单中',
+        tagType: 'ok',
+        active: '2026.08.31 11:21',
+        days: 16,
+        output: '0.00',
+        project: '红果短剧 · 短剧分发',
+        bindAt: '2026.08.15 21:06',
+        avatar: 'c',
+        outputByRange: { today: '0.00', yesterday: '4.00', d7: '19.00', d30: '76.00', custom: '41.00' },
+        perfByRange: { today: '0.00', yesterday: '0.00', d7: '0.00', d30: '0.00', custom: '0.00' },
+        trend: [2, 8, 5, 0, 11, 4, 0]
+      },
+      {
+        name: '白颜',
+        id: '88210086',
+        feishu: '白颜',
+        wechat: 'baiyan88',
+        tag: '出单中',
+        tagType: 'ok',
+        active: '2026.08.24 17:52',
+        days: 65,
+        output: '13,517.00',
+        project: '红果漫剧APP · 漫剧推广',
+        bindAt: '2026.08.24 17:52',
+        avatar: 'd',
+        hiddenInList: true,
+        outputByRange: { today: '286.00', yesterday: '412.00', d7: '2,860.00', d30: '13,517.00', custom: '8,240.00' },
+        perfByRange: { today: '0.00', yesterday: '0.00', d7: '0.00', d30: '0.00', custom: '0.00' },
+        trend: [180, 420, 260, 510, 340, 470, 390]
+      }
+    ];
+
+    const AVATARS = {
+      a: '<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><rect width="80" height="80" fill="#f3d27a"/><circle cx="40" cy="32" r="14" fill="#f4c9a8"/><path d="M18 78c2-18 12-28 22-28s20 10 22 28" fill="#1a1a1a"/><path d="M26 28c8-10 22-10 28 2 2 4-2 8-8 7-8-1-16-1-22 0-6 1-8-3-6-7 2-6 4-8 8-2z" fill="#2b2118"/></svg>',
+      b: '<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><rect width="80" height="80" fill="#d7e4f2"/><circle cx="40" cy="33" r="14" fill="#f0c8b0"/><ellipse cx="40" cy="33" rx="16" ry="8" fill="none" stroke="#2a2a2a" stroke-width="2.4"/><circle cx="32" cy="33" r="1.6" fill="#2a2a2a"/><circle cx="48" cy="33" r="1.6" fill="#2a2a2a"/><path d="M20 80c3-20 12-30 20-30s17 10 20 30" fill="#3d5a7a"/><path d="M24 24c10-12 24-10 30 2-8-2-20-2-30 0z" fill="#1f1f1f"/></svg>',
+      c: '<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><rect width="80" height="80" fill="#f2b8b0"/><circle cx="40" cy="32" r="14" fill="#f3c4a8"/><path d="M18 80c3-20 12-30 22-30s19 10 22 30" fill="#c62828"/><path d="M22 30c8-14 28-14 36 0-6-4-28-4-36 0z" fill="#3a2418"/></svg>',
+      d: '<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><rect width="80" height="80" fill="#e8d5c4"/><circle cx="40" cy="32" r="14" fill="#f3cbb4"/><path d="M18 80c3-18 12-28 22-28s19 10 22 28" fill="#4a3728"/><path d="M24 26c10-12 26-10 32 3-8-3-22-3-32 0z" fill="#2b1d14"/></svg>'
+    };
+
+    const RANGES = [
+      { id: 'today', label: '今日', title: '今日' },
+      { id: 'yesterday', label: '昨日', title: '昨日' },
+      { id: 'd7', label: '近7天', title: '近 7 天' },
+      { id: 'd30', label: '近30天', title: '近 30 天' },
+      { id: 'custom', label: '自定义', title: '所选区间', cal: true }
+    ];
+    const WEEK = ['二', '三', '四', '五', '六', '日', '一'];
+
+    let currentScreen = 'list';
+    let currentUserId = '88210086';
+    let currentRange = 'd30';
+
+    function toast(msg) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 1600);
+    }
+
+    function findUser(id) {
+      return USERS.find(u => u.id === id) || USERS.find(u => u.id === '88210086');
+    }
+
+    function fieldVal(v) {
+      return v ? v : '<span class="empty">未填写</span>';
+    }
+
+    function renderChart(values) {
+      const w = 320, h = 118, padX = 10, padY = 16;
+      const min = Math.min(...values);
+      const max = Math.max(...values);
+      const span = max - min || 1;
+      const pts = values.map((v, i) => {
+        const x = padX + i * (w - padX * 2) / (values.length - 1);
+        const y = h - padY - ((v - min) / span) * (h - padY * 2 - 10);
+        return [x, y];
+      });
+      const line = pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
+      const area = line + ` L${pts[pts.length - 1][0].toFixed(1)},${h - 18} L${pts[0][0].toFixed(1)},${h - 18} Z`;
+      const labels = WEEK.map((d, i) => {
+        const x = padX + i * (w - padX * 2) / (WEEK.length - 1);
+        return `<text x="${x.toFixed(1)}" y="${h - 2}" text-anchor="middle" font-size="10" fill="#b0b0b0">${d}</text>`;
+      }).join('');
+      return `<svg class="trend-svg" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="trendFill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#1bb76e" stop-opacity=".22"/>
+            <stop offset="100%" stop-color="#1bb76e" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <path d="${area}" fill="url(#trendFill)"/>
+        <path d="${line}" fill="none" stroke="#1bb76e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        ${labels}
+      </svg>`;
+    }
+
+    function renderList() {
+      document.getElementById('userList').innerHTML = USERS.filter(u => !u.hiddenInList).map(u => {
+        const feishu = u.feishu
+          ? `飞书昵称 ${u.feishu}`
+          : `飞书昵称 <span class="empty">未填写</span>`;
+        const wechat = u.wechat
+          ? `微信号 ${u.wechat}`
+          : `微信号 <span class="empty">未填写</span>`;
+        return `
+          <article class="user-card" data-id="${u.id}">
+            <div class="avatar">${AVATARS[u.avatar]}</div>
+            <div class="card-main">
+              <div class="name-row">
+                <span class="name">${u.name}</span>
+                <span class="name-id">(ID:${u.id})</span>
+                <span class="tag ${u.tagType}">${u.tag}</span>
+              </div>
+              <div class="meta id-inline">${feishu}<span class="sep">·</span>${wechat}</div>
+              <div class="meta">活跃 ${u.active} · 绑定 ${u.days} 天</div>
+            </div>
+            <div class="metric">
+              <div class="label">今日产出</div>
+              <div class="value"><span class="yen">¥</span>${u.output}</div>
+            </div>
+            <div class="chevron">›</div>
+          </article>`;
+      }).join('');
+
+      document.querySelectorAll('.user-card').forEach(card => {
+        card.addEventListener('click', () => setScreen('detail', card.dataset.id));
+      });
+    }
+
+    function renderDetail() {
+      const u = findUser(currentUserId);
+      const range = RANGES.find(r => r.id === currentRange) || RANGES[3];
+      const out = u.outputByRange[currentRange];
+      const perf = u.perfByRange[currentRange];
+      document.getElementById('detailBody').innerHTML = `
+        <article class="profile-card">
+          <div class="profile-top">
+            <div class="avatar-sq">${AVATARS[u.avatar]}</div>
+            <div class="profile-info">
+              <div class="name-row">
+                <span class="name">${u.name}</span>
+                <span class="name-id">(ID:${u.id})</span>
+                <span class="tag ${u.tagType}">${u.tag}</span>
+              </div>
+              <div class="profile-sub">${u.project}</div>
+              <div class="profile-extra">飞书昵称 ${fieldVal(u.feishu)}<span class="sep">·</span>微信号 ${fieldVal(u.wechat)}</div>
+              <div class="profile-sub">绑定 ${u.days} 天 · ${u.bindAt}</div>
+            </div>
+          </div>
+        </article>
+        <div class="range-bar" id="rangeBar">
+          ${RANGES.map(r => `<button type="button" data-range="${r.id}" class="${r.id === currentRange ? 'active' : ''}">${r.label}${r.cal ? '<span class="cal"></span>' : ''}</button>`).join('')}
+        </div>
+        <div class="kpi-row">
+          <div class="kpi">
+            <div class="k">达人${range.title}产出</div>
+            <div class="v">¥${out}</div>
+            <div class="hint">TA 在项目里做单赚的</div>
+          </div>
+          <div class="kpi perf">
+            <div class="k">导师服务绩效</div>
+            <div class="v">+¥${perf}</div>
+            <div class="hint">${range.title} · 平台另付 · 不扣用户收益</div>
+          </div>
+        </div>
+        <section class="trend-card">
+          <div class="trend-head">
+            <h3>近 7 天产出趋势</h3>
+            <span class="tag ${u.tagType}">${u.tag}</span>
+          </div>
+          ${renderChart(u.trend)}
+        </section>
+        <section class="sum-card">
+          <div class="sum-cell">
+            <div class="k">项目累计：我服务 TA 获得的导师服务绩效</div>
+            <div class="v orange">¥${u.perfByRange.d30}</div>
+          </div>
+          <div class="sum-cell">
+            <div class="k">绑定时长</div>
+            <div class="v">${u.days}天</div>
+          </div>
+        </section>
+        <p class="disclaimer">教学、答疑、复盘等服务动作在飞书社群进行。此处只看 TA 的收益状况与我的导师服务绩效结果。</p>
+      `;
+      document.querySelectorAll('#rangeBar button').forEach(btn => {
+        btn.addEventListener('click', () => {
+          currentRange = btn.dataset.range;
+          if (currentRange === 'custom') toast('Demo：已切到自定义区间');
+          renderDetail();
+        });
+      });
+    }
+
+    function syncNav() {
+      document.querySelectorAll('.demo-nav button').forEach(btn => {
+        const onDetail = currentScreen === 'detail' && btn.dataset.screen === 'detail';
+        const onList = currentScreen === 'list' && btn.dataset.screen === 'list'
+          && ((document.body.classList.contains('show-id') && btn.dataset.mode === 'after')
+            || (!document.body.classList.contains('show-id') && btn.dataset.mode === 'before'));
+        btn.classList.toggle('active', onDetail || onList);
+      });
+    }
+
+    function setScreen(screen, userId) {
+      currentScreen = screen;
+      if (userId) currentUserId = userId;
+      document.querySelectorAll('.screen').forEach(el => el.classList.toggle('active', el.id === 'screen-' + screen));
+      if (screen === 'detail') renderDetail();
+      syncNav();
+      if (window.parent !== window) window.parent.postMessage({ type: 'mentorScreen', screen, id: currentUserId }, '*');
+    }
+
+    function setMode(mode) {
+      document.body.classList.toggle('show-id', mode !== 'before');
+      setScreen('list');
+    }
+
+    document.querySelectorAll('.demo-nav button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (btn.dataset.screen === 'detail') {
+          currentUserId = '88210086';
+          currentRange = 'd30';
+          document.body.classList.add('show-id');
+          setScreen('detail', currentUserId);
+        } else {
+          setMode(btn.dataset.mode);
+        }
+      });
+    });
+    document.getElementById('detailBack').addEventListener('click', () => setMode(document.body.classList.contains('show-id') ? 'after' : 'before'));
+
+    const params = new URLSearchParams(location.search);
+    if (params.get('embed') === '1') document.body.classList.add('embed-mode');
+    if (params.get('id') && findUser(params.get('id'))) currentUserId = params.get('id');
+    if (params.get('range') && RANGES.some(r => r.id === params.get('range'))) currentRange = params.get('range');
+    const initMode = params.get('mode') === 'before' ? 'before' : 'after';
+    document.body.classList.toggle('show-id', initMode !== 'before');
+    renderList();
+    setScreen(params.get('screen') === 'detail' ? 'detail' : 'list');
+  </script>
+</body>
+</html>

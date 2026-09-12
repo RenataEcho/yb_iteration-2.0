@@ -1,0 +1,2136 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>一键代发 · 前端交互 Demo</title>
+  <style>
+    :root {
+      --orange: #ff6b1a;
+      --orange-light: #fff3eb;
+      --orange-border: #ffd4b8;
+      --bg: #f5f6f8;
+      --surface: #fff;
+      --text: #1a2332;
+      --muted: #8a93a0;
+      --border: #ececec;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; background: #e8eaed; color: var(--text); }
+    .demo-shell { display: flex; flex-direction: column; align-items: center; padding: 20px 16px 40px; gap: 16px; }
+    .demo-header { width: 100%; max-width: 960px; background: #fff; border-radius: 12px; padding: 16px 20px; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
+    .demo-header h1 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+    .demo-header p { font-size: 13px; color: #6b7280; line-height: 1.5; }
+    .demo-nav { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .demo-nav button {
+      padding: 6px 12px; border-radius: 999px; border: 1px solid var(--border);
+      background: #fff; font-size: 12px; cursor: pointer; color: #6b7280;
+    }
+    .demo-nav button.active, .demo-nav button:hover {
+      background: var(--orange-light); border-color: var(--orange-border); color: var(--orange); font-weight: 600;
+    }
+    .phone-frame {
+      width: 375px; height: 812px; border-radius: 36px; overflow: hidden; position: relative;
+      box-shadow: 0 20px 60px rgba(0,0,0,.18), inset 0 0 0 8px #1a1a1a; background: #fff;
+    }
+    .phone-notch {
+      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      width: 120px; height: 28px; background: #1a1a1a; border-radius: 0 0 16px 16px; z-index: 120;
+    }
+    .screen { display: none; flex-direction: column; height: 100%; overflow: hidden; background: var(--bg); }
+    .screen.active { display: flex; }
+    .status-bar {
+      height: 44px; flex-shrink: 0; display: flex; align-items: flex-end; justify-content: space-between;
+      padding: 0 20px 6px; font-size: 12px; font-weight: 600; background: #fff;
+    }
+    .nav-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 2px 8px 8px; flex-shrink: 0; background: #fff;
+    }
+    .nav-bar .back { width: 36px; height: 36px; border: none; background: none; font-size: 22px; cursor: pointer; }
+    .nav-bar .title { font-size: 17px; font-weight: 700; flex: 1; text-align: center; margin-right: 36px; }
+    .nav-bar .ghost {
+      border: none; background: none; color: var(--orange); font-size: 13px; font-weight: 600; cursor: pointer; padding: 0 8px;
+    }
+    .project-row {
+      display: flex; gap: 10px; padding: 8px 12px 6px; background: #fff;
+      overflow-x: auto; flex-shrink: 0; scrollbar-width: none;
+    }
+    .project-row::-webkit-scrollbar { display: none; }
+    .proj {
+      flex: 0 0 64px; display: flex; flex-direction: column; align-items: center; gap: 4px;
+      padding: 6px 4px 4px; border: 1.5px solid transparent; border-radius: 10px;
+      background: none; cursor: pointer; color: #333;
+    }
+    .proj.on { border-color: #ffc9a3; background: var(--orange-light); }
+    .proj.on .proj-name { color: var(--orange); font-weight: 700; }
+    .proj-ico {
+      width: 44px; height: 44px; border-radius: 10px; color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 800; letter-spacing: -0.5px;
+      overflow: hidden; background: #f4f5f7;
+    }
+    .proj-ico img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .proj-name { font-size: 10px; line-height: 1.2; text-align: center; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .search-wrap { padding: 4px 12px 10px; background: #fff; flex-shrink: 0; }
+    .search-box {
+      display: flex; align-items: center; gap: 8px; height: 36px;
+      padding: 0 12px; border-radius: 18px; background: #fff;
+      box-shadow: 0 2px 8px rgba(20,24,32,.06); border: 1px solid #f0f0f0;
+    }
+    .search-box .ico { color: var(--orange); font-size: 14px; }
+    .search-box input { flex: 1; border: none; background: none; outline: none; font-size: 12px; }
+    .filter-row {
+      display: flex; gap: 8px; padding: 0 12px 10px; background: #fff;
+      overflow-x: auto; flex-shrink: 0; scrollbar-width: none;
+    }
+    .filter-row::-webkit-scrollbar { display: none; }
+    .dd {
+      flex-shrink: 0; height: 30px; padding: 0 10px; border-radius: 8px; border: none;
+      background: #f4f5f7; font-size: 12px; color: #333; cursor: pointer;
+    }
+    .dd.on { color: var(--orange); background: var(--orange-light); font-weight: 600; }
+    .dd-mask { position: absolute; inset: 0; background: rgba(20,24,32,.35); z-index: 40; display: none; }
+    .dd-mask.show { display: block; }
+    .dd-sheet {
+      position: absolute; left: 0; right: 0; top: 236px; background: #fff; z-index: 41;
+      border-radius: 0 0 16px 16px; padding: 8px 12px 14px; display: none;
+      box-shadow: 0 12px 24px rgba(0,0,0,.08);
+    }
+    .dd-sheet.show { display: block; }
+    .dd-opt {
+      width: 100%; text-align: left; padding: 11px 8px; border: none; background: none;
+      font-size: 14px; color: #222; cursor: pointer; border-bottom: 1px solid #f4f4f4;
+    }
+    .dd-opt.active { color: var(--orange); font-weight: 700; }
+    .plaza-banner {
+      position: relative; margin: 0 12px 10px; height: 88px; border-radius: 12px;
+      overflow: hidden; flex-shrink: 0; background: #1a1a1a;
+    }
+    .plaza-banner[hidden] { display: none !important; }
+    .bn-track { position: relative; width: 100%; height: 100%; }
+    .bn-slide {
+      position: absolute; inset: 0; opacity: 0; transition: opacity .35s;
+      cursor: pointer; border: none; padding: 0; background: #1a1a1a;
+    }
+    .bn-slide.on { opacity: 1; z-index: 1; }
+    .bn-slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .bn-slide .bn-cap {
+      position: absolute; left: 0; right: 0; top: 0; bottom: 0;
+      padding: 12px 14px 18px;
+      background: linear-gradient(90deg, rgba(20,12,8,.72) 0%, rgba(20,12,8,.28) 58%, transparent 100%);
+      color: #fff; text-align: left; display: flex; flex-direction: column; justify-content: center;
+    }
+    .bn-slide .bn-cap b { display: block; font-size: 15px; line-height: 1.2; }
+    .bn-slide .bn-cap span { display: block; margin-top: 4px; font-size: 11px; opacity: .9; }
+    .bn-dots {
+      position: absolute; left: 0; right: 0; bottom: 6px; z-index: 2;
+      display: flex; justify-content: center; gap: 5px;
+    }
+    .bn-dot {
+      width: 6px; height: 6px; border-radius: 50%; border: none;
+      background: rgba(255,255,255,.4); cursor: pointer; padding: 0;
+    }
+    .bn-dot.on { background: #fff; width: 14px; border-radius: 99px; }
+    .scroll { flex: 1; overflow-y: auto; padding: 0 12px 12px; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px 8px; }
+    .g-card { cursor: pointer; }
+    .thumb { position: relative; width: 100%; aspect-ratio: 3 / 4; border-radius: 8px; overflow: hidden; }
+    .cover-wrap { position: absolute; inset: 0; background: #2a2f3a; }
+    .cover-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .cover-wrap.cover-miss {
+      display: flex; align-items: center; justify-content: center; padding: 8px;
+      background: linear-gradient(160deg, #3a3f4a, #1c2028);
+    }
+    .cover-wrap.cover-miss .cover-img { display: none; }
+    .cover-wrap.cover-miss::after {
+      content: attr(data-book); color: #fff; font-size: 12px; font-weight: 700;
+      text-align: center; line-height: 1.35;
+    }
+    .kind-tag {
+      position: absolute; top: 6px; left: 6px; font-size: 10px; color: #fff;
+      background: rgba(0,0,0,.45); padding: 2px 6px; border-radius: 4px;
+    }
+    .thumb-bar {
+      position: absolute; left: 0; right: 0; bottom: 0; padding: 5px 6px;
+      background: linear-gradient(transparent, rgba(0,0,0,.55));
+      color: #fff; font-size: 10px; display: flex; justify-content: space-between;
+    }
+    .g-title {
+      margin-top: 6px; font-size: 12px; font-weight: 700; line-height: 1.35;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .g-src { margin-top: 3px; font-size: 11px; color: var(--muted); }
+    .card { background: #fff; border-radius: 12px; padding: 12px; margin-bottom: 12px; }
+    .btn-primary, .btn-ghost {
+      height: 46px; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer;
+    }
+    .btn-primary { border: none; background: var(--orange); color: #fff; width: 100%; }
+    .btn-primary:disabled { opacity: .45; cursor: not-allowed; }
+    .btn-ghost { border: 1px solid #e5e7eb; background: #fff; color: #333; }
+    .foot { padding: 10px 16px 18px; background: #fff; border-top: 1px solid #f3f3f3; flex-shrink: 0; }
+    .foot-claim { display: flex; align-items: center; gap: 8px; }
+    .foot-claim.hidden { display: none; }
+    .quota-chip { min-width: 58px; text-align: center; }
+    .quota-chip span { display: block; font-size: 10px; color: var(--muted); }
+    .quota-chip b { display: block; font-size: 16px; color: var(--orange); line-height: 1.2; }
+    .btn-tip {
+      width: 58px; height: 46px; border: 1px solid #ffd4b8; border-radius: 12px;
+      background: var(--orange-light); color: var(--orange); font-size: 11px; font-weight: 700; cursor: pointer;
+    }
+    .foot-claim .btn-primary, .foot-claim .btn-ghost { flex: 1; width: auto; font-size: 13px; line-height: 1.2; padding: 0 8px; }
+    .wm-dl { font-size: 14px; line-height: 1.25; padding: 0 10px; }
+    .dy-sheet {
+      position: absolute; inset: 0; z-index: 40; background: #111; color: #fff;
+      display: none; flex-direction: column;
+    }
+    .dy-sheet.show { display: flex; }
+    .dy-bar {
+      height: 48px; display: flex; align-items: center; justify-content: space-between;
+      padding: 0 12px; background: #161616; flex-shrink: 0;
+    }
+    .dy-bar b { font-size: 15px; }
+    .dy-bar button { border: none; background: none; color: #fff; font-size: 20px; cursor: pointer; }
+    .dy-hint { padding: 8px 14px 4px; font-size: 12px; color: #a3a3a3; }
+    .dy-grid {
+      flex: 1; overflow: auto; display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 2px; padding: 2px; background: #000;
+    }
+    .dy-cell { position: relative; aspect-ratio: 1; overflow: hidden; background: #222; }
+    .dy-cell img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .dy-cell.on { outline: 2px solid #fe2c55; outline-offset: -2px; }
+    .dy-cell .ck {
+      position: absolute; top: 6px; right: 6px; width: 18px; height: 18px; border-radius: 50%;
+      background: #fe2c55; color: #fff; font-size: 11px; display: grid; place-items: center; font-weight: 700;
+    }
+    .dy-foot {
+      padding: 10px 14px 18px; background: #161616; display: flex; gap: 8px; flex-shrink: 0;
+    }
+    .dy-foot .btn-ghost {
+      flex: 1; background: #2a2a2a; color: #fff; border-color: #3a3a3a; font-size: 14px;
+    }
+    .dy-foot .btn-primary { flex: 2; background: #fe2c55; font-size: 14px; }
+    .seg {
+      display: flex; margin: 0 12px 12px; padding: 4px; background: #eceef2;
+      border-radius: 10px; flex-shrink: 0;
+    }
+    .seg button {
+      flex: 1; height: 32px; border: none; background: none; border-radius: 8px;
+      font-size: 13px; color: #8a93a0; cursor: pointer;
+    }
+    .seg button.on { background: #fff; color: var(--orange); font-weight: 700; }
+    .kv { display: grid; grid-template-columns: 76px 1fr; gap: 8px 10px; font-size: 13px; }
+    .kv dt { color: var(--muted); }
+    #screen-detail .scroll { padding: 0 0 20px; }
+    #pubTips { margin-bottom: 12px; }
+    .media-full { position: relative; width: 100%; aspect-ratio: 1; background: #1a1a1a; overflow: hidden; }
+    .media-full.is-album { cursor: pointer; }
+    .media-full .cover-wrap { position: absolute; inset: 0; }
+    .media-badge {
+      position: absolute; top: 10px; right: 10px; z-index: 2;
+      background: rgba(0,0,0,.55); color: #fff; font-size: 11px; padding: 3px 8px; border-radius: 999px;
+    }
+    .play-btn {
+      position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);
+      width: 56px; height: 56px; border: none; border-radius: 50%;
+      background: rgba(255,255,255,.92); color: #111; font-size: 20px; cursor: pointer; z-index: 2;
+    }
+    .v-bar { position: absolute; left: 12px; right: 12px; bottom: 14px; height: 3px; background: rgba(255,255,255,.3); border-radius: 99px; z-index: 2; }
+    .v-prog { height: 100%; width: 0; background: #fff; border-radius: 99px; }
+    .v-end {
+      display: none; position: absolute; inset: 0; background: rgba(0,0,0,.55);
+      color: #fff; font-size: 13px; align-items: center; justify-content: center; text-align: center; padding: 16px; z-index: 3;
+    }
+    .v-end.show { display: flex; }
+    .detail-pad { padding: 0 12px; }
+    .steps { margin: 0; padding-left: 18px; font-size: 12px; color: #4b5563; line-height: 1.7; }
+    .steps b { color: var(--orange); }
+    .kw-mask {
+      position: absolute; inset: 0; background: rgba(20,24,32,.4); z-index: 70; display: none;
+    }
+    .kw-mask.show { display: block; }
+    .preview-mask {
+      position: absolute; inset: 0; z-index: 90; display: none;
+      background: rgba(8,10,14,.92);
+      -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
+    }
+    .preview-mask.show { display: block; }
+    .preview-stage { position: absolute; inset: 0; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+    .preview-stage.is-blur .preview-img,
+    .preview-stage.is-blur .preview-wm { filter: blur(18px); }
+    .preview-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; pointer-events: none; -webkit-user-drag: none; user-select: none; }
+    .preview-wm {
+      position: absolute; inset: 0; z-index: 2; pointer-events: none;
+      display: flex; align-items: center; justify-content: center;
+      color: rgba(255,255,255,.38); font-size: 18px; font-weight: 700;
+      letter-spacing: .08em; transform: rotate(-24deg);
+      text-shadow: 0 1px 2px rgba(0,0,0,.35);
+    }
+    .preview-close, .preview-nav { position: absolute; z-index: 3; border: none; background: rgba(0,0,0,.45); color: #fff; cursor: pointer; border-radius: 50%; }
+    .preview-close { top: 48px; right: 12px; width: 36px; height: 36px; font-size: 22px; }
+    body.embed-mode .preview-close { top: 12px; }
+    .preview-nav { top: 50%; transform: translateY(-50%); width: 36px; height: 48px; font-size: 22px; border-radius: 8px; }
+    .preview-nav.prev { left: 8px; }
+    .preview-nav.next { right: 8px; }
+    .preview-nav[hidden], .preview-count[hidden] { display: none !important; }
+    .preview-count {
+      position: absolute; left: 50%; bottom: 28px; transform: translateX(-50%);
+      z-index: 3; color: #fff; font-size: 12px; font-weight: 600;
+      background: rgba(0,0,0,.45); padding: 4px 10px; border-radius: 999px;
+    }
+    .kw-sheet {
+      position: absolute; left: 0; right: 0; bottom: 0; z-index: 71; display: none;
+      background: #fff; border-radius: 16px 16px 0 0; max-height: 78%; 
+      flex-direction: column; overflow: hidden;
+    }
+    .kw-sheet.show { display: flex; }
+    .kw-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 16px 8px; }
+    .kw-head h3 { font-size: 16px; }
+    .kw-head .x { border: none; background: none; font-size: 20px; width: 32px; cursor: pointer; color: #666; }
+    .kw-search { margin: 0 16px 8px; }
+    .kw-list { flex: 1; overflow-y: auto; padding: 0 8px 8px; }
+    .kw-row {
+      width: 100%; display: flex; align-items: center; justify-content: space-between;
+      padding: 13px 10px; border: none; background: none; font-size: 14px; color: #222; cursor: pointer; text-align: left;
+    }
+    .kw-row.on { color: var(--orange); font-weight: 700; }
+    .kw-check {
+      width: 20px; height: 20px; border-radius: 50%; background: var(--orange); color: #fff;
+      font-size: 12px; display: none; align-items: center; justify-content: center;
+    }
+    .kw-row.on .kw-check { display: flex; }
+    .kw-foot { padding: 10px 16px 18px; }
+    .pills { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 12px; }
+    .pill { font-size: 11px; padding: 3px 8px; border-radius: 999px; background: var(--orange-light); color: #c2410c; }
+    .stat-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+    .stat { background: #fff; border-radius: 10px; padding: 10px 8px; text-align: center; }
+    .stat b { display: block; font-size: 14px; margin-top: 4px; }
+    .stat span { font-size: 11px; color: var(--muted); }
+    .select-list { display: flex; flex-direction: column; gap: 8px; }
+    .opt {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px; border: 1px solid #eee; border-radius: 10px; background: #fff; cursor: pointer;
+    }
+    .opt.on { border-color: #ffc9a3; background: var(--orange-light); }
+    .sku { display: flex; justify-content: space-between; align-items: center; padding: 12px 10px; border: none; border-bottom: 1px solid #f4f4f4; background: none; width: 100%; cursor: pointer; text-align: left; font-size: 14px; color: #222; }
+    .sku.on { color: var(--orange); }
+    .sku .sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .sku .orig { text-decoration: line-through; color: #c4c4c4; margin-right: 6px; font-weight: 400; }
+    .sku.on .sub { color: #c2410c; }
+    .sku.on .orig { color: #e7b8a0; }
+    .c-card {
+      background: #fff; border-radius: 14px; margin-bottom: 12px;
+      border: 1px solid #eee; box-shadow: 0 2px 8px rgba(20,24,32,.05);
+    }
+    .c-kw { padding: 12px 12px 0; font-size: 16px; font-weight: 700; }
+    .c-top { display: flex; gap: 10px; padding: 10px 12px 12px; }
+    .c-hit { cursor: pointer; }
+    .c-cover { position: relative; width: 64px; height: 84px; border-radius: 8px; overflow: hidden; flex-shrink: 0; }
+    .c-play {
+      position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+      width: 22px; height: 22px; border-radius: 50%; background: rgba(255,255,255,.9);
+      font-size: 9px; display: flex; align-items: center; justify-content: center;
+    }
+    .c-info { flex: 1; min-width: 0; }
+    .c-line { font-size: 13px; color: #222; line-height: 1.45; font-weight: 600; }
+    .c-sub { font-size: 12px; color: #6b7280; margin-top: 4px; line-height: 1.5; }
+    .c-dl { color: var(--orange); }
+    .c-dl.out { color: #dc2626; }
+    .c-tools {
+      display: flex; align-items: center; gap: 6px;
+      margin: 0 10px 10px; padding: 6px 8px; background: #f6f7f9; border-radius: 10px;
+    }
+    .c-tools button {
+      flex: 1; height: 34px; border: none; background: none;
+      color: #6b7280; font-size: 13px; font-weight: 500; cursor: pointer;
+    }
+    .c-tools button.primary {
+      flex: 1.2; border-radius: 8px; background: var(--orange); color: #fff; font-weight: 700;
+    }
+    .tip-h { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+    .tip-h .tip-label { font-size: 14px; font-weight: 700; color: #222; }
+    .tip-h button {
+      border: none; background: var(--orange-light); color: var(--orange);
+      font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 999px; cursor: pointer;
+    }
+    #pubTips .tip-box {
+      width: 100%; min-height: 88px; padding: 10px 12px; border: 1px solid #eee;
+      border-radius: 8px; font: inherit; font-size: 14px; line-height: 1.55;
+      resize: none; background: #fafafa; color: #222;
+    }
+    #loadSub { margin-top: 8px; font-size: 12px; color: var(--muted); }
+    .load-bar { display: none; margin-top: 10px; height: 6px; background: #ffe8d6; border-radius: 99px; overflow: hidden; }
+    .load-bar.show { display: block; }
+    .load-bar-in { height: 100%; width: 0; background: var(--orange); border-radius: 99px; transition: width .15s linear; }
+    #screen-watermark { background: #111; }
+    .wm-preview {
+      flex: 1 1 auto; min-height: 220px; position: relative; overflow: hidden; background: #111;
+    }
+    .wm-preview .cover-wrap, .wm-preview .cover-img { width: 100%; height: 100%; }
+    .wm-preview .cover-img { object-fit: cover; }
+    .wm-nav {
+      position: absolute; top: 0; left: 0; right: 0; z-index: 6;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 36px 8px 16px; background: linear-gradient(rgba(0,0,0,.5), transparent); color: #fff;
+    }
+    body.embed-mode .wm-nav { padding-top: 10px; }
+    .wm-nav .back { width: 36px; height: 36px; border: none; background: none; color: #fff; font-size: 22px; cursor: pointer; }
+    .wm-nav .title { font-size: 16px; font-weight: 700; flex: 1; text-align: center; margin-right: 36px; }
+    .wm-mark {
+      position: absolute; left: 50%; top: 58%; transform: translate(-50%, -50%);
+      z-index: 4; cursor: grab; user-select: none; touch-action: none; max-width: 86%;
+      padding: 4px 8px; border-radius: 4px; line-height: 1.25; white-space: nowrap;
+    }
+    .wm-mark:active { cursor: grabbing; }
+    .wm-panel {
+      flex: 0 0 auto; overflow: hidden; background: #fff;
+      padding: 12px 12px 16px; border-radius: 16px 16px 0 0;
+      box-shadow: 0 -10px 28px rgba(0,0,0,.16);
+    }
+    .wm-dock { display: flex; flex-direction: column; gap: 12px; }
+    .wm-sheet {
+      flex: 0 0 auto; border: 1px solid #f0f0f0; border-radius: 12px;
+      background: #fafafa; overflow: hidden; display: flex; flex-direction: column;
+    }
+    .wm-tabs {
+      display: flex; padding: 4px; gap: 4px; background: #eceef2; flex-shrink: 0;
+    }
+    .wm-tabs button {
+      flex: 1; height: 32px; border: none; border-radius: 8px; background: none;
+      font-size: 13px; color: #8a93a0; cursor: pointer;
+    }
+    .wm-tabs button.on { background: #fff; color: var(--orange); font-weight: 700; }
+    .wm-panes { display: grid; background: #fff; }
+    .wm-pane {
+      grid-area: 1 / 1; padding: 14px 12px 12px;
+      visibility: hidden; pointer-events: none; align-self: stretch;
+    }
+    .wm-pane.on { visibility: visible; pointer-events: auto; }
+    .wm-stack { display: flex; flex-direction: column; gap: 14px; }
+    .wm-block { display: flex; flex-direction: column; gap: 8px; }
+    .wm-k { font-size: 11px; color: var(--muted); font-weight: 700; letter-spacing: .02em; }
+    .wm-in {
+      width: 100%; height: 42px; border: 1px solid #eee; border-radius: 10px;
+      padding: 0 12px; font-size: 16px; background: #fff; -webkit-user-select: text; user-select: text;
+      flex-shrink: 0;
+    }
+    .wm-chips, .wm-modes { display: flex; flex-wrap: wrap; gap: 8px; }
+    .wm-swatches {
+      display: flex; flex-wrap: wrap; gap: 10px;
+      max-width: 210px;
+    }
+    .wm-swatches.bg { max-width: 252px; }
+    .wm-chip {
+      flex-shrink: 0; height: 30px; padding: 0 10px; border-radius: 8px; border: 1px solid #eee;
+      background: #f6f7f9; font-size: 12px; color: #333; cursor: pointer;
+    }
+    .wm-chip.on { border-color: #ffc9a3; background: var(--orange-light); color: var(--orange); font-weight: 700; }
+    .wm-step {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .wm-step .wm-stepper {
+      display: flex; align-items: center; gap: 2px;
+      background: #f4f5f7; border-radius: 8px; padding: 2px;
+    }
+    .wm-stepper button {
+      width: 32px; height: 32px; border: none; border-radius: 6px;
+      background: #fff; color: #333; font-size: 18px; line-height: 1; cursor: pointer;
+    }
+    .wm-stepper b { min-width: 22px; text-align: center; font-size: 14px; }
+    .wm-alpha {
+      display: flex; align-items: center; gap: 12px;
+      min-height: 36px; padding: 2px 2px 0;
+    }
+    .wm-alpha input[type="range"] { flex: 1; min-width: 0; height: 32px; accent-color: var(--orange); }
+    .wm-alpha .n { width: 42px; font-size: 13px; color: #333; text-align: right; font-weight: 700; }
+    .wm-sw {
+      width: 32px; height: 32px; border-radius: 50%; border: 2px solid #fff;
+      box-shadow: 0 0 0 1px #d4d4d4; cursor: pointer; padding: 0; flex-shrink: 0;
+    }
+    .wm-sw.on { box-shadow: 0 0 0 2px var(--orange); }
+    .wm-sw.none { background: linear-gradient(135deg, #fff 46%, #ef4444 50%, #fff 54%); }
+    .wm-dl { height: 44px; font-size: 15px; flex-shrink: 0; }
+    .notice {
+      margin: 0 0 4px; padding: 12px 12px 10px; border-radius: 12px;
+      background: #fff7f0; border: 1px solid #ffe0c7;
+    }
+    .notice-h {
+      display: flex; align-items: center; gap: 6px;
+      color: var(--orange); font-size: 13px; font-weight: 700; margin-bottom: 10px;
+    }
+    .notice-h i {
+      width: 16px; height: 16px; border-radius: 50%;
+      background: var(--orange); color: #fff; font-style: normal; font-size: 11px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .notice-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; text-align: center; }
+    .notice-ico {
+      width: 28px; height: 28px; margin: 0 auto 6px; border-radius: 50%;
+      background: #ffe8d4; color: var(--orange);
+      display: flex; align-items: center; justify-content: center; font-size: 13px;
+    }
+    .notice-grid p { font-size: 11px; line-height: 1.4; color: #4b5563; font-weight: 600; }
+    .notice-foot {
+      margin-top: 10px; padding-top: 8px; border-top: 1px solid #ffe0c7;
+      font-size: 11px; color: #6b7280; text-align: center; line-height: 1.45;
+    }
+    .empty { padding: 72px 20px; text-align: center; color: var(--muted); font-size: 13px; line-height: 1.6; }
+    .poster { margin: 12px 0 20px; border-radius: 16px; overflow: hidden; background: #16110e; color: #fff; }
+    .poster-hero {
+      position: relative; min-height: 210px; padding: 26px 20px 22px;
+      background: #2a1810 center/cover no-repeat;
+    }
+    .poster-hero::after {
+      content: ""; position: absolute; inset: 0;
+      background: linear-gradient(180deg, rgba(22,17,14,.25) 0%, rgba(22,17,14,.82) 100%);
+    }
+    .poster-hero .hero-txt { position: relative; z-index: 1; }
+    .poster-kicker {
+      display: inline-block; font-size: 10px; letter-spacing: 1px;
+      padding: 3px 8px; border-radius: 999px; background: rgba(255,107,26,.9); margin-bottom: 10px;
+    }
+    .poster-hero h2 { font-size: 26px; line-height: 1.25; margin-bottom: 8px; }
+    .poster-hero p { font-size: 13px; opacity: .92; line-height: 1.55; }
+    .poster-stats {
+      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1px;
+      background: #2a221c; border-top: 1px solid #3a2e26;
+    }
+    .poster-stats div { padding: 12px 6px; text-align: center; background: #1c1612; }
+    .poster-stats b { display: block; font-size: 16px; color: #ffb087; }
+    .poster-stats span { display: block; margin-top: 3px; font-size: 10px; color: #c4b4a8; }
+    .poster-body { padding: 16px 18px 20px; background: #fff; color: #1a2332; }
+    .poster-block { margin-bottom: 16px; }
+    .poster-block h3 { font-size: 13px; color: var(--orange); margin-bottom: 8px; }
+    .poster-block li { font-size: 13px; color: #374151; line-height: 1.7; margin-left: 18px; }
+    .poster-roles { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+    .poster-role {
+      padding: 10px; border-radius: 10px; background: #fff7f1; border: 1px solid #ffd4b8;
+    }
+    .poster-role b { display: block; font-size: 13px; color: #c2410c; margin-bottom: 4px; }
+    .poster-role span { font-size: 11px; color: #6b7280; line-height: 1.45; }
+    .poster-qr-wrap {
+      text-align: center; padding: 16px 12px 4px; background: #fff7f1;
+      border-radius: 12px; border: 1px dashed #ffd4b8;
+    }
+    .qr {
+      margin: 0 auto; width: 128px; height: 128px; background:
+        repeating-linear-gradient(90deg, #111 0 6px, #fff 6px 12px),
+        repeating-linear-gradient(0deg, #111 0 6px, #fff 6px 12px);
+      background-size: 12px 12px; border: 8px solid #fff; border-radius: 8px;
+      box-shadow: 0 8px 20px rgba(0,0,0,.12);
+    }
+    .poster .hint { margin-top: 10px; font-size: 12px; color: #6b7280; }
+    .kw-mask, .load-mask {
+      position: absolute; inset: 0; background: rgba(20,24,32,.4); z-index: 70; display: none;
+    }
+    .load-mask.show { display: block; }
+    .load-box {
+      position: absolute; left: 50%; top: 46%; transform: translate(-50%,-50%);
+      z-index: 72; display: none; background: #fff; border-radius: 16px;
+      padding: 22px 26px; text-align: center; min-width: 176px;
+      box-shadow: 0 16px 40px rgba(0,0,0,.18);
+    }
+    .load-box.show { display: block; }
+    .spin {
+      width: 34px; height: 34px; border: 3px solid #ffe4d1; border-top-color: var(--orange);
+      border-radius: 50%; margin: 0 auto 12px; animation: spin .7s linear infinite;
+    }
+    .spin.done { animation: none; border-color: var(--orange); background: var(--orange); }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .field { margin-bottom: 12px; }
+    .field label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+    .field select, .field input {
+      width: 100%; height: 40px; border: 1px solid #eee; border-radius: 10px; padding: 0 10px; font-size: 14px; background: #fff;
+    }
+    .tabbar {
+      flex-shrink: 0; height: 58px; display: flex; border-top: 1px solid #f0f0f0; background: #fff;
+    }
+    .tabbar button {
+      flex: 1; border: none; background: none; font-size: 11px; color: #8a93a0; cursor: pointer;
+    }
+    .tabbar button.on { color: var(--orange); font-weight: 700; }
+    .tabbar b { display: block; font-size: 18px; line-height: 1.1; font-weight: 400; }
+    .claim-head { display: flex; align-items: center; justify-content: space-between; padding: 4px 4px 10px; }
+    .claim-head h3 { font-size: 15px; }
+    .toast {
+      position: absolute; left: 50%; bottom: 88px; transform: translateX(-50%) translateY(20px);
+      background: #1e293b; color: #fff; padding: 8px 14px; border-radius: 999px; font-size: 12px;
+      opacity: 0; transition: .2s; pointer-events: none; z-index: 80; white-space: nowrap;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .quota { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+    body.embed-mode { background: #fff; margin: 0; }
+    body.embed-mode .demo-header, body.embed-mode .demo-nav { display: none !important; }
+    body.embed-mode .demo-shell { padding: 0; min-height: 100vh; }
+    body.embed-mode .phone-frame { width: 100%; max-width: 100%; height: 100vh; border-radius: 0; box-shadow: none; }
+    body.embed-mode .phone-notch, body.embed-mode .status-bar { display: none; }
+    body.embed-mode .nav-bar { padding-top: 10px; }
+    body.embed-mode .dd-sheet { top: 196px; }
+  </style>
+</head>
+<body>
+  <div class="demo-shell">
+    <div class="demo-header">
+      <h1>一键代发 · 前端交互 Demo</h1>
+      <p>先校验次数再浮层选词。广场项目图标直选，详情素材铺满；列表不展示收益金额。</p>
+      <div class="demo-nav" id="screenNav"></div>
+    </div>
+    <div class="phone-frame">
+      <div class="phone-notch"></div>
+      <div class="toast" id="toast"></div>
+      <div class="dd-mask" id="ddMask"></div>
+      <div class="dd-sheet" id="ddSheet"></div>
+      <div class="kw-mask" id="kwMask"></div>
+      <div class="preview-mask" id="previewMask">
+        <div class="preview-stage" id="previewStage">
+          <img class="preview-img" id="previewImg" alt="" draggable="false" />
+          <div class="preview-wm" id="previewWm"></div>
+          <button class="preview-close" type="button" id="previewClose" aria-label="关闭预览">×</button>
+          <button class="preview-nav prev" type="button" id="previewPrev" aria-label="上一张">‹</button>
+          <button class="preview-nav next" type="button" id="previewNext" aria-label="下一张">›</button>
+          <div class="preview-count" id="previewCount"></div>
+        </div>
+      </div>
+      <div class="kw-sheet" id="kwSheet">
+        <div class="kw-head">
+          <h3>选择该项目关键词</h3>
+          <button class="x" type="button" id="kwClose">×</button>
+        </div>
+        <div class="kw-search">
+          <div class="search-box">
+            <span class="ico" aria-hidden="true">⌕</span>
+            <input id="kwSearch" placeholder="输入关键词搜索" />
+          </div>
+        </div>
+        <div class="kw-list" id="kwList"></div>
+        <div class="kw-foot"><button class="btn-primary" type="button" id="confirmKw">确定选择</button></div>
+      </div>
+      <div class="kw-sheet" id="buySheet">
+        <div class="kw-head">
+          <h3>兑换领取次数</h3>
+          <button class="x" type="button" id="buyClose">×</button>
+        </div>
+        <p class="quota" id="buyHint" style="padding:0 16px 4px">积分余额 860 · 在售最多 4 档</p>
+        <div class="kw-list" id="skuList"></div>
+        <div class="kw-foot"><button class="btn-primary" type="button" id="confirmBuy">兑换</button></div>
+      </div>
+      <div class="load-mask" id="loadMask"></div>
+      <div class="load-box" id="loadBox">
+        <div class="spin" id="loadSpin"></div>
+        <div id="loadText">正在下载稿件</div>
+        <div id="loadSub"></div>
+        <div class="load-bar" id="loadBarWrap"><div class="load-bar-in" id="loadBar"></div></div>
+      </div>
+      <section class="screen" id="screen-feed">
+        <div class="status-bar"><span>9:41</span><span>5G</span></div>
+        <div class="nav-bar">
+          <span style="width:36px"></span>
+          <div class="title">作品广场</div>
+          <span style="width:36px"></span>
+        </div>
+        <div class="project-row" id="projectRow"></div>
+        <div class="search-wrap">
+          <div class="search-box">
+            <span class="ico" aria-hidden="true">⌕</span>
+            <input id="feedSearch" placeholder="输入书名/稿件名搜索" />
+          </div>
+        </div>
+        <div class="filter-row" id="feedFilters"></div>
+        <div class="plaza-banner" id="plazaBanner" hidden></div>
+        <div class="scroll" id="feedList"></div>
+        <nav class="tabbar">
+          <button class="on" type="button" data-tab="feed"><b>⌂</b>广场</button>
+          <button type="button" data-tab="claims"><b>☰</b>已领</button>
+        </nav>
+      </section>
+
+      <section class="screen" id="screen-poster">
+        <div class="status-bar"><span>9:41</span><span>5G</span></div>
+        <div class="nav-bar">
+          <button class="back" type="button" onclick="setScreen('feed', true)">‹</button>
+          <div class="title">剪辑手招募</div>
+        </div>
+        <div class="scroll">
+          <div class="poster">
+            <div class="poster-hero" style="background-image:url('assets/fr014/bn-recruit.jpg')">
+              <div class="hero-txt">
+                <span class="poster-kicker">PLATFORM HIRING</span>
+                <h2>剪辑手招募中</h2>
+                <p>平台正在扩编兼职剪辑手。书和项目都备好，你来做图集和视频，客服扫码即可入驻。</p>
+              </div>
+            </div>
+            <div class="poster-stats">
+              <div><b>分成供稿</b><span>按项目结算</span></div>
+              <div><b>图集 / 视频</b><span>两种成片都收</span></div>
+              <div><b>客服直录</b><span>录入当天可发</span></div>
+            </div>
+            <div class="poster-body">
+              <div class="poster-block">
+                <h3>卖点</h3>
+                <ul>
+                  <li>不用自己找书、找项目，平台持续供稿</li>
+                  <li>口播、混剪、图文切片按你擅长的类型接</li>
+                  <li>客服一对一接入，后台录入后立刻能发</li>
+                </ul>
+              </div>
+              <div class="poster-roles">
+                <div class="poster-role"><b>短视频剪辑</b><span>会卡点、混剪、口播的创作者优先</span></div>
+                <div class="poster-role"><b>图文切片</b><span>会排版、会做解压图集也能入驻</span></div>
+              </div>
+              <div class="poster-block">
+                <h3>适合谁</h3>
+                <ul>
+                  <li>有成片作品、想接稳定兼职的剪辑手</li>
+                  <li>不想走站内自助申请，愿意加客服沟通的人</li>
+                </ul>
+              </div>
+              <div class="poster-qr-wrap">
+                <div class="qr" aria-label="客服二维码"></div>
+                <p class="hint">扫描二维码联系客服报名<br />由后台录入后开通上传</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" id="screen-detail">
+        <div class="status-bar"><span>9:41</span><span>5G</span></div>
+        <div class="nav-bar">
+          <button class="back" type="button" onclick="goBackFromDetail()">‹</button>
+          <div class="title">稿件详情</div>
+        </div>
+        <div class="scroll" id="detailBody"></div>
+        <div class="foot">
+          <div class="foot-claim" id="footUnclaimed">
+            <div class="quota-chip"><span>剩余次数</span><b id="claimQuotaFoot">0</b></div>
+            <button class="btn-tip" type="button" id="quickKw">快捷提词</button>
+            <button class="btn-primary" type="button" id="goClaim">领取稿件</button>
+          </div>
+          <div class="foot-claim hidden" id="footClaimed">
+            <button class="btn-ghost" type="button" id="copyTitle">添加水印</button>
+            <button class="btn-primary" type="button" id="editWork">下载并发布到抖音</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" id="screen-claim">
+        <div class="status-bar"><span>9:41</span><span>5G</span></div>
+        <div class="nav-bar">
+          <button class="back" type="button" onclick="setScreen('detail')">‹</button>
+          <div class="title">领取校验</div>
+        </div>
+        <div class="scroll">
+          <p class="quota">选词已改为详情页浮层。本页仅作场景入口，进入后会打开浮层。</p>
+        </div>
+      </section>
+
+      <section class="screen" id="screen-buy">
+        <div class="status-bar"><span>9:41</span><span>5G</span></div>
+        <div class="nav-bar">
+          <button class="back" type="button" onclick="setScreen('detail')">‹</button>
+          <div class="title">购买次数</div>
+        </div>
+        <div class="scroll">
+          <p class="quota">积分余额 860 · 在售最多 4 档，下架不可买</p>
+          <div id="skuList"></div>
+        </div>
+      </section>
+
+      <section class="screen" id="screen-claims">
+        <div class="status-bar"><span>9:41</span><span>5G</span></div>
+        <div class="nav-bar">
+          <span style="width:36px"></span>
+          <div class="title">我的领取</div>
+          <span style="width:36px"></span>
+        </div>
+        <div class="scroll">
+          <div class="project-row" id="claimProjects"></div>
+          <div class="seg" id="claimTabs"></div>
+          <div id="claimList"></div>
+        </div>
+        <nav class="tabbar">
+          <button type="button" data-tab="feed"><b>⌂</b>广场</button>
+          <button class="on" type="button" data-tab="claims"><b>☰</b>已领</button>
+        </nav>
+      </section>
+
+      <section class="screen" id="screen-fillback">
+        <div class="status-bar"><span>9:41</span><span>5G</span></div>
+        <div class="nav-bar">
+          <button class="back" type="button" onclick="setScreen('claims')">‹</button>
+          <div class="title">项目回填</div>
+        </div>
+        <div class="scroll">
+          <p class="quota">复用该项目已有回填页，本 FR 不新造字段</p>
+          <div class="card">
+            <div class="field"><label>发布平台</label><select><option>抖音</option><option>视频号</option></select></div>
+            <div class="field"><label>作品链接</label><input placeholder="粘贴已发布作品链接" /></div>
+            <div class="field"><label>发布帐号</label><input placeholder="帐号昵称" /></div>
+          </div>
+        </div>
+        <div class="foot"><button class="btn-primary" type="button" id="doFill">提交回填</button></div>
+      </section>
+
+      <section class="screen" id="screen-watermark">
+        <div class="wm-preview" id="wmPreview"></div>
+        <div class="wm-nav">
+          <button class="back" type="button" onclick="setScreen('detail', true)">‹</button>
+          <div class="title">添加水印</div>
+          <span style="width:36px"></span>
+        </div>
+        <div class="wm-panel" id="wmPanel"></div>
+      </section>
+
+      <div class="dy-sheet" id="dySheet" role="dialog" aria-label="抖音相册">
+        <div class="dy-bar">
+          <button type="button" id="dyClose">×</button>
+          <b>抖音相册</b>
+          <span style="width:24px"></span>
+        </div>
+        <div class="dy-hint" id="dyHint">稿件已保存，正在拉起相册选片发布</div>
+        <div class="dy-grid" id="dyGrid"></div>
+        <div class="dy-foot">
+          <button class="btn-ghost" type="button" id="dyCancel">取消</button>
+          <button class="btn-primary" type="button" id="dyPublish">用所选内容发布</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="yijian-daifa-store.js"></script>
+  <script>
+    var SCREENS = [
+      { id: 'feed', label: '作品广场' },
+      { id: 'poster', label: '招募海报' },
+      { id: 'detail', label: '稿件详情' },
+      { id: 'claim', label: '浮层选词' },
+      { id: 'buy', label: '浮层兑换' },
+      { id: 'claims', label: '我的领取' },
+      { id: 'fillback', label: '项目回填' },
+      { id: 'watermark', label: '添加水印' },
+      { id: 'douyin', label: '跳转抖音相册' },
+      { id: 'timeout', label: '24h 超时释放' },
+      { id: 'banned', label: '停权无法领' }
+    ];
+    var embedMode = /(?:^|[?&])embed=1(?:&|$)/.test(location.search);
+    var STORE = YJD.open({ reset: !embedMode });
+    YJD.applyFreeDay(STORE);
+    var ITEMS = STORE.works;
+    var BANNERS = STORE.banners;
+    var SKUS = STORE.skus;
+    var KEYWORDS = STORE.keywords;
+    function persistStore() { YJD.save(STORE); }
+    function plazaProjects() {
+      return [{ id: '', name: '全部', mark: '全', color: '#94a3b8' }].concat(
+        YJD.enabledProjects(STORE).map(function (p) { return { id: p.name, name: p.name, logo: p.logo }; })
+      );
+    }
+    var PROJECTS = plazaProjects();
+    function buildFilters() {
+      var eds = [];
+      ITEMS.forEach(function (it) { if (eds.indexOf(it.editor) === -1) eds.push(it.editor); });
+      return [
+        { key: 'editor', label: '剪辑师', options: eds },
+        { key: 'mat', label: '素材类型', options: YJD.enabledMats(STORE).map(function (m) { return m.name; }) },
+        { key: 'kind', label: '稿件类型', options: ['图集', '视频'] }
+      ];
+    }
+    var FILTERS = buildFilters();
+    var CLIP_FONTS = [
+      { id: 'sys', name: '系统', family: '-apple-system, "PingFang SC", "Microsoft YaHei", sans-serif' },
+      { id: 'syht', name: '思源黑体', family: '"Source Han Sans SC", "Noto Sans SC", "PingFang SC", sans-serif' },
+      { id: 'syst', name: '思源宋体', family: '"Source Han Serif SC", "Noto Serif SC", "Songti SC", serif' },
+      { id: 'kuaile', name: '站酷快乐体', family: '"ZCOOL KuaiLe", "PingFang SC", sans-serif' },
+      { id: 'kuhei', name: '站酷酷黑体', family: '"ZCOOL QingKe HuangYou", "PingFang SC", sans-serif' },
+      { id: 'ali', name: '阿里巴巴普惠体', family: '"Alibaba PuHuiTi", "PingFang SC", sans-serif' },
+      { id: 'dy', name: '抖音美好体', family: '"Douyin Sans", "PingFang SC", sans-serif' },
+      { id: 'xiaobai', name: '包图小白体', family: '"Baotu Xiaobai", "Yuanti SC", "PingFang SC", sans-serif' }
+    ];
+    var CLIP_COLORS = [
+      { id: 'white', name: '白', hex: '#FFFFFF' },
+      { id: 'black', name: '黑', hex: '#000000' },
+      { id: 'red', name: '红', hex: '#FF2D55' },
+      { id: 'orange', name: '橙', hex: '#FF6B1A' },
+      { id: 'yellow', name: '黄', hex: '#FFCC00' },
+      { id: 'green', name: '绿', hex: '#34C759' },
+      { id: 'cyan', name: '青', hex: '#5AC8FA' },
+      { id: 'blue', name: '蓝', hex: '#007AFF' },
+      { id: 'purple', name: '紫', hex: '#AF52DE' },
+      { id: 'gray', name: '灰', hex: '#8E8E93' }
+    ];
+    var CLIP_BGS = [{ id: 'none', name: '无', hex: '' }].concat(CLIP_COLORS);
+    var WM_MODES = [
+      { id: 'all', label: '全部应用' },
+      { id: '2-1', label: '每2张打1张水印' },
+      { id: '3-1', label: '每3张打1张水印' },
+      { id: '5-1', label: '每5张打1张水印' },
+      { id: '2-10', label: '每2张打10张水印' }
+    ];
+    var state = {
+      filters: { project: '', editor: '', mat: '', kind: '' },
+      claimFilters: { project: '', status: '未回填' },
+      search: '',
+      current: 'M-01',
+      kw: '',
+      kwPick: '',
+      kwQuery: '',
+      kwMode: 'claim',
+      pendingSheet: '',
+      pendingBuy: false,
+      skuPick: 0,
+      videoTimer: null,
+      free: STORE.user.free,
+      bought: STORE.user.bought,
+      strikes: STORE.user.strikes,
+      banned: STORE.user.banned,
+      fromScreen: 'feed',
+      claiming: false,
+      claims: STORE.claims,
+      fillId: null,
+      openFilter: null,
+      wm: null,
+      loadTimer: null
+    };
+
+    function rebindFe() {
+      STORE = YJD.open();
+      YJD.applyFreeDay(STORE);
+      ITEMS = STORE.works;
+      BANNERS = STORE.banners;
+      SKUS = STORE.skus;
+      KEYWORDS = STORE.keywords;
+      PROJECTS = plazaProjects();
+      FILTERS = buildFilters();
+      state.claims = STORE.claims;
+      state.free = STORE.user.free;
+      state.bought = STORE.user.bought;
+      state.strikes = STORE.user.strikes;
+      state.banned = STORE.user.banned;
+    }
+    function esc(s) {
+      return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+        return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
+      });
+    }
+    function persistFe() {
+      STORE.user.free = state.free;
+      STORE.user.bought = state.bought;
+      STORE.user.strikes = state.strikes;
+      STORE.user.banned = state.banned;
+      persistStore();
+    }
+    function myClaims() {
+      return STORE.claims.filter(function (c) { return c.user === STORE.user.id; });
+    }
+    function quota() { return state.free + state.bought; }
+    function item(id) { return ITEMS.find(function (x) { return x.id === id; }); }
+    function coverMiss(img) {
+      img.style.display = 'none';
+      if (img.parentNode) img.parentNode.classList.add('cover-miss');
+    }
+    function coverHtml(src, book, genre) {
+      return '<div class="cover-wrap" data-book="' + (book || '') + '" data-genre="' + (genre || '') + '">' +
+        '<img class="cover-img" src="' + (src || '') + '" alt="' + (genre || '') + '封面 ' + (book || '') + '" onerror="coverMiss(this)" /></div>';
+    }
+    var bannerTimer = null;
+    var bannerIdx = 0;
+    function enabledBanners() {
+      return BANNERS.filter(function (b) { return b.on; }).slice(0, 5);
+    }
+    function stopBanner() {
+      if (bannerTimer) { clearInterval(bannerTimer); bannerTimer = null; }
+    }
+    function showBanner(i) {
+      var slides = document.querySelectorAll('#plazaBanner .bn-slide');
+      var dots = document.querySelectorAll('#plazaBanner .bn-dot');
+      if (!slides.length) return;
+      bannerIdx = ((i % slides.length) + slides.length) % slides.length;
+      slides.forEach(function (el, n) { el.classList.toggle('on', n === bannerIdx); });
+      dots.forEach(function (el, n) { el.classList.toggle('on', n === bannerIdx); });
+    }
+    function renderPlazaBanner() {
+      stopBanner();
+      var el = document.getElementById('plazaBanner');
+      if (!el) return;
+      var list = enabledBanners();
+      if (!list.length) {
+        el.hidden = true;
+        el.innerHTML = '';
+        return;
+      }
+      el.hidden = false;
+      var dots = list.length >= 2
+        ? '<div class="bn-dots">' + list.map(function (_, i) {
+          return '<button class="bn-dot' + (i === 0 ? ' on' : '') + '" type="button" data-i="' + i + '"></button>';
+        }).join('') + '</div>'
+        : '';
+      el.innerHTML = '<div class="bn-track">' + list.map(function (b, i) {
+        var bn = b.kind === 'recruit' ? 'recruit' : b.id;
+        return '<button class="bn-slide' + (i === 0 ? ' on' : '') + '" type="button" data-bn="' + bn + '" data-kind="' + b.kind + '">' +
+          '<img src="' + b.img + '" alt="' + b.title + '" />' +
+          '<div class="bn-cap"><b>' + b.title + '</b><span>' + (b.sub || '') + '</span></div></button>';
+      }).join('') + '</div>' + dots;
+      bannerIdx = 0;
+      el.querySelectorAll('.bn-slide').forEach(function (btn) {
+        btn.onclick = function () {
+          if (btn.dataset.kind === 'recruit' || btn.dataset.bn === 'recruit') setScreen('poster', true);
+        };
+      });
+      el.querySelectorAll('.bn-dot').forEach(function (dot) {
+        dot.onclick = function (e) {
+          e.stopPropagation();
+          showBanner(Number(dot.dataset.i));
+        };
+      });
+      if (list.length >= 2) {
+        bannerTimer = setInterval(function () { showBanner(bannerIdx + 1); }, 3000);
+      }
+    }
+    function toast(msg) {
+      var el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(toast._t);
+      toast._t = setTimeout(function () { el.classList.remove('show'); }, 1600);
+    }
+    function closeDd() {
+      state.openFilter = null;
+      document.getElementById('ddMask').classList.remove('show');
+      document.getElementById('ddSheet').classList.remove('show');
+    }
+    function openDd(key, options, current, onPick, allLabel) {
+      state.openFilter = key;
+      var html = '<button class="dd-opt' + (!current ? ' active' : '') + '" data-v="">' + allLabel + '</button>';
+      html += options.map(function (v) {
+        return '<button class="dd-opt' + (current === v ? ' active' : '') + '" data-v="' + v + '">' + v + '</button>';
+      }).join('');
+      var sheet = document.getElementById('ddSheet');
+      sheet.innerHTML = html;
+      sheet.classList.add('show');
+      document.getElementById('ddMask').classList.add('show');
+      sheet.querySelectorAll('.dd-opt').forEach(function (btn) {
+        btn.onclick = function () { onPick(btn.dataset.v); closeDd(); };
+      });
+    }
+    function visibleItems() {
+      var q = state.search;
+      return ITEMS.filter(function (it) {
+        if (!YJD.plazaEligible(STORE, it)) return false;
+        if (q && it.title.indexOf(q) === -1 && it.book.indexOf(q) === -1) return false;
+        if (state.filters.project && it.project !== state.filters.project) return false;
+        if (state.filters.editor && it.editor !== state.filters.editor) return false;
+        if (state.filters.mat && it.mat !== state.filters.mat) return false;
+        if (state.filters.kind && it.kind !== state.filters.kind) return false;
+        return true;
+      });
+    }
+    function renderProjectRow(elId, current, onPick, list) {
+      var el = document.getElementById(elId);
+      if (!el) return;
+      var items = list || PROJECTS;
+      el.innerHTML = items.map(function (p) {
+        var ico = p.logo
+          ? '<span class="proj-ico"><img src="' + p.logo + '" alt="' + p.name + '" /></span>'
+          : '<span class="proj-ico" style="background:' + (p.color || '#94a3b8') + '">' + (p.mark || '') + '</span>';
+        return '<button class="proj' + (current === p.id ? ' on' : '') + '" type="button" data-id="' + p.id + '">' +
+          ico + '<span class="proj-name">' + p.name + '</span></button>';
+      }).join('');
+      el.querySelectorAll('.proj').forEach(function (btn) {
+        btn.onclick = function () { onPick(btn.dataset.id); };
+      });
+    }
+    function claimedProjects() {
+      var seen = {};
+      myClaims().forEach(function (c) { if (c.project) seen[c.project] = true; });
+      return PROJECTS.filter(function (p) { return !p.id || seen[p.id]; });
+    }
+    function fmtClock(ts) {
+      if (!ts) return '未下载';
+      var d = new Date(ts);
+      var pad = function (n) { return n < 10 ? '0' + n : '' + n; };
+      return (d.getMonth() + 1) + '月' + d.getDate() + '日 ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+    }
+    function dlCountdown(c) {
+      if (c && c.status === '已超时') return { text: '回填已超时', expired: true };
+      var left = (c.expireAt || 0) - Date.now();
+      if (left <= 0) return { text: '下载已失效', expired: true };
+      var d = Math.floor(left / 86400000);
+      var h = Math.floor((left % 86400000) / 3600000);
+      return { text: '还可下载 ' + d + '天' + h + '时', expired: false };
+    }
+    function downloadBlockToast(c) {
+      return YJD.downloadBlockReason(c, item(c && c.mid), { banned: state.banned });
+    }
+    function renderProjects() {
+      renderProjectRow('projectRow', state.filters.project, function (id) {
+        state.filters.project = id;
+        renderFeed();
+      });
+    }
+    function renderFilters() {
+      document.getElementById('feedFilters').innerHTML = FILTERS.map(function (f) {
+        var cur = state.filters[f.key];
+        return '<button class="dd' + (cur ? ' on' : '') + '" type="button" data-f="' + f.key + '">' +
+          (cur || f.label) + ' ▾</button>';
+      }).join('');
+      document.querySelectorAll('#feedFilters .dd').forEach(function (btn) {
+        btn.onclick = function () {
+          var f = FILTERS.find(function (x) { return x.key === btn.dataset.f; });
+          openDd(f.key, f.options, state.filters[f.key], function (v) {
+            state.filters[f.key] = v;
+            renderFeed();
+          }, f.label);
+        };
+      });
+    }
+    function renderFeed() {
+      renderProjects();
+      renderFilters();
+      renderPlazaBanner();
+      var list = visibleItems();
+      var html = list.length
+        ? '<div class="grid">' + list.map(function (it) {
+          return '<div class="g-card feed-card" data-id="' + it.id + '" data-genre="' + (it.genre || '') + '">' +
+            '<div class="thumb">' + coverHtml(it.cover, it.book, it.genre) +
+            '<span class="kind-tag">' + it.kind + '</span>' +
+            '<div class="thumb-bar"><span>' + it.editor + '</span><span>' + it.time + '</span></div></div>' +
+            '<div class="g-title">' + it.title + '</div>' +
+            '<div class="g-src">' + it.project + '</div></div>';
+        }).join('') + '</div>'
+        : '<div class="empty">没有可领取的稿件<br/>占用中的稿件已对他人隐藏</div>';
+      document.getElementById('feedList').innerHTML = html;
+      document.querySelectorAll('#feedList .feed-card').forEach(function (el) {
+        el.onclick = function () { openDetail(el.dataset.id); };
+      });
+    }
+    function openDetail(id, from) {
+      if (!item(id)) { toast('稿件已不存在'); return; }
+      state.fromScreen = from || 'feed';
+      state.current = id;
+      setScreen('detail', true);
+    }
+    function goBackFromDetail() {
+      setScreen(state.fromScreen === 'claims' ? 'claims' : 'feed', true);
+    }
+    function noticeHtml() {
+      return '<div class="notice" id="detailNotice">' +
+        '<div class="notice-h"><i>!</i>注意事项</div>' +
+        '<div class="notice-grid">' +
+        '<div><div class="notice-ico">日</div><p>24小时内<br/>完成发布</p></div>' +
+        '<div><div class="notice-ico">链</div><p>未按时回填<br/>任务失效</p></div>' +
+        '<div><div class="notice-ico">禁</div><p>终身未回填超过3次<br/>将禁止领取</p></div>' +
+        '</div>' +
+        '<p class="notice-foot">请遵守平台规则发布，禁止违规内容，否则收益将被取消</p></div>';
+    }
+    function renderDetail() {
+      var it = item(state.current);
+      if (!it) return;
+      var mine = myClaimOf(it.id);
+      var media = it.kind === '视频'
+        ? '<div class="media-full" id="videoPlayer">' + coverHtml(it.cover, it.book, it.genre) +
+          '<span class="media-badge">试看 5 秒</span>' +
+          '<button class="play-btn" type="button" id="playVideo">▶</button>' +
+          '<div class="v-bar"><div class="v-prog" id="vProg"></div></div>' +
+          '<div class="v-end" id="vEnd">试看结束，领取后查看完整稿件</div></div>'
+        : '<div class="media-full is-album" id="albumPreview">' + coverHtml(it.cover, it.book, it.genre) +
+          '<span class="media-badge">' + (it.imgs || 1) + ' 张</span></div>';
+      var extraCard = mine
+        ? '<div class="card" id="pubTips"><div class="tip-h"><span class="tip-label" id="pubTipsLabel">发布技巧</span><button type="button" data-copy="tips" aria-label="复制发布技巧">复制</button></div>' +
+          '<textarea class="tip-box" readonly aria-labelledby="pubTipsLabel">' + esc(YJD.tipText(it)) + '</textarea></div>'
+        : '<div class="card"><h3 style="font-size:14px;margin-bottom:6px">领取步骤</h3>' +
+          '<ol class="steps" id="claimSteps">' +
+          '<li><b>1.</b> 确认剩余次数（按钮旁可见）</li>' +
+          '<li><b>2.</b> 选择该项目已通过关键词</li>' +
+          '<li><b>3.</b> 下载稿件并保存到相册</li>' +
+          '<li><b>4.</b> 24 小时内回填发布</li>' +
+          '</ol></div>';
+      document.getElementById('detailBody').innerHTML = media +
+        '<div class="detail-pad">' +
+        '<div class="card" style="margin-top:12px"><h3 style="font-size:18px">' + it.title + '</h3>' +
+        '<div class="pills">' + (it.tags || []).map(function (t) {
+          return '<span class="pill">' + t + '</span>';
+        }).join('') + '</div>' +
+        '<div class="stat-row">' +
+        '<div class="stat"><span>稿件作者</span><b>' + it.editor + '</b></div>' +
+        '<div class="stat"><span>上传时间</span><b>' + it.time + '</b></div>' +
+        '<div class="stat"><span>分成比例</span><b>' + ((YJD.editorByName(STORE, it.editor) || it).share) + '</b></div>' +
+        '</div></div>' +
+        '<dl class="kv card"><dt>项目名称</dt><dd>' + it.project + '</dd><dt>书籍名称</dt><dd>' + it.book + '</dd><dt>书籍 ID</dt><dd>' + (it.bookId || '—') + '</dd></dl>' +
+        extraCard + noticeHtml() + '</div>';
+      document.getElementById('claimQuotaFoot').textContent = quota();
+      document.getElementById('footUnclaimed').classList.toggle('hidden', !!mine);
+      document.getElementById('footClaimed').classList.toggle('hidden', !mine);
+      var btn = document.getElementById('goClaim');
+      var claimReason = claimBlockReason(it);
+      btn.disabled = !!claimReason && claimReason !== '次数不足';
+      btn.textContent = state.banned ? '已被停权，无法领取'
+        : (claimReason === '稿件已被占用' ? '已被占用'
+          : (claimReason && claimReason !== '次数不足' ? '当前不可领' : '领取稿件'));
+      var play = document.getElementById('playVideo');
+      if (play) play.onclick = startVideoPreview;
+      var album = document.getElementById('albumPreview');
+      if (album) album.onclick = function () { openAlbumPreview(it); };
+      document.querySelectorAll('#pubTips [data-copy]').forEach(function (b) {
+        b.onclick = function () {
+          var txt = YJD.tipText(it);
+          if (!txt) { toast('暂无发布技巧'); return; }
+          if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt);
+          toast('已复制发布技巧');
+        };
+      });
+      var tipBox = document.querySelector('#pubTips .tip-box');
+      if (tipBox) tipBox.scrollIntoView({ block: 'end' });
+    }
+    function myClaimOf(mid) {
+      return myClaims().find(function (c) { return c.mid === mid && c.status !== '已超时'; });
+    }
+    function startVideoPreview() {
+      var end = document.getElementById('vEnd');
+      var prog = document.getElementById('vProg');
+      var play = document.getElementById('playVideo');
+      if (!end || !prog) return;
+      end.classList.remove('show');
+      play.style.display = 'none';
+      prog.style.width = '0%';
+      var start = Date.now();
+      if (state.videoTimer) cancelAnimationFrame(state.videoTimer);
+      function tick() {
+        var p = Math.min(1, (Date.now() - start) / 5000);
+        prog.style.width = (p * 100) + '%';
+        if (p < 1) state.videoTimer = requestAnimationFrame(tick);
+        else {
+          play.style.display = '';
+          end.classList.add('show');
+        }
+      }
+      state.videoTimer = requestAnimationFrame(tick);
+    }
+    function previewUrls(it) {
+      var list = (it.preview || []).filter(Boolean).slice(0, 3);
+      if (!list.length && it.cover) list = [it.cover];
+      return list.slice(0, 3);
+    }
+    function renderAlbumPreview() {
+      var urls = state.previewUrls || [];
+      var i = state.previewIdx || 0;
+      if (i < 0) i = 0;
+      if (i > urls.length - 1) i = Math.max(0, urls.length - 1);
+      state.previewIdx = i;
+      var img = document.getElementById('previewImg');
+      img.src = urls[i] || '';
+      document.getElementById('previewCount').textContent = urls.length ? (i + 1) + ' / ' + urls.length : '';
+      document.getElementById('previewCount').hidden = urls.length < 2;
+      document.getElementById('previewPrev').hidden = urls.length < 2;
+      document.getElementById('previewNext').hidden = urls.length < 2;
+      document.getElementById('previewWm').textContent = (STORE.user && STORE.user.id) || 'U-10086';
+    }
+    function openAlbumPreview(it) {
+      if (!it || it.kind === '视频') return;
+      state.previewUrls = previewUrls(it);
+      state.previewIdx = 0;
+      document.getElementById('previewStage').classList.toggle('is-blur', !!document.hidden);
+      renderAlbumPreview();
+      document.getElementById('previewMask').classList.add('show');
+    }
+    function closeAlbumPreview() {
+      document.getElementById('previewMask').classList.remove('show');
+      document.getElementById('previewStage').classList.remove('is-blur');
+      state.previewUrls = [];
+      state.previewIdx = 0;
+    }
+    function stepAlbumPreview(delta) {
+      var urls = state.previewUrls || [];
+      if (urls.length < 2) return;
+      state.previewIdx = (state.previewIdx + delta + urls.length) % urls.length;
+      renderAlbumPreview();
+    }
+    function currentKws() {
+      var it = item(state.current);
+      var all = YJD.claimableKeywords(STORE, it && it.project);
+      var q = state.kwQuery;
+      return q ? all.filter(function (k) { return k.indexOf(q) !== -1; }) : all;
+    }
+    function renderKwList() {
+      var list = currentKws();
+      document.getElementById('kwList').innerHTML = list.length
+        ? list.map(function (k) {
+          return '<button class="kw-row' + (state.kwPick === k ? ' on' : '') + '" type="button" data-k="' + k + '">' +
+            '<span>' + k + '</span><i class="kw-check">✓</i></button>';
+        }).join('')
+        : '<p class="quota" style="padding:16px">暂无已通过申词</p>';
+      document.querySelectorAll('#kwList .kw-row').forEach(function (el) {
+        el.onclick = function () { state.kwPick = el.dataset.k; renderKwList(); };
+      });
+    }
+    function openKwSheet(mode) {
+      state.kwMode = mode || 'claim';
+      state.kwPick = '';
+      state.kwQuery = '';
+      document.getElementById('kwSearch').value = '';
+      renderKwList();
+      document.getElementById('kwMask').classList.add('show');
+      document.getElementById('kwSheet').classList.add('show');
+    }
+    function closeKwSheet() {
+      document.getElementById('kwMask').classList.remove('show');
+      document.getElementById('kwSheet').classList.remove('show');
+      document.getElementById('buySheet').classList.remove('show');
+    }
+    function closeBuySheet() {
+      document.getElementById('buySheet').classList.remove('show');
+      if (!document.getElementById('kwSheet').classList.contains('show')) {
+        document.getElementById('kwMask').classList.remove('show');
+      }
+    }
+    function openBuySheet() {
+      closeKwSheet();
+      state.skuPick = 0;
+      renderBuy();
+      document.getElementById('kwMask').classList.add('show');
+      document.getElementById('buySheet').classList.add('show');
+    }
+    function renderClaim() {
+      openKwSheet('claim');
+    }
+    function skuPriceLine(s) {
+      var now = (Number(s.points) || 0) + ' 积分';
+      var orig = Number(s.origPoints);
+      if (orig > Number(s.points)) {
+        return '<s class="orig">' + orig + ' 积分</s>' + now;
+      }
+      return now;
+    }
+    function renderBuy() {
+      var list = SKUS.filter(function (s) { return s.on; }).slice(0, 4);
+      document.getElementById('skuList').innerHTML = list.map(function (s, i) {
+        return '<button class="sku' + (state.skuPick === i ? ' on' : '') + '" type="button" data-i="' + i + '">' +
+          '<div><strong>' + s.times + ' 次</strong><div class="sub">' + skuPriceLine(s) + '</div></div>' +
+          '<i class="kw-check"' + (state.skuPick === i ? ' style="display:flex"' : '') + '>✓</i></button>';
+      }).join('');
+      document.querySelectorAll('#skuList .sku').forEach(function (btn) {
+        btn.onclick = function () { state.skuPick = Number(btn.dataset.i); renderBuy(); };
+      });
+    }
+    function confirmBuy() {
+      var list = SKUS.filter(function (s) { return s.on; }).slice(0, 4);
+      var s = list[state.skuPick];
+      if (!s) { toast('请先选择兑换档位'); return; }
+      state.bought += s.times;
+      persistFe();
+      closeBuySheet();
+      var q = document.getElementById('claimQuotaFoot');
+      if (q) q.textContent = quota();
+      toast('兑换成功，次数 +' + s.times + '（不退）');
+    }
+    function renderClaimTabs() {
+      var tabs = ['未回填', '已回填', '已超时'];
+      document.getElementById('claimTabs').innerHTML = tabs.map(function (t) {
+        return '<button type="button" class="' + (state.claimFilters.status === t ? 'on' : '') + '" data-st="' + t + '">' + t + '</button>';
+      }).join('');
+      document.querySelectorAll('#claimTabs button').forEach(function (btn) {
+        btn.onclick = function () {
+          state.claimFilters.status = btn.dataset.st;
+          renderClaims();
+        };
+      });
+    }
+    function renderClaims() {
+      var projects = claimedProjects();
+      if (state.claimFilters.project && !projects.some(function (p) { return p.id === state.claimFilters.project; })) {
+        state.claimFilters.project = '';
+      }
+      renderProjectRow('claimProjects', state.claimFilters.project, function (id) {
+        state.claimFilters.project = id;
+        renderClaims();
+      }, projects);
+      renderClaimTabs();
+      var rows = myClaims().filter(function (c) {
+        if (state.claimFilters.project && c.project !== state.claimFilters.project) return false;
+        if (state.claimFilters.status && c.status !== state.claimFilters.status) return false;
+        return true;
+      });
+      document.getElementById('claimList').innerHTML = rows.length ? rows.map(function (c) {
+        var src = item(c.mid);
+        var cover = (src && src.cover) || c.cover;
+        var genre = (src && src.genre) || '';
+        var book = (src && src.book) || c.title;
+        var cd = dlCountdown(c);
+        return '<div class="c-card">' +
+          '<div class="c-hit" data-mid="' + c.mid + '">' +
+          '<div class="c-kw">' + (c.kw || '未选词') + '</div>' +
+          '<div class="c-top"><div class="c-cover">' + coverHtml(cover, book, genre) +
+          (c.kind === '视频' ? '<span class="c-play">▶</span>' : '') + '</div>' +
+          '<div class="c-info"><p class="c-line">' + c.title + '</p>' +
+          '<p class="c-sub">项目 ' + (c.project || '—') + ' · 作者 ' + (c.editor || '—') + '</p>' +
+          '<p class="c-sub">领取时间 ' + (c.time || '刚刚') + '</p>' +
+          '<p class="c-sub">下载时间 ' + fmtClock(c.downloadedAt) + '</p>' +
+          '<p class="c-sub c-dl' + (cd.expired ? ' out' : '') + '">' + cd.text + '</p></div></div></div>' +
+          '<div class="c-tools">' +
+          '<button type="button" data-dl="' + c.id + '">下载</button>' +
+          '<button type="button" data-copy="' + c.id + '">复制链接</button>' +
+          '<button class="primary" type="button" data-fill="' + c.id + '">立即回填</button>' +
+          '</div></div>';
+      }).join('') : '<div class="empty">暂无记录~</div>';
+      document.querySelectorAll('#claimList .c-hit').forEach(function (el) {
+        el.onclick = function () {
+          if (!el.dataset.mid) return;
+          openDetail(el.dataset.mid, 'claims');
+        };
+      });
+      document.querySelectorAll('[data-fill]').forEach(function (btn) {
+        btn.onclick = function (e) {
+          e.stopPropagation();
+          var c = state.claims.find(function (x) { return x.id === btn.dataset.fill; });
+          if (!c) return;
+          if (c.status === '已回填') { toast('该稿件已回填'); return; }
+          if (c.status === '已超时') { toast('已超时，无法回填'); return; }
+          state.fillId = c.id;
+          setScreen('fillback', true);
+        };
+      });
+      document.querySelectorAll('[data-dl]').forEach(function (btn) {
+        btn.onclick = function (e) {
+          e.stopPropagation();
+          var c = state.claims.find(function (x) { return x.id === btn.dataset.dl; });
+          if (!c) return;
+          var block = downloadBlockToast(c);
+          if (block) { toast(block); return; }
+          c.downloadedAt = Date.now();
+          persistFe();
+          toast('稿件已开始下载');
+          renderClaims();
+        };
+      });
+      document.querySelectorAll('[data-copy]').forEach(function (btn) {
+        btn.onclick = function (e) {
+          e.stopPropagation();
+          var c = state.claims.find(function (x) { return x.id === btn.dataset.copy; });
+          if (!c) return;
+          var block = downloadBlockToast(c);
+          if (block) { toast(block); return; }
+          if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(c.link || c.title);
+          toast('已复制稿件链接');
+        };
+      });
+    }
+    function makeClaim(it, extra) {
+      extra = extra || {};
+      var now = extra.claimedAt || Date.now();
+      return {
+        id: extra.id || ('C-' + Date.now()),
+        user: STORE.user.id,
+        mid: it.id,
+        title: it.title,
+        work: it.title,
+        project: it.project,
+        editor: it.editor,
+        book: it.book || '',
+        bookId: it.bookId || '',
+        cover: it.cover,
+        kind: it.kind,
+        kw: extra.kw || state.kw || '',
+        fill: extra.fill || '—',
+        fillVideo: extra.fillVideo || '',
+        pendingEarn: extra.pendingEarn,
+        time: extra.time || '刚刚',
+        status: extra.status || '未回填',
+        link: extra.link || ('https://ybdd.demo/ms/' + it.id),
+        claimedAt: now,
+        expireAt: extra.expireAt || YJD.clientExpireAt(now),
+        downloadedAt: extra.downloadedAt !== undefined ? extra.downloadedAt : now,
+        shareSnapshot: extra.shareSnapshot || (function () {
+          var ed = YJD.editorByName(STORE, it.editor);
+          return (ed && ed.share) || it.share || '50%';
+        })(),
+        filledAt: extra.filledAt || ''
+      };
+    }
+    function attachClaim(it, extra) {
+      var c = makeClaim(it, extra);
+      YJD.bindClaimOss(it, c.claimedAt);
+      return c;
+    }
+    function hexA(hex, a) {
+      if (!hex) return 'transparent';
+      var n = hex.replace('#', '');
+      var r = parseInt(n.slice(0, 2), 16);
+      var g = parseInt(n.slice(2, 4), 16);
+      var b = parseInt(n.slice(4, 6), 16);
+      return 'rgba(' + r + ',' + g + ',' + b + ',' + (Math.max(0, Math.min(100, a)) / 100) + ')';
+    }
+    function defaultWm(claim) {
+      return {
+        text: (claim && claim.kw) || '',
+        font: 'syht',
+        size: 5,
+        color: 'white',
+        colorA: 100,
+        bg: 'none',
+        bgA: 55,
+        mode: 'all',
+        tab: 'font',
+        x: 50,
+        y: 58
+      };
+    }
+    function clipFont(id) {
+      return CLIP_FONTS.find(function (f) { return f.id === id; }) || CLIP_FONTS[0];
+    }
+    function clipColor(id) {
+      return CLIP_COLORS.find(function (c) { return c.id === id; }) || CLIP_COLORS[0];
+    }
+    function clipBg(id) {
+      return CLIP_BGS.find(function (c) { return c.id === id; }) || CLIP_BGS[0];
+    }
+    function applyWmStyle() {
+      var el = document.getElementById('wmMark');
+      if (!el || !state.wm) return;
+      var font = clipFont(state.wm.font);
+      var color = clipColor(state.wm.color);
+      var bg = clipBg(state.wm.bg);
+      el.textContent = state.wm.text || '水印文字';
+      el.style.left = state.wm.x + '%';
+      el.style.top = state.wm.y + '%';
+      el.style.fontFamily = font.family;
+      el.style.fontSize = (10 + Number(state.wm.size) * 3.2) + 'px';
+      el.style.color = hexA(color.hex, state.wm.colorA);
+      el.style.background = bg.id === 'none' ? 'transparent' : hexA(bg.hex, state.wm.bgA);
+      el.style.fontWeight = font.id === 'syst' ? '500' : '700';
+    }
+    function bindWmDrag() {
+      var box = document.getElementById('wmPreview');
+      var el = document.getElementById('wmMark');
+      if (!box || !el) return;
+      var dragging = false;
+      function move(e) {
+        var t = e.touches ? e.touches[0] : e;
+        var r = box.getBoundingClientRect();
+        state.wm.x = Math.max(8, Math.min(92, ((t.clientX - r.left) / r.width) * 100));
+        state.wm.y = Math.max(8, Math.min(92, ((t.clientY - r.top) / r.height) * 100));
+        el.style.left = state.wm.x + '%';
+        el.style.top = state.wm.y + '%';
+      }
+      el.onpointerdown = function (e) {
+        dragging = true;
+        el.setPointerCapture(e.pointerId);
+        e.preventDefault();
+      };
+      el.onpointermove = function (e) { if (dragging) move(e); };
+      el.onpointerup = function () { dragging = false; };
+      el.onpointercancel = function () { dragging = false; };
+    }
+    function wmColorPane(kind) {
+      var isBg = kind === 'bg';
+      var list = isBg ? CLIP_BGS : CLIP_COLORS;
+      var cur = isBg ? state.wm.bg : state.wm.color;
+      var alpha = isBg ? state.wm.bgA : state.wm.colorA;
+      var id = isBg ? 'wmBgs' : 'wmColors';
+      var aId = isBg ? 'wmBgA' : 'wmColorA';
+      var nId = isBg ? 'wmBgAN' : 'wmColorAN';
+      return '<div class="wm-stack">' +
+        '<div class="wm-block"><div class="wm-k">颜色</div><div class="wm-swatches' + (isBg ? ' bg' : '') + '" id="' + id + '">' +
+        list.map(function (c) {
+          var cls = 'wm-sw' + (c.id === 'none' ? ' none' : '') + (cur === c.id ? ' on' : '');
+          return '<button class="' + cls + '" type="button" data-' + (isBg ? 'bg' : 'color') + '="' + c.id + '" style="' + (c.hex ? 'background:' + c.hex : '') + '" title="' + c.name + '"></button>';
+        }).join('') + '</div></div>' +
+        '<div class="wm-block"><div class="wm-k">透明度</div><label class="wm-alpha">' +
+        '<input type="range" id="' + aId + '" min="0" max="100" value="' + alpha + '" />' +
+        '<span class="n" id="' + nId + '">' + alpha + '%</span></label></div></div>';
+    }
+    function wmAllPanes() {
+      var wm = state.wm;
+      var tab = wm.tab || 'font';
+      return '<div class="wm-panes" id="wmPanes">' +
+        '<div class="wm-pane' + (tab === 'font' ? ' on' : '') + '" data-pane="font"><div class="wm-stack">' +
+        '<div class="wm-block"><div class="wm-k">字体</div><div class="wm-chips" id="wmFonts">' +
+        CLIP_FONTS.map(function (f) {
+          return '<button class="wm-chip' + (wm.font === f.id ? ' on' : '') + '" type="button" data-font="' + f.id + '">' + f.name + '</button>';
+        }).join('') + '</div></div>' +
+        '<div class="wm-block"><div class="wm-k">字号 0–10</div><div class="wm-step"><div class="wm-stepper">' +
+        '<button type="button" id="wmSizeMinus">−</button><b id="wmSizeN">' + wm.size + '</b>' +
+        '<button type="button" id="wmSizePlus">+</button></div></div></div></div></div>' +
+        '<div class="wm-pane' + (tab === 'color' ? ' on' : '') + '" data-pane="color">' + wmColorPane('color') + '</div>' +
+        '<div class="wm-pane' + (tab === 'bg' ? ' on' : '') + '" data-pane="bg">' + wmColorPane('bg') + '</div>' +
+        '<div class="wm-pane' + (tab === 'mode' ? ' on' : '') + '" data-pane="mode"><div class="wm-stack">' +
+        '<div class="wm-block"><div class="wm-k">应用范围</div><div class="wm-modes" id="wmModes">' +
+        WM_MODES.map(function (m) {
+          return '<button class="wm-chip' + (wm.mode === m.id ? ' on' : '') + '" type="button" data-mode="' + m.id + '" title="' + m.label + '">' + m.label + '</button>';
+        }).join('') + '</div></div></div></div></div>';
+    }
+    function bindWmTabBody() {
+      var fonts = document.getElementById('wmFonts');
+      if (fonts) {
+        fonts.querySelectorAll('.wm-chip').forEach(function (b) {
+          b.onclick = function () {
+            state.wm.font = b.dataset.font;
+            fonts.querySelectorAll('.wm-chip').forEach(function (x) { x.classList.toggle('on', x === b); });
+            applyWmStyle();
+          };
+        });
+        document.getElementById('wmSizeMinus').onclick = function () {
+          state.wm.size = Math.max(0, state.wm.size - 1);
+          document.getElementById('wmSizeN').textContent = state.wm.size;
+          applyWmStyle();
+        };
+        document.getElementById('wmSizePlus').onclick = function () {
+          state.wm.size = Math.min(10, state.wm.size + 1);
+          document.getElementById('wmSizeN').textContent = state.wm.size;
+          applyWmStyle();
+        };
+      }
+      var colors = document.getElementById('wmColors');
+      if (colors) {
+        colors.querySelectorAll('.wm-sw').forEach(function (b) {
+          b.onclick = function () {
+            state.wm.color = b.dataset.color;
+            colors.querySelectorAll('.wm-sw').forEach(function (x) { x.classList.toggle('on', x === b); });
+            applyWmStyle();
+          };
+        });
+        document.getElementById('wmColorA').oninput = function (e) {
+          state.wm.colorA = Number(e.target.value);
+          document.getElementById('wmColorAN').textContent = state.wm.colorA + '%';
+          applyWmStyle();
+        };
+      }
+      var bgs = document.getElementById('wmBgs');
+      if (bgs) {
+        bgs.querySelectorAll('.wm-sw').forEach(function (b) {
+          b.onclick = function () {
+            state.wm.bg = b.dataset.bg;
+            bgs.querySelectorAll('.wm-sw').forEach(function (x) { x.classList.toggle('on', x === b); });
+            applyWmStyle();
+          };
+        });
+        document.getElementById('wmBgA').oninput = function (e) {
+          state.wm.bgA = Number(e.target.value);
+          document.getElementById('wmBgAN').textContent = state.wm.bgA + '%';
+          applyWmStyle();
+        };
+      }
+      var modes = document.getElementById('wmModes');
+      if (modes) {
+        modes.querySelectorAll('.wm-chip').forEach(function (b) {
+          b.onclick = function () {
+            state.wm.mode = b.dataset.mode;
+            modes.querySelectorAll('.wm-chip').forEach(function (x) { x.classList.toggle('on', x === b); });
+          };
+        });
+      }
+    }
+    function switchWmTab(tab) {
+      state.wm.tab = tab;
+      document.querySelectorAll('#wmTabs button').forEach(function (b) {
+        b.classList.toggle('on', b.dataset.tab === tab);
+      });
+      document.querySelectorAll('#wmPanes .wm-pane').forEach(function (p) {
+        p.classList.toggle('on', p.dataset.pane === tab);
+      });
+    }
+    function watermarkVideoToast(it) {
+      return (it && it.kind === '视频') ? '视频稿件暂不支持添加水印' : '';
+    }
+    function renderWatermark() {
+      var it = item(state.current);
+      var mine = myClaimOf(state.current);
+      if (!it || !mine) {
+        toast('请先领取稿件');
+        setScreen('detail', true);
+        return;
+      }
+      var videoBlock = watermarkVideoToast(it);
+      if (videoBlock) {
+        toast(videoBlock);
+        setScreen('detail', true);
+        return;
+      }
+      if (!state.wm) state.wm = defaultWm(mine);
+      if (!state.wm.tab) state.wm.tab = 'font';
+      document.getElementById('wmPreview').innerHTML = coverHtml(it.cover, it.book, it.genre) +
+        '<div class="wm-mark" id="wmMark"></div>';
+      applyWmStyle();
+      bindWmDrag();
+      var wm = state.wm;
+      document.getElementById('wmPanel').innerHTML =
+        '<div class="wm-dock">' +
+        '<input class="wm-in" id="wmText" type="text" inputmode="text" enterkeyhint="done" autocomplete="off" autocorrect="on" maxlength="20" placeholder="点这里输入水印文字" value="' + (wm.text || '') + '" />' +
+        '<div class="wm-sheet">' +
+        '<div class="wm-tabs" id="wmTabs">' +
+        [['font', '字体'], ['color', '字色'], ['bg', '背景'], ['mode', '水印']].map(function (t) {
+          return '<button type="button" data-tab="' + t[0] + '" class="' + (wm.tab === t[0] ? 'on' : '') + '">' + t[1] + '</button>';
+        }).join('') + '</div>' +
+        wmAllPanes() + '</div>' +
+        '<button class="btn-primary wm-dl" type="button" id="dlWm">下载水印稿件并发布到抖音</button></div>';
+      var input = document.getElementById('wmText');
+      input.oninput = function (e) {
+        state.wm.text = e.target.value;
+        applyWmStyle();
+      };
+      input.onclick = function (e) { e.stopPropagation(); input.focus(); };
+      document.getElementById('wmMark').addEventListener('dblclick', function () { input.focus(); });
+      document.querySelectorAll('#wmTabs button').forEach(function (b) {
+        b.onclick = function () { switchWmTab(b.dataset.tab); };
+      });
+      bindWmTabBody();
+      document.getElementById('dlWm').onclick = function () { downloadManuscript(true); };
+    }
+    function showLoad(text, extra) {
+      extra = extra || {};
+      document.getElementById('loadMask').classList.add('show');
+      document.getElementById('loadBox').classList.add('show');
+      document.getElementById('loadText').textContent = text;
+      var sub = document.getElementById('loadSub');
+      var barWrap = document.getElementById('loadBarWrap');
+      var bar = document.getElementById('loadBar');
+      if (extra.sub) {
+        sub.textContent = extra.sub;
+        sub.style.display = 'block';
+      } else {
+        sub.textContent = '';
+        sub.style.display = 'none';
+      }
+      if (extra.percent != null) {
+        barWrap.classList.add('show');
+        bar.style.width = extra.percent + '%';
+      } else {
+        barWrap.classList.remove('show');
+        bar.style.width = '0%';
+      }
+      var spin = document.getElementById('loadSpin');
+      if (extra.done) spin.classList.add('done');
+      else spin.classList.remove('done');
+    }
+    function hideLoad() {
+      document.getElementById('loadMask').classList.remove('show');
+      document.getElementById('loadBox').classList.remove('show');
+      document.getElementById('loadBarWrap').classList.remove('show');
+    }
+    function currentClaim() {
+      return myClaimOf(state.current);
+    }
+    function tryOpenDouyinScheme() {
+      var schemes = ['snssdk1128://openRecord', 'aweme://openRecord', 'snssdk1128://'];
+      schemes.forEach(function (url, i) {
+        setTimeout(function () {
+          var iframe = document.createElement('iframe');
+          iframe.style.display = 'none';
+          iframe.src = url;
+          document.body.appendChild(iframe);
+          setTimeout(function () { iframe.remove(); }, 800);
+        }, i * 120);
+      });
+    }
+    function closeDouyinAlbum() {
+      document.getElementById('dySheet').classList.remove('show');
+    }
+    function openDouyinAlbum(it, watermarked) {
+      it = it || item(state.current);
+      var grid = document.getElementById('dyGrid');
+      var shots = [];
+      if (it && it.kind === '图集') {
+        shots = (it.preview && it.preview.length ? it.preview : YJD.albumPreview(it.cover)).slice(0, 6);
+      } else if (it) {
+        shots = [it.cover];
+      }
+      if (!shots.length) shots = ['assets/fr014/cover-m01.jpg'];
+      document.getElementById('dyHint').textContent = watermarked
+        ? '水印稿已进相册，抖音正在拉起相册选片'
+        : '稿件已进相册，抖音正在拉起相册选片';
+      grid.innerHTML = shots.map(function (src, i) {
+        return '<div class="dy-cell' + (i === 0 ? ' on' : '') + '">' +
+          '<img src="' + src + '" alt="" /><span class="ck">' + (i === 0 ? '1' : '') + '</span></div>';
+      }).join('');
+      document.getElementById('dySheet').classList.add('show');
+      tryOpenDouyinScheme();
+    }
+    function downloadManuscript(watermarked) {
+      var mine = currentClaim();
+      var it = item(state.current);
+      if (!mine || !it) return;
+      if (watermarked) {
+        var videoBlock = watermarkVideoToast(it);
+        if (videoBlock) { toast(videoBlock); return; }
+      }
+      var dlBlock = downloadBlockToast(mine);
+      if (dlBlock) { toast(dlBlock); return; }
+      if (state.loadTimer) clearTimeout(state.loadTimer);
+      var isVideo = it.kind === '视频';
+      var total = isVideo ? 100 : (it.imgs || 1);
+      var n = 0;
+      var phase = watermarked ? 0 : 1;
+      if (watermarked) showLoad('正在打水印');
+      else if (isVideo) showLoad('正在下载', { percent: 0, sub: '0%' });
+      else showLoad('正在下载', { sub: '0/' + total + ' 张' });
+      function tick() {
+        if (phase === 0) {
+          phase = 1;
+          n = 0;
+          if (isVideo) showLoad('正在下载', { percent: 0, sub: '0%' });
+          else showLoad('正在下载', { sub: '0/' + total + ' 张' });
+          state.loadTimer = setTimeout(tick, 220);
+          return;
+        }
+        n += isVideo ? 8 : 1;
+        if (n > total) n = total;
+        if (isVideo) showLoad('正在下载', { percent: n, sub: n + '%' });
+        else showLoad('正在下载', { sub: n + '/' + total + ' 张' });
+        if (n < total) {
+          state.loadTimer = setTimeout(tick, isVideo ? 90 : 160);
+        } else {
+          showLoad('正在下载', isVideo ? { percent: 100, sub: '100%', done: true } : { sub: total + '/' + total + ' 张', done: true });
+          state.loadTimer = setTimeout(function () {
+            hideLoad();
+            mine.downloadedAt = Date.now();
+            persistFe();
+            toast(watermarked ? '水印稿件已保存到相册' : '稿件已保存到相册');
+            openDouyinAlbum(it, watermarked);
+          }, 280);
+        }
+      }
+      state.loadTimer = setTimeout(tick, watermarked ? 700 : 180);
+    }
+    function openWatermark() {
+      var mine = currentClaim();
+      if (!mine) { toast('请先领取稿件'); return; }
+      var it = item(state.current);
+      var videoBlock = watermarkVideoToast(it);
+      if (videoBlock) { toast(videoBlock); return; }
+      var wmBlock = downloadBlockToast(mine);
+      if (wmBlock) { toast(wmBlock); return; }
+      state.wm = defaultWm(mine);
+      setScreen('watermark', true);
+    }
+    function claimBlockReason(it) {
+      if (!it) return '稿件已不存在';
+      if (state.banned) return '你已被停权，无法领取';
+      if (quota() <= 0) return '次数不足';
+      var idle = Object.assign({}, it, { occ: '空闲', occupied: false });
+      if (!YJD.plazaEligible(STORE, idle)) return '稿件当前不可领';
+      if (it.occ === '已完成' || it.occ === '占用中' || it.occupied) return '稿件已被占用';
+      return '';
+    }
+    function syncClaimQuota() {
+      YJD.applyFreeDay(STORE);
+      state.free = STORE.user.free;
+    }
+    function keywordClaimToast(it, name) {
+      if (!name || !YJD.isClaimableKeyword(STORE, it && it.project, name)) {
+        return '请先选择该项目已通过的关键关键词';
+      }
+      if (YJD.keywordBookConflict(STORE, it && it.project, name, it && it.bookId)) {
+        return '请选择与该稿件书籍一致的已通过关键词';
+      }
+      return '';
+    }
+    function startClaim() {
+      var it = item(state.current);
+      if (!it) { toast('稿件已不存在'); return; }
+      syncClaimQuota();
+      if (state.banned) {
+        closeKwSheet();
+        closeBuySheet();
+        toast('你已被停权，无法领取');
+        return;
+      }
+      if (quota() <= 0) { toast('次数不足'); openBuySheet(); return; }
+      closeBuySheet();
+      openKwSheet('claim');
+    }
+    function finishClaim(mid, kw) {
+      state.claiming = false;
+      var it = item(mid || state.current);
+      if (kw) state.kw = kw;
+      syncClaimQuota();
+      if (state.banned) {
+        closeKwSheet();
+        closeBuySheet();
+        toast('你已被停权，无法领取');
+        return;
+      }
+      if (quota() <= 0) { toast('次数不足'); openBuySheet(); return; }
+      var kwToast = keywordClaimToast(it, state.kw);
+      if (kwToast) { toast(kwToast); return; }
+      var reason = claimBlockReason(it);
+      if (reason === '次数不足') { toast(reason); openBuySheet(); return; }
+      if (reason) { toast(reason); return; }
+      if (state.free > 0) state.free -= 1; else state.bought -= 1;
+      it.occ = '占用中';
+      it.occupied = true;
+      state.current = it.id;
+      STORE.claims.unshift(attachClaim(it));
+      persistFe();
+      document.getElementById('claimQuotaFoot').textContent = quota();
+      toast('领取成功，次数已扣且不退');
+      state.claimFilters.status = '未回填';
+      setScreen('detail', true);
+    }
+    function runClaimLoading() {
+      if (state.claiming) return;
+      state.claiming = true;
+      var mid = state.current;
+      var kw = state.kw;
+      var mask = document.getElementById('loadMask');
+      var box = document.getElementById('loadBox');
+      var text = document.getElementById('loadText');
+      var spin = document.getElementById('loadSpin');
+      mask.classList.add('show');
+      box.classList.add('show');
+      spin.classList.remove('done');
+      document.getElementById('loadSub').style.display = 'none';
+      document.getElementById('loadBarWrap').classList.remove('show');
+      var steps = ['正在下载稿件', '正在保存到相册', '已保存到相册'];
+      var i = 0;
+      text.textContent = steps[0];
+      function next() {
+        i += 1;
+        if (i < steps.length) {
+          text.textContent = steps[i];
+          if (i === steps.length - 1) spin.classList.add('done');
+          setTimeout(next, 700);
+        } else {
+          mask.classList.remove('show');
+          box.classList.remove('show');
+          finishClaim(mid, kw);
+        }
+      }
+      setTimeout(next, 700);
+    }
+    function confirmKw() {
+      var it = item(state.current);
+      if (!state.kwPick || !YJD.isClaimableKeyword(STORE, it && it.project, state.kwPick)) {
+        toast('请先选择该项目已通过的关键关键词');
+        return;
+      }
+      state.kw = state.kwPick;
+      if (state.kwMode === 'copy') {
+        closeKwSheet();
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(state.kw);
+        toast('已复制提词：' + state.kw);
+        return;
+      }
+      syncClaimQuota();
+      if (state.banned) {
+        closeKwSheet();
+        closeBuySheet();
+        toast('你已被停权，无法领取');
+        return;
+      }
+      if (quota() <= 0) { toast('次数不足'); closeKwSheet(); openBuySheet(); return; }
+      var kwToast = keywordClaimToast(it, state.kw);
+      if (kwToast) { toast(kwToast); return; }
+      var reason = claimBlockReason(it);
+      if (reason === '次数不足') { toast(reason); closeKwSheet(); openBuySheet(); return; }
+      if (reason) { toast(reason); return; }
+      closeKwSheet();
+      runClaimLoading();
+    }
+    function doFill() {
+      var c = state.claims.find(function (x) { return x.id === state.fillId; });
+      if (c) {
+        c.status = '已回填';
+        c.fill = c.fill && c.fill !== '—' ? c.fill : '已回填';
+        c.fillVideo = c.fillVideo || ('https://channels.weixin.qq.com/demo/' + c.id);
+        c.pendingEarn = 0;
+        c.filledAt = c.filledAt || YJD.now();
+        var it = item(c.mid);
+        if (it) {
+          it.occ = '已完成';
+          it.occupied = false;
+        }
+        persistFe();
+      }
+      toast('回填完成');
+      state.claimFilters.status = '已回填';
+      setScreen('claims', true);
+    }
+    function applyScene(id) {
+      closeDd();
+      if (id === 'timeout') {
+        var it = item('M-01');
+        if (!it || (window.YJD && YJD.isFileDeleted && YJD.isFileDeleted(it))) {
+          toast('演示稿件已删除');
+          showScreen('claims');
+          return;
+        }
+        it.occ = '空闲';
+        it.occupied = false;
+        state.strikes = Math.max(state.strikes, 1);
+        if (state.free + state.bought === 3) { if (state.free > 0) state.free -= 1; else state.bought -= 1; }
+        if (!myClaims().some(function (c) { return c.mid === 'M-01' && c.status === '已超时'; })) {
+          var claimedAt = Date.now() - 36 * 3600000;
+          YJD.bindClaimOss(it, claimedAt);
+          STORE.claims.unshift(attachClaim(it, {
+            id: 'C-to', kw: '掌心宠溺', time: '昨天', status: '已超时',
+            claimedAt: claimedAt, expireAt: claimedAt + 3 * 86400000, downloadedAt: null
+          }));
+        }
+        if (state.strikes > 3) {
+          state.banned = true;
+          if (!STORE.bans.some(function (b) { return b.user === STORE.user.id && b.status === '停权中'; })) {
+            STORE.bans.unshift({ user: STORE.user.id, strikes: state.strikes, time: YJD.now(), status: '停权中' });
+          }
+        }
+        persistFe();
+        state.claimFilters.status = '已超时';
+        id = 'claims';
+        toast('满 24h 未回填：记 1 次，稿件释放，次数不退');
+      } else if (id === 'banned') {
+        state.banned = true;
+        state.strikes = 4;
+        persistFe();
+        id = 'detail';
+        state.current = 'M-02';
+      } else if (id === 'buy') {
+        state.kw = '';
+        state.free = 0;
+        state.bought = 0;
+        persistFe();
+        state.current = 'M-01';
+        id = 'detail';
+        state.pendingBuy = true;
+      } else if (id === 'claim') {
+        state.current = 'M-01';
+        state.kw = '';
+        id = 'detail';
+        state.pendingSheet = 'claim';
+      } else if (id === 'fillback') {
+        if (!myClaims().some(function (c) { return c.status === '未回填'; })) {
+          var fillIt = item('M-01');
+          fillIt.occ = '占用中';
+          fillIt.occupied = true;
+          STORE.claims.unshift(attachClaim(fillIt, { id: 'C-fill', kw: '掌心宠溺', status: '未回填' }));
+          persistFe();
+        }
+        state.claimFilters.status = '未回填';
+        state.fillId = myClaims().find(function (c) { return c.status === '未回填'; }).id;
+      } else if (id === 'watermark') {
+        var wmIt = item(state.current);
+        if (!myClaimOf(state.current) || (wmIt && wmIt.kind === '视频')) {
+          state.current = 'M-06';
+        }
+        state.wm = defaultWm(myClaimOf(state.current));
+      } else if (id === 'douyin') {
+        state.current = 'M-06';
+        id = 'detail';
+        state.pendingDouyin = true;
+      }
+      showScreen(id);
+    }
+    function showScreen(id) {
+      if (id === 'timeout' || id === 'banned') { applyScene(id); return; }
+      if (id === 'claim') { id = 'detail'; state.pendingSheet = state.pendingSheet || 'claim'; }
+      if (id === 'buy') { id = 'detail'; state.pendingBuy = true; }
+      if (id === 'douyin') { id = 'detail'; state.pendingDouyin = true; }
+      if (!state.pendingSheet && !state.pendingBuy) closeKwSheet();
+      if (document.getElementById('previewMask').classList.contains('show')) closeAlbumPreview();
+      document.querySelectorAll('.screen').forEach(function (s) { s.classList.remove('active'); });
+      var el = document.getElementById('screen-' + id);
+      if (!el) { id = 'feed'; el = document.getElementById('screen-feed'); }
+      el.classList.add('active');
+      if (id === 'feed') renderFeed();
+      else stopBanner();
+      if (id === 'detail') renderDetail();
+      if (id === 'claims' || id === 'fillback') renderClaims();
+      if (id === 'watermark') renderWatermark();
+      if (id !== 'detail' && id !== 'watermark') closeDouyinAlbum();
+      if (state.pendingDouyin) {
+        state.pendingDouyin = false;
+        openDouyinAlbum(item(state.current), false);
+      }
+      if (state.pendingBuy) {
+        state.pendingBuy = false;
+        openBuySheet();
+      } else if (state.pendingSheet) {
+        var sheet = state.pendingSheet;
+        state.pendingSheet = '';
+        openKwSheet(sheet);
+      }
+      document.querySelectorAll('#screenNav button').forEach(function (btn) {
+        btn.classList.toggle('active', btn.dataset.screen === id);
+      });
+      notifyScreen(id);
+    }
+    function setScreen(id, keep) {
+      if (document.getElementById('previewMask').classList.contains('show')) closeAlbumPreview();
+      if (!keep) resetForNav(id);
+      showScreen(id);
+    }
+    function resetForNav(id) {
+      if (id === 'feed') { state.search = ''; state.filters = { project: '', editor: '', mat: '', kind: '' }; if (!embedMode) state.banned = STORE.user.banned; closeKwSheet(); document.getElementById('feedSearch').value = ''; }
+      if (id === 'detail') { if (!embedMode) state.banned = STORE.user.banned; if (!item(state.current) || item(state.current).occupied) state.current = 'M-01'; }
+    }
+    function notifyScreen(id) {
+      if (window.parent !== window) window.parent.postMessage({ type: 'yijianDaifaScreen', screen: id }, '*');
+    }
+
+    document.getElementById('goClaim').onclick = startClaim;
+    document.getElementById('quickKw').onclick = function () {
+      var it = item(state.current);
+      toast('跳转到对应项目的题词页面');
+    };
+    document.getElementById('copyTitle').onclick = openWatermark;
+    document.getElementById('editWork').onclick = function () { downloadManuscript(false); };
+    document.getElementById('dyClose').onclick = closeDouyinAlbum;
+    document.getElementById('dyCancel').onclick = closeDouyinAlbum;
+    document.getElementById('dyPublish').onclick = function () {
+      closeDouyinAlbum();
+      toast('已选中相册成片，可在抖音继续发布');
+    };
+    document.getElementById('confirmKw').onclick = confirmKw;
+    document.getElementById('kwClose').onclick = closeKwSheet;
+    document.getElementById('kwMask').onclick = function () { closeKwSheet(); closeBuySheet(); };
+    document.getElementById('previewClose').onclick = closeAlbumPreview;
+    document.getElementById('previewPrev').onclick = function () { stepAlbumPreview(-1); };
+    document.getElementById('previewNext').onclick = function () { stepAlbumPreview(1); };
+    document.getElementById('previewMask').addEventListener('contextmenu', function (e) { e.preventDefault(); });
+    document.getElementById('previewMask').addEventListener('dragstart', function (e) { e.preventDefault(); });
+    document.getElementById('previewMask').addEventListener('touchstart', function (e) {
+      if (e.touches && e.touches.length > 1) e.preventDefault();
+    }, { passive: false });
+    document.addEventListener('visibilitychange', function () {
+      if (!document.getElementById('previewMask').classList.contains('show')) return;
+      if (document.hidden) document.getElementById('previewStage').classList.add('is-blur');
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeAlbumPreview();
+    });
+    document.getElementById('buyClose').onclick = closeBuySheet;
+    document.getElementById('confirmBuy').onclick = confirmBuy;
+    document.getElementById('kwSearch').addEventListener('input', function (e) {
+      state.kwQuery = e.target.value.trim();
+      renderKwList();
+    });
+    document.getElementById('doFill').onclick = doFill;
+    document.getElementById('ddMask').onclick = closeDd;
+    document.getElementById('feedSearch').addEventListener('input', function (e) {
+      state.search = e.target.value.trim();
+      renderFeed();
+    });
+    document.querySelectorAll('.tabbar button').forEach(function (btn) {
+      btn.addEventListener('click', function () { setScreen(btn.dataset.tab, true); });
+    });
+
+    document.getElementById('screenNav').innerHTML = SCREENS.map(function (s) {
+      return '<button type="button" data-screen="' + s.id + '">' + s.label + '</button>';
+    }).join('');
+    document.querySelectorAll('#screenNav button').forEach(function (btn) {
+      btn.addEventListener('click', function () { applyScene(btn.dataset.screen); });
+    });
+
+    var params = new URLSearchParams(location.search);
+    if (params.get('embed') === '1') document.body.classList.add('embed-mode');
+    applyScene(params.get('screen') || 'feed');
+    window.addEventListener('message', function (e) {
+      if (e.data && e.data.type === 'setScreen') applyScene(e.data.screen);
+    });
+    window.addEventListener('storage', function (e) {
+      if (e.key !== YJD.KEY) return;
+      rebindFe();
+      var active = document.querySelector('.screen.active');
+      var sid = active ? active.id.replace('screen-', '') : 'feed';
+      showScreen(sid);
+    });
+  </script>
+</body>
+</html>

@@ -242,7 +242,7 @@
     }
     .tfoot { font-weight: 700; background: #f8fafc; }
     .project-block {
-      background: #fff; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 12px;
+      background: #fff; border: 1px solid var(--border); border-radius: 10px; overflow: auto; margin-bottom: 12px;
     }
     .project-head {
       display: flex; align-items: center; justify-content: space-between; gap: 8px;
@@ -359,7 +359,7 @@
           <span class="ai-mark" aria-hidden="true"></span>
           AI工作台
           <span class="badge badge-fr">FR-009</span>
-          <span class="badge badge-version">v1 Demo</span>
+          <span class="badge badge-version">v3 Demo</span>
         </h1>
         <p class="page-desc">运营用一句话查询。三类：项目业务、用户数据、用户关系。问法见对话区「如何使用」；实现口径见页头「需求规则」。</p>
       </div>
@@ -401,7 +401,7 @@
       <button class="btn btn-ghost" data-close-drawer type="button">关闭</button>
     </div>
     <div class="drawer-body">
-      <p>把要查的事用一句话说出来，答案在右侧表格。不会写时，照着下面的句子改赛道、项目或用户ID即可。</p>
+      <p>把要查的事用一句话说出来，答案在右侧表格。不会写时，照着下面的句子改赛道、项目或用户ID即可。自定义日期范围一次最多 31 天（含起止日），超出先缩小再问，避免扫库过大。</p>
       <h4>项目业务</h4>
       <div class="scene">
         <b>看某个赛道里，每个项目今天谁题词最多</b>
@@ -418,6 +418,10 @@
       <div class="scene">
         <b>看某个项目这几天的订单</b>
         <p>可以这样问：星河小说按日订单数据<br />你会看到：每天的出单人数、出单关键词数量、订单量、累计收益（看不到具体关键词）</p>
+      </div>
+      <div class="scene">
+        <b>看某个项目某段时间已结算订单谁排前面</b>
+        <p>可以这样问：番茄小说 2026.8.1-2026.8.31 已结算订单前100名<br />你会看到：用户ID、昵称、该项目动态结算字段总值（有效拉新量、拉失活量、拉活量）、总收益。日期一次最多 31 天。</p>
       </div>
       <h4>用户数据</h4>
       <div class="scene">
@@ -471,6 +475,7 @@
         <li>独立工作台：左对话、右结果表；v1 只读，写指令必须拒绝。</li>
         <li>只执行已批准意图，禁止开放 NL2SQL / 模型口算排名与关系。</li>
         <li>缺赛道 / 项目 / 用户ID / 时间范围 / 业务名称：先澄清，结果区不出假表。</li>
+        <li>FR-30 防扫库：自定义日期范围含首尾最多 31 个自然日。超出不查库，对话区要求缩小。近7日 / 近30日 / 今日 / 按年 / 累计不受本条拦截。</li>
         <li>本页 Demo 为 Mock，题词量、赛道、时区未接真库。</li>
       </ul>
       <h4>项目业务 · 实现口径</h4>
@@ -490,6 +495,10 @@
         <b>FR-20 指定项目按日订单</b>
         <p>按日一行：项目名称、出单人数、出单关键词数量、订单量、累计收益。关键词只出 count，禁止出词面。</p>
       </div>
+      <div class="scene">
+        <b>FR-29 指定项目日期范围内已结算 Top N</b>
+        <p>槽位：项目名称 + 日期范围；Top N 未写则默认 100。只统计已结算。列：用户ID、用户昵称、项目动态订单量字段各一列（区间总值）、总收益。结算字段随项目配置动态下发，禁止写死「订单量」一列。本 Demo：有效拉新量、拉失活量、拉活量。排名按动态字段合计降序，并列第 N 全留。点号日期 2026.8.1-2026.8.31 与 2026-08-01至2026-08-31 等价。日期范围受 FR-30 约束。detect 须先于 FR-20：带「前N / top N / 榜」的已结算订单走本意图，不拆成按日订单；有「订单明细」仍走 FR-28。</p>
+      </div>
       <h4>用户数据 · 实现口径</h4>
       <div class="scene">
         <b>FR-21 邀请数据</b>
@@ -505,11 +514,11 @@
       </div>
       <div class="scene">
         <b>FR-25 项目收益</b>
-        <p>必出用户ID + 累计收益。近7/30/日期范围：按日明细。按年：按月明细。累计：可不出明细。</p>
+        <p>必出用户ID + 累计收益。近7/30/日期范围：按日明细。按年：按月明细。累计：可不出明细。自定义日期范围受 FR-30 约束；查整年用「2026年项目收益」，不要用 1 月到 12 月的按日区间。</p>
       </div>
       <div class="scene">
         <b>FR-28 用户订单明细</b>
-        <p>槽位：用户ID + 日期范围 + 业务 title，缺一先澄清，结果区不出假表。业务 title 由提问带上：品牌业务、海外故事、海外短剧、星图融合、星图；别名品牌→品牌业务、融合→星图融合。状态可组合：已审核待结算、已结算、退款/已退款；未点名则三态全出。KPI 按用户+范围+业务汇总三态，不过滤状态。表1 一行=项目×状态；表2 出订单ID与关键词词面。状态展示：已审核待结算→已审核，退款→已退款。缺业务 title 列出五个 title，不回退成全业务汇总。detect 须先于 FR-20，避免「用户…订单明细」被当成要项目名。</p>
+        <p>槽位：用户ID + 日期范围 + 业务 title，缺一先澄清，结果区不出假表。日期范围受 FR-30 约束。业务 title 由提问带上：品牌业务、海外故事、海外短剧、星图融合、星图；别名品牌→品牌业务、融合→星图融合。状态可组合：已审核待结算、已结算、退款/已退款；未点名则三态全出。KPI 按用户+范围+业务汇总三态，不过滤状态。表1 一行=项目×状态；表2 出订单ID与关键词词面。状态展示：已审核待结算→已审核，退款→已退款。缺业务 title 列出五个 title，不回退成全业务汇总。detect 须先于 FR-20，避免「用户…订单明细」被当成要项目名。</p>
       </div>
       <h4>用户关系 · 实现口径</h4>
       <div class="scene">
@@ -518,7 +527,7 @@
       </div>
       <div class="scene">
         <b>FR-26 向上分红关系</b>
-        <p>行：用户ID、关系（直属、间属、归级、直属团队、间属团队）、上级ID、累计分红。时间槽：按日 / 累计 / 日期。</p>
+        <p>行：用户ID、关系（直属、间属、归级、直属团队、间属团队）、上级ID、累计分红。时间槽：按日 / 累计 / 日期。自定义日期范围受 FR-30 约束。</p>
       </div>
       <div class="scene">
         <b>FR-27 指定项目向上分红</b>
@@ -621,7 +630,57 @@
         ],
         '古言馆': buildOrderDays(23),
         '都市短剧': buildOrderDays(55),
-        '悬疑短剧': buildOrderDays(27)
+        '悬疑短剧': buildOrderDays(27),
+        '番茄小说': buildOrderDays(90)
+      };
+      var SETTLED_FIELDS = ['有效拉新量', '拉失活量', '拉活量'];
+      var SETTLED_WINDOW = { from: '2026-08-01', to: '2026-08-31' };
+      var SETTLED_PROJECTS = ['番茄小说'];
+      var SETTLED_EXTRA_NAMES = ['禾予', '南枝', '青柠', '晚风', '拾光', '慕白', '江晚', '云舒', '林深', '苏晚', '北城', '顾言', '沈夜', '夏河', '陆川', '叶安', '周宁', '韩叙', '陈舟', '方棠'];
+      function settledIdentity(i) {
+        var known = ['1001', '1002', '1003', '1004', '2001', '2002', '3001'];
+        if (i < known.length && USERS[known[i]]) {
+          return { id: known[i], name: USERS[known[i]].name };
+        }
+        var idx = i - known.length;
+        return {
+          id: String(4101 + idx),
+          name: SETTLED_EXTRA_NAMES[idx % SETTLED_EXTRA_NAMES.length] + String(Math.floor(idx / SETTLED_EXTRA_NAMES.length) + 1)
+        };
+      }
+      function buildSettledTopRows(n, seed) {
+        var rows = [];
+        for (var i = 0; i < n; i++) {
+          var u = settledIdentity(i);
+          var pullNew = 160 - i;
+          var pullInactive = 48 - Math.floor(i / 5) - (seed % 3);
+          var pullActive = 72 - Math.floor(i / 3);
+          var metrics = {};
+          metrics[SETTLED_FIELDS[0]] = pullNew;
+          metrics[SETTLED_FIELDS[1]] = pullInactive;
+          metrics[SETTLED_FIELDS[2]] = pullActive;
+          var volume = pullNew + pullInactive + pullActive;
+          rows.push({
+            userId: u.id,
+            name: u.name,
+            metrics: metrics,
+            volume: volume,
+            revenue: Math.round(volume * (22.4 - i * 0.06 - seed * 0.2) * 100) / 100
+          });
+        }
+        return rows.sort(function (a, b) {
+          if (b.volume !== a.volume) return b.volume - a.volume;
+          return b.revenue - a.revenue;
+        });
+      }
+      var SETTLED_TOP = {
+        '番茄小说': buildSettledTopRows(100, 0),
+        '星河小说': buildSettledTopRows(100, 2),
+        '夜话连载': buildSettledTopRows(100, 3),
+        '短篇工坊': [],
+        '古言馆': buildSettledTopRows(36, 5),
+        '都市短剧': buildSettledTopRows(64, 4),
+        '悬疑短剧': buildSettledTopRows(28, 6)
       };
       var ORDER_STATUS_LABEL = { reviewed: '已审核', settled: '已结算', refunded: '已退款' };
       var BIZ_TITLES = ['品牌业务', '海外故事', '海外短剧', '星图融合', '星图'];
@@ -675,6 +734,7 @@
         ]
       };
       var PROJECT_NAMES = PROJECTS.map(function (p) { return p.name; });
+      var ALL_PROJECT_NAMES = SETTLED_PROJECTS.concat(PROJECT_NAMES);
       var TRACK_NAMES = ['小说', '短剧'];
 
       var chatLog = document.getElementById('chatLog');
@@ -714,13 +774,13 @@
         return '<div class="result-summary"><span class="badge ' + (cls || 'badge-info') + '">' + badge + '</span><span>' + text + '</span></div>';
       }
       function matchProject(text) {
-        for (var i = 0; i < PROJECT_NAMES.length; i++) {
-          if (text.indexOf(PROJECT_NAMES[i]) !== -1) return PROJECT_NAMES[i];
+        for (var i = 0; i < ALL_PROJECT_NAMES.length; i++) {
+          if (text.indexOf(ALL_PROJECT_NAMES[i]) !== -1) return ALL_PROJECT_NAMES[i];
         }
         return '';
       }
       function matchProjects(text) {
-        return PROJECT_NAMES.filter(function (name) { return text.indexOf(name) !== -1; });
+        return ALL_PROJECT_NAMES.filter(function (name) { return text.indexOf(name) !== -1; });
       }
       function matchTrack(text) {
         for (var i = 0; i < TRACK_NAMES.length; i++) {
@@ -735,8 +795,50 @@
         return sorted.filter(function (row, i) { return i < 3 || row.count === sorted[2].count; });
       }
       function parseRange(text) {
-        var m = text.match(/(\d{4}-\d{2}-\d{2})\s*(?:至|到|-)\s*(\d{4}-\d{2}-\d{2})/);
-        return m ? { from: m[1], to: m[2] } : null;
+        var m = text.match(/(\d{4})[.\-\/年](\d{1,2})[.\-\/月](\d{1,2})日?\s*(?:至|到|-|~)\s*(\d{4})[.\-\/年](\d{1,2})[.\-\/月](\d{1,2})日?/);
+        return m ? { from: ymdParts(m[1], m[2], m[3]), to: ymdParts(m[4], m[5], m[6]) } : null;
+      }
+      function ymdParts(y, m, d) {
+        return y + '-' + pad(Number(m)) + '-' + pad(Number(d));
+      }
+      function stripQueryNoise(text) {
+        return String(text)
+          .replace(/\d{4}[.\-\/年]\d{1,2}[.\-\/月]\d{1,2}日?/g, ' ')
+          .replace(/(?:前|top\s*)\d+/ig, ' ');
+      }
+      function parseTopN(text) {
+        var m = text.match(/(?:前|top\s*)(\d+)/i);
+        if (!m) return 100;
+        return Math.max(1, Math.min(100, parseInt(m[1], 10)));
+      }
+      function keepTopN(rows, n) {
+        var sorted = rows.slice().sort(function (a, b) {
+          if (b.volume !== a.volume) return b.volume - a.volume;
+          return b.revenue - a.revenue;
+        });
+        if (!sorted.length || sorted.length <= n) return sorted;
+        var threshold = sorted[n - 1].volume;
+        return sorted.filter(function (row, i) { return i < n || row.volume === threshold; });
+      }
+      function rangesOverlap(a, b) {
+        return a.from <= b.to && a.to >= b.from;
+      }
+      var MAX_RANGE_DAYS = 31;
+      function rangeDayCount(range) {
+        if (!range || !range.from || !range.to) return 0;
+        var a = range.from.split('-').map(Number);
+        var b = range.to.split('-').map(Number);
+        var from = Date.UTC(a[0], a[1] - 1, a[2]);
+        var to = Date.UTC(b[0], b[1] - 1, b[2]);
+        return Math.floor((to - from) / 86400000) + 1;
+      }
+      function rangeOverLimit(range) {
+        return range && range.from <= range.to && rangeDayCount(range) > MAX_RANGE_DAYS;
+      }
+      function rejectWideRange(range) {
+        return rangeOverLimit(range)
+          ? { kind: 'clarify-range-limit', range: range, days: rangeDayCount(range) }
+          : null;
       }
       function matchBizTitle(text) {
         if (text.indexOf('品牌业务') !== -1) return '品牌业务';
@@ -751,8 +853,7 @@
       function matchUserId(text) {
         var labeled = text.match(/用户\s*(\d{3,})/);
         if (labeled) return labeled[1];
-        var cleaned = text.replace(/\d{4}-\d{2}-\d{2}/g, '');
-        var ids = cleaned.match(/\d{3,}/g) || [];
+        var ids = stripQueryNoise(text).match(/\d{3,}/g) || [];
         return ids[0] || '';
       }
       function parseOrderStatuses(text) {
@@ -945,8 +1046,19 @@
         setResult(html, '用户数据 · 团长身份');
         return '当前团长身份：V1 ' + LEADER_STOCK.v1 + ' 人、V2 ' + LEADER_STOCK.v2 + ' 人、V3 ' + LEADER_STOCK.v3 + ' 人。';
       }
+      function blockWideRange(range) {
+        var days = rangeDayCount(range);
+        setResult(
+          '<div class="result-empty"><strong>日期范围不能超过 ' + MAX_RANGE_DAYS + ' 天</strong><span>本次 ' +
+            days + ' 天（' + esc(range.from) + ' 至 ' + esc(range.to) +
+            '）。超出上限不查库，请缩小后再问。例如 2026.8.1-2026.8.31。</span></div>',
+          '已拦截'
+        );
+        return '日期范围不能超过 ' + MAX_RANGE_DAYS + ' 天。本次 ' + days + ' 天，未查库。请缩小后再问。';
+      }
       function renderRevenue(id, mode, extra) {
         if (!USERS[id]) return missingUser(id);
+        if (mode === 'range' && extra && rangeOverLimit(extra)) return blockWideRange(extra);
         var pack = REVENUE[id] || { 7: [], 30: [], total: 0, year: [] };
         var title = '项目收益';
         var series = [];
@@ -990,6 +1102,7 @@
       }
       function renderUserOrders(id, range, biz, statuses) {
         if (!USERS[id]) return missingUser(id);
+        if (rangeOverLimit(range)) return blockWideRange(range);
         if (range.from > range.to) {
           setResult('<div class="result-empty"><strong>还缺时间范围</strong><span>用户订单明细需要日期范围，起始日不能晚于结束日，例如 2026-08-01至2026-08-31。</span></div>', '待澄清');
           return '用户订单明细的起始日不能晚于结束日。';
@@ -1067,6 +1180,45 @@
         setResult(html, '项目业务 · 按日订单 · ' + name);
         return name + ' 按日订单已出表：出单人数、出单关键词数量、订单量、累计收益。关键词只出数值。';
       }
+      function renderSettledTop(name, range, n) {
+        if (rangeOverLimit(range)) return blockWideRange(range);
+        if (range.from > range.to) {
+          setResult('<div class="result-empty"><strong>还缺时间范围</strong><span>已结算榜的起始日不能晚于结束日，例如 2026.8.1-2026.8.31。</span></div>', '待澄清');
+          return '已结算榜的起始日不能晚于结束日。';
+        }
+        var fields = SETTLED_FIELDS.slice();
+        var source = rangesOverlap(range, SETTLED_WINDOW) ? (SETTLED_TOP[name] || []) : [];
+        var rows = keepTopN(source, n);
+        var volumeSum = rows.reduce(function (s, r) { return s + r.volume; }, 0);
+        var revenueSum = rows.reduce(function (s, r) { return s + r.revenue; }, 0);
+        var html = summary('项目业务', name + ' · 已结算订单 Top ' + n + ' · ' + range.from + ' 至 ' + range.to) +
+          kpiHtml([
+            { k: '上榜人数', v: rows.length + ' 人' },
+            { k: '动态字段合计', v: volumeSum.toLocaleString('zh-CN') },
+            { k: '总收益合计', v: money(revenueSum) }
+          ]);
+        html += '<p class="page-desc" style="max-width:none;margin:0 0 10px;">结算字段随项目动态下发。本项目：' +
+          fields.join('、') + '。只统计已结算订单。</p>';
+        html += '<div class="project-block"><table><thead><tr><th>用户ID</th><th>用户昵称</th>';
+        fields.forEach(function (field) { html += '<th>' + esc(field) + '</th>'; });
+        html += '<th>总收益</th></tr></thead><tbody>';
+        if (!rows.length) {
+          html += '<tr><td class="empty-cell" colspan="' + (3 + fields.length) + '">暂无数据</td></tr>';
+        } else {
+          rows.forEach(function (row) {
+            html += '<tr><td>' + userCell(row.userId) + '</td><td>' + esc(row.name) + '</td>';
+            fields.forEach(function (field) {
+              html += '<td>' + Number(row.metrics[field] || 0).toLocaleString('zh-CN') + '</td>';
+            });
+            html += '<td>' + money(row.revenue) + '</td></tr>';
+          });
+        }
+        html += '</tbody></table></div>';
+        setResult(html, '项目业务 · 已结算榜 · ' + name);
+        if (!rows.length) return name + ' 在 ' + range.from + ' 至 ' + range.to + ' 暂无已结算订单。';
+        return name + ' ' + range.from + ' 至 ' + range.to + ' 已结算订单 Top ' + n + ' 已出表。列为用户ID、昵称、' +
+          fields.join('、') + '与总收益。';
+      }
       function renderDividend(track) {
         var rows = DIVIDENDS.filter(function (r) { return r.track === track; });
         var sum = rows.reduce(function (s, r) { return s + r.amount; }, 0);
@@ -1121,7 +1273,7 @@
         var t = text.replace(/\s+/g, ' ').trim();
         if (!t) return { kind: 'empty' };
         if (/改|修改|调整|设为|换成/.test(t) && /上级|团长|关系/.test(t)) return { kind: 'write' };
-        var ids = t.match(/\d{3,}/g) || [];
+        var ids = stripQueryNoise(t).match(/\d{3,}/g) || [];
         var track = matchTrack(t);
         var project = matchProject(t);
         var range = parseRange(t);
@@ -1134,6 +1286,10 @@
           if (/收益向上/.test(t)) return { kind: 'clarify-project' };
           if (/向上分红|分红关系/.test(t)) {
             if (!ids.length) return { kind: 'clarify-user', need: '向上分红查询' };
+            if (range) {
+              var upwardWide = rejectWideRange(range);
+              if (upwardWide) return upwardWide;
+            }
             var scope = /今日|按日/.test(t) ? '按日' : range ? (range.from + ' 至 ' + range.to) : '累计';
             return { kind: 'upward', id: ids[0], scope: scope };
           }
@@ -1142,7 +1298,7 @@
           if (ids.length < 2) return { kind: 'clarify' };
           return { kind: 'relation', ids: ids.slice(0, 2) };
         }
-        if (/题词|提词|top\s*3|前三/i.test(t)) {
+        if (/题词|提词/.test(t) || ((/top\s*3|前三/i.test(t)) && !/订单|已结算/.test(t))) {
           if (!track) return { kind: 'clarify-track' };
           return { kind: /所有项目/.test(t) ? 'rank-project' : 'rank-track', track: track };
         }
@@ -1153,9 +1309,18 @@
         var biz = matchBizTitle(t);
         var userId = matchUserId(t);
         var hasOrderStatus = /已审核待结算|已结算|退款/.test(t);
+        if ((/订单|已结算/.test(t)) && /(?:前\s*\d+|top\s*\d+|榜单)/i.test(t) && !/订单明细/.test(t)) {
+          if (!project) return { kind: 'clarify-settled-project' };
+          if (!range) return { kind: 'clarify-settled-range' };
+          var settledWide = rejectWideRange(range);
+          if (settledWide) return settledWide;
+          return { kind: 'settled-top', project: project, range: range, n: parseTopN(t) };
+        }
         if (/订单明细/.test(t) || (userId && /订单/.test(t) && (hasOrderStatus || biz))) {
           if (!userId) return { kind: 'clarify-user', need: '用户订单明细查询' };
           if (!range || range.from > range.to) return { kind: 'clarify-order-range' };
+          var orderWide = rejectWideRange(range);
+          if (orderWide) return orderWide;
           if (!biz) return { kind: 'clarify-biz' };
           return { kind: 'user-orders', id: userId, range: range, biz: biz, statuses: parseOrderStatuses(t) };
         }
@@ -1177,7 +1342,11 @@
             var y = t.match(/(\d{4})\s*年/);
             return { kind: 'revenue', id: ids[0], mode: 'year', extra: y ? y[1] : '2026' };
           }
-          if (range) return { kind: 'revenue', id: ids[0], mode: 'range', extra: range };
+          if (range) {
+            var revenueWide = rejectWideRange(range);
+            if (revenueWide) return revenueWide;
+            return { kind: 'revenue', id: ids[0], mode: 'range', extra: range };
+          }
           if (/30/.test(t)) return { kind: 'revenue', id: ids[0], mode: 'days', extra: 30 };
           if (/7/.test(t)) return { kind: 'revenue', id: ids[0], mode: 'days', extra: 7 };
           return { kind: 'clarify-range', id: ids[0] };
@@ -1201,8 +1370,16 @@
           return intent.need + '需要用户ID。';
         }
         if (intent.kind === 'clarify-project') {
-          setResult('<div class="result-empty"><strong>还缺项目名称</strong><span>可问：星河小说、夜话连载、短篇工坊、古言馆、都市短剧、悬疑短剧。</span></div>', '待澄清');
+          setResult('<div class="result-empty"><strong>还缺项目名称</strong><span>可问：番茄小说、星河小说、夜话连载、短篇工坊、古言馆、都市短剧、悬疑短剧。</span></div>', '待澄清');
           return '订单查询需要项目名称。例如：星河小说按日订单数据。';
+        }
+        if (intent.kind === 'clarify-settled-project') {
+          setResult('<div class="result-empty"><strong>还缺项目名称</strong><span>已结算榜需要项目名称。例如：番茄小说 2026.8.1-2026.8.31 已结算订单前100名。</span></div>', '待澄清');
+          return '已结算榜需要项目名称。例如：番茄小说 2026.8.1-2026.8.31 已结算订单前100名。';
+        }
+        if (intent.kind === 'clarify-settled-range') {
+          setResult('<div class="result-empty"><strong>还缺时间范围</strong><span>已结算榜需要日期范围，例如 2026.8.1-2026.8.31。</span></div>', '待澄清');
+          return '已结算榜需要日期范围。例如：番茄小说 2026.8.1-2026.8.31 已结算订单前100名。';
         }
         if (intent.kind === 'clarify-track') {
           setResult('<div class="result-empty"><strong>还缺赛道名称</strong><span>可问小说赛道或短剧赛道。</span></div>', '待澄清');
@@ -1216,6 +1393,9 @@
           setResult('<div class="result-empty"><strong>还缺时间范围</strong><span>用户订单明细需要日期范围，例如 2026-08-01至2026-08-31。</span></div>', '待澄清');
           return '用户订单明细需要时间范围。';
         }
+        if (intent.kind === 'clarify-range-limit') {
+          return blockWideRange(intent.range);
+        }
         if (intent.kind === 'clarify-biz') {
           setResult('<div class="result-empty"><strong>还缺业务名称</strong><span>可问：' + BIZ_TITLES.join('、') + '。</span></div>', '待澄清');
           return '用户订单明细需要业务名称。可问' + BIZ_TITLES.join('、') + '。';
@@ -1224,6 +1404,7 @@
         if (intent.kind === 'rank-track') return renderRankByTrack(intent.track);
         if (intent.kind === 'dividend') return renderDividend(intent.track);
         if (intent.kind === 'user-orders') return renderUserOrders(intent.id, intent.range, intent.biz, intent.statuses);
+        if (intent.kind === 'settled-top') return renderSettledTop(intent.project, intent.range, intent.n);
         if (intent.kind === 'orders') return renderOrders(intent.project);
         if (intent.kind === 'invite') return renderInvite(intent.id);
         if (intent.kind === 'register') return renderRegister();
