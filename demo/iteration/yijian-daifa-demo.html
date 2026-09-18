@@ -807,6 +807,7 @@
       { id: 'claim', label: '浮层选词' },
       { id: 'buy', label: '浮层兑换' },
       { id: 'claims', label: '我的领取' },
+      { id: 'claimed-detail', label: '已领取详情' },
       { id: 'fillback', label: '项目回填' },
       { id: 'watermark', label: '添加水印' },
       { id: 'douyin', label: '跳转抖音相册' },
@@ -1978,10 +1979,17 @@
       } else if (id === 'banned') {
         state.banned = true;
         state.strikes = 4;
-        persistFe();
+        if (!embedMode) persistFe();
         id = 'detail';
-        state.current = 'M-02';
+        state.current = 'M-01';
+      } else if (id === 'detail') {
+        state.banned = false;
+        if (state.free + state.bought <= 0) state.free = 1;
+        var idle = item('M-01');
+        if (idle) { idle.occ = '空闲'; idle.occupied = false; }
+        state.current = 'M-01';
       } else if (id === 'buy') {
+        state.banned = false;
         state.kw = '';
         state.free = 0;
         state.bought = 0;
@@ -1990,10 +1998,16 @@
         id = 'detail';
         state.pendingBuy = true;
       } else if (id === 'claim') {
+        state.banned = false;
+        if (state.free + state.bought <= 0) state.free = 1;
         state.current = 'M-01';
         state.kw = '';
         id = 'detail';
         state.pendingSheet = 'claim';
+      } else if (id === 'claimed-detail') {
+        state.banned = false;
+        state.current = 'M-06';
+        id = 'detail';
       } else if (id === 'fillback') {
         if (!myClaims().some(function (c) { return c.status === '未回填'; })) {
           var fillIt = item('M-01');
@@ -2019,6 +2033,7 @@
     }
     function showScreen(id) {
       if (id === 'timeout' || id === 'banned') { applyScene(id); return; }
+      if (id === 'claimed-detail') { applyScene(id); return; }
       if (id === 'claim') { id = 'detail'; state.pendingSheet = state.pendingSheet || 'claim'; }
       if (id === 'buy') { id = 'detail'; state.pendingBuy = true; }
       if (id === 'douyin') { id = 'detail'; state.pendingDouyin = true; }
@@ -2124,13 +2139,15 @@
     window.addEventListener('message', function (e) {
       if (e.data && e.data.type === 'setScreen') applyScene(e.data.screen);
     });
-    window.addEventListener('storage', function (e) {
-      if (e.key !== YJD.KEY) return;
-      rebindFe();
-      var active = document.querySelector('.screen.active');
-      var sid = active ? active.id.replace('screen-', '') : 'feed';
-      showScreen(sid);
-    });
+    if (!embedMode) {
+      window.addEventListener('storage', function (e) {
+        if (e.key !== YJD.KEY) return;
+        rebindFe();
+        var active = document.querySelector('.screen.active');
+        var sid = active ? active.id.replace('screen-', '') : 'feed';
+        showScreen(sid);
+      });
+    }
   </script>
 </body>
 </html>

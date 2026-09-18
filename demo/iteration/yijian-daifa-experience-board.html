@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>一键代发 · 三端体验总览</title>
+  <style>
+    :root {
+      --orange: #ff6b1a;
+      --ink: #1a2332;
+      --muted: #64748b;
+      --paper: #eef1f5;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: #dfe3ea;
+      color: var(--ink);
+    }
+    .hero {
+      max-width: 1680px;
+      margin: 0 auto;
+      padding: 28px 28px 8px;
+    }
+    .hero h1 { font-size: 28px; letter-spacing: -.02em; }
+    .hero p { margin-top: 8px; color: var(--muted); font-size: 14px; line-height: 1.6; }
+    .hero .tag {
+      display: inline-block;
+      margin-top: 12px;
+      background: #fff3eb;
+      color: var(--orange);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+    .board {
+      max-width: 1680px;
+      margin: 0 auto 40px;
+      padding: 16px 24px 32px;
+    }
+    .sec {
+      background: #fff;
+      border-radius: 18px;
+      padding: 22px 22px 26px;
+      margin-top: 20px;
+      box-shadow: 0 12px 36px rgba(26, 35, 50, .08);
+    }
+    .sec h2 {
+      font-size: 18px;
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+    }
+    .sec h2 span { font-size: 13px; font-weight: 500; color: var(--muted); }
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 22px 18px;
+      margin-top: 18px;
+      justify-content: flex-start;
+    }
+    .tile { width: 250px; }
+    .tile.pc { width: 760px; }
+    .cap {
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .cap em {
+      font-style: normal;
+      font-weight: 500;
+      color: var(--muted);
+      font-size: 11px;
+    }
+    .phone {
+      width: 250px;
+      height: 540px;
+      border-radius: 28px;
+      overflow: hidden;
+      background: #111;
+      box-shadow: 0 14px 32px rgba(0,0,0,.16);
+      position: relative;
+      border: 8px solid #1a1a1a;
+    }
+    .phone iframe, .laptop iframe {
+      width: 375px;
+      height: 812px;
+      border: 0;
+      transform: scale(0.624);
+      transform-origin: 0 0;
+      background: #fff;
+    }
+    .laptop {
+      width: 760px;
+      height: 456px;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #fff;
+      border: 1px solid #e6e8eb;
+      box-shadow: 0 14px 32px rgba(0,0,0,.1);
+    }
+    .laptop iframe {
+      width: 1180px;
+      height: 708px;
+      transform: scale(0.644);
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="tag">FR-014 一键代发 · 体验总览</div>
+    <h1>一张图看完：App / 站外 H5 / PC 剪辑手端</h1>
+    <p>以下为现有 Demo 真页面（iframe），不是示意线框。手机框内是用户侧；宽屏是创作者中心「剪辑供稿」。</p>
+  </header>
+
+  <main class="board">
+    <section class="sec" id="sec-app">
+      <h2>App / 移动端 <span>发现 → 详情领取 → 回填发布</span></h2>
+      <div class="row">
+        <figure class="tile">
+          <figcaption class="cap">作品广场 <em>首页 Feed</em></figcaption>
+          <div class="phone"><iframe src="yijian-daifa-demo.html?embed=1&screen=feed" title="作品广场"></iframe></div>
+        </figure>
+        <figure class="tile">
+          <figcaption class="cap">招募海报 <em>广场 Banner 进入</em></figcaption>
+          <div class="phone"><iframe src="yijian-daifa-demo.html?embed=1&screen=poster" title="招募海报"></iframe></div>
+        </figure>
+        <figure class="tile">
+          <figcaption class="cap">稿件详情 <em>未停权 · 可领取</em></figcaption>
+          <div class="phone"><iframe src="yijian-daifa-demo.html?embed=1&screen=detail" title="稿件详情未停权"></iframe></div>
+        </figure>
+        <figure class="tile">
+          <figcaption class="cap">稿件详情 <em>已停权 · 无法领取</em></figcaption>
+          <div class="phone"><iframe src="yijian-daifa-demo.html?embed=1&screen=banned" title="稿件详情已停权"></iframe></div>
+        </figure>
+        <figure class="tile">
+          <figcaption class="cap">领取选词 <em>详情浮层</em></figcaption>
+          <div class="phone"><iframe src="yijian-daifa-demo.html?embed=1&screen=claim" title="领取选词"></iframe></div>
+        </figure>
+        <figure class="tile">
+          <figcaption class="cap">积分购次 <em>次数不足</em></figcaption>
+          <div class="phone"><iframe src="yijian-daifa-demo.html?embed=1&screen=buy" title="积分购次"></iframe></div>
+        </figure>
+        <figure class="tile">
+          <figcaption class="cap">我的领取 <em>底栏入口</em></figcaption>
+          <div class="phone"><iframe src="yijian-daifa-demo.html?embed=1&screen=claims" title="我的领取"></iframe></div>
+        </figure>
+        <figure class="tile">
+          <figcaption class="cap">已领取详情 <em>从我的领取进入</em></figcaption>
+          <div class="phone"><iframe src="yijian-daifa-demo.html?embed=1&screen=claimed-detail" title="已领取稿件详情"></iframe></div>
+        </figure>
+        <figure class="tile">
+          <figcaption class="cap">添加水印 <em>图集已领后</em></figcaption>
+          <div class="phone"><iframe src="yijian-daifa-demo.html?embed=1&screen=watermark" title="添加水印"></iframe></div>
+        </figure>
+      </div>
+    </section>
+
+    <section class="sec" id="sec-h5">
+      <h2>站外 H5 <span>扫码 / 链接落地，无需登录</span></h2>
+      <div class="row">
+        <figure class="tile">
+          <figcaption class="cap">可下载落地页 <em>有余量</em></figcaption>
+          <div class="phone"><iframe src="yijian-daifa-offsite.html?embed=1&id=X-01" title="站外可下载"></iframe></div>
+        </figure>
+        <figure class="tile">
+          <figcaption class="cap">素材已领完 <em>缺省态</em></figcaption>
+          <div class="phone"><iframe src="yijian-daifa-offsite.html?embed=1&id=X-04" title="站外已领完"></iframe></div>
+        </figure>
+        <figure class="tile">
+          <figcaption class="cap">链接已失效 <em>缺省态</em></figcaption>
+          <div class="phone"><iframe src="yijian-daifa-offsite.html?embed=1&id=GONE" title="站外链接失效"></iframe></div>
+        </figure>
+      </div>
+    </section>
+
+    <section class="sec" id="sec-pc">
+      <h2>PC 剪辑手端 <span>已有创作者中心 · 剪辑供稿</span></h2>
+      <div class="row">
+        <figure class="tile pc">
+          <figcaption class="cap">剪辑供稿看板 <em>统计 + 最近上传</em></figcaption>
+          <div class="laptop"><iframe src="yijian-daifa-pc.html?embed=1&screen=home" title="剪辑供稿看板"></iframe></div>
+        </figure>
+        <figure class="tile pc">
+          <figcaption class="cap">上传入口 <em>先字段后成片</em></figcaption>
+          <div class="laptop"><iframe src="yijian-daifa-pc.html?embed=1&screen=upload" title="上传入口"></iframe></div>
+        </figure>
+        <figure class="tile pc">
+          <figcaption class="cap">上传 list <em>右豹稿件</em></figcaption>
+          <div class="laptop"><iframe src="yijian-daifa-pc.html?embed=1&screen=list" title="上传 list"></iframe></div>
+        </figure>
+        <figure class="tile pc">
+          <figcaption class="cap">收益数据 <em>仅右豹端已结算</em></figcaption>
+          <div class="laptop"><iframe src="yijian-daifa-pc.html?embed=1&screen=earn" title="收益数据"></iframe></div>
+        </figure>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
