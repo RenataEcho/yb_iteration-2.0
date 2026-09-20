@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FR-015 · 双节逐鹿榜 · 右豹迭代需求记录</title>
+  <style>
+    :root {
+      --primary: #2563eb; --primary-hover: #1d4ed8; --primary-light: #eff6ff; --primary-border: #bfdbfe;
+      --accent-rule: #0891b2; --accent-version: #7c3aed; --accent-fr: #d97706;
+      --success: #16a34a; --success-bg: #f0fdf4; --warning: #d97706; --warning-bg: #fffbeb;
+      --danger: #dc2626; --danger-bg: #fef2f2;
+      --surface: #fff; --surface-glass: rgba(255,255,255,0.72); --surface-hover: #f8fafc; --border: #e8edf3;
+      --text-primary: #18222f; --text-secondary: #4a5568; --text-muted: #9aa5b4;
+      --sidebar-w: 240px; --drawer-w: 480px; --radius-sm: 7px; --radius-lg: 14px;
+      --shadow: 0 8px 32px rgba(30,40,80,0.10);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 13px;
+      color: var(--text-primary);
+      background: linear-gradient(135deg, #e0e7ff 0%, #f0f4f8 40%, #e0f2fe 100%);
+      background-attachment: fixed; min-height: 100vh;
+    }
+    .sidebar {
+      position: fixed; inset: 0 auto 0 0; width: var(--sidebar-w); z-index: 200;
+      display: flex; flex-direction: column;
+      background: rgba(240,244,255,0.95); backdrop-filter: blur(20px);
+      border-right: 1px solid rgba(148,163,196,0.22);
+    }
+    .sidebar-brand { padding: 16px 14px 12px; border-bottom: 1px solid rgba(148,163,196,0.22); }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: linear-gradient(135deg, #2563eb, #7c3aed); color: #fff;
+      display: flex; align-items: center; justify-content: center; font-weight: 700;
+    }
+    .brand-text { font-size: 14px; font-weight: 700; }
+    .brand-sub { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+    .sprint-pill {
+      display: inline-block; margin-top: 10px; font-size: 11px; font-weight: 600;
+      padding: 3px 8px; border-radius: 999px; background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0;
+    }
+    .sidebar-scroll { flex: 1; overflow-y: auto; padding: 8px 0 16px; }
+    .sidebar-foot { padding: 10px 14px 14px; border-top: 1px solid rgba(148,163,196,0.22); font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+    .main { margin-left: var(--sidebar-w); padding: 16px 20px 40px; min-height: 100vh; }
+    .breadcrumb { padding: 4px 0 12px; font-size: 12px; color: var(--text-muted); }
+    .breadcrumb a { color: var(--primary); text-decoration: none; }
+    .page-header { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; }
+    .page-header h1 { font-size: 19px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .page-desc { font-size: 12px; color: var(--text-muted); max-width: 780px; line-height: 1.55; }
+    .badge { display: inline-flex; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: var(--radius-sm); }
+    .badge-fr { background: #fffbeb; color: var(--accent-fr); border: 1px solid #fde68a; }
+    .badge-version { background: #f5f3ff; color: var(--accent-version); border: 1px solid #ddd6fe; }
+    .page-tab-bar {
+      display: flex; gap: 0; margin-bottom: 16px;
+      background: var(--surface-glass); backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.55); border-radius: var(--radius-lg);
+      padding: 4px; box-shadow: var(--shadow); width: fit-content;
+    }
+    .page-tab-bar button {
+      padding: 8px 20px; border: none; background: transparent; cursor: pointer;
+      font-size: 13px; font-weight: 500; color: var(--text-secondary); border-radius: 10px;
+    }
+    .page-tab-bar button.active { background: var(--primary); color: #fff; font-weight: 600; }
+    .page-view { display: none; }
+    .page-view.active { display: block; }
+    .btn {
+      display: inline-flex; align-items: center; height: 34px; padding: 0 14px;
+      border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid transparent;
+    }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-rule { background: var(--primary-light); color: var(--primary); border-color: var(--primary-border); }
+    .btn-rule.active { background: var(--primary); color: #fff; }
+    .btn-ghost-sm { background: var(--surface); color: var(--text-secondary); border: 1px solid var(--border); height: 32px; padding: 0 12px; border-radius: var(--radius-sm); cursor: pointer; font-size: 12px; }
+    .glass-card {
+      background: var(--surface-glass); backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.55); border-radius: var(--radius-lg);
+      box-shadow: var(--shadow); overflow: hidden;
+    }
+    .demo-layout { display: grid; grid-template-columns: minmax(280px, 5fr) minmax(360px, 7fr); gap: 16px; }
+    @media (max-width: 1024px) { .demo-layout { grid-template-columns: 1fr; } }
+    .scene-panel { padding: 16px 18px; }
+    .scene-panel h2 { font-size: 14px; font-weight: 700; margin-bottom: 10px; }
+    .scene-list { display: flex; flex-direction: column; gap: 6px; }
+    .scene-btn {
+      text-align: left; padding: 10px 12px; border-radius: var(--radius-sm);
+      border: 1px solid var(--border); background: rgba(255,255,255,0.6); cursor: pointer;
+    }
+    .scene-btn.active { border-color: var(--primary-border); background: var(--primary-light); color: var(--primary); font-weight: 600; }
+    .scene-btn .scene-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+    .scene-btn .scene-desc { font-size: 11px; color: var(--text-muted); line-height: 1.45; }
+    .scene-btn.active .scene-desc { color: #3b82f6; }
+    .scene-note { margin-top: 14px; padding: 10px 12px; border-radius: var(--radius-sm); background: #fffbeb; border: 1px solid #fde68a; font-size: 12px; color: #92400e; line-height: 1.55; }
+    .mockup-panel { padding: 16px; display: flex; justify-content: center; min-height: 520px; }
+    .mockup-frame-wrap {
+      width: 100%; max-width: 375px; border-radius: 28px; overflow: hidden;
+      background: #1e293b; box-shadow: 0 16px 48px rgba(0,0,0,0.18); aspect-ratio: 375 / 812;
+    }
+    .mockup-frame-wrap iframe { width: 100%; height: 100%; border: none; display: block; background: #fff7ed; }
+    .table-toolbar { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--border); gap: 10px; flex-wrap: wrap; }
+    .table-toolbar h3 { font-size: 14px; font-weight: 700; }
+    .stat-chips { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+    .stat-chip {
+      padding: 8px 12px; border-radius: 8px; background: #fff; border: 1px solid var(--border);
+      font-size: 12px; color: var(--text-secondary);
+    }
+    .stat-chip strong { font-size: 16px; font-weight: 700; color: var(--text-primary); margin-left: 6px; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 760px; }
+    th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); font-size: 12px; }
+    th { font-size: 11px; font-weight: 600; color: var(--text-muted); background: rgba(248,250,252,0.9); white-space: nowrap; }
+    tr:hover td { background: var(--surface-hover); }
+    .tag { display: inline-flex; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+    .tag-ok { background: var(--success-bg); color: var(--success); }
+    .tag-warn { background: var(--warning-bg); color: var(--warning); }
+    .tag-muted { background: #f1f5f9; color: var(--text-muted); }
+    .amt { font-variant-numeric: tabular-nums; font-weight: 700; color: #dc2626; }
+    .cell-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .drawer-overlay {
+      position: fixed; inset: 0; background: rgba(15,23,42,0.35); z-index: 500;
+      opacity: 0; pointer-events: none; transition: opacity 0.25s;
+    }
+    .drawer-overlay.open { opacity: 1; pointer-events: auto; }
+    .drawer {
+      position: fixed; top: 0; right: 0; bottom: 0; width: var(--drawer-w); z-index: 501;
+      background: rgba(255,255,255,0.98); backdrop-filter: blur(12px);
+      box-shadow: -8px 0 40px rgba(30,40,60,0.18);
+      transform: translateX(100%); transition: transform 0.28s ease;
+      display: flex; flex-direction: column;
+    }
+    .drawer.open { transform: translateX(0); }
+    .drawer-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .drawer-header h2 { font-size: 15px; font-weight: 700; }
+    .drawer-close { width: 28px; height: 28px; border: none; background: #f1f5f9; border-radius: 6px; cursor: pointer; font-size: 16px; }
+    .rule-tab-bar { display: flex; gap: 0; padding: 0 16px; border-bottom: 1px solid var(--border); }
+    .rule-tab-bar button {
+      padding: 10px 18px; border: none; background: none; cursor: pointer;
+      font-size: 13px; color: var(--text-secondary); border-bottom: 2px solid transparent; margin-bottom: -1px;
+    }
+    .rule-tab-bar button.active { color: var(--primary); font-weight: 600; border-bottom-color: var(--primary); }
+    .drawer-body { flex: 1; overflow-y: auto; padding: 16px 20px 32px; }
+    .rule-panel { display: none; }
+    .rule-panel.active { display: block; }
+    .rule-section { margin-bottom: 22px; }
+    .rule-section h3 { font-size: 14px; font-weight: 700; color: var(--accent-rule); margin-bottom: 8px; }
+    .rule-section h3 span {
+      display: inline-flex; width: 22px; height: 22px; align-items: center; justify-content: center;
+      background: #ecfeff; color: var(--accent-rule); border-radius: 6px; font-size: 12px; margin-right: 8px;
+    }
+    .rule-content { font-size: 13px; color: var(--text-secondary); line-height: 1.65; }
+    .rule-content ul { padding-left: 18px; margin-top: 6px; }
+    .rule-content li { margin-bottom: 5px; }
+    .rule-content code { font-family: ui-monospace, monospace; font-size: 12px; background: #f1f5f9; padding: 1px 5px; border-radius: 4px; }
+    .flow-page-intro { padding: 16px 18px 0; font-size: 12px; color: var(--text-muted); line-height: 1.55; }
+    .flow-svg-wrap { overflow: auto; padding: 16px 18px 24px; max-height: 72vh; }
+    .flow-svg-wrap svg { display: block; margin: 0 auto; min-width: 920px; }
+    .flow-edges line, .flow-edges polyline { stroke: #94a3b8; stroke-width: 1.5; fill: none; }
+    .flow-legend { display: flex; flex-wrap: wrap; gap: 12px; padding: 0 18px 20px; font-size: 11px; color: var(--text-muted); }
+    .flow-legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 4px; vertical-align: -2px; }
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: #1e293b; color: #fff; padding: 10px 18px; border-radius: 999px; font-size: 13px;
+      opacity: 0; transition: all 0.25s; z-index: 600; pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand">
+        <div class="brand-icon">迭</div>
+        <div>
+          <div class="brand-text">右豹迭代需求记录</div>
+          <div class="brand-sub">PRD Demo · 产品交付研发</div>
+        </div>
+      </div>
+      <span class="sprint-pill">YBDD2.0 · 迭代 v1</span>
+    </div>
+    <div class="sidebar-scroll" data-iteration-sidebar></div>
+    <div class="sidebar-foot">FR-015 · 页内 Tab<br />前端交互 / 管理后台 / 业务流程</div>
+  </aside>
+
+  <main class="main">
+    <nav class="breadcrumb">
+      <a href="framework-shell.html">Sprint 概览</a>
+      <span> / 运营 / 双节逐鹿榜</span>
+    </nav>
+    <header class="page-header">
+      <div>
+        <h1>
+          双节逐鹿榜
+          <span class="badge badge-fr">FR-015</span>
+          <span class="badge badge-version">v1 当前</span>
+        </h1>
+        <p class="page-desc">中秋国庆活动榜（2026-09-25 至 2026-10-09）。H5 展示前 100 名：头像、脱敏昵称、活动期收益、排名；底栏展示当前用户真实昵称与名次。每小时整点刷新快照。统计全部项目有效收益，版权分销除外；订单是否落入活动期以订单更新时间判定。</p>
+      </div>
+      <div class="page-header-actions">
+        <button class="btn btn-rule" id="toggleRuleDrawer" type="button">📋 需求规则</button>
+      </div>
+    </header>
+
+    <div class="page-tab-bar" role="tablist">
+      <button type="button" class="active" data-page="view-fe" role="tab">前端交互</button>
+      <button type="button" data-page="view-admin" role="tab">管理后台</button>
+      <button type="button" data-page="view-flow" role="tab">业务流程</button>
+    </div>
+
+    <div id="view-fe" class="page-view active">
+      <div class="demo-layout">
+        <div class="glass-card scene-panel">
+          <h2>场景切换</h2>
+          <div class="scene-list">
+            <button class="scene-btn active" type="button" data-screen="in">
+              <div class="scene-title">有数据 · 我在榜内</div>
+              <div class="scene-desc">100 条完整行样式；第 8 名高亮；底栏贴列表底部不遮挡</div>
+            </button>
+            <button class="scene-btn" type="button" data-screen="out">
+              <div class="scene-title">有数据 · 未进前 100</div>
+              <div class="scene-desc">列表仍 100 人；底栏真实昵称 + 排名 922</div>
+            </button>
+            <button class="scene-btn" type="button" data-screen="before">
+              <div class="scene-title">活动未开始</div>
+              <div class="scene-desc">空态：9 月 25 日 00:00 开榜，底栏不展示</div>
+            </button>
+            <button class="scene-btn" type="button" data-screen="ended">
+              <div class="scene-title">最终榜</div>
+              <div class="scene-desc">活动结束后定格最后一次整点快照，文案改为最终榜</div>
+            </button>
+            <button class="scene-btn" type="button" data-screen="rules">
+              <div class="scene-title">活动规则</div>
+              <div class="scene-desc">奖项表 + 统计口径 + 发奖风控，文案对齐海报</div>
+            </button>
+          </div>
+          <div class="scene-note">这是<strong>移动端 H5</strong>（375 宽预览，真机全屏）。有数据态：白底列表、行分割线、TOP1–3 色条与头像描边、收益千分位、底栏贴在列表底部不遮挡。他人昵称 <code>****山</code>，自己底栏展示全名。</div>
+        </div>
+        <div class="glass-card mockup-panel">
+          <div class="mockup-frame-wrap">
+            <iframe id="mockupFrame" title="双节逐鹿榜 Mockup" src="about:blank"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="view-admin" class="page-view">
+      <div class="glass-card">
+        <div class="table-toolbar">
+          <h3>榜单快照</h3>
+          <button class="btn-ghost-sm" type="button" onclick="showToast('Mock：已标记下次整点重算')">手动重算（下一整点）</button>
+        </div>
+        <div class="stat-chips">
+          <div class="stat-chip">活动窗<strong>09-25 00:00 ~ 10-09 23:59</strong></div>
+          <div class="stat-chip">最近快照<strong>2026-09-17 15:00</strong></div>
+          <div class="stat-chip">列表人数<strong>100</strong></div>
+          <div class="stat-chip">排除项目<strong>版权分销</strong></div>
+          <div class="stat-chip">时间字段<strong>订单更新时间</strong></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>排名</th><th>用户</th><th>脱敏昵称</th><th>活动期收益</th><th>计入订单数</th><th>最近计入更新时间</th><th>发奖档</th>
+              </tr>
+            </thead>
+            <tbody id="snapBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="view-flow" class="page-view">
+      <div class="glass-card flow-page">
+        <p class="flow-page-intro">一张闭环：整点任务按订单更新时间汇总活动窗内收益（排除版权分销）→ 排名写入快照 → H5 只读快照前 100 + 当前用户名次。活动结束后定格，发奖走审核榜而非实时数。</p>
+        <div class="flow-svg-wrap">
+          <svg width="1080" height="820" viewBox="0 0 1080 820" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <marker id="flow-arrow-15" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                <path d="M0,0 L8,4 L0,8 Z" fill="#94a3b8" />
+              </marker>
+            </defs>
+            <g class="flow-edges" marker-end="url(#flow-arrow-15)">
+              <line x1="540" y1="64" x2="540" y2="94" />
+              <line x1="540" y1="174" x2="540" y2="204" />
+              <line x1="540" y1="284" x2="540" y2="314" />
+              <line x1="540" y1="394" x2="540" y2="424" />
+              <line x1="540" y1="504" x2="540" y2="534" />
+              <line x1="540" y1="614" x2="540" y2="644" />
+              <line x1="540" y1="724" x2="540" y2="754" />
+              <line x1="460" y1="134" x2="230" y2="134" />
+              <line x1="460" y1="354" x2="230" y2="354" />
+              <polyline points="60,134 20,134 20,4 540,4 540,16" />
+            </g>
+            <g font-family="Inter, PingFang SC, sans-serif">
+              <rect x="360" y="16" width="360" height="48" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="540" y="36" text-anchor="middle" font-size="12" fill="#1e40af">整点到达 · 触发榜单任务</text>
+              <text x="540" y="52" text-anchor="middle" font-size="10" fill="#64748b">每 1 小时一次 · 活动结束后停止滚动</text>
+
+              <polygon points="540,94 620,134 540,174 460,134" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="540" y="138" text-anchor="middle" font-size="11" fill="#854d0e">当前 ∈ 活动窗?</text>
+              <text x="300" y="126" font-size="10" fill="#dc2626">否</text>
+              <rect x="60" y="114" width="170" height="40" rx="6" fill="#fecaca" stroke="#dc2626" />
+              <text x="145" y="139" text-anchor="middle" font-size="11" fill="#991b1b">未开始空态 / 已定格</text>
+              <text x="552" y="190" font-size="10" fill="#16a34a">是</text>
+
+              <rect x="360" y="204" width="360" height="80" rx="6" fill="#dcfce7" stroke="#16a34a" />
+              <text x="540" y="228" text-anchor="middle" font-size="12" fill="#166534">拉取收益订单</text>
+              <text x="540" y="246" text-anchor="middle" font-size="10" fill="#64748b">updated_at ∈ [09-25 00:00, 10-09 23:59]</text>
+              <text x="540" y="262" text-anchor="middle" font-size="10" fill="#64748b">排除版权分销 · 用户维度求和</text>
+
+              <polygon points="540,314 620,354 540,394 460,354" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="540" y="358" text-anchor="middle" font-size="11" fill="#854d0e">有效收益?</text>
+              <text x="300" y="346" font-size="10" fill="#dc2626">否</text>
+              <rect x="60" y="334" width="170" height="40" rx="6" fill="#fecaca" stroke="#dc2626" />
+              <text x="145" y="359" text-anchor="middle" font-size="11" fill="#991b1b">不计入（违规/未回填）</text>
+              <text x="552" y="410" font-size="10" fill="#16a34a">是</text>
+
+              <rect x="360" y="424" width="360" height="80" rx="6" fill="#dcfce7" stroke="#16a34a" />
+              <text x="540" y="448" text-anchor="middle" font-size="12" fill="#166534">按收益降序排名</text>
+              <text x="540" y="466" text-anchor="middle" font-size="10" fill="#64748b">保留 2 位小数 · 同分按更早计入时间</text>
+              <text x="540" y="482" text-anchor="middle" font-size="10" fill="#64748b">仍同分按 user_id 升序</text>
+
+              <rect x="360" y="534" width="360" height="80" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="540" y="558" text-anchor="middle" font-size="12" fill="#1e40af">写入快照</text>
+              <text x="540" y="576" text-anchor="middle" font-size="10" fill="#64748b">Top 100 列表 + 全量名次索引</text>
+              <text x="540" y="592" text-anchor="middle" font-size="10" fill="#64748b">H5 读快照，不实时扫单</text>
+
+              <rect x="360" y="644" width="360" height="80" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="540" y="668" text-anchor="middle" font-size="12" fill="#1e40af">C 端打开榜单 H5</text>
+              <text x="540" y="686" text-anchor="middle" font-size="10" fill="#64748b">头像 / 脱敏昵称 / 活动期收益 / 排名</text>
+              <text x="540" y="702" text-anchor="middle" font-size="10" fill="#64748b">底栏：真实昵称 + 本人名次（可 &gt;100）</text>
+
+              <rect x="360" y="754" width="360" height="48" rx="6" fill="#ffedd5" stroke="#ea580c" />
+              <text x="540" y="774" text-anchor="middle" font-size="12" fill="#9a3412">结束后定格 · 按审核榜发奖</text>
+              <text x="540" y="790" text-anchor="middle" font-size="10" fill="#9a3412">海报奖项 1 / 2 / 3 / 4–88 名</text>
+            </g>
+          </svg>
+        </div>
+        <div class="flow-legend">
+          <span><i style="background:#dbeafe;border:1px solid #2563eb"></i>前端 / 快照展示</span>
+          <span><i style="background:#dcfce7;border:1px solid #16a34a"></i>后端汇总 / 排名</span>
+          <span><i style="background:#ffedd5;border:1px solid #ea580c"></i>发奖审核</span>
+          <span><i style="background:#fef9c3;border:1px solid #ca8a04"></i>校验</span>
+          <span><i style="background:#fecaca;border:1px solid #dc2626"></i>不计入 / 空态</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="drawer-overlay" id="ruleOverlay" onclick="setRuleDrawer(false)"></div>
+  <aside class="drawer" id="ruleDrawer" role="dialog" aria-labelledby="ruleTitle">
+    <div class="drawer-header">
+      <h2 id="ruleTitle">FR-015 · v1 需求规则</h2>
+      <button class="drawer-close" type="button" onclick="setRuleDrawer(false)">×</button>
+    </div>
+    <div class="rule-tab-bar">
+      <button type="button" class="active" data-rule="rule-fe">前端需求</button>
+      <button type="button" data-rule="rule-admin">后台需求</button>
+    </div>
+    <div class="drawer-body">
+      <div id="rule-fe" class="rule-panel active">
+        <div class="rule-section">
+          <h3><span>1</span>业务目标</h3>
+          <div class="rule-content">
+            <p>中秋国庆「双节逐鹿狂欢」期间，给用户一张可刷的收益冲榜页：看见前 100 名和自己的名次，驱动项目有效收益。</p>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>2</span>页面与字段</h3>
+          <div class="rule-content">
+            <ul>
+              <li><strong>入口</strong>：独立活动 H5（海报 / 站内信 / 运营投放）。不并入 OPC 经营榜，不按赛道拆 Tab。</li>
+              <li><strong>活动窗</strong>：2026-09-25 00:00:00 — 2026-10-09 23:59:59（以平台时区）。</li>
+              <li><strong>头图</strong>：活动名「双节逐鹿榜」、日期、最近快照时间（如「更新至 2026-09-17 15:00 · 每小时更新」）。</li>
+              <li><strong>列表只展示前 100 名</strong>，每行必含：排名、用户头像、脱敏昵称、活动期间收益（单位元，2 位小数）、口径标签「活动期」。</li>
+              <li><strong>脱敏</strong>：他人昵称保留最后一个字，其余以 <code>****</code> 代替，如 <code>****山</code>。底栏当前用户展示<strong>真实昵称</strong>。</li>
+              <li><strong>前三名</strong>：TOP 1 / 2 / 3 角标，收益用强调红；第 4 名起普通数字名次。</li>
+              <li><strong>底栏</strong>：当前用户头像、真实昵称、排名、活动期收益。未进前 100 仍展示真实名次（可 &gt;100），列表不插入该用户。</li>
+              <li><strong>规则浮层</strong>：奖项表（海报 1–88 名）+ 统计口径 + 发奖风控文案。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>3</span>刷新与状态</h3>
+          <div class="rule-content">
+            <ul>
+              <li>H5 <strong>只读最近一次整点快照</strong>，不实时扫单。文案展示快照时刻。</li>
+              <li><strong>未开始</strong>：空态说明开榜时间，不展示假数据，隐藏底栏。</li>
+              <li><strong>进行中</strong>：每小时更新一次；用户下拉不强制刷新，下次打开或整点后再次进入才看到新快照。</li>
+              <li><strong>已结束</strong>：展示「最终榜」，快照定格为活动结束后第一次覆盖完整窗口的整点任务（10-10 00:00），之后不再滚动。</li>
+              <li>无头像用默认色块 + 末字；收益为 0 且从未计入的用户不进榜，底栏仍可展示 0.00 与未上榜名次。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>4</span>统计口径（C 端展示必须与快照一致）</h3>
+          <div class="rule-content">
+            <ul>
+              <li><strong>项目范围</strong>：活动期间<strong>全部项目</strong>，<strong>版权分销除外</strong>。</li>
+              <li><strong>时间纬度</strong>：收益订单是否计入，看<strong>订单更新时间</strong> <code>updated_at</code> 是否落在活动闭区间，<strong>不是下单时间 / 结算时间</strong>。</li>
+              <li>用户维度对计入订单金额求和，保留 2 位小数后排名。</li>
+              <li>同分：最近一笔计入订单的更新时间更早者靠前；仍相同按 <code>user_id</code> 升序。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>5</span>边界</h3>
+          <div class="rule-content">
+            <ul>
+              <li>不做 7 日 / 30 日 / 日榜切换；不做平台项目榜 / OPC 经营榜双 Tab。</li>
+              <li>发奖以审核后的最终榜为准，H5 冲榜数仅作过程展示。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div id="rule-admin" class="rule-panel">
+        <div class="rule-section">
+          <h3><span>1</span>业务目标</h3>
+          <div class="rule-content">
+            <p>运营查看整点快照、核对口径与发奖档，不在本 FR 做奖品物流履约（实物/现金走既有发放流程）。</p>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>2</span>任务与字段</h3>
+          <div class="rule-content">
+            <ul>
+              <li><strong>小时任务</strong>：每整点跑一次。筛选 <code>updated_at ∈ [活动开始, 活动结束]</code> 的收益订单；项目类型 ≠ 版权分销；按用户求和、排名、写快照。</li>
+              <li><strong>快照</strong>：<code>snapshot_at</code>、Top 100（rank、user_id、avatar、masked_nick、amount）、全量名次索引（供底栏查询本人 rank）。</li>
+              <li>后台列表：排名、UID、脱敏昵称、活动期收益、计入订单数、最近计入更新时间、发奖档（1 / 2 / 3 / 4-10 … / 未进奖）。</li>
+              <li>活动结束后任务停跑，保留最终快照。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>3</span>与海报风控的关系</h3>
+          <div class="rule-content">
+            <ul>
+              <li>需回填项目须当天回填，否则该笔不计入有效收益。</li>
+              <li>违规、刷量、作弊订单不予结算，不进榜。</li>
+              <li>发奖前允许运营按活动方案审核调档；H5 不以调档实时改榜，最终对外以审核榜公示（若需要另开公示页，本 FR 不做）。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="toast" id="toast"></div>
+  <script>
+    var PRIZE = [
+      [1, '台式电脑'], [2, '苹果 18ProMax'], [3, '华为 Pura X'],
+      [10, '现金 888'], [20, '现金 666'], [30, '现金 500'],
+      [45, '现金 300'], [65, '现金 200'], [88, '现金 100']
+    ];
+    function prizeOf(rank) {
+      if (rank === 1) return '冠军 · 台式电脑';
+      if (rank === 2) return '亚军 · 苹果 18ProMax';
+      if (rank === 3) return '季军 · 华为 Pura X';
+      if (rank <= 10) return '4–10 名 · 现金 888';
+      if (rank <= 20) return '11–20 名 · 现金 666';
+      if (rank <= 30) return '21–30 名 · 现金 500';
+      if (rank <= 45) return '31–45 名 · 现金 300';
+      if (rank <= 65) return '46–65 名 · 现金 200';
+      if (rank <= 88) return '66–88 名 · 现金 100';
+      return '未进奖';
+    }
+    function renderSnap() {
+      var last = '山发8子7风月鹿豹星海云龙虎松梅竹菊岩泉'.split('');
+      var html = '';
+      var amount = 58089;
+      for (var i = 1; i <= 20; i++) {
+        amount = Math.max(120, amount * (i < 4 ? 0.76 : 0.965) - (i * 18));
+        var lastCh = last[(i - 1) % last.length];
+        html += '<tr><td>' + i + '</td><td>U-10' + (100 + i) + '<div class="cell-sub">头像已同步</div></td><td>****' + lastCh + '</td><td class="amt">' + amount.toFixed(2) + '</td><td>' + (80 - i) + '</td><td>2026-09-17 14:' + String(60 - i).padStart(2, '0') + '</td><td><span class="tag ' + (i <= 88 ? 'tag-ok' : 'tag-muted') + '">' + prizeOf(i) + '</span></td></tr>';
+      }
+      html += '<tr><td colspan="7" style="text-align:center;color:#9aa5b4">演示截取前 20 行 · 实际快照 100 行</td></tr>';
+      document.getElementById('snapBody').innerHTML = html;
+    }
+    function showToast(msg) {
+      var el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      setTimeout(function () { el.classList.remove('show'); }, 1800);
+    }
+    function getActiveScreen() {
+      return document.querySelector('.scene-list .scene-btn.active')?.dataset.screen || 'in';
+    }
+    function currentTabKey() {
+      var id = document.querySelector('.page-view.active')?.id;
+      return { 'view-fe': 'fe', 'view-admin': 'admin', 'view-flow': 'flow' }[id] || 'fe';
+    }
+    function syncPageUrl() {
+      var params = new URLSearchParams();
+      params.set('tab', currentTabKey());
+      history.replaceState(null, '', '?' + params.toString());
+    }
+    function buildMockupSrc(screen) {
+      return 'zhulu-board-demo.html?embed=1&v=2&screen=' + screen;
+    }
+    function loadMockupFrame() {
+      document.getElementById('mockupFrame').src = buildMockupSrc(getActiveScreen());
+    }
+    function switchRuleTab(ruleId, btn) {
+      document.querySelectorAll('.rule-tab-bar button').forEach(function (b) { b.classList.remove('active'); });
+      document.querySelectorAll('.rule-panel').forEach(function (p) { p.classList.remove('active'); });
+      btn.classList.add('active');
+      document.getElementById(ruleId).classList.add('active');
+    }
+    function syncRuleTabToPage() {
+      var activePage = document.querySelector('.page-view.active')?.id;
+      var ruleId = activePage === 'view-admin' ? 'rule-admin' : 'rule-fe';
+      var btn = document.querySelector('.rule-tab-bar button[data-rule="' + ruleId + '"]');
+      if (btn) switchRuleTab(ruleId, btn);
+    }
+    var ruleDrawer = document.getElementById('ruleDrawer');
+    var toggleRuleBtn = document.getElementById('toggleRuleDrawer');
+    function setRuleDrawer(open) {
+      ruleDrawer.classList.toggle('open', open);
+      document.getElementById('ruleOverlay').classList.toggle('open', open);
+      toggleRuleBtn.classList.toggle('active', open);
+      if (open) syncRuleTabToPage();
+    }
+    toggleRuleBtn.onclick = function () { setRuleDrawer(!ruleDrawer.classList.contains('open')); };
+
+    document.querySelectorAll('.scene-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('.scene-btn').forEach(function (b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        syncPageUrl();
+        loadMockupFrame();
+      });
+    });
+    document.querySelectorAll('.page-tab-bar button').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('.page-tab-bar button').forEach(function (b) { b.classList.remove('active'); });
+        document.querySelectorAll('.page-view').forEach(function (v) { v.classList.remove('active'); });
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.page).classList.add('active');
+        if (btn.dataset.page === 'view-fe') loadMockupFrame();
+        if (btn.dataset.page === 'view-admin') renderSnap();
+        syncPageUrl();
+        syncRuleTabToPage();
+      });
+    });
+    document.querySelectorAll('.rule-tab-bar button').forEach(function (btn) {
+      btn.addEventListener('click', function () { switchRuleTab(btn.dataset.rule, btn); });
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') setRuleDrawer(false);
+    });
+    window.addEventListener('message', function (e) {
+      if (!e.data || e.data.type !== 'zhuluScreen') return;
+      var btn = document.querySelector('.scene-btn[data-screen="' + e.data.screen + '"]');
+      if (!btn) return;
+      document.querySelectorAll('.scene-btn').forEach(function (b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+    });
+
+    var params = new URLSearchParams(location.search);
+    var tab = params.get('tab');
+    var tabPageMap = { admin: 'view-admin', flow: 'view-flow', fe: 'view-fe' };
+    if (tab && tabPageMap[tab]) {
+      var tbtn = document.querySelector('[data-page="' + tabPageMap[tab] + '"]');
+      if (tbtn) tbtn.click();
+    }
+    renderSnap();
+    if (document.querySelector('.page-view.active')?.id === 'view-fe') loadMockupFrame();
+  </script>
+  <script src="sidebar-nav.js"></script>
+</body>
+</html>
