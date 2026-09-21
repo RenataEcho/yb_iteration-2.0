@@ -1,7 +1,7 @@
 /* FR-014 一键代发 · 前后端共用数据（localStorage 逻辑闭环，非真实接口） */
 (function (global) {
   var KEY = 'fr014-yjd-v6';
-  var VER = 6;
+  var VER = 7;
   var CLIENT_DL_MS = 3 * 86400000;
   var OSS_TTL_MS = 7 * 86400000;
   var UNCLAIMED_TTL_MS = 15 * 86400000;
@@ -160,11 +160,11 @@
         { id: 'OE-04', editor: '阿凯', ybId: 'YB10221', mid: 'X-02', project: '红果短剧', book: '我在末世囤了亿万物资', bookId: '8301928471', kw: '末世囤货', amount: 32, settledAt: '2026-09-10 11:08:00' }
       ],
       banners: [
+        { id: 'B-00', title: '不用剪 · 即领即发', sub: '官方成片已备好，领取就能发', kind: 'promo', on: true, img: 'assets/fr014/bn-bound-claim.jpg' },
         { id: 'B-01', title: '剪辑手招募', sub: '扫码联系客服 · 录入即可供稿', kind: 'recruit', on: true, img: 'assets/fr014/bn-recruit.jpg' },
         { id: 'B-02', title: '热门稿件上新', sub: '小说 / 漫画 / 视频成片可领', kind: 'promo', on: true, img: 'assets/fr014/bn-hot.jpg' },
         { id: 'B-03', title: '领取后 24 小时回填', sub: '超时记一次未回填，次数不退', kind: 'promo', on: true, img: 'assets/fr014/bn-guide.jpg' },
-        { id: 'B-04', title: '剪辑手精选', sub: '口播、混剪、图文切片都有', kind: 'promo', on: true, img: 'assets/fr014/bn-pick.jpg' },
-        { id: 'B-05', title: '不会剪辑也能做项目', sub: '领取成片，去项目里发布变现', kind: 'promo', on: true, img: 'assets/fr014/bn-tips.jpg' }
+        { id: 'B-04', title: '剪辑手精选', sub: '口播、混剪、图文切片都有', kind: 'promo', on: true, img: 'assets/fr014/bn-pick.jpg' }
       ]
     };
   }

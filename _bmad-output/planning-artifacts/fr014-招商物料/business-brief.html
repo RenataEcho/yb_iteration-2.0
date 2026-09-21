@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>右豹「一键代发」业务说明</title>
+  <style>
+    :root { --orange: #ff6b1a; --ink: #1a2332; --muted: #5b6472; --line: #e6e8eb; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: #ece8e4;
+      color: var(--ink);
+    }
+    .bar {
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .bar a { color: var(--orange); text-decoration: none; }
+    .bar button {
+      border: 0; background: var(--orange); color: #fff;
+      border-radius: 8px; padding: 7px 14px; cursor: pointer; font-size: 12px;
+    }
+    .sheet {
+      max-width: 880px;
+      margin: 0 auto 48px;
+      background: #fff;
+      padding: 40px 48px 52px;
+      box-shadow: 0 10px 30px rgba(26, 35, 50, .08);
+    }
+    .kicker {
+      font-size: 11px;
+      letter-spacing: .16em;
+      font-weight: 700;
+      color: var(--orange);
+    }
+    h1 { font-size: 26px; line-height: 1.35; margin: 8px 0 10px; }
+    .lead {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.7;
+      padding-bottom: 16px;
+      margin-bottom: 8px;
+      border-bottom: 2px solid var(--orange);
+    }
+    h2 {
+      font-size: 17px;
+      margin: 28px 0 10px;
+      padding-top: 4px;
+      page-break-after: avoid;
+    }
+    h3 { font-size: 14px; color: #c2410c; margin: 16px 0 8px; page-break-after: avoid; }
+    p { font-size: 14.5px; line-height: 1.85; margin-bottom: 10px; }
+    ul, ol { margin: 0 0 12px 1.3em; }
+    li { font-size: 14.5px; line-height: 1.8; margin-bottom: 4px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 8px 0 16px;
+      font-size: 13px;
+    }
+    th, td {
+      border: 1px solid var(--line);
+      padding: 8px 10px;
+      text-align: left;
+      vertical-align: top;
+      line-height: 1.6;
+    }
+    th { background: #fff7ed; color: #9a3412; font-weight: 700; }
+    .callout {
+      background: #fff7ed;
+      border-left: 4px solid var(--orange);
+      padding: 12px 14px;
+      margin: 12px 0 16px;
+      font-size: 15px;
+      line-height: 1.75;
+    }
+    .redline {
+      background: #fff7f7;
+      border: 1px solid #fecaca;
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin: 10px 0 16px;
+    }
+    .redline h3 { color: #b91c1c; margin-top: 0; }
+    .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 12px 14px;
+    }
+    .card b { display: block; font-size: 13px; margin-bottom: 6px; }
+    .card p { font-size: 13px; color: #374151; margin: 0; }
+    footer {
+      margin-top: 28px;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+      font-size: 12px;
+      color: #9ca3af;
+      line-height: 1.7;
+    }
+    @page { size: A4; margin: 16mm 16mm 18mm; }
+    @media print {
+      .bar { display: none !important; }
+      body { background: #fff; }
+      .sheet { box-shadow: none; margin: 0; max-width: none; padding: 0; }
+      h2, h3, .callout, .card, table, .redline { break-inside: avoid; }
+    }
+    @media (max-width: 700px) {
+      .sheet { padding: 24px 18px 36px; }
+      .cols { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bar">
+    <a href="index.html">← 招商物料</a>
+    <button type="button" onclick="window.print()">打印 / 存为 PDF</button>
+  </div>
+  <article class="sheet">
+    <div class="kicker">YOU BAO · 业务说明</div>
+    <h1>右豹「一键代发」业务介绍</h1>
+    <p class="lead">面向剪辑手招募 · 面向市场合作。口径对齐产品合同，不含内部编号与实现细节。分成比例、授权项目、是否免审以商务与运营书面确认为准。</p>
+
+    <h2>一句话</h2>
+    <div class="callout"><strong>有制作能力的人交成片，没有制作能力的人领成片去发、去赚。</strong><br />剪辑手把图集、视频供到平台；用户领取后按项目规则发布，关键词产生的订单收益按事先约定的分成结算。</div>
+
+    <h2>解决什么问题</h2>
+    <p>短视频与图文项目要持续出片，但大量有流量、有词、有项目资格的人<strong>做不出成片</strong>。平台把「做片」和「发片变现」拆开：</p>
+    <table>
+      <thead>
+        <tr><th>角色</th><th>他们缺什么</th><th>一键代发给他们什么</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>剪辑手</td><td>稳定的项目与结算入口</td><td>授权项目、批量交稿、按领取后的关键词订单分成</td></tr>
+        <tr><td>领取用户</td><td>剪辑与成片能力</td><td>可领的图集 / 视频、发布技巧、下载后直达抖音相册</td></tr>
+        <tr><td>品牌项目</td><td>内容供给与达人产能</td><td>把已有品牌项目接入供稿池，成片可被有词用户领取发布</td></tr>
+      </tbody>
+    </table>
+
+    <h2>给剪辑手：为什么加入</h2>
+    <h3>适合谁</h3>
+    <ul>
+      <li>能稳定产出<strong>图集或视频</strong>成片</li>
+      <li>愿意按项目、按书籍供稿，而不是只发自己的号</li>
+      <li>接受<strong>电脑端交稿</strong>（手机 App 不能传剪辑供稿）</li>
+      <li>接受平台审核（部分创作者可协商免审，以录入为准）</li>
+    </ul>
+
+    <h3>你怎么赚钱</h3>
+    <p>用户领取你的稿件时，必须先选定该项目里<strong>已审核通过</strong>的关键词。该词后续产生的<strong>平台订单收益</strong>，按领取当时锁定的<strong>分成比例</strong>拆账：</p>
+    <ul>
+      <li>剪辑手侧：订单收益 × 分成比例</li>
+      <li>用户侧：订单收益 − 剪辑手分账</li>
+    </ul>
+    <p>结算状态沿用平台已有的关键词订单结算，不另开一套账。电脑「创作者中心 → 剪辑供稿」看板可看：已授权项目、上传数、被领取数、已结算收益；右豹端稿件支持按日 / 按月看明细并导出。</p>
+
+    <h3>两条供稿路</h3>
+    <div class="cols">
+      <div class="card">
+        <b>右豹（站内广场）</b>
+        <p>成片进入平台作品广场，供已有项目资格的用户领取、回填、发布。适合要平台流量与关键词分账的创作者。</p>
+      </div>
+      <div class="card">
+        <b>站外</b>
+        <p>开通后可走独立链接 / 二维码。对方不用登录即可按份下载。适合已有私域、社群、线下合作。站外稿不进右豹广场。</p>
+      </div>
+    </div>
+    <p>两条路可以只开一条，也可以都开，以入驻时选择为准。</p>
+
+    <h3>怎么入驻（没有线上申请表）</h3>
+    <ol>
+      <li>看招募海报（卖点、适合谁、底部客服码）</li>
+      <li>加客服沟通项目、分成、发布渠道</li>
+      <li>运营在后台录入：右豹 ID、分成比例、是否需要审核、发布平台</li>
+      <li>电脑打开创作者中心，进入<strong>剪辑供稿</strong>即可交稿</li>
+    </ol>
+    <p>扫码不等于已入驻。未录入时只能看招募说明，不能上传。</p>
+
+    <h3>交稿怎么做</h3>
+    <ul>
+      <li>只在<strong>电脑 · 创作者中心 · 剪辑供稿</strong></li>
+      <li>一次传：<strong>一个项目 + 一本书 + 一种类型</strong>（图集或视频）</li>
+      <li>视频：文件名即标题；图集：一个文件夹一条，文件夹名即标题</li>
+      <li>可填发布技巧，也可一键用 AI 按书籍生成后再改</li>
+      <li>右豹稿：提交后进入平台审核（或按约定免审直通）；通过且无人占用才进广场</li>
+      <li>站外稿：按文件夹分享，扫码即下</li>
+    </ul>
+
+    <h3>成片会留多久</h3>
+    <ul>
+      <li>传上去一直没人领：<strong>15 天</strong>后系统删除云端文件</li>
+      <li>有人领过：领取人约 <strong>3 天</strong>内可下载；云端再保留到首次领取后约 <strong>7 天</strong></li>
+      <li>你自己删除：云端立刻一起删，<strong>不能恢复</strong>；已被占用或已完成的稿不能删</li>
+      <li>站外：每成功下载一份，该份素材即从云端去掉</li>
+    </ul>
+    <p>请按项目节奏供稿，不要把云盘当长期片库。</p>
+
+    <h2>给市场 / 商务：如何对外招商</h2>
+    <h3>产品定位</h3>
+    <p>右豹<strong>一键代发</strong>是品牌项目的<strong>成片供给与领取分发</strong>能力：</p>
+    <ul>
+      <li>不替代现有项目、申词、回填、结算中台</li>
+      <li>不做成「人人上传自制剪辑」</li>
+      <li>做成「专业剪辑手供稿 + 有词用户领取发布」的产能网络</li>
+    </ul>
+    <p>一句话对外：<strong>把会做片的人和会发片的人接在同一条项目链上，按关键词订单分成。</strong></p>
+
+    <h3>可谈的三类合作</h3>
+    <p><strong>1. 剪辑产能合作（主招商）</strong><br />工作室、MCN、兼职剪辑、图文工作室。谈：授权哪些品牌项目、分成、是否审核、右豹 / 站外、月供稿量与类型（图集 / 视频）。</p>
+    <p><strong>2. 品牌项目扩供</strong><br />已有品牌项目、缺成片。谈：项目是否接入一键代发池、Logo 与名称带出、启用 / 停用、领取用户是否已有该项目申词资格。</p>
+    <p><strong>3. 站外分发合作</strong><br />剪辑手或渠道已有私域。谈：无登录落地页、按份下载、不进平台广场、与站内分账规则分开（站外收益按剪辑手在该项目-书籍下的自产词口径，细节商务确认）。</p>
+
+    <h3>给合作方的价值主张</h3>
+    <ul>
+      <li><strong>供给可管：</strong>项目授权、启用禁用、素材类型、审核 / 免审都在运营侧</li>
+      <li><strong>占用可清：</strong>同一成片同时只被一人领取；超时未按规则回填会释放，避免死锁库存</li>
+      <li><strong>结算可对：</strong>分账绑在「领取当时的分成」和「该词的订单结算」上，改比例不回溯已领记录</li>
+      <li><strong>履约有约束：</strong>领取用户须在约定时限内回填发布；多次不履约将失去继续领取资格</li>
+      <li><strong>渠道可拆：</strong>站内广场走平台用户；站外走链接码，互不混进广场</li>
+    </ul>
+
+    <div class="redline">
+      <h3>不承诺什么（商务红线）</h3>
+      <ul>
+        <li>不承诺保底领取量、保底收益</li>
+        <li>不承诺站内申请、自助开通剪辑手身份</li>
+        <li>不承诺 App 内上传</li>
+        <li>不把本产品说成「代运营整号」或「平台替你发抖音」——平台提供成片、发布技巧与下载后拉起抖音相册，<strong>发布动作仍在领取人侧</strong></li>
+        <li>分成、免审、项目名单必须以录入结果为准，口头承诺无效</li>
+      </ul>
+    </div>
+
+    <h3>商务洽谈清单（建议一次谈清）</h3>
+    <ol>
+      <li>合作身份：个人剪辑手 / 工作室（是否统一右豹 ID）</li>
+      <li>发布平台：仅右豹 / 仅站外 / 都要</li>
+      <li>分成比例（写入录入，领取时锁定）</li>
+      <li>稿件是否需要平台审核</li>
+      <li>授权品牌项目清单</li>
+      <li>供稿类型与命名规范（图集文件夹 / 视频文件名）</li>
+      <li>月度供稿节奏（对齐 15 天未领取清理）</li>
+      <li>结算对账周期（对齐平台关键词订单已结算）</li>
+      <li>客服对接人与录入时间</li>
+    </ol>
+
+    <h2>用户侧怎么转起来</h2>
+    <ol>
+      <li>用户在作品广场按项目、剪辑师、素材、图集/视频浏览可领成片</li>
+      <li>详情可预览（图集有限张、视频短试看），展示分成比例，不展示具体金额</li>
+      <li>领取前须：账号可领、剩余次数足够、选好已通过的关键词、该稿空闲</li>
+      <li>领取成功后限时回填到该项目页面，并可用官方下载（约 3 天）发布；图集可加水印后再下</li>
+      <li>关键词订单结算时，若该词已绑定本次已回填的代发领取，则按分成拆到用户与剪辑手</li>
+    </ol>
+    <p>领取次数含平台配置的免费额度，也可用积分兑换「次数包」。具体档位与积分价以当时商品为准。</p>
+
+    <h2>招募海报可用短文案</h2>
+    <p><strong>主标题</strong>　会做片，就在这变现。</p>
+    <p><strong>副标题</strong>　把成片供进品牌项目，用户领取去发，关键词订单按分成结算。</p>
+    <p><strong>适合谁</strong>　能稳定出图集 / 视频的剪辑、工作室；只在电脑交稿。</p>
+    <p><strong>三句卖点</strong>　授权项目可接 · 批量上传 · 领取后按词分成。</p>
+    <p><strong>行动</strong>　长按识别客服二维码，开通「剪辑供稿」。</p>
+    <p><strong>脚注</strong>　扫码后需运营录入方可上传。未录入不能交稿。收益以平台订单结算为准。</p>
+
+    <h2>电梯稿（30 秒）</h2>
+    <p>右豹一键代发，让会剪辑的人给品牌项目供成片，让不会做片但有项目、有词的人直接领取去发。剪辑手加客服开通电脑端「剪辑供稿」，图集和视频都能传；用户在 App 里领、回填、发布。钱从关键词订单来，按入驻时谈好的分成，领取当时锁定，结算后两边都能对上账。也可以开通站外链接，给私域按份下载。要合作，先定项目、分成、审不审、走站内还是站外。</p>
+
+    <footer>
+      本文仅作对外业务解释，不构成保底收益或自助开通承诺。分成、项目授权与审核以运营书面录入为准。<br />
+      右豹 · 一键代发 · 业务说明
+    </footer>
+  </article>
+</body>
+</html>

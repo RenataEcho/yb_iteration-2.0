@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FR-016 · 奖钱包合并提现 · 右豹迭代需求记录</title>
+  <style>
+    :root {
+      --primary: #2563eb; --primary-hover: #1d4ed8; --primary-light: #eff6ff; --primary-border: #bfdbfe;
+      --accent-rule: #0891b2; --accent-version: #7c3aed; --accent-fr: #d97706;
+      --success: #16a34a; --success-bg: #f0fdf4; --warning: #d97706; --warning-bg: #fffbeb;
+      --danger: #dc2626; --danger-bg: #fef2f2;
+      --surface: #fff; --surface-glass: rgba(255,255,255,0.72); --surface-hover: #f8fafc; --border: #e8edf3;
+      --text-primary: #18222f; --text-secondary: #4a5568; --text-muted: #9aa5b4;
+      --sidebar-w: 240px; --drawer-w: 480px; --radius-sm: 7px; --radius-lg: 14px;
+      --shadow: 0 8px 32px rgba(30,40,80,0.10);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 13px;
+      color: var(--text-primary);
+      background: linear-gradient(135deg, #e0e7ff 0%, #f0f4f8 40%, #e0f2fe 100%);
+      background-attachment: fixed; min-height: 100vh;
+    }
+    .sidebar {
+      position: fixed; inset: 0 auto 0 0; width: var(--sidebar-w); z-index: 200;
+      display: flex; flex-direction: column;
+      background: rgba(240,244,255,0.95); backdrop-filter: blur(20px);
+      border-right: 1px solid rgba(148,163,196,0.22);
+    }
+    .sidebar-brand { padding: 16px 14px 12px; border-bottom: 1px solid rgba(148,163,196,0.22); }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: linear-gradient(135deg, #2563eb, #7c3aed); color: #fff;
+      display: flex; align-items: center; justify-content: center; font-weight: 700;
+    }
+    .brand-text { font-size: 14px; font-weight: 700; }
+    .brand-sub { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+    .sprint-pill {
+      display: inline-block; margin-top: 10px; font-size: 11px; font-weight: 600;
+      padding: 3px 8px; border-radius: 999px; background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0;
+    }
+    .sidebar-scroll { flex: 1; overflow-y: auto; padding: 8px 0 16px; }
+    .sidebar-foot { padding: 10px 14px 14px; border-top: 1px solid rgba(148,163,196,0.22); font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+    .main { margin-left: var(--sidebar-w); padding: 16px 20px 40px; min-height: 100vh; }
+    .breadcrumb { padding: 4px 0 12px; font-size: 12px; color: var(--text-muted); }
+    .breadcrumb a { color: var(--primary); text-decoration: none; }
+    .page-header { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; }
+    .page-header h1 { font-size: 19px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .page-desc { font-size: 12px; color: var(--text-muted); max-width: 760px; line-height: 1.55; }
+    .badge { display: inline-flex; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: var(--radius-sm); }
+    .badge-fr { background: #fffbeb; color: var(--accent-fr); border: 1px solid #fde68a; }
+    .badge-version { background: #f5f3ff; color: var(--accent-version); border: 1px solid #ddd6fe; }
+    .page-tab-bar {
+      display: flex; gap: 0; margin-bottom: 16px;
+      background: var(--surface-glass); backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.55); border-radius: var(--radius-lg);
+      padding: 4px; box-shadow: var(--shadow); width: fit-content;
+    }
+    .page-tab-bar button {
+      padding: 8px 20px; border: none; background: transparent; cursor: pointer;
+      font-size: 13px; font-weight: 500; color: var(--text-secondary); border-radius: 10px;
+    }
+    .page-tab-bar button.active { background: var(--primary); color: #fff; font-weight: 600; }
+    .page-view { display: none; }
+    .page-view.active { display: block; }
+    .btn {
+      display: inline-flex; align-items: center; height: 34px; padding: 0 14px;
+      border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid transparent;
+    }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-rule { background: var(--primary-light); color: var(--primary); border-color: var(--primary-border); }
+    .btn-rule.active { background: var(--primary); color: #fff; }
+    .btn-ghost-sm { background: var(--surface); color: var(--text-secondary); border: 1px solid var(--border); height: 32px; padding: 0 12px; border-radius: var(--radius-sm); cursor: pointer; font-size: 12px; }
+    .glass-card {
+      background: var(--surface-glass); backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.55); border-radius: var(--radius-lg);
+      box-shadow: var(--shadow); overflow: hidden;
+    }
+    .demo-layout { display: flex; flex-direction: column; gap: 16px; }
+    .scene-panel { padding: 16px 20px 18px; background: #fff; }
+    .scene-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+    .scene-panel h2 { font-size: 18px; font-weight: 700; margin-bottom: 4px; color: var(--text-primary); }
+    .scene-lead { font-size: 13px; color: #6b7280; line-height: 1.5; max-width: 760px; }
+    .scene-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .scene-btn {
+      padding: 6px 12px; border-radius: 999px; border: 1px solid var(--border);
+      background: #fff; font-size: 12px; cursor: pointer; color: #6b7280; line-height: 1.4;
+    }
+    .scene-btn:hover { border-color: var(--primary-border); color: var(--primary); }
+    .scene-btn.active { border-color: var(--primary-border); background: var(--primary-light); color: var(--primary); font-weight: 600; }
+    .scene-hint { margin-top: 10px; font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+    .scene-tools { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .btn-preview {
+      display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0;
+      height: 32px; padding: 0 12px; border-radius: 999px; cursor: pointer;
+      border: 1px solid var(--border); background: #fff; color: var(--text-secondary);
+      font-size: 12px; font-weight: 600;
+    }
+    .btn-preview:hover, .btn-preview[aria-pressed="true"] {
+      border-color: var(--primary-border); background: var(--primary-light); color: var(--primary);
+    }
+    .mockup-panel { padding: 20px 16px; display: flex; justify-content: center; min-height: 520px; }
+    .mockup-frame-wrap {
+      width: 100%; max-width: 375px; border-radius: 28px; overflow: hidden;
+      background: #1e293b; box-shadow: 0 16px 48px rgba(0,0,0,0.18); aspect-ratio: 375 / 812;
+    }
+    .mockup-frame-wrap iframe { width: 100%; height: 100%; border: none; display: block; background: #fff; }
+    .demo-layout:fullscreen, .demo-layout:-webkit-full-screen,
+    body.preview-fs-fallback .demo-layout.is-preview {
+      width: 100%; height: 100%; padding: 16px; gap: 12px; overflow: auto;
+      background: linear-gradient(135deg, #e0e7ff 0%, #f0f4f8 40%, #e0f2fe 100%);
+    }
+    body.preview-fs-fallback .demo-layout.is-preview {
+      position: fixed; inset: 0; z-index: 400;
+    }
+    .demo-layout:fullscreen .mockup-panel,
+    .demo-layout:-webkit-full-screen .mockup-panel,
+    body.preview-fs-fallback .demo-layout.is-preview .mockup-panel {
+      flex: 1; min-height: 0; align-items: stretch;
+    }
+    .demo-layout:fullscreen .mockup-frame-wrap,
+    .demo-layout:-webkit-full-screen .mockup-frame-wrap,
+    body.preview-fs-fallback .demo-layout.is-preview .mockup-frame-wrap {
+      max-width: min(390px, calc((100vh - 200px) * 375 / 812));
+      height: calc(100vh - 200px); aspect-ratio: 375 / 812;
+    }
+    .drawer-overlay {
+      position: fixed; inset: 0; background: rgba(15,23,42,0.35); z-index: 500;
+      opacity: 0; pointer-events: none; transition: opacity 0.25s;
+    }
+    .drawer-overlay.open { opacity: 1; pointer-events: auto; }
+    .drawer {
+      position: fixed; top: 0; right: 0; bottom: 0; width: var(--drawer-w); z-index: 501;
+      background: rgba(255,255,255,0.98);
+      box-shadow: -8px 0 40px rgba(30,40,60,0.18);
+      transform: translateX(100%); transition: transform 0.28s ease;
+      display: flex; flex-direction: column;
+    }
+    .drawer.open { transform: translateX(0); }
+    .drawer-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .drawer-header h2 { font-size: 15px; font-weight: 700; }
+    .drawer-close { width: 28px; height: 28px; border: none; background: #f1f5f9; border-radius: 6px; cursor: pointer; font-size: 16px; }
+    .rule-tab-bar { display: flex; gap: 0; padding: 0 16px; border-bottom: 1px solid var(--border); }
+    .rule-tab-bar button {
+      padding: 10px 18px; border: none; background: none; cursor: pointer;
+      font-size: 13px; color: var(--text-secondary); border-bottom: 2px solid transparent; margin-bottom: -1px;
+    }
+    .rule-tab-bar button.active { color: var(--primary); font-weight: 600; border-bottom-color: var(--primary); }
+    .drawer-body { flex: 1; overflow-y: auto; padding: 16px 20px 32px; }
+    .rule-panel { display: none; }
+    .rule-panel.active { display: block; }
+    .rule-section { margin-bottom: 22px; }
+    .rule-section h3 { font-size: 14px; font-weight: 700; color: var(--accent-rule); margin-bottom: 8px; }
+    .rule-section h3 span {
+      display: inline-flex; width: 22px; height: 22px; align-items: center; justify-content: center;
+      background: #ecfeff; color: var(--accent-rule); border-radius: 6px; font-size: 12px; margin-right: 8px;
+    }
+    .rule-content { font-size: 13px; color: var(--text-secondary); line-height: 1.65; }
+    .rule-content ul { padding-left: 18px; margin-top: 6px; }
+    .rule-content li { margin-bottom: 5px; }
+    .kv { display: grid; grid-template-columns: 96px 1fr; gap: 8px 10px; font-size: 13px; }
+    .kv dt { color: var(--text-muted); }
+    .flow-page { padding: 0; }
+    .flow-page-intro { padding: 16px 18px 12px; font-size: 12px; color: var(--text-muted); line-height: 1.55; }
+    .flow-split {
+      display: grid;
+      grid-template-columns: 300px minmax(0, 1fr);
+      align-items: stretch;
+      border-top: 1px solid var(--border);
+    }
+    .flow-rules {
+      border-right: 1px solid var(--border);
+      padding: 14px 0 16px;
+      background: rgba(248,250,252,0.72);
+      max-height: 72vh;
+      overflow-y: auto;
+    }
+    .flow-rules-title {
+      font-size: 12px; font-weight: 700; color: var(--text-primary);
+      padding: 0 16px 10px; letter-spacing: 0.02em;
+    }
+    .flow-diagram { min-width: 0; display: flex; flex-direction: column; }
+    .flow-svg-wrap { overflow: auto; padding: 12px 14px 8px; max-height: 72vh; }
+    .flow-svg-wrap svg { display: block; margin: 0 auto; max-width: 100%; height: auto; min-width: 0; }
+    .flow-edges line, .flow-edges polyline { stroke: #94a3b8; stroke-width: 1.5; fill: none; }
+    .flow-legend {
+      display: flex; flex-wrap: wrap; gap: 12px;
+      padding: 10px 18px 16px; font-size: 11px; color: var(--text-muted);
+      border-top: 1px solid var(--border);
+    }
+    .flow-legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 4px; vertical-align: -2px; }
+    .flow-tab-bar {
+      display: flex; flex-wrap: wrap; gap: 4px; padding: 12px 16px 0; border-bottom: 1px solid var(--border);
+    }
+    .flow-tab-bar button {
+      padding: 9px 16px; border: none; background: none; cursor: pointer;
+      font-size: 13px; color: var(--text-secondary); border-bottom: 2px solid transparent; margin-bottom: -1px;
+    }
+    .flow-tab-bar button.active { color: var(--primary); font-weight: 600; border-bottom-color: var(--primary); }
+    .flow-pane { display: none; }
+    .flow-pane.active { display: block; }
+    .ix-step {
+      display: grid; grid-template-columns: 36px 1fr; gap: 10px; align-items: start;
+      padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; background: #fff; margin: 0 14px 8px;
+    }
+    .ix-step i {
+      width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      background: var(--primary-light); color: var(--primary); font-style: normal; font-size: 12px; font-weight: 700;
+    }
+    .ix-step b { display: block; font-size: 13px; margin-bottom: 2px; }
+    .ix-step span { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+    .ix-step.warn i { background: #fffbeb; color: #d97706; }
+    .ix-step.fail i { background: #fef2f2; color: #dc2626; }
+    .ix-step.ok i { background: #f0fdf4; color: #16a34a; }
+    @media (max-width: 720px) {
+      .flow-split { grid-template-columns: 1fr; }
+      .flow-rules { border-right: none; border-bottom: 1px solid var(--border); max-height: none; }
+    }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand">
+        <div class="brand-icon">迭</div>
+        <div>
+          <div class="brand-text">右豹迭代需求记录</div>
+          <div class="brand-sub">PRD Demo · 产品交付研发</div>
+        </div>
+      </div>
+      <span class="sprint-pill">YBDD2.0 · 迭代 v1</span>
+    </div>
+    <div class="sidebar-scroll" data-iteration-sidebar></div>
+    <div class="sidebar-foot">FR-016 · 奖钱包合并提现<br />前端交互 / 业务流程</div>
+  </aside>
+
+  <main class="main">
+    <nav class="breadcrumb">
+      <a href="framework-shell.html">Sprint 概览</a>
+      <span> / 财务 / 奖钱包合并提现</span>
+    </nav>
+    <header class="page-header">
+      <div>
+        <h1>
+          奖钱包合并提现
+          <span class="badge badge-fr">FR-016</span>
+          <span class="badge badge-version">v2 切点账本</span>
+        </h1>
+        <p class="page-desc">一个提现入口。收益仍分三钱包入账；切点后余额只写统一字段，旧三余额冻结为旧库存。可提现 = 旧库存 + 统一余额。禁止把历史三余额加进新字段。</p>
+      </div>
+      <div class="page-header-actions">
+        <button class="btn btn-rule" id="toggleRuleDrawer" type="button">📋 需求规则</button>
+      </div>
+    </header>
+
+    <div class="page-tab-bar" role="tablist">
+      <button type="button" class="active" data-page="view-fe" role="tab">前端交互</button>
+      <button type="button" data-page="view-flow" role="tab">业务流程</button>
+    </div>
+
+    <div id="view-fe" class="page-view active">
+      <div class="demo-layout" id="feDemo">
+        <div class="glass-card scene-panel">
+          <div class="scene-head">
+            <div>
+              <h2>钱包合并提现 · 前端交互 Demo</h2>
+              <p class="scene-lead">一个提现入口。收益仍分钱包入账；切点后余额只写统一字段。点横向标签切换场景，下方为预览。</p>
+            </div>
+            <button class="btn-preview" type="button" data-preview="fe" aria-pressed="false">全屏预览</button>
+          </div>
+          <div class="scene-list">
+            <button class="scene-btn active" type="button" data-screen="home" data-desc="总收入旁今日入账；三格为已提现 / 可提现 / 提现；三张卡仅查看明细">钱包首页</button>
+            <button class="scene-btn" type="button" data-screen="withdraw" data-desc="可提现为统一余额；文案说明合并前三口袋已并入新钱包">提现页</button>
+            <button class="scene-btn" type="button" data-screen="records" data-desc="顶部入口；累计提现 / 实际到账；记录为合并后新数据">提现明细</button>
+            <button class="scene-btn" type="button" data-screen="income" data-desc="收益卡片：项目名称、收益金额、实际到账、状态、动账后收益">查看明细</button>
+            <button class="scene-btn" type="button" data-screen="books" data-desc="总收入 ≠ 可提现；旧库存只减不增">账本对照</button>
+          </div>
+          <p class="scene-hint" id="feSceneHint">总收入旁今日入账；三格为已提现 / 可提现 / 提现；三张卡仅查看明细</p>
+          <div class="scene-tools">
+            <button class="btn-ghost-sm" type="button" data-wallet-tool="sim-credit">模拟新结算 +1.35</button>
+            <button class="btn-ghost-sm" type="button" data-wallet-tool="reset">重置账本</button>
+          </div>
+        </div>
+        <div class="glass-card mockup-panel">
+          <div class="mockup-frame-wrap">
+            <iframe id="mockupFrame" title="钱包合并提现 Mockup" src="about:blank"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div id="view-flow" class="page-view">
+      <div class="glass-card flow-page">
+        <div class="flow-tab-bar" role="tablist">
+          <button type="button" class="active" data-flow="flow-payout" role="tab">流程1 · 收益打款入账</button>
+          <button type="button" data-flow="flow-withdraw" role="tab">流程2 · 用户合并提现</button>
+        </div>
+
+        <div id="flow-payout" class="flow-pane active">
+          <p class="flow-page-intro">扣税发生在<strong>后台打款入账</strong>，不在用户点提现时。只有云账户应税接口扣税成功，才写入实际到账，并同步增加可提现。</p>
+          <div class="flow-split">
+            <div class="flow-rules">
+              <h3 class="flow-rules-title">规则说明</h3>
+              <div class="ix-step"><i>1</i><div><b>后台操作打款</b><span>运营对订单 / 收益批次发起打款。用户侧此时还不能把这笔钱提走。</span></div></div>
+              <div class="ix-step"><i>2</i><div><b>录入已结算收益</b><span>将该笔记入对应用户、对应钱包的已结算收益：收益金额=打款额，状态=扣税中，实际到账暂为 0。</span></div></div>
+              <div class="ix-step"><i>3</i><div><b>调取云账户「钱包余额应税」接口</b><span>用该笔已结算收益调应税接口，替换原提现扣税接口。税率与税额以接口返回为准。</span></div></div>
+              <div class="ix-step ok"><i>4</i><div><b>扣税成功 → 写入实际到账</b><span>实际到账金额 = 收益金额 − 接口返回税额。状态改为已到账。收益明细展示扣税文案。</span></div></div>
+              <div class="ix-step ok"><i>5</i><div><b>同时增加可提现余额</b><span>切点后：统一余额 += 实际到账金额；旧三钱包库存不回写。切点前历史库存保持冻结，只减不增。</span></div></div>
+              <div class="ix-step fail"><i>×</i><div><b>扣税失败</b><span>状态=到账失败，回写失败原因；不写实际到账；可提现不增加。用户可在收益卡片点说明 icon 看原因。</span></div></div>
+            </div>
+            <div class="flow-diagram">
+          <div class="flow-svg-wrap">
+            <svg width="1080" height="560" viewBox="0 0 1080 560" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <marker id="flow-arrow-pay" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                  <path d="M0,0 L8,4 L0,8 Z" fill="#94a3b8" />
+                </marker>
+              </defs>
+              <g class="flow-edges" marker-end="url(#flow-arrow-pay)">
+                <line x1="540" y1="56" x2="540" y2="80" />
+                <line x1="540" y1="144" x2="540" y2="168" />
+                <line x1="540" y1="232" x2="540" y2="256" />
+                <polyline points="440,296 260,296" />
+                <line x1="540" y1="336" x2="540" y2="360" />
+                <line x1="540" y1="440" x2="540" y2="464" />
+              </g>
+              <g class="flow-nodes" font-family="Inter, PingFang SC, sans-serif">
+                <rect x="340" y="16" width="400" height="40" rx="8" fill="#eff6ff" stroke="#2563eb" />
+                <text x="540" y="41" text-anchor="middle" font-size="12" fill="#18222f">后台对收益批次发起打款</text>
+
+                <rect x="320" y="80" width="440" height="64" rx="8" fill="#f0fdf4" stroke="#16a34a" />
+                <text x="540" y="106" text-anchor="middle" font-size="12" fill="#18222f">写入已结算收益（收益金额）</text>
+                <text x="540" y="126" text-anchor="middle" font-size="10" fill="#64748b">分钱包流水 · 状态=扣税中 · 实际到账=0</text>
+
+                <rect x="320" y="168" width="440" height="64" rx="8" fill="#fff7ed" stroke="#ea580c" />
+                <text x="540" y="194" text-anchor="middle" font-size="12" fill="#18222f">调用云账户 · 钱包余额应税接口</text>
+                <text x="540" y="214" text-anchor="middle" font-size="10" fill="#64748b">替换原提现扣税 · 税额以返回为准</text>
+
+                <polygon points="540,256 640,296 540,336 440,296" fill="#fffbeb" stroke="#d97706" />
+                <text x="540" y="300" text-anchor="middle" font-size="12" fill="#92400e">扣税成功?</text>
+                <text x="328" y="284" font-size="11" fill="#dc2626">否</text>
+                <rect x="40" y="264" width="220" height="64" rx="8" fill="#fef2f2" stroke="#dc2626" />
+                <text x="150" y="290" text-anchor="middle" font-size="12" fill="#991b1b">到账失败</text>
+                <text x="150" y="310" text-anchor="middle" font-size="10" fill="#64748b">不增加可提现 · 记失败原因</text>
+                <text x="552" y="352" font-size="11" fill="#16a34a">是</text>
+
+                <rect x="320" y="360" width="440" height="80" rx="8" fill="#f0fdf4" stroke="#16a34a" />
+                <text x="540" y="390" text-anchor="middle" font-size="12" fill="#18222f">写入实际到账金额</text>
+                <text x="540" y="410" text-anchor="middle" font-size="10" fill="#64748b">实际到账 = 收益金额 − 税额</text>
+                <text x="540" y="426" text-anchor="middle" font-size="10" fill="#64748b">状态=已到账</text>
+
+                <rect x="320" y="464" width="440" height="80" rx="8" fill="#f0fdf4" stroke="#16a34a" />
+                <text x="540" y="494" text-anchor="middle" font-size="12" fill="#18222f">同时：可提现余额增加实际到账</text>
+                <text x="540" y="514" text-anchor="middle" font-size="10" fill="#64748b">切点后只加统一余额，禁止回写旧库存</text>
+                <text x="540" y="530" text-anchor="middle" font-size="10" fill="#64748b">用户收益明细可见动账后收益</text>
+              </g>
+            </svg>
+          </div>
+            </div>
+          </div>
+          <div class="flow-legend">
+            <span><i style="background:#eff6ff;border:1px solid #2563eb"></i>前端 / 操作</span>
+            <span><i style="background:#f0fdf4;border:1px solid #16a34a"></i>后端 / 写入</span>
+            <span><i style="background:#fff7ed;border:1px solid #ea580c"></i>异步 / 任务</span>
+            <span><i style="background:#fffbeb;border:1px solid #d97706"></i>校验 / 分支</span>
+            <span><i style="background:#fef2f2;border:1px solid #dc2626"></i>阻断 / 驳回</span>
+          </div>
+        </div>
+
+        <div id="flow-withdraw" class="flow-pane">
+          <p class="flow-page-intro">用户提现不再扣税。可提现 = 冻结旧库存 + 统一余额（已是税后实际到账）。一个入口一次打款。</p>
+          <div class="flow-split">
+            <div class="flow-rules">
+              <h3 class="flow-rules-title">规则说明</h3>
+              <div class="ix-step"><i>1</i><div><b>打开钱包首页</b><span>展示总收入、已提现、可提现。三张卡不再分别提现。</span></div></div>
+              <div class="ix-step"><i>2</i><div><b>校验到账账户</b><span>未绑定则阻断，引导去绑定。</span></div></div>
+              <div class="ix-step"><i>3</i><div><b>提交提现金额</b><span>金额须 ≤ 可提现。待入账不计入。文案提示合并前三口袋已并入新钱包。</span></div></div>
+              <div class="ix-step"><i>4</i><div><b>拆分扣减</b><span>旧项目 → 旧团队 → 旧活动 → 统一余额。拆分合计=申请额，打款仍一笔。</span></div></div>
+              <div class="ix-step ok"><i>5</i><div><b>写入统一提现记录</b><span>出现在顶部「提现明细」（合并后新数据）。各钱包查看明细里的提现 Tab 只保留合并前旧记录。</span></div></div>
+            </div>
+            <div class="flow-diagram">
+          <div class="flow-svg-wrap">
+            <svg width="1080" height="680" viewBox="0 0 1080 680" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <marker id="flow-arrow-wd" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                  <path d="M0,0 L8,4 L0,8 Z" fill="#94a3b8" />
+                </marker>
+              </defs>
+              <g class="flow-edges" marker-end="url(#flow-arrow-wd)">
+                <line x1="540" y1="56" x2="540" y2="80" />
+                <line x1="540" y1="144" x2="540" y2="168" />
+                <polyline points="460,208 200,208" />
+                <line x1="540" y1="248" x2="540" y2="272" />
+                <line x1="540" y1="336" x2="540" y2="360" />
+                <polyline points="460,400 200,400" />
+                <line x1="540" y1="440" x2="540" y2="464" />
+                <line x1="540" y1="548" x2="540" y2="572" />
+              </g>
+              <g class="flow-nodes" font-family="Inter, PingFang SC, sans-serif">
+                <rect x="360" y="16" width="360" height="40" rx="8" fill="#eff6ff" stroke="#2563eb" />
+                <text x="540" y="41" text-anchor="middle" font-size="12" fill="#18222f">用户打开钱包页</text>
+
+                <rect x="320" y="80" width="440" height="64" rx="8" fill="#f0fdf4" stroke="#16a34a" />
+                <text x="540" y="106" text-anchor="middle" font-size="12" fill="#18222f">可提现 = 冻结旧库存 + 统一余额</text>
+                <text x="540" y="126" text-anchor="middle" font-size="10" fill="#64748b">待入账不计 · 此余额已是税后</text>
+
+                <polygon points="540,168 620,208 540,248 460,208" fill="#fffbeb" stroke="#d97706" />
+                <text x="540" y="212" text-anchor="middle" font-size="11" fill="#92400e">已绑提现账户?</text>
+                <text x="336" y="200" font-size="11" fill="#dc2626">否</text>
+                <rect x="40" y="188" width="160" height="40" rx="8" fill="#fef2f2" stroke="#dc2626" />
+                <text x="120" y="213" text-anchor="middle" font-size="11" fill="#991b1b">阻断 · 去绑定</text>
+                <text x="552" y="264" font-size="11" fill="#16a34a">是</text>
+
+                <rect x="360" y="272" width="360" height="64" rx="8" fill="#eff6ff" stroke="#2563eb" />
+                <text x="540" y="298" text-anchor="middle" font-size="12" fill="#18222f">首页唯一「提现」入口</text>
+                <text x="540" y="318" text-anchor="middle" font-size="10" fill="#64748b">不再分三个钱包提现</text>
+
+                <polygon points="540,360 620,400 540,440 460,400" fill="#fffbeb" stroke="#d97706" />
+                <text x="540" y="404" text-anchor="middle" font-size="11" fill="#92400e">金额≤可提现?</text>
+                <text x="336" y="392" font-size="11" fill="#dc2626">否</text>
+                <rect x="40" y="380" width="160" height="40" rx="8" fill="#fef2f2" stroke="#dc2626" />
+                <text x="120" y="405" text-anchor="middle" font-size="11" fill="#991b1b">拦截提交</text>
+                <text x="552" y="456" font-size="11" fill="#16a34a">是</text>
+
+                <rect x="320" y="464" width="440" height="84" rx="8" fill="#f0fdf4" stroke="#16a34a" />
+                <text x="540" y="494" text-anchor="middle" font-size="12" fill="#18222f">拆分扣减后一笔打款</text>
+                <text x="540" y="514" text-anchor="middle" font-size="10" fill="#64748b">旧项目 → 旧团队 → 旧活动 → 统一余额</text>
+                <text x="540" y="530" text-anchor="middle" font-size="10" fill="#64748b">提现不再调用应税接口</text>
+
+                <rect x="360" y="572" width="360" height="56" rx="8" fill="#fff7ed" stroke="#ea580c" />
+                <text x="540" y="596" text-anchor="middle" font-size="12" fill="#18222f">写入合并后提现明细</text>
+                <text x="540" y="614" text-anchor="middle" font-size="10" fill="#64748b">旧记录仍在各钱包提现明细</text>
+              </g>
+            </svg>
+          </div>
+            </div>
+          </div>
+          <div class="flow-legend">
+            <span><i style="background:#eff6ff;border:1px solid #2563eb"></i>前端 / 操作</span>
+            <span><i style="background:#f0fdf4;border:1px solid #16a34a"></i>后端 / 写入</span>
+            <span><i style="background:#fff7ed;border:1px solid #ea580c"></i>异步 / 任务</span>
+            <span><i style="background:#fffbeb;border:1px solid #d97706"></i>校验 / 分支</span>
+            <span><i style="background:#fef2f2;border:1px solid #dc2626"></i>阻断 / 驳回</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="drawer-overlay" id="ruleOverlay" onclick="setRuleDrawer(false)"></div>
+  <aside class="drawer" id="ruleDrawer" role="dialog" aria-labelledby="ruleTitle">
+    <div class="drawer-header">
+      <h2 id="ruleTitle">FR-016 · v1 需求规则</h2>
+      <button class="drawer-close" type="button" onclick="setRuleDrawer(false)">×</button>
+    </div>
+    <div class="drawer-body">
+      <div id="rule-fe" class="rule-panel active">
+        <div class="rule-section">
+          <h3><span>1</span>业务目标</h3>
+          <div class="rule-content">
+            <p>一个提现入口。收益分钱包入账不变；切点后余额只写统一字段，旧三余额冻结。可提现 = 冻结旧库存 + 统一余额。</p>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>2</span>页面</h3>
+          <div class="rule-content">
+            <ul>
+              <li><strong>钱包首页</strong>：今日入账贴在总收入旁；三格为已提现、可提现、提现。三张卡去掉操作按钮，灰色字段为累计已结算 / 累计待入账。</li>
+              <li><strong>提现页</strong>：可提现为新钱包统一余额；文案「合并前可提现余额 xx.xx 元(项目:xx;团队:xx,活动:xx)，已全部合并进新钱包的可提现余额里」。待入账不计。</li>
+              <li><strong>提现明细</strong>：顶栏右侧进入；展示累计提现 / 实际到账（无预扣税额），记录含实际到账、提现ID、申请时间、打款时间；「提现记录」旁提示「以下数据为钱包合并提现后的新数据，旧数据仍在各个钱包的提现明细页面查看」。</li>
+              <li><strong>查看明细</strong>：收益明细顶部统计累计已结算 / 实际到账 / 预扣税额；卡片标题为项目名称 + 收益金额，其下为实际到账金额与状态（扣税中 / 已到账 / 到账失败，失败可点 icon 看原因）；描述保留并追加扣税文案；底部为时间戳与动账后收益。提现明细同现网记录页，标题旁提示「以下数据为合并提现前的钱包提现记录」。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>3</span>交互</h3>
+          <div class="rule-content">
+            <ul>
+              <li>未选到账方式：点确定 Toast「请选择到账方式」，停留在提现页。</li>
+              <li>金额为空或超合计：拦截，不提交。</li>
+              <li>待入款不计入可提现。</li>
+              <li>提现页提示：合并前可提现余额已全部并入新钱包可提现。</li>
+              <li>提现不再扣税。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>4</span>收益打款入账</h3>
+          <div class="rule-content">
+            <ul>
+              <li>后台操作打款 → 将用户收益录入已结算收益（状态扣税中）。</li>
+              <li>调取云账户「钱包余额应税」接口；税额以返回为准。</li>
+              <li>扣税成功：写入实际到账金额，同时可提现（统一余额）增加实际到账；禁止回写旧库存。</li>
+              <li>扣税失败：到账失败并记原因，可提现不增加。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>5</span>业务流程</h3>
+          <div class="rule-content"><p>见页内「业务流程」Tab：流程1 收益打款入账、流程2 用户合并提现。</p></div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <script src="sidebar-nav.js"></script>
+  <script>
+    function getActiveScreen() {
+      return document.querySelector('.scene-list .scene-btn.active')?.dataset.screen || 'home';
+    }
+    function currentTabKey() {
+      var id = document.querySelector('.page-view.active')?.id;
+      return { 'view-fe': 'fe', 'view-flow': 'flow' }[id] || 'fe';
+    }
+    function currentFlowKey() {
+      return document.querySelector('.flow-tab-bar button.active')?.dataset.flow || 'flow-payout';
+    }
+    function syncPageUrl() {
+      var params = new URLSearchParams();
+      params.set('tab', currentTabKey());
+      if (currentTabKey() === 'flow') params.set('flow', currentFlowKey());
+      history.replaceState(null, '', '?' + params.toString());
+    }
+    function loadMockupFrame() {
+      document.getElementById('mockupFrame').src = 'wallet-merge-withdraw-demo.html?embed=1&v=16&screen=' + getActiveScreen();
+    }
+    function setPreviewButtons(on) {
+      document.querySelectorAll('[data-preview]').forEach(function (b) {
+        b.textContent = on ? '退出全屏' : '全屏预览';
+        b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
+    }
+    function isPreviewOn() {
+      return !!(document.fullscreenElement || document.webkitFullscreenElement || document.body.classList.contains('preview-fs-fallback'));
+    }
+    function exitPreview() {
+      document.body.classList.remove('preview-fs-fallback');
+      document.querySelectorAll('.demo-layout').forEach(function (el) { el.classList.remove('is-preview'); });
+      setPreviewButtons(false);
+      if (document.fullscreenElement || document.webkitFullscreenElement) {
+        var exitFs = document.exitFullscreen || document.webkitExitFullscreen;
+        if (exitFs) {
+          var done = exitFs.call(document);
+          if (done && done.catch) done.catch(function () {});
+        }
+      }
+    }
+    function togglePreview() {
+      var layout = document.getElementById('feDemo');
+      if (!layout) return;
+      if (isPreviewOn()) { exitPreview(); return; }
+      layout.classList.add('is-preview');
+      setPreviewButtons(true);
+      var req = layout.requestFullscreen || layout.webkitRequestFullscreen;
+      if (req) {
+        req.call(layout).catch(function () { document.body.classList.add('preview-fs-fallback'); });
+      } else {
+        document.body.classList.add('preview-fs-fallback');
+      }
+    }
+    var ruleDrawer = document.getElementById('ruleDrawer');
+    var toggleRuleBtn = document.getElementById('toggleRuleDrawer');
+    function setRuleDrawer(open) {
+      ruleDrawer.classList.toggle('open', open);
+      document.getElementById('ruleOverlay').classList.toggle('open', open);
+      toggleRuleBtn.classList.toggle('active', open);
+    }
+    toggleRuleBtn.onclick = function () { setRuleDrawer(!ruleDrawer.classList.contains('open')); };
+    document.querySelectorAll('.scene-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('.scene-btn').forEach(function (b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        var hint = document.getElementById('feSceneHint');
+        if (hint) hint.textContent = btn.getAttribute('data-desc') || '';
+        loadMockupFrame();
+        syncPageUrl();
+      });
+    });
+    document.querySelectorAll('[data-wallet-tool]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var frame = document.getElementById('mockupFrame');
+        if (frame && frame.contentWindow) {
+          frame.contentWindow.postMessage({ type: 'walletTool', act: btn.getAttribute('data-wallet-tool') }, '*');
+        }
+      });
+    });
+    document.querySelectorAll('[data-preview]').forEach(function (btn) {
+      btn.addEventListener('click', function () { togglePreview(); });
+    });
+    document.addEventListener('fullscreenchange', function () {
+      if (!document.fullscreenElement && !document.webkitFullscreenElement) exitPreview();
+    });
+    document.querySelectorAll('.page-tab-bar button').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('.page-tab-bar button').forEach(function (b) { b.classList.remove('active'); });
+        document.querySelectorAll('.page-view').forEach(function (v) { v.classList.remove('active'); });
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.page).classList.add('active');
+        if (btn.dataset.page === 'view-fe') loadMockupFrame();
+        syncPageUrl();
+      });
+    });
+    document.querySelectorAll('.flow-tab-bar button').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('.flow-tab-bar button').forEach(function (b) { b.classList.remove('active'); });
+        document.querySelectorAll('.flow-pane').forEach(function (p) { p.classList.remove('active'); });
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.flow).classList.add('active');
+        syncPageUrl();
+      });
+    });
+    loadMockupFrame();
+    (function boot() {
+      var params = new URLSearchParams(location.search);
+      var tab = params.get('tab');
+      var map = { flow: 'view-flow', fe: 'view-fe' };
+      if (tab === 'admin') tab = 'fe';
+      if (tab && map[tab]) {
+        document.querySelectorAll('.page-tab-bar button').forEach(function (b) {
+          if (b.dataset.page === map[tab]) b.click();
+        });
+      }
+      var flow = params.get('flow');
+      if (flow) {
+        var fbtn = document.querySelector('.flow-tab-bar button[data-flow="' + flow + '"]');
+        if (fbtn) fbtn.click();
+      }
+    })();
+  </script>
+</body>
+</html>

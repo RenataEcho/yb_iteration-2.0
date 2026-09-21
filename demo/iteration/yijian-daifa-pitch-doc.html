@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-pitch-store="fr014-pitch-brief-v6">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>右豹一键代发 · 业务说明</title>
+  <style>
+    :root { --orange: #ff6b1a; --ink: #1a2332; --muted: #6b7280; --line: #e6e8eb; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: #ece8e4;
+      color: var(--ink);
+    }
+    .bar {
+      max-width: 880px; margin: 0 auto; padding: 12px 16px;
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 12px; color: var(--muted);
+    }
+    .bar a { color: var(--orange); text-decoration: none; }
+    .bar .actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+    .bar button {
+      border: 0; background: var(--orange); color: #fff;
+      border-radius: 8px; padding: 7px 12px; cursor: pointer; font-size: 12px;
+    }
+    .bar .btn-ghost { background: #fff; color: var(--ink); border: 1px solid var(--line); }
+    .doc {
+      max-width: 880px; margin: 0 auto 40px; background: #fff;
+      padding: 36px 40px 48px; box-shadow: 0 10px 30px rgba(26,35,50,.08);
+      user-select: text; -webkit-user-select: text;
+    }
+    .doc.is-editing { outline: 2px dashed var(--orange); outline-offset: 4px; }
+    .doc.is-editing :focus { background: #fff7ed; }
+    .meta { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+    h1 { font-size: 26px; font-weight: 700; line-height: 1.35; margin-bottom: 10px; }
+    .sub {
+      font-size: 14px; color: var(--muted); line-height: 1.7;
+      padding-bottom: 16px; margin-bottom: 20px; border-bottom: 1px solid var(--line);
+    }
+    h2 { font-size: 17px; font-weight: 700; margin: 26px 0 10px; line-height: 1.45; }
+    h3 { font-size: 14px; font-weight: 700; margin: 16px 0 8px; color: #c2410c; }
+    p { font-size: 15px; line-height: 1.85; margin-bottom: 10px; }
+    ul, ol { margin: 0 0 12px 1.35em; }
+    li { font-size: 15px; line-height: 1.8; margin-bottom: 4px; }
+    .note {
+      font-size: 13px; color: var(--muted); line-height: 1.7;
+      margin-top: 28px; padding-top: 14px; border-top: 1px solid var(--line);
+    }
+    .flow-chart {
+      margin: 12px 0 18px; padding: 12px 8px 10px;
+      background: #f8fafc; border: 1px solid var(--line); border-radius: 12px;
+    }
+    .flow-chart figcaption {
+      font-size: 12px; font-weight: 700; color: #475569; margin: 0 10px 6px;
+    }
+    .flow-md { display: none; }
+    .flow-svg-wrap { overflow: auto; padding: 4px 8px 8px; }
+    .flow-svg-wrap svg { display: block; margin: 0 auto; min-width: 920px; }
+    .flow-edges line, .flow-edges polyline { stroke: #94a3b8; stroke-width: 1.5; fill: none; }
+    .flow-legend {
+      display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
+      padding: 4px 8px 8px; font-size: 11px; color: #64748b;
+    }
+    .flow-legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 4px; vertical-align: -2px; }
+    html.embed .bar {
+      display: flex !important; position: sticky; top: 0; z-index: 8;
+      background: #ece8e4; max-width: none;
+    }
+    html.embed .bar .back { display: none; }
+    html.embed .doc { margin: 0 auto 24px; box-shadow: none; }
+    @media (max-width: 700px) { .doc { padding: 22px 16px 32px; } }
+    @media print {
+      .bar { display: none !important; }
+      body { background: #fff; }
+      .doc { box-shadow: none; margin: 0; max-width: none; padding: 0; }
+      .flow-chart { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bar">
+    <a class="back" href="fr-opc-yijian-daifa.html?tab=pitch">← 招商物料</a>
+    <div class="actions">
+      <button type="button" class="btn-ghost" id="pitchReset">还原</button>
+      <button type="button" class="btn-ghost" id="pitchEdit" aria-pressed="false">编辑</button>
+      <button type="button" id="pitchCopy">复制 Markdown</button>
+    </div>
+  </div>
+  <article class="doc sheet">
+    <div class="meta">右豹 · 对外业务说明 · 含流程图 · 可复制到微信 / Word / 邮件</div>
+    <h1>一键代发业务说明</h1>
+    <p class="sub">本文说明「一键代发」是什么、怎么走、有哪些必须遵守的规则。分成比例、授权项目、是否免审以商务与运营书面确认为准。页内流程图与产品「业务流程」同规范：正交折线、失败/驳回接到起点顶边。点「复制 Markdown」后，流程图是带回环的 Mermaid。</p>
+
+    <h2>一、业务是什么</h2>
+    <p>一键代发把「做片」和「发片变现」拆开：有制作能力的人把图集、视频成片供到平台；没有制作能力、但有项目资格和关键词的人领取成片去发布。关键词产生的订单收益，按事先约定的分成结算。</p>
+    <p>一句话：把会做片的人和会发片的人接在同一条项目链上，按关键词订单分成。</p>
+    <p>它不替代现有的项目、申词、回填、结算中台，也不做成「人人上传自制剪辑」，更不是代运营整号或平台替用户发抖音。平台提供成片、发布技巧，以及下载成功后拉起抖音相册；发布动作仍在领取人侧。</p>
+
+    <h2>二、总流程图</h2>
+    <figure class="flow-chart no-edit">
+      <figcaption>图1 · 总流程（失败/超时必须回到起点，形成闭环）</figcaption>
+      <pre class="flow-md">flowchart TD
+  A[扫码招募] --> B[后台录入]
+  B -->|未录入或已停用| A
+  B --> C[电脑交稿]
+  C -->|未授权或项目禁用| C
+  C -->|上传失败只重失败文件| C
+  C --> D{右豹或站外}
+  D -->|右豹| E[平台审核]
+  E -->|已驳回须重传| C
+  E -->|通过且空闲| F[作品广场]
+  F --> G[选词领取]
+  G -->|门禁失败| F
+  G --> H{24h 内回填?}
+  H -->|是| I[占用结束]
+  I --> J[订单结算分成]
+  J --> F
+  H -->|否 释放不退次| F
+  D -->|站外| K[链接或二维码]
+  K --> L[无登录按份下载]
+  L -->|夹内还有余量| K
+      L -->|已领完| K</pre>
+      <div class="flow-svg-wrap">
+        <svg width="920" height="780" viewBox="0 0 920 780" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="pitch-arr-1" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+              <path d="M0,0 L8,4 L0,8 Z" fill="#94a3b8" />
+            </marker>
+          </defs>
+          <g class="flow-edges" marker-end="url(#pitch-arr-1)">
+            <line x1="460" y1="56" x2="460" y2="80" />
+            <line x1="380" y1="120" x2="200" y2="120" />
+            <polyline points="40,140 16,140 16,16 280,16" />
+            <line x1="460" y1="160" x2="460" y2="184" />
+            <line x1="460" y1="232" x2="460" y2="256" />
+            <line x1="540" y1="296" x2="700" y2="296" />
+            <line x1="790" y1="308" x2="790" y2="328" />
+            <line x1="790" y1="368" x2="790" y2="388" />
+            <polyline points="880,416 904,416 904,328 880,328" />
+            <line x1="460" y1="336" x2="460" y2="360" />
+            <line x1="380" y1="400" x2="200" y2="400" />
+            <polyline points="40,420 24,420 24,184 280,184" />
+            <line x1="460" y1="440" x2="460" y2="464" />
+            <line x1="460" y1="504" x2="460" y2="528" />
+            <line x1="280" y1="548" x2="160" y2="548" />
+            <polyline points="40,568 8,568 8,464 280,464" />
+            <line x1="460" y1="568" x2="460" y2="592" />
+            <line x1="540" y1="632" x2="700" y2="632" />
+            <polyline points="880,660 904,660 904,464 640,464" />
+            <line x1="460" y1="672" x2="460" y2="696" />
+            <polyline points="40,724 8,724 8,464 280,464" />
+          </g>
+          <g class="flow-nodes" font-family="PingFang SC, Microsoft YaHei, sans-serif">
+            <rect x="280" y="16" width="360" height="40" rx="6" fill="#dbeafe" stroke="#2563eb" />
+            <text x="460" y="41" text-anchor="middle" font-size="12" fill="#1e40af">扫码招募 · 客服接入</text>
+
+            <polygon points="460,80 540,120 460,160 380,120" fill="#fef9c3" stroke="#ca8a04" />
+            <text x="460" y="124" text-anchor="middle" font-size="11" fill="#854d0e">已录入且开通?</text>
+            <text x="256" y="112" font-size="10" fill="#dc2626">否</text>
+            <rect x="40" y="100" width="160" height="40" rx="6" fill="#fecaca" stroke="#dc2626" />
+            <text x="120" y="125" text-anchor="middle" font-size="11" fill="#991b1b">阻断上传</text>
+            <text x="472" y="176" font-size="10" fill="#16a34a">是</text>
+
+            <rect x="280" y="184" width="360" height="48" rx="6" fill="#dbeafe" stroke="#2563eb" />
+            <text x="460" y="213" text-anchor="middle" font-size="12" fill="#1e40af">电脑交稿 · 失败只重失败文件</text>
+
+            <polygon points="460,256 540,296 460,336 380,296" fill="#fef9c3" stroke="#ca8a04" />
+            <text x="460" y="300" text-anchor="middle" font-size="11" fill="#854d0e">走右豹渠道?</text>
+            <text x="556" y="284" font-size="10" fill="#dc2626">否 · 站外</text>
+            <rect x="700" y="268" width="180" height="40" rx="6" fill="#e2e8f0" stroke="#94a3b8" />
+            <text x="790" y="293" text-anchor="middle" font-size="11" fill="#475569">免审 · 不进广场</text>
+            <rect x="700" y="328" width="180" height="40" rx="6" fill="#dbeafe" stroke="#2563eb" />
+            <text x="790" y="353" text-anchor="middle" font-size="11" fill="#1e40af">链接 / 二维码</text>
+            <rect x="700" y="388" width="180" height="56" rx="6" fill="#dcfce7" stroke="#16a34a" />
+            <text x="790" y="412" text-anchor="middle" font-size="11" fill="#166534">无登录按份下载</text>
+            <text x="790" y="430" text-anchor="middle" font-size="10" fill="#64748b">下一份回到落地页</text>
+            <text x="472" y="352" font-size="10" fill="#16a34a">是</text>
+
+            <polygon points="460,360 540,400 460,440 380,400" fill="#fef9c3" stroke="#ca8a04" />
+            <text x="460" y="404" text-anchor="middle" font-size="11" fill="#854d0e">审核通过?</text>
+            <text x="256" y="392" font-size="10" fill="#dc2626">否 · 驳回</text>
+            <rect x="40" y="380" width="160" height="40" rx="6" fill="#fecaca" stroke="#dc2626" />
+            <text x="120" y="405" text-anchor="middle" font-size="11" fill="#991b1b">已驳回须重传</text>
+            <text x="472" y="456" font-size="10" fill="#16a34a">是</text>
+
+            <rect x="280" y="464" width="360" height="40" rx="6" fill="#dcfce7" stroke="#16a34a" />
+            <text x="460" y="489" text-anchor="middle" font-size="12" fill="#166534">作品广场 · 仅空闲已通过</text>
+
+            <rect x="280" y="528" width="360" height="40" rx="6" fill="#dbeafe" stroke="#2563eb" />
+            <text x="460" y="553" text-anchor="middle" font-size="12" fill="#1e40af">选词领取</text>
+            <text x="168" y="540" font-size="10" fill="#dc2626">门禁失败</text>
+            <rect x="40" y="528" width="120" height="40" rx="6" fill="#fecaca" stroke="#dc2626" />
+            <text x="100" y="553" text-anchor="middle" font-size="11" fill="#991b1b">不扣次</text>
+
+            <polygon points="460,592 540,632 460,672 380,632" fill="#fef9c3" stroke="#ca8a04" />
+            <text x="460" y="636" text-anchor="middle" font-size="11" fill="#854d0e">24h 内回填?</text>
+            <text x="556" y="620" font-size="10" fill="#16a34a">是</text>
+            <rect x="700" y="604" width="180" height="56" rx="6" fill="#dcfce7" stroke="#16a34a" />
+            <text x="790" y="628" text-anchor="middle" font-size="11" fill="#166534">占用结束 · 结算分成</text>
+            <text x="790" y="646" text-anchor="middle" font-size="10" fill="#64748b">看其他稿回广场</text>
+            <text x="472" y="688" font-size="10" fill="#dc2626">否</text>
+
+            <rect x="280" y="696" width="360" height="56" rx="6" fill="#ffedd5" stroke="#ea580c" />
+            <text x="460" y="720" text-anchor="middle" font-size="12" fill="#9a3412">释放 · 不退次 · 回广场</text>
+            <text x="460" y="738" text-anchor="middle" font-size="10" fill="#64748b">回环接到广场顶边</text>
+          </g>
+        </svg>
+      </div>
+      <div class="flow-legend">
+        <span><i style="background:#dbeafe;border:1px solid #2563eb"></i>操作</span>
+        <span><i style="background:#dcfce7;border:1px solid #16a34a"></i>完成 / 写入</span>
+        <span><i style="background:#ffedd5;border:1px solid #ea580c"></i>超时 / 释放</span>
+        <span><i style="background:#fef9c3;border:1px solid #ca8a04"></i>校验</span>
+        <span><i style="background:#fecaca;border:1px solid #dc2626"></i>阻断 / 驳回</span>
+        <span><i style="background:#e2e8f0;border:1px solid #94a3b8"></i>站外旁路</span>
+      </div>
+    </figure>
+
+    <h2>三、三类角色</h2>
+    <ul>
+      <li>剪辑手：经客服接入、后台录入后，在电脑端为授权项目供图集或视频，按领取后的关键词订单分成。</li>
+      <li>领取用户：在 App 领取成片、限时回填发布；列表不展示金额，详情只展示分成比例。</li>
+      <li>运营：录入剪辑手、审稿、配项目与次数、处理停权恢复；不在 C 端给剪辑手开上传口。</li>
+    </ul>
+
+    <h2>四、剪辑手规则</h2>
+    <h3>入驻</h3>
+    <ul>
+      <li>没有线上申请表，没有 App 上传。海报（PC 招募位、C 端广场招募帧）只有卖点和客服码。</li>
+      <li>扫码不等于入驻。运营必须录入：右豹 ID、分成比例、是否需要审核、发布平台（右豹 / 站外，至少选一个）、可上传项目。</li>
+      <li>未录入或已停用：不能上传；招募说明仍可看。停用后点上传会提示权限已收回。</li>
+      <li>停用不因「名下还有稿 / 有人占用」而拦截；但名下仍有稿时不能删除该剪辑手账号。</li>
+    </ul>
+    <h3>交稿</h3>
+    <ul>
+      <li>只在电脑「创作者中心 → 剪辑供稿」。一次只能：一个项目 + 一本书 + 一种类型（图集或视频）。</li>
+      <li>顺序不可颠倒：先填项目、书名 / 书 ID / 链接、类型、素材类型，再选文件夹或压缩包。不要先选文件再回头补字段。</li>
+      <li>视频：文件名（去后缀）= 标题。图集：一个文件夹一条，文件夹名 = 标题；不要把所有图平铺在一个大文件夹。</li>
+      <li>压缩包会先「解压中」再解析；文件夹直接解析。确认表可改发布技巧，也可用 AI 整表生成；空技巧也可以上传。</li>
+      <li>上传失败只重传失败文件，不重传发布技巧。解压中、上传中不要关窗。</li>
+    </ul>
+    <h3>审核（仅右豹）</h3>
+    <ul>
+      <li>录入时「稿件需要审核 = 是」：新稿默认审核中；「否」：新稿默认已通过。改成否，不回溯已经在审的稿。</li>
+      <li>审核中、已驳回不进广场。驳回必须写原因。已通过不能再驳回。</li>
+      <li>运营直接录入的稿视为已审，默认已通过。</li>
+    </ul>
+    <h3>站外稿</h3>
+    <ul>
+      <li>不进广场、不审核、无发布技巧、无素材类型。以文件夹分享链接或二维码。</li>
+      <li>对方不用登录。点一次下载立刻扣 1 个余量。已领完只出示「素材已领完」，不再给下载按钮。</li>
+    </ul>
+
+    <h2>五、领取流程图与门禁规则</h2>
+    <figure class="flow-chart no-edit">
+      <figcaption>图2 · 领取门禁（顺序不可颠倒；失败回到本门或广场）</figcaption>
+      <pre class="flow-md">flowchart TD
+  S[点领取] --> A{已停权?}
+  A -->|是| Z[无法领取 不弹层]
+  Z -.->|仅后台恢复后| S
+  A -->|否| B{次数大于0?}
+  B -->|否| C[只兑换次数 不打开选词]
+  C -->|兑换成功刷新次数| B
+  B -->|是| D{已选通过的词?}
+  D -->|未选或书ID不符| D
+  D -->|是| E{稿件空闲?}
+  E -->|否 不扣次| F[回作品广场]
+  F --> S
+      E -->|是| G[领取成功 扣次不退 独占]</pre>
+      <div class="flow-svg-wrap">
+        <svg width="920" height="700" viewBox="0 0 920 700" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="pitch-arr-2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+              <path d="M0,0 L8,4 L0,8 Z" fill="#94a3b8" />
+            </marker>
+          </defs>
+          <g class="flow-edges" marker-end="url(#pitch-arr-2)">
+            <line x1="460" y1="56" x2="460" y2="80" />
+            <line x1="540" y1="120" x2="700" y2="120" />
+            <polyline points="880,140 904,140 904,16 640,16" stroke-dasharray="4 3" />
+            <line x1="460" y1="160" x2="460" y2="184" />
+            <line x1="380" y1="224" x2="200" y2="224" />
+            <polyline points="40,244 16,244 16,184 460,184" />
+            <line x1="460" y1="264" x2="460" y2="288" />
+            <line x1="380" y1="328" x2="200" y2="328" />
+            <polyline points="40,348 24,348 24,288 460,288" />
+            <line x1="460" y1="368" x2="460" y2="392" />
+            <line x1="540" y1="432" x2="700" y2="432" />
+            <polyline points="880,460 904,460 904,16 640,16" />
+            <line x1="460" y1="472" x2="460" y2="496" />
+          </g>
+          <g class="flow-nodes" font-family="PingFang SC, Microsoft YaHei, sans-serif">
+            <rect x="280" y="16" width="360" height="40" rx="6" fill="#dbeafe" stroke="#2563eb" />
+            <text x="460" y="41" text-anchor="middle" font-size="12" fill="#1e40af">点领取</text>
+
+            <polygon points="460,80 540,120 460,160 380,120" fill="#fef9c3" stroke="#ca8a04" />
+            <text x="460" y="124" text-anchor="middle" font-size="11" fill="#854d0e">已停权?</text>
+            <text x="556" y="108" font-size="10" fill="#dc2626">是</text>
+            <rect x="700" y="100" width="180" height="40" rx="6" fill="#fecaca" stroke="#dc2626" />
+            <text x="790" y="125" text-anchor="middle" font-size="11" fill="#991b1b">无法领取 · 不弹层</text>
+            <text x="472" y="176" font-size="10" fill="#16a34a">否</text>
+
+            <polygon points="460,184 540,224 460,264 380,224" fill="#fef9c3" stroke="#ca8a04" />
+            <text x="460" y="228" text-anchor="middle" font-size="11" fill="#854d0e">剩余次数&gt;0?</text>
+            <text x="256" y="216" font-size="10" fill="#dc2626">否 · 购次</text>
+            <rect x="40" y="204" width="160" height="40" rx="6" fill="#dbeafe" stroke="#2563eb" />
+            <text x="120" y="229" text-anchor="middle" font-size="11" fill="#1e40af">只兑换次数</text>
+            <text x="472" y="280" font-size="10" fill="#16a34a">是</text>
+
+            <polygon points="460,288 540,328 460,368 380,328" fill="#fef9c3" stroke="#ca8a04" />
+            <text x="460" y="332" text-anchor="middle" font-size="11" fill="#854d0e">已选通过关键词?</text>
+            <text x="256" y="320" font-size="10" fill="#dc2626">否</text>
+            <rect x="40" y="308" width="160" height="40" rx="6" fill="#fecaca" stroke="#dc2626" />
+            <text x="120" y="333" text-anchor="middle" font-size="11" fill="#991b1b">拦截 · 不扣次</text>
+            <text x="472" y="384" font-size="10" fill="#16a34a">是</text>
+
+            <polygon points="460,392 540,432 460,472 380,432" fill="#fef9c3" stroke="#ca8a04" />
+            <text x="460" y="436" text-anchor="middle" font-size="11" fill="#854d0e">稿件空闲未占用?</text>
+            <text x="556" y="420" font-size="10" fill="#dc2626">否</text>
+            <rect x="700" y="404" width="180" height="56" rx="6" fill="#fecaca" stroke="#dc2626" />
+            <text x="790" y="428" text-anchor="middle" font-size="11" fill="#991b1b">领取失败</text>
+            <text x="790" y="446" text-anchor="middle" font-size="10" fill="#64748b">不扣次 · 回广场</text>
+            <text x="472" y="488" font-size="10" fill="#16a34a">是</text>
+
+            <rect x="280" y="496" width="360" height="56" rx="6" fill="#dcfce7" stroke="#16a34a" />
+            <text x="460" y="520" text-anchor="middle" font-size="12" fill="#166534">领取成功 · 扣次不退</text>
+            <text x="460" y="538" text-anchor="middle" font-size="10" fill="#64748b">占用并对他人隐藏</text>
+          </g>
+        </svg>
+      </div>
+      <div class="flow-legend">
+        <span><i style="background:#dbeafe;border:1px solid #2563eb"></i>操作</span>
+        <span><i style="background:#dcfce7;border:1px solid #16a34a"></i>完成 / 写入</span>
+        <span><i style="background:#fef9c3;border:1px solid #ca8a04"></i>校验</span>
+        <span><i style="background:#fecaca;border:1px solid #dc2626"></i>阻断</span>
+      </div>
+    </figure>
+    <h3>必须同时满足</h3>
+    <ul>
+      <li>门禁顺序固定：停权 → 次数 → 选词 → 资格 / 占用。次数不够不得打开选词浮层。不可跳过选词只扣次。</li>
+      <li>停权中：按钮文案「已被停权，无法领取」，不打开兑换、不打开选词。</li>
+      <li>可选的词只有两种状态：审核通过待发布、审核通过已回填。待审核、已驳回不出、不可领。无默认带入任何一条。</li>
+      <li>词上带书籍 ID 且与稿件书籍不一致：提示选与该书一致的词，不扣次。词不带书 ID 则只按项目校验。</li>
+      <li>未选词或没有已通过词：提示先选该项目已通过关键词，不扣次。</li>
+      <li>稿件被他人占用、项目禁用、未通过审核等：不扣次、不占用。</li>
+      <li>领取成功一次写入：占用中、扣次（先扣当天免费、再扣已购，不退）、领取记录为未回填、锁定当时的剪辑手 ID 与分成比例。</li>
+    </ul>
+    <h3>次数</h3>
+    <ul>
+      <li>剩余次数 = 当日免费剩余 + 已购剩余。免费按工作日 / 节假日两套配置，跨自然日重置免费，已购不重置。</li>
+      <li>积分兑换形态为「x 次需要 y 积分」，同时在售最多 4 档，可改价、下架。下架后不能新兑，已买次数保留。原价高于现价时出示划线价。</li>
+      <li>兑换成功只刷新次数，不自动弹出选词。</li>
+    </ul>
+    <h3>广场里能看见什么</h3>
+    <ul>
+      <li>必须同时成立才出现：已通过审核、当前空闲、稿件状态正常、项目启用、剪辑手已录入且开通右豹、素材类型启用、不是站外稿。缺一条就看不见。</li>
+      <li>任何列表不展示收益金额、分成、积分。详情展示分成比例，不展示金额。</li>
+      <li>未领取也可预览：图集最多看 3 张（角标仍是真实张数），视频试看 5 秒。预览不扣次、不占用、不能当下载。真机系统截屏拦不住，不要对外承诺「截不了屏」。</li>
+    </ul>
+
+    <h2>六、回填、占用与停权</h2>
+    <figure class="flow-chart no-edit">
+      <figcaption>图3 · 回填、释放与停权（释放/恢复必须回到广场）</figcaption>
+      <pre class="flow-md">flowchart TD
+  G[领取成功] --> H{24h 内回填?}
+  H -->|是| Done[占用结束 永不回广场]
+  Done --> P[回广场看其他稿]
+  H -->|否| Rel[记1次未回填 释放 不退次]
+  Rel --> Ban{终身未回填超过3次?}
+  Ban -->|否| P2[回作品广场]
+  P2 -->|再领再扣次再选词| G
+  Ban -->|是 第4次超时| Stop[停权 不能再领]
+  Stop -->|仅后台手动恢复| P2
+  P --> P2</pre>
+      <div class="flow-svg-wrap">
+        <svg width="920" height="560" viewBox="0 0 920 560" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="pitch-arr-3" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+              <path d="M0,0 L8,4 L0,8 Z" fill="#94a3b8" />
+            </marker>
+          </defs>
+          <g class="flow-edges" marker-end="url(#pitch-arr-3)">
+            <line x1="460" y1="72" x2="460" y2="96" />
+            <line x1="540" y1="136" x2="700" y2="136" />
+            <line x1="460" y1="176" x2="460" y2="200" />
+            <line x1="460" y1="256" x2="460" y2="280" />
+            <line x1="380" y1="320" x2="200" y2="320" />
+            <line x1="120" y1="340" x2="120" y2="380" />
+            <polyline points="40,400 16,400 16,16 280,16" stroke-dasharray="4 3" />
+            <line x1="460" y1="360" x2="460" y2="384" />
+            <polyline points="280,440 8,440 8,16 280,16" />
+          </g>
+          <g class="flow-nodes" font-family="PingFang SC, Microsoft YaHei, sans-serif">
+            <rect x="280" y="16" width="360" height="56" rx="6" fill="#dcfce7" stroke="#16a34a" />
+            <text x="460" y="40" text-anchor="middle" font-size="12" fill="#166534">领取成功</text>
+            <text x="460" y="58" text-anchor="middle" font-size="10" fill="#64748b">扣次不退 · 独占</text>
+
+            <polygon points="460,96 540,136 460,176 380,136" fill="#fef9c3" stroke="#ca8a04" />
+            <text x="460" y="140" text-anchor="middle" font-size="11" fill="#854d0e">24h 内已回填?</text>
+            <text x="556" y="124" font-size="10" fill="#16a34a">是</text>
+            <rect x="700" y="108" width="180" height="56" rx="6" fill="#dcfce7" stroke="#16a34a" />
+            <text x="790" y="132" text-anchor="middle" font-size="11" fill="#166534">占用结束</text>
+            <text x="790" y="150" text-anchor="middle" font-size="10" fill="#64748b">该稿永不回广场</text>
+            <text x="472" y="192" font-size="10" fill="#dc2626">否</text>
+
+            <rect x="280" y="200" width="360" height="56" rx="6" fill="#ffedd5" stroke="#ea580c" />
+            <text x="460" y="224" text-anchor="middle" font-size="12" fill="#9a3412">记 1 次未回填 + 释放</text>
+            <text x="460" y="242" text-anchor="middle" font-size="10" fill="#64748b">不退次 · 稿件回广场</text>
+
+            <polygon points="460,280 540,320 460,360 380,320" fill="#fef9c3" stroke="#ca8a04" />
+            <text x="460" y="324" text-anchor="middle" font-size="11" fill="#854d0e">终身未回填&gt;3?</text>
+            <text x="256" y="312" font-size="10" fill="#dc2626">是 · 停权</text>
+            <rect x="40" y="300" width="160" height="40" rx="6" fill="#fecaca" stroke="#dc2626" />
+            <text x="120" y="325" text-anchor="middle" font-size="11" fill="#991b1b">停权不能再领</text>
+            <rect x="40" y="380" width="160" height="40" rx="6" fill="#dcfce7" stroke="#16a34a" />
+            <text x="120" y="405" text-anchor="middle" font-size="11" fill="#166534">仅后台手动恢复</text>
+            <text x="472" y="376" font-size="10" fill="#16a34a">否 · 可再领</text>
+
+            <rect x="280" y="384" width="360" height="56" rx="6" fill="#e2e8f0" stroke="#94a3b8" />
+            <text x="460" y="408" text-anchor="middle" font-size="12" fill="#475569">回广场再领</text>
+            <text x="460" y="426" text-anchor="middle" font-size="10" fill="#64748b">再扣次 · 再选词 · 接到起点顶边</text>
+          </g>
+        </svg>
+      </div>
+      <div class="flow-legend">
+        <span><i style="background:#dcfce7;border:1px solid #16a34a"></i>完成 / 恢复</span>
+        <span><i style="background:#ffedd5;border:1px solid #ea580c"></i>超时 / 释放</span>
+        <span><i style="background:#fef9c3;border:1px solid #ca8a04"></i>校验</span>
+        <span><i style="background:#fecaca;border:1px solid #dc2626"></i>停权</span>
+        <span><i style="background:#e2e8f0;border:1px solid #94a3b8"></i>再领回环</span>
+      </div>
+    </figure>
+    <ul>
+      <li>同一成片同一时刻只被一人占用。占用中他人广场看不到，领取也失败。</li>
+      <li>领取后须在 24 小时内走该项目已有回填页。回填成功：记录变为已回填，稿件变为已完成，不再出现在广场，次数不退。</li>
+      <li>满 24 小时未回填：记原领取人 1 次未回填，稿件释放回广场。已扣次数不退。未停权的原领取人与他人都可再领，再领再扣次、再选词。</li>
+      <li>「超过 3 次」= 第 4 次超时才停权。前 3 次超时后仍可再领。按终身累计，不是滚动窗口。停权后不能再领任何稿，没有自助解禁，只能后台手动恢复。</li>
+      <li>已回填、已超时的记录不能再进回填页。</li>
+    </ul>
+
+    <h2>七、下载、水印与文案</h2>
+    <ul>
+      <li>未回填 / 已回填：领取后约 3 天内可官方下载；倒计时结束出示「下载已失效」。</li>
+      <li>已超时 Tab 只收录超时未回填，卡片文案「回填已超时」，不可下载。不再对外说「已被他人领取」。</li>
+      <li>点下载或复制链接时，提示优先顺序：时效已过 → 停权 → 24 小时未回填。</li>
+      <li>已领取详情出示一段「发布技巧」，可整段复制。底栏：添加水印、下载并发布到抖音（保存到相册后拉起抖音相册）。</li>
+      <li>水印仅图集。视频点「添加水印」提示暂不支持，不进页。未领取不能加水印。</li>
+      <li>快捷提词只提示去该项目题词页，不领取、不扣次。</li>
+    </ul>
+
+    <h2>八、分成与入账</h2>
+    <figure class="flow-chart no-edit">
+      <figcaption>图4 · 关键词订单结算如何分账（下一笔订单再进本图）</figcaption>
+      <pre class="flow-md">flowchart TD
+  O[下一笔关键词订单] --> S{是否已结算?}
+  S -->|待结算 只累计不写明细| O
+  S -->|已结算| B{该词有已回填的代发领取?}
+  B -->|否| U[全额给用户]
+  B -->|是| Split[剪辑手等于应结算乘以领取时分成快照]
+  Split --> W[用户实结等于应结算减分账]
+  W --> In[两边同时入账 同一笔只落一次]
+  U --> O
+      In --> O</pre>
+      <div class="flow-svg-wrap">
+        <svg width="920" height="520" viewBox="0 0 920 520" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="pitch-arr-4" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+              <path d="M0,0 L8,4 L0,8 Z" fill="#94a3b8" />
+            </marker>
+          </defs>
+          <g class="flow-edges" marker-end="url(#pitch-arr-4)">
+            <line x1="460" y1="72" x2="460" y2="96" />
+            <line x1="380" y1="136" x2="200" y2="136" />
+            <polyline points="40,156 16,156 16,16 280,16" />
+            <line x1="460" y1="176" x2="460" y2="200" />
+            <line x1="540" y1="240" x2="700" y2="240" />
+            <polyline points="880,268 904,268 904,16 640,16" />
+            <line x1="460" y1="280" x2="460" y2="304" />
+            <line x1="460" y1="360" x2="460" y2="384" />
+            <polyline points="40,468 8,468 8,16 280,16" />
+          </g>
+          <g class="flow-nodes" font-family="PingFang SC, Microsoft YaHei, sans-serif">
+            <rect x="280" y="16" width="360" height="56" rx="6" fill="#dbeafe" stroke="#2563eb" />
+            <text x="460" y="40" text-anchor="middle" font-size="12" fill="#1e40af">下一笔关键词订单</text>
+            <text x="460" y="58" text-anchor="middle" font-size="10" fill="#64748b">先结算后回填不回溯已落账</text>
+
+            <polygon points="460,96 540,136 460,176 380,136" fill="#fef9c3" stroke="#ca8a04" />
+            <text x="460" y="140" text-anchor="middle" font-size="11" fill="#854d0e">订单已结算?</text>
+            <text x="256" y="128" font-size="10" fill="#dc2626">否</text>
+            <rect x="40" y="116" width="160" height="40" rx="6" fill="#e2e8f0" stroke="#94a3b8" />
+            <text x="120" y="141" text-anchor="middle" font-size="11" fill="#475569">待结算不写明细</text>
+            <text x="472" y="192" font-size="10" fill="#16a34a">是</text>
+
+            <polygon points="460,200 540,240 460,280 380,240" fill="#fef9c3" stroke="#ca8a04" />
+            <text x="460" y="244" text-anchor="middle" font-size="11" fill="#854d0e">已回填的代发领取?</text>
+            <text x="556" y="228" font-size="10" fill="#dc2626">否</text>
+            <rect x="700" y="212" width="180" height="56" rx="6" fill="#e2e8f0" stroke="#94a3b8" />
+            <text x="790" y="236" text-anchor="middle" font-size="11" fill="#475569">全额给用户</text>
+            <text x="790" y="254" text-anchor="middle" font-size="10" fill="#64748b">下一笔再进本图</text>
+            <text x="472" y="296" font-size="10" fill="#16a34a">是</text>
+
+            <rect x="280" y="304" width="360" height="56" rx="6" fill="#dcfce7" stroke="#16a34a" />
+            <text x="460" y="328" text-anchor="middle" font-size="12" fill="#166534">剪辑手 = 应结算 × 分成快照</text>
+            <text x="460" y="346" text-anchor="middle" font-size="10" fill="#64748b">用户实结 = 应结算 − 分账</text>
+
+            <rect x="280" y="384" width="360" height="56" rx="6" fill="#dcfce7" stroke="#16a34a" />
+            <text x="460" y="408" text-anchor="middle" font-size="12" fill="#166534">两边同时入账 · 同一笔只落一次</text>
+            <text x="460" y="426" text-anchor="middle" font-size="10" fill="#64748b">回环接到下一笔订单顶边</text>
+          </g>
+        </svg>
+      </div>
+      <div class="flow-legend">
+        <span><i style="background:#dbeafe;border:1px solid #2563eb"></i>订单</span>
+        <span><i style="background:#dcfce7;border:1px solid #16a34a"></i>入账</span>
+        <span><i style="background:#fef9c3;border:1px solid #ca8a04"></i>校验</span>
+        <span><i style="background:#e2e8f0;border:1px solid #94a3b8"></i>待结算 / 全额用户</span>
+      </div>
+    </figure>
+    <ul>
+      <li>领取时锁定分成快照。之后改剪辑手当前比例，不改已经领取的那一笔。</li>
+      <li>构成代发绑定的条件：该关键词存在至少一条「已回填」的领取。未回填、已超时都不算。一词多条已回填时，按最近一次回填来分。</li>
+      <li>待结算只累计，不写明细。已经按非代发落账的，后来才回填，不回溯改账。</li>
+      <li>剪辑手看板里的收益数据只统计右豹端稿，不含站外稿。站外收益口径另行书面确认。</li>
+    </ul>
+
+    <h2>九、成片存储规则</h2>
+    <figure class="flow-chart no-edit">
+      <figcaption>图5 · 成片能留多久（下载/恢复走回环，删对象为终点）</figcaption>
+      <pre class="flow-md">flowchart TD
+  Up[成片上传到云端] --> Ch{渠道}
+  Ch -->|右豹一直未领| T15[满15天删除]
+  Ch -->|右豹首次领取| D3[C端3天可下]
+  D3 -->|3天内再下| D3
+  D3 -->|过期且系统未满7天| R{恢复过?}
+  R -->|否 后台恢复一次| D3
+  R -->|系统满7天| Del[删除不可恢复]
+  T15 --> Del
+  Ch -->|站外| DL[下载一份立刻删该份]
+  DL -->|夹内还有余量| DL
+  DL -->|余量0| Empty[落地页素材已领完]
+  Empty -->|再扫码仍进缺省页| Empty
+      Up -->|主动删除| Del</pre>
+      <div class="flow-svg-wrap">
+        <svg width="920" height="780" viewBox="0 0 920 780" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="pitch-arr-5" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+              <path d="M0,0 L8,4 L0,8 Z" fill="#94a3b8" />
+            </marker>
+          </defs>
+          <g class="flow-edges" marker-end="url(#pitch-arr-5)">
+            <line x1="460" y1="72" x2="460" y2="96" />
+            <line x1="540" y1="136" x2="700" y2="136" />
+            <polyline points="880,164 904,164 904,108 880,108" />
+            <line x1="380" y1="136" x2="200" y2="136" />
+            <line x1="460" y1="176" x2="460" y2="206" />
+            <line x1="460" y1="262" x2="460" y2="292" />
+            <line x1="540" y1="332" x2="700" y2="332" />
+            <polyline points="880,360 904,360 904,292 540,292" />
+            <line x1="460" y1="372" x2="460" y2="402" />
+            <line x1="380" y1="442" x2="200" y2="442" />
+            <line x1="460" y1="482" x2="460" y2="512" />
+            <line x1="540" y1="552" x2="700" y2="552" />
+            <line x1="460" y1="592" x2="460" y2="622" />
+            <line x1="460" y1="678" x2="460" y2="702" />
+            <polyline points="460,758 460,772 904,772 904,292 540,292" />
+          </g>
+          <g class="flow-nodes" font-family="PingFang SC, Microsoft YaHei, sans-serif">
+            <rect x="280" y="16" width="360" height="56" rx="6" fill="#dbeafe" stroke="#2563eb" />
+            <text x="460" y="40" text-anchor="middle" font-size="12" fill="#1e40af">成片上传到云端</text>
+            <text x="460" y="58" text-anchor="middle" font-size="10" fill="#64748b">主动删除立刻清对象 · 不可恢复</text>
+
+            <polygon points="460,96 540,136 460,176 380,136" fill="#fef9c3" stroke="#ca8a04" />
+            <text x="460" y="140" text-anchor="middle" font-size="11" fill="#854d0e">已有首次领取?</text>
+            <text x="256" y="124" font-size="10" fill="#dc2626">否 · 未领</text>
+            <rect x="40" y="116" width="160" height="40" rx="6" fill="#fecaca" stroke="#dc2626" />
+            <text x="120" y="141" text-anchor="middle" font-size="11" fill="#991b1b">满 15 天删除</text>
+            <text x="556" y="124" font-size="10" fill="#64748b">站外</text>
+            <rect x="700" y="108" width="180" height="56" rx="6" fill="#e2e8f0" stroke="#94a3b8" />
+            <text x="790" y="132" text-anchor="middle" font-size="11" fill="#475569">下载一份删一份</text>
+            <text x="790" y="150" text-anchor="middle" font-size="10" fill="#64748b">余量未完再走本框</text>
+            <text x="472" y="188" font-size="10" fill="#16a34a">是 · 右豹已领</text>
+
+            <rect x="280" y="206" width="360" height="56" rx="6" fill="#dcfce7" stroke="#16a34a" />
+            <text x="460" y="230" text-anchor="middle" font-size="12" fill="#166534">签发 C 端 3 天 + 系统 7 天</text>
+            <text x="460" y="248" text-anchor="middle" font-size="10" fill="#64748b">3 天窗内可反复下载</text>
+
+            <polygon points="460,292 540,332 460,372 380,332" fill="#fef9c3" stroke="#ca8a04" />
+            <text x="460" y="336" text-anchor="middle" font-size="11" fill="#854d0e">C 端 3 天内?</text>
+            <text x="556" y="320" font-size="10" fill="#16a34a">是</text>
+            <rect x="700" y="304" width="180" height="56" rx="6" fill="#dbeafe" stroke="#2563eb" />
+            <text x="790" y="328" text-anchor="middle" font-size="11" fill="#1e40af">下载成功</text>
+            <text x="790" y="346" text-anchor="middle" font-size="10" fill="#64748b">回环再问 3 天窗</text>
+            <text x="472" y="384" font-size="10" fill="#dc2626">否</text>
+
+            <polygon points="460,402 540,442 460,482 380,442" fill="#fef9c3" stroke="#ca8a04" />
+            <text x="460" y="446" text-anchor="middle" font-size="11" fill="#854d0e">系统满 7 天?</text>
+            <text x="256" y="430" font-size="10" fill="#dc2626">是</text>
+            <rect x="40" y="422" width="160" height="40" rx="6" fill="#fecaca" stroke="#dc2626" />
+            <text x="120" y="447" text-anchor="middle" font-size="11" fill="#991b1b">删除不可恢复</text>
+            <text x="472" y="494" font-size="10" fill="#16a34a">否</text>
+
+            <polygon points="460,512 540,552 460,592 380,552" fill="#fef9c3" stroke="#ca8a04" />
+            <text x="460" y="556" text-anchor="middle" font-size="11" fill="#854d0e">已恢复过一次?</text>
+            <text x="556" y="540" font-size="10" fill="#dc2626">是</text>
+            <rect x="700" y="532" width="180" height="40" rx="6" fill="#fecaca" stroke="#dc2626" />
+            <text x="790" y="557" text-anchor="middle" font-size="11" fill="#991b1b">不可再恢复</text>
+            <text x="472" y="604" font-size="10" fill="#16a34a">否</text>
+
+            <rect x="280" y="622" width="360" height="56" rx="6" fill="#dbeafe" stroke="#2563eb" />
+            <text x="460" y="646" text-anchor="middle" font-size="12" fill="#1e40af">后台恢复一次下载窗</text>
+            <text x="460" y="664" text-anchor="middle" font-size="10" fill="#64748b">新的 3 天不得超过系统 7 天</text>
+
+            <rect x="280" y="702" width="360" height="56" rx="6" fill="#dcfce7" stroke="#16a34a" />
+            <text x="460" y="726" text-anchor="middle" font-size="12" fill="#166534">重计 3 天</text>
+            <text x="460" y="744" text-anchor="middle" font-size="10" fill="#64748b">回环接到「C 端 3 天内?」顶边</text>
+          </g>
+        </svg>
+      </div>
+      <div class="flow-legend">
+        <span><i style="background:#dbeafe;border:1px solid #2563eb"></i>操作</span>
+        <span><i style="background:#dcfce7;border:1px solid #16a34a"></i>签发 / 重计</span>
+        <span><i style="background:#fef9c3;border:1px solid #ca8a04"></i>校验</span>
+        <span><i style="background:#fecaca;border:1px solid #dc2626"></i>删除终点</span>
+        <span><i style="background:#e2e8f0;border:1px solid #94a3b8"></i>站外按份</span>
+      </div>
+    </figure>
+    <ul>
+      <li>右豹一直没人领：从上传起约 15 天删除云端文件，状态变为已删除。</li>
+      <li>右豹有人领过：领取人约 3 天可下；云端对象再留到首次领取后约 7 天。满 7 天删除后不可再恢复。7 天内运营可给用户恢复一次下载窗口，新的 3 天不能超过系统 7 天。</li>
+      <li>站外不走 3 天 / 7 天：每成功下载一份就删该份。整夹一直没人领，同样满 15 天删。</li>
+      <li>剪辑手或后台主动删除：云端立刻一起删，不能恢复。占用中、已完成不能删。已删除的行还在清单里，但不能再下、不能再分享。</li>
+      <li>不回收用户已经存到本地的文件。请按项目节奏供稿，不要把云盘当长期片库。</li>
+    </ul>
+
+    <h2>十、可谈的合作与红线</h2>
+    <p>可谈三类：剪辑产能（项目、分成、审核、渠道、月供稿量）；品牌扩供（是否接入供稿池、启用停用、领取方是否已有申词资格）；站外分发（无登录落地页、按份下载、不进广场）。</p>
+    <p>一次谈清：身份（个人 / 工作室、是否统一右豹 ID）、仅右豹 / 仅站外 / 都要、分成、是否审核、授权项目清单、命名规范、月度节奏（对齐 15 天未领清理）、对账周期、对接人与录入时间。</p>
+    <ul>
+      <li>不承诺保底领取量、保底收益。</li>
+      <li>不承诺站内自助申请剪辑手，不承诺 App 内上传。</li>
+      <li>不把产品说成代运营整号或平台替你发抖音。</li>
+      <li>分成、免审、项目名单以录入为准，口头承诺无效。</li>
+    </ul>
+
+    <h2>十一、对外口述（约 30 秒）</h2>
+    <p>右豹一键代发，让会剪辑的人给品牌项目供成片，让不会做片但有项目、有词的人直接领取去发。剪辑手加客服开通电脑端「剪辑供稿」，图集和视频都能传；用户在 App 里领、回填、发布。钱从关键词订单来，按入驻时谈好的分成，领取当时锁定，结算后两边都能对上账。也可以开通站外链接，给私域按份下载。要合作，先定项目、分成、审不审、走站内还是站外。</p>
+
+    <p class="note">口径以产品规则为准。具体分成、项目授权、审核方式以书面确认为准。复制时如需改数字或项目名，请与运营对齐后再外发。</p>
+  </article>
+  <script src="yijian-daifa-pitch-edit.js?v=6"></script>
+</body>
+</html>

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>一键代发 · 通顶 BN 备选</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: #e8e6e1;
+      color: #2c241c;
+    }
+    .page { max-width: 1240px; margin: 0 auto; padding: 24px 20px 64px; }
+    .kicker { font-size: 11px; letter-spacing: .18em; color: #8a6a3b; font-weight: 700; }
+    .page > h1 { font-size: 26px; margin: 6px 0 8px; letter-spacing: -.03em; }
+    .lead { font-size: 13px; color: #6b6560; line-height: 1.65; max-width: 62ch; }
+    .meta { margin: 8px 0 16px; font-size: 12px; color: #8a837c; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, 375px);
+      gap: 22px 20px;
+      margin-top: 8px;
+    }
+    .card { width: 375px; }
+    .card h3 {
+      font-size: 12px; font-weight: 600; color: #6b6560; margin-bottom: 8px;
+      display: flex; justify-content: space-between; align-items: baseline;
+    }
+    .card h3 em { font-style: normal; font-weight: 500; font-size: 11px; color: #9a958e; }
+    .bn {
+      width: 375px; height: 225px;
+      position: relative; overflow: hidden; cursor: pointer;
+      color: var(--ink);
+      background:
+        radial-gradient(80% 90% at 92% 18%, var(--glow) 0%, transparent 46%),
+        linear-gradient(165deg, var(--bg1) 0%, var(--bg2) 48%, var(--bg3) 100%);
+    }
+    .bn:focus { outline: 2px solid #b08d57; outline-offset: 3px; }
+    .bn.on { box-shadow: 0 0 0 2px #fff, 0 0 0 4px #b08d57; }
+    .bn::after {
+      content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .1;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+      mix-blend-mode: overlay;
+    }
+    .copy { position: relative; z-index: 2; padding: 22px 16px 18px; width: 228px; }
+    .eyebrow { color: var(--accent); font-size: 12px; font-weight: 700; margin-bottom: 6px; }
+    .bn h2 { font-size: 24px; line-height: 1.2; letter-spacing: -.03em; font-weight: 800; }
+    .sub { margin-top: 6px; font-size: 12px; color: var(--muted); font-weight: 600; }
+    .benefits { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; max-width: 210px; }
+    .benefits span {
+      background: var(--chip); color: var(--chip-ink);
+      font-size: 11px; font-weight: 600; padding: 5px 10px; border-radius: 999px;
+    }
+    .cta {
+      margin-top: 12px; display: inline-flex; align-items: center; justify-content: center;
+      height: 32px; padding: 0 18px; border: none; border-radius: 999px;
+      background: var(--cta-bg); color: var(--cta-ink); font-size: 13px; font-weight: 700;
+      box-shadow: 0 8px 18px var(--cta-shadow);
+    }
+    .stack { position: absolute; right: 4px; top: 24px; width: 158px; height: 172px; z-index: 1; }
+    .poster {
+      position: absolute; width: 100px; height: 138px; border-radius: 26px; overflow: hidden;
+      box-shadow: 0 14px 28px var(--photo-shadow);
+    }
+    .poster img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .poster.a { right: 0; top: 4px; transform: rotate(7deg); z-index: 2; }
+    .poster.b { left: 0; top: 22px; transform: rotate(-9deg); z-index: 1; }
+    .single {
+      position: absolute; right: 14px; top: 28px; width: 118px; height: 168px;
+      border-radius: 28px; overflow: hidden; z-index: 1;
+      box-shadow: 0 16px 32px var(--photo-shadow);
+    }
+    .single img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .dots {
+      position: absolute; left: 0; right: 0; bottom: 10px; z-index: 3;
+      display: flex; justify-content: center; gap: 5px;
+    }
+    .dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--dot); }
+    .dots i.on { width: 14px; border-radius: 99px; background: var(--dot-on); }
+
+    /* 1 瓷白金 */
+    .ivory {
+      --bg1: #f4eee4; --bg2: #f7f3ec; --bg3: #fbf8f3;
+      --glow: #e8d7b8; --ink: #2a241c; --muted: #8a7d6b;
+      --accent: #9a7b45; --chip: rgba(255,255,255,.7); --chip-ink: #6b5430;
+      --cta-bg: #2a241c; --cta-ink: #f4eee4; --cta-shadow: rgba(42,36,28,.16);
+      --photo-shadow: rgba(42,36,28,.18); --dot: #d9cbb6; --dot-on: #b08d57;
+    }
+    /* 2 墨金 */
+    .ink {
+      --bg1: #171410; --bg2: #1f1b16; --bg3: #241e18;
+      --glow: #3a2e20; --ink: #f3eadb; --muted: #b9a78a;
+      --accent: #d4b37a; --chip: rgba(255,255,255,.08); --chip-ink: #e6d5b5;
+      --cta-bg: #e6d3ad; --cta-ink: #2a2218; --cta-shadow: rgba(0,0,0,.28);
+      --photo-shadow: rgba(0,0,0,.4); --dot: #4a4034; --dot-on: #d4b37a;
+    }
+    /* 3 雾杏 */
+    .taupe {
+      --bg1: #e9e2d8; --bg2: #f0ebe4; --bg3: #f6f2ec;
+      --glow: #d8cfc3; --ink: #3a342e; --muted: #8a8176;
+      --accent: #8d6e56; --chip: rgba(255,255,255,.72); --chip-ink: #5c4c3e;
+      --cta-bg: #fff; --cta-ink: #5c4c3e; --cta-shadow: rgba(60,48,36,.1);
+      --photo-shadow: rgba(60,48,36,.16); --dot: #d3c8ba; --dot-on: #8d6e56;
+    }
+    /* 4 朱砂（克制） */
+    .cinnabar {
+      --bg1: #f6ebe6; --bg2: #faf3ef; --bg3: #fdf8f5;
+      --glow: #edd3c8; --ink: #3b241e; --muted: #9a6f62;
+      --accent: #a14a3a; --chip: rgba(255,255,255,.76); --chip-ink: #8a3d32;
+      --cta-bg: #fff; --cta-ink: #a14a3a; --cta-shadow: rgba(161,74,58,.12);
+      --photo-shadow: rgba(80,30,20,.14); --dot: #e4c8be; --dot-on: #c46a58;
+    }
+    /* 5 茶褐 */
+    .tea {
+      --bg1: #ece6d6; --bg2: #f3eee2; --bg3: #f8f5ec;
+      --glow: #dccfae; --ink: #2f3328; --muted: #7d826c;
+      --accent: #6b6f4e; --chip: rgba(255,255,255,.7); --chip-ink: #4d5238;
+      --cta-bg: #3a3d2e; --cta-ink: #f3eee2; --cta-shadow: rgba(58,61,46,.16);
+      --photo-shadow: rgba(40,42,28,.16); --dot: #d2cbb6; --dot-on: #6b6f4e;
+    }
+    /* 6 品牌浅橙（对照） */
+    .peach {
+      --bg1: #ffe7d2; --bg2: #fff1e6; --bg3: #fff7f1;
+      --glow: #ffd9b3; --ink: #4a2a12; --muted: #a56a45;
+      --accent: #ff5a1f; --chip: rgba(255,255,255,.78); --chip-ink: #9a3f16;
+      --cta-bg: #fff; --cta-ink: #c2410c; --cta-shadow: rgba(255,122,40,.12);
+      --photo-shadow: rgba(90,42,12,.16); --dot: #e8c4a6; --dot-on: #ff8a4c;
+    }
+
+    .preview-wrap { margin-top: 36px; display: flex; gap: 28px; flex-wrap: wrap; align-items: flex-start; }
+    .board-lab { font-size: 12px; color: #8a837c; margin-bottom: 10px; }
+    .phone {
+      width: 391px; border-radius: 36px; overflow: hidden; position: relative; background: #fff;
+      box-shadow: 0 22px 56px rgba(0,0,0,.14), inset 0 0 0 8px #1a1a1a;
+    }
+    .inner {
+      width: 375px; margin: 0 auto;
+      background: linear-gradient(180deg, #f3eee8 0%, #f7f4f0 42%, #f4f2ef 100%);
+    }
+    .notch {
+      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      width: 118px; height: 26px; background: #1a1a1a; border-radius: 0 0 16px 16px; z-index: 5;
+    }
+    .status {
+      height: 44px; display: flex; align-items: flex-end; justify-content: space-between;
+      padding: 0 18px 6px; font-size: 12px; font-weight: 700;
+    }
+    .head { display: flex; align-items: flex-start; justify-content: space-between; padding: 4px 14px 10px; }
+    .who { display: flex; gap: 10px; align-items: center; }
+    .avatar {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #e8d7b8, #8a6a3b);
+      color: #fff; font-size: 16px; font-weight: 800; display: grid; place-items: center;
+    }
+    .who b { font-size: 17px; display: block; }
+    .trust {
+      margin-top: 6px; display: inline-flex; gap: 6px; background: #fff; border-radius: 999px;
+      padding: 4px 10px; font-size: 10px; color: #6b6560; font-weight: 600; white-space: nowrap;
+    }
+    .trust em { color: #16a34a; font-style: normal; }
+    .head-right { display: flex; align-items: center; gap: 8px; }
+    .mail {
+      width: 34px; height: 34px; border-radius: 12px; background: #fff; display: grid; place-items: center; position: relative;
+    }
+    .mail i {
+      position: absolute; top: -4px; right: -4px; background: #c2410c; color: #fff;
+      font-size: 10px; font-style: normal; min-width: 16px; height: 16px; border-radius: 99px; display: grid; place-items: center;
+    }
+    .capsule { display: flex; background: #fff; border-radius: 999px; overflow: hidden; }
+    .capsule span { width: 34px; height: 30px; display: grid; place-items: center; font-size: 13px; color: #444; }
+    .capsule span + span { border-left: 1px solid #eee; }
+    .search {
+      margin: 0 14px 8px; height: 40px; border-radius: 20px; background: #fff;
+      display: flex; align-items: center; padding: 0 6px 0 14px; font-size: 13px; color: #9aa3af;
+    }
+    .search b { margin-left: auto; color: #8a6a3b; padding: 0 12px; font-size: 14px; }
+    .sheet { background: #fff; border-radius: 22px 22px 0 0; min-height: 220px; padding: 16px; }
+    .sheet h3 { font-size: 15px; margin-bottom: 10px; }
+    .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .ph { height: 86px; border-radius: 18px; background: #f3efe9; }
+    .note { margin-top: 18px; font-size: 12px; color: #6b6560; line-height: 1.7; max-width: 72ch; }
+    .hex { font-size: 11px; color: #9a958e; margin-top: 6px; }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="kicker">FR-014 · 产品内首页 · 通顶 BN 备选</div>
+    <h1>更克制的色系 · 375 × 225</h1>
+    <p class="lead">同一构图，六套色。点任一张，右边首页机位跟着换。默认推荐「瓷白金」：奶油底 + 墨金按钮，比品牌浅橙更安静。</p>
+    <p class="meta">尺寸锁定 375pt × 225pt · 圆角成片封面 · 无立体生成物</p>
+
+    <div class="grid" id="alts"></div>
+
+    <div class="preview-wrap">
+      <div>
+        <div class="board-lab">放进首页</div>
+        <div class="phone">
+          <div class="notch"></div>
+          <div class="inner">
+            <div class="status"><span>9:41</span><span>5G</span></div>
+            <div class="head">
+              <div class="who">
+                <div class="avatar">豹</div>
+                <div>
+                  <b>测试</b>
+                  <div class="trust"><em>✓</em> 数据透明 | 秒级提现 | 秒级到账</div>
+                </div>
+              </div>
+              <div class="head-right">
+                <div class="mail">✉<i>6</i></div>
+                <div class="capsule"><span>···</span><span>—</span><span>◎</span></div>
+              </div>
+            </div>
+            <div class="search">输任务/项目名搜一搜 🔥<b>搜索</b></div>
+            <div id="phoneBn"></div>
+            <div class="sheet">
+              <h3>推荐项目</h3>
+              <div class="cards"><div class="ph"></div><div class="ph"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="note" id="why"></p>
+    </div>
+  </div>
+  <script>
+    var ALTS = [
+      { id: 'ivory', name: '瓷白金', tag: '推荐', cls: 'ivory', layout: 'stack', a: 'cover-m01.jpg', b: 'cover-m04.jpg', hex: '#f7f3ec / #2a241c / #9a7b45', why: '奶油纸 + 墨色按钮。像杂志广告，不抢首页，也不像活动促销。' },
+      { id: 'ink', name: '墨金', tag: '夜色', cls: 'ink', layout: 'stack', a: 'cover-m01.jpg', b: 'cover-m06.jpg', hex: '#1f1b16 / #f3eadb / #d4b37a', why: '通顶直接铺深色块，成片更像私藏。和浅色首页对比较强，高级感最足。' },
+      { id: 'taupe', name: '雾杏', tag: '轻', cls: 'taupe', layout: 'stack', a: 'cover-m03.jpg', b: 'cover-m01.jpg', hex: '#f0ebe4 / #3a342e / #8d6e56', why: '灰杏底，几乎无彩。适合不想离开首页浅色体系、又要去掉亮橙。' },
+      { id: 'cinnabar', name: '朱砂', tag: '克制红', cls: 'cinnabar', layout: 'stack', a: 'cover-m01.jpg', b: 'cover-m04.jpg', hex: '#faf3ef / #a14a3a / #3b241e', why: '朱砂只作点缀，不走品牌亮橙。还认得是右豹，但更像品宣。' },
+      { id: 'tea', name: '茶褐', tag: '东方', cls: 'tea', layout: 'single', a: 'cover-m01.jpg', b: '', hex: '#f3eee2 / #3a3d2e / #6b6f4e', why: '单张大圆角封面，茶褐按钮。更干净，卖点全靠字。' },
+      { id: 'peach', name: '品牌浅橙', tag: '对照', cls: 'peach', layout: 'stack', a: 'cover-m01.jpg', b: 'cover-m04.jpg', hex: '#fff1e6 / #ff5a1f / #4a2a12', why: '对齐生金计划。最像现在首页，也最「运营活动」。' }
+    ];
+    var current = 'ivory';
+    function bnHtml(alt, forPhone) {
+      var vis = alt.layout === 'single'
+        ? '<div class="single"><img src="assets/fr014/' + alt.a + '" alt=""></div>'
+        : '<div class="stack"><div class="poster b"><img src="assets/fr014/' + (alt.b || alt.a) + '" alt=""></div><div class="poster a"><img src="assets/fr014/' + alt.a + '" alt=""></div></div>';
+      return '<div class="bn ' + alt.cls + (forPhone ? '' : (alt.id === current ? ' on' : '')) + '" data-id="' + alt.id + '">' +
+        '<div class="copy"><div class="eyebrow">一键代发 · 官方成片</div><h2>不用剪，即领即发</h2>' +
+        '<div class="sub">有词就领 · 领取锁定分成</div>' +
+        '<div class="benefits"><span>不用剪</span><span>即领即发</span><span>官方成片</span></div>' +
+        '<button class="cta" type="button">立即领取</button></div>' + vis +
+        '<div class="dots"><i class="on"></i><i></i><i></i></div></div>';
+    }
+    function paint() {
+      var alt = ALTS.filter(function (a) { return a.id === current; })[0];
+      document.getElementById('alts').innerHTML = ALTS.map(function (a) {
+        return '<div class="card"><h3>' + a.name + ' <em>' + a.tag + ' · ' + a.hex + '</em></h3>' + bnHtml(a, false) + '</div>';
+      }).join('');
+      document.getElementById('phoneBn').innerHTML = bnHtml(alt, true);
+      document.getElementById('why').innerHTML = '<b>' + alt.name + '：</b>' + alt.why + '<div class="hex">' + alt.hex + '</div>';
+      document.querySelectorAll('#alts .bn').forEach(function (el) {
+        el.onclick = function () { current = el.dataset.id; paint(); };
+      });
+    }
+    paint();
+  </script>
+</body>
+</html>

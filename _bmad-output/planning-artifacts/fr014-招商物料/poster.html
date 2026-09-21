@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>右豹一键代发 · 剪辑手招募海报</title>
+  <style>
+    :root {
+      --orange: #ff6b1a;
+      --ink: #1a2332;
+      --muted: #6b7280;
+      --paper: #fff8f3;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: #ece8e4;
+      color: var(--ink);
+      min-height: 100vh;
+    }
+    .bar {
+      max-width: 420px;
+      margin: 0 auto;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .bar a { color: var(--orange); text-decoration: none; }
+    .bar button {
+      border: 0;
+      background: var(--orange);
+      color: #fff;
+      border-radius: 8px;
+      padding: 7px 12px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .phone {
+      width: min(390px, calc(100% - 24px));
+      margin: 0 auto 40px;
+      background: #16110e;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 18px 50px rgba(26, 35, 50, .28);
+    }
+    .hero {
+      padding: 28px 22px 22px;
+      background:
+        linear-gradient(180deg, rgba(22,17,14,.15), rgba(22,17,14,.82)),
+        radial-gradient(120% 80% at 10% 0%, #ff8a4c 0%, #c2410c 55%, #16110e 100%);
+      color: #fff;
+    }
+    .kicker {
+      font-size: 11px;
+      letter-spacing: .18em;
+      color: #ffd4b8;
+      margin-bottom: 10px;
+    }
+    .hero h1 { font-size: 30px; line-height: 1.25; margin-bottom: 10px; }
+    .hero p { font-size: 14px; line-height: 1.65; opacity: .94; }
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1px;
+      background: #2a211c;
+    }
+    .stats div {
+      background: #1c1612;
+      padding: 14px 6px;
+      text-align: center;
+    }
+    .stats b { display: block; color: #ffb087; font-size: 13px; }
+    .stats span { display: block; margin-top: 4px; font-size: 10px; color: #c4b4a8; }
+    .body { background: #fff; padding: 18px 20px 22px; color: var(--ink); }
+    .body h2 { font-size: 13px; color: var(--orange); margin-bottom: 8px; }
+    .body ul { margin: 0 0 16px 18px; }
+    .body li { font-size: 13px; line-height: 1.7; color: #374151; }
+    .roles { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+    .role {
+      background: var(--paper);
+      border: 1px solid #ffd4b8;
+      border-radius: 10px;
+      padding: 10px;
+    }
+    .role b { display: block; font-size: 13px; color: #c2410c; margin-bottom: 4px; }
+    .role span { font-size: 11px; color: var(--muted); line-height: 1.45; display: block; min-height: 2.9em; }
+    .qr-wrap {
+      text-align: center;
+      padding: 16px 12px 8px;
+      border: 1px dashed #ffd4b8;
+      border-radius: 14px;
+      background: var(--paper);
+    }
+    .qr {
+      width: 132px;
+      height: 132px;
+      margin: 0 auto;
+      border-radius: 8px;
+      background:
+        repeating-conic-gradient(#1a2332 0 25%, #fff 0 50%) 0 0 / 16px 16px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-size: 11px;
+      text-shadow: 0 0 4px #000;
+      position: relative;
+    }
+    .qr::after {
+      content: "替换为客服码";
+      position: absolute;
+      inset: 18px;
+      background: rgba(26, 35, 50, .82);
+      border-radius: 6px;
+      display: grid;
+      place-items: center;
+      font-weight: 600;
+    }
+    .qr-wrap p { margin-top: 10px; font-size: 12px; color: var(--muted); line-height: 1.55; }
+    .foot {
+      margin-top: 12px;
+      font-size: 11px;
+      color: #9ca3af;
+      line-height: 1.5;
+      text-align: center;
+    }
+    @media print {
+      .bar { display: none; }
+      body { background: #fff; }
+      .phone { box-shadow: none; margin: 0 auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bar">
+    <a href="index.html">← 招商物料</a>
+    <button type="button" onclick="window.print()">打印 / 存 PDF</button>
+  </div>
+  <article class="phone">
+    <header class="hero">
+      <div class="kicker">YOU BAO · 一键代发</div>
+      <h1>会做片，就在这变现</h1>
+      <p>把成片供进品牌项目，用户领取去发，关键词订单按分成结算。</p>
+    </header>
+    <div class="stats">
+      <div><b>授权项目</b><span>平台备书备项</span></div>
+      <div><b>批量上传</b><span>图集 / 视频</span></div>
+      <div><b>按词分成</b><span>领取后结算</span></div>
+    </div>
+    <div class="body">
+      <h2>卖点</h2>
+      <ul>
+        <li>不用自己找书、找项目，授权项目可直接供稿</li>
+        <li>电脑端批量交图集或视频，可附发布技巧</li>
+        <li>用户领取后按关键词订单分成，看板可对账</li>
+      </ul>
+      <div class="roles">
+        <div class="role"><b>短视频剪辑</b><span>会卡点、混剪、口播的创作者</span></div>
+        <div class="role"><b>图文切片</b><span>会排版、做解压图集也能加入</span></div>
+      </div>
+      <h2>适合谁</h2>
+      <ul>
+        <li>能稳定出图集 / 视频的剪辑、工作室</li>
+        <li>只在电脑交稿；愿意加客服开通，不走线上申请表</li>
+      </ul>
+      <div class="qr-wrap">
+        <div class="qr" role="img" aria-label="客服二维码占位，请替换为真实客服码"></div>
+        <p>长按识别客服二维码，开通「剪辑供稿」<br />扫码后需运营录入方可上传</p>
+      </div>
+      <p class="foot">未录入不能交稿。收益以平台订单结算为准。分成、项目、是否免审以书面确认为准。</p>
+    </div>
+  </article>
+</body>
+</html>

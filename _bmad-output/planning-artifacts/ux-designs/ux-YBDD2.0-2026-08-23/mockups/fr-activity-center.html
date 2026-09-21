@@ -12,7 +12,7 @@
       --danger: #dc2626; --danger-bg: #fef2f2;
       --surface: #fff; --surface-glass: rgba(255,255,255,0.72); --surface-hover: #f8fafc; --border: #e8edf3;
       --text-primary: #18222f; --text-secondary: #4a5568; --text-muted: #9aa5b4;
-      --sidebar-w: 240px; --drawer-w: 480px; --radius-sm: 7px; --radius-lg: 14px;
+      --sidebar-w: 240px; --drawer-w: 560px; --radius-sm: 7px; --radius-lg: 14px;
       --shadow: 0 8px 32px rgba(30,40,80,0.10);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -48,7 +48,7 @@
     .breadcrumb a { color: var(--primary); text-decoration: none; }
     .page-header { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; }
     .page-header h1 { font-size: 19px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .page-desc { font-size: 12px; color: var(--text-muted); max-width: 720px; line-height: 1.55; }
+    .page-desc { font-size: 12px; color: var(--text-muted); max-width: 760px; line-height: 1.55; }
     .badge { display: inline-flex; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: var(--radius-sm); }
     .badge-fr { background: #fffbeb; color: var(--accent-fr); border: 1px solid #fde68a; }
     .badge-version { background: #f5f3ff; color: var(--accent-version); border: 1px solid #ddd6fe; }
@@ -63,8 +63,16 @@
       font-size: 13px; font-weight: 500; color: var(--text-secondary); border-radius: 10px;
     }
     .page-tab-bar button.active { background: var(--primary); color: #fff; font-weight: 600; }
-    .page-view { display: none; }
-    .page-view.active { display: block; }
+    .page-view, .sub-view { display: none; }
+    .page-view.active, .sub-view.active { display: block; }
+    .module-tab-bar {
+      display: flex; gap: 0; margin: 0 0 14px; border-bottom: 1px solid var(--border);
+    }
+    .module-tab-bar button {
+      padding: 8px 16px; border: none; background: none; cursor: pointer;
+      font-size: 13px; color: var(--text-secondary); border-bottom: 2px solid transparent; margin-bottom: -1px;
+    }
+    .module-tab-bar button.active { color: var(--primary); font-weight: 600; border-bottom-color: var(--primary); }
     .btn {
       display: inline-flex; align-items: center; height: 34px; padding: 0 14px;
       border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid transparent;
@@ -73,33 +81,62 @@
     .btn-primary:hover { background: var(--primary-hover); }
     .btn-rule { background: var(--primary-light); color: var(--primary); border-color: var(--primary-border); }
     .btn-rule.active { background: var(--primary); color: #fff; }
-    .btn-ghost { background: var(--surface); color: var(--text-secondary); border-color: var(--border); }
     .btn-ghost-sm { background: var(--surface); color: var(--text-secondary); border: 1px solid var(--border); height: 32px; padding: 0 12px; border-radius: var(--radius-sm); cursor: pointer; font-size: 12px; }
     .glass-card {
       background: var(--surface-glass); backdrop-filter: blur(16px);
       border: 1px solid rgba(255,255,255,0.55); border-radius: var(--radius-lg);
       box-shadow: var(--shadow); overflow: hidden;
     }
-    .demo-layout { display: grid; grid-template-columns: minmax(280px, 5fr) minmax(360px, 7fr); gap: 16px; }
-    @media (max-width: 1024px) { .demo-layout { grid-template-columns: 1fr; } }
-    .scene-panel { padding: 16px 18px; }
-    .scene-panel h2 { font-size: 14px; font-weight: 700; margin-bottom: 10px; }
-    .scene-list { display: flex; flex-direction: column; gap: 6px; }
+    .demo-layout { display: grid; grid-template-columns: minmax(340px, 38%) minmax(360px, 1fr); gap: 16px; align-items: start; }
+    @media (max-width: 900px) { .demo-layout { grid-template-columns: minmax(300px, 42%) minmax(320px, 1fr); } }
+    @media (max-width: 640px) { .demo-layout { grid-template-columns: 1fr; } }
+    .scene-panel { padding: 16px 20px 18px; background: #fff; max-height: calc(100vh - 168px); overflow-y: auto; }
+    .scene-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+    .scene-panel h2 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+    .scene-lead { font-size: 13px; color: #6b7280; line-height: 1.5; }
+    .scene-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
     .scene-btn {
-      text-align: left; padding: 10px 12px; border-radius: var(--radius-sm);
-      border: 1px solid var(--border); background: rgba(255,255,255,0.6); cursor: pointer;
+      padding: 6px 12px; border-radius: 999px; border: 1px solid var(--border);
+      background: #fff; font-size: 12px; cursor: pointer; color: #6b7280; line-height: 1.4;
     }
+    .scene-btn:hover { border-color: var(--primary-border); color: var(--primary); }
     .scene-btn.active { border-color: var(--primary-border); background: var(--primary-light); color: var(--primary); font-weight: 600; }
-    .scene-btn .scene-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
-    .scene-btn .scene-desc { font-size: 11px; color: var(--text-muted); line-height: 1.45; }
-    .scene-btn.active .scene-desc { color: #3b82f6; }
-    .scene-note { margin-top: 14px; padding: 10px 12px; border-radius: var(--radius-sm); background: #fffbeb; border: 1px solid #fde68a; font-size: 12px; color: #92400e; line-height: 1.55; }
-    .mockup-panel { padding: 16px; display: flex; justify-content: center; min-height: 520px; }
+    .scene-hint { margin-top: 10px; font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+    .scene-rules { margin-top: 14px; display: grid; gap: 10px; }
+    .scene-rules[hidden] { display: none !important; }
+    .scene-rule {
+      padding: 10px 12px; border-radius: 10px; background: #f8fafc;
+      border: 1px solid #e8edf3; font-size: 12px; line-height: 1.55; color: #475569;
+    }
+    .scene-rule h3 { margin: 0 0 6px; font-size: 12px; font-weight: 700; color: #0f172a; }
+    .scene-rule ul { margin: 0; padding-left: 1.15em; }
+    .scene-rule li { margin: 3px 0; }
+    .scene-rule table { width: 100%; border-collapse: collapse; margin: 6px 0 2px; font-size: 11px; }
+    .scene-rule th, .scene-rule td { border-bottom: 1px solid #e8edf3; padding: 5px 4px; text-align: left; vertical-align: top; line-height: 1.45; }
+    .scene-rule th { color: #64748b; font-weight: 600; }
+    .scene-award-swatch { display: grid; gap: 8px; margin-top: 8px; }
+    .scene-award-swatch .pv-award { margin: 0; }
+    .btn-preview {
+      display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0;
+      height: 32px; padding: 0 12px; border-radius: 999px; cursor: pointer;
+      border: 1px solid var(--border); background: #fff; color: var(--text-secondary);
+      font-size: 12px; font-weight: 600;
+    }
+    .btn-preview:hover, .btn-preview[aria-pressed="true"] {
+      border-color: var(--primary-border); background: var(--primary-light); color: var(--primary);
+    }
+    .mockup-panel { padding: 12px; display: flex; justify-content: center; min-height: 0; }
     .mockup-frame-wrap {
-      width: 100%; max-width: 375px; border-radius: 28px; overflow: hidden;
+      width: min(100%, 390px); max-width: 390px; border-radius: 28px; overflow: hidden;
       background: #1e293b; box-shadow: 0 16px 48px rgba(0,0,0,0.18); aspect-ratio: 375 / 812;
     }
     .mockup-frame-wrap iframe { width: 100%; height: 100%; border: none; display: block; background: #f5f6f8; }
+    .demo-layout:fullscreen, .demo-layout:-webkit-full-screen,
+    body.preview-fs-fallback .demo-layout.is-preview {
+      width: 100%; height: 100%; padding: 16px; gap: 12px; overflow: auto;
+      background: linear-gradient(135deg, #e0e7ff 0%, #f0f4f8 40%, #e0f2fe 100%);
+    }
+    body.preview-fs-fallback .demo-layout.is-preview { position: fixed; inset: 0; z-index: 400; }
     .table-toolbar { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--border); }
     .table-toolbar h3 { font-size: 14px; font-weight: 700; }
     .filter-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 14px 16px; align-items: end; border-bottom: 1px solid var(--border); }
@@ -108,27 +145,28 @@
     .filter-field input, .filter-field select { height: 30px; padding: 0 9px; border: 1px solid var(--border); border-radius: 6px; font-size: 12px; width: 100%; }
     .filter-actions { grid-column: 1 / -1; display: flex; gap: 8px; justify-content: flex-end; padding-top: 4px; }
     .table-wrap { overflow-x: auto; }
-    #view-admin table { width: 100%; table-layout: fixed; border-collapse: collapse; }
+    #view-admin table { width: 100%; min-width: 1180px; table-layout: fixed; border-collapse: collapse; }
     #view-admin th, #view-admin td {
       padding: 0 8px; height: 48px; text-align: center; vertical-align: middle;
       border-bottom: 1px solid var(--border); font-size: 12px;
       overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
     #view-admin th { font-size: 11px; font-weight: 600; color: var(--text-muted); background: rgba(248,250,252,0.9); }
-    #view-admin tbody tr { height: 48px; }
-    #view-admin tbody tr:hover td { background: var(--surface-hover); }
     #view-admin td.col-title { text-align: left; }
-    #view-admin .tag { margin: 0 auto; }
-    .link { color: var(--primary); cursor: pointer; text-decoration: none; margin-right: 10px; font-size: 12px; font-weight: 500; background: none; border: none; padding: 0; }
+    #view-admin td.col-ops { overflow: visible; white-space: normal; }
+    .link, .link-num {
+      color: var(--primary); cursor: pointer; text-decoration: none; margin-right: 8px;
+      font-size: 12px; font-weight: 500; background: none; border: none; padding: 0;
+      position: relative; z-index: 1;
+    }
     .tag { display: inline-flex; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; }
     .tag-ok { background: var(--success-bg); color: var(--success); }
-    .tag-warn { background: var(--warning-bg); color: var(--warning); }
     .tag-muted { background: #f1f5f9; color: var(--text-muted); }
-    .drawer-overlay, .modal-overlay {
+    .drawer-overlay {
       position: fixed; inset: 0; background: rgba(15,23,42,0.35); z-index: 500;
       opacity: 0; pointer-events: none; transition: opacity 0.25s;
     }
-    .drawer-overlay.open, .modal-overlay.open { opacity: 1; pointer-events: auto; }
+    .drawer-overlay.open { opacity: 1; pointer-events: auto; }
     .drawer {
       position: fixed; top: 0; right: 0; bottom: 0; width: var(--drawer-w); z-index: 501;
       background: rgba(255,255,255,0.98); backdrop-filter: blur(12px);
@@ -136,7 +174,8 @@
       transform: translateX(100%); transition: transform 0.28s ease;
       display: flex; flex-direction: column;
     }
-    .drawer.open { transform: translateX(0); }
+    .drawer { pointer-events: none; }
+    .drawer.open { transform: translateX(0); pointer-events: auto; }
     .drawer-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
     .drawer-header h2 { font-size: 15px; font-weight: 700; }
     .drawer-close { width: 28px; height: 28px; border: none; background: #f1f5f9; border-radius: 6px; cursor: pointer; font-size: 16px; }
@@ -159,23 +198,7 @@
     .rule-content ul { padding-left: 18px; margin-top: 6px; }
     .rule-content li { margin-bottom: 5px; }
     .rule-content code { font-family: ui-monospace, monospace; font-size: 12px; background: #f1f5f9; padding: 1px 5px; border-radius: 4px; }
-    .modal {
-      position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.95);
-      width: 480px; max-width: calc(100vw - 32px); z-index: 501;
-      background: #fff; border-radius: var(--radius-lg); box-shadow: 0 16px 48px rgba(30,40,60,0.2);
-      opacity: 0; pointer-events: none; transition: all 0.2s;
-    }
-    .modal-overlay.open .modal { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
-    .modal-header { padding: 16px 20px; border-bottom: 1px solid var(--border); font-size: 15px; font-weight: 700; }
-    .modal-body { padding: 16px 20px; }
-    .form-field { margin-bottom: 12px; }
-    .form-field label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
-    .form-field input, .form-field select, .form-field textarea {
-      width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px;
-    }
-    .modal-footer { padding: 12px 20px 16px; display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid var(--border); }
     .flow-page-intro { padding: 16px 18px 0; font-size: 12px; color: var(--text-muted); line-height: 1.55; }
-    .flow-scroll-hint { padding: 6px 18px 0; font-size: 11px; color: var(--text-muted); }
     .flow-svg-wrap { overflow: auto; padding: 16px 18px 24px; max-height: 78vh; }
     .flow-svg-wrap svg { display: block; margin: 0 auto; max-width: 100%; }
     .flow-edges line, .flow-edges polyline, .flow-edges path { stroke: #64748b; stroke-width: 1.5; fill: none; }
@@ -190,28 +213,119 @@
     .req { color: var(--danger); margin-left: 2px; }
     .editor-page {
       position: fixed; top: 0; left: var(--sidebar-w); right: 0; bottom: 0; z-index: 400;
-      display: none; flex-direction: column; background: #f5f7fb;
+      display: none; flex-direction: column;
+      background: linear-gradient(135deg, #e0e7ff 0%, #f0f4f8 40%, #e0f2fe 100%);
     }
     .editor-page.open { display: flex; }
+    .editor-shell {
+      flex: 1; width: 100%; min-height: 0;
+      display: flex; flex-direction: column;
+      background: transparent; border: none; box-shadow: none; border-radius: 0;
+    }
     .editor-top {
       display: flex; align-items: center; gap: 10px; flex-shrink: 0;
-      padding: 10px 20px; background: #fff; border-bottom: 1px solid var(--border);
+      padding: 12px 24px; background: rgba(255,255,255,0.78);
+      border-bottom: 1px solid var(--border); backdrop-filter: blur(12px);
     }
+    .editor-crumb {
+      display: flex; align-items: center; gap: 8px; min-width: 0; margin-right: auto;
+    }
+    .editor-crumb-link {
+      border: none; background: none; padding: 0; cursor: pointer;
+      font-size: 13px; color: var(--primary); font-family: inherit;
+    }
+    .editor-crumb-link:hover { text-decoration: underline; }
+    .editor-crumb-sep { color: var(--text-muted); font-size: 13px; }
     .editor-back {
       width: 30px; height: 30px; border: 1px solid var(--border); border-radius: 7px;
       background: #fff; color: var(--text-secondary); cursor: pointer; font-size: 16px; line-height: 1;
     }
-    .editor-back:hover { background: var(--surface-hover); color: var(--text-primary); }
     .editor-top h2 { font-size: 15px; font-weight: 700; }
+    .editor-steps {
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: flex-start; gap: 0;
+      width: min(1280px, 100%); margin: 0 auto;
+      padding: 14px 24px 6px;
+    }
+    .editor-steps button {
+      display: flex; align-items: center; gap: 10px;
+      border: none; background: none; padding: 6px 4px; cursor: pointer;
+      text-align: left; font-family: inherit; color: var(--text-secondary);
+    }
+    .editor-steps button i {
+      width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+      border: 2px solid #cbd5e1; display: inline-flex; align-items: center; justify-content: center;
+      font-style: normal; font-weight: 700; font-size: 13px; color: #94a3b8; background: #fff;
+    }
+    .editor-steps button span { display: grid; gap: 1px; }
+    .editor-steps button b { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+    .editor-steps button em { font-size: 11px; font-style: normal; color: var(--text-muted); font-weight: 400; }
+    .editor-steps button.active i {
+      background: var(--primary); border-color: var(--primary); color: #fff;
+    }
+    .editor-steps button.active b { color: var(--primary); }
+    .editor-steps button.is-done i {
+      background: var(--primary-light); border-color: var(--primary); color: var(--primary);
+    }
+    .editor-steps-line {
+      flex: 0 0 56px; width: 56px; height: 2px; background: #e2e8f0; margin: 0 12px;
+      align-self: center; margin-bottom: 14px;
+    }
+    .editor-steps button.is-done + .editor-steps-line { background: var(--primary-border); }
     .editor-body {
       flex: 1; min-height: 0; display: grid;
-      grid-template-columns: minmax(280px, 340px) minmax(360px, 1fr) 300px;
-      gap: 16px; padding: 12px 20px 6px; overflow: hidden;
+      grid-template-columns: minmax(420px, 1fr) 320px;
+      gap: 20px; padding: 16px 24px 10px; overflow: hidden;
+      width: min(1280px, 100%); margin: 0 auto;
     }
-    .editor-col { min-height: 0; display: flex; flex-direction: column; }
-    .editor-col-label { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px; flex-shrink: 0; }
-    .editor-form { overflow-y: auto; padding-right: 4px; }
-    .ef { margin-bottom: 8px; }
+    .editor-form { overflow-y: auto; padding-right: 6px; min-height: 0; display: flex; flex-direction: column; gap: 12px; }
+    .editor-card {
+      background: #fff; border: 1px solid #e8edf3; border-radius: 16px;
+      padding: 18px 20px 16px; box-shadow: 0 1px 2px rgba(15,23,42,.04);
+    }
+    .editor-card-head {
+      display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;
+      margin-bottom: 16px;
+    }
+    .editor-card-head h3 { margin: 0; font-size: 15px; font-weight: 700; letter-spacing: -.2px; }
+    .editor-card-head p { margin: 4px 0 0; font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+    .editor-card-idx { font-size: 12px; font-weight: 600; color: #94a3b8; letter-spacing: .04em; flex-shrink: 0; padding-top: 2px; }
+    .editor-card .ef { margin-bottom: 0; }
+    .editor-card .ef-split { gap: 12px 16px; }
+    .editor-stack { display: grid; gap: 14px; }
+    .editor-stack[hidden] { display: none !important; }
+    #claimList[hidden] { display: none !important; }
+    .btn-add-row {
+      display: inline-flex; align-items: center; gap: 6px; margin-top: 8px;
+      border: none; background: none; padding: 0; cursor: pointer;
+      font-size: 13px; font-weight: 600; color: var(--primary);
+    }
+    .btn-add-row:hover { text-decoration: underline; }
+    .ladder-card {
+      border: 1px solid #e8edf3; border-radius: 10px; padding: 8px 10px; background: #fff;
+      min-width: 0;
+    }
+    .ladder-row {
+      display: flex; flex-wrap: nowrap; align-items: center; gap: 6px;
+      min-width: 540px;
+    }
+    .ladder-row-title {
+      flex-shrink: 0; font-size: 13px; font-weight: 700; color: var(--text-primary); white-space: nowrap;
+    }
+    .ladder-row-label {
+      flex-shrink: 0; font-size: 12px; color: var(--text-secondary); font-weight: 500; white-space: nowrap;
+    }
+    .ladder-row .range-sep { color: var(--text-muted); font-size: 13px; flex-shrink: 0; }
+    .ladder-row input, .ladder-row select {
+      width: 0; min-width: 52px; flex: 1 1 52px; height: 32px; padding: 0 6px;
+      border: 1px solid var(--border); border-radius: 8px; font-size: 12px; font-family: inherit; background: #fff;
+    }
+    .ladder-row [data-rf="prizeKind"] { flex: 1.1 1 72px; min-width: 72px; }
+    .ladder-row [data-rf="prizeValue"] { flex: 1.3 1 72px; min-width: 64px; }
+    .ladder-row [data-rf="prizeValue"][hidden] { display: none !important; }
+    .ladder-row .ff-del { flex-shrink: 0; }
+    .ladder-stack { overflow-x: auto; min-width: 0; }
+    .ef { margin-bottom: 10px; }
     .ef > label { display: block; font-size: 12px; color: var(--text-secondary); font-weight: 500; margin-bottom: 5px; }
     .ef input[type="text"], .ef input[type="datetime-local"], .ef input[type="number"], .ef select, .ef textarea {
       width: 100%; border: 1px solid var(--border); border-radius: var(--radius-sm);
@@ -223,10 +337,6 @@
     .ef input:focus, .ef select:focus, .ef textarea:focus {
       outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.10);
     }
-    .ef input.is-error, .ef select.is-error, .ef textarea.is-error, .datetime-wrap.is-error input {
-      border-color: var(--danger);
-    }
-    .ef select:disabled { background: #f8fafc; color: var(--text-muted); cursor: not-allowed; }
     .field-box { position: relative; }
     .char-count { position: absolute; right: 8px; bottom: 6px; font-size: 11px; color: var(--text-muted); }
     .field-hint { margin-top: 3px; font-size: 11px; color: var(--text-muted); line-height: 1.4; }
@@ -246,7 +356,7 @@
       position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
       width: 14px; height: 14px; color: var(--text-muted); pointer-events: none;
     }
-    .stepper { display: flex; align-items: center; height: 34px; border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; background: #fff; width: 148px; }
+    .stepper { display: flex; align-items: center; height: 34px; border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; background: #fff; width: 100%; max-width: 220px; }
     .stepper button {
       width: 34px; height: 100%; border: none; background: #f8fafc; color: var(--text-secondary);
       cursor: pointer; font-size: 16px; flex-shrink: 0;
@@ -257,33 +367,34 @@
       color: var(--text-primary); background: #fff; font-family: inherit;
     }
     .stepper input:focus { outline: none; }
-    .radio-group { display: flex; gap: 10px; }
-    .radio-pill {
-      display: inline-flex; align-items: center; justify-content: center;
-      min-width: 72px; height: 32px; padding: 0 14px; border-radius: 999px; cursor: pointer;
-      border: 1px solid var(--border); background: #fff; color: var(--text-secondary);
-      font-size: 13px; font-weight: 500;
-    }
-    .radio-pill input { display: none; }
-    .radio-pill.active { background: var(--primary); border-color: var(--primary); color: #fff; }
-    .ef-split { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .img-upload { display: flex; align-items: center; gap: 8px; }
+    .img-upload { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .img-upload-btn {
       height: 32px; padding: 0 12px; border: 1px dashed var(--border); border-radius: var(--radius-sm);
       background: #fff; color: var(--text-secondary); font-size: 12px; cursor: pointer;
     }
     .img-upload-btn:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
     .img-upload-preview {
-      position: relative; width: 54px; height: 22px; border-radius: 6px; overflow: visible;
+      position: relative; width: 54px; height: 36px; border-radius: 6px; overflow: visible;
       background: #f1f5f9; display: flex; align-items: center; justify-content: center;
     }
-    .img-upload-preview img { max-width: 54px; max-height: 20px; display: block; }
+    .img-upload-preview img { max-width: 54px; max-height: 36px; display: block; object-fit: cover; }
     .img-upload-clear {
       position: absolute; top: -7px; right: -7px; width: 16px; height: 16px; border: none;
       border-radius: 50%; background: #475569; color: #fff; font-size: 11px; line-height: 1; cursor: pointer;
     }
+    .tag-field {
+      min-height: 34px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+      background: #fff; padding: 4px 8px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+    }
+    .tag-field:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.10); }
+    .tag-chip {
+      display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 8px;
+      border-radius: 999px; background: var(--primary-light); color: var(--primary); font-size: 12px;
+    }
+    .tag-chip button { border: none; background: none; color: inherit; cursor: pointer; font-size: 12px; line-height: 1; }
+    .tag-field input { border: none !important; height: 24px !important; flex: 1; min-width: 96px; padding: 0 !important; box-shadow: none !important; }
     .rte {
-      flex: 1; min-height: 0; display: flex; flex-direction: column;
+      min-height: 180px; display: flex; flex-direction: column;
       background: #fff; border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
     }
     .rte.fullscreen {
@@ -302,58 +413,216 @@
     .rte-btn svg { width: 14px; height: 14px; }
     .rte-sep { width: 1px; height: 16px; background: var(--border); margin: 6px 4px; }
     .rte-body {
-      flex: 1; min-height: 160px; padding: 14px 16px; overflow-y: auto; outline: none;
+      flex: 1; min-height: 120px; padding: 14px 16px; overflow-y: auto; outline: none;
       font-size: 14px; line-height: 1.7; color: var(--text-primary);
     }
     .rte-body:empty::before { content: attr(data-placeholder); color: var(--text-muted); }
-    .preview-col { align-items: center; }
+    .ef-split { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .radio-group, .switch-row { display: flex; align-items: center; gap: 10px; }
+    .radio-pill {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 72px; height: 32px; padding: 0 14px; border-radius: 999px; cursor: pointer;
+      border: 1px solid var(--border); background: #fff; color: var(--text-secondary);
+      font-size: 13px; font-weight: 500;
+    }
+    .radio-pill.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+    .radio-pill input { display: none; }
+    .detail-tabs { display: flex; gap: 0; margin: 0 0 12px; border-bottom: 1px solid var(--border); }
+    .detail-tabs button {
+      padding: 8px 14px; border: none; background: none; cursor: pointer;
+      font-size: 13px; color: var(--text-secondary); border-bottom: 2px solid transparent; margin-bottom: -1px;
+    }
+    .detail-tabs button.active { color: var(--primary); font-weight: 600; border-bottom-color: var(--primary); }
+    #caseList {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    }
+    #caseList .field-hint { grid-column: 1 / -1; margin: 0; }
+    .board-cfg-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px;
+    }
+    .board-cfg-grid[hidden] { display: none !important; }
+    .case-item {
+      position: relative; padding: 12px 40px 12px 12px; margin-bottom: 0;
+      border: 1px solid var(--border); border-radius: 8px; background: #fbfcfe;
+      display: grid; gap: 10px; min-width: 0;
+    }
+    .case-item .case-del,
+    .rule-item .rule-del,
+    .ff-del {
+      width: 28px; height: 28px; border: none; background: transparent; border-radius: 6px;
+      cursor: pointer; color: var(--text-muted); font-size: 18px; line-height: 1;
+    }
+    .case-item .case-del { position: absolute; top: 8px; right: 8px; }
+    .panel-title-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .panel-title-row h3 { font-size: 15px; font-weight: 700; }
+    .claim-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .claim-item, .rule-item {
+      position: relative; padding: 14px 40px 14px 14px;
+      border: 1px solid #e8edf3; border-radius: 12px; background: #f8fafc;
+      display: grid; gap: 12px; min-width: 0;
+    }
+    .rule-item .rule-del { position: absolute; top: 8px; right: 8px; }
+    .ladder-row {
+      margin-bottom: 8px;
+    }
+    .ef-top > .btn-ghost-sm, .ef-top > .btn-add-row { margin-top: 4px; }
+    .preview-col { align-items: center; display: flex; flex-direction: column; padding-top: 2px; min-height: 0; overflow-y: auto; }
     .phone-frame {
-      width: 230px; height: 470px; background: #111827; border-radius: 32px;
-      padding: 10px; box-shadow: 0 16px 40px rgba(15,23,42,0.18); flex-shrink: 0;
+      width: 320px; height: 640px; background: #111827; border-radius: 28px;
+      padding: 11px; box-shadow: 0 12px 28px rgba(15,23,42,0.16); flex-shrink: 0;
     }
-    .phone-screen {
-      height: 100%; background: #fff; border-radius: 24px; overflow: hidden;
-      display: flex; flex-direction: column;
+    .phone-screen { height: 100%; background: #fff; border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; }
+    .phone-status { height: 28px; display: flex; align-items: center; justify-content: center; }
+    .phone-notch { width: 72px; height: 12px; background: #111827; border-radius: 0 0 10px 10px; }
+    .phone-title { text-align: center; font-size: 14px; font-weight: 700; padding: 6px 16px 10px; border-bottom: 1px solid #f1f5f9; }
+    .phone-content { flex: 1; overflow-y: auto; padding: 0; background: #f5f6f8; font-size: 13px; line-height: 1.6; }
+    .pv-card {
+      display: flex; gap: 10px; margin: 8px 12px 10px; padding: 10px;
+      background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(15,23,42,.06);
     }
-    .phone-status {
-      height: 28px; display: flex; align-items: center; justify-content: center; position: relative; flex-shrink: 0;
+    .pv-cover { width: 72px; height: 72px; border-radius: 10px; object-fit: cover; flex-shrink: 0; background: #fff; }
+    .pv-title { font-size: 14px; font-weight: 800; line-height: 1.4; margin-bottom: 4px; }
+    .pv-time { font-size: 11px; color: var(--text-muted); margin-bottom: 6px; }
+    .pv-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 6px; }
+    .pv-chip { font-size: 10px; padding: 2px 7px; border-radius: 999px; background: #fff4ed; color: #ff5722; font-weight: 600; }
+    .pv-chip-p { background: #fff; border: 1px solid #ffccbc; color: var(--text-primary); }
+    .pv-chip-p em { font-style: normal; color: #ff5722; }
+    .pv-meta { font-size: 11px; color: var(--text-secondary); display: flex; gap: 8px; }
+    .pv-award {
+      margin: 0 12px 10px; padding: 10px 12px; border-radius: 12px;
+      font-size: 12px; font-weight: 600;
+      box-shadow: 0 1px 4px rgba(15,23,42,.06);
     }
-    .phone-notch {
-      width: 72px; height: 12px; background: #111827; border-radius: 0 0 10px 10px;
+    .pv-award.won { background: #fff4ed; color: #9a3412; border: 1px solid #ffd4b8; }
+    .pv-award.not_won { background: #d8dce3; color: #374151; border: 1px solid #c5cad3; }
+    .pv-main {
+      margin: 0 12px 12px; background: #fff; border-radius: 12px;
+      box-shadow: 0 1px 4px rgba(15,23,42,.06); overflow: hidden;
     }
-    .phone-title {
-      text-align: center; font-size: 14px; font-weight: 700; padding: 6px 16px 10px;
-      border-bottom: 1px solid #f1f5f9; color: var(--text-primary); flex-shrink: 0;
-      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    #previewTabs { display: flex; gap: 0; margin: 0; border-bottom: 1px solid var(--border); background: #fff; }
+    #previewTabs[hidden] { display: none !important; }
+    #previewTabs button {
+      flex: 1; padding: 8px 0; border: none; background: none; cursor: pointer;
+      font-size: 13px; color: var(--text-secondary); border-bottom: 2px solid transparent; margin-bottom: -1px;
     }
-    .phone-content { flex: 1; overflow-y: auto; padding: 12px; background: #f8fafc; }
-    .phone-placeholder { height: 160px; border-radius: 10px; background: #e5e7eb; }
-    .phone-html { font-size: 13px; line-height: 1.65; color: var(--text-primary); background: #fff; border-radius: 10px; padding: 10px; min-height: 160px; }
-    .phone-html img { max-width: 100%; }
+    #previewTabs button.active { color: #ff5722; font-weight: 700; border-bottom-color: #ff5722; }
+    #previewPane { padding: 10px 12px 14px; min-height: 80px; }
+    #previewPane .intro-html, #previewPane .phone-html { font-size: 12px; line-height: 1.65; }
+    #previewPane .intro-html img, #previewPane .case-media img, #previewPane video { max-width: 100%; border-radius: 8px; display: block; }
+    #previewPane .case-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    #previewPane .case-block { margin-bottom: 0; }
+    #previewPane .case-name { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+    .board-limit-row { display: flex; align-items: center; gap: 8px; }
+    .board-limit-row input { width: 88px; height: 34px; border: 1px solid var(--border); border-radius: 8px; padding: 0 10px; }
+    .board-hint { font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-top: 4px; }
+    #previewPane .board-empty { color: #9aa5b4; font-size: 12px; padding: 20px 0; text-align: center; }
+    #previewPane .board-list { background: #fff; }
+    #previewPane .board-row {
+      display: grid; grid-template-columns: 32px 28px minmax(0, 1fr) auto;
+      grid-template-rows: auto auto; column-gap: 8px; align-items: center;
+      padding: 8px 0; border-bottom: 1px solid #f3f4f6; font-size: 11px;
+    }
+    #previewPane .board-row:last-child { border-bottom: none; }
+    #previewPane .board-rank {
+      grid-column: 1; grid-row: 1; width: 32px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #previewPane .board-av-wrap { grid-column: 2; grid-row: 1; position: relative; width: 28px; height: 28px; }
+    #previewPane .board-top {
+      font-size: 8px; font-weight: 800; padding: 1px 4px; border-radius: 4px; color: #fff;
+    }
+    #previewPane .board-top.is-1 { background: #ff5722; }
+    #previewPane .board-top.is-2 { background: #f59e0b; }
+    #previewPane .board-top.is-3 { background: #d97706; }
+    #previewPane .board-num { font-size: 12px; font-weight: 700; color: #9ca3af; }
+    #previewPane .board-av, #previewPane .board-av-fallback {
+      width: 28px; height: 28px; border-radius: 50%; object-fit: cover;
+      color: #fff; font-size: 11px; font-weight: 700;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+    #previewPane .board-av + .board-av-fallback { display: none !important; }
+    #previewPane .board-nick { grid-column: 3; grid-row: 1; font-size: 12px; font-weight: 700; min-width: 0; }
+    #previewPane .board-val { grid-column: 4; grid-row: 1; font-size: 12px; font-weight: 800; color: #f97316; text-align: right; }
+    #previewPane .board-metric, #previewPane .board-period {
+      font-size: 10px; color: #9aa5b4; font-weight: 400; line-height: 1.3;
+    }
+    #previewPane .board-metric { grid-column: 3; grid-row: 2; }
+    #previewPane .board-period { grid-column: 4; grid-row: 2; text-align: right; }
+    #previewPane .board-me {
+      display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; grid-template-rows: auto auto;
+      column-gap: 8px; align-items: center; margin-top: 8px; padding-top: 8px;
+      border-top: 1px solid #f3f4f6;
+    }
+    #previewPane .board-me .board-av, #previewPane .board-me .board-av-fallback { grid-column: 1; grid-row: 1; }
+    #previewPane .me-name { grid-column: 2; grid-row: 1; font-size: 12px; font-weight: 800; }
+    #previewPane .me-val { grid-column: 3; grid-row: 1; font-size: 12px; font-weight: 800; color: #f97316; text-align: right; }
+    #previewPane .me-rank { grid-column: 2; grid-row: 2; font-size: 10px; color: #9aa5b4; font-weight: 400; }
+    #previewPane .me-period { grid-column: 3; grid-row: 2; font-size: 10px; color: #9aa5b4; text-align: right; }
+    #previewCta { display: flex; gap: 8px; padding: 10px; border-top: 1px solid #f1f5f9; }
+    #previewCta[hidden] { display: none !important; }
+    #previewCta button {
+      flex: 1; border: none; border-radius: 999px; padding: 8px; font-size: 12px; font-weight: 700;
+      background: linear-gradient(135deg, #ff8a4c, #ff5722); color: #fff;
+    }
     .editor-foot {
       flex-shrink: 0; display: flex; justify-content: center; gap: 10px;
-      padding: 10px 20px 12px; background: #fff; border-top: 1px solid var(--border);
+      padding: 12px 24px; background: rgba(255,255,255,0.86);
+      border-top: 1px solid var(--border);
     }
-    .btn-save { min-width: 120px; height: 38px; justify-content: center; font-size: 14px; }
-    @media (max-width: 1280px) {
-      .editor-body { grid-template-columns: minmax(260px, 300px) minmax(280px, 1fr) 250px; }
-      .phone-frame { width: 210px; height: 440px; }
+    .editor-foot [hidden] { display: none !important; }
+    .ms-wrap { position: relative; }
+    .ms-trigger {
+      width: 100%; min-height: 34px; text-align: left; border: 1px solid var(--border);
+      border-radius: 7px; background: #fff; padding: 6px 10px; cursor: pointer; font-size: 13px;
     }
-    @media (max-width: 1024px) {
+    .ms-panel {
+      position: absolute; left: 0; right: 0; top: calc(100% + 4px); z-index: 20;
+      background: #fff; border: 1px solid var(--border); border-radius: 8px; box-shadow: var(--shadow); padding: 8px;
+    }
+    .ms-options { max-height: 180px; overflow: auto; display: flex; flex-direction: column; gap: 4px; margin-top: 6px; }
+    .ms-options label { display: flex; align-items: center; gap: 6px; font-size: 12px; padding: 4px; }
+    .ms-options label[hidden] { display: none !important; }
+    .data-block { padding: 18px 20px 24px; }
+    .data-block h2 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .data-block p, .data-block li { font-size: 13px; color: var(--text-secondary); line-height: 1.7; }
+    .data-block ul { padding-left: 18px; margin: 8px 0 12px; }
+    .ix-tab-bar { display: flex; flex-wrap: wrap; gap: 0; margin: 14px 0 0; border-bottom: 1px solid var(--border); }
+    .ix-tab-bar button {
+      padding: 9px 16px; border: none; background: none; cursor: pointer;
+      font-size: 13px; color: var(--text-secondary); border-bottom: 2px solid transparent; margin-bottom: -1px;
+    }
+    .ix-tab-bar button.active { color: var(--primary); font-weight: 600; border-bottom-color: var(--primary); }
+    .ix-pane { display: none; padding: 16px 0 4px; }
+    .ix-pane.active { display: block; }
+    .ix-rule { background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 12px 14px; margin: 0 0 16px; font-size: 13px; line-height: 1.7; color: #92400e; }
+    .ix-step { display: grid; grid-template-columns: 36px 1fr; gap: 10px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; background: #fff; margin-bottom: 8px; }
+    .ix-step i {
+      width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      background: var(--primary-light); color: var(--primary); font-style: normal; font-size: 12px; font-weight: 700;
+    }
+    .impl-prompt { padding: 16px 18px 24px; }
+    .impl-prompt-head { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; margin-bottom: 14px; flex-wrap: wrap; }
+    .impl-prompt-head h2 { font-size: 16px; font-weight: 700; }
+    .impl-note { margin: 0 0 14px; padding: 10px 12px; border-radius: 8px; background: #fffbeb; border: 1px solid #fde68a; font-size: 12px; line-height: 1.55; color: #92400e; }
+    .impl-block { margin-bottom: 16px; }
+    .impl-block h4 { font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; }
+    .impl-step { border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; margin-bottom: 10px; background: #fff; }
+    .impl-kind { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; }
+    .impl-kind.check { background: #fef9c3; color: #854d0e; }
+    .impl-kind.write { background: #dcfce7; color: #166534; }
+    .impl-kind.ui { background: #dbeafe; color: #1e40af; }
+    .impl-kv { display: grid; grid-template-columns: 64px 1fr; gap: 6px 10px; font-size: 12px; margin-top: 8px; }
+    .drawer-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .drawer-table th, .drawer-table td { padding: 8px 6px; border-bottom: 1px solid var(--border); text-align: left; }
+    .drawer-table th { color: var(--text-muted); font-size: 11px; }
+    @media (max-width: 1100px) {
       .editor-body { grid-template-columns: 1fr; overflow-y: auto; }
-      .preview-col { display: none; }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-      }
+      .preview-col { display: flex; padding-bottom: 20px; }
+      .claim-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
-
   <aside class="sidebar">
     <div class="sidebar-brand">
       <div class="brand">
@@ -363,10 +632,10 @@
           <div class="brand-sub">PRD Demo · 产品交付研发</div>
         </div>
       </div>
-      <span class="sprint-pill">YBDD2.0 · 迭代 v1</span>
+      <span class="sprint-pill">YBDD2.0 · 迭代 v2</span>
     </div>
     <div class="sidebar-scroll" data-iteration-sidebar></div>
-    <div class="sidebar-foot">FR-006 · 页内 Tab<br />前端交互 / 管理后台 / 业务流程</div>
+    <div class="sidebar-foot">FR-006 · 页内 Tab<br />前端交互 / 管理后台 / 前后端数据交互</div>
   </aside>
 
   <main class="main">
@@ -374,15 +643,14 @@
       <a href="framework-shell.html">Sprint 概览</a>
       <span> / 运营 / 活动中心</span>
     </nav>
-
     <header class="page-header">
       <div>
         <h1>
           活动中心
           <span class="badge badge-fr">FR-006</span>
-          <span class="badge badge-version">v1 当前</span>
+          <span class="badge badge-version">v2 当前</span>
         </h1>
-        <p class="page-desc">改造现有活动中心：保留图1卡片布局；顶部 Banner 展示置顶活动；支持全部/进行中/已结束筛选；卡片展示浏览人数；参加人数由后台虚拟配置，未配置不展示；参加人数后图未配置则不展示。</p>
+        <p class="page-desc">查看只进详情。封面用后台「封面」。领取仅介绍 Tab 且进行中可点；跳转失败不记已参与。榜单由后台开关控制。本人展位只看第 2 步 <code>showUserAward</code>，不绑榜单。闭合规则见场景说明与 <code>fe-be-contract.md</code>。</p>
       </div>
       <div class="page-header-actions">
         <button class="btn btn-rule" id="toggleRuleDrawer" type="button">📋 需求规则</button>
@@ -392,156 +660,361 @@
     <div class="page-tab-bar" role="tablist">
       <button type="button" class="active" data-page="view-fe" role="tab">前端交互</button>
       <button type="button" data-page="view-admin" role="tab">管理后台</button>
-      <button type="button" data-page="view-flow" role="tab">业务流程</button>
+      <button type="button" data-page="view-data" role="tab">前后端数据交互</button>
     </div>
 
     <div id="view-fe" class="page-view active">
-      <div class="demo-layout">
-        <div class="glass-card scene-panel">
-          <h2>场景切换</h2>
-          <div class="scene-list">
-            <button class="scene-btn active" type="button" data-filter="all">
-              <div class="scene-title">图1 · 活动中心 · 全部</div>
-              <div class="scene-desc">顶部 Banner 置顶 + 筛选 Tab + 图1卡片列表；状态角标为待开始/进行中/已结束</div>
-            </button>
-            <button class="scene-btn" type="button" data-filter="ongoing">
-              <div class="scene-title">筛选 · 进行中</div>
-              <div class="scene-desc">仅展示进行中活动；置顶 Banner 固定展示在顶部，不随筛选隐藏</div>
-            </button>
-            <button class="scene-btn" type="button" data-filter="ended">
-              <div class="scene-title">筛选 · 已结束</div>
-              <div class="scene-desc">仅展示已结束活动；置顶 Banner 仍固定展示在顶部</div>
-            </button>
-            <button class="scene-btn" type="button" data-filter="registration">
-              <div class="scene-title">人数展示 · 浏览 / 参加</div>
-              <div class="scene-desc">卡片展示浏览人数；已配置参加人数的活动展示「x人已参加」；后图未配置则只显示文字</div>
-            </button>
+      <div class="module-tab-bar" role="tablist">
+        <button type="button" class="active" data-sub="fe-scene" role="tab">场景</button>
+        <button type="button" data-sub="fe-flow" role="tab">业务流程</button>
+        <button type="button" data-sub="fe-impl" role="tab">开发提示词</button>
+      </div>
+      <div id="fe-scene" class="sub-view active">
+        <div class="demo-layout" id="feDemo">
+          <div class="glass-card scene-panel">
+            <div class="scene-head">
+              <div>
+                <h2>活动中心 · 前端交互 Demo</h2>
+                <p class="scene-lead">点查看进详情。筛选只过滤卡片，Banner 不撤。领取后才进已参与。闭合边界写在下方场景规则，不只指向契约文件。</p>
+              </div>
+              <button class="btn-preview" type="button" data-preview="fe" aria-pressed="false">全屏预览</button>
+            </div>
+            <div class="scene-list">
+              <button class="scene-btn active" type="button" data-scene="list-all" data-hint="筛选 Tab 在 Demo 内点击切换。Banner 不随筛选隐藏。">列表 · 全部</button>
+              <button class="scene-btn" type="button" data-scene="detail-camp" data-hint="三 Tab 已获奖。介绍 / 案例 / 榜单可点。">详情 · 三 Tab 已获奖</button>
+            </div>
+            <p class="scene-hint" id="feSceneHint">筛选 Tab 在 Demo 内点击切换。Banner 不随筛选隐藏。</p>
+            <div class="scene-rules" id="sceneRulesList">
+              <div class="scene-rule">
+                <h3>筛选与入口</h3>
+                <ul>
+                  <li>Tab：全部 / 进行中 / 已结束 / 已参与。在右侧 Demo 内点切换。<strong>没有「待开始」筛选</strong>，待开始只出现在「全部」。</li>
+                  <li>只过滤下方卡片；置顶 Banner 不随任一筛选（含已参与）隐藏。</li>
+                  <li><strong>整张列表卡片可点</strong>，与「查看」相同：一律进详情，不外跳，不记已参与。Banner 整块同样进详情。</li>
+                  <li>隐藏活动不进 Banner / 四个 Tab / 详情。深链打开隐藏活动时停在列表。</li>
+                  <li>已参与 = 显示池 ∩ 该用户已领取；活动被隐藏后从已参与消失。</li>
+                  <li>已参与空态：「暂无已参与的活动」；其他筛选空：「暂无符合条件的活动」。</li>
+                  <li>列表卡片不打已获奖/未获奖角标。</li>
+                </ul>
+              </div>
+              <div class="scene-rule">
+                <h3>列表卡片参数 ↔ 后台位置</h3>
+                <p>图1 卡片。字段均在编辑第 1 步「活动基础信息」。隐藏活动（活动状态=隐藏）不进显示池。</p>
+                <table>
+                  <thead><tr><th>卡片表面</th><th>后台位置</th></tr></thead>
+                  <tbody>
+                    <tr><td>项目·名称</td><td>第 1 步「项目」<code>projects[]</code></td></tr>
+                    <tr><td>待开始 / 进行中 / 已结束角标</td><td>第 1 步「开始时间」「结束时间」按当前时刻计算，无独立角标字段</td></tr>
+                    <tr><td>标题</td><td>第 1 步「活动标题」<code>title</code></td></tr>
+                    <tr><td>标题下灰字</td><td>第 1 步「活动描述」<code>description</code>；与标签分开取值；未填不展示</td></tr>
+                    <tr><td>活动时间</td><td>第 1 步开始～结束；结束空=长期</td></tr>
+                    <tr><td>x人浏览</td><td>第 1 步「浏览量」<code>initialViews</code>，必带，前端不累加</td></tr>
+                    <tr><td>x人已参加</td><td>第 1 步「参加人数」<code>enrolledCount</code>；未填整段不展示；无后图</td></tr>
+                    <tr><td>「查看」</td><td>固定文案，不随后台领取按钮变化</td></tr>
+                  </tbody>
+                </table>
+                <ul>
+                  <li>标签 <code>tags[]</code> 配在第 1 步「标签」，详情标签行使用；列表图1 以项目行为主。</li>
+                  <li>封面 <code>cover</code> 在第 1 步「封面」，用于详情顶栏；列表/Banner 不强制用封面。</li>
+                  <li>所属平台、所属赛道只用于后台筛选，不上列表卡片。</li>
+                </ul>
+              </div>
+              <div class="scene-rule">
+                <h3>排序规则</h3>
+                <ul>
+                  <li>显示池内最多 1 条置顶：第 1 步「是否置顶」<code>pinned</code>。置顶只出 Banner，不在下方列表重复（已参与 Tab 仍可出现该活动卡片）。</li>
+                  <li>下方卡片顺序沿用既有列表序：与后台活动列表「排序」列一致，<strong>数值越大越靠前</strong>；同分再按稳定 id。</li>
+                  <li>本 FR 不新增可编辑排序字段；后台「排序」列仅展示。</li>
+                  <li>筛选 Tab 只过滤，不改相对顺序。</li>
+                </ul>
+              </div>
+            </div>
+            <div class="scene-rules" id="sceneRulesDetail" hidden>
+              <div class="scene-rule">
+                <h3>2.1 三 Tab 显示规则</h3>
+                <ul>
+                  <li>顺序固定：介绍 → 案例 → 榜单；缺则跳过。默认落在从左起第一个实际存在的 Tab。</li>
+                  <li>介绍：已下发介绍正文才出现。</li>
+                  <li>案例：至少 1 条完整案例（名称 + 图片或视频组成）才出现。</li>
+                  <li>榜单：后台「榜单」=开启才出现。空名单仍出该 Tab 内容（仅榜单一个时无 Tab 栏），空态「暂无榜单数据」；底栏 <code>self</code> 仍可在。</li>
+                  <li>未配置的 Tab 整段不渲染。实际存在不足 2 个：不展示 Tab 栏，正文仍在独立内容卡片。</li>
+                  <li>禁止「我的作品」。本 Demo 为三 Tab 齐全态，点 Tab 可切换。</li>
+                </ul>
+              </div>
+              <div class="scene-rule">
+                <h3>2.2 按钮点击规则</h3>
+                <ul>
+                  <li>领取只在「介绍」Tab 底栏展示。案例、榜单不显示。无介绍 Tab：即使开了领取开关也无底栏。</li>
+                  <li>开关关或 0 个已配按钮：无底栏。最多 2 个；半填不下发。</li>
+                  <li>待开始 / 已结束：已配按钮可展示但不可点，不记已参与。</li>
+                  <li>进行中、不需跳转：点击后文案变为配置值，并记已参与；再点保持变更文案，不新增已参与行。</li>
+                  <li>进行中、需跳转：客户端成功调起即记（不要求落地页 200）；失败不记。Demo 地址含 <code>fail</code> 视为失败。</li>
+                  <li>去重键（用户, 活动）。两个按钮点任一都是同一条。列表/Banner「查看」不记。</li>
+                </ul>
+              </div>
+              <div class="scene-rule">
+                <h3>2.3 奖品显示规则与样式</h3>
+                <ul>
+                  <li>仅第 2 步打开「显示用户获奖/未获奖信息」<strong>且已下发 <code>awardStatus</code></strong> 才展示。不绑榜单开关、不绑活动是否结束。无审核中。详情内容页不配置该样式。</li>
+                  <li>开关开但未算出/未下发 <code>awardStatus</code>：不展示展位。</li>
+                  <li>位置：信息卡片与 Tab 区之间，独立卡片（圆角、留白、轻阴影），与上下白卡片分开。</li>
+                  <li><code>awardStatus=won</code>：浅橙底 + 橙边 + 深橙字，文案「恭喜获奖」，可带 <code>awardPrize</code>。</li>
+                  <li><code>not_won</code>：结构与已获奖相同，灰底 + 灰边 + 深灰字，文案「未获奖，再接再厉」。</li>
+                  <li>列表卡片不打获奖角标。</li>
+                </ul>
+                <div class="scene-award-swatch">
+                  <div class="pv-award won">恭喜获奖，奖品 188 元</div>
+                  <div class="pv-award not_won">未获奖，再接再厉</div>
+                </div>
+              </div>
+              <div class="scene-rule">
+                <h3>2.4 其他规则</h3>
+                <ul>
+                  <li>页头固定「活动详情」，不放活动标题。信息卡片与 Tab/正文卡片各自白底圆角。</li>
+                  <li>已下发封面才展示封面；浏览人数始终「x人浏览」；参加人数未下发则不展示。</li>
+                  <li>隐藏活动不进显示池。深链打开隐藏 <code>activityId</code> 停在列表，不当详情。</li>
+                  <li>案例图片点击放大、长按保存（Demo toast）。案例视频用 Mock 地址可播。案例卡片两列平铺。</li>
+                  <li>登录能力已存在，本 FR 不单开未登录分支。</li>
+                </ul>
+              </div>
+              <div class="scene-rule">
+                <h3>2.5 榜单字段（名称均来自后台配置或能力出参）</h3>
+                <p>C 端不写死「短剧推广」「7日收益」。行描述、周期描述的<strong>字段名</strong>是后台第 1 步详情内容 · 榜单里的配置项；未填不展示、不下发。</p>
+                <table>
+                  <thead><tr><th>C 端表面</th><th>字段名</th><th>来源</th></tr></thead>
+                  <tbody>
+                    <tr><td>是否出现榜单 Tab</td><td><code>leaderboardVisible</code></td><td>后台第 1 步「榜单」开启/隐藏</td></tr>
+                    <tr><td>名单条数</td><td><code>leaderboardLimit</code></td><td>后台第 1 步「TOP 名单数」</td></tr>
+                    <tr><td>昵称下方描述</td><td><code>leaderboardLineDesc</code></td><td>后台第 1 步「行描述」；灰色小字，不高亮</td></tr>
+                    <tr><td>金额/奖品下方描述</td><td><code>leaderboardPeriodDesc</code></td><td>后台第 1 步「周期描述」；灰色小字，不高亮</td></tr>
+                    <tr><td>名次、头像、脱敏昵称、金额/奖品</td><td><code>rank</code> / <code>avatarUrl</code> / <code>nicknameMasked</code> / <code>value</code></td><td>能力「活动榜单」；昵称与金额/奖品与头像垂直居中</td></tr>
+                  </tbody>
+                </table>
+                <ul>
+                  <li>脱敏昵称由能力返回，C 端不再用明文。无标签。排名列宽固定，第 4 名起与前三同列。</li>
+                  <li>隐藏榜单：不请求能力「活动榜单」。开启时必带 <code>self</code>；本人不在 TOP 内仍展示底栏（如排名·999+）。</li>
+                  <li>行数 ≤ TOP，不足不补空行。空名单正文「暂无榜单数据」。</li>
+                </ul>
+              </div>
+              <div class="scene-rule">
+                <h3>2.6 闭合边界（交付）</h3>
+                <ul>
+                  <li>隐藏活动：深链不当详情、已参与 Tab 也不再出现。</li>
+                  <li>无「待开始」筛选；待开始只在「全部」。浏览人数取后台初始值，C 端不 +1。</li>
+                  <li>无介绍 Tab 则无领取底栏。跳转成功=客户端调起成功，不要求落地页 200。地址含 <code>fail</code> 视为失败。</li>
+                  <li>两个领取按钮去重为同一条已参与。本 FR 不单开未登录页，记账发生在已登录会话。</li>
+                  <li>展位只看 <code>showUserAward</code>+<code>awardStatus</code>，不看榜单、不看是否结束。</li>
+                  <li>奖励规则：半填整条不下发，允许 0 条仍保存。多条独立命中；同类区间重叠按配置顺序第一条命中即停。统计口径沿用现网。</li>
+                  <li>后台：置顶冲突拒绝保存（不自动取消对方）；榜单开且 TOP 小于 1 拒绝保存。半填介绍/案例/领取只是不下发。</li>
+                  <li>完整能力入参/出参见仓库 <code>_bmad-output/specs/spec-fr006-activity-center/fe-be-contract.md</code>。</li>
+                </ul>
+              </div>
+            </div>
           </div>
-          <div class="scene-note">置顶活动以<strong>顶部 Banner</strong>形式展示，不在列表卡片中重复出现。列表卡片结构沿用图1：<strong>项目标签 → 灰色内容区（状态角标 + 图标 + 标题/副标题）→ 底部信息 +「查看」按钮</strong>。</div>
-        </div>
-        <div class="glass-card mockup-panel">
-          <div class="mockup-frame-wrap">
-            <iframe id="mockupFrame" title="活动中心 Mockup" src="about:blank" data-src="activity-center-demo.html"></iframe>
+          <div class="glass-card mockup-panel">
+            <div class="mockup-frame-wrap">
+              <iframe id="mockupFrame" title="活动中心 Mockup" src="about:blank"></iframe>
+            </div>
           </div>
         </div>
+      </div>
+      <div id="fe-flow" class="sub-view">
+        <div class="glass-card flow-page">
+          <p class="flow-page-intro">一条主链：运营保存并显示 → 用户看 Banner/列表 → 点查看进详情（不记已参与）→ 点领取才写已参与。</p>
+          <div class="flow-svg-wrap">
+            <svg width="760" height="860" viewBox="0 0 760 860" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <marker id="flow-arrow-fe" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+                  <path d="M0,0 L9,4.5 L0,9 Z" fill="#64748b"/>
+                </marker>
+              </defs>
+              <g class="flow-edges" marker-end="url(#flow-arrow-fe)">
+                <line x1="380" y1="52" x2="380" y2="78"/>
+                <line x1="380" y1="150" x2="380" y2="176"/>
+                <line x1="380" y1="256" x2="380" y2="282"/>
+                <line x1="440" y1="322" x2="560" y2="322"/>
+                <line x1="380" y1="362" x2="380" y2="388"/>
+                <line x1="380" y1="456" x2="380" y2="482"/>
+                <line x1="380" y1="550" x2="380" y2="576"/>
+                <line x1="440" y1="616" x2="560" y2="616"/>
+                <line x1="380" y1="656" x2="380" y2="682"/>
+                <line x1="380" y1="750" x2="380" y2="776"/>
+              </g>
+              <ellipse cx="380" cy="30" rx="40" ry="20" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.6"/>
+              <text x="380" y="34" text-anchor="middle" font-size="12" font-weight="600" fill="#166534">开始</text>
+              <rect x="230" y="78" width="300" height="72" rx="8" fill="#eff6ff" stroke="#2563eb"/>
+              <text x="380" y="106" text-anchor="middle" font-size="13" font-weight="600" fill="#18222f">用户进入活动中心</text>
+              <text x="380" y="128" text-anchor="middle" font-size="11" fill="#64748b">Banner 固定 · 筛选只过滤卡片</text>
+              <rect x="230" y="176" width="300" height="80" rx="8" fill="#dbeafe" stroke="#2563eb"/>
+              <text x="380" y="206" text-anchor="middle" font-size="13" font-weight="600" fill="#1e40af">点查看进详情</text>
+              <text x="380" y="228" text-anchor="middle" font-size="11" fill="#64748b">不外跳 · 不因查看记账</text>
+              <polygon points="380,282 440,322 380,362 320,322" fill="#fef9c3" stroke="#ca8a04"/>
+              <text x="380" y="318" text-anchor="middle" font-size="12" font-weight="600" fill="#854d0e">已配领取按钮？</text>
+              <text x="380" y="336" text-anchor="middle" font-size="10" fill="#64748b">关或 0 条无底栏</text>
+              <text x="448" y="318" font-size="11" fill="#dc2626" font-weight="600">否</text>
+              <rect x="560" y="300" width="168" height="44" rx="8" fill="#e2e8f0" stroke="#94a3b8"/>
+              <text x="644" y="326" text-anchor="middle" font-size="12" fill="#475569">只读详情结束</text>
+              <rect x="230" y="388" width="300" height="68" rx="8" fill="#fff7ed" stroke="#ea580c"/>
+              <text x="380" y="416" text-anchor="middle" font-size="13" font-weight="600" fill="#9a3412">用户点领取按钮</text>
+              <text x="380" y="436" text-anchor="middle" font-size="11" fill="#64748b">仅进行中可点 · 失败跳转不记账</text>
+              <rect x="230" y="482" width="300" height="68" rx="8" fill="#dcfce7" stroke="#16a34a"/>
+              <text x="380" y="510" text-anchor="middle" font-size="13" font-weight="600" fill="#166534">写已参与</text>
+              <text x="380" y="530" text-anchor="middle" font-size="11" fill="#64748b">去重 (user, 活动)</text>
+              <polygon points="380,576 440,616 380,656 320,616" fill="#fef9c3" stroke="#ca8a04"/>
+              <text x="380" y="612" text-anchor="middle" font-size="12" font-weight="600" fill="#854d0e">仍在显示池？</text>
+              <text x="448" y="612" font-size="11" fill="#16a34a" font-weight="600">是</text>
+              <rect x="560" y="594" width="168" height="44" rx="8" fill="#fef2f2" stroke="#dc2626"/>
+              <text x="644" y="620" text-anchor="middle" font-size="12" fill="#991b1b">已参与不展示</text>
+              <rect x="230" y="682" width="300" height="68" rx="8" fill="#dcfce7" stroke="#16a34a"/>
+              <text x="380" y="710" text-anchor="middle" font-size="13" font-weight="600" fill="#166534">已参与 Tab 出现该活动</text>
+              <text x="380" y="730" text-anchor="middle" font-size="11" fill="#64748b">空态「暂无已参与的活动」</text>
+              <ellipse cx="380" cy="798" rx="40" ry="20" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.6"/>
+              <text x="380" y="802" text-anchor="middle" font-size="12" font-weight="600" fill="#166534">结束</text>
+            </svg>
+          </div>
+          <div class="flow-legend">
+            <span><i style="background:#dbeafe;border:1px solid #2563eb"></i>前端</span>
+            <span><i style="background:#dcfce7;border:1px solid #16a34a"></i>后端写入</span>
+            <span><i style="background:#fef9c3;border:1px solid #ca8a04"></i>校验</span>
+            <span><i style="background:#fef2f2;border:1px solid #dc2626"></i>阻断</span>
+          </div>
+        </div>
+      </div>
+      <div id="fe-impl" class="sub-view">
+        <div class="glass-card" data-impl-host="c"></div>
       </div>
     </div>
 
     <div id="view-admin" class="page-view">
-      <div class="glass-card">
-        <div class="table-toolbar">
-          <h3>活动管理</h3>
-          <button class="btn btn-primary" type="button" onclick="openActivityEditor()">新增活动</button>
-        </div>
-        <div class="filter-bar">
-          <div class="filter-field"><label>活动标题</label><input type="text" id="filterTitle" placeholder="培训营" /></div>
-          <div class="filter-field"><label>所属平台</label><select id="filterPlatform"><option value="">全部</option><option>右豹</option><option>小程序</option></select></div>
-          <div class="filter-field"><label>所属赛道</label><select id="filterTrack"><option value="">全部</option><option>内容创作</option><option>官方培训</option><option>推广变现</option></select></div>
-          <div class="filter-field"><label>活动状态</label><select id="filterVisible"><option value="">全部</option><option value="1">显示</option><option value="0">隐藏</option></select></div>
-          <div class="filter-actions">
-            <button class="btn-ghost-sm" type="button" onclick="resetActivityFilter()">重置</button>
-            <button class="btn btn-primary" type="button" onclick="queryActivityFilter()">查询</button>
+      <div class="module-tab-bar" role="tablist">
+        <button type="button" class="active" data-sub="admin-list" role="tab">列表</button>
+        <button type="button" data-sub="admin-flow" role="tab">业务流程</button>
+        <button type="button" data-sub="admin-impl" role="tab">开发提示词</button>
+      </div>
+      <div id="admin-list" class="sub-view active">
+        <div class="glass-card">
+          <div class="table-toolbar">
+            <h3>活动管理</h3>
+            <button class="btn btn-primary" type="button" onclick="openActivityEditor()">新增活动</button>
+          </div>
+          <div class="filter-bar">
+            <div class="filter-field"><label>活动标题</label><input type="text" id="filterTitle" placeholder="培训营" /></div>
+            <div class="filter-field"><label>所属平台</label><select id="filterPlatform"><option value="">全部</option><option>右豹</option><option>小程序</option></select></div>
+            <div class="filter-field"><label>所属赛道</label><select id="filterTrack"><option value="">全部</option><option>内容创作</option><option>官方培训</option><option>推广变现</option></select></div>
+            <div class="filter-field"><label>活动状态</label><select id="filterVisible"><option value="">全部</option><option value="1">显示</option><option value="0">隐藏</option></select></div>
+            <div class="filter-actions">
+              <button class="btn-ghost-sm" type="button" onclick="resetActivityFilter()">重置</button>
+              <button class="btn btn-primary" type="button" onclick="queryActivityFilter()">查询</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <colgroup>
+                <col style="width:72px" /><col style="width:180px" /><col style="width:80px" /><col style="width:90px" /><col style="width:100px" />
+                <col style="width:80px" /><col style="width:80px" /><col style="width:80px" /><col style="width:160px" /><col style="width:56px" /><col style="width:200px" />
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>ID</th><th>活动标题</th><th>所属平台</th><th>所属赛道</th><th>项目</th>
+                  <th>活动状态</th><th>浏览人数</th><th>参加人数</th><th>活动时间</th><th>排序</th><th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="activityTableBody"></tbody>
+            </table>
           </div>
         </div>
-        <div class="table-wrap">
-          <table>
-            <colgroup>
-              <col /><col /><col /><col /><col /><col /><col /><col /><col /><col /><col />
-            </colgroup>
-            <thead>
-              <tr>
-                <th>ID</th><th>活动标题</th><th>所属平台</th><th>所属赛道</th><th>项目</th>
-                <th>活动状态</th><th>浏览人数</th><th>参加人数</th><th>活动时间</th><th>排序</th><th>操作</th>
-              </tr>
-            </thead>
-            <tbody id="activityTableBody"></tbody>
-          </table>
+      </div>
+      <div id="admin-flow" class="sub-view">
+        <div class="glass-card flow-page">
+          <p class="flow-page-intro">运营两步保存：基础信息+介绍+案例 → 领取按钮与奖励规则。活动状态=显示才进显示池。置顶冲突拒绝保存。半填介绍/领取/规则只是不下发。榜单开且 TOP&lt;1 拒绝。</p>
+          <div class="flow-svg-wrap">
+            <svg width="760" height="780" viewBox="0 0 760 780" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <marker id="flow-arrow-admin" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+                  <path d="M0,0 L9,4.5 L0,9 Z" fill="#64748b"/>
+                </marker>
+              </defs>
+              <g class="flow-edges" marker-end="url(#flow-arrow-admin)">
+                <line x1="380" y1="52" x2="380" y2="78"/>
+                <line x1="380" y1="156" x2="380" y2="182"/>
+                <line x1="380" y1="260" x2="380" y2="286"/>
+                <line x1="440" y1="326" x2="560" y2="326"/>
+                <line x1="380" y1="366" x2="380" y2="392"/>
+                <line x1="440" y1="432" x2="560" y2="432"/>
+                <line x1="380" y1="472" x2="380" y2="498"/>
+                <line x1="380" y1="576" x2="380" y2="602"/>
+                <line x1="380" y1="670" x2="380" y2="696"/>
+              </g>
+              <ellipse cx="380" cy="30" rx="40" ry="20" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.6"/>
+              <text x="380" y="34" text-anchor="middle" font-size="12" font-weight="600" fill="#166534">开始</text>
+              <rect x="220" y="78" width="320" height="78" rx="8" fill="#eff6ff" stroke="#2563eb"/>
+              <text x="380" y="108" text-anchor="middle" font-size="13" font-weight="600">第1步 基础信息+介绍+案例</text>
+              <text x="380" y="130" text-anchor="middle" font-size="11" fill="#64748b">介绍/案例/榜单按配置 · 案例名称+组成</text>
+              <rect x="220" y="182" width="320" height="78" rx="8" fill="#eff6ff" stroke="#2563eb"/>
+              <text x="380" y="212" text-anchor="middle" font-size="13" font-weight="600">第2步 活动规则</text>
+              <text x="380" y="234" text-anchor="middle" font-size="11" fill="#64748b">领取开关 + 奖励规则</text>
+              <polygon points="380,286 440,326 380,366 320,326" fill="#fef9c3" stroke="#ca8a04"/>
+              <text x="380" y="322" text-anchor="middle" font-size="12" font-weight="600" fill="#854d0e">必填齐全？</text>
+              <text x="448" y="322" font-size="11" fill="#dc2626" font-weight="600">否</text>
+              <rect x="560" y="304" width="168" height="44" rx="8" fill="#fef2f2" stroke="#dc2626"/>
+              <text x="644" y="330" text-anchor="middle" font-size="12" fill="#991b1b">不保存</text>
+              <polygon points="380,392 440,432 380,472 320,432" fill="#fef9c3" stroke="#ca8a04"/>
+              <text x="380" y="428" text-anchor="middle" font-size="12" font-weight="600" fill="#854d0e">活动状态=显示？</text>
+              <text x="448" y="428" font-size="11" fill="#16a34a" font-weight="600">是</text>
+              <rect x="560" y="410" width="168" height="44" rx="8" fill="#e2e8f0" stroke="#94a3b8"/>
+              <text x="644" y="436" text-anchor="middle" font-size="12" fill="#475569">写入但不进显示池</text>
+              <rect x="220" y="498" width="320" height="78" rx="8" fill="#dcfce7" stroke="#16a34a"/>
+              <text x="380" y="528" text-anchor="middle" font-size="13" font-weight="600" fill="#166534">C 端可读显示池</text>
+              <text x="380" y="550" text-anchor="middle" font-size="11" fill="#64748b">Banner / 列表 / 详情 / 已参与</text>
+              <rect x="220" y="602" width="320" height="68" rx="8" fill="#dbeafe" stroke="#2563eb"/>
+              <text x="380" y="630" text-anchor="middle" font-size="13" font-weight="600">参加人数 / 达标用户 / 删除</text>
+              <text x="380" y="650" text-anchor="middle" font-size="11" fill="#64748b">奖励计算按本活动规则</text>
+              <ellipse cx="380" cy="718" rx="40" ry="20" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.6"/>
+              <text x="380" y="722" text-anchor="middle" font-size="12" font-weight="600" fill="#166534">结束</text>
+            </svg>
+          </div>
+          <div class="flow-legend">
+            <span><i style="background:#eff6ff;border:1px solid #2563eb"></i>运营作业</span>
+            <span><i style="background:#dcfce7;border:1px solid #16a34a"></i>下发</span>
+            <span><i style="background:#fef9c3;border:1px solid #ca8a04"></i>校验</span>
+          </div>
         </div>
+      </div>
+      <div id="admin-impl" class="sub-view">
+        <div class="glass-card" data-impl-host="admin"></div>
       </div>
     </div>
 
-    <div id="view-flow" class="page-view">
-      <div class="glass-card flow-page">
-        <p class="flow-page-intro">一条主链看完：运营配好并保存 → 显示才给用户看 → 卡片必带浏览人数，参加人数选配（有后图才跟图）→ 点查看有链接跳配置地址，没有则进活动详情。</p>
-        <div class="flow-svg-wrap">
-          <svg width="720" height="780" viewBox="0 0 720 780" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <marker id="flow-arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto" markerUnits="userSpaceOnUse">
-                <path d="M0,0 L9,4.5 L0,9 Z" fill="#64748b"/>
-              </marker>
-            </defs>
-            <g class="flow-edges" marker-end="url(#flow-arrow)">
-              <line x1="360" y1="52" x2="360" y2="72"/>
-              <line x1="360" y1="140" x2="360" y2="160"/>
-              <line x1="360" y1="240" x2="360" y2="260"/>
-              <line x1="420" y1="200" x2="520" y2="200"/>
-              <line x1="360" y1="328" x2="360" y2="348"/>
-              <line x1="400" y1="388" x2="520" y2="388"/>
-              <line x1="360" y1="428" x2="360" y2="448"/>
-              <line x1="360" y1="508" x2="360" y2="528"/>
-              <line x1="400" y1="568" x2="520" y2="568"/>
-              <line x1="360" y1="608" x2="360" y2="628"/>
-              <line x1="360" y1="672" x2="360" y2="692"/>
-            </g>
-
-            <ellipse cx="360" cy="30" rx="40" ry="20" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.6"/>
-            <text x="360" y="34" text-anchor="middle" font-size="12" font-weight="600" fill="#166534">开始</text>
-
-            <rect x="210" y="72" width="300" height="68" rx="8" fill="#eff6ff" stroke="#2563eb"/>
-            <text x="360" y="96" text-anchor="middle" font-size="13" font-weight="600" fill="#18222f">运营配置活动并保存</text>
-            <text x="360" y="116" text-anchor="middle" font-size="11" fill="#64748b">标题 · 时间 · 显示/隐藏 · 浏览量</text>
-            <text x="360" y="132" text-anchor="middle" font-size="11" fill="#64748b">参加人数、后图、跳转链接选填</text>
-
-            <polygon points="360,160 420,200 360,240 300,200" fill="#fffbeb" stroke="#d97706"/>
-            <text x="360" y="196" text-anchor="middle" font-size="12" font-weight="600" fill="#92400e">对用户显示？</text>
-            <text x="360" y="214" text-anchor="middle" font-size="10" fill="#64748b">隐藏则用户看不到</text>
-            <text x="428" y="196" font-size="11" fill="#dc2626" font-weight="600">否</text>
-            <text x="372" y="256" font-size="11" fill="#16a34a" font-weight="600">是</text>
-
-            <rect x="520" y="178" width="168" height="44" rx="8" fill="#fef2f2" stroke="#dc2626"/>
-            <text x="604" y="205" text-anchor="middle" font-size="12" font-weight="600" fill="#991b1b">不展示 · 结束</text>
-
-            <rect x="200" y="260" width="320" height="68" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
-            <text x="360" y="284" text-anchor="middle" font-size="13" font-weight="600" fill="#166534">用户进入活动中心</text>
-            <text x="360" y="304" text-anchor="middle" font-size="11" fill="#64748b">Banner + 卡片 · 必带「x人浏览」</text>
-            <text x="360" y="320" text-anchor="middle" font-size="11" fill="#64748b">可筛全部 / 进行中 / 已结束</text>
-
-            <polygon points="360,348 420,388 360,428 300,388" fill="#fffbeb" stroke="#d97706"/>
-            <text x="360" y="384" text-anchor="middle" font-size="12" font-weight="600" fill="#92400e">配了参加人数？</text>
-            <text x="360" y="402" text-anchor="middle" font-size="10" fill="#64748b">没配整段不展示</text>
-            <text x="428" y="384" font-size="11" fill="#16a34a" font-weight="600">是</text>
-            <text x="372" y="440" font-size="11" fill="#64748b" font-weight="600">否</text>
-
-            <rect x="520" y="366" width="168" height="44" rx="8" fill="#fff7ed" stroke="#ea580c"/>
-            <text x="604" y="385" text-anchor="middle" font-size="12" font-weight="600" fill="#9a3412">展示「x人已参加」</text>
-            <text x="604" y="401" text-anchor="middle" font-size="10" fill="#64748b">有后图才跟在后面</text>
-
-            <rect x="220" y="448" width="280" height="60" rx="8" fill="#fff7ed" stroke="#ea580c"/>
-            <text x="360" y="472" text-anchor="middle" font-size="13" font-weight="600" fill="#9a3412">用户点「查看」</text>
-            <text x="360" y="490" text-anchor="middle" font-size="11" fill="#64748b">卡片 / Banner 同一个按钮</text>
-
-            <polygon points="360,528 420,568 360,608 300,568" fill="#fffbeb" stroke="#d97706"/>
-            <text x="360" y="564" text-anchor="middle" font-size="12" font-weight="600" fill="#92400e">有跳转链接？</text>
-            <text x="360" y="582" text-anchor="middle" font-size="10" fill="#64748b">空则进详情</text>
-            <text x="428" y="564" font-size="11" fill="#16a34a" font-weight="600">是</text>
-            <text x="372" y="620" font-size="11" fill="#64748b" font-weight="600">否</text>
-
-            <rect x="520" y="546" width="168" height="44" rx="8" fill="#eff6ff" stroke="#2563eb"/>
-            <text x="604" y="573" text-anchor="middle" font-size="12" font-weight="600" fill="#1e40af">跳到配置地址</text>
-
-            <rect x="210" y="628" width="300" height="44" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
-            <text x="360" y="648" text-anchor="middle" font-size="12" font-weight="600" fill="#166534">进入活动详情页</text>
-            <text x="360" y="664" text-anchor="middle" font-size="10" fill="#64748b">展示后台配置的活动内容</text>
-
-            <ellipse cx="360" cy="714" rx="40" ry="20" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.6"/>
-            <text x="360" y="718" text-anchor="middle" font-size="12" font-weight="600" fill="#166534">结束</text>
-          </svg>
-        </div>
-        <div class="flow-legend">
-          <span><i style="background:#eff6ff;border:1px solid #2563eb"></i>运营作业</span>
-          <span><i style="background:#f0fdf4;border:1px solid #16a34a"></i>用户看到 / 起止</span>
-          <span><i style="background:#fffbeb;border:1px solid #d97706"></i>判断</span>
-          <span><i style="background:#fef2f2;border:1px solid #dc2626"></i>不展示</span>
+    <div id="view-data" class="page-view">
+      <div class="glass-card">
+        <div class="data-block">
+          <h2>前后端数据交互</h2>
+          <p>本 Demo 无真实 HTTP。对照能力名落地：活动列表 / 活动详情 / 活动榜单 / 已参与集合 / 后台保存。禁止发明奖励管理路径，禁止 listOutboundUrl。闭合表见 <code>fe-be-contract.md</code>。</p>
+          <div class="ix-tab-bar" role="tablist">
+            <button type="button" class="active" data-ix="ix-fe">前端需求</button>
+            <button type="button" data-ix="ix-e2e">端到端</button>
+            <button type="button" data-ix="ix-api">接口契约</button>
+          </div>
+          <div id="ix-fe" class="ix-pane active">
+            <div class="ix-rule">查看一律进详情。领取按钮才写已参与。详情 Tab 为介绍/案例/榜单已配置子集。能力入参/出参与闭合边界以 <code>fe-be-contract.md</code> 为准。</div>
+            <div class="ix-step"><i>1</i><div><b>活动列表</b><span>显示池 + 置顶 Banner。筛选只过滤卡片。隐藏活动不返回。无待开始 Tab。</span></div></div>
+            <div class="ix-step"><i>2</i><div><b>活动详情</b><span>按配置装配 Tab 与领取。半填不下发。隐藏 activityId 当不存在。展位只看 showUserAward + awardStatus。</span></div></div>
+            <div class="ix-step"><i>3</i><div><b>活动榜单</b><span>仅开启时请求。rows ≤ TOP；必带 self。描述字段走活动主数据，不走本能力。</span></div></div>
+            <div class="ix-step"><i>4</i><div><b>已参与集合</b><span>仅进行中领取写入，去重 (user, 活动)。查看 / 期外 / 跳转失败不写。显示池 ∩ 已参与。</span></div></div>
+            <div class="ix-step"><i>5</i><div><b>后台保存</b><span>必填与置顶冲突整单拒绝。半填介绍/案例/领取/规则只是不下发。榜单开且 TOP&lt;1 拒绝。</span></div></div>
+          </div>
+          <div id="ix-e2e" class="ix-pane">
+            <div class="ix-rule">端到端对照：点查看进详情；进行中、介绍 Tab 点领取才写已参与。跳转失败不记账。Banner 查看不记账。</div>
+            <div class="ix-step"><i>1</i><div><b>点查看进详情</b><span>卡片 / Banner 同一行为，无外跳 toast。</span></div></div>
+            <div class="ix-step"><i>2</i><div><b>写已参与</b><span>跳转成功 toast「并记入已参与」；非跳转 toast「已记入已参与」。地址含 fail 不记账。两按钮去重同一条。</span></div></div>
+            <div class="ix-step"><i>3</i><div><b>已参与空态</b><span>从未领取时「暂无已参与的活动」，Banner 仍在。</span></div></div>
+            <div class="ix-step"><i>4</i><div><b>隐藏深链</b><span>打开隐藏 activityId 停在列表，不进详情。</span></div></div>
+            <div class="ix-step"><i>5</i><div><b>无介绍无 CTA</b><span>无介绍 Tab 时无领取底栏。</span></div></div>
+            <div class="ix-step"><i>6</i><div><b>展位不绑榜单</b><span>showUserAward 关则无展位；开且有 awardStatus 才展示，与榜单开关无关。</span></div></div>
+          </div>
+          <div id="ix-api" class="ix-pane">
+            <div class="glass-card" data-impl-host="api"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -550,7 +1023,7 @@
   <div class="drawer-overlay" id="ruleOverlay" onclick="setRuleDrawer(false)"></div>
   <aside class="drawer" id="ruleDrawer" role="dialog">
     <div class="drawer-header">
-      <h2>FR-006 · 需求规则 · v1</h2>
+      <h2>FR-006 · 需求规则 · v2</h2>
       <button class="drawer-close" type="button" onclick="setRuleDrawer(false)">×</button>
     </div>
     <div class="rule-tab-bar" role="tablist">
@@ -561,83 +1034,57 @@
       <div id="rule-fe" class="rule-panel active">
         <div class="rule-section">
           <h3><span>1</span>业务目标</h3>
-          <div class="rule-content">
-            <p>用户进入活动中心后，只看到<strong>系统判定为「显示」</strong>的活动：卡片沿用图1；始终看到浏览人数；参加人数与后图按后台是否配置决定显隐；点「查看」有跳转链接则跳配置地址，没有则进入活动详情页。</p>
-          </div>
+          <div class="rule-content"><p>用户只看显示池。查看进详情。领取后进入已参与。详情 Tab 为介绍/案例/榜单已配置子集。</p></div>
         </div>
         <div class="rule-section">
           <h3><span>2</span>页面与入口</h3>
           <div class="rule-content">
             <ul>
-              <li><strong>入口</strong>：个人中心 / 首页等既有入口；页头「活动中心」。</li>
-              <li><strong>置顶 Banner</strong>：最多 1 条；不在下方列表重复；<strong>不随筛选 Tab 隐藏</strong>。取消置顶后 Banner 立即消失。</li>
-              <li><strong>筛选</strong>：全部 / 进行中 / 已结束；只过滤列表卡片，不撤 Banner。空则「暂无符合条件的活动」。</li>
-              <li><strong>卡片结构（图1）</strong>：项目标签 → 灰色内容区（状态角标 + 图标 + 标题/副标题）→ 底部信息 +「查看」。按钮文案不因状态改变。</li>
-              <li><strong>C 端状态角标</strong>：由系统按活动时间计算 <code>待开始</code> / <code>进行中</code> / <code>已结束</code>，不是后台「显示/隐藏」。</li>
+              <li>筛选：全部 / 进行中 / 已结束 / 已参与。无待开始 Tab。Banner 不随筛选隐藏。</li>
+              <li>隐藏活动不进列表/详情。深链隐藏 id 停在列表。已参与后再隐藏则已参与 Tab 消失该卡。</li>
+              <li>详情页头固定「活动详情」。无我的作品。榜单仅后台开启时出现；空名单仍出该 Tab 内容。</li>
+              <li>领取底栏最多 2 个、仅介绍 Tab。无介绍则无底栏。跳转成功=客户端调起；地址含 fail 失败。去重（用户, 活动）。</li>
             </ul>
           </div>
         </div>
         <div class="rule-section">
-          <h3><span>3</span>展示判断</h3>
+          <h3><span>3</span>业务流程</h3>
+          <div class="rule-content"><p>见前端交互 → 业务流程。点查看进详情，领取才写已参与。浏览人数不 +1。</p></div>
+        </div>
+        <div class="rule-section">
+          <h3><span>4</span>闭合</h3>
           <div class="rule-content">
             <ul>
-              <li><strong>浏览人数</strong>：始终展示「x人浏览」，取后台初始浏览量；前端不累加、不编造。</li>
-              <li><strong>参加人数</strong>：已配置 →「x人已参加」（虚拟值）；未配置 → 人数与后图整段不展示。</li>
-              <li><strong>后图</strong>：仅在已展示参加人数之后判断；已配置则跟在文案后，未配置不放占位图。只配后图、不配人数时仍不展示该图。</li>
-              <li><strong>跳转</strong>：点 Banner/卡片「查看」有链接则跳配置地址，没有则进入既有活动详情页（展示活动内容）。本 FR 不重做详情页样式。</li>
+              <li>展位：<code>showUserAward</code> + 已下发 <code>awardStatus</code>，不绑榜单、不绑是否结束。列表无获奖角标。</li>
+              <li>榜单开启必带 <code>self</code>；隐藏不请求能力。行数 ≤ TOP。</li>
+              <li>同分排序按稳定 id。能力入参/出参以 <code>fe-be-contract.md</code> 为准。</li>
             </ul>
-          </div>
-        </div>
-        <div class="rule-section">
-          <h3><span>4</span>边界规则</h3>
-          <div class="rule-content">
-            <ul>
-              <li>后台「隐藏」的活动不进入 C 端可见池，列表与 Banner 均不出现。</li>
-            </ul>
-          </div>
-        </div>
-        <div class="rule-section">
-          <h3><span>5</span>业务流程</h3>
-          <div class="rule-content">
-            <p>见页内 Tab <strong>「业务流程」</strong>。</p>
           </div>
         </div>
       </div>
       <div id="rule-admin" class="rule-panel">
         <div class="rule-section">
           <h3><span>1</span>业务目标</h3>
-          <div class="rule-content">
-            <p>运营在后台完成「配置 → 保存」；系统负责校验、计算 C 端状态、组装下发字段。运营不直接改 C 端角标文案。</p>
-          </div>
+          <div class="rule-content"><p>两步保存活动。第1步基础+介绍+案例，第2步领取与奖励规则。</p></div>
         </div>
         <div class="rule-section">
-          <h3><span>2</span>作业与字段</h3>
+          <h3><span>2</span>列表</h3>
           <div class="rule-content">
             <ul>
-              <li>三栏页：左基础字段、中富文本、右预览；新增/编辑同一页，编辑回填。</li>
-              <li><strong>必填</strong>：活动标题（≤64）、开始时间、活动状态（显示/隐藏）。不通过则不保存，退回并提示缺失项。</li>
-              <li><strong>选填</strong>：平台、赛道、项目（先赛道后项目）、简介（≤200）、跳转链接、结束时间（空=长期；有值且早于开始则退回）、排序（默认 0，越大越前）、初始浏览量（默认 0）、参加人数（虚拟）、参加人数后图、活动内容。</li>
+              <li>操作：编辑 / 达标用户 / 删除。</li>
+              <li>已配参加人数可点进参与详情。</li>
+              <li>不拆子菜单。榜单开关与 TOP 名单数配在第 1 步详情内容。</li>
             </ul>
           </div>
         </div>
         <div class="rule-section">
-          <h3><span>3</span>列表与筛选</h3>
+          <h3><span>3</span>保存与下发</h3>
           <div class="rule-content">
             <ul>
-              <li>筛选项：活动标题、所属平台、所属赛道、活动状态（显示/隐藏）。重置只清空条件，不自动查询。</li>
-              <li>列表：ID、标题、平台、赛道、项目、状态、浏览人数、参加人数、活动时间、排序、操作；等宽均分行高，超长省略。</li>
-              <li>参加人数未配置在列表显示 <code>-</code>；操作仅「编辑」。</li>
-            </ul>
-          </div>
-        </div>
-        <div class="rule-section">
-          <h3><span>4</span>边界规则</h3>
-          <div class="rule-content">
-            <ul>
-              <li>项目下拉依赖赛道；未选赛道时禁用，占位「请先选择所属赛道」。</li>
-              <li>状态=显示才进入 C 端可见池并按时间计算待开始/进行中/已结束；隐藏则写入但不下发。</li>
-              <li>组装下发：浏览人数必带；参加人数、后图仅配置了才下发。未下发字段 C 端视为未配置。</li>
-              <li>表单校验（必填、结束时间）留在编辑页，不画进主流程。</li>
+              <li>拒绝整单：标题空或超长、无开始时间、无活动状态、结束早于开始、显示且置顶冲突（不自动取消对方）。</li>
+              <li>榜单开且 TOP 小于 1：拒绝保存。半填介绍/案例/领取/奖励：可保存但不下发。</li>
+              <li>播放奖 / 全勤 / 累计收益：半填整条丢弃。多条独立命中；同类区间重叠按从上到下第一条命中即停。禁止 excludeProjects。</li>
+              <li>累计收益：品牌项目、其他业务项目至少一类非空。能力契约 <code>fe-be-contract.md</code>。</li>
             </ul>
           </div>
         </div>
@@ -645,14 +1092,51 @@
     </div>
   </aside>
 
+  <div class="drawer-overlay" id="listOverlay" onclick="closeListDrawer()"></div>
+  <aside class="drawer" id="listDrawer" role="dialog">
+    <div class="drawer-header">
+      <h2 id="listDrawerTitle">参与详情</h2>
+      <button class="drawer-close" type="button" onclick="closeListDrawer()">×</button>
+    </div>
+    <div class="drawer-body">
+      <div id="listDrawerHead"></div>
+      <div id="listDrawerBody"></div>
+    </div>
+  </aside>
+
   <section class="editor-page" id="activityEditor" aria-label="活动编辑">
+    <div class="editor-shell">
     <div class="editor-top">
       <button class="editor-back" type="button" title="返回列表" onclick="closeActivityEditor()">‹</button>
-      <h2 id="editorTitle">新增活动</h2>
+      <div class="editor-crumb">
+        <button type="button" class="editor-crumb-link" onclick="closeActivityEditor()">活动管理</button>
+        <span class="editor-crumb-sep">/</span>
+        <h2 id="editorTitle">新增活动</h2>
+      </div>
     </div>
+    <nav id="editorStepNav" class="editor-steps" aria-label="编辑步骤">
+      <button type="button" class="active" data-estep="1">
+        <i>1</i>
+        <span><b>基础信息</b><em>周期、封面、介绍、案例与榜单</em></span>
+      </button>
+      <span class="editor-steps-line" aria-hidden="true"></span>
+      <button type="button" data-estep="2">
+        <i>2</i>
+        <span><b>活动规则</b><em>领取按钮与奖励阶梯</em></span>
+      </button>
+    </nav>
     <div class="editor-body">
-      <div class="editor-col">
-        <div class="editor-form" id="activityForm">
+      <div class="editor-form" id="activityForm">
+        <div id="step-1" class="editor-stack">
+          <section class="editor-card">
+            <div class="editor-card-head">
+              <div>
+                <h3>活动基础信息</h3>
+                <p>定义活动周期、平台、赛道、项目与展示状态。</p>
+              </div>
+              <span class="editor-card-idx">01 / 02</span>
+            </div>
+            <div class="editor-stack">
           <div class="ef">
             <label>活动标题<span class="req">*</span></label>
             <div class="field-box">
@@ -660,188 +1144,294 @@
               <span class="char-count"><span id="actTitleCount">0</span> / 64</span>
             </div>
           </div>
-          <div class="ef">
-            <label>所属平台</label>
-            <select id="actPlatform">
-              <option value="">请选择所属平台</option>
-              <option>右豹</option>
-              <option>小程序</option>
-            </select>
-          </div>
-          <div class="ef">
-            <label>所属赛道</label>
-            <select id="actTrack">
-              <option value="">请选择所属赛道</option>
-              <option>内容创作</option>
-              <option>官方培训</option>
-              <option>推广变现</option>
-            </select>
-          </div>
-          <div class="ef">
-            <label>项目</label>
-            <select id="actProject" disabled>
-              <option value="">请先选择所属赛道</option>
-            </select>
-          </div>
-          <div class="ef">
-            <label>活动简介</label>
-            <div class="field-box">
-              <textarea id="actIntro" maxlength="200" placeholder="请输入活动简介"></textarea>
-              <span class="char-count"><span id="actIntroCount">0</span> / 200</span>
+          <div class="ef-split">
+            <div class="ef">
+              <label>活动描述</label>
+              <div class="field-box">
+                <textarea id="actDescription" maxlength="40" placeholder="卡片标题下灰字，与标签分开"></textarea>
+                <span class="char-count"><span id="actDescCount">0</span> / 40</span>
+              </div>
             </div>
-          </div>
-          <div class="ef">
-            <label>跳转链接</label>
-            <input type="text" id="actLink" placeholder="请输入跳转链接，如 https:// 或小程序路径" />
-            <div class="field-hint">选填；有值则 C 端跳该地址，留空则进入活动详情页</div>
-          </div>
-          <div class="ef">
-            <label>开始时间<span class="req">*</span></label>
-            <div class="datetime-wrap" data-placeholder="请选择活动开始时间">
-              <input type="datetime-local" id="actStart" />
-              <svg class="dt-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+            <div class="ef">
+              <label>标签</label>
+              <div class="tag-field">
+                <div id="actTagChips"></div>
+                <input type="text" id="actTagInput" placeholder="回车添加" />
+              </div>
             </div>
-          </div>
-          <div class="ef">
-            <label>结束时间</label>
-            <div class="datetime-wrap" data-placeholder="选填，空表示长期有效">
-              <input type="datetime-local" id="actEnd" />
-              <svg class="dt-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-            </div>
-          </div>
-          <div class="ef">
-            <label>排序</label>
-            <div class="stepper">
-              <button type="button" data-stepper="actSort" data-delta="-1">−</button>
-              <input type="number" id="actSort" value="0" min="0" step="1" />
-              <button type="button" data-stepper="actSort" data-delta="1">+</button>
-            </div>
-            <div class="field-hint">默认为0，数值越大越排前</div>
-          </div>
-          <div class="ef">
-            <label>初始浏览量</label>
-            <div class="stepper">
-              <button type="button" data-stepper="actViews" data-delta="-1">−</button>
-              <input type="number" id="actViews" value="0" min="0" step="1" />
-              <button type="button" data-stepper="actViews" data-delta="1">+</button>
-            </div>
-            <div class="field-hint">C 端展示为「x人浏览」</div>
           </div>
           <div class="ef-split">
             <div class="ef">
-              <label>参加人数</label>
-              <input type="number" id="actEnrolled" min="0" step="1" placeholder="不填则不展示" />
-              <div class="field-hint">虚拟人数，不填不展示</div>
+              <label>所属平台</label>
+              <select id="actPlatform"><option value="">请选择所属平台</option><option>右豹</option><option>小程序</option></select>
             </div>
             <div class="ef">
-              <label>参加人数后图</label>
-              <div class="img-upload" id="enrollImgWrap">
-                <input type="file" id="actEnrollImage" accept="image/*" hidden />
-                <div class="img-upload-preview" id="enrollImgPreview" hidden>
-                  <img id="enrollImgThumb" alt="参加人数后图" />
-                  <button type="button" class="img-upload-clear" title="移除图片" onclick="clearEnrollImage()">×</button>
-                </div>
-                <button type="button" class="img-upload-btn" id="enrollImgPick" onclick="document.getElementById('actEnrollImage').click()">上传图片</button>
-              </div>
-              <div class="field-hint">不配置则不展示后图</div>
+              <label>所属赛道</label>
+              <select id="actTrack"><option value="">请选择所属赛道</option><option>内容创作</option><option>官方培训</option><option>推广变现</option></select>
             </div>
           </div>
           <div class="ef">
-            <label>活动状态<span class="req">*</span></label>
-            <div class="radio-group" id="actVisibleGroup">
-              <label class="radio-pill active"><input type="radio" name="actVisible" value="1" checked />显示</label>
-              <label class="radio-pill"><input type="radio" name="actVisible" value="0" />隐藏</label>
+            <label>项目</label>
+            <div class="ms-wrap" id="actProjectsWrap"></div>
+          </div>
+          <div class="ef-split">
+            <div class="ef">
+              <label>开始时间<span class="req">*</span></label>
+              <div class="datetime-wrap" data-placeholder="请选择活动开始时间">
+                <input type="datetime-local" id="actStart" />
+                <svg class="dt-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+              </div>
+            </div>
+            <div class="ef">
+              <label>结束时间</label>
+              <div class="datetime-wrap" data-placeholder="选填，空表示长期有效">
+                <input type="datetime-local" id="actEnd" />
+                <svg class="dt-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
-      <div class="editor-col">
-        <div class="editor-col-label">活动内容</div>
-        <div class="rte" id="rteWrap">
-          <div class="rte-toolbar" id="rteToolbar">
-            <button class="rte-btn" type="button" data-cmd="bold" title="加粗"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M7 5h7a4 4 0 0 1 0 8H7zm0 8h8a4 4 0 0 1 0 8H7z"/></svg></button>
-            <button class="rte-btn" type="button" data-cmd="italic" title="斜体"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 5H9M13 19H7M14 5l-4 14"/></svg></button>
-            <button class="rte-btn" type="button" data-cmd="underline" title="下划线"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M7 5v7a5 5 0 0 0 10 0V5M6 20h12"/></svg></button>
-            <button class="rte-btn" type="button" data-cmd="strikeThrough" title="删除线"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 12h12M16 7a4 4 0 0 0-8 .8M8 17a4 4 0 0 0 8-.8"/></svg></button>
-            <span class="rte-sep"></span>
-            <button class="rte-btn" type="button" data-cmd="fontSize" title="字号"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 20 10 4h2l6 16M6.5 14h7"/></svg></button>
-            <button class="rte-btn" type="button" data-cmd="foreColor" title="文字颜色"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 20h14M8 16 12 4l4 12M9.2 12h5.6"/></svg></button>
-            <span class="rte-sep"></span>
-            <button class="rte-btn" type="button" data-cmd="justifyLeft" title="左对齐"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 6h16M4 12h10M4 18h16"/></svg></button>
-            <button class="rte-btn" type="button" data-cmd="justifyCenter" title="居中"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 6h16M7 12h10M4 18h16"/></svg></button>
-            <button class="rte-btn" type="button" data-cmd="justifyRight" title="右对齐"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 6h16M10 12h10M4 18h16"/></svg></button>
-            <span class="rte-sep"></span>
-            <button class="rte-btn" type="button" data-cmd="insertUnorderedList" title="无序列表"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="5" cy="7" r="1.2" fill="currentColor"/><circle cx="5" cy="12" r="1.2" fill="currentColor"/><circle cx="5" cy="17" r="1.2" fill="currentColor"/><path d="M9 7h11M9 12h11M9 17h11"/></svg></button>
-            <button class="rte-btn" type="button" data-cmd="insertOrderedList" title="有序列表"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 7h11M9 12h11M9 17h11M4 6.5h2v5M4 16h3"/></svg></button>
-            <button class="rte-btn" type="button" data-cmd="insertCheckbox" title="待办列表"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="4" y="5" width="6" height="6" rx="1"/><path d="M5.5 8l1.4 1.4L9.6 6.5M13 8h7M4 17h16"/></svg></button>
-            <span class="rte-sep"></span>
-            <button class="rte-btn" type="button" data-cmd="createLink" title="链接"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 12a4 4 0 0 1 0-6l2-2a4 4 0 0 1 6 6l-1 1M15 12a4 4 0 0 1 0 6l-2 2a4 4 0 0 1-6-6l1-1"/></svg></button>
-            <button class="rte-btn" type="button" data-cmd="insertImage" title="图片"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="4" y="5" width="16" height="14" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="m20 16-5-5-7 7"/></svg></button>
-            <button class="rte-btn" type="button" data-cmd="insertVideo" title="视频"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="m16 10 5-3v10l-5-3z"/></svg></button>
-            <button class="rte-btn" type="button" data-cmd="insertTable" title="表格"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="4" y="5" width="16" height="14" rx="1"/><path d="M4 10h16M4 15h16M10 5v14M16 5v14"/></svg></button>
-            <button class="rte-btn" type="button" data-cmd="formatBlock" title="代码块"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m8 8-4 4 4 4M16 8l4 4-4 4"/></svg></button>
-            <button class="rte-btn" type="button" data-cmd="insertHorizontalRule" title="分割线"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12h16"/></svg></button>
-            <span class="rte-sep"></span>
-            <button class="rte-btn" type="button" data-cmd="undo" title="撤销"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M8 8H4v4"/><path d="M4 12a8 8 0 1 0 2-5.3"/></svg></button>
-            <button class="rte-btn" type="button" data-cmd="redo" title="重做"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M16 8h4v4"/><path d="M20 12a8 8 0 1 1-2-5.3"/></svg></button>
-            <button class="rte-btn" type="button" data-cmd="fullscreen" title="全屏"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M8 4H4v4M16 4h4v4M4 16v4h4M20 16v4h-4"/></svg></button>
+          <div class="ef-split">
+            <div class="ef">
+              <label>浏览量</label>
+              <div class="stepper">
+                <button type="button" data-stepper="actViews" data-delta="-1">−</button>
+                <input type="number" id="actViews" value="0" min="0" step="1" />
+                <button type="button" data-stepper="actViews" data-delta="1">+</button>
+              </div>
+            </div>
+            <div class="ef">
+              <label>参加人数</label>
+              <input type="number" id="actEnrolled" min="0" step="1" placeholder="不填则不展示" />
+            </div>
           </div>
-          <div class="rte-body" id="actContent" contenteditable="true" data-placeholder="请输入活动内容"></div>
+          <div class="ef-split">
+            <div class="ef">
+              <label>活动状态<span class="req">*</span></label>
+              <div class="radio-group" id="actVisibleGroup">
+                <label class="radio-pill active"><input type="radio" name="actVisible" value="1" checked />显示</label>
+                <label class="radio-pill"><input type="radio" name="actVisible" value="0" />隐藏</label>
+              </div>
+            </div>
+            <div class="ef">
+              <label>是否置顶</label>
+              <div class="radio-group" id="actPinnedGroup">
+                <label class="radio-pill"><input type="radio" name="actPinned" value="1" />是</label>
+                <label class="radio-pill active"><input type="radio" name="actPinned" value="0" checked />否</label>
+              </div>
+            </div>
+          </div>
+          <div class="ef">
+            <label>封面</label>
+            <div class="img-upload" id="coverImgWrap">
+              <input type="file" id="actCoverFile" accept="image/*" hidden />
+              <div class="img-upload-preview" id="coverImgPreview" hidden>
+                <img id="coverImgThumb" alt="封面" />
+                <button type="button" class="img-upload-clear" title="移除封面" onclick="clearCoverImage()">×</button>
+              </div>
+              <button type="button" class="img-upload-btn" id="actCover">上传封面</button>
+            </div>
+          </div>
+            </div>
+          </section>
+          <section class="editor-card">
+            <div class="editor-card-head">
+              <div>
+                <h3>详情内容</h3>
+                <p>介绍、案例与榜单。完整案例才下发案例 Tab；榜单开启才下发榜单 Tab。</p>
+              </div>
+              <span class="editor-card-idx">02 / 02</span>
+            </div>
+          <div class="detail-tabs">
+            <button type="button" class="active" data-dtab="intro">介绍</button>
+            <button type="button" data-dtab="cases">案例</button>
+            <button type="button" data-dtab="board">榜单</button>
+          </div>
+          <div id="dtab-intro">
+            <div class="ef">
+              <label>活动介绍</label>
+              <div class="rte" id="rteWrap">
+                <div class="rte-toolbar" id="rteToolbar">
+                  <button class="rte-btn" type="button" data-cmd="bold" title="加粗"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M7 5h7a4 4 0 0 1 0 8H7zm0 8h8a4 4 0 0 1 0 8H7z"/></svg></button>
+                  <button class="rte-btn" type="button" data-cmd="italic" title="斜体"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 5H9M13 19H7M14 5l-4 14"/></svg></button>
+                  <button class="rte-btn" type="button" data-cmd="underline" title="下划线"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M7 5v7a5 5 0 0 0 10 0V5M6 20h12"/></svg></button>
+                  <span class="rte-sep"></span>
+                  <button class="rte-btn" type="button" data-cmd="insertUnorderedList" title="无序列表"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="5" cy="7" r="1.2" fill="currentColor"/><circle cx="5" cy="12" r="1.2" fill="currentColor"/><circle cx="5" cy="17" r="1.2" fill="currentColor"/><path d="M9 7h11M9 12h11M9 17h11"/></svg></button>
+                  <button class="rte-btn" type="button" data-cmd="insertImage" title="图片"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="4" y="5" width="16" height="14" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="m20 16-5-5-7 7"/></svg></button>
+                  <button class="rte-btn" type="button" data-cmd="insertVideo" title="视频"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="m16 10 5-3v10l-5-3z"/></svg></button>
+                  <span class="rte-sep"></span>
+                  <button class="rte-btn" type="button" data-cmd="fullscreen" title="全屏"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M8 4H4v4M16 4h4v4M4 16v4h4M20 16v4h-4"/></svg></button>
+                </div>
+                <div class="rte-body" id="actIntro" contenteditable="true" data-placeholder="介绍正文，有则下发介绍 Tab"></div>
+              </div>
+            </div>
+          </div>
+          <div id="dtab-cases" hidden>
+            <div id="caseList"></div>
+            <button class="btn-add-row" type="button" id="addCase">＋ 添加案例</button>
+          </div>
+          <div id="dtab-board" hidden>
+            <div class="ef">
+              <label>榜单</label>
+              <div class="radio-group" id="actBoardGroup">
+                <label class="radio-pill"><input type="radio" name="actBoard" value="1" />开启</label>
+                <label class="radio-pill active"><input type="radio" name="actBoard" value="0" checked />隐藏</label>
+              </div>
+            </div>
+            <div id="actBoardLimitWrap" class="board-cfg-grid" hidden>
+              <div class="ef">
+                <label>TOP 名单数</label>
+                <div class="board-limit-row">前 <input type="number" id="actBoardLimit" min="1" step="1" value="10" /> 名</div>
+              </div>
+              <div class="ef">
+                <label>行描述</label>
+                <input type="text" id="actBoardLineDesc" maxlength="20" placeholder="如：短剧推广，未填 C 端不展示" />
+              </div>
+              <div class="ef">
+                <label>周期描述</label>
+                <input type="text" id="actBoardPeriodDesc" maxlength="20" placeholder="如：7日收益，未填 C 端不展示" />
+              </div>
+            </div>
+            <p class="board-hint">开启后 C 端出现榜单 Tab（空名单仍出，空态「暂无榜单数据」）。名单走能力「活动榜单」：TOP 名次、头像、脱敏昵称、value，必带 self。TOP 须 ≥1。行描述 / 周期描述未填不下发。昵称旁无标签。展位改在第 2 步，不绑本开关。</p>
+          </div>
+          </section>
+        </div>
+        <div id="step-2" class="editor-stack" hidden>
+          <section class="editor-card sec-jump">
+            <div class="editor-card-head">
+              <div>
+                <h3>活动领取</h3>
+                <p>关闭则 C 端无底栏。开启后最多两个按钮；半填不下发。仅介绍 Tab 展示；无介绍 Tab 时即使开启也无底栏。</p>
+              </div>
+              <span class="editor-card-idx">01 / 02</span>
+            </div>
+            <div class="panel-title-row" style="margin-bottom:12px">
+              <span></span>
+              <label class="switch-row"><input type="checkbox" id="actNeedClaim" /> 是否需要领取按钮</label>
+            </div>
+            <div id="claimList" class="claim-grid"></div>
+          </section>
+          <section class="editor-card sec-reward">
+            <div class="editor-card-head">
+              <div>
+                <h3>奖励规则</h3>
+                <p>播放奖与项目收益奖按阶梯配置；半填整条不下发，允许 0 条仍保存。多条独立命中，同类区间重叠按第一条命中。展位只看本开关 + 已下发 awardStatus。</p>
+              </div>
+              <span class="editor-card-idx">02 / 02</span>
+            </div>
+            <div class="panel-title-row" style="margin-bottom:12px">
+              <label class="switch-row"><input type="checkbox" id="actShowUserAward" /> 显示用户获奖/未获奖信息</label>
+              <button class="btn-add-row" type="button" id="addRewardRule">＋ 添加规则</button>
+            </div>
+            <div id="rewardRuleList" class="editor-stack"></div>
+          </section>
         </div>
       </div>
-      <div class="editor-col preview-col">
-        <div class="editor-col-label">预览</div>
+      <div class="preview-col">
         <div class="phone-frame">
           <div class="phone-screen">
             <div class="phone-status"><div class="phone-notch"></div></div>
-            <div class="phone-title" id="previewTitle">活动标题</div>
-            <div class="phone-content" id="previewBody">
-              <div class="phone-placeholder"></div>
-            </div>
+            <div class="phone-title">活动详情</div>
+            <div class="phone-content" id="previewBody"></div>
+            <div id="previewCta" hidden></div>
           </div>
         </div>
       </div>
     </div>
     <div class="editor-foot">
-      <button class="btn btn-primary btn-save" type="button" onclick="submitActivity()">保存</button>
+      <button class="btn btn-ghost-sm" type="button" onclick="closeActivityEditor()">取消</button>
+      <button class="btn btn-ghost-sm" type="button" id="editorPrev" hidden>上一步</button>
+      <button class="btn btn-primary" type="button" id="editorNext">下一步</button>
+      <button class="btn btn-primary" type="button" onclick="submitActivity()">保存</button>
+    </div>
     </div>
   </section>
 
   <div class="toast" id="toast"></div>
-
+  <script src="activity-center-impl-prompts.js"></script>
   <script>
-    const TRACK_PROJECTS = {
-      '内容创作': ['小说推文', '漫剧推广', '短视频带货'],
-      '官方培训': ['右豹平台', '新人成长'],
-      '推广变现': ['知乎故事', '番茄小说']
-    };
+    const COVER_IMG = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="88" height="88" viewBox="0 0 88 88"><defs><linearGradient id="c" x1="0" x2="1"><stop stop-color="#7c3aed"/><stop offset="1" stop-color="#ff5722"/></linearGradient></defs><rect width="88" height="88" rx="12" fill="url(#c)"/><text x="44" y="50" text-anchor="middle" fill="#fff" font-size="14" font-family="sans-serif">封面</text></svg>');
+    const CASE_VIDEO = 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4';
+    const PROJECTS = ['右豹平台', '小说推文', '漫剧推广', '短视频带货', '新人成长', '知乎故事', '番茄小说'];
+    const BRAND_PROJECTS = [
+      '番茄小说', '知乎故事', '番茄畅听', '红果短剧APP-短剧', '红果漫剧APP', '迅雷网盘',
+      '书旗短篇', '最右', 'UC故事会', '起点', 'QQ阅读', '飞卢小说', '七猫小说',
+      '掌阅长篇', '书旗长篇', '盐言星图', '盐言聚星', '悟空网文'
+    ];
+    const OTHER_BIZ_PROJECTS = ['商单', '版权', '融合短剧', '融合小说', '融合漫剧', '海外小说', '海外短剧', '快手零粉', '快手星火'];
+    const PARTICIPANTS = [
+      { uid: 'U1001', name: '右小豹', mobile: '138****1001', works: 12 },
+      { uid: 'U1002', name: '星野', mobile: '139****2002', works: 4 }
+    ];
+    const QUALIFIED = [
+      { uid: 'U1001', name: '右小豹', mobile: '138****1001', anchor: '播放 12800', rank: 1, prize: '188 元', calc: '命中第1档' },
+      { uid: 'U1008', name: '林七', mobile: '137****8008', anchor: '播放 8600', rank: 2, prize: '88 元', calc: '命中第2档' }
+    ];
 
-    const ENROLL_IMG = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="54" height="20" viewBox="0 0 54 20"><circle cx="10" cy="10" r="8" fill="#f59e0b" stroke="#fff" stroke-width="2"/><circle cx="22" cy="10" r="8" fill="#fb7185" stroke="#fff" stroke-width="2"/><circle cx="34" cy="10" r="8" fill="#60a5fa" stroke="#fff" stroke-width="2"/><circle cx="46" cy="10" r="8" fill="#34d399" stroke="#fff" stroke-width="2"/></svg>');
+    const DEFAULT_CLAIMS = [
+      { label: '加入社群', needJump: true, url: 'https://example.com/yb-camp', clickedLabel: '' },
+      { label: '立即领取', needJump: false, url: '', clickedLabel: '已领取' }
+    ];
+    const DEFAULT_RULES = [
+      { type: 'play', ladders: [
+        { playsFrom: 10000, playsTo: 49999, prizeKind: 'cash', prizeValue: '188' },
+        { playsFrom: 50000, playsTo: 99999, prizeKind: 'goods', prizeValue: '流量礼包' }
+      ] },
+      { type: 'attendance', dailyWorks: 1, streakDays: 3, bonus: '全勤 50 元' },
+      { type: 'revenue', brandProjects: ['番茄小说'], otherBizProjects: ['商单'], rankLadders: [
+        { rankFrom: 1, rankTo: 1, prizeKind: 'cash', prizeValue: '300' },
+        { rankFrom: 2, rankTo: 10, prizeKind: 'cash', prizeValue: '88' }
+      ] }
+    ];
+    const DEFAULT_CASES = [
+      { name: '培训现场', assets: ['现场图'] },
+      { name: '直播回放', assets: ['回放视频'] }
+    ];
 
+    const MOCK_LEADERBOARD = [
+      { nicknameMasked: '****山', avatarUrl: 'https://i.pravatar.cc/96?img=12', value: '99999.99元' },
+      { nicknameMasked: '****发', avatarUrl: 'https://i.pravatar.cc/96?img=32', value: '99999.99元' },
+      { nicknameMasked: '****8', avatarUrl: 'https://i.pravatar.cc/96?img=5', value: '99999.99元' },
+      { nicknameMasked: '****子', avatarUrl: 'https://i.pravatar.cc/96?img=47', value: '99999.99元' },
+      { nicknameMasked: '叶**城', avatarUrl: 'https://i.pravatar.cc/96?img=48', value: '99999.99元' },
+      { nicknameMasked: 'a**8', avatarUrl: 'https://i.pravatar.cc/96?img=15', value: '88888.00元' },
+      { nicknameMasked: '林**七', avatarUrl: 'https://i.pravatar.cc/96?img=20', value: '77777.00元' },
+      { nicknameMasked: '右**豹', avatarUrl: 'https://i.pravatar.cc/96?img=23', value: '66666.00元' },
+      { nicknameMasked: '星**野', avatarUrl: 'https://i.pravatar.cc/96?img=25', value: '55555.00元' },
+      { nicknameMasked: '小**白', avatarUrl: 'https://i.pravatar.cc/96?img=33', value: '44444.00元' }
+    ];
     const ACTIVITY_ROWS = [
-      { id: 'ACT-001', title: '3天右豹生态公益培训营', platform: '右豹', track: '官方培训', project: '右豹平台', intro: '3天学会选赛道·做项目', link: '', start: '2026-08-22T10:00', end: '2026-08-25T18:00', sort: 20, views: 1280, enrolled: 164, enrollImage: ENROLL_IMG, visible: true, content: '<p>3天右豹生态公益培训营，带你快速选赛道、做项目。</p>' },
-      { id: 'ACT-002', title: '小说推文免费培训第1期', platform: '右豹', track: '内容创作', project: '小说推文', intro: '从选书到发布，官方免费带教', link: '', start: '2026-08-22T09:00', end: '2026-08-29T21:00', sort: 10, views: 860, enrolled: 164, enrollImage: ENROLL_IMG, visible: true, content: '<p>小说推文免费培训第 1 期。</p>' },
-      { id: 'ACT-003', title: '漫剧推广实战营第2期', platform: '右豹', track: '内容创作', project: '漫剧推广', intro: '官方社群答疑 + 实操带练', link: '', start: '2026-08-10T09:00', end: '2026-08-20T21:00', sort: 8, views: 640, enrolled: 200, enrollImage: '', visible: true, content: '<p>漫剧推广实战营第 2 期。</p>' },
-      { id: 'ACT-004', title: '右豹创作者成长计划', platform: '右豹', track: '官方培训', project: '右豹平台', intro: '官方扶持优质创作者', link: '', start: '2026-09-01T00:00', end: '2026-09-30T23:59', sort: 5, views: 0, enrolled: '', enrollImage: '', visible: true, content: '<p>右豹创作者成长计划。</p>' },
-      { id: 'ACT-005', title: '右豹新人入门指引', platform: '小程序', track: '官方培训', project: '新人成长', intro: '快速了解平台核心功能', link: '', start: '2026-07-01T00:00', end: '2026-07-31T23:59', sort: 1, views: 320, enrolled: '', enrollImage: '', visible: false, content: '<p>右豹新人入门指引。</p>' }
+      { id: 'ACT-001', title: '3天右豹生态公益培训营', description: '3天学会选赛道·做项目', platform: '右豹', track: '官方培训', projects: ['右豹平台'], tags: ['公益', '培训'], start: '2026-08-22T10:00', end: '2026-08-25T18:00', sort: 20, views: 1280, enrolled: 164, visible: true, pinned: true, cover: 'cover://camp', intro: '3天学会选赛道·做项目', cases: DEFAULT_CASES.slice(), leaderboardVisible: true, leaderboardLimit: 10, leaderboardLineDesc: '短剧推广', leaderboardPeriodDesc: '7日收益', needClaimButtons: true, claimButtons: JSON.parse(JSON.stringify(DEFAULT_CLAIMS)), showUserAward: true, rewardRules: JSON.parse(JSON.stringify(DEFAULT_RULES)) },
+      { id: 'ACT-002', title: '小说推文免费培训第 1 期', description: '从选书到发布，官方免费带教', platform: '右豹', track: '内容创作', projects: ['小说推文'], tags: ['培训'], start: '2026-08-22T09:00', end: '2026-08-29T21:00', sort: 10, views: 860, enrolled: 164, visible: true, pinned: false, cover: 'cover://a2', intro: '从选书到发布', cases: [{ name: '课堂作业', assets: ['作业图'] }], leaderboardVisible: false, leaderboardLimit: 10, needClaimButtons: true, claimButtons: [{ label: '领取资料', needJump: true, url: 'https://example.com/a2-pack', clickedLabel: '' }, { label: '', needJump: false, url: '', clickedLabel: '' }], showUserAward: false, rewardRules: [] },
+      { id: 'ACT-003', title: '漫剧推广实战营第 2 期', description: '官方社群答疑 + 实操带练', platform: '右豹', track: '内容创作', projects: ['漫剧推广'], tags: [], start: '2026-08-10T09:00', end: '2026-08-20T21:00', sort: 8, views: 640, enrolled: 200, visible: true, pinned: false, cover: '', intro: '实操带练', cases: [], leaderboardVisible: false, leaderboardLimit: 10, needClaimButtons: false, claimButtons: [{ label: '', needJump: true, url: '', clickedLabel: '' }, { label: '', needJump: false, url: '', clickedLabel: '' }], showUserAward: false, rewardRules: [] },
+      { id: 'ACT-004', title: '右豹创作者成长计划', description: '官方扶持优质创作者', platform: '右豹', track: '官方培训', projects: ['右豹平台'], tags: [], start: '2026-09-01T00:00', end: '2026-09-30T23:59', sort: 5, views: 0, enrolled: '', visible: true, pinned: false, cover: 'cover://plan', intro: '', cases: [], leaderboardVisible: false, leaderboardLimit: 10, needClaimButtons: false, claimButtons: [{ label: '', needJump: true, url: '', clickedLabel: '' }, { label: '', needJump: false, url: '', clickedLabel: '' }], showUserAward: false, rewardRules: [] },
+      { id: 'ACT-005', title: '右豹新人入门指引', description: '快速了解平台核心功能', platform: '小程序', track: '官方培训', projects: ['新人成长'], tags: [], start: '2026-07-01T00:00', end: '2026-07-31T23:59', sort: 1, views: 320, enrolled: '', visible: false, pinned: false, cover: '', intro: '', cases: [], leaderboardVisible: false, leaderboardLimit: 10, needClaimButtons: false, claimButtons: [{ label: '', needJump: true, url: '', clickedLabel: '' }, { label: '', needJump: false, url: '', clickedLabel: '' }], showUserAward: false, rewardRules: [] }
     ];
 
     let editingId = null;
-    let currentEnrollImage = '';
+    let editorStep = 1;
+    let draftClaims = [];
+    let draftRules = [];
+    let draftCases = [];
+    let draftProjects = [];
+    let draftCover = '';
+    let draftTags = [];
+    let previewTab = 'intro';
     let activityFilter = { title: '', platform: '', track: '', visible: '' };
 
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2200);
+    }
     function formatTimeRange(r) {
       const s = (r.start || '').replace('T', ' ').slice(0, 16);
       if (!r.end) return s + ' ~ 长期';
       return s + ' ~ ' + (r.end || '').replace('T', ' ').slice(0, 16);
     }
-
     function visibleTag(visible) {
-      return visible
-        ? '<span class="tag tag-ok">显示</span>'
-        : '<span class="tag tag-muted">隐藏</span>';
+      return visible ? '<span class="tag tag-ok">显示</span>' : '<span class="tag tag-muted">隐藏</span>';
     }
-
     function matchActivityFilter(r) {
       if (activityFilter.title && !r.title.includes(activityFilter.title)) return false;
       if (activityFilter.platform && r.platform !== activityFilter.platform) return false;
@@ -850,25 +1440,31 @@
       if (activityFilter.visible === '0' && r.visible) return false;
       return true;
     }
-
     function renderActivityTable() {
       const rows = ACTIVITY_ROWS.filter(matchActivityFilter).slice().sort((a, b) => (b.sort || 0) - (a.sort || 0));
-      document.getElementById('activityTableBody').innerHTML = rows.map(r => `
-        <tr>
+      document.getElementById('activityTableBody').innerHTML = rows.map(r => {
+        const enrolled = (r.enrolled === 0 || r.enrolled)
+          ? `<button class="link-num" type="button" onclick="openEnrolled('${r.id}')">${r.enrolled}</button>`
+          : '-';
+        return `<tr>
           <td title="${r.id}">${r.id}</td>
           <td class="col-title" title="${r.title}">${r.title}</td>
-          <td title="${r.platform || '-'}">${r.platform || '-'}</td>
-          <td title="${r.track || '-'}">${r.track || '-'}</td>
-          <td title="${r.project || '-'}">${r.project || '-'}</td>
+          <td>${r.platform || '-'}</td>
+          <td>${r.track || '-'}</td>
+          <td title="${(r.projects || []).join('、')}">${(r.projects || []).join('、') || '-'}</td>
           <td>${visibleTag(r.visible)}</td>
           <td>${r.views ?? 0}</td>
-          <td>${r.enrolled === 0 || r.enrolled ? r.enrolled : '-'}</td>
+          <td>${enrolled}</td>
           <td title="${formatTimeRange(r)}">${formatTimeRange(r)}</td>
           <td>${r.sort ?? 0}</td>
-          <td><button class="link" type="button" onclick="openActivityEditor('${r.id}')">编辑</button></td>
-        </tr>`).join('') || '<tr><td colspan="11" style="text-align:center;color:var(--text-muted);padding:28px 12px">暂无符合条件的活动</td></tr>';
+          <td class="col-ops">
+            <button class="link" type="button" onclick="openActivityEditor('${r.id}')">编辑</button>
+            <button class="link" type="button" onclick="openQualified('${r.id}')">达标用户</button>
+            <button class="link" type="button" onclick="deleteActivity('${r.id}')">删除</button>
+          </td>
+        </tr>`;
+      }).join('') || '<tr><td colspan="11" style="text-align:center;color:var(--text-muted);padding:28px">暂无符合条件的活动</td></tr>';
     }
-
     function queryActivityFilter() {
       activityFilter = {
         title: document.getElementById('filterTitle').value.trim(),
@@ -879,7 +1475,6 @@
       renderActivityTable();
       showToast('已按条件筛选');
     }
-
     function resetActivityFilter() {
       document.getElementById('filterTitle').value = '';
       document.getElementById('filterPlatform').value = '';
@@ -887,122 +1482,586 @@
       document.getElementById('filterVisible').value = '';
       showToast('筛选条件已重置');
     }
-
-    function getActiveFilter() {
-      return document.querySelector('.scene-btn.active')?.dataset.filter || 'all';
+    function openListDrawer(title, headHtml, bodyHtml) {
+      document.getElementById('listDrawerTitle').textContent = title;
+      document.getElementById('listDrawerHead').innerHTML = headHtml;
+      document.getElementById('listDrawerBody').innerHTML = bodyHtml;
+      document.getElementById('listDrawer').classList.add('open');
+      document.getElementById('listOverlay').classList.add('open');
+    }
+    function closeListDrawer() {
+      document.getElementById('listDrawer').classList.remove('open');
+      document.getElementById('listOverlay').classList.remove('open');
+    }
+    function openEnrolled() {
+      openListDrawer('参与详情',
+        '<p>字段：用户 ID、用户昵称、手机号、作品数</p>',
+        `<table class="drawer-table"><thead><tr><th>用户 ID</th><th>用户昵称</th><th>手机号</th><th>作品数</th></tr></thead><tbody>${
+          PARTICIPANTS.map(p => `<tr><td>${p.uid}</td><td>${p.name}</td><td>${p.mobile}</td><td>${p.works}</td></tr>`).join('')
+        }</tbody></table>`);
+    }
+    function openQualified() {
+      openListDrawer('达标用户',
+        '<p>字段：用户 ID、用户昵称、手机号、达标锚定数据、排名、奖品/奖励金额、奖励计算</p>',
+        `<table class="drawer-table"><thead><tr><th>用户 ID</th><th>用户昵称</th><th>达标锚定数据</th><th>排名</th><th>奖励</th><th>奖励计算</th></tr></thead><tbody>${
+          QUALIFIED.map(p => `<tr><td>${p.uid}</td><td>${p.name}</td><td>${p.anchor}</td><td>${p.rank}</td><td>${p.prize}</td><td>${p.calc}</td></tr>`).join('')
+        }</tbody></table>`);
+    }
+    function deleteActivity(id) {
+      if (!confirm('确认删除该活动？')) return;
+      const idx = ACTIVITY_ROWS.findIndex(r => r.id === id);
+      if (idx >= 0) ACTIVITY_ROWS.splice(idx, 1);
+      renderActivityTable();
+      showToast('已删除（Demo）');
     }
 
-    function buildMockupSrc(filter) {
-      return `activity-center-demo.html?embed=1&filter=${filter}`;
+    function setRadio(groupId, name, on) {
+      document.querySelectorAll('#' + groupId + ' .radio-pill').forEach(pill => {
+        const val = pill.querySelector('input').value === '1';
+        pill.classList.toggle('active', val === on);
+        pill.querySelector('input').checked = val === on;
+      });
+    }
+    function radioValue(name) {
+      return document.querySelector('input[name="' + name + '"]:checked')?.value === '1';
+    }
+    function boardInitial(nick) {
+      const s = String(nick || '').replace(/\*/g, '').trim();
+      return s.slice(-1) || '·';
+    }
+    function boardAvatarHtml(rank, nick, avatarUrl) {
+      const hues = [24, 18, 270, 152, 210, 330, 40, 190, 300, 80];
+      const h = hues[(Math.max(1, rank) - 1) % hues.length];
+      const fb = '<div class="board-av-fallback" style="background:hsl(' + h + ' 72% 62%)">' + boardInitial(nick) + '</div>';
+      if (!avatarUrl) return fb;
+      return '<img class="board-av" src="' + avatarUrl + '" alt="" onerror="this.style.display=\'none\';var n=this.nextElementSibling;if(n)n.style.display=\'flex\'" />' + fb;
+    }
+    function boardAvBlock(r) {
+      const av = boardAvatarHtml(r.rank, r.nicknameMasked, r.avatarUrl);
+      const mark = r.rank <= 3
+        ? '<span class="board-top is-' + r.rank + '">TOP ' + r.rank + '</span>'
+        : '<span class="board-num">' + r.rank + '</span>';
+      return '<div class="board-rank">' + mark + '</div><div class="board-av-wrap">' + av + '</div>';
+    }
+    function activityLeaderboard(item) {
+      const n = Math.max(0, Number(item && item.leaderboardLimit) || 0);
+      return {
+        lineDesc: String((item && item.leaderboardLineDesc) || '').trim(),
+        periodDesc: String((item && item.leaderboardPeriodDesc) || '').trim(),
+        rows: MOCK_LEADERBOARD.slice(0, n).map((row, i) => ({
+          rank: i + 1,
+          nicknameMasked: row.nicknameMasked,
+          avatarUrl: row.avatarUrl,
+          value: row.value
+        })),
+        self: { nicknameMasked: '****躁', rankLabel: '999+', avatarUrl: 'https://i.pravatar.cc/96?img=12', value: '9999.99元' }
+      };
+    }
+    function renderBoardMeHtml(payload) {
+      const self = payload && payload.self;
+      if (!self) return '';
+      const period = (payload && payload.periodDesc) || '';
+      return '<div class="board-me">' + boardAvatarHtml(99, self.nicknameMasked, self.avatarUrl) +
+        '<div class="me-name">' + self.nicknameMasked + '</div>' +
+        '<div class="me-val">' + self.value + '</div>' +
+        '<div class="me-rank">排名·' + self.rankLabel + '</div>' +
+        (period ? '<div class="me-period">' + period + '</div>' : '') +
+        '</div>';
+    }
+    function renderLeaderboardHtml(payload) {
+      const rows = (payload && payload.rows) || [];
+      const metric = (payload && payload.lineDesc) || '';
+      const period = (payload && payload.periodDesc) || '';
+      if (!rows.length) return '<div class="board-empty">暂无榜单数据</div>';
+      return '<div class="board-list">' + rows.map(r => {
+        return '<div class="board-row">' +
+          boardAvBlock(r) +
+          '<div class="board-nick">' + r.nicknameMasked + '</div>' +
+          '<div class="board-val">' + r.value + '</div>' +
+          (metric ? '<div class="board-metric">' + metric + '</div>' : '') +
+          (period ? '<div class="board-period">' + period + '</div>' : '') +
+        '</div>';
+      }).join('') + '</div>';
+    }
+    function syncBoardLimitUi() {
+      document.getElementById('actBoardLimitWrap').hidden = !radioValue('actBoard');
+    }
+    function previewConfiguredTabs() {
+      const tabs = [];
+      if (previewHasIntro()) tabs.push({ id: 'intro', label: '介绍' });
+      if (previewCompleteCases().length) tabs.push({ id: 'cases', label: '案例' });
+      if (radioValue('actBoard')) tabs.push({ id: 'board', label: '榜单' });
+      return tabs;
     }
 
-    function loadMockupFrame(forceReload) {
-      const frame = document.getElementById('mockupFrame');
-      if (!frame) return;
-      const filter = getActiveFilter();
-      const src = buildMockupSrc(filter);
-      if (forceReload || frame.getAttribute('src') === 'about:blank') {
-        frame.src = src;
+    function renderProjectPicker(hostId, selected, opts) {
+      const host = document.getElementById(hostId);
+      if (!host) return;
+      const sel = selected.slice();
+      const searchAttr = (opts && opts.searchAttr) || 'data-act-proj-search';
+      const triggerAttr = (opts && opts.triggerAttr) || 'data-proj-trigger';
+      const emptyLabel = (opts && opts.emptyLabel) || '请选择项目';
+      const options = (opts && opts.options) || PROJECTS;
+      const searchPh = (opts && opts.searchPlaceholder) || '搜索项目';
+      host.innerHTML = `<button type="button" class="ms-trigger" ${triggerAttr}>${sel.length ? sel.join('、') : emptyLabel}</button>
+        <div class="ms-panel" hidden>
+          <input type="text" ${searchAttr} placeholder="${searchPh}" />
+          <div class="ms-options">${options.map(p => `<label><input type="checkbox" value="${p}" ${sel.includes(p) ? 'checked' : ''} /> ${p}</label>`).join('')}</div>
+        </div>`;
+      const trigger = host.querySelector(`[${triggerAttr}]`);
+      const panel = host.querySelector('.ms-panel');
+      const search = host.querySelector(`[${searchAttr}]`);
+      trigger.addEventListener('click', () => { panel.hidden = !panel.hidden; });
+      search.addEventListener('input', () => {
+        const q = search.value.trim();
+        host.querySelectorAll('.ms-options label').forEach(lab => {
+          lab.hidden = !!(q && lab.textContent.indexOf(q) === -1);
+        });
+      });
+      host.querySelectorAll('.ms-options input').forEach(inp => {
+        inp.addEventListener('change', () => {
+          const next = Array.from(host.querySelectorAll('.ms-options input:checked')).map(i => i.value);
+          if (opts && opts.onChange) opts.onChange(next);
+          trigger.textContent = next.length ? next.join('、') : emptyLabel;
+        });
+      });
+    }
+
+    function renderTags() {
+      document.getElementById('actTagChips').innerHTML = draftTags.map((t, i) =>
+        `<span class="tag-chip">${t}<button type="button" data-rm-tag="${i}" aria-label="移除">×</button></span>`
+      ).join('');
+      document.querySelectorAll('[data-rm-tag]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          draftTags.splice(Number(btn.dataset.rmTag), 1);
+          renderTags();
+          updatePreview();
+        });
+      });
+    }
+
+    function coverSrc(src) {
+      if (!src) return '';
+      if (/^(data:|https?:|blob:)/i.test(src)) return src;
+      return COVER_IMG;
+    }
+
+    function setCoverImage(src) {
+      draftCover = src || '';
+      const preview = document.getElementById('coverImgPreview');
+      const thumb = document.getElementById('coverImgThumb');
+      const pick = document.getElementById('actCover');
+      const has = !!draftCover;
+      preview.hidden = !has;
+      pick.textContent = has ? '更换封面' : '上传封面';
+      if (has) thumb.src = coverSrc(draftCover);
+    }
+
+    function clearCoverImage() {
+      draftCover = '';
+      document.getElementById('actCoverFile').value = '';
+      setCoverImage('');
+      updatePreview();
+    }
+
+    function renderCases() {
+      const el = document.getElementById('caseList');
+      if (!draftCases.length) {
+        el.innerHTML = '<p class="field-hint">尚未添加案例。完整案例 = 名称 + 组成附件。</p>';
         return;
       }
-      try {
-        frame.contentWindow?.postMessage({ type: 'setFilter', filter }, '*');
-      } catch (_) {
-        frame.src = src;
+      el.innerHTML = draftCases.map((c, i) => `
+        <div class="case-item" data-case-i="${i}">
+          <button type="button" class="case-del" data-case-del="${i}" title="删除案例">×</button>
+          <div class="ef"><label>案例名称</label><input type="text" data-cf-case="name" value="${c.name || ''}" /></div>
+          <div class="ef">
+            <label>案例组成</label>
+            <div class="img-upload">
+              <button type="button" class="img-upload-btn" data-case-add="image">上传图片</button>
+              <button type="button" class="img-upload-btn" data-case-add="video">上传视频</button>
+            </div>
+            <div class="field-hint">${(c.assets || []).length ? (c.assets || []).join('、') : '图片或视频，至少 1 个'}</div>
+          </div>
+        </div>`).join('');
+      el.querySelectorAll('[data-case-i]').forEach(box => {
+        const i = Number(box.dataset.caseI);
+        const nameInp = box.querySelector('[data-cf-case="name"]');
+        if (nameInp) nameInp.addEventListener('input', () => { draftCases[i].name = nameInp.value; updatePreview(); });
+        box.querySelectorAll('[data-case-add]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const kind = btn.dataset.caseAdd === 'video' ? '视频' : '图片';
+            draftCases[i].assets = draftCases[i].assets || [];
+            draftCases[i].assets.push(kind + (draftCases[i].assets.length + 1));
+            renderCases();
+            updatePreview();
+          });
+        });
+        const del = box.querySelector('[data-case-del]');
+        if (del) del.addEventListener('click', () => {
+          draftCases.splice(i, 1);
+          renderCases();
+          updatePreview();
+        });
+      });
+    }
+
+    function renderClaims() {
+      const list = document.getElementById('claimList');
+      const on = document.getElementById('actNeedClaim').checked;
+      list.hidden = !on;
+      if (!on) {
+        document.getElementById('previewCta').hidden = true;
+        document.getElementById('previewCta').innerHTML = '';
+        return;
       }
-    }
-
-    document.querySelectorAll('.scene-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.scene-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        loadMockupFrame(false);
+      while (draftClaims.length < 2) draftClaims.push({ label: '', needJump: false, url: '', clickedLabel: '' });
+      draftClaims = draftClaims.slice(0, 2);
+      list.innerHTML = draftClaims.map((c, i) => `
+        <div class="claim-item" data-claim-i="${i}">
+          <div class="ef"><label>按钮文案</label><input type="text" data-cf="label" value="${c.label || ''}" /></div>
+          <div class="ef">
+            <label>是否需要跳转</label>
+            <select data-cf="jump">
+              <option value="1"${c.needJump ? ' selected' : ''}>是</option>
+              <option value="0"${c.needJump ? '' : ' selected'}>否</option>
+            </select>
+          </div>
+          <div class="ef"><label>跳转地址</label><input type="text" data-cf="url" value="${c.url || ''}" ${c.needJump ? '' : 'hidden'} /></div>
+          <div class="ef"><label>点击后变更文案</label><input type="text" data-cf="clicked" value="${c.clickedLabel || ''}" ${c.needJump ? 'hidden' : ''} /></div>
+        </div>`).join('');
+      list.querySelectorAll('[data-claim-i]').forEach(box => {
+        const i = Number(box.dataset.claimI);
+        box.querySelector('[data-cf="label"]').addEventListener('input', e => { draftClaims[i].label = e.target.value; updatePreview(); });
+        box.querySelector('[data-cf="url"]').addEventListener('input', e => { draftClaims[i].url = e.target.value; updatePreview(); });
+        box.querySelector('[data-cf="clicked"]').addEventListener('input', e => { draftClaims[i].clickedLabel = e.target.value; updatePreview(); });
+        box.querySelector('[data-cf="jump"]').addEventListener('change', e => {
+          draftClaims[i].needJump = e.target.value === '1';
+          box.querySelector('[data-cf="url"]').hidden = !draftClaims[i].needJump;
+          box.querySelector('[data-cf="clicked"]').hidden = draftClaims[i].needJump;
+          updatePreview();
+        });
       });
-    });
+      updatePreview();
+    }
 
-    document.querySelectorAll('.page-tab-bar button').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.page-tab-bar button').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.page-view').forEach(v => v.classList.remove('active'));
-        btn.classList.add('active');
-        document.getElementById(btn.dataset.page).classList.add('active');
-        if (btn.dataset.page === 'view-fe') loadMockupFrame(true);
-        const tabMap = { 'view-fe': 'fe', 'view-admin': 'admin', 'view-flow': 'flow' };
-        history.replaceState(null, '', '?tab=' + (tabMap[btn.dataset.page] || 'fe'));
-        syncRuleTabToPage();
+    function ruleTypeLabel(type) {
+      return { play: '播放奖', attendance: '全勤奖', revenue: '累计项目收益奖' }[type] || type;
+    }
+
+    function cnLadder(i) {
+      return ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十'][i] || String(i + 1);
+    }
+    function emptyPlayLadder() {
+      return { playsFrom: '', playsTo: '', prizeKind: '', prizeValue: '' };
+    }
+    function emptyRankLadder() {
+      return { rankFrom: '', rankTo: '', prizeKind: '', prizeValue: '' };
+    }
+    function inferPrize(l) {
+      if (l.prizeKind) return { prizeKind: l.prizeKind, prizeValue: l.prizeValue || '' };
+      const raw = String(l.prize || l.prizeValue || '').trim();
+      if (!raw) return { prizeKind: '', prizeValue: '' };
+      if (/元|奖金/.test(raw)) return { prizeKind: 'cash', prizeValue: raw.replace(/\s*元$/, '') };
+      return { prizeKind: 'goods', prizeValue: raw };
+    }
+    function normalizePlayLadder(l) {
+      const p = inferPrize(l);
+      return { playsFrom: l.playsFrom ?? l.plays ?? '', playsTo: l.playsTo ?? '', prizeKind: p.prizeKind, prizeValue: p.prizeValue };
+    }
+    function normalizeRankLadder(l) {
+      const p = inferPrize(l);
+      return { rankFrom: l.rankFrom ?? l.rank ?? '', rankTo: l.rankTo ?? '', prizeKind: p.prizeKind, prizeValue: p.prizeValue };
+    }
+    function prizeKindSelect(lad, li) {
+      const k = lad.prizeKind || '';
+      return `<select data-rf="prizeKind" data-li="${li}">
+        <option value=""${!k ? ' selected' : ''}>请选择</option>
+        <option value="cash"${k === 'cash' ? ' selected' : ''}>奖金</option>
+        <option value="goods"${k === 'goods' ? ' selected' : ''}>实物礼品</option>
+      </select>`;
+    }
+    function prizeValueInput(lad, li) {
+      const k = lad.prizeKind || '';
+      const ph = k === 'goods' ? '礼品名称' : (k === 'cash' ? '奖金金额' : '选择类型后填写');
+      return `<input type="text" data-rf="prizeValue" data-li="${li}" placeholder="${ph}" value="${lad.prizeValue || ''}" ${k ? '' : 'hidden'} />`;
+    }
+    function ladderRowHtml(kind, lad, li, title) {
+      const fromKey = kind === 'play' ? 'playsFrom' : 'rankFrom';
+      const toKey = kind === 'play' ? 'playsTo' : 'rankTo';
+      const delAttr = kind === 'play' ? 'data-ladder-del' : 'data-rank-del';
+      const rangeLabel = kind === 'play' ? '区间' : '名次区间';
+      return `<div class="ladder-card"><div class="ladder-row" data-ladder-i="${li}">
+        <span class="ladder-row-title">${title}</span>
+        <span class="ladder-row-label">${rangeLabel}</span>
+        <input type="number" min="1" data-rf="${fromKey}" data-li="${li}" placeholder="x" value="${lad[fromKey] ?? ''}" />
+        <span class="range-sep">~</span>
+        <input type="number" min="1" data-rf="${toKey}" data-li="${li}" placeholder="y" value="${lad[toKey] ?? ''}" />
+        <span class="ladder-row-label">奖品类型</span>
+        ${prizeKindSelect(lad, li)}
+        ${prizeValueInput(lad, li)}
+        <button type="button" class="ff-del" ${delAttr}="${li}" title="删除阶梯">×</button>
+      </div></div>`;
+    }
+    function ladderComplete(l, fromKey, toKey) {
+      const from = Number(l[fromKey]);
+      const to = Number(l[toKey]);
+      return from >= 1 && to >= from && (l.prizeKind === 'cash' || l.prizeKind === 'goods') && String(l.prizeValue || '').trim();
+    }
+
+    function prizeText(l) {
+      if (!l) return '';
+      if (l.prizeValue) return l.prizeKind === 'cash' ? l.prizeValue + ' 元' : l.prizeValue;
+      if (l.prize) return l.prize;
+      return '';
+    }
+
+    function normalizeRules(rules) {
+      return (rules || []).map(r => {
+        if (r.type === 'play') {
+          let ladders = Array.isArray(r.ladders) ? r.ladders.map(normalizePlayLadder) : [];
+          if (!ladders.length && (r.plays || r.prize)) ladders = [normalizePlayLadder(r)];
+          if (!ladders.length) ladders = [emptyPlayLadder()];
+          return { type: 'play', ladders };
+        }
+        if (r.type === 'attendance') {
+          return { type: 'attendance', dailyWorks: r.dailyWorks, streakDays: r.streakDays, bonus: r.bonus || '' };
+        }
+        const rankLadders = (r.rankLadders && r.rankLadders.length)
+          ? r.rankLadders.map(normalizeRankLadder)
+          : [emptyRankLadder()];
+        return {
+          type: 'revenue',
+          brandProjects: (r.brandProjects || []).slice(),
+          otherBizProjects: (r.otherBizProjects || []).slice(),
+          rankLadders
+        };
       });
-    });
-
-    const ruleDrawer = document.getElementById('ruleDrawer');
-    const toggleRuleBtn = document.getElementById('toggleRuleDrawer');
-
-    function switchRuleTab(ruleId, btn) {
-      document.querySelectorAll('.rule-tab-bar button').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.rule-panel').forEach(p => p.classList.remove('active'));
-      btn.classList.add('active');
-      document.getElementById(ruleId).classList.add('active');
     }
 
-    document.querySelectorAll('.rule-tab-bar button').forEach(btn => {
-      btn.addEventListener('click', () => switchRuleTab(btn.dataset.rule, btn));
-    });
-
-    function syncRuleTabToPage() {
-      const activePage = document.querySelector('.page-view.active')?.id;
-      const ruleId = activePage === 'view-admin' ? 'rule-admin' : 'rule-fe';
-      const btn = document.querySelector('.rule-tab-bar button[data-rule="' + ruleId + '"]');
-      if (btn) switchRuleTab(ruleId, btn);
+    function typeSelectHtml(type) {
+      return `<select data-rf="type">
+        <option value="play"${type === 'play' ? ' selected' : ''}>播放奖</option>
+        <option value="attendance"${type === 'attendance' ? ' selected' : ''}>全勤奖</option>
+        <option value="revenue"${type === 'revenue' ? ' selected' : ''}>累计项目收益奖</option>
+      </select>`;
     }
 
-    function setRuleDrawer(open) {
-      ruleDrawer.classList.toggle('open', open);
-      document.getElementById('ruleOverlay').classList.toggle('open', open);
-      toggleRuleBtn.classList.toggle('active', open);
-      if (open) syncRuleTabToPage();
-    }
-
-    toggleRuleBtn.onclick = () => setRuleDrawer(!ruleDrawer.classList.contains('open'));
-
-    function showToast(msg) {
-      const t = document.getElementById('toast');
-      t.textContent = msg;
-      t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 2500);
-    }
-
-    function fillProjectOptions(track, selected) {
-      const sel = document.getElementById('actProject');
-      const list = TRACK_PROJECTS[track] || [];
-      sel.disabled = !track;
-      sel.innerHTML = '<option value="">' + (track ? '请选择项目' : '请先选择所属赛道') + '</option>'
-        + list.map(p => `<option${p === selected ? ' selected' : ''}>${p}</option>`).join('');
-    }
-
-    function setVisibleRadio(visible) {
-      document.querySelectorAll('#actVisibleGroup .radio-pill').forEach(pill => {
-        const on = pill.querySelector('input').value === (visible ? '1' : '0');
-        pill.classList.toggle('active', on);
-        pill.querySelector('input').checked = on;
+    function renderRules() {
+      const el = document.getElementById('rewardRuleList');
+      if (!draftRules.length) {
+        el.innerHTML = '<p class="field-hint">尚未添加规则。可添加播放奖、全勤奖、累计项目收益奖。</p>';
+        return;
+      }
+      el.innerHTML = draftRules.map((r, i) => {
+        if (r.type === 'play') {
+          const rows = (r.ladders || []).map((lad, li) => ladderRowHtml('play', lad, li, '阶梯' + cnLadder(li))).join('');
+          return `<div class="rule-item" data-rule-i="${i}">
+            <button type="button" class="rule-del" data-rule-del="${i}" title="删除规则">×</button>
+            <div class="ef"><label>规则类型</label>${typeSelectHtml('play')}</div>
+            <div class="ef ef-top ladder-stack">${rows}
+              <button class="btn-add-row" type="button" data-add-play>＋ 添加阶梯</button>
+            </div>
+          </div>`;
+        }
+        if (r.type === 'attendance') {
+          return `<div class="rule-item" data-rule-i="${i}">
+            <button type="button" class="rule-del" data-rule-del="${i}" title="删除规则">×</button>
+            <div class="ef"><label>规则类型</label>${typeSelectHtml('attendance')}</div>
+            <div class="ef-split">
+              <div class="ef"><label>每日有效稿件</label><input type="number" data-rf="daily" min="1" value="${r.dailyWorks || ''}" /></div>
+              <div class="ef"><label>连续打卡天数</label><input type="number" data-rf="streak" min="1" value="${r.streakDays || ''}" /></div>
+            </div>
+            <div class="ef"><label>全勤奖金</label><input type="text" data-rf="bonus" value="${r.bonus || ''}" /></div>
+          </div>`;
+        }
+        const rows = (r.rankLadders || [emptyRankLadder()]).map((lad, li) => ladderRowHtml('rank', lad, li, '阶梯' + (li + 1))).join('');
+        return `<div class="rule-item" data-rule-i="${i}" data-rule-brand data-rule-biz>
+          <button type="button" class="rule-del" data-rule-del="${i}" title="删除规则">×</button>
+          <div class="ef"><label>规则类型</label>${typeSelectHtml('revenue')}</div>
+          <div class="ef-split">
+            <div class="ef"><label>品牌项目</label><div class="ms-wrap" id="ruleBrand-${i}"></div></div>
+            <div class="ef"><label>其他业务项目</label><div class="ms-wrap" id="ruleBiz-${i}"></div></div>
+          </div>
+          <div class="ef ef-top ladder-stack">${rows}
+            <button class="btn-add-row" type="button" data-add-rank>＋ 添加阶梯</button>
+          </div>
+        </div>`;
+      }).join('');
+      el.querySelectorAll('.rule-item').forEach(box => {
+        const i = Number(box.dataset.ruleI);
+        const typeSel = box.querySelector('[data-rf="type"]');
+        if (typeSel) typeSel.addEventListener('change', () => {
+          const type = typeSel.value;
+          if (type === 'play') draftRules[i] = { type: 'play', ladders: [emptyPlayLadder()] };
+          else if (type === 'attendance') draftRules[i] = { type: 'attendance', dailyWorks: 1, streakDays: 1, bonus: '' };
+          else draftRules[i] = { type: 'revenue', brandProjects: [], otherBizProjects: [], rankLadders: [emptyRankLadder()] };
+          renderRules();
+        });
+        const delRule = box.querySelector('[data-rule-del]');
+        if (delRule) delRule.addEventListener('click', () => {
+          draftRules.splice(i, 1);
+          renderRules();
+        });
+        const bindLadderField = (inp, listKey, fromKey, toKey) => {
+          const key = inp.dataset.rf;
+          const li = inp.dataset.li != null ? Number(inp.dataset.li) : null;
+          if (li == null) return;
+          draftRules[i][listKey] = draftRules[i][listKey] || [];
+          const empty = listKey === 'ladders' ? emptyPlayLadder() : emptyRankLadder();
+          draftRules[i][listKey][li] = draftRules[i][listKey][li] || empty;
+          if (key === fromKey || key === toKey) {
+            draftRules[i][listKey][li][key] = inp.value === '' ? '' : Number(inp.value);
+          }
+          if (key === 'prizeKind') {
+            draftRules[i][listKey][li].prizeKind = inp.value;
+            const val = box.querySelector(`[data-rf="prizeValue"][data-li="${li}"]`);
+            if (val) {
+              val.hidden = !inp.value;
+              val.placeholder = inp.value === 'goods' ? '礼品名称' : (inp.value === 'cash' ? '奖金金额' : '选择类型后填写');
+            }
+          }
+          if (key === 'prizeValue') draftRules[i][listKey][li].prizeValue = inp.value;
+        };
+        box.querySelectorAll('input, select').forEach(inp => {
+          const ev = inp.tagName === 'SELECT' ? 'change' : 'input';
+          inp.addEventListener(ev, () => {
+            const key = inp.dataset.rf;
+            if (draftRules[i].type === 'play') bindLadderField(inp, 'ladders', 'playsFrom', 'playsTo');
+            if (key === 'daily') draftRules[i].dailyWorks = Number(inp.value || 0);
+            if (key === 'streak') draftRules[i].streakDays = Number(inp.value || 0);
+            if (key === 'bonus') draftRules[i].bonus = inp.value;
+            if (draftRules[i].type === 'revenue') bindLadderField(inp, 'rankLadders', 'rankFrom', 'rankTo');
+          });
+        });
+        box.querySelectorAll('[data-ladder-del]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            draftRules[i].ladders.splice(Number(btn.dataset.ladderDel), 1);
+            if (!draftRules[i].ladders.length) draftRules[i].ladders.push(emptyPlayLadder());
+            renderRules();
+          });
+        });
+        box.querySelectorAll('[data-rank-del]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            draftRules[i].rankLadders.splice(Number(btn.dataset.rankDel), 1);
+            if (!draftRules[i].rankLadders.length) draftRules[i].rankLadders.push(emptyRankLadder());
+            renderRules();
+          });
+        });
+        const addPlay = box.querySelector('[data-add-play]');
+        if (addPlay) addPlay.addEventListener('click', () => {
+          draftRules[i].ladders = draftRules[i].ladders || [];
+          draftRules[i].ladders.push(emptyPlayLadder());
+          renderRules();
+        });
+        const addRank = box.querySelector('[data-add-rank]');
+        if (addRank) addRank.addEventListener('click', () => {
+          draftRules[i].rankLadders = draftRules[i].rankLadders || [];
+          draftRules[i].rankLadders.push(emptyRankLadder());
+          renderRules();
+        });
+        if (box.hasAttribute('data-rule-brand')) {
+          renderProjectPicker('ruleBrand-' + i, draftRules[i].brandProjects || [], {
+            options: BRAND_PROJECTS,
+            searchAttr: 'data-brand-search',
+            triggerAttr: 'data-brand-trigger',
+            emptyLabel: '请选择品牌项目',
+            searchPlaceholder: '搜索品牌项目',
+            onChange: next => { draftRules[i].brandProjects = next; }
+          });
+        }
+        if (box.hasAttribute('data-rule-biz')) {
+          renderProjectPicker('ruleBiz-' + i, draftRules[i].otherBizProjects || [], {
+            options: OTHER_BIZ_PROJECTS,
+            searchAttr: 'data-biz-search',
+            triggerAttr: 'data-biz-trigger',
+            emptyLabel: '请选择其他业务项目',
+            searchPlaceholder: '搜索其他业务',
+            onChange: next => { draftRules[i].otherBizProjects = next; }
+          });
+        }
       });
     }
 
-    function bindCharCount(inputId, countId) {
-      const input = document.getElementById(inputId);
-      const count = document.getElementById(countId);
-      const sync = () => { count.textContent = (input.value || '').length; };
-      input.addEventListener('input', () => { sync(); updatePreview(); });
-      sync();
+    function previewIntroHtml() {
+      const introEl = document.getElementById('actIntro');
+      return introEl ? introEl.innerHTML : '';
     }
-
+    function previewHasIntro() {
+      const introEl = document.getElementById('actIntro');
+      if (!introEl) return false;
+      const text = introEl.innerText.replace(/\u00a0/g, ' ').trim();
+      return !!(text || introEl.querySelector('img,video,table'));
+    }
+    function previewCompleteCases() {
+      return (draftCases || []).filter(c => c.name && c.assets && c.assets.length);
+    }
+    function bindPreviewTabs() {
+      document.querySelectorAll('#previewTabs button').forEach(btn => {
+        btn.addEventListener('click', () => {
+          previewTab = btn.dataset.ptab;
+          updatePreview();
+        });
+      });
+    }
     function updatePreview() {
       const title = document.getElementById('actTitle').value.trim() || '活动标题';
-      document.getElementById('previewTitle').textContent = title;
-      const html = document.getElementById('actContent').innerHTML;
-      const text = document.getElementById('actContent').innerText.replace(/\u00a0/g, ' ').trim();
-      const body = document.getElementById('previewBody');
-      body.innerHTML = text || document.getElementById('actContent').querySelector('img,video,table')
-        ? `<div class="phone-html">${html}</div>`
-        : '<div class="phone-placeholder"></div>';
+      const tabs = previewConfiguredTabs();
+      const showTabs = tabs.length >= 2;
+      if (!tabs.some(t => t.id === previewTab)) previewTab = tabs[0] ? tabs[0].id : 'intro';
+      let pane = '<div style="color:#9aa5b4">暂无介绍</div>';
+      if (previewTab === 'board' && radioValue('actBoard')) {
+        const payload = activityLeaderboard({
+          leaderboardLimit: document.getElementById('actBoardLimit').value,
+          leaderboardLineDesc: document.getElementById('actBoardLineDesc').value,
+          leaderboardPeriodDesc: document.getElementById('actBoardPeriodDesc').value
+        });
+        pane = renderLeaderboardHtml(payload) + renderBoardMeHtml(payload);
+      } else if (previewTab === 'cases' && previewCompleteCases().length) {
+        pane = previewCompleteCases().map(c => {
+            const media = (c.assets || []).map(a => {
+              const isVideo = String(a).indexOf('视频') >= 0 || (a && a.type === 'video');
+              return isVideo
+                ? `<video controls playsinline src="${CASE_VIDEO}" poster="" style="width:100%;background:#e5e7eb"></video>`
+                : '<div style="height:84px;border-radius:8px;background:linear-gradient(135deg,#ff8a4c,#ff5722);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px">案例图</div>';
+            }).join('');
+            return `<div class="case-block"><div class="case-name">${c.name}</div><div class="case-media">${media}</div></div>`;
+          }).join('');
+        pane = '<div class="case-grid">' + pane + '</div>';
+      } else if (previewHasIntro()) {
+        pane = `<div class="intro-html">${previewIntroHtml()}</div>`;
+      }
+      const tags = draftTags.map(t => `<span class="pv-chip">${t}</span>`).join('');
+      const projects = (draftProjects || []).map(p => `<span class="pv-chip pv-chip-p">项目·<em>${p}</em></span>`).join('');
+      const start = document.getElementById('actStart').value;
+      const end = document.getElementById('actEnd').value;
+      const time = formatTimeRange({ start, end });
+      const views = document.getElementById('actViews').value || 0;
+      const enrolledRaw = document.getElementById('actEnrolled').value;
+      const enroll = enrolledRaw === '' ? '' : `<span>${enrolledRaw}人已参加</span>`;
+      const cover = draftCover
+        ? `<img class="pv-cover" src="${coverSrc(draftCover)}" alt="封面" />`
+        : '';
+      const award = document.getElementById('actShowUserAward')?.checked
+        ? '<div class="pv-award won">恭喜获奖，奖品 188 元</div>'
+        : '';
+      const tabBar = showTabs
+        ? `<div id="previewTabs">${tabs.map(t => `<button type="button" data-ptab="${t.id}" class="${previewTab === t.id ? 'active' : ''}">${t.label}</button>`).join('')}</div>`
+        : '<div id="previewTabs" hidden></div>';
+      document.getElementById('previewBody').innerHTML =
+        `<div class="pv-card">${cover}<div><div class="pv-title">${title}</div><div class="pv-time">活动时间·${time}</div><div class="pv-tags">${tags}${projects}</div><div class="pv-meta"><span>${views}人浏览</span>${enroll}</div></div></div>` +
+        award +
+        `<div class="pv-main">${tabBar}<div id="previewPane">${pane}</div></div>`;
+      bindPreviewTabs();
+      const cta = document.getElementById('previewCta');
+      const on = document.getElementById('actNeedClaim').checked;
+      const buttons = draftClaims.filter(c => c.label && (c.needJump ? c.url : c.clickedLabel)).slice(0, 2);
+      if (!on || !buttons.length || previewTab !== 'intro') {
+        cta.hidden = true;
+        cta.innerHTML = '';
+      } else {
+        cta.hidden = false;
+        cta.innerHTML = buttons.map(b => `<button type="button">${b.label}</button>`).join('');
+      }
     }
 
     function syncDatetimePlaceholders() {
@@ -1014,51 +2073,83 @@
       });
     }
 
-    function resetEditorErrors() {
-      document.querySelectorAll('#activityForm .is-error').forEach(el => el.classList.remove('is-error'));
-    }
-
-    function emptyActivity() {
-      return { id: '', title: '', platform: '', track: '', project: '', intro: '', link: '', start: '', end: '', sort: 0, views: 0, enrolled: '', enrollImage: '', visible: true, content: '' };
-    }
-
-    function setEnrollImage(src) {
-      currentEnrollImage = src || '';
-      const preview = document.getElementById('enrollImgPreview');
-      const thumb = document.getElementById('enrollImgThumb');
-      const pick = document.getElementById('enrollImgPick');
-      const has = !!currentEnrollImage;
-      preview.hidden = !has;
-      pick.textContent = has ? '更换图片' : '上传图片';
-      if (has) thumb.src = currentEnrollImage;
-    }
-
-    function clearEnrollImage() {
-      currentEnrollImage = '';
-      document.getElementById('actEnrollImage').value = '';
-      setEnrollImage('');
+    function setEditorStep(step) {
+      editorStep = step;
+      document.getElementById('step-1').hidden = step !== 1;
+      document.getElementById('step-2').hidden = step !== 2;
+      document.querySelectorAll('#editorStepNav button').forEach(btn => {
+        const n = Number(btn.dataset.estep);
+        btn.classList.toggle('active', n === step);
+        btn.classList.toggle('is-done', n < step);
+      });
+      document.getElementById('editorPrev').hidden = step === 1;
+      document.getElementById('editorNext').hidden = step === 2;
     }
 
     function fillActivityForm(row) {
       document.getElementById('actTitle').value = row.title || '';
+      document.getElementById('actTitleCount').textContent = (row.title || '').length;
+      document.getElementById('actDescription').value = row.description || '';
+      document.getElementById('actDescCount').textContent = (row.description || '').length;
+      draftTags = (row.tags || []).slice();
+      renderTags();
+      document.getElementById('actTagInput').value = '';
       document.getElementById('actPlatform').value = row.platform || '';
       document.getElementById('actTrack').value = row.track || '';
-      fillProjectOptions(row.track || '', row.project || '');
-      document.getElementById('actIntro').value = row.intro || '';
-      document.getElementById('actLink').value = row.link || '';
       document.getElementById('actStart').value = row.start || '';
       document.getElementById('actEnd').value = row.end || '';
-      document.getElementById('actSort').value = row.sort ?? 0;
       document.getElementById('actViews').value = row.views ?? 0;
       document.getElementById('actEnrolled').value = (row.enrolled === 0 || row.enrolled) ? row.enrolled : '';
-      setEnrollImage(row.enrollImage || '');
-      setVisibleRadio(row.visible !== false);
-      document.getElementById('actContent').innerHTML = row.content || '';
-      document.getElementById('actTitleCount').textContent = (row.title || '').length;
-      document.getElementById('actIntroCount').textContent = (row.intro || '').length;
-      resetEditorErrors();
+      document.getElementById('actIntro').innerHTML = row.intro || '';
+      setRadio('actVisibleGroup', 'actVisible', row.visible !== false);
+      setRadio('actPinnedGroup', 'actPinned', !!row.pinned);
+      setCoverImage(row.cover || '');
+      draftProjects = (row.projects || []).slice();
+      renderProjectPicker('actProjectsWrap', draftProjects, { onChange: next => { draftProjects = next; } });
+      draftCases = (row.cases && row.cases.length) ? JSON.parse(JSON.stringify(row.cases)) : [{ name: '', assets: [] }];
+      renderCases();
+      draftClaims = JSON.parse(JSON.stringify(row.claimButtons && row.claimButtons.length ? row.claimButtons : [
+        { label: '', needJump: true, url: '', clickedLabel: '' },
+        { label: '', needJump: false, url: '', clickedLabel: '' }
+      ]));
+      document.getElementById('actNeedClaim').checked = !!row.needClaimButtons;
+      document.getElementById('actShowUserAward').checked = !!row.showUserAward;
+      renderClaims();
+      draftRules = normalizeRules(JSON.parse(JSON.stringify(row.rewardRules || [])));
+      renderRules();
+      setRadio('actBoardGroup', 'actBoard', !!row.leaderboardVisible);
+      document.getElementById('actBoardLimit').value = row.leaderboardLimit >= 1 ? row.leaderboardLimit : 10;
+      document.getElementById('actBoardLineDesc').value = row.leaderboardLineDesc || '';
+      document.getElementById('actBoardPeriodDesc').value = row.leaderboardPeriodDesc || '';
+      syncBoardLimitUi();
+      document.querySelectorAll('.detail-tabs button').forEach(b => b.classList.toggle('active', b.dataset.dtab === 'intro'));
+      document.getElementById('dtab-intro').hidden = false;
+      document.getElementById('dtab-cases').hidden = true;
+      document.getElementById('dtab-board').hidden = true;
+      document.getElementById('rteWrap').classList.remove('fullscreen');
+      previewTab = 'intro';
+      setEditorStep(1);
       syncDatetimePlaceholders();
       updatePreview();
+    }
+
+    function emptyActivity() {
+      return {
+        id: '', title: '', description: '', platform: '', track: '', projects: [], tags: [], start: '', end: '',
+        sort: 0, views: 0, enrolled: '', visible: true, pinned: false, cover: '', intro: '',
+        cases: [{ name: '', assets: [] }],
+        leaderboardVisible: false,
+        leaderboardLimit: 10,
+        leaderboardLineDesc: '',
+        leaderboardPeriodDesc: '',
+        needClaimButtons: false,
+        showUserAward: false,
+        claimButtons: [
+          { label: '', needJump: true, url: '', clickedLabel: '' },
+          { label: '', needJump: false, url: '', clickedLabel: '' }
+        ],
+        rewardRules: []
+      };
     }
 
     function openActivityEditor(id) {
@@ -1066,131 +2157,315 @@
       editingId = row ? row.id : null;
       document.getElementById('editorTitle').textContent = row ? '编辑活动' : '新增活动';
       fillActivityForm(row || emptyActivity());
-      document.getElementById('rteWrap').classList.remove('fullscreen');
-      document.getElementById('activityEditor').classList.add('open');
+      document.getElementById('activityEditor').className = 'editor-page open';
     }
 
     function closeActivityEditor() {
-      document.getElementById('activityEditor').classList.remove('open');
       document.getElementById('rteWrap').classList.remove('fullscreen');
+      document.getElementById('activityEditor').className = 'editor-page';
       editingId = null;
     }
 
     function collectActivityForm() {
       return {
         title: document.getElementById('actTitle').value.trim(),
+        description: document.getElementById('actDescription').value.trim(),
+        tags: draftTags.slice(),
         platform: document.getElementById('actPlatform').value,
         track: document.getElementById('actTrack').value,
-        project: document.getElementById('actProject').value,
-        intro: document.getElementById('actIntro').value.trim(),
-        link: document.getElementById('actLink').value.trim(),
+        projects: draftProjects.slice(),
         start: document.getElementById('actStart').value,
         end: document.getElementById('actEnd').value,
-        sort: Number(document.getElementById('actSort').value || 0),
         views: Number(document.getElementById('actViews').value || 0),
         enrolled: document.getElementById('actEnrolled').value === '' ? '' : Number(document.getElementById('actEnrolled').value),
-        enrollImage: currentEnrollImage,
-        visible: document.querySelector('input[name="actVisible"]:checked')?.value === '1',
-        content: document.getElementById('actContent').innerHTML
+        visible: radioValue('actVisible'),
+        pinned: radioValue('actPinned'),
+        cover: draftCover,
+        intro: document.getElementById('actIntro').innerHTML,
+        cases: draftCases.filter(c => c.name && c.assets && c.assets.length),
+        leaderboardVisible: radioValue('actBoard'),
+        leaderboardLimit: Number(document.getElementById('actBoardLimit').value || 0),
+        leaderboardLineDesc: document.getElementById('actBoardLineDesc').value.trim(),
+        leaderboardPeriodDesc: document.getElementById('actBoardPeriodDesc').value.trim(),
+        needClaimButtons: document.getElementById('actNeedClaim').checked,
+        showUserAward: document.getElementById('actShowUserAward').checked,
+        claimButtons: JSON.parse(JSON.stringify(draftClaims)),
+        rewardRules: JSON.parse(JSON.stringify(draftRules)).map(r => {
+          if (r.type === 'play') {
+            const ladders = (r.ladders || []).filter(l => ladderComplete(l, 'playsFrom', 'playsTo'));
+            return ladders.length ? { type: 'play', ladders } : null;
+          }
+          if (r.type === 'attendance') {
+            if (!(Number(r.dailyWorks) >= 1 && Number(r.streakDays) >= 1 && String(r.bonus || '').trim())) return null;
+            return r;
+          }
+          const rankLadders = (r.rankLadders || []).filter(l => ladderComplete(l, 'rankFrom', 'rankTo'));
+          const brandProjects = (r.brandProjects || []).filter(Boolean);
+          const otherBizProjects = (r.otherBizProjects || []).filter(Boolean);
+          return (brandProjects.length || otherBizProjects.length) && rankLadders.length
+            ? { type: 'revenue', brandProjects, otherBizProjects, rankLadders }
+            : null;
+        }).filter(Boolean)
       };
     }
 
     function submitActivity() {
-      resetEditorErrors();
       const data = collectActivityForm();
-      if (!data.title) {
-        document.getElementById('actTitle').classList.add('is-error');
-        document.getElementById('actTitle').focus();
-        showToast('请输入活动标题');
+      if (!data.title) { showToast('请输入活动标题'); return; }
+      if (!data.start) { showToast('请选择活动开始时间'); return; }
+      if (data.end && data.end < data.start) { showToast('结束时间不能早于开始时间'); return; }
+      if (data.visible && data.pinned) {
+        const other = ACTIVITY_ROWS.find(r => r.id !== editingId && r.visible && r.pinned);
+        if (other) { showToast('显示池内已有置顶活动'); return; }
+      }
+      if (data.leaderboardVisible && !(data.leaderboardLimit >= 1)) {
+        showToast('请填写榜单前几名');
         return;
       }
-      if (!data.start) {
-        document.getElementById('actStart').classList.add('is-error');
-        document.getElementById('actStart').focus();
-        showToast('请选择活动开始时间');
-        return;
-      }
-      if (data.end && data.end < data.start) {
-        document.getElementById('actEnd').classList.add('is-error');
-        document.getElementById('actEnd').focus();
-        showToast('结束时间不能早于开始时间');
-        return;
-      }
+      if (!data.leaderboardVisible) data.leaderboardLimit = data.leaderboardLimit >= 1 ? data.leaderboardLimit : 10;
       if (editingId) {
         const idx = ACTIVITY_ROWS.findIndex(r => r.id === editingId);
         if (idx >= 0) ACTIVITY_ROWS[idx] = { ...ACTIVITY_ROWS[idx], ...data };
       } else {
         const next = ACTIVITY_ROWS.reduce((max, r) => Math.max(max, Number((r.id || '').replace(/\D/g, '')) || 0), 0) + 1;
-        ACTIVITY_ROWS.unshift({ id: 'ACT-' + String(next).padStart(3, '0'), ...data });
+        ACTIVITY_ROWS.unshift({ id: 'ACT-' + String(next).padStart(3, '0'), sort: 0, ...data });
       }
       renderActivityTable();
       closeActivityEditor();
       showToast('Demo 已保存（Mock，不写入后端）');
     }
 
-    document.getElementById('actTrack').addEventListener('change', () => {
-      fillProjectOptions(document.getElementById('actTrack').value, '');
+    function switchPage(pageId) {
+      document.querySelectorAll('.page-tab-bar button').forEach(b => {
+        b.className = b.dataset.page === pageId ? 'active' : '';
+      });
+      document.querySelectorAll('.page-view').forEach(v => {
+        v.className = v.id === pageId ? 'page-view active' : 'page-view';
+      });
+      if (pageId === 'view-fe') {
+        const sceneBtn = document.querySelector('#view-fe .module-tab-bar button[data-sub="fe-scene"]');
+        if (sceneBtn && !document.getElementById('fe-flow').classList.contains('active')) sceneBtn.click();
+      }
+    }
+
+    function switchSub(btn) {
+      const bar = btn.closest('.module-tab-bar');
+      const scope = bar.parentElement;
+      bar.querySelectorAll('button').forEach(b => { b.className = b === btn ? 'active' : ''; });
+      scope.querySelectorAll(':scope > .sub-view').forEach(v => {
+        v.className = v.id === btn.dataset.sub ? 'sub-view active' : 'sub-view';
+      });
+      if (btn.dataset.sub === 'fe-scene') loadMockupFrame();
+    }
+
+    const SCENE_SRC = {
+      'list-all': 'activity-center-demo.html?embed=1&filter=all',
+      'detail-camp': 'activity-center-demo.html?embed=1&screen=detail&id=pinned'
+    };
+
+    function loadMockupFrame() {
+      const scene = document.querySelector('#fe-scene .scene-btn.active')?.dataset.scene || 'list-all';
+      const frame = document.getElementById('mockupFrame');
+      const listRules = document.getElementById('sceneRulesList');
+      const detailRules = document.getElementById('sceneRulesDetail');
+      if (listRules) listRules.hidden = scene !== 'list-all';
+      if (detailRules) detailRules.hidden = scene !== 'detail-camp';
+      if (frame) frame.src = (SCENE_SRC[scene] || SCENE_SRC['list-all']) + '&v=fe-scene9';
+    }
+
+    function setPreviewButtons(on) {
+      document.querySelectorAll('.btn-preview').forEach(b => b.setAttribute('aria-pressed', on ? 'true' : 'false'));
+    }
+    function isPreviewOn() {
+      return !!(document.fullscreenElement || document.webkitFullscreenElement || document.body.classList.contains('preview-fs-fallback'));
+    }
+    function exitPreview() {
+      if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen();
+      else if (document.webkitFullscreenElement && document.webkitExitFullscreen) document.webkitExitFullscreen();
+      document.body.classList.remove('preview-fs-fallback');
+      document.querySelectorAll('.demo-layout').forEach(el => el.classList.remove('is-preview'));
+      setPreviewButtons(false);
+    }
+    function togglePreview() {
+      const layout = document.getElementById('feDemo');
+      if (!layout) return;
+      if (isPreviewOn()) { exitPreview(); return; }
+      layout.classList.add('is-preview');
+      setPreviewButtons(true);
+      const req = layout.requestFullscreen || layout.webkitRequestFullscreen;
+      if (req) req.call(layout).catch(() => document.body.classList.add('preview-fs-fallback'));
+      else document.body.classList.add('preview-fs-fallback');
+    }
+
+    document.querySelectorAll('.page-tab-bar button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        exitPreview();
+        switchPage(btn.dataset.page);
+        if (btn.dataset.page === 'view-fe') loadMockupFrame();
+      });
     });
+    document.querySelectorAll('.module-tab-bar button').forEach(btn => {
+      btn.addEventListener('click', () => switchSub(btn));
+    });
+    document.querySelectorAll('#fe-scene .scene-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#fe-scene .scene-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('feSceneHint').textContent = btn.dataset.hint || '';
+        loadMockupFrame();
+      });
+    });
+    document.querySelectorAll('[data-preview]').forEach(btn => {
+      btn.addEventListener('click', togglePreview);
+    });
+    document.addEventListener('fullscreenchange', () => {
+      if (!document.fullscreenElement && !document.body.classList.contains('preview-fs-fallback')) {
+        document.querySelectorAll('.demo-layout').forEach(el => el.classList.remove('is-preview'));
+        setPreviewButtons(false);
+      }
+    });
+    document.querySelectorAll('.detail-tabs button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.detail-tabs button').forEach(b => b.classList.toggle('active', b === btn));
+        document.getElementById('dtab-intro').hidden = btn.dataset.dtab !== 'intro';
+        document.getElementById('dtab-cases').hidden = btn.dataset.dtab !== 'cases';
+        document.getElementById('dtab-board').hidden = btn.dataset.dtab !== 'board';
+        if (btn.dataset.dtab === 'board' && radioValue('actBoard')) previewTab = 'board';
+        else if (btn.dataset.dtab === 'cases' && previewCompleteCases().length) previewTab = 'cases';
+        else previewTab = 'intro';
+        updatePreview();
+      });
+    });
+    document.querySelectorAll('#editorStepNav button').forEach(btn => {
+      btn.addEventListener('click', () => setEditorStep(Number(btn.dataset.estep)));
+    });
+    document.getElementById('editorPrev').addEventListener('click', () => setEditorStep(1));
+    document.getElementById('editorNext').addEventListener('click', () => setEditorStep(2));
+    document.getElementById('actNeedClaim').addEventListener('change', () => { renderClaims(); updatePreview(); });
+    document.getElementById('actShowUserAward').addEventListener('change', updatePreview);
+    document.getElementById('addCase').addEventListener('click', () => {
+      draftCases.push({ name: '', assets: [] });
+      renderCases();
+    });
+    document.getElementById('addRewardRule').addEventListener('click', () => {
+      draftRules.push({ type: 'play', ladders: [emptyPlayLadder()] });
+      renderRules();
+    });
+    document.getElementById('actTitle').addEventListener('input', () => {
+      document.getElementById('actTitleCount').textContent = (document.getElementById('actTitle').value || '').length;
+      updatePreview();
+    });
+    document.getElementById('actDescription').addEventListener('input', () => {
+      document.getElementById('actDescCount').textContent = (document.getElementById('actDescription').value || '').length;
+      updatePreview();
+    });
+    document.getElementById('actIntro').addEventListener('input', updatePreview);
     document.getElementById('actStart').addEventListener('input', () => { syncDatetimePlaceholders(); updatePreview(); });
     document.getElementById('actEnd').addEventListener('input', syncDatetimePlaceholders);
-    document.getElementById('actContent').addEventListener('input', updatePreview);
-    bindCharCount('actTitle', 'actTitleCount');
-    bindCharCount('actIntro', 'actIntroCount');
-    document.getElementById('actEnrollImage').addEventListener('change', e => {
+    document.getElementById('actTagInput').addEventListener('keydown', e => {
+      if (e.key !== 'Enter') return;
+      e.preventDefault();
+      const v = document.getElementById('actTagInput').value.trim();
+      if (!v || draftTags.includes(v)) return;
+      draftTags.push(v);
+      document.getElementById('actTagInput').value = '';
+      renderTags();
+      updatePreview();
+    });
+    document.getElementById('actCover').addEventListener('click', () => document.getElementById('actCoverFile').click());
+    document.getElementById('actCoverFile').addEventListener('change', e => {
       const file = e.target.files && e.target.files[0];
       if (!file) return;
       const reader = new FileReader();
-      reader.onload = () => setEnrollImage(String(reader.result || ''));
+      reader.onload = () => { setCoverImage(String(reader.result || '')); updatePreview(); };
       reader.readAsDataURL(file);
     });
-
     document.querySelectorAll('[data-stepper]').forEach(btn => {
       btn.addEventListener('click', () => {
         const input = document.getElementById(btn.dataset.stepper);
-        const next = Math.max(0, Number(input.value || 0) + Number(btn.dataset.delta));
-        input.value = next;
+        input.value = Math.max(0, Number(input.value || 0) + Number(btn.dataset.delta));
       });
     });
-
-    document.querySelectorAll('#actVisibleGroup .radio-pill').forEach(pill => {
-      pill.addEventListener('click', () => {
-        setVisibleRadio(pill.querySelector('input').value === '1');
-      });
-    });
-
     document.getElementById('rteToolbar').addEventListener('click', e => {
       const btn = e.target.closest('.rte-btn');
       if (!btn) return;
       const cmd = btn.dataset.cmd;
-      const editor = document.getElementById('actContent');
+      const editor = document.getElementById('actIntro');
       editor.focus();
       if (cmd === 'fullscreen') {
         document.getElementById('rteWrap').classList.toggle('fullscreen');
         return;
       }
-      if (cmd === 'createLink') {
-        const url = prompt('请输入链接地址', 'https://');
-        if (url) document.execCommand('createLink', false, url);
-      } else if (cmd === 'insertImage') {
+      if (cmd === 'insertImage') {
         const url = prompt('请输入图片地址', 'https://');
         if (url) document.execCommand('insertImage', false, url);
       } else if (cmd === 'insertVideo') {
         document.execCommand('insertHTML', false, '<p><video controls src="" style="max-width:100%"></video></p>');
-      } else if (cmd === 'insertTable') {
-        document.execCommand('insertHTML', false, '<table border="1" style="width:100%;border-collapse:collapse"><tr><td>单元格</td><td>单元格</td></tr><tr><td>单元格</td><td>单元格</td></tr></table><p></p>');
-      } else if (cmd === 'insertCheckbox') {
-        document.execCommand('insertHTML', false, '<p><input type="checkbox" /> 待办事项</p>');
-      } else if (cmd === 'fontSize') {
-        document.execCommand('fontSize', false, '4');
-      } else if (cmd === 'foreColor') {
-        document.execCommand('foreColor', false, '#2563eb');
-      } else if (cmd === 'formatBlock') {
-        document.execCommand('formatBlock', false, 'pre');
       } else {
         document.execCommand(cmd, false, null);
       }
       updatePreview();
     });
+    document.querySelectorAll('#actVisibleGroup .radio-pill, #actPinnedGroup .radio-pill, #actBoardGroup .radio-pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        const group = pill.parentElement;
+        group.querySelectorAll('.radio-pill').forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        pill.querySelector('input').checked = true;
+        if (group.id === 'actBoardGroup') {
+          syncBoardLimitUi();
+          if (radioValue('actBoard')) previewTab = 'board';
+          updatePreview();
+        }
+      });
+    });
+    document.getElementById('actBoardLimit').addEventListener('input', () => {
+      if (radioValue('actBoard')) previewTab = 'board';
+      updatePreview();
+    });
+    document.getElementById('actBoardLineDesc').addEventListener('input', () => {
+      if (radioValue('actBoard')) previewTab = 'board';
+      updatePreview();
+    });
+    document.getElementById('actBoardPeriodDesc').addEventListener('input', () => {
+      if (radioValue('actBoard')) previewTab = 'board';
+      updatePreview();
+    });
+    document.querySelectorAll('[data-ix]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#view-data [data-ix]').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('#view-data .ix-pane').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        const pane = document.getElementById(btn.dataset.ix);
+        if (pane) pane.classList.add('active');
+      });
+    });
+
+    const ruleDrawer = document.getElementById('ruleDrawer');
+    const toggleRuleBtn = document.getElementById('toggleRuleDrawer');
+    function switchRuleTab(ruleId, btn) {
+      document.querySelectorAll('.rule-tab-bar button').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.rule-panel').forEach(p => p.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      const panel = document.getElementById(ruleId);
+      if (panel) panel.classList.add('active');
+    }
+    document.querySelectorAll('.rule-tab-bar button').forEach(btn => {
+      btn.addEventListener('click', () => switchRuleTab(btn.dataset.rule, btn));
+    });
+    function syncRuleTabToPage() {
+      const activePage = document.querySelector('.page-view.active')?.id;
+      const ruleId = activePage === 'view-admin' ? 'rule-admin' : 'rule-fe';
+      const btn = document.querySelector('.rule-tab-bar button[data-rule="' + ruleId + '"]');
+      if (btn) switchRuleTab(ruleId, btn);
+    }
+    function setRuleDrawer(open) {
+      ruleDrawer.classList.toggle('open', open);
+      document.getElementById('ruleOverlay').classList.toggle('open', open);
+      toggleRuleBtn.classList.toggle('active', open);
+      if (open) syncRuleTabToPage();
+    }
+    toggleRuleBtn.onclick = () => setRuleDrawer(!ruleDrawer.classList.contains('open'));
 
     document.addEventListener('keydown', e => {
       if (e.key !== 'Escape') return;
@@ -1198,24 +2473,33 @@
         document.getElementById('rteWrap').classList.remove('fullscreen');
         return;
       }
-      if (document.getElementById('activityEditor').classList.contains('open')) {
-        closeActivityEditor();
-        return;
-      }
+      if (document.getElementById('activityEditor').classList.contains('open')) { closeActivityEditor(); return; }
+      closeListDrawer();
       setRuleDrawer(false);
+      if (document.body.classList.contains('preview-fs-fallback')) exitPreview();
+    });
+
+    document.querySelectorAll('.page-tab-bar button').forEach(btn => {
+      btn.addEventListener('click', syncRuleTabToPage);
     });
 
     const params = new URLSearchParams(location.search);
     const tab = params.get('tab');
-    const tabPageMap = { admin: 'view-admin', flow: 'view-flow', fe: 'view-fe' };
-    if (tab && tabPageMap[tab]) {
-      const btn = document.querySelector('[data-page="' + tabPageMap[tab] + '"]');
-      if (btn) btn.click();
+    if (tab === 'flow') {
+      document.querySelectorAll('.page-tab-bar button').forEach(b => { b.className = b.dataset.page === 'view-fe' ? 'active' : ''; });
+      document.querySelectorAll('.page-view').forEach(v => { v.className = v.id === 'view-fe' ? 'page-view active' : 'page-view'; });
+      document.querySelectorAll('#view-fe .module-tab-bar button').forEach(b => { b.className = b.dataset.sub === 'fe-flow' ? 'active' : ''; });
+      document.querySelectorAll('#view-fe > .sub-view').forEach(v => { v.className = v.id === 'fe-flow' ? 'sub-view active' : 'sub-view'; });
+    } else if (tab === 'admin' || tab === 'data' || tab === 'fe') {
+      const page = { admin: 'view-admin', data: 'view-data', fe: 'view-fe' }[tab];
+      switchPage(page);
     }
 
     renderActivityTable();
-    if (document.querySelector('.page-view.active')?.id === 'view-fe') loadMockupFrame(true);
-
+    if (document.querySelector('.page-view.active')?.id === 'view-fe' && document.getElementById('fe-scene').classList.contains('active')) {
+      loadMockupFrame();
+    }
+    if (window.AC_IMPL) AC_IMPL.mountAll();
     const editorParam = params.get('editor');
     if (editorParam === 'new') openActivityEditor();
     else if (editorParam) openActivityEditor(editorParam);

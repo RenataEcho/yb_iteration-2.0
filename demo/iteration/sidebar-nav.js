@@ -21,7 +21,8 @@
     'fr-book-select': '<path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/><path d="M8 7h8"/><path d="M8 11h6"/>',
     'fr-ai-keyword': '<path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"/>',
     'fr-opc-yijian-daifa': '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M8 12h8"/><path d="M8 16h5"/><circle cx="8" cy="8" r="1"/>',
-    'fr-zhulu-board': '<path d="M8 21V11"/><path d="M12 21V7"/><path d="M16 21V3"/><path d="M4 21h16"/>'
+    'fr-zhulu-board': '<path d="M8 21V11"/><path d="M12 21V7"/><path d="M16 21V3"/><path d="M4 21h16"/>',
+    'fr-wallet-merge-withdraw': '<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/>'
   };
   var ICON_FALLBACK = '<circle cx="12" cy="12" r="4"/>';
   var ICON_CHEVRON_LEFT = '<path d="m15 18-6-6 6-6"/>';
@@ -44,17 +45,18 @@
         { id: 'fr-opc-daifa-revenue', label: '代发收益', href: 'fr-opc-daifa-revenue.html', fr: 'FR-002', defaultStatus: 'live' },
         { id: 'fr-finance-brand-refund', label: '品牌退款', href: 'fr-finance-brand-refund.html', fr: 'FR-003', defaultStatus: 'live' },
         { id: 'fr-project-estimated-data', label: '预估数据', href: 'fr-project-estimated-data.html', fr: 'FR-004', defaultStatus: 'live' },
-        { id: 'fr-project-order-optimize', label: '订单优化', href: 'fr-project-order-optimize.html', fr: 'FR-005' },
-        { id: 'fr-activity-center', label: '活动中心', href: 'fr-activity-center.html', fr: 'FR-006', defaultStatus: 'paused' },
-        { id: 'fr-project-order-distribute', label: '订单分发', href: 'fr-project-order-distribute.html', fr: 'FR-007' },
+        { id: 'fr-project-order-optimize', label: '订单优化', href: 'fr-project-order-optimize.html', fr: 'FR-005', defaultStatus: 'live' },
+        { id: 'fr-activity-center', label: '活动中心', href: 'fr-activity-center.html', fr: 'FR-006', defaultStatus: 'dev' },
+        { id: 'fr-project-order-distribute', label: '订单分发', href: 'fr-project-order-distribute.html', fr: 'FR-007', defaultStatus: 'live' },
         { id: 'fr-gift-center', label: '礼品中心', href: 'fr-gift-center.html', fr: 'FR-008', defaultStatus: 'paused' },
-        { id: 'fr-ai-workbench', label: 'AI工作台', href: 'fr-ai-workbench.html', fr: 'FR-009' },
-        { id: 'fr-agent-cert', label: '代理迭代V1.0', href: 'fr-agent-cert.html', fr: 'FR-010' },
-        { id: 'fr-org-mentor-board', label: '导师迭代V1.0', href: 'fr-org-mentor-board.html', fr: 'FR-011' },
-        { id: 'fr-book-select', label: '选书中心', href: 'fr-book-select.html', fr: 'FR-012' },
+        { id: 'fr-ai-workbench', label: 'AI工作台', href: 'fr-ai-workbench.html', fr: 'FR-009', defaultStatus: 'live' },
+        { id: 'fr-agent-cert', label: '代理迭代V1.0', href: 'fr-agent-cert.html', fr: 'FR-010', defaultStatus: 'dev' },
+        { id: 'fr-org-mentor-board', label: '导师迭代V1.0', href: 'fr-org-mentor-board.html', fr: 'FR-011', defaultStatus: 'live' },
+        { id: 'fr-book-select', label: '选书中心', href: 'fr-book-select.html', fr: 'FR-012', defaultStatus: 'live' },
         { id: 'fr-ai-keyword', label: 'AI申词', href: 'fr-ai-keyword.html', fr: 'FR-013' },
-        { id: 'fr-opc-yijian-daifa', label: '一键代发', href: 'fr-opc-yijian-daifa.html', fr: 'FR-014' },
-        { id: 'fr-zhulu-board', label: '双节逐鹿榜', href: 'fr-zhulu-board.html', fr: 'FR-015' }
+        { id: 'fr-opc-yijian-daifa', label: '一键代发', href: 'fr-opc-yijian-daifa.html', fr: 'FR-014', defaultStatus: 'live' },
+        { id: 'fr-zhulu-board', label: '双节逐鹿榜', href: 'fr-zhulu-board.html', fr: 'FR-015' },
+        { id: 'fr-wallet-merge-withdraw', label: '奖钱包合并提现', href: 'fr-wallet-merge-withdraw.html', fr: 'FR-016' }
       ]
     },
     {

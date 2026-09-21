@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>钱包合并提现 · 前端交互 Demo</title>
+  <style>
+    :root {
+      --orange: #ff5a2d;
+      --orange-soft: #fff1ea;
+      --orange-border: #ffc9b0;
+      --bg: #f4f5f7;
+      --text: #1c2430;
+      --muted: #8b93a0;
+      --phone-w: 375px;
+      --phone-h: 812px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: #e8eaed; min-height: 100vh; color: var(--text);
+    }
+    .demo-shell { display: flex; flex-direction: column; align-items: center; padding: 20px 16px 40px; gap: 16px; }
+    .demo-header { width: 100%; max-width: 960px; background: #fff; border-radius: 12px; padding: 16px 20px; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
+    .demo-header h1 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+    .demo-header p { font-size: 13px; color: #64748b; line-height: 1.55; }
+    .demo-nav { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .demo-nav button, .mode-nav button {
+      padding: 6px 12px; border-radius: 999px; border: 1px solid #ececec;
+      background: #fff; font-size: 12px; cursor: pointer; color: #6b7280;
+    }
+    .demo-nav button.active, .mode-nav button.active {
+      background: var(--orange-soft); border-color: var(--orange-border); color: var(--orange); font-weight: 600;
+    }
+    .mode-nav { display: flex; gap: 8px; margin-top: 10px; }
+    .phone-frame {
+      width: var(--phone-w); height: var(--phone-h);
+      border-radius: 36px; overflow: hidden; position: relative;
+      box-shadow: 0 20px 60px rgba(0,0,0,.18), inset 0 0 0 8px #1a1a1a;
+      background: var(--bg);
+    }
+    .phone-notch {
+      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      width: 120px; height: 28px; background: #1a1a1a; border-radius: 0 0 16px 16px; z-index: 40;
+    }
+    .screen { display: none; flex-direction: column; height: 100%; overflow: hidden; }
+    .screen.active { display: flex; }
+    .nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 46px 12px 8px; position: relative; z-index: 3; flex-shrink: 0;
+      color: #fff;
+    }
+    .nav.light { color: var(--text); background: #f7f8fa; }
+    .nav .side { width: 36px; height: 32px; border: none; background: none; color: inherit; font-size: 22px; cursor: pointer; }
+    .nav h1 { font-size: 17px; font-weight: 600; }
+    .capsule {
+      display: flex; align-items: center; gap: 8px; padding: 3px 8px;
+      border: 1px solid rgba(255,255,255,.35); border-radius: 999px; background: rgba(255,255,255,.12);
+    }
+    .nav.light .capsule { border-color: rgba(0,0,0,.08); background: #fff; }
+    .capsule i { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid currentColor; opacity: .85; display: inline-block; }
+    .scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+    .page-pad { padding: 12px 12px 28px; background: #f7f8fa; min-height: 100%; }
+    .stat-3 {
+      display: grid; grid-template-columns: 1fr 1fr 1fr; background: #fff;
+      border-radius: 16px; padding: 16px 4px; margin-bottom: 18px; text-align: center;
+    }
+    .stat-3.stat-2 { grid-template-columns: 1fr 1fr; }
+    .stat-3 > div { position: relative; }
+    .stat-3 > div:not(:last-child)::after {
+      content: ''; position: absolute; right: 0; top: 18%; width: 1px; height: 64%; background: #eef0f3;
+    }
+    .stat-3 .k { font-size: 12px; color: #8b93a0; }
+    .stat-3 .v { font-size: 20px; font-weight: 800; margin-top: 8px; color: #1c2430; }
+    .i-tip {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 14px; height: 14px; margin-left: 3px; padding: 0; border: 1px solid #c5cad3;
+      border-radius: 50%; font-size: 9px; line-height: 1; color: #c5cad3; vertical-align: 1px;
+      background: none; cursor: pointer;
+    }
+    .tip-mask {
+      display: none; position: absolute; inset: 0; z-index: 80;
+      background: rgba(15, 23, 42, 0.4); align-items: center; justify-content: center; padding: 24px;
+    }
+    .tip-mask.open { display: flex; }
+    .tip-box {
+      width: 100%; background: #fff; border-radius: 14px; padding: 18px 16px 14px;
+      box-shadow: 0 12px 32px rgba(0,0,0,.16);
+    }
+    .tip-box h3 { font-size: 16px; margin-bottom: 8px; }
+    .tip-box p { font-size: 13px; color: #4b5563; line-height: 1.6; }
+    .tip-box button {
+      margin-top: 14px; width: 100%; height: 40px; border: none; border-radius: 10px;
+      background: #ff5a2d; color: #fff; font-size: 14px; font-weight: 700; cursor: pointer;
+    }
+    .sec-title { font-size: 16px; font-weight: 800; margin: 4px 4px 12px; }
+    .sec-head { margin: 4px 4px 12px; }
+    .sec-head .sec-title { margin: 0 0 4px; }
+    .sec-hint { font-size: 12px; color: #9aa3af; font-weight: 400; line-height: 1.45; }
+    .rec { background: #fff; border-radius: 16px; padding: 16px 14px; margin-bottom: 10px; }
+    .rec-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+    .rec-title { font-size: 16px; font-weight: 800; line-height: 1.4; }
+    .rec-amt { font-size: 20px; font-weight: 800; white-space: nowrap; }
+    .rec-mid { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 12px; color: #9aa3af; }
+    .rec-lines { margin-top: 8px; font-size: 12px; color: #9aa3af; line-height: 1.75; }
+    .toast {
+      position: absolute; left: 50%; bottom: 90px; transform: translateX(-50%);
+      background: #1c2430; color: #fff; padding: 8px 14px; border-radius: 8px; font-size: 13px;
+      opacity: 0; pointer-events: none; z-index: 30; white-space: nowrap; max-width: 86%;
+    }
+    .toast.show { opacity: 1; }
+    .wd-page { background: #f3f5f8; min-height: 100%; padding: 8px 16px 28px; }
+    .acct-row { padding: 10px 4px 16px; width: 100%; border: none; background: none; text-align: left; cursor: pointer; }
+    .acct-k { font-size: 13px; color: #9aa3af; }
+    .acct-v { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; font-size: 18px; font-weight: 800; }
+    .acct-v .chev { color: #c5cad3; font-weight: 400; font-size: 20px; }
+    .amt-card { background: #fff; border-radius: 16px; padding: 16px 16px 12px; }
+    .amt-lab { font-size: 15px; font-weight: 800; }
+    .amt-line { display: flex; align-items: center; gap: 8px; margin-top: 18px; padding-bottom: 14px; border-bottom: 1px solid #eef0f3; }
+    .yen { font-size: 28px; font-weight: 800; }
+    .amt-line input { flex: 1; border: none; outline: none; font-size: 28px; font-weight: 800; min-width: 0; }
+    .all-btn { border: none; background: none; color: #ff6b4a; font-size: 15px; font-weight: 700; cursor: pointer; flex-shrink: 0; }
+    .avail-line { padding-top: 12px; font-size: 13px; color: #9aa3af; }
+    .split-mini { margin-top: 8px; font-size: 12px; color: #b0b6c0; line-height: 1.55; }
+    .ok-btn {
+      margin-top: 18px; width: 100%; height: 48px; border: none; border-radius: 12px;
+      background: linear-gradient(90deg, #ff7a45, #ff4d2d); color: #fff; font-size: 16px; font-weight: 700; cursor: pointer;
+    }
+    .inc-head { padding: 4px 16px 10px; background: #f7f8fa; }
+    .inc-sum { display: flex; justify-content: space-between; align-items: baseline; }
+    .inc-sum .lab { font-size: 14px; color: #6b7280; }
+    .inc-sum .val { color: #ff5a2d; font-weight: 800; }
+    .inc-sum .more { font-size: 13px; color: #6b7280; }
+    .inc-sub { margin-top: 6px; font-size: 12px; color: #9aa3af; }
+    .inc-card { background: #fff; border-radius: 12px; padding: 14px; margin: 0 12px 10px; }
+    .inc-top { display: flex; justify-content: space-between; gap: 8px; align-items: flex-start; }
+    .inc-title { font-size: 15px; font-weight: 800; line-height: 1.4; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .inc-plus { color: #ff5a2d; font-size: 18px; font-weight: 800; white-space: nowrap; }
+    .inc-mid { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 12px; color: #9aa3af; }
+    .inc-body { margin-top: 8px; font-size: 13px; color: #8b93a0; line-height: 1.55; }
+    .inc-tax { color: #64748b; }
+    .inc-foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 10px; font-size: 12px; color: #9aa3af; }
+    .inc-st { display: inline-flex; align-items: center; gap: 4px; }
+    .inc-st.st-paid { color: #22c55e; }
+    .inc-st.st-taxing { color: #f59e0b; }
+    .inc-st.st-failed { color: #ef4444; }
+    .inc-st .i-tip { border-color: #ef4444; color: #ef4444; }
+    .home-bg {
+      background: linear-gradient(180deg, #ff6a3d 0%, #ff8a55 42%, #f6f7f9 42%);
+      min-height: 100%; padding-bottom: 24px;
+    }
+    .home-hero { padding: 4px 16px 10px; color: #fff; }
+    .hero-k { font-size: 13px; opacity: .92; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .hero-k .shield { font-size: 11px; background: rgba(255,255,255,.18); padding: 2px 8px; border-radius: 999px; }
+    .today-tag {
+      font-size: 11px; background: rgba(255,255,255,.2); padding: 2px 8px; border-radius: 999px;
+      font-weight: 600;
+    }
+    .hero-v { font-size: 42px; font-weight: 800; letter-spacing: -1px; margin: 6px 0 14px; }
+    .hero-3 {
+      display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px; align-items: center;
+      background: rgba(255,255,255,.16); border-radius: 14px; padding: 12px 10px; text-align: center;
+    }
+    .hero-3 .k { font-size: 11px; opacity: .9; }
+    .hero-3 .v { font-size: 16px; font-weight: 800; margin-top: 6px; }
+    .hero-wd {
+      height: 36px; min-width: 72px; padding: 0 16px; border: none; border-radius: 10px;
+      background: #fff; color: #ff4d2d; font-weight: 800; font-size: 14px; cursor: pointer;
+    }
+    .home-nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 46px 16px 2px; color: #fff;
+    }
+    .home-nav .side {
+      width: 36px; height: 32px; border: none; background: none; color: inherit; font-size: 22px; cursor: pointer;
+    }
+    .home-nav .rule-link {
+      border: none; background: none; color: #fff; font-size: 15px; font-weight: 400; cursor: pointer;
+    }
+    .detail-tabs {
+      display: flex; gap: 0; margin: 0 12px 10px; background: #eceef2; border-radius: 10px; padding: 3px;
+    }
+    .detail-tabs button {
+      flex: 1; height: 32px; border: none; border-radius: 8px; background: transparent;
+      font-size: 13px; color: #6b7280; cursor: pointer;
+    }
+    .detail-tabs button.active { background: #fff; color: #111; font-weight: 700; }
+    .w-card {
+      margin: 12px 16px 0; background: #fff; border-radius: 16px; padding: 14px;
+    }
+    .w-card .top { display: flex; justify-content: space-between; align-items: center; }
+    .w-card h2 { font-size: 15px; font-weight: 800; }
+    .link-muted { border: none; background: none; color: #9aa3af; font-size: 12px; cursor: pointer; }
+    .w-total { margin-top: 10px; font-size: 12px; color: #9aa3af; }
+    .w-total b { font-size: 28px; color: #111; font-weight: 800; margin-right: 8px; }
+    .w-foot { display: flex; justify-content: space-between; margin-top: 12px; font-size: 12px; color: #9aa3af; }
+    .tool-bar { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .tool-bar button {
+      height: 32px; padding: 0 12px; border-radius: 8px; border: 1px dashed #ffc9b0;
+      background: #fff7f3; color: #c2410c; font-size: 12px; cursor: pointer;
+    }
+    .book-card { background: #fff; border-radius: 14px; padding: 14px; margin-bottom: 10px; }
+    .book-card h3 { font-size: 14px; margin-bottom: 8px; }
+    .book-row { display: flex; justify-content: space-between; font-size: 13px; padding: 6px 0; border-bottom: 1px solid #f3f4f6; }
+    .book-row:last-child { border-bottom: none; }
+    .warn { color: #b45309; font-size: 12px; line-height: 1.5; margin-top: 8px; }
+    .pill { display: inline-block; font-size: 10px; padding: 1px 6px; border-radius: 999px; background: #fff7ed; color: #c2410c; margin-left: 4px; }
+    .pill.ok { background: #ecfdf5; color: #047857; }
+    body.embed-mode { background: var(--bg); }
+    body.embed-mode .demo-header, body.embed-mode .demo-nav, body.embed-mode .mode-nav { display: none !important; }
+    body.embed-mode .demo-shell { padding: 0; min-height: 100vh; }
+    body.embed-mode .phone-frame { width: 100%; max-width: 100%; height: 100vh; border-radius: 0; box-shadow: none; }
+    body.embed-mode .phone-notch { display: none; }
+    body.embed-mode .nav { padding-top: 12px; }
+    body.embed-mode .home-nav { padding-top: 12px; }
+  </style>
+</head>
+<body>
+  <div class="demo-shell">
+    <div class="demo-header">
+      <h1>钱包优化 · 一个提现入口（切点账本）</h1>
+      <p>收益仍分三钱包入账。切点后可提现 = 冻结旧库存 + 统一余额。禁止把旧三余额加进新字段。点「模拟新结算」看新钱只进统一余额。</p>
+      <div class="mode-nav" id="modeNav"></div>
+      <div class="demo-nav" id="sceneNav"></div>
+      <div class="tool-bar">
+        <button type="button" data-act="sim-credit">模拟新结算 +1.35（项目）</button>
+        <button type="button" data-act="reset">重置账本</button>
+      </div>
+    </div>
+    <div class="phone-frame">
+      <div class="phone-notch"></div>
+      <section class="screen" id="screen-home"></section>
+      <section class="screen" id="screen-withdraw"></section>
+      <section class="screen" id="screen-records"></section>
+      <section class="screen" id="screen-income"></section>
+      <section class="screen" id="screen-books"></section>
+      <div class="toast" id="toast"></div>
+      <div class="tip-mask" id="tipMask">
+        <div class="tip-box">
+          <h3 id="tipTitle">说明</h3>
+          <p id="tipBody"></p>
+          <button type="button" data-act="close-tip">我知道了</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    var CUTOVER = '2026-09-01';
+    var KEYS = [
+      { id: 'project', name: '项目收益钱包', short: '项目' },
+      { id: 'team', name: '团队奖励钱包', short: '团队' },
+      { id: 'activity', name: '平台活动钱包', short: '活动' }
+    ];
+    function cloneInit() {
+      return {
+        mode: 'after',
+        income: { project: 180.00, team: 12.50, activity: 4.19 },
+        today: { project: 0, team: 0, activity: 0 },
+        legacy: { project: 80.60, team: 12.00, activity: 4.00 },
+        mergedAvail: 96.60,
+        mergedPockets: { project: 80.60, team: 12.00, activity: 4.00 },
+        unified: 100.09,
+        pending: { project: 8.00, team: 0, activity: 0 },
+        accountSelected: false,
+        incomeWallet: 'project',
+        detailTab: 'income',
+        records: [
+          { title: '提现到支付宝**** **** **** 2707', amt: 2.27, tax: 0, id: '202505211212346819547560188', apply: '2025.05.21 12:12:34', paid: '2025.05.22 12:36:36', split: { project: 2.27, team: 0, activity: 0, unified: 0 } },
+          { title: '提现到支付宝**** **** **** 2707', amt: 193.72, tax: 0, id: '2025031514070005085536560188', apply: '2025.03.15 14:07:00', paid: '2025.03.16 14:31:02', split: { project: 193.72, team: 0, activity: 0, unified: 0 } },
+          { title: '提现到**** **** **** 2707', amt: 0.10, tax: 0, id: '202501010022115142065560188', apply: '2025.01.01 00:22:11', paid: '2025.01.02 00:46:13', split: { project: 0.10, team: 0, activity: 0, unified: 0 } }
+        ],
+        incomes: [
+          { wallet: 'project', name: '百度网盘', amt: 1.35, tax: 0.01, net: 1.34, after: 180.00, time: '2026-09-17 11:52:25', status: 'paid', desc: '「百度网盘」打款周期2026-09-16收益到账(关键词「云盘结算」)于2026-09-17 11:52:25结算到账收益1.35元' },
+          { wallet: 'project', name: '夸克网盘', amt: 0.47, tax: 0.01, net: 0, after: 178.65, time: '2026-09-17 03:01:34', status: 'taxing', desc: '「夸克网盘」打款周期2026-09-16收益到账(关键词「100253691479」)于2026-09-17 03:01:34结算到账收益0.47元' },
+          { wallet: 'project', name: '迅雷搜索', amt: 8.00, tax: 0.06, net: 0, after: 178.65, time: '2026-09-16 13:31:22', status: 'failed', failReason: '税务校验未通过，收益未入账。', desc: '「迅雷搜索」打款周期2026-09-15收益到账(关键词「2197771875」)于2026-09-16 13:31:22结算到账收益8元' },
+          { wallet: 'project', name: '历史项目收益', amt: 80.60, tax: 0.60, net: 80.00, after: 178.18, time: '2026-08-20 18:00:00', status: 'paid', desc: '切点前：收益与余额都记在项目钱包。该笔对应的税后余额已冻结在旧库存。' },
+          { wallet: 'team', name: '团队奖励', amt: 12.50, tax: 0.10, net: 12.40, after: 12.50, time: '2026-08-12 09:10:00', status: 'paid', desc: '切点前团队钱包分别入账。' },
+          { wallet: 'activity', name: '活动奖励', amt: 4.19, tax: 0.03, net: 4.16, after: 4.19, time: '2026-08-08 12:00:00', status: 'paid', desc: '切点前活动钱包分别入账。' }
+        ]
+      };
+    }
+    var S = cloneInit();
+    var amountInput = 0;
+    var SCENES = [
+      { id: 'home', label: '钱包首页' },
+      { id: 'withdraw', label: '提现页' },
+      { id: 'records', label: '提现明细' },
+      { id: 'income', label: '查看明细' },
+      { id: 'books', label: '账本对照' }
+    ];
+
+    function r2(n) { return Math.round(Number(n) * 100) / 100; }
+    function money(n) {
+      return r2(n).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+    function toast(t) {
+      var el = document.getElementById('toast');
+      el.textContent = t;
+      el.classList.add('show');
+      setTimeout(function () { el.classList.remove('show'); }, 1800);
+    }
+    function go(id) { showScreen(id); }
+    function post(id) {
+      if (window.parent !== window) window.parent.postMessage({ type: 'walletScreen', screen: id }, '*');
+    }
+    function legacySum() { return r2(S.legacy.project + S.legacy.team + S.legacy.activity); }
+    function avail() {
+      if (S.mode === 'before') return legacySum();
+      return r2(legacySum() + S.unified);
+    }
+    function incomeSum() {
+      return r2(S.income.project + S.income.team + S.income.activity);
+    }
+    function todaySum() {
+      return r2(S.today.project + S.today.team + S.today.activity);
+    }
+    function pendingSum() {
+      return r2(S.pending.project + S.pending.team + S.pending.activity);
+    }
+    function withdrawnSum() {
+      return S.records.reduce(function (a, r) { return r2(a + r.amt); }, 0);
+    }
+    function recordsForWallet(id) {
+      return S.records.filter(function (r) {
+        return r.split && r2(r.split[id] || 0) > 0;
+      });
+    }
+    function splitAmount(amt) {
+      var left = r2(amt);
+      var order = S.mode === 'before'
+        ? ['project', 'team', 'activity']
+        : ['project', 'team', 'activity', 'unified'];
+      var out = { project: 0, team: 0, activity: 0, unified: 0 };
+      order.forEach(function (k) {
+        var pocket = k === 'unified' ? S.unified : S.legacy[k];
+        var take = Math.min(left, pocket);
+        out[k] = r2(take);
+        left = r2(left - take);
+      });
+      out.left = left;
+      return out;
+    }
+    function navBar(title, backAct, light) {
+      return '<div class="nav' + (light ? ' light' : '') + '">' +
+        '<button class="side" type="button" data-act="' + backAct + '">‹</button>' +
+        '<h1>' + title + '</h1>' +
+        '<div class="capsule"><span>···</span><span>－</span><i></i></div></div>';
+    }
+    function acctLabel() {
+      return S.accountSelected ? '建设银行 **** 8135' : '请选择到账方式';
+    }
+    function renderHome() {
+      var cards = KEYS.map(function (w) {
+        return '<article class="w-card"><div class="top"><h2>' + w.name + '</h2>' +
+          '<button class="link-muted" type="button" data-act="income" data-wallet="' + w.id + '">查看明细 ›</button></div>' +
+          '<div class="w-total">总收入(元)<br><b>' + money(S.income[w.id]) + '</b></div>' +
+          '<div class="w-foot"><span>累计已结算 · ' + money(S.income[w.id]) + '</span><span>累计待入账 · ' + money(S.pending[w.id]) + '</span></div></article>';
+      }).join('');
+      return '<div class="scroll home-bg">' +
+        '<div class="home-nav"><button class="side" type="button" data-act="noop">‹</button>' +
+        '<button class="rule-link" type="button" data-act="records">提现明细</button></div>' +
+        '<div class="home-hero">' +
+        '<div class="hero-k">钱包总收入(元) <span class="today-tag">今日钱包入账 ' + money(todaySum()) + '</span> <span class="shield">安全保障中</span></div>' +
+        '<div class="hero-v">' + money(incomeSum()) + '</div>' +
+        '<div class="hero-3"><div><div class="k">已提现</div><div class="v">' + money(withdrawnSum()) +
+        '</div></div><div><div class="k">可提现</div><div class="v">' + money(avail()) +
+        '</div></div><button type="button" class="hero-wd" data-act="withdraw">提现</button></div></div>' +
+        cards + '</div>';
+    }
+    function renderWithdraw() {
+      var shown = amountInput > 0 ? String(amountInput) : '';
+      var plan = '合并前可提现余额 ' + money(S.mergedAvail) + ' 元(项目:' + money(S.mergedPockets.project) +
+        ';团队:' + money(S.mergedPockets.team) + ',活动:' + money(S.mergedPockets.activity) +
+        ')，已全部合并进新钱包的可提现余额里';
+      return navBar('提现', 'home', true) +
+        '<div class="scroll wd-page">' +
+        '<button type="button" class="acct-row" data-act="pick-ccb"><div class="acct-k">到账卡号</div>' +
+        '<div class="acct-v"><span>' + acctLabel() + '</span><span class="chev">›</span></div></button>' +
+        '<div class="amt-card">' +
+        '<div class="amt-lab">提现金额</div>' +
+        '<div class="amt-line"><span class="yen">¥</span>' +
+        '<input id="amt" type="text" inputmode="decimal" value="' + shown + '" data-act="amt-keep" />' +
+        '<button class="all-btn" type="button" data-act="all-amt">全部</button></div>' +
+        '<div class="avail-line">可提现金额 ' + money(avail()) + '</div>' +
+        '<div class="split-mini">' + plan + '</div></div>' +
+        '<button class="ok-btn" type="button" data-act="submit-wd">确定</button>' +
+        '</div>';
+    }
+    var STAT_TIPS = {
+      'wd-total': { title: '累计提现', text: '本页累计已成功发起的提现金额。' },
+      'wd-net': { title: '实际到账', text: '打款成功后实际到账的金额。' },
+      'wd-tax': { title: '预扣税额', text: '提现记录中展示的税额；税款已在收益结算入账时扣除。' },
+      'inc-settled': { title: '累计已结算', text: '本钱包已结算入账的收益合计（税前）。' },
+      'inc-net': { title: '实际到账', text: '扣税后实际进入可提现余额的金额。' },
+      'inc-tax': { title: '预扣税额', text: '根据国税总局要求，收益打款到账进行扣税。此处为累计已扣税额。' }
+    };
+    function tipIcon(key) {
+      return '<button type="button" class="i-tip" data-act="stat-tip" data-tip="' + key + '">i</button>';
+    }
+    function recItem(r) {
+      return '<article class="rec">' +
+        '<div class="rec-top"><div class="rec-title">' + r.title + '</div><div class="rec-amt">-' + money(r.amt) + '</div></div>' +
+        '<div class="rec-mid"><span>实际到账·' + money(r.amt) + '</span><span>已打款</span></div>' +
+        '<div class="rec-lines">提现ID:' + (r.id || '-') + '<br>申请时间:' + (r.apply || r.time || '-') +
+        '<br>打款时间:' + (r.paid || '-') + '</div></article>';
+    }
+    function recStats(rows, showTax) {
+      var sum = rows.reduce(function (a, r) { return r2(a + r.amt); }, 0);
+      var html = '<div class="stat-3' + (showTax ? '' : ' stat-2') + '">' +
+        '<div><div class="k">累计提现 ' + tipIcon('wd-total') + '</div><div class="v">' + money(sum) + '</div></div>' +
+        '<div><div class="k">实际到账 ' + tipIcon('wd-net') + '</div><div class="v">' + money(sum) + '</div></div>';
+      if (showTax) {
+        var tax = rows.reduce(function (a, r) { return r2(a + (r.tax || 0)); }, 0);
+        html += '<div><div class="k">预扣税额 ' + tipIcon('wd-tax') + '</div><div class="v">' + money(tax) + '</div></div>';
+      }
+      return html + '</div>';
+    }
+    function incomeStats(gross, tax) {
+      var net = r2(gross - tax);
+      return '<div class="stat-3">' +
+        '<div><div class="k">累计已结算 ' + tipIcon('inc-settled') + '</div><div class="v">' + money(gross) + '</div></div>' +
+        '<div><div class="k">实际到账 ' + tipIcon('inc-net') + '</div><div class="v">' + money(net) + '</div></div>' +
+        '<div><div class="k">预扣税额 ' + tipIcon('inc-tax') + '</div><div class="v">' + money(tax) + '</div></div></div>';
+    }
+    function recList(rows, hint, showTax) {
+      var title = hint
+        ? '<div class="sec-head"><div class="sec-title">提现记录</div><p class="sec-hint">' + hint + '</p></div>'
+        : '<div class="sec-title">提现记录</div>';
+      return recStats(rows, showTax !== false) + title +
+        (rows.length ? rows.map(recItem).join('') : '<article class="rec" style="color:#9aa3af;text-align:center">暂无提现记录</article>');
+    }
+    function renderRecords() {
+      return navBar('提现明细', 'home', true) +
+        '<div class="scroll page-pad">' + recList(S.records, '以下数据为钱包合并提现后的新数据，旧数据仍在各个钱包的提现明细页面查看', false) + '</div>';
+    }
+    function incomeStatus(item) {
+      var st = item.status || 'paid';
+      var label = st === 'taxing' ? '扣税中' : st === 'failed' ? '到账失败' : '已到账';
+      var icon = '';
+      if (st === 'failed') {
+        icon = '<button type="button" class="i-tip" data-act="fail-tip" data-reason="' +
+          String(item.failReason || '到账失败，请稍后重试').replace(/"/g, '') + '">i</button>';
+      }
+      return '<span class="inc-st st-' + st + '">' + label + icon + '</span>';
+    }
+    function incomeCard(item) {
+      var net = item.net != null ? item.net : r2(item.amt - (item.tax || 0));
+      return '<article class="inc-card"><div class="inc-top"><div class="inc-title">' + (item.name || item.title) +
+        '</div><div class="inc-plus">+' + money(item.amt) + '</div></div>' +
+        '<div class="inc-mid"><span>实际到账·' + money(net) + '</span>' + incomeStatus(item) + '</div>' +
+        '<div class="inc-body">' + item.desc +
+        '<div class="inc-tax">按国家税务总局要求扣除税额' + money(item.tax) + '元</div></div>' +
+        '<div class="inc-foot"><span>' + item.time + '</span><span>动账后收益：' + money(item.after || 0) + '</span></div></article>';
+    }
+    function renderIncome() {
+      var w = KEYS.filter(function (x) { return x.id === S.incomeWallet; })[0] || KEYS[0];
+      var tab = S.detailTab || 'income';
+      var tabs = '<div class="detail-tabs">' +
+        '<button type="button" class="' + (tab === 'income' ? 'active' : '') + '" data-act="detail-tab" data-tab="income">收益明细</button>' +
+        '<button type="button" class="' + (tab === 'withdraw' ? 'active' : '') + '" data-act="detail-tab" data-tab="withdraw">提现明细</button></div>';
+      var body;
+      if (tab === 'withdraw') {
+        body = '<div class="page-pad" style="padding-top:0">' +
+          recList(recordsForWallet(w.id), '以下数据为合并提现前的钱包提现记录') + '</div>';
+      } else {
+        var rows = S.incomes.filter(function (x) { return x.wallet === w.id; });
+        var taxSum = rows.reduce(function (a, r) {
+          if (r.status && r.status !== 'paid') return a;
+          return r2(a + (r.tax || 0));
+        }, 0);
+        body = '<div class="page-pad" style="padding-top:0">' +
+          incomeStats(S.income[w.id], taxSum) +
+          '<div class="inc-head" style="padding:0 4px 10px"><div class="inc-sum"><span class="lab">该段收入 · <span class="val">' + money(S.income[w.id]) +
+          '元</span></span><span class="more">全部时间 ▾</span></div>' +
+          '<div class="inc-sub">根据国税总局要求，收益打款到账进行扣税，累计税额：' + money(taxSum) + '元</div></div>' +
+          rows.map(incomeCard).join('') + '</div>';
+      }
+      return navBar('查看明细', 'home', true) +
+        '<div class="scroll" style="background:#f7f8fa">' + tabs + body + '</div>';
+    }
+    function renderBooks() {
+      return navBar('账本对照', 'home', true) +
+        '<div class="scroll page-pad">' +
+        '<div class="book-card"><h3>不要混用的两套数</h3>' +
+        '<div class="book-row"><span>钱包总收入（三本收益流水）</span><b>' + money(incomeSum()) + '</b></div>' +
+        '<div class="book-row"><span>可提现（旧库存+统一余额）</span><b>' + money(avail()) + '</b></div>' +
+        '<div class="book-row"><span>待入款（不进可提现）</span><b>' + money(pendingSum()) + '</b></div>' +
+        '<p class="warn">总收入不是可提现。禁止把旧三余额加进统一字段（会双计）。</p></div>' +
+        '<div class="book-card"><h3>切点前冻结旧库存 · 只减不增</h3>' +
+        KEYS.map(function (w) {
+          return '<div class="book-row"><span>' + w.short + '</span><b>' + money(S.legacy[w.id]) + '</b></div>';
+        }).join('') +
+        '<div class="book-row"><span>旧库存合计</span><b>' + money(legacySum()) + '</b></div></div>' +
+        '<div class="book-card"><h3>切点后统一余额 · 新结算只写这里</h3>' +
+        '<div class="book-row"><span>unified_balance</span><b>' + money(S.unified) + '</b></div>' +
+        '<p class="warn">新结算：收益明细记对应钱包 + 税后金额加统一余额。旧库存字段不变。</p></div>' +
+        '</div>';
+    }
+    function readAmt() {
+      var input = document.getElementById('amt');
+      if (!input) return amountInput;
+      var n = parseFloat(String(input.value).replace(/,/g, ''));
+      return isNaN(n) ? 0 : r2(n);
+    }
+    function submitWithdraw() {
+      amountInput = readAmt();
+      if (!S.accountSelected) { toast('请选择到账方式'); return; }
+      if (amountInput <= 0) { toast('请输入提现金额'); return; }
+      if (amountInput > avail()) { toast('超出可提现金额'); return; }
+      var sp = splitAmount(amountInput);
+      if (sp.left > 0) { toast('余额已变，请刷新'); return; }
+      S.legacy.project = r2(S.legacy.project - sp.project);
+      S.legacy.team = r2(S.legacy.team - sp.team);
+      S.legacy.activity = r2(S.legacy.activity - sp.activity);
+      if (S.mode === 'after') S.unified = r2(S.unified - sp.unified);
+      S.records.unshift({
+        title: '提现到建设银行**** 8135',
+        amt: amountInput,
+        tax: 0,
+        id: '20260920154600' + String(Date.now()).slice(-6),
+        apply: '2026.09.20 15:46:00',
+        paid: '2026.09.20 16:10:00',
+        split: sp
+      });
+      amountInput = 0;
+      toast(S.mode === 'after' ? '已提交，一次打款，账本已拆分扣减' : '已提交当前钱包提现');
+      setTimeout(function () { go('records'); }, 700);
+    }
+    function bindWithdraw() {
+      var input = document.getElementById('amt');
+      if (!input) return;
+      input.addEventListener('input', function () {
+        amountInput = readAmt();
+      });
+      input.addEventListener('change', function () {
+        amountInput = readAmt();
+        document.getElementById('screen-withdraw').innerHTML = renderWithdraw();
+        bindWithdraw();
+      });
+    }
+    var renders = {
+      home: renderHome,
+      withdraw: renderWithdraw,
+      records: renderRecords,
+      income: renderIncome,
+      books: renderBooks
+    };
+    function showScreen(id) {
+      if (!renders[id]) id = 'home';
+      document.querySelectorAll('.screen').forEach(function (el) { el.classList.remove('active'); });
+      var el = document.getElementById('screen-' + id);
+      el.innerHTML = renders[id]();
+      el.classList.add('active');
+      document.querySelectorAll('.demo-nav button').forEach(function (b) {
+        b.classList.toggle('active', b.dataset.screen === id);
+      });
+      if (id === 'withdraw') bindWithdraw();
+      document.getElementById('tipMask').classList.remove('open');
+      post(id);
+    }
+    function simCredit() {
+      var gross = 1.35;
+      var tax = 0.01;
+      var net = r2(gross - tax);
+      S.income.project = r2(S.income.project + gross);
+      S.today.project = r2(S.today.project + gross);
+      if (S.mode === 'after') {
+        S.unified = r2(S.unified + net);
+        S.incomes.unshift({
+          wallet: 'project', name: '模拟结算', amt: gross, tax: tax, net: net,
+          after: S.income.project, time: '2026-09-20 15:50:00', status: 'paid',
+          desc: '新结算：项目收益流水 +1.35；统一余额 +' + money(net) + '；旧库存不变（仍是 ' + money(S.legacy.project) + '）。'
+        });
+        toast('收益进项目流水，余额只加统一字段');
+      } else {
+        S.legacy.project = r2(S.legacy.project + net);
+        toast('现网：项目钱包余额和收益都加了一笔');
+      }
+      var active = document.querySelector('.screen.active');
+      showScreen(active ? active.id.replace('screen-', '') : 'home');
+    }
+    function resetLedger() {
+      var mode = S.mode;
+      S = cloneInit();
+      S.mode = mode;
+      amountInput = 0;
+      toast('账本已重置');
+      showScreen('home');
+    }
+    document.querySelector('.phone-frame').addEventListener('click', function (e) {
+      if (e.target.id === 'tipMask') {
+        e.target.classList.remove('open');
+        return;
+      }
+      var node = e.target.closest('[data-act]');
+      if (!node) return;
+      var act = node.getAttribute('data-act');
+      if (act === 'home' || act === 'withdraw' || act === 'records' || act === 'income' || act === 'books') {
+        if (act === 'income' && node.dataset.wallet) {
+          S.incomeWallet = node.dataset.wallet;
+          S.detailTab = 'income';
+        }
+        return go(act);
+      }
+      if (act === 'detail-tab') {
+        S.detailTab = node.dataset.tab || 'income';
+        return go('income');
+      }
+      if (act === 'stat-tip') {
+        var tip = STAT_TIPS[node.dataset.tip];
+        if (!tip) return;
+        document.getElementById('tipTitle').textContent = tip.title;
+        document.getElementById('tipBody').textContent = tip.text;
+        document.getElementById('tipMask').classList.add('open');
+        return;
+      }
+      if (act === 'fail-tip') {
+        document.getElementById('tipTitle').textContent = '到账失败';
+        document.getElementById('tipBody').textContent = node.getAttribute('data-reason') || '到账失败，请稍后重试';
+        document.getElementById('tipMask').classList.add('open');
+        return;
+      }
+      if (act === 'close-tip') {
+        document.getElementById('tipMask').classList.remove('open');
+        return;
+      }
+      if (act === 'pick-ccb') {
+        S.accountSelected = true;
+        toast('已选择建设银行');
+        showScreen(document.querySelector('.screen.active').id.replace('screen-', ''));
+      }
+      if (act === 'all-amt') {
+        amountInput = avail();
+        document.getElementById('screen-withdraw').innerHTML = renderWithdraw();
+        bindWithdraw();
+      }
+      if (act === 'submit-wd') submitWithdraw();
+      if (act === 'withdraw-one') {
+        toast('现网要分别点三个提现');
+        go('withdraw');
+      }
+    });
+    var toolBar = document.querySelector('.tool-bar');
+    if (toolBar) {
+      toolBar.addEventListener('click', function (e) {
+        var b = e.target.closest('[data-act]');
+        if (!b) return;
+        if (b.dataset.act === 'sim-credit') simCredit();
+        if (b.dataset.act === 'reset') resetLedger();
+      });
+    }
+    window.addEventListener('message', function (e) {
+      if (!e.data || e.data.type !== 'walletTool') return;
+      if (e.data.act === 'sim-credit') simCredit();
+      if (e.data.act === 'reset') resetLedger();
+    });
+    document.getElementById('sceneNav').innerHTML = SCENES.map(function (s) {
+      return '<button type="button" data-screen="' + s.id + '">' + s.label + '</button>';
+    }).join('');
+    document.getElementById('sceneNav').addEventListener('click', function (e) {
+      var b = e.target.closest('button');
+      if (b) showScreen(b.dataset.screen);
+    });
+    document.getElementById('modeNav').innerHTML =
+      '<button type="button" data-mode="before">现网：三个提现</button>' +
+      '<button type="button" data-mode="after">优化后：一个提现</button>';
+    document.getElementById('modeNav').addEventListener('click', function (e) {
+      var b = e.target.closest('button');
+      if (!b) return;
+      S.mode = b.dataset.mode;
+      document.querySelectorAll('#modeNav button').forEach(function (x) {
+        x.classList.toggle('active', x === b);
+      });
+      showScreen('home');
+    });
+    var params = new URLSearchParams(location.search);
+    if (params.get('embed') === '1') document.body.classList.add('embed-mode');
+    if (params.get('mode') === 'before' || params.get('mode') === 'after') S.mode = params.get('mode');
+    document.querySelectorAll('#modeNav button').forEach(function (x) {
+      x.classList.toggle('active', x.dataset.mode === S.mode);
+    });
+    var start = params.get('screen');
+    showScreen(['home', 'withdraw', 'records', 'income', 'books'].indexOf(start) >= 0 ? start : 'home');
+  </script>
+</body>
+</html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>右豹一键代发 · 商务一页纸</title>
+  <style>
+    :root { --orange: #ff6b1a; --ink: #1a2332; --muted: #6b7280; --line: #e6e8eb; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: #f4f5f7;
+      color: var(--ink);
+    }
+    .bar {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .bar a { color: var(--orange); text-decoration: none; }
+    .bar button {
+      border: 0; background: var(--orange); color: #fff;
+      border-radius: 8px; padding: 7px 12px; cursor: pointer; font-size: 12px;
+    }
+    .sheet {
+      max-width: 820px;
+      margin: 0 auto 40px;
+      background: #fff;
+      border-radius: 12px;
+      padding: 28px 32px 24px;
+      box-shadow: 0 10px 30px rgba(26,35,50,.08);
+    }
+    header { display: flex; justify-content: space-between; gap: 16px; border-bottom: 2px solid var(--orange); padding-bottom: 14px; margin-bottom: 16px; }
+    .brand { font-size: 12px; letter-spacing: .12em; color: var(--orange); font-weight: 700; }
+    h1 { font-size: 22px; margin-top: 4px; }
+    header p { font-size: 13px; color: var(--muted); line-height: 1.55; max-width: 300px; text-align: right; }
+    .lead { font-size: 15px; line-height: 1.7; margin-bottom: 14px; }
+    h2 { font-size: 13px; color: var(--orange); margin: 0 0 6px; }
+    .three { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+    .card { border: 1px solid var(--line); border-radius: 10px; padding: 12px; }
+    .card b { display: block; font-size: 13px; margin-bottom: 6px; }
+    .card span { font-size: 12px; color: #374151; line-height: 1.55; }
+    .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 20px; }
+    ul { margin-left: 16px; }
+    li { font-size: 13px; line-height: 1.6; color: #374151; }
+    .no {
+      background: #fff7f7;
+      border: 1px solid #fecaca;
+      border-radius: 10px;
+      padding: 12px 14px;
+      grid-column: 1 / -1;
+    }
+    .no h2 { color: #b91c1c; }
+    ol { margin-left: 18px; columns: 2; column-gap: 24px; }
+    ol li { font-size: 13px; line-height: 1.7; break-inside: avoid; }
+    .loop { font-size: 12px; color: var(--muted); line-height: 1.65; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
+    footer { margin-top: 12px; font-size: 11px; color: #9ca3af; }
+    @media (max-width: 700px) {
+      .three, .cols { grid-template-columns: 1fr; }
+      ol { columns: 1; }
+      header { flex-direction: column; }
+      header p { text-align: left; max-width: none; }
+      .sheet { padding: 20px 16px; }
+    }
+    @media print {
+      .bar { display: none; }
+      body { background: #fff; }
+      .sheet { box-shadow: none; margin: 0; max-width: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bar">
+    <a href="index.html">← 招商物料</a>
+    <button type="button" onclick="window.print()">打印 / 存 PDF</button>
+  </div>
+  <article class="sheet">
+    <header>
+      <div>
+        <div class="brand">YOU BAO · 一键代发</div>
+        <h1>商务一页纸</h1>
+      </div>
+      <p>给市场 / 合作方看的招商口径。<br />口头承诺无效，以录入结果为准。</p>
+    </header>
+    <p class="lead"><strong>把会做片的人和会发片的人接在同一条项目链上，按关键词订单分成。</strong>这是品牌项目的成片供给与领取分发，不是代运营整号，也不替代现有项目、申词、回填、结算中台。</p>
+    <h2>可谈的三类合作</h2>
+    <div class="three">
+      <div class="card"><b>1 剪辑产能</b><span>工作室 / MCN / 兼职剪辑。谈授权项目、分成、是否审核、右豹或站外、月供稿量。</span></div>
+      <div class="card"><b>2 品牌扩供</b><span>已有品牌项目缺成片。谈是否接入供稿池、启用停用、领取方是否已有该项目申词资格。</span></div>
+      <div class="card"><b>3 站外分发</b><span>已有私域。谈无登录落地页、按份下载、不进广场；站外收益口径另行书面确认。</span></div>
+    </div>
+    <div class="cols">
+      <section>
+        <h2>价值主张</h2>
+        <ul>
+          <li><strong>供给可管：</strong>授权、启用、素材类型、审核 / 免审在运营侧</li>
+          <li><strong>占用可清：</strong>一稿同时一人领；超时未回填释放</li>
+          <li><strong>结算可对：</strong>按领取当时分成；改比例不回溯</li>
+          <li><strong>履约有约束：</strong>多次不回填将失去继续领取资格</li>
+          <li><strong>渠道可拆：</strong>站内广场与站外链接互不混进广场</li>
+        </ul>
+      </section>
+      <section>
+        <h2>用户侧怎么转（对外可讲）</h2>
+        <ul>
+          <li>广场按项目浏览可领成片，详情出示分成比例、不出金额</li>
+          <li>领取须有次数、选已通过的词、该稿空闲</li>
+          <li>领取后限时回填；约 3 天官方下载；图集可加水印</li>
+          <li>词已绑定本次已回填领取时，结算按分成拆两边</li>
+        </ul>
+      </section>
+      <section class="no">
+        <h2>不承诺（商务红线）</h2>
+        <ul>
+          <li>不承诺保底领取量、保底收益</li>
+          <li>不承诺站内自助申请剪辑手、不承诺 App 内上传</li>
+          <li>不把产品说成「平台替你发抖音」——发布动作在领取人侧</li>
+          <li>分成、免审、项目名单必须以录入为准</li>
+        </ul>
+      </section>
+    </div>
+    <h2>一次谈清</h2>
+    <ol>
+      <li>身份：个人 / 工作室（是否统一右豹 ID）</li>
+      <li>渠道：仅右豹 / 仅站外 / 都要</li>
+      <li>分成比例（领取时锁定）</li>
+      <li>稿件是否需要平台审核</li>
+      <li>授权品牌项目清单</li>
+      <li>供稿类型与命名规范</li>
+      <li>月度节奏（对齐 15 天未领清理）</li>
+      <li>对账周期（对齐关键词订单已结算）</li>
+      <li>客服对接人与录入时间</li>
+    </ol>
+    <p class="loop">电梯稿：剪辑手加客服开通电脑「剪辑供稿」；用户在 App 领取、回填、发布。钱从关键词订单来，入驻谈好分成，领取当时锁定。</p>
+    <footer>完整口径见同目录上一份业务介绍 Markdown。本页供会谈打印。</footer>
+  </article>
+</body>
+</html>

@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-pitch-store="fr014-pitch-ends-v1">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>右豹一键代发 · 各端功能</title>
+  <style>
+    :root { --orange: #ff6b1a; --ink: #1a2332; --muted: #5b6472; --line: #e6e8eb; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: #ece8e4;
+      color: var(--ink);
+    }
+    .bar {
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .bar a { color: var(--orange); text-decoration: none; }
+    .bar .actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+    .bar button, .bar .open-full {
+      border: 0; background: var(--orange); color: #fff;
+      border-radius: 8px; padding: 7px 14px; cursor: pointer; font-size: 12px;
+      text-decoration: none;
+    }
+    .bar .btn-ghost, .bar .open-full {
+      background: #fff; color: var(--ink); border: 1px solid var(--line);
+    }
+    .sheet.is-editing { outline: 2px dashed var(--orange); outline-offset: 4px; }
+    .sheet.is-editing :focus { background: #fff7ed; }
+    .sheet.is-editing .no-edit { outline: 1px dashed #e6e8eb; background: #fafafa; }
+    html.embed .bar {
+      display: flex !important;
+      position: sticky; top: 0; z-index: 8;
+      background: #ece8e4; max-width: none;
+    }
+    html.embed .bar .back { display: none; }
+    html.embed .sheet { margin: 16px auto 24px; box-shadow: none; }
+    .sheet {
+      max-width: 880px;
+      margin: 0 auto 48px;
+      background: #fff;
+      padding: 40px 48px 52px;
+      box-shadow: 0 10px 30px rgba(26, 35, 50, .08);
+    }
+    .kicker {
+      font-size: 11px;
+      letter-spacing: .16em;
+      font-weight: 700;
+      color: var(--orange);
+    }
+    h1 { font-size: 26px; line-height: 1.35; margin: 8px 0 10px; }
+    .lead {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.7;
+      padding-bottom: 16px;
+      margin-bottom: 8px;
+      border-bottom: 2px solid var(--orange);
+    }
+    h2 {
+      font-size: 17px;
+      margin: 28px 0 10px;
+      padding-top: 4px;
+      page-break-after: avoid;
+    }
+    h3 { font-size: 14px; color: #c2410c; margin: 16px 0 8px; page-break-after: avoid; }
+    p { font-size: 14.5px; line-height: 1.85; margin-bottom: 10px; }
+    ul { margin: 0 0 12px 1.3em; }
+    li { font-size: 14.5px; line-height: 1.8; margin-bottom: 4px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 8px 0 16px;
+      font-size: 13px;
+    }
+    th, td {
+      border: 1px solid var(--line);
+      padding: 8px 10px;
+      text-align: left;
+      vertical-align: top;
+      line-height: 1.6;
+    }
+    th { background: #fff7ed; color: #9a3412; font-weight: 700; }
+    .callout {
+      background: #fff7ed;
+      border-left: 4px solid var(--orange);
+      padding: 12px 14px;
+      margin: 12px 0 16px;
+      font-size: 15px;
+      line-height: 1.75;
+    }
+    .redline {
+      background: #fff7f7;
+      border: 1px solid #fecaca;
+      padding: 12px 14px;
+      margin: 12px 0 0;
+      font-size: 14px;
+      line-height: 1.75;
+      color: #7f1d1d;
+    }
+    .pill {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 99px;
+      margin-right: 4px;
+    }
+    .pill.c { background: #ffedd5; color: #9a3412; }
+    .pill.pc { background: #e0f2fe; color: #075985; }
+    .pill.op { background: #dcfce7; color: #166534; }
+    .pill.h5 { background: #ede9fe; color: #5b21b6; }
+    .flow-chart { margin: 10px 0 18px; overflow: auto; }
+    .flow-chart figcaption { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+    .flow-md { display: none; }
+    .flow-chart svg { display: block; min-width: 820px; }
+    footer {
+      margin-top: 20px;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+      font-size: 11px;
+      color: #9ca3af;
+      line-height: 1.55;
+    }
+    @media print {
+      body { background: #fff; }
+      .bar { display: none !important; }
+      .sheet { box-shadow: none; margin: 0; max-width: none; padding: 0; }
+    }
+    @media (max-width: 640px) {
+      .sheet { padding: 24px 18px 36px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bar">
+    <a class="back" href="fr-opc-yijian-daifa.html?tab=pitch&pitch=ends">← 招商物料</a>
+    <div class="actions">
+      <a class="open-full" href="yijian-daifa-pitch-ends.html" target="_blank" rel="noopener">新窗口打开</a>
+      <button type="button" class="btn-ghost" id="pitchReset">还原</button>
+      <button type="button" id="pitchEdit" aria-pressed="false">编辑</button>
+      <button type="button" class="btn-ghost" id="pitchCopy">复制 Markdown</button>
+      <button type="button" class="btn-ghost" onclick="window.print()">打印 / 存为 PDF</button>
+    </div>
+  </div>
+  <article class="sheet">
+    <div class="kicker">YOU BAO · 招商说明</div>
+    <h1>一键代发 · 各端功能</h1>
+    <p class="lead">给剪辑手、渠道和商务看四个端怎么分工。点「编辑」可改文案，本机保存；流程图不要改结构。分成、授权项目、是否免审以书面确认为准。</p>
+
+    <div class="callout"><strong>一句话：</strong>会做片的人在电脑交成片，不会做片但有项目、有词的人在 App 领成片去发。站外另走链接 / 二维码，对方不用登录即可按份下载。</div>
+
+    <h2>四个端对照</h2>
+    <table>
+      <thead>
+        <tr><th>端</th><th>谁用</th><th>入口</th><th>能做什么</th><th>不能做什么</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="pill c">C 端</span>用户 App</td><td>领取用户</td><td>作品广场 → 详情 → 我的领取</td><td>浏览、预览、领取、回填、下载发抖音；图集可加水印</td><td>上传、当剪辑手、改审核</td></tr>
+        <tr><td><span class="pill pc">PC</span>创作者中心</td><td>已录入剪辑手</td><td>创作者中心 → 剪辑供稿</td><td>看板、批量交稿、看出审与占用、出站外码</td><td>手机 App 交稿；未录入不能传</td></tr>
+        <tr><td><span class="pill op">后台</span>运营</td><td>平台运营</td><td>一键代发七个菜单</td><td>录入剪辑手、审稿、管项目/素材/次数、停权恢复、恢复下载</td><td>替用户回填；已通过再驳回</td></tr>
+        <tr><td><span class="pill h5">站外</span>落地页</td><td>扫码下载人</td><td>分享链接 / 二维码</td><td>无登录按份下载</td><td>进广场、选词、扣次、回填</td></tr>
+      </tbody>
+    </table>
+
+    <h2>总览流程</h2>
+    <figure class="flow-chart no-edit">
+      <figcaption>站内在「已通过且空闲」汇合；站外永不进广场。</figcaption>
+      <pre class="flow-md">flowchart LR
+  A[海报加客服] --> B[后台录入]
+  B --> C[PC 交稿]
+  C --> D[右豹审核进广场]
+  C --> E[站外出码]
+  D --> F[用户领取回填]
+  F --> G[订单结算分账]
+  E --> H[无登录按份下载]
+</pre>
+      <svg width="860" height="168" viewBox="0 0 860 168" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs><marker id="e-arr-1" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#94a3b8"/></marker></defs>
+        <g fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#e-arr-1)">
+          <line x1="128" y1="36" x2="148" y2="36"/>
+          <line x1="276" y1="36" x2="296" y2="36"/>
+          <line x1="424" y1="20" x2="444" y2="20"/>
+          <line x1="424" y1="52" x2="444" y2="52"/>
+          <line x1="572" y1="20" x2="592" y2="20"/>
+          <line x1="572" y1="116" x2="592" y2="116"/>
+          <line x1="720" y1="36" x2="720" y2="88"/>
+        </g>
+        <g font-family="PingFang SC, Microsoft YaHei, sans-serif">
+          <rect x="8" y="12" width="120" height="48" rx="6" fill="#ede9fe" stroke="#7c3aed"/>
+          <text x="68" y="41" text-anchor="middle" font-size="12" fill="#5b21b6">海报加客服</text>
+          <rect x="148" y="12" width="128" height="48" rx="6" fill="#dcfce7" stroke="#16a34a"/>
+          <text x="212" y="41" text-anchor="middle" font-size="12" fill="#166534">后台录入</text>
+          <rect x="296" y="12" width="128" height="48" rx="6" fill="#e0f2fe" stroke="#0284c7"/>
+          <text x="360" y="41" text-anchor="middle" font-size="12" fill="#075985">PC 交稿</text>
+          <rect x="444" y="4" width="128" height="32" rx="6" fill="#ffedd5" stroke="#ea580c"/>
+          <text x="508" y="25" text-anchor="middle" font-size="12" fill="#9a3412">右豹 · 审核</text>
+          <rect x="592" y="4" width="248" height="32" rx="6" fill="#ffedd5" stroke="#ea580c"/>
+          <text x="716" y="25" text-anchor="middle" font-size="12" fill="#9a3412">广场领取 · 回填 · 结算</text>
+          <rect x="444" y="100" width="128" height="32" rx="6" fill="#ede9fe" stroke="#7c3aed"/>
+          <text x="508" y="121" text-anchor="middle" font-size="12" fill="#5b21b6">站外 · 出码</text>
+          <rect x="592" y="100" width="248" height="32" rx="6" fill="#ede9fe" stroke="#7c3aed"/>
+          <text x="716" y="121" text-anchor="middle" font-size="12" fill="#5b21b6">无登录 · 按份下载</text>
+        </g>
+      </svg>
+    </figure>
+
+    <h2><span class="pill c">C 端</span>用户 · App / 站内 H5</h2>
+    <p>给没有制作能力、但已有项目资格和关键词的人。广场不展示收益金额，详情只出分成比例。</p>
+    <table>
+      <thead><tr><th>页面</th><th>功能</th><th>对外怎么讲</th></tr></thead>
+      <tbody>
+        <tr><td>作品广场</td><td>按项目、剪辑师、素材、图集/视频浏览可领成片</td><td>只出现能领的成片；别人正在用的看不到</td></tr>
+        <tr><td>稿件详情</td><td>预览后领取；已领可复制发布技巧、下载发抖音</td><td>图集最多看 3 张，视频试看 5 秒。预览不等于领取</td></tr>
+        <tr><td>领取</td><td>账号可领、次数够、选好已通过的词、该稿空闲</td><td>必须先选词。次数不够可兑积分档。失败不扣次</td></tr>
+        <tr><td>我的领取</td><td>24 小时内回填；约 3 天可官方下载</td><td>超时释放，次数不退。多次不回填将停权</td></tr>
+      </tbody>
+    </table>
+    <figure class="flow-chart no-edit">
+      <figcaption>领取顺序：停权 → 次数 → 选词 → 空闲。超时不退次。</figcaption>
+      <pre class="flow-md">flowchart LR
+  A[广场] --> B[详情预览]
+  B --> C{可领?}
+  C -->|停权/没次/没词/被占| D[失败不扣次]
+  C -->|通过| E[扣次占用]
+  E --> F[回填或下载]
+  F -->|满24h未回填| G[释放不退次]
+</pre>
+      <svg width="860" height="88" viewBox="0 0 860 88" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs><marker id="e-arr-c" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#94a3b8"/></marker></defs>
+        <g fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#e-arr-c)">
+          <line x1="108" y1="36" x2="128" y2="36"/>
+          <line x1="256" y1="36" x2="276" y2="36"/>
+          <line x1="404" y1="36" x2="424" y2="36"/>
+          <line x1="572" y1="36" x2="592" y2="36"/>
+        </g>
+        <g font-family="PingFang SC, Microsoft YaHei, sans-serif">
+          <rect x="8" y="12" width="100" height="48" rx="6" fill="#ffedd5" stroke="#ea580c"/>
+          <text x="58" y="41" text-anchor="middle" font-size="12" fill="#9a3412">广场</text>
+          <rect x="128" y="12" width="128" height="48" rx="6" fill="#ffedd5" stroke="#ea580c"/>
+          <text x="192" y="41" text-anchor="middle" font-size="12" fill="#9a3412">详情预览</text>
+          <rect x="276" y="12" width="128" height="48" rx="6" fill="#fef9c3" stroke="#ca8a04"/>
+          <text x="340" y="41" text-anchor="middle" font-size="12" fill="#854d0e">四道门禁</text>
+          <rect x="424" y="12" width="148" height="48" rx="6" fill="#dcfce7" stroke="#16a34a"/>
+          <text x="498" y="41" text-anchor="middle" font-size="12" fill="#166534">扣次占用</text>
+          <rect x="592" y="12" width="252" height="48" rx="6" fill="#dcfce7" stroke="#16a34a"/>
+          <text x="718" y="41" text-anchor="middle" font-size="12" fill="#166534">回填 / 下载发抖音</text>
+        </g>
+      </svg>
+    </figure>
+
+    <h2><span class="pill pc">PC</span>剪辑手 · 创作者中心</h2>
+    <p>上传<strong>只在电脑</strong>。扫海报不等于已入驻，须运营录入后才能传。</p>
+    <table>
+      <thead><tr><th>模块</th><th>功能</th><th>对外怎么讲</th></tr></thead>
+      <tbody>
+        <tr><td>剪辑供稿</td><td>招募说明 + 看板 + 上传</td><td>未录入只能看招募，不能传</td></tr>
+        <tr><td>右豹交稿</td><td>按项目、书籍批量传图集或视频</td><td>一次一个项目 + 一本书 + 一种类型；可写发布技巧</td></tr>
+        <tr><td>站外交稿</td><td>整夹一条，生成链接和二维码</td><td>免审、不进广场，适合私域分发</td></tr>
+        <tr><td>成片时效</td><td>未领取约 15 天清理；领过后领取人约 3 天可下</td><td>不要当长期网盘。自己删除后不能恢复</td></tr>
+      </tbody>
+    </table>
+    <figure class="flow-chart no-edit">
+      <figcaption>先填字段再选成片。右豹走审核；站外免审出码。</figcaption>
+      <pre class="flow-md">flowchart LR
+  A[打开剪辑供稿] --> B{已录入?}
+  B -->|否| C[只能看招募]
+  B -->|是| D[右豹或站外]
+  D --> E[右豹审核进广场]
+  D --> F[站外出链接码]
+</pre>
+      <svg width="860" height="88" viewBox="0 0 860 88" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs><marker id="e-arr-pc" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#94a3b8"/></marker></defs>
+        <g fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#e-arr-pc)">
+          <line x1="148" y1="36" x2="168" y2="36"/>
+          <line x1="316" y1="36" x2="336" y2="36"/>
+          <line x1="484" y1="36" x2="504" y2="36"/>
+        </g>
+        <g font-family="PingFang SC, Microsoft YaHei, sans-serif">
+          <rect x="8" y="12" width="140" height="48" rx="6" fill="#e0f2fe" stroke="#0284c7"/>
+          <text x="78" y="41" text-anchor="middle" font-size="12" fill="#075985">打开剪辑供稿</text>
+          <rect x="168" y="12" width="148" height="48" rx="6" fill="#fef9c3" stroke="#ca8a04"/>
+          <text x="242" y="41" text-anchor="middle" font-size="12" fill="#854d0e">已录入才能传</text>
+          <rect x="336" y="12" width="148" height="48" rx="6" fill="#ffedd5" stroke="#ea580c"/>
+          <text x="410" y="41" text-anchor="middle" font-size="12" fill="#9a3412">右豹进广场</text>
+          <rect x="504" y="12" width="340" height="48" rx="6" fill="#ede9fe" stroke="#7c3aed"/>
+          <text x="674" y="41" text-anchor="middle" font-size="12" fill="#5b21b6">站外链接 / 二维码 · 不进广场</text>
+        </g>
+      </svg>
+    </figure>
+
+    <h2><span class="pill op">后台</span>运营怎么管</h2>
+    <p>合作谈完后，由运营落表。对方看到的权限以录入结果为准。</p>
+    <table>
+      <thead><tr><th>菜单</th><th>做什么</th></tr></thead>
+      <tbody>
+        <tr><td>剪辑手管理</td><td>录右豹 ID、分成、审不审、右豹/站外、授权项目</td></tr>
+        <tr><td>稿件管理</td><td>审右豹新稿；站外看出码和已领份数</td></tr>
+        <tr><td>领取记录</td><td>查谁领了、选了什么词、回填没有；可恢复一次官方下载</td></tr>
+        <tr><td>黑名单</td><td>多次不回填自动停权，只可由运营恢复</td></tr>
+        <tr><td>项目 / 素材 / 次数</td><td>接入品牌项目、素材分类、免费次数与积分档</td></tr>
+      </tbody>
+    </table>
+
+    <h2><span class="pill h5">站外 H5</span>链接 / 二维码</h2>
+    <p>适合已有私域、社群的剪辑手。对方<strong>不用登录</strong>，点一次下一份。不进右豹广场，也不占用户领取次数。</p>
+    <table>
+      <thead><tr><th>状态</th><th>对方看到</th></tr></thead>
+      <tbody>
+        <tr><td>还有余量</td><td>基础信息 +「下载稿件」</td></tr>
+        <tr><td>已领完</td><td>「素材已领完」，没有下载按钮</td></tr>
+        <tr><td>稿已删除</td><td>「链接已失效」</td></tr>
+      </tbody>
+    </table>
+    <figure class="flow-chart no-edit">
+      <figcaption>每成功下载一份，该份成片即从云端去掉。</figcaption>
+      <pre class="flow-md">flowchart LR
+  A[扫码打开] --> B{还有余量?}
+  B -->|否| C[已领完 / 失效]
+  B -->|是| D[点下载]
+  D --> E[余量减1并删该份]
+</pre>
+      <svg width="860" height="72" viewBox="0 0 860 72" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs><marker id="e-arr-h5" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#94a3b8"/></marker></defs>
+        <g fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#e-arr-h5)">
+          <line x1="148" y1="32" x2="168" y2="32"/>
+          <line x1="316" y1="32" x2="336" y2="32"/>
+          <line x1="484" y1="32" x2="504" y2="32"/>
+        </g>
+        <g font-family="PingFang SC, Microsoft YaHei, sans-serif">
+          <rect x="8" y="12" width="140" height="40" rx="6" fill="#ede9fe" stroke="#7c3aed"/>
+          <text x="78" y="37" text-anchor="middle" font-size="12" fill="#5b21b6">扫码打开</text>
+          <rect x="168" y="12" width="148" height="40" rx="6" fill="#fef9c3" stroke="#ca8a04"/>
+          <text x="242" y="37" text-anchor="middle" font-size="12" fill="#854d0e">余量还够?</text>
+          <rect x="336" y="12" width="148" height="40" rx="6" fill="#ede9fe" stroke="#7c3aed"/>
+          <text x="410" y="37" text-anchor="middle" font-size="12" fill="#5b21b6">点下载扣 1 份</text>
+          <rect x="504" y="12" width="340" height="40" rx="6" fill="#dcfce7" stroke="#16a34a"/>
+          <text x="674" y="37" text-anchor="middle" font-size="12" fill="#166534">保存到相册 · 该份云端即删</text>
+        </g>
+      </svg>
+    </figure>
+
+    <h2>钱怎么分</h2>
+    <p>关键词订单<strong>已结算</strong>时：若该词绑定了已回填的代发领取，按领取当时锁定的分成拆到用户和剪辑手；否则全额给用户。改当前分成不算旧账。不承诺保底领取量或保底收益。</p>
+
+    <div class="redline"><strong>对外不要讲：</strong>扫海报等于已入驻；App 能交剪辑供稿；平台替用户发抖音；超时退次数；保底收益。</div>
+    <footer>招商口径。点「编辑」改字后存在本机。流程图结构锁定。分成与项目名单以录入为准。</footer>
+  </article>
+  <script src="yijian-daifa-pitch-edit.js?v=ends1"></script>
+</body>
+</html>

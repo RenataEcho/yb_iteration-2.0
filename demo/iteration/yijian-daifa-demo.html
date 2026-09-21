@@ -500,6 +500,20 @@
     .poster-stats span { display: block; margin-top: 3px; font-size: 10px; color: #c4b4a8; }
     .poster-body { padding: 16px 18px 20px; background: #fff; color: #1a2332; }
     .poster-block { margin-bottom: 16px; }
+    .poster-block .muted { color: #6b7280; font-size: 12px; line-height: 1.6; }
+    .poster-flow { list-style: none; margin: 0 0 16px; padding: 0; }
+    .poster-flow li {
+      display: flex; gap: 10px; align-items: flex-start;
+      font-size: 13px; color: #374151; line-height: 1.55; margin: 0 0 8px;
+    }
+    .poster-flow i {
+      flex: 0 0 18px; height: 18px; border-radius: 50%; background: #fff3eb; color: #c2410c;
+      font-size: 11px; font-style: normal; font-weight: 700;
+      display: grid; place-items: center; margin-top: 1px;
+    }
+    .poster-foot {
+      margin-top: 12px; font-size: 11px; color: #9aa3af; line-height: 1.55; text-align: center;
+    }
     .poster-block h3 { font-size: 13px; color: var(--orange); margin-bottom: 8px; }
     .poster-block li { font-size: 13px; color: #374151; line-height: 1.7; margin-left: 18px; }
     .poster-roles { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
@@ -654,39 +668,47 @@
           <div class="poster">
             <div class="poster-hero" style="background-image:url('assets/fr014/bn-recruit.jpg')">
               <div class="hero-txt">
-                <span class="poster-kicker">PLATFORM HIRING</span>
-                <h2>剪辑手招募中</h2>
-                <p>平台正在扩编兼职剪辑手。书和项目都备好，你来做图集和视频，客服扫码即可入驻。</p>
+                <span class="poster-kicker">一键代发 · 剪辑供稿</span>
+                <h2>会做片，就在这变现</h2>
+                <p>项目和书都备好。你交图集或视频，用户领取去发，关键词订单按谈好的分成结算。</p>
               </div>
             </div>
             <div class="poster-stats">
-              <div><b>分成供稿</b><span>按项目结算</span></div>
               <div><b>图集 / 视频</b><span>两种成片都收</span></div>
-              <div><b>客服直录</b><span>录入当天可发</span></div>
+              <div><b>谈好分成</b><span>领取当时锁定</span></div>
+              <div><b>电脑交稿</b><span>录入当天可传</span></div>
             </div>
             <div class="poster-body">
               <div class="poster-block">
-                <h3>卖点</h3>
+                <h3>你能得到什么</h3>
                 <ul>
-                  <li>不用自己找书、找项目，平台持续供稿</li>
-                  <li>口播、混剪、图文切片按你擅长的类型接</li>
-                  <li>客服一对一接入，后台录入后立刻能发</li>
+                  <li>不用自己找书、找项目，授权项目持续供稿</li>
+                  <li>口播、混剪、图文切片，按你擅长的类型接</li>
+                  <li>客服谈好分成和项目，后台录入后用电脑上传</li>
                 </ul>
               </div>
               <div class="poster-roles">
-                <div class="poster-role"><b>短视频剪辑</b><span>会卡点、混剪、口播的创作者优先</span></div>
-                <div class="poster-role"><b>图文切片</b><span>会排版、会做解压图集也能入驻</span></div>
+                <div class="poster-role"><b>短视频</b><span>口播、混剪、卡点。成片供进广场，用户去发。</span></div>
+                <div class="poster-role"><b>图集切片</b><span>排版、解压图也能交。图集视频都收。</span></div>
               </div>
               <div class="poster-block">
                 <h3>适合谁</h3>
                 <ul>
-                  <li>有成片作品、想接稳定兼职的剪辑手</li>
-                  <li>不想走站内自助申请，愿意加客服沟通的人</li>
+                  <li>能稳定出图集或短视频的剪辑、工作室</li>
+                  <li>愿意加客服沟通、只在电脑交稿的人</li>
                 </ul>
               </div>
-              <div class="poster-qr-wrap">
-                <div class="qr" aria-label="客服二维码"></div>
-                <p class="hint">扫描二维码联系客服报名<br />由后台录入后开通上传</p>
+              <div class="poster-block">
+                <h3>这页不是给谁</h3>
+                <p class="muted">不会做片、只想领成片去发，请回作品广场。本页没有申请表，加客服也不等于已经能传。</p>
+              </div>
+              <div class="poster-block">
+                <h3>怎么开通</h3>
+                <ol class="poster-flow">
+                  <li><i>1</i><span>联系客服，说明你擅长的成片类型</span></li>
+                  <li><i>2</i><span>谈定授权项目、分成、稿件要不要审</span></li>
+                  <li><i>3</i><span>后台录入后，电脑打开「剪辑供稿」上传</span></li>
+                </ol>
               </div>
             </div>
           </div>
@@ -984,7 +1006,7 @@
           showBanner(Number(dot.dataset.i));
         };
       });
-      if (list.length >= 2) {
+      if (list.length >= 2 && new URLSearchParams(location.search).get('bnLock') !== '1') {
         bannerTimer = setInterval(function () { showBanner(bannerIdx + 1); }, 3000);
       }
     }

@@ -49,7 +49,8 @@
       position: absolute; top: 0; left: 50%; transform: translateX(-50%);
       width: 120px; height: 28px; background: #1a1a1a; border-radius: 0 0 16px 16px; z-index: 100;
     }
-    .screen { display: flex; flex-direction: column; height: 100%; overflow: hidden; position: relative; }
+    .screen { display: none; flex-direction: column; height: 100%; overflow: hidden; position: relative; }
+    .screen.active { display: flex; }
     .nav-bar {
       display: flex; align-items: center; justify-content: space-between;
       padding: 48px 16px 12px; background: var(--bg); flex-shrink: 0;
@@ -66,7 +67,7 @@
     .pinned-banner {
       position: relative; border-radius: 14px; overflow: hidden; margin-bottom: 14px;
       background: linear-gradient(135deg, var(--purple-start) 0%, var(--purple-end) 100%);
-      padding: 16px; color: #fff; min-height: 132px;
+      padding: 16px; color: #fff; min-height: 132px; cursor: pointer;
     }
     .pinned-banner .banner-label {
       display: inline-flex; align-items: center; gap: 4px;
@@ -74,8 +75,7 @@
     }
     .pinned-banner .banner-title { font-size: 17px; font-weight: 800; line-height: 1.35; margin-bottom: 6px; padding-right: 72px; }
     .pinned-banner .banner-sub { font-size: 12px; opacity: .88; line-height: 1.5; margin-bottom: 10px; padding-right: 72px; }
-    .pinned-banner .banner-meta { font-size: 11px; opacity: .78; margin-bottom: 12px; }
-    .pinned-banner .banner-enroll { font-size: 11px; opacity: .92; margin-bottom: 12px; }
+    .pinned-banner .banner-meta { font-size: 11px; opacity: .78; margin-bottom: 8px; }
     .pinned-banner .banner-thumb {
       position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
       width: 64px; height: 80px; border-radius: 8px; background: rgba(255,255,255,.15);
@@ -105,7 +105,8 @@
     .list-meta .count { color: var(--text-muted); font-size: 12px; }
     .activity-card {
       background: var(--surface); border-radius: var(--radius); padding: 14px;
-      margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.04);
+      margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.04); position: relative;
+      cursor: pointer;
     }
     .card-top { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }
     .card-top .project-label { font-size: 13px; color: var(--text-primary); }
@@ -127,6 +128,12 @@
     }
     .status-badge.ended { color: var(--text-muted); border-color: var(--border); }
     .status-badge.upcoming { color: #2563eb; border-color: #bfdbfe; background: #eff6ff; }
+    .result-badge {
+      position: absolute; top: 10px; right: 10px; z-index: 2;
+      font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px;
+    }
+    .result-badge.won { color: #b45309; background: #fff7ed; border: 1px solid #fed7aa; }
+    .result-badge.not_won { color: var(--text-muted); background: #f3f4f6; border: 1px solid var(--border); }
     .card-text { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; }
     .card-title { font-size: 15px; font-weight: 700; line-height: 1.4; margin-bottom: 4px; }
     .card-subtitle { font-size: 12px; color: var(--text-muted); line-height: 1.45; }
@@ -136,39 +143,165 @@
     }
     .card-footer-left { flex: 1; min-width: 0; }
     .card-time { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
-    .enroll-count { font-size: 12px; color: var(--text-secondary); }
+    .card-stats { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+    .view-count, .enroll-count { font-size: 12px; color: var(--text-secondary); display: inline-flex; align-items: center; gap: 6px; }
+    .banner-stats { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-bottom: 12px; }
+    .banner-views, .banner-enroll { font-size: 11px; opacity: .92; display: inline-flex; align-items: center; gap: 6px; }
     .btn-action {
       flex-shrink: 0; border: none; border-radius: 999px; padding: 8px 18px;
       font-size: 13px; font-weight: 700; cursor: pointer; color: #fff;
       background: linear-gradient(135deg, var(--orange-start), var(--orange));
     }
-    .empty-state {
-      text-align: center; padding: 48px 20px; color: var(--text-muted); font-size: 13px;
-    }
+    .empty-state { text-align: center; padding: 48px 20px; color: var(--text-muted); font-size: 13px; }
     .toast {
       position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px);
       background: rgba(0,0,0,.78); color: #fff; padding: 10px 18px; border-radius: 999px;
       font-size: 13px; opacity: 0; pointer-events: none; transition: all .25s; z-index: 200;
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-    .rule-overlay {
-      position: absolute; inset: 0; background: rgba(0,0,0,.45);
-      opacity: 0; pointer-events: none; transition: opacity .25s; z-index: 80;
+    .detail-scroll { flex: 1; overflow-y: auto; padding: 0 0 88px; background: var(--bg); }
+    .detail-card {
+      display: flex; gap: 12px; margin: 4px 16px 12px; padding: 14px;
+      background: #fff; border-radius: 14px; box-shadow: 0 1px 6px rgba(15,23,42,.06);
     }
-    .rule-overlay.show { opacity: 1; pointer-events: auto; }
-    .rule-sheet {
-      position: absolute; left: 0; right: 0; bottom: 0; z-index: 90;
-      background: var(--surface); border-radius: 16px 16px 0 0;
-      padding: 20px 20px 28px; transform: translateY(100%);
-      transition: transform .28s ease;
+    .detail-cover {
+      width: 88px; height: 88px; border-radius: 10px; background: #fff;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
     }
-    .rule-sheet.show { transform: translateY(0); }
-    .rule-sheet h3 { font-size: 16px; font-weight: 700; margin-bottom: 10px; }
-    .rule-sheet p { font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
-    .rule-sheet .btn-close {
-      width: 100%; margin-top: 18px; border: none; border-radius: 999px;
-      padding: 11px; font-size: 14px; font-weight: 700; cursor: pointer;
-      background: linear-gradient(135deg, var(--orange-start), var(--orange)); color: #fff;
+    .detail-cover img, .detail-cover svg { width: 88px; height: 88px; object-fit: cover; display: block; border-radius: 10px; }
+    .detail-cover svg { width: 56px; height: 56px; margin: 16px; }
+    .detail-cta button:disabled { opacity: .45; cursor: not-allowed; filter: grayscale(.2); }
+    .detail-head-main { flex: 1; min-width: 0; }
+    .detail-title { font-size: 16px; font-weight: 800; line-height: 1.4; margin-bottom: 6px; }
+    .detail-time { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; }
+    .detail-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+    .chip {
+      font-size: 11px; padding: 3px 8px; border-radius: 999px;
+      background: var(--orange-light); color: var(--orange); font-weight: 600;
+    }
+    .chip-project { background: #fff; border: 1px solid var(--orange-border); color: var(--text-primary); }
+    .chip-project em { font-style: normal; color: var(--orange); }
+    .detail-meta { font-size: 12px; color: var(--text-secondary); display: flex; gap: 12px; }
+    #detailAward[hidden] { display: none !important; }
+    .reward-bar {
+      margin: 0 16px 12px; padding: 14px;
+      border-radius: 14px;
+      font-size: 13px; font-weight: 600; line-height: 1.5;
+      box-shadow: 0 1px 6px rgba(15,23,42,.06);
+    }
+    .reward-bar.won {
+      background: var(--orange-light); color: #9a3412;
+      border: 1px solid var(--orange-border);
+    }
+    .reward-bar.not_won {
+      background: #d8dce3; color: #374151;
+      border: 1px solid #c5cad3;
+    }
+    .detail-main {
+      margin: 0 16px 12px; background: #fff; border-radius: 14px;
+      box-shadow: 0 1px 6px rgba(15,23,42,.06); overflow: hidden;
+    }
+    .detail-tabs {
+      display: flex; gap: 0; margin: 0; border-bottom: 1px solid var(--border);
+      background: #fff;
+    }
+    .detail-tabs[hidden] { display: none !important; }
+    .detail-tabs button {
+      flex: 1; padding: 12px 8px; border: none; background: none; cursor: pointer;
+      font-size: 14px; color: var(--text-secondary); border-bottom: 2px solid transparent; margin-bottom: -1px;
+    }
+    .detail-tabs button.active { color: var(--orange); font-weight: 700; border-bottom-color: var(--orange); }
+    .detail-body { padding: 14px 16px 18px; }
+    .board-empty { color: var(--text-muted); font-size: 13px; padding: 28px 0; text-align: center; }
+    .board-list { background: #fff; }
+    .board-row {
+      display: grid;
+      grid-template-columns: 40px 48px minmax(0, 1fr) auto;
+      grid-template-rows: auto auto;
+      column-gap: 10px;
+      align-items: center;
+      padding: 14px 0; border-bottom: 1px solid #f3f4f6;
+    }
+    .board-row:last-child { border-bottom: none; }
+    .board-rank {
+      grid-column: 1; grid-row: 1; width: 40px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .board-av-wrap { grid-column: 2; grid-row: 1; position: relative; width: 48px; height: 48px; }
+    .board-top {
+      font-size: 9px; font-weight: 800; letter-spacing: .02em;
+      padding: 2px 5px; border-radius: 6px; color: #fff; line-height: 1.2;
+    }
+    .board-top.is-1 { background: linear-gradient(180deg, #ff8a3d, #ff5722); }
+    .board-top.is-2 { background: linear-gradient(180deg, #ffb347, #f59e0b); }
+    .board-top.is-3 { background: linear-gradient(180deg, #f0b27a, #d97706); }
+    .board-num {
+      font-size: 15px; font-weight: 700; color: #9ca3af; line-height: 1;
+    }
+    .board-av {
+      width: 48px; height: 48px; border-radius: 50%; object-fit: cover;
+      background: #e5e7eb; display: block;
+    }
+    .board-av-fallback {
+      width: 48px; height: 48px; border-radius: 50%;
+      color: #fff; font-size: 16px; font-weight: 700;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+    .board-av-wrap .board-av-fallback {
+      position: absolute; inset: 0; width: 48px; height: 48px;
+    }
+    .board-av + .board-av-fallback { display: none !important; }
+    .board-nick { grid-column: 3; grid-row: 1; font-size: 15px; font-weight: 800; line-height: 1.3; color: #111827; min-width: 0; }
+    .board-val { grid-column: 4; grid-row: 1; font-size: 16px; font-weight: 800; color: #f97316; text-align: right; }
+    .board-metric, .board-period {
+      font-size: 11px; color: #9ca3af; font-weight: 400; margin: 0; line-height: 1.3;
+    }
+    .board-metric { grid-column: 3; grid-row: 2; }
+    .board-period { grid-column: 4; grid-row: 2; text-align: right; }
+    .board-me {
+      position: absolute; left: 0; right: 0; bottom: 0; z-index: 4;
+      display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; grid-template-rows: auto auto;
+      column-gap: 10px; align-items: center;
+      padding: 10px 16px 18px; background: rgba(255,255,255,.96);
+      box-shadow: 0 -8px 24px rgba(15,23,42,.08);
+    }
+    .board-me[hidden] { display: none !important; }
+    .board-me .board-av, .board-me .board-av-fallback {
+      grid-column: 1; grid-row: 1; width: 40px; height: 40px; font-size: 14px;
+    }
+    .me-name { grid-column: 2; grid-row: 1; font-size: 15px; font-weight: 800; }
+    .me-val { grid-column: 3; grid-row: 1; font-size: 15px; font-weight: 800; color: #f97316; text-align: right; }
+    .me-rank { grid-column: 2; grid-row: 2; font-size: 12px; color: #9ca3af; font-weight: 400; margin: 0; }
+    .me-period { grid-column: 3; grid-row: 2; font-size: 11px; color: #9ca3af; text-align: right; }
+    .case-lightbox {
+      position: fixed; inset: 0; z-index: 700; background: rgba(15,23,42,.72);
+      display: flex; align-items: center; justify-content: center; padding: 24px;
+    }
+    .case-lightbox[hidden] { display: none !important; }
+    .case-lightbox img { max-width: 100%; max-height: 100%; border-radius: 8px; }
+    .case-media img { cursor: zoom-in; }
+    .intro-html { font-size: 14px; line-height: 1.7; color: var(--text-primary); }
+    .intro-html p { margin-bottom: 10px; }
+    .case-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .case-block { margin: 0; min-width: 0; }
+    .case-name { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+    .case-media { display: flex; flex-direction: column; gap: 8px; }
+    .case-media img, .case-media video {
+      width: 100%; border-radius: 10px; background: #e5e7eb; display: block;
+    }
+    .detail-cta {
+      position: absolute; left: 0; right: 0; bottom: 0;
+      display: flex; gap: 10px; padding: 12px 16px 20px;
+      background: linear-gradient(180deg, rgba(245,246,248,0), var(--bg) 28%, var(--bg));
+    }
+    .detail-cta[hidden] { display: none !important; }
+    .detail-cta button {
+      flex: 1; border: none; border-radius: 999px; padding: 12px 10px;
+      font-size: 14px; font-weight: 700; cursor: pointer; color: #fff;
+      background: linear-gradient(135deg, var(--orange-start), var(--orange));
+    }
+    .detail-cta button.ghost {
+      background: #fff; color: var(--orange); border: 1px solid var(--orange-border);
     }
     body.embed-mode { background: var(--bg); margin: 0; }
     body.embed-mode .demo-header { display: none !important; }
@@ -184,17 +317,17 @@
   <div class="demo-shell">
     <div class="demo-header">
       <h1>活动中心 · 前端交互 Demo</h1>
-      <p>保留图1卡片布局；顶部 Banner 展示置顶活动；状态为待开始/进行中/已结束；报名类活动展示「x人已参加」。</p>
+      <p>「查看」只进详情。领取仅介绍 Tab 且进行中可点；跳转失败不记。无待开始筛选。榜单由后台开关控制。展位只看第 2 步 showUserAward，不绑榜单。封面来自后台「封面」。</p>
       <div class="demo-nav" id="screenNav">
         <button type="button" class="active" data-filter="all">全部活动</button>
         <button type="button" data-filter="ongoing">进行中</button>
         <button type="button" data-filter="ended">已结束</button>
-        <button type="button" data-filter="registration">报名类活动</button>
+        <button type="button" data-filter="participated">已参与</button>
       </div>
     </div>
     <div class="phone-frame">
       <div class="phone-notch"></div>
-      <div class="screen" id="screen-activity-center">
+      <div class="screen active" id="screen-activity-center">
         <div class="nav-bar">
           <button class="back" type="button" aria-label="返回">‹</button>
           <div class="title">活动中心</div>
@@ -206,6 +339,7 @@
             <button type="button" class="active" data-filter="all">全部</button>
             <button type="button" data-filter="ongoing">进行中</button>
             <button type="button" data-filter="ended">已结束</button>
+            <button type="button" data-filter="participated">已参与</button>
           </div>
           <div class="list-meta">
             <span class="label">全部活动</span>
@@ -214,91 +348,277 @@
           <div id="activityList"></div>
           <div class="empty-state" id="emptyState" hidden>暂无符合条件的活动</div>
         </div>
-        <div class="rule-overlay" id="ruleOverlay" onclick="closeViewRule()"></div>
-        <div class="rule-sheet" id="ruleSheet">
-          <h3>跳转规则</h3>
-          <p>跳转详情页或者配置的跳转地址</p>
-          <button class="btn-close" type="button" onclick="closeViewRule()">我知道了</button>
+      </div>
+      <div class="screen" id="screen-detail">
+        <div class="nav-bar">
+          <button class="back" type="button" id="detailBack" aria-label="返回">‹</button>
+          <div class="title">活动详情</div>
+          <div class="capsule" aria-hidden="true"><span></span><span></span><span></span></div>
         </div>
+        <div class="detail-scroll">
+          <div class="detail-card" id="detailHead"></div>
+          <div id="detailAward"></div>
+          <div class="detail-main" id="detailMain">
+            <div class="detail-tabs" id="detailTabs" hidden></div>
+            <div class="detail-body" id="detailBody"></div>
+          </div>
+        </div>
+        <div class="detail-cta" id="detailCta" hidden></div>
+        <div class="board-me" id="boardMe" hidden></div>
       </div>
     </div>
   </div>
   <div class="toast" id="toast"></div>
+  <div class="case-lightbox" id="caseLightbox" hidden>
+    <img id="caseLightboxImg" alt="案例大图" />
+  </div>
 
   <script>
     const ICON_SVG = '<svg viewBox="0 0 64 64" fill="none"><rect width="64" height="64" rx="12" fill="#fff"/><path d="M32 10c8 6 14 14 14 24 0 8-6 14-14 16-8-2-14-8-14-16C18 24 24 16 32 10z" fill="#ff5722"/><circle cx="38" cy="28" r="4" fill="#fff"/></svg>';
+    const CASE_IMG = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="640" height="280" viewBox="0 0 640 280"><defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#ff8a4c"/><stop offset="1" stop-color="#ff5722"/></linearGradient></defs><rect width="640" height="280" fill="url(#g)"/><text x="320" y="150" text-anchor="middle" fill="#fff" font-size="28" font-family="sans-serif">活动案例</text></svg>');
+    const CASE_VIDEO = 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4';
+    const COVER_IMG = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="176" height="176" viewBox="0 0 176 176"><defs><linearGradient id="c" x1="0" x2="1"><stop stop-color="#7c3aed"/><stop offset="1" stop-color="#ff5722"/></linearGradient></defs><rect width="176" height="176" rx="20" fill="url(#c)"/><text x="88" y="96" text-anchor="middle" fill="#fff" font-size="22" font-family="sans-serif">封面</text></svg>');
+
+    const MOCK_LEADERBOARD = [
+      { nicknameMasked: '****山', avatarUrl: 'https://i.pravatar.cc/96?img=12', value: '99999.99元' },
+      { nicknameMasked: '****发', avatarUrl: 'https://i.pravatar.cc/96?img=32', value: '99999.99元' },
+      { nicknameMasked: '****8', avatarUrl: 'https://i.pravatar.cc/96?img=5', value: '99999.99元' },
+      { nicknameMasked: '****子', avatarUrl: 'https://i.pravatar.cc/96?img=47', value: '99999.99元' },
+      { nicknameMasked: '叶**城', avatarUrl: 'https://i.pravatar.cc/96?img=48', value: '99999.99元' },
+      { nicknameMasked: 'a**8', avatarUrl: 'https://i.pravatar.cc/96?img=15', value: '88888.00元' },
+      { nicknameMasked: '林**七', avatarUrl: 'https://i.pravatar.cc/96?img=20', value: '77777.00元' },
+      { nicknameMasked: '右**豹', avatarUrl: 'https://i.pravatar.cc/96?img=23', value: '66666.00元' },
+      { nicknameMasked: '星**野', avatarUrl: 'https://i.pravatar.cc/96?img=25', value: '55555.00元' },
+      { nicknameMasked: '小**白', avatarUrl: 'https://i.pravatar.cc/96?img=33', value: '44444.00元' }
+    ];
+
+    function boardInitial(nick) {
+      const s = String(nick || '').replace(/\*/g, '').trim();
+      return s.slice(-1) || '·';
+    }
+    function boardAvatarHtml(rank, nick, avatarUrl) {
+      const hues = [24, 18, 270, 152, 210, 330, 40, 190, 300, 80];
+      const h = hues[(Math.max(1, rank) - 1) % hues.length];
+      const fb = '<div class="board-av-fallback" style="background:hsl(' + h + ' 72% 62%)">' + boardInitial(nick) + '</div>';
+      if (!avatarUrl) return fb;
+      return '<img class="board-av" src="' + avatarUrl + '" alt="" onerror="this.style.display=\'none\';var n=this.nextElementSibling;if(n)n.style.display=\'flex\'" />' + fb;
+    }
+    function boardAvBlock(r) {
+      const av = boardAvatarHtml(r.rank, r.nicknameMasked, r.avatarUrl);
+      const mark = r.rank <= 3
+        ? '<span class="board-top is-' + r.rank + '">TOP ' + r.rank + '</span>'
+        : '<span class="board-num">' + r.rank + '</span>';
+      return '<div class="board-rank">' + mark + '</div><div class="board-av-wrap">' + av + '</div>';
+    }
+    function activityLeaderboard(item) {
+      const n = Math.max(0, Number(item && item.leaderboardLimit) || 0);
+      return {
+        lineDesc: String((item && item.leaderboardLineDesc) || '').trim(),
+        periodDesc: String((item && item.leaderboardPeriodDesc) || '').trim(),
+        rows: MOCK_LEADERBOARD.slice(0, n).map((row, i) => ({
+          rank: i + 1,
+          nicknameMasked: row.nicknameMasked,
+          avatarUrl: row.avatarUrl,
+          value: row.value
+        })),
+        self: {
+          nicknameMasked: '****躁',
+          rankLabel: '999+',
+          avatarUrl: 'https://i.pravatar.cc/96?img=12',
+          value: '9999.99元'
+        }
+      };
+    }
+    function renderBoardMeHtml(payload) {
+      const self = payload && payload.self;
+      if (!self) return '';
+      const period = (payload && payload.periodDesc) || '';
+      return boardAvatarHtml(99, self.nicknameMasked, self.avatarUrl) +
+        '<div class="me-name">' + self.nicknameMasked + '</div>' +
+        '<div class="me-val">' + self.value + '</div>' +
+        '<div class="me-rank">排名·' + self.rankLabel + '</div>' +
+        (period ? '<div class="me-period">' + period + '</div>' : '');
+    }
+    function renderLeaderboardHtml(payload) {
+      const rows = (payload && payload.rows) || [];
+      const metric = (payload && payload.lineDesc) || '';
+      const period = (payload && payload.periodDesc) || '';
+      if (!rows.length) return '<div class="board-empty">暂无榜单数据</div>';
+      return '<div class="board-list">' + rows.map(r => {
+        return '<div class="board-row">' +
+          boardAvBlock(r) +
+          '<div class="board-nick">' + r.nicknameMasked + '</div>' +
+          '<div class="board-val">' + r.value + '</div>' +
+          (metric ? '<div class="board-metric">' + metric + '</div>' : '') +
+          (period ? '<div class="board-period">' + period + '</div>' : '') +
+        '</div>';
+      }).join('') + '</div>';
+    }
 
     const STATUS_LABEL = { ongoing: '进行中', ended: '已结束', upcoming: '待开始' };
     const STATUS_CLASS = { ongoing: '', ended: 'ended', upcoming: 'upcoming' };
 
     const PINNED = {
-      id: 'pinned', type: 'registration', status: 'ongoing',
+      id: 'pinned', status: 'ongoing', visible: true, pinned: true, sort: 20, cover: COVER_IMG,
       label: '右豹官方公益计划', title: '3天右豹生态公益培训营',
-      subtitle: '3天学会选赛道·做项目', timeRange: '2026.08.22-2026.08.25', enrolled: 164
+      subtitle: '3天学会选赛道·做项目', description: '3天学会选赛道·做项目', timeRange: '2026.08.22-2026.08.25',
+      views: 1280, enrolled: 164, tags: ['公益', '培训'], projects: ['右豹平台'],
+      introContent: '<p>3 天公益培训营：选赛道、做项目、进社群。官方讲师带练，结营后可继续跟练。</p><p>适合想快速上手右豹生态的新人创作者。</p>',
+      cases: [
+        { name: '培训现场', assets: [{ type: 'image', src: CASE_IMG }] },
+        { name: '直播回放', assets: [{ type: 'video', src: CASE_VIDEO }] }
+      ],
+      needClaimButtons: true,
+      claimButtons: [
+        { label: '立即领取', needJump: false, clickedLabel: '已领取' },
+        { label: '加入社群', needJump: true, url: 'https://example.com/yb-camp' }
+      ],
+      leaderboardVisible: true,
+      leaderboardLimit: 10,
+      leaderboardLineDesc: '短剧推广',
+      leaderboardPeriodDesc: '7日收益',
+      awardStatus: 'won',
+      awardPrize: '188 元',
+      showUserAward: true
     };
 
     const ACTIVITIES = [
       {
-        id: 'a2', type: 'registration', status: 'ongoing',
-        project: '小说推文', title: '小说推文免费培训第 1 期', subtitle: '从选书到发布，官方免费带教',
-        timeRange: '2026.08.22-2026.08.29', enrolled: 164
+        id: 'a2', status: 'ongoing', visible: true, sort: 10, cover: COVER_IMG,
+        project: '小说推文', projects: ['小说推文'], tags: ['培训'],
+        title: '小说推文免费培训第 1 期', description: '从选书到发布，官方免费带教',
+        timeRange: '2026.08.22-2026.08.29', views: 860, enrolled: 164,
+        introContent: '<p>小说推文免费培训第 1 期：从选书、写推文到发布复盘，官方免费带教。</p>',
+        cases: [{ name: '课堂作业', assets: [{ type: 'image', src: CASE_IMG }] }],
+        needClaimButtons: true,
+        claimButtons: [
+          { label: '领取资料', needJump: true, url: 'https://example.com/a2-pack' }
+        ]
       },
       {
-        id: 'a3', type: 'registration', status: 'ongoing',
-        project: '漫剧推广', title: '漫剧推广实战营第 2 期', subtitle: '官方社群答疑 + 实操带练',
-        timeRange: '2026.08.10-2026.08.20', enrolled: 200
+        id: 'a3', status: 'ongoing', visible: true, sort: 8,
+        project: '漫剧推广', projects: ['漫剧推广'], tags: ['实战'],
+        title: '漫剧推广实战营第 2 期', description: '官方社群答疑 + 实操带练',
+        timeRange: '2026.08.10-2026.08.20', views: 640, enrolled: 200,
+        introContent: '<p>漫剧推广实战营第 2 期，官方社群答疑 + 实操带练。</p>',
+        needClaimButtons: false, claimButtons: []
       },
       {
-        id: 'a4', type: 'normal', status: 'upcoming',
-        project: '右豹平台', title: '右豹创作者成长计划', subtitle: '官方扶持优质创作者',
-        timeRange: '2026.09.01-2026.09.30'
+        id: 'a4', status: 'upcoming', visible: true, sort: 5, cover: COVER_IMG,
+        project: '右豹平台', projects: ['右豹平台'], tags: ['成长'],
+        title: '右豹创作者成长计划', description: '官方扶持优质创作者',
+        timeRange: '2026.09.01-2026.09.30', views: 0,
+        introContent: '<p>右豹创作者成长计划，官方扶持优质创作者。</p>',
+        needClaimButtons: true,
+        claimButtons: [{ label: '预约领取', needJump: false, clickedLabel: '已预约' }]
       },
       {
-        id: 'a5', type: 'normal', status: 'ended',
-        project: '右豹平台', title: '右豹新人入门指引', subtitle: '快速了解平台核心功能',
-        timeRange: '2026.07.01-2026.07.31'
+        id: 'a5', status: 'ended', visible: false, sort: 1,
+        project: '右豹平台', projects: ['右豹平台'], tags: [],
+        title: '右豹新人入门指引', description: '快速了解平台核心功能',
+        timeRange: '2026.07.01-2026.07.31', views: 320,
+        introContent: '<p>右豹新人入门指引。</p>',
+        needClaimButtons: false, claimButtons: []
       },
       {
-        id: 'a6', type: 'normal', status: 'ended',
-        project: '右豹平台', title: '3天右豹生态公益培训营', subtitle: '3天学会选赛道·做项目',
-        timeRange: '2026.07.22-2026.08.22'
+        id: 'a6', status: 'ended', visible: true, sort: 3, cover: COVER_IMG,
+        project: '右豹平台', projects: ['右豹平台'], tags: ['往期'],
+        title: '右豹生态训练营往期', description: '往期结营回顾',
+        timeRange: '2026.07.22-2026.08.22', views: 210, enrolled: 88,
+        introContent: '<p>往期训练营已结束。领取按钮展示但不可点。</p>',
+        cases: [{ name: '结营回顾', assets: [{ type: 'image', src: CASE_IMG }] }],
+        needClaimButtons: true,
+        claimButtons: [
+          { label: '查看证书', needJump: false, clickedLabel: '已查看' }
+        ]
+      },
+      {
+        id: 'a7', status: 'ongoing', visible: true, sort: 4,
+        project: '小说推文', projects: ['小说推文'], tags: ['资料'],
+        title: '跳转失败不计参与样例', description: '坏链演示',
+        timeRange: '2026.08.22-2026.08.29', views: 12,
+        introContent: '<p>需跳转的领取在失败时不记已参与。</p>',
+        needClaimButtons: true,
+        claimButtons: [{ label: '打开资料', needJump: true, url: 'fail://jump' }]
+      },
+      {
+        id: 'a8', status: 'ended', visible: true, sort: 2, cover: COVER_IMG,
+        project: '右豹平台', projects: ['右豹平台'], tags: ['收益榜'],
+        title: '右豹活动期收益榜', description: '按活动期有效收益排名',
+        timeRange: '2026.07.01-2026.07.31', views: 420, enrolled: 96,
+        introContent: '<p>活动期有效收益榜。本 Demo 为未获奖展位。</p>',
+        cases: [{ name: '榜单说明', assets: [{ type: 'image', src: CASE_IMG }] }],
+        needClaimButtons: false, claimButtons: [],
+        leaderboardVisible: true,
+        leaderboardLimit: 10,
+        leaderboardLineDesc: '短剧推广',
+        leaderboardPeriodDesc: '7日收益',
+        awardStatus: 'not_won',
+        showUserAward: true
       }
     ];
 
+    const ALL = [PINNED].concat(ACTIVITIES);
+    const participated = new Set();
+    const clickedLabels = {};
     let currentFilter = 'all';
+    let currentDetailId = null;
+
+    function findItem(id) {
+      if (id === 'pinned' || id === 'a1') return PINNED;
+      return ALL.find(x => x.id === id);
+    }
+
+    function visiblePool() {
+      return ALL.filter(a => a.visible !== false);
+    }
 
     function matchFilter(item, filter) {
       if (filter === 'all') return true;
       if (filter === 'ongoing') return item.status === 'ongoing';
       if (filter === 'ended') return item.status === 'ended';
-      if (filter === 'registration') return item.type === 'registration';
+      if (filter === 'upcoming') return item.status === 'upcoming';
+      if (filter === 'participated') return participated.has(item.id);
       return true;
+    }
+
+    function hasEnrolled(item) {
+      return item.enrolled !== null && item.enrolled !== undefined && item.enrolled !== '';
+    }
+
+    function projectLine(item) {
+      const names = item.projects && item.projects.length ? item.projects : (item.project ? [item.project] : []);
+      if (!names.length) return '';
+      return '项目·<em>' + names.join('、') + '</em>';
     }
 
     function renderBanner() {
       const el = document.getElementById('pinnedBanner');
-      const enrollLine = PINNED.type === 'registration'
-        ? `<div class="banner-enroll">${PINNED.enrolled}人已参加</div>` : '';
+      const enrollLine = hasEnrolled(PINNED)
+        ? `<span class="banner-enroll">${PINNED.enrolled}人已参加</span>` : '';
       el.innerHTML = `
-        <div class="pinned-banner">
+        <div class="pinned-banner" onclick="openDetail('${PINNED.id}')">
           <div class="banner-label">🎓 ${PINNED.label}</div>
           <div class="banner-title">${PINNED.title}</div>
-          <div class="banner-sub">${PINNED.subtitle}</div>
+          <div class="banner-sub">${PINNED.description || ''}</div>
           <div class="banner-meta">活动时间·${PINNED.timeRange}</div>
-          ${enrollLine}
-          <button class="btn-banner" type="button" onclick="handleAction('${PINNED.id}')">查看</button>
+          <div class="banner-stats">
+            <span class="banner-views">${PINNED.views ?? 0}人浏览</span>
+            ${enrollLine}
+          </div>
+          <button class="btn-banner" type="button" onclick="openDetail('${PINNED.id}')">查看</button>
           <div class="banner-thumb">${ICON_SVG}</div>
         </div>`;
     }
 
     function renderCard(a) {
       const statusCls = STATUS_CLASS[a.status] || '';
-      const enrollBlock = a.type === 'registration'
-        ? `<div class="enroll-count">${a.enrolled}人已参加</div>` : '';
+      const enrollBlock = hasEnrolled(a)
+        ? `<span class="enroll-count">${a.enrolled}人已参加</span>` : '';
       return `
-        <article class="activity-card" data-id="${a.id}">
+        <article class="activity-card" data-id="${a.id}" onclick="openDetail('${a.id}')">
           <div class="card-top">
-            <span class="project-label">项目·<em>${a.project}</em></span>
+            <span class="project-label">${projectLine(a)}</span>
           </div>
           <div class="card-body">
             <div class="card-icon-wrap">
@@ -307,25 +627,38 @@
             </div>
             <div class="card-text">
               <div class="card-title">${a.title}</div>
-              <div class="card-subtitle">${a.subtitle}</div>
+              ${a.description ? `<div class="card-subtitle">${a.description}</div>` : ''}
             </div>
           </div>
           <div class="card-footer">
             <div class="card-footer-left">
               <div class="card-time">活动时间·${a.timeRange}</div>
-              ${enrollBlock}
+              <div class="card-stats">
+                <span class="view-count">${a.views ?? 0}人浏览</span>
+                ${enrollBlock}
+              </div>
             </div>
-            <button class="btn-action" type="button" onclick="handleAction('${a.id}')">查看</button>
+            <button class="btn-action" type="button" onclick="openDetail('${a.id}')">查看</button>
           </div>
         </article>`;
     }
 
     function renderList() {
       renderBanner();
-      const list = ACTIVITIES.filter(a => matchFilter(a, currentFilter));
+      const list = visiblePool().filter(a => {
+        if (!matchFilter(a, currentFilter)) return false;
+        if (a.pinned && currentFilter !== 'participated') return false;
+        return true;
+      }).slice().sort((a, b) => (b.sort || 0) - (a.sort || 0) || String(a.id).localeCompare(String(b.id)));
       document.getElementById('activityList').innerHTML = list.map(renderCard).join('');
-      document.getElementById('emptyState').hidden = list.length > 0 || !!PINNED;
-      const filterLabels = { all: '全部活动', ongoing: '进行中', ended: '已结束', registration: '报名类活动' };
+      const empty = document.getElementById('emptyState');
+      if (list.length) {
+        empty.hidden = true;
+      } else {
+        empty.hidden = false;
+        empty.textContent = currentFilter === 'participated' ? '暂无已参与的活动' : '暂无符合条件的活动';
+      }
+      const filterLabels = { all: '全部活动', ongoing: '进行中', ended: '已结束', participated: '已参与' };
       document.querySelector('.list-meta .label').textContent = filterLabels[currentFilter] || '全部活动';
       document.getElementById('listCount').textContent = `共 ${list.length} 条`;
     }
@@ -333,7 +666,7 @@
     function setFilter(filter) {
       currentFilter = filter;
       document.querySelectorAll('#filterTabs button').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.filter === filter || (filter === 'registration' && btn.dataset.filter === 'all'));
+        btn.classList.toggle('active', btn.dataset.filter === filter);
       });
       document.querySelectorAll('#screenNav button').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.filter === filter);
@@ -341,20 +674,217 @@
       renderList();
     }
 
-    function handleAction(id) {
-      const item = id === 'pinned' ? PINNED : ACTIVITIES.find(x => x.id === id);
-      if (!item) return;
-      openViewRule();
+    function showList() {
+      document.getElementById('screen-activity-center').className = 'screen active';
+      document.getElementById('screen-detail').className = 'screen';
+      currentDetailId = null;
+      renderList();
     }
 
-    function openViewRule() {
-      document.getElementById('ruleOverlay').classList.add('show');
-      document.getElementById('ruleSheet').classList.add('show');
+    function configuredTabs(item) {
+      const tabs = [];
+      if (item.introContent) tabs.push({ id: 'intro', label: '介绍' });
+      const cases = (item.cases || []).filter(c => c.name && c.assets && c.assets.length);
+      if (cases.length) tabs.push({ id: 'cases', label: '案例' });
+      if (item.leaderboardVisible) tabs.push({ id: 'board', label: '榜单' });
+      return tabs;
     }
 
-    function closeViewRule() {
-      document.getElementById('ruleOverlay').classList.remove('show');
-      document.getElementById('ruleSheet').classList.remove('show');
+    function completeClaims(item) {
+      if (!item.needClaimButtons) return [];
+      return (item.claimButtons || []).filter(btn => {
+        if (!btn || !btn.label) return false;
+        if (btn.needJump) return !!btn.url;
+        return !!btn.clickedLabel;
+      }).slice(0, 2);
+    }
+
+    function claimOpen(item) {
+      return item.status === 'ongoing';
+    }
+
+    function jumpSucceeds(url) {
+      if (!url) return false;
+      if (/^fail:\/\//i.test(url) || /(?:[#?&]|\/)fail(?:[/?#]|$)/i.test(url)) return false;
+      try { window.open(url, '_blank', 'noopener'); } catch (_) {}
+      return true;
+    }
+
+    function renderDetailHead(item) {
+      const tags = (item.tags || []).map(t => `<span class="chip">${t}</span>`).join('');
+      const projects = (item.projects || []).map(p => `<span class="chip chip-project">项目·<em>${p}</em></span>`).join('');
+      const enroll = hasEnrolled(item) ? `<span>${item.enrolled}人已参加</span>` : '';
+      const coverBlock = item.cover
+        ? `<div class="detail-cover"><img src="${item.cover}" alt="封面" /></div>`
+        : '';
+      document.getElementById('detailHead').innerHTML = `
+          ${coverBlock}
+          <div class="detail-head-main">
+            <div class="detail-title">${item.title}</div>
+            <div class="detail-time">活动时间·${item.timeRange}</div>
+            <div class="detail-tags">${tags}${projects}</div>
+            <div class="detail-meta">
+              <span>${item.views ?? 0}人浏览</span>
+              ${enroll}
+            </div>
+          </div>`;
+    }
+
+    function renderAward(item) {
+      const el = document.getElementById('detailAward');
+      if (!item.showUserAward || !item.awardStatus) {
+        el.hidden = true;
+        el.innerHTML = '';
+        return;
+      }
+      el.hidden = false;
+      if (item.awardStatus === 'won') {
+        el.innerHTML = `<div class="reward-bar won">恭喜获奖${item.awardPrize ? '，奖品 ' + item.awardPrize : ''}</div>`;
+      } else {
+        el.innerHTML = '<div class="reward-bar not_won">未获奖，再接再厉</div>';
+      }
+    }
+
+    function renderDetailTabs(item, activeTab) {
+      const tabs = configuredTabs(item);
+      const bar = document.getElementById('detailTabs');
+      if (tabs.length < 2) {
+        bar.hidden = true;
+        bar.innerHTML = '';
+        return tabs[0] ? tabs[0].id : 'intro';
+      }
+      const current = tabs.some(t => t.id === activeTab) ? activeTab : tabs[0].id;
+      bar.hidden = false;
+      bar.innerHTML = tabs.map(t =>
+        `<button type="button" data-tab="${t.id}" class="${t.id === current ? 'active' : ''}">${t.label}</button>`
+      ).join('');
+      bar.querySelectorAll('button').forEach(btn => {
+        btn.addEventListener('click', () => fillDetailBody(item, btn.dataset.tab));
+      });
+      return current;
+    }
+
+    function fillDetailBody(item, tabId) {
+      const tabs = configuredTabs(item);
+      const current = tabs.some(t => t.id === tabId) ? tabId : (tabs[0] && tabs[0].id);
+      document.querySelectorAll('#detailTabs button').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === current);
+      });
+      const body = document.getElementById('detailBody');
+      if (current === 'intro') {
+        body.innerHTML = `<div class="intro-html">${item.introContent || ''}</div>`;
+      } else if (current === 'cases') {
+        const cases = (item.cases || []).filter(c => c.name && c.assets && c.assets.length);
+        body.innerHTML = '<div class="case-grid">' + cases.map(c => {
+          const media = c.assets.map(a => {
+            if (a.type === 'video') return `<video controls playsinline src="${a.src || CASE_VIDEO}" poster="${CASE_IMG}"></video>`;
+            return `<img src="${a.src || CASE_IMG}" alt="${c.name}" />`;
+          }).join('');
+          return `<div class="case-block"><div class="case-name">${c.name}</div><div class="case-media">${media}</div></div>`;
+        }).join('') + '</div>';
+        bindCaseMedia();
+      } else if (current === 'board') {
+        body.innerHTML = renderLeaderboardHtml(activityLeaderboard(item));
+      }
+      renderDock(item, current);
+    }
+
+    function bindCaseMedia() {
+      document.querySelectorAll('#detailBody .case-media img').forEach(img => {
+        img.addEventListener('click', () => {
+          document.getElementById('caseLightboxImg').src = img.src;
+          document.getElementById('caseLightbox').hidden = false;
+        });
+        let hold = 0;
+        const clear = () => { if (hold) { window.clearTimeout(hold); hold = 0; } };
+        img.addEventListener('pointerdown', () => {
+          hold = window.setTimeout(() => { hold = 0; toast('已保存到相册（Demo）'); }, 550);
+        });
+        img.addEventListener('pointerup', clear);
+        img.addEventListener('pointerleave', clear);
+        img.addEventListener('pointercancel', clear);
+      });
+    }
+
+    function renderDock(item, tabId) {
+      const me = document.getElementById('boardMe');
+      const cta = document.getElementById('detailCta');
+      if (tabId === 'board') {
+        cta.hidden = true;
+        cta.innerHTML = '';
+        const html = renderBoardMeHtml(activityLeaderboard(item));
+        me.hidden = !html;
+        me.innerHTML = html;
+        return;
+      }
+      me.hidden = true;
+      me.innerHTML = '';
+      if (tabId !== 'intro') {
+        cta.hidden = true;
+        cta.innerHTML = '';
+        return;
+      }
+      renderCta(item);
+    }
+
+    function renderCta(item) {
+      const bar = document.getElementById('detailCta');
+      const buttons = completeClaims(item);
+      if (!buttons.length) {
+        bar.hidden = true;
+        bar.innerHTML = '';
+        return;
+      }
+      bar.hidden = false;
+      const canClick = claimOpen(item);
+      bar.innerHTML = buttons.map((btn, i) => {
+        const shown = clickedLabels[item.id + ':' + i] || btn.label;
+        const ghost = i > 0 ? ' ghost' : '';
+        const dis = canClick ? '' : ' disabled';
+        return `<button type="button" class="${ghost.trim()}" data-ci="${i}"${dis}>${shown}</button>`;
+      }).join('');
+      bar.querySelectorAll('button').forEach(el => {
+        el.addEventListener('click', () => handleClaim(item, Number(el.dataset.ci)));
+      });
+    }
+
+    function markParticipated(id) {
+      participated.add(id);
+    }
+
+    function handleClaim(item, index) {
+      const buttons = completeClaims(item);
+      const btn = buttons[index];
+      if (!btn) return;
+      if (!claimOpen(item)) {
+        toast('活动未开始或已结束，不能领取');
+        return;
+      }
+      if (btn.needJump) {
+        if (!jumpSucceeds(btn.url)) {
+          toast('跳转失败，未记入已参与');
+          return;
+        }
+        markParticipated(item.id);
+        toast('已打开跳转并记入已参与');
+        return;
+      }
+      clickedLabels[item.id + ':' + index] = btn.clickedLabel;
+      markParticipated(item.id);
+      toast('已记入已参与');
+      renderCta(item);
+    }
+
+    function openDetail(id) {
+      const item = findItem(id);
+      if (!item || item.visible === false) return;
+      currentDetailId = item.id;
+      document.getElementById('screen-activity-center').className = 'screen';
+      document.getElementById('screen-detail').className = 'screen active';
+      renderDetailHead(item);
+      renderAward(item);
+      const tab = renderDetailTabs(item);
+      fillDetailBody(item, tab);
     }
 
     function toast(msg) {
@@ -363,7 +893,11 @@
       el.classList.add('show');
       setTimeout(() => el.classList.remove('show'), 1800);
     }
+    document.getElementById('caseLightbox').addEventListener('click', () => {
+      document.getElementById('caseLightbox').hidden = true;
+    });
 
+    document.getElementById('detailBack').addEventListener('click', showList);
     document.querySelectorAll('#filterTabs button').forEach(btn => {
       btn.addEventListener('click', () => setFilter(btn.dataset.filter));
     });
@@ -371,18 +905,44 @@
       btn.addEventListener('click', () => setFilter(btn.dataset.filter));
     });
 
-    const urlParams = new URLSearchParams(location.search);
-    if (urlParams.get('embed') === '1') document.body.classList.add('embed-mode');
-    const initFilter = urlParams.get('filter');
-    if (initFilter && ['all', 'ongoing', 'ended', 'registration'].includes(initFilter)) {
-      setFilter(initFilter);
-    } else {
-      renderList();
+    function applyParams(params) {
+      if (params.get('embed') === '1') document.body.classList.add('embed-mode');
+      const scene = params.get('scene') || '';
+      const filter = params.get('filter');
+      if (filter && ['all', 'ongoing', 'ended', 'participated'].includes(filter)) {
+        setFilter(filter);
+      } else {
+        renderList();
+      }
+      const sceneId = ({
+        'detail-cover': 'pinned',
+        'detail-camp': 'pinned',
+        'detail-intro': 'a3',
+        'detail-not-won': 'a8',
+        'detail-upcoming': 'a4',
+        'detail-ended': 'a6',
+        'detail-jump-fail': 'a7'
+      })[scene];
+      const screen = params.get('screen') || (scene.indexOf('detail') === 0 ? 'detail' : '');
+      const id = params.get('id') || sceneId || '';
+      if (screen === 'detail' && id) openDetail(id);
     }
 
+    applyParams(new URLSearchParams(location.search));
+
     window.addEventListener('message', e => {
-      if (e.data?.type === 'setFilter' && ['all', 'ongoing', 'ended', 'registration'].includes(e.data.filter)) {
-        setFilter(e.data.filter);
+      const data = e.data || {};
+      if (data.type === 'setFilter' && ['all', 'ongoing', 'ended', 'participated'].includes(data.filter)) {
+        showList();
+        setFilter(data.filter);
+      }
+      if (data.type === 'openDetail' && data.id) openDetail(data.id);
+      if (data.type === 'setScreen') {
+        if (data.screen === 'detail' && data.id) openDetail(data.id);
+        if (data.screen === 'list') {
+          if (data.filter) setFilter(data.filter);
+          showList();
+        }
       }
     });
   </script>

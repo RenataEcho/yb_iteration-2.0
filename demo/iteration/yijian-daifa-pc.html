@@ -52,7 +52,7 @@
     .recruit-bn::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(0,0,0,.55), rgba(0,0,0,.15)); }
     .recruit-bn .t { position: relative; z-index: 1; padding: 22px 24px; color: #fff; }
     .recruit-bn .kicker { font-size: 11px; opacity: .85; letter-spacing: .04em; }
-    .recruit-bn h2 { font-size: 22px; margin: 6px 0 6px; }
+    .recruit-bn h2 { font-size: 22px; margin: 6px 0 6px; letter-spacing: -.02em; }
     .recruit-bn p { font-size: 13px; opacity: .92; line-height: 1.5; max-width: 520px; }
     .recruit-bn .hint { margin-top: 10px; font-size: 12px; color: #ffd4b8; }
     .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
@@ -137,7 +137,7 @@
     }
     .drawer-overlay.open { opacity: 1; pointer-events: auto; }
     .drawer {
-      position: absolute; top: 0; right: 0; bottom: 0; width: 400px; z-index: 21;
+      position: absolute; top: 0; right: 0; bottom: 0; width: 440px; z-index: 21;
       background: #fff; box-shadow: -8px 0 32px rgba(0,0,0,.16);
       transform: translateX(100%); transition: transform .24s ease;
       display: flex; flex-direction: column;
@@ -149,6 +149,32 @@
     .drawer-body { flex: 1; overflow-y: auto; padding: 16px 18px 28px; }
     .drawer-body h3 { font-size: 13px; color: var(--orange); margin: 12px 0 6px; }
     .drawer-body li { font-size: 13px; margin-left: 18px; line-height: 1.7; }
+    .recruit-lead { font-size: 13px; color: var(--text); line-height: 1.65; margin-bottom: 12px; }
+    .recruit-stats {
+      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin: 0 0 14px;
+    }
+    .recruit-stats div {
+      background: #fff7f1; border: 1px solid #ffd4b8; border-radius: 10px; padding: 10px 8px; text-align: center;
+    }
+    .recruit-stats b { display: block; font-size: 12px; color: #c2410c; }
+    .recruit-stats span { display: block; margin-top: 4px; font-size: 11px; color: var(--muted); }
+    .recruit-roles { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 0 0 4px; }
+    .recruit-roles div {
+      padding: 10px; border-radius: 10px; background: #fff7f1; border: 1px solid #ffd4b8;
+    }
+    .recruit-roles b { display: block; font-size: 13px; color: #c2410c; margin-bottom: 4px; }
+    .recruit-roles span { font-size: 12px; color: #6b7280; line-height: 1.45; }
+    .recruit-note { font-size: 12px; color: var(--muted); line-height: 1.6; margin: 0 0 4px; }
+    .recruit-flow { list-style: none; margin: 0; padding: 0; }
+    .recruit-flow li {
+      display: flex; gap: 10px; align-items: flex-start; margin: 0 0 8px 0 !important;
+      font-size: 13px; line-height: 1.55;
+    }
+    .recruit-flow i {
+      flex: 0 0 18px; height: 18px; border-radius: 50%; background: #fff3eb; color: #c2410c;
+      font-size: 11px; font-style: normal; font-weight: 700; display: grid; place-items: center; margin-top: 1px;
+    }
+    .recruit-foot { margin-top: 12px; font-size: 11px; color: var(--muted); line-height: 1.55; text-align: center; }
     .qr-wrap { margin-top: 16px; text-align: center; }
     .qr { width: 120px; height: 120px; margin: 0 auto; border-radius: 8px; background:
       repeating-conic-gradient(#1a2332 0 25%, #fff 0 50%) 0 0 / 12px 12px; border: 4px solid #eee; }
@@ -293,10 +319,10 @@
         <section class="view" id="view-home">
           <button class="recruit-bn" type="button" id="recruitBn" style="background-image:url('assets/fr014/bn-recruit.jpg')">
             <div class="t">
-              <div class="kicker">剪辑手招募</div>
-              <h2>剪辑手招募中</h2>
-              <p>书和项目都备好，你来做图集和视频。扫码联系客服即可入驻。</p>
-              <div class="hint">点击查看招募详情 →</div>
+              <div class="kicker">一键代发 · 剪辑供稿</div>
+              <h2>会做片，就在这变现</h2>
+              <p>项目和书都备好。你交图集或视频，用户领取去发，关键词订单按谈好的分成结算。</p>
+              <div class="hint">查看招募详情 · 联系客服 →</div>
             </div>
           </button>
           <div class="toolbar">
@@ -341,7 +367,7 @@
           </div>
           <div id="boardEmpty" class="empty" hidden>
             <b>你还不是剪辑手</b>
-            请先点击上方招募入口，扫描客服二维码报名。<br />后台录入右豹 ID、分成比例、备注后，再看本看板。
+            点上方招募，联系客服。谈定项目和分成、后台录入后，才能看看板、传稿。<br />本页没有申请表，加客服不等于已经能传。
             <div style="margin-top:14px"><button class="btn btn-ghost" type="button" data-go="guide">查看操作说明</button></div>
           </div>
         </section>
@@ -407,22 +433,36 @@
         <button class="drawer-close" type="button" id="recruitClose">×</button>
       </div>
       <div class="drawer-body">
-        <p class="desc">客服接入、后台录入。不在站内填申请表。</p>
-        <h3>卖点</h3>
+        <p class="recruit-lead">会做片，就在这变现。项目和书都备好。你交图集或视频，用户领取去发，关键词订单按谈好的分成结算。</p>
+        <div class="recruit-stats">
+          <div><b>图集 / 视频</b><span>两种成片都收</span></div>
+          <div><b>谈好分成</b><span>领取当时锁定</span></div>
+          <div><b>电脑交稿</b><span>录入当天可传</span></div>
+        </div>
+        <h3>你能得到什么</h3>
         <ul>
-          <li>不用自己找书、找项目，平台持续供稿</li>
-          <li>口播、混剪、图文切片按你擅长的类型接</li>
-          <li>客服一对一接入，后台录入后立刻能在电脑上传</li>
+          <li>不用自己找书、找项目，授权项目持续供稿</li>
+          <li>口播、混剪、图文切片，按你擅长的类型接</li>
+          <li>客服谈好分成和项目，后台录入后用电脑上传</li>
         </ul>
+        <div class="recruit-roles">
+          <div><b>短视频</b><span>口播、混剪、卡点。成片供进广场，用户去发。</span></div>
+          <div><b>图集切片</b><span>排版、解压图也能交。图集视频都收。</span></div>
+        </div>
         <h3>适合谁</h3>
         <ul>
-          <li>有成片作品、想接稳定兼职的剪辑手</li>
-          <li>不愿意走站内自助申请，愿意加客服沟通的人</li>
+          <li>能稳定出图集或短视频的剪辑、工作室</li>
+          <li>愿意加客服沟通、只在电脑交稿的人</li>
         </ul>
-        <div class="qr-wrap">
-          <div class="qr" aria-label="客服二维码"></div>
-          <p class="desc" style="margin:8px 0 0">扫描二维码联系客服报名 · 无站内申请表</p>
-        </div>
+        <h3>这页不是给谁</h3>
+        <p class="recruit-note">不会做片、只想领成片去发，请用手机作品广场。本页没有申请表，加客服也不等于已经能传。</p>
+        <h3>怎么开通</h3>
+        <ol class="recruit-flow">
+          <li><i>1</i><span>联系客服，说明你擅长的成片类型</span></li>
+          <li><i>2</i><span>谈定授权项目、分成、稿件要不要审</span></li>
+          <li><i>3</i><span>后台录入后，在本页「剪辑供稿」上传</span></li>
+        </ol>
+        <p class="recruit-foot">联系客服开通剪辑供稿。录入后即可在电脑上传。</p>
       </div>
     </aside>
 
