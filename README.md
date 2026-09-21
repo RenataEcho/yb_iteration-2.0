@@ -10,14 +10,11 @@
 
 | FR | 名称 | 路径 |
 |----|------|------|
-| FR-005 | 订单优化 | `demo/iteration/fr-project-order-optimize.html` |
-| FR-007 | 订单分发 | `demo/iteration/fr-project-order-distribute.html` |
-| FR-009 | AI工作台 | `demo/iteration/fr-ai-workbench.html` |
+| FR-006 | 活动中心 | `demo/iteration/fr-activity-center.html` |
 | FR-010 | 代理迭代V1.0 | `demo/iteration/fr-agent-cert.html` |
-| FR-011 | 导师迭代V1.0 | `demo/iteration/fr-org-mentor-board.html` |
-| FR-012 | 选书中心 | `demo/iteration/fr-book-select.html` |
 | FR-013 | AI申词 | `demo/iteration/fr-ai-keyword.html` |
-| FR-014 | 一键代发 | `demo/iteration/fr-opc-yijian-daifa.html` |
+| FR-015 | 双节逐鹿榜 | `demo/iteration/fr-zhulu-board.html` |
+| FR-016 | 奖钱包合并提现 | `demo/iteration/fr-wallet-merge-withdraw.html` |
 
 ## 归档需求
 
@@ -28,6 +25,12 @@ Sprint 概览将状态为「已上线」的需求归入归档。默认已上线�
 | FR-002 | 代发收益 | `demo/iteration/fr-opc-daifa-revenue.html` |
 | FR-003 | 品牌退款 | `demo/iteration/fr-finance-brand-refund.html` |
 | FR-004 | 预估数据 | `demo/iteration/fr-project-estimated-data.html` |
+| FR-005 | 订单优化 | `demo/iteration/fr-project-order-optimize.html` |
+| FR-007 | 订单分发 | `demo/iteration/fr-project-order-distribute.html` |
+| FR-009 | AI工作台 | `demo/iteration/fr-ai-workbench.html` |
+| FR-011 | 导师迭代V1.0 | `demo/iteration/fr-org-mentor-board.html` |
+| FR-012 | 选书中心 | `demo/iteration/fr-book-select.html` |
+| FR-014 | 一键代发 | `demo/iteration/fr-opc-yijian-daifa.html` |
 
 ## 废纸篓
 
@@ -36,5 +39,4 @@ Sprint 概览将状态为「已暂停」的需求归入废纸篓。默认暂停�
 | FR | 名称 | 路径 |
 |----|------|------|
 | FR-001 | 代发分配 | `demo/iteration/fr-opc-daifa-allocation.html` |
-| FR-006 | 活动中心 | `demo/iteration/fr-activity-center.html` |
 | FR-008 | 礼品中心 | `demo/iteration/fr-gift-center.html` |
