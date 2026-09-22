@@ -65,6 +65,11 @@
     .page-tab-bar button.active { background: var(--primary); color: #fff; font-weight: 600; }
     .page-view { display: none; }
     .page-view.active { display: block; }
+    #view-fe.page-view.active {
+      display: flex; flex-direction: column;
+      height: calc(100vh - 188px); min-height: 560px;
+    }
+    #view-fe .demo-layout { flex: 1; min-height: 0; }
     .btn {
       display: inline-flex; align-items: center; height: 34px; padding: 0 14px;
       border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid transparent;
@@ -79,7 +84,7 @@
       box-shadow: var(--shadow); overflow: hidden;
     }
     .demo-layout { display: flex; flex-direction: column; gap: 16px; }
-    .scene-panel { padding: 16px 20px 18px; background: #fff; }
+    .scene-panel { padding: 12px 16px 14px; background: #fff; flex-shrink: 0; }
     .scene-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
     .scene-panel h2 { font-size: 18px; font-weight: 700; margin-bottom: 4px; color: var(--text-primary); }
     .scene-lead { font-size: 13px; color: #6b7280; line-height: 1.5; max-width: 760px; }
@@ -101,30 +106,68 @@
     .btn-preview:hover, .btn-preview[aria-pressed="true"] {
       border-color: var(--primary-border); background: var(--primary-light); color: var(--primary);
     }
-    .mockup-panel { padding: 20px 16px; display: flex; justify-content: center; min-height: 520px; }
-    .mockup-frame-wrap {
-      width: 100%; max-width: 375px; border-radius: 28px; overflow: hidden;
-      background: #1e293b; box-shadow: 0 16px 48px rgba(0,0,0,0.18); aspect-ratio: 375 / 812;
+    .mockup-board {
+      padding: 14px 16px 16px; background: #fff;
+      flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden;
     }
-    .mockup-frame-wrap iframe { width: 100%; height: 100%; border: none; display: block; background: #fff; }
+    .board-sec + .board-sec { margin-top: 22px; }
+    .board-sec h3 {
+      font-size: 15px; font-weight: 700; display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px;
+    }
+    .board-sec h3 span { font-size: 12px; font-weight: 500; color: var(--text-muted); }
+    .board-scroll {
+      overflow: auto;
+      flex: 1;
+      min-height: 0;
+      padding: 4px 2px 8px;
+    }
+    .board-row {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 20px 18px;
+      margin-top: 12px;
+    }
+    .board-tile { min-width: 0; scroll-margin: 12px; }
+    .board-cap {
+      font-size: 13px; font-weight: 700; margin-bottom: 8px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .board-cap em { font-style: normal; font-weight: 500; color: var(--text-muted); font-size: 11px; }
+    .board-phone {
+      width: 100%;
+      aspect-ratio: 375 / 812;
+      border-radius: 24px; overflow: hidden;
+      background: #111; border: 7px solid #1a1a1a;
+      box-shadow: 0 14px 32px rgba(0,0,0,.16); position: relative;
+    }
+    .board-phone iframe {
+      width: 375px; height: 812px; border: 0; display: block;
+      transform-origin: 0 0; background: #fff;
+      position: absolute; top: 0; left: 0;
+    }
     .demo-layout:fullscreen, .demo-layout:-webkit-full-screen,
     body.preview-fs-fallback .demo-layout.is-preview {
-      width: 100%; height: 100%; padding: 16px; gap: 12px; overflow: auto;
+      width: 100%; height: 100%; padding: 16px; gap: 12px;
+      overflow: hidden; display: flex; flex-direction: column;
       background: linear-gradient(135deg, #e0e7ff 0%, #f0f4f8 40%, #e0f2fe 100%);
     }
     body.preview-fs-fallback .demo-layout.is-preview {
       position: fixed; inset: 0; z-index: 400;
     }
-    .demo-layout:fullscreen .mockup-panel,
-    .demo-layout:-webkit-full-screen .mockup-panel,
-    body.preview-fs-fallback .demo-layout.is-preview .mockup-panel {
-      flex: 1; min-height: 0; align-items: stretch;
+    .demo-layout:fullscreen .scene-panel,
+    .demo-layout:-webkit-full-screen .scene-panel,
+    body.preview-fs-fallback .demo-layout.is-preview .scene-panel {
+      flex-shrink: 0;
     }
-    .demo-layout:fullscreen .mockup-frame-wrap,
-    .demo-layout:-webkit-full-screen .mockup-frame-wrap,
-    body.preview-fs-fallback .demo-layout.is-preview .mockup-frame-wrap {
-      max-width: min(390px, calc((100vh - 200px) * 375 / 812));
-      height: calc(100vh - 200px); aspect-ratio: 375 / 812;
+    .demo-layout:fullscreen .mockup-board,
+    .demo-layout:-webkit-full-screen .mockup-board,
+    body.preview-fs-fallback .demo-layout.is-preview .mockup-board {
+      flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden;
+    }
+    .demo-layout:fullscreen .board-scroll,
+    .demo-layout:-webkit-full-screen .board-scroll,
+    body.preview-fs-fallback .demo-layout.is-preview .board-scroll {
+      flex: 1; max-height: none; min-height: 0;
     }
     .drawer-overlay {
       position: fixed; inset: 0; background: rgba(15,23,42,0.35); z-index: 500;
@@ -166,25 +209,29 @@
     .flow-page-intro { padding: 16px 18px 12px; font-size: 12px; color: var(--text-muted); line-height: 1.55; }
     .flow-split {
       display: grid;
-      grid-template-columns: 300px minmax(0, 1fr);
+      grid-template-columns: 1fr;
       align-items: stretch;
       border-top: 1px solid var(--border);
     }
     .flow-rules {
-      border-right: 1px solid var(--border);
-      padding: 14px 0 16px;
+      padding: 12px 14px 14px;
       background: rgba(248,250,252,0.72);
-      max-height: 72vh;
-      overflow-y: auto;
+      border-bottom: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
     }
     .flow-rules-title {
       font-size: 12px; font-weight: 700; color: var(--text-primary);
-      padding: 0 16px 10px; letter-spacing: 0.02em;
+      letter-spacing: 0.02em;
+      grid-column: 1 / -1;
+      padding: 0 2px 2px;
     }
     .flow-diagram { min-width: 0; display: flex; flex-direction: column; }
-    .flow-svg-wrap { overflow: auto; padding: 12px 14px 8px; max-height: 72vh; }
-    .flow-svg-wrap svg { display: block; margin: 0 auto; max-width: 100%; height: auto; min-width: 0; }
+    .flow-svg-wrap { overflow: auto; padding: 8px 12px 4px; }
+    .flow-svg-wrap svg { display: block; margin: 0 auto; width: 100%; height: auto; min-width: 0; }
     .flow-edges line, .flow-edges polyline { stroke: #94a3b8; stroke-width: 1.5; fill: none; }
+    .flow-edges.flow-loop line, .flow-edges.flow-loop polyline { stroke: #64748b; stroke-dasharray: 6 4; }
     .flow-legend {
       display: flex; flex-wrap: wrap; gap: 12px;
       padding: 10px 18px 16px; font-size: 11px; color: var(--text-muted);
@@ -203,7 +250,7 @@
     .flow-pane.active { display: block; }
     .ix-step {
       display: grid; grid-template-columns: 36px 1fr; gap: 10px; align-items: start;
-      padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; background: #fff; margin: 0 14px 8px;
+      padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; background: #fff; margin: 0;
     }
     .ix-step i {
       width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
@@ -214,9 +261,8 @@
     .ix-step.warn i { background: #fffbeb; color: #d97706; }
     .ix-step.fail i { background: #fef2f2; color: #dc2626; }
     .ix-step.ok i { background: #f0fdf4; color: #16a34a; }
-    @media (max-width: 720px) {
-      .flow-split { grid-template-columns: 1fr; }
-      .flow-rules { border-right: none; border-bottom: 1px solid var(--border); max-height: none; }
+    @media (max-width: 1100px) {
+      .flow-rules { grid-template-columns: 1fr 1fr; }
     }
   </style>
 </head>
@@ -246,9 +292,9 @@
         <h1>
           奖钱包合并提现
           <span class="badge badge-fr">FR-016</span>
-          <span class="badge badge-version">v2 切点账本</span>
+          <span class="badge badge-version">v4 待划转</span>
         </h1>
-        <p class="page-desc">一个提现入口。收益仍分三钱包入账；切点后余额只写统一字段，旧三余额冻结为旧库存。可提现 = 旧库存 + 统一余额。禁止把历史三余额加进新字段。</p>
+        <p class="page-desc">打款进分口袋记待划转，不预扣税、不加可提现。用户划转时同意应税方案并调云账户应税，税后进入所选实名账户可提现，再提现。</p>
       </div>
       <div class="page-header-actions">
         <button class="btn btn-rule" id="toggleRuleDrawer" type="button">📋 需求规则</button>
@@ -266,26 +312,75 @@
           <div class="scene-head">
             <div>
               <h2>钱包合并提现 · 前端交互 Demo</h2>
-              <p class="scene-lead">一个提现入口。收益仍分钱包入账；切点后余额只写统一字段。点横向标签切换场景，下方为预览。</p>
+              <p class="scene-lead">一行 4 个机位。划转页顶部下拉选账户（不展示实名金额），各钱包自定义划转金额。</p>
             </div>
             <button class="btn-preview" type="button" data-preview="fe" aria-pressed="false">全屏预览</button>
           </div>
           <div class="scene-list">
-            <button class="scene-btn active" type="button" data-screen="home" data-desc="总收入旁今日入账；三格为已提现 / 可提现 / 提现；三张卡仅查看明细">钱包首页</button>
-            <button class="scene-btn" type="button" data-screen="withdraw" data-desc="可提现为统一余额；文案说明合并前三口袋已并入新钱包">提现页</button>
-            <button class="scene-btn" type="button" data-screen="records" data-desc="顶部入口；累计提现 / 实际到账；记录为合并后新数据">提现明细</button>
-            <button class="scene-btn" type="button" data-screen="income" data-desc="收益卡片：项目名称、收益金额、实际到账、状态、动账后收益">查看明细</button>
+            <button class="scene-btn active" type="button" data-screen="home" data-desc="可划转余额；首次进入弹出改版公告；顶栏划转+提现；三卡仅查看明细">钱包首页</button>
+            <button class="scene-btn" type="button" data-screen="home-notice" data-desc="首页改版公告：插画说明优势（一次提现、可部分划转、提现不再扣税）+ 先划转再提现、划转时扣税">弹窗·改版公告</button>
+            <button class="scene-btn" type="button" data-screen="transfer" data-desc="顶部下拉选划转账户（无金额）；各钱包单独填金额">划转页</button>
+            <button class="scene-btn" type="button" data-screen="withdraw" data-desc="先选认证账户看可提现，再选到账方式">提现页</button>
+            <button class="scene-btn" type="button" data-screen="records-tf" data-desc="累计已划转 / 实际到账 / 预扣税额；记录含分钱包金额、税额、状态、动账后收益">划转明细</button>
+            <button class="scene-btn" type="button" data-screen="records-wd" data-desc="累计提现；到账用户=名称+脱敏证件号；无实际到账字段">提现明细</button>
+            <button class="scene-btn" type="button" data-screen="income" data-desc="收益卡片：项目、金额、已结算、时间、动账后收益；无页头统计/实际到账/扣税文案">查看明细</button>
             <button class="scene-btn" type="button" data-screen="books" data-desc="总收入 ≠ 可提现；旧库存只减不增">账本对照</button>
+            <button class="scene-btn" type="button" data-screen="kyc-tax" data-desc="点确认划转弹出应税同意；勾选同意后才能划转；同意后不再弹出">弹窗·应税同意</button>
           </div>
-          <p class="scene-hint" id="feSceneHint">总收入旁今日入账；三格为已提现 / 可提现 / 提现；三张卡仅查看明细</p>
+          <p class="scene-hint" id="feSceneHint">点标签滚动到对应页面。区域内可滑动查看全部手机。</p>
           <div class="scene-tools">
             <button class="btn-ghost-sm" type="button" data-wallet-tool="sim-credit">模拟新结算 +1.35</button>
             <button class="btn-ghost-sm" type="button" data-wallet-tool="reset">重置账本</button>
           </div>
         </div>
-        <div class="glass-card mockup-panel">
-          <div class="mockup-frame-wrap">
-            <iframe id="mockupFrame" title="钱包合并提现 Mockup" src="about:blank"></iframe>
+        <div class="glass-card mockup-board">
+          <div class="board-scroll" id="feBoardScroll">
+            <section class="board-sec">
+              <h3>钱包主路径 <span>首页 → 划转 → 提现</span></h3>
+              <div class="board-row">
+                <figure class="board-tile" id="tile-home">
+                  <figcaption class="board-cap">钱包首页 <em>可划转余额 · 改版公告</em></figcaption>
+                  <div class="board-phone"><iframe class="wallet-phone" title="钱包首页" src="wallet-merge-withdraw-demo.html?embed=1&v=31&screen=home"></iframe></div>
+                </figure>
+                <figure class="board-tile" id="tile-transfer">
+                  <figcaption class="board-cap">划转页 <em>顶部选账户 · 分钱包金额</em></figcaption>
+                  <div class="board-phone"><iframe class="wallet-phone" title="划转页" src="wallet-merge-withdraw-demo.html?embed=1&v=31&screen=transfer"></iframe></div>
+                </figure>
+                <figure class="board-tile" id="tile-withdraw">
+                  <figcaption class="board-cap">提现页 <em>先选账户再选到账</em></figcaption>
+                  <div class="board-phone"><iframe class="wallet-phone" title="提现页" src="wallet-merge-withdraw-demo.html?embed=1&v=31&screen=withdraw"></iframe></div>
+                </figure>
+                <figure class="board-tile" id="tile-records-tf">
+                  <figcaption class="board-cap">划转明细 <em>已划转 · 到账 · 税额</em></figcaption>
+                  <div class="board-phone"><iframe class="wallet-phone" title="划转明细" src="wallet-merge-withdraw-demo.html?embed=1&v=31&screen=records-tf"></iframe></div>
+                </figure>
+                <figure class="board-tile" id="tile-records-wd">
+                  <figcaption class="board-cap">提现明细 <em>到账用户 · 无实际到账</em></figcaption>
+                  <div class="board-phone"><iframe class="wallet-phone" title="提现明细" src="wallet-merge-withdraw-demo.html?embed=1&v=31&screen=records-wd"></iframe></div>
+                </figure>
+                <figure class="board-tile" id="tile-income">
+                  <figcaption class="board-cap">查看明细 <em>已结算 · 无扣税</em></figcaption>
+                  <div class="board-phone"><iframe class="wallet-phone" title="查看明细" src="wallet-merge-withdraw-demo.html?embed=1&v=31&screen=income"></iframe></div>
+                </figure>
+                <figure class="board-tile" id="tile-books">
+                  <figcaption class="board-cap">账本对照 <em>可划转余额 ≠ 可提现</em></figcaption>
+                  <div class="board-phone"><iframe class="wallet-phone" title="账本对照" src="wallet-merge-withdraw-demo.html?embed=1&v=31&screen=books"></iframe></div>
+                </figure>
+              </div>
+            </section>
+            <section class="board-sec">
+              <h3>改版公告与应税同意 <span>首页公告一次 · 划转同意一次</span></h3>
+              <div class="board-row">
+                <figure class="board-tile" id="tile-home-notice">
+                  <figcaption class="board-cap">改版公告 <em>进首页弹出</em></figcaption>
+                  <div class="board-phone"><iframe class="wallet-phone" title="改版公告" src="wallet-merge-withdraw-demo.html?embed=1&v=31&screen=home-notice"></iframe></div>
+                </figure>
+                <figure class="board-tile" id="tile-kyc-tax">
+                  <figcaption class="board-cap">同意应税方案 <em>确认划转时</em></figcaption>
+                  <div class="board-phone"><iframe class="wallet-phone" title="应税同意弹窗" src="wallet-merge-withdraw-demo.html?embed=1&v=31&screen=kyc-tax"></iframe></div>
+                </figure>
+              </div>
+            </section>
           </div>
         </div>
       </div>
@@ -294,213 +389,256 @@
 
     <div id="view-flow" class="page-view">
       <div class="glass-card flow-page">
-        <div class="flow-tab-bar" role="tablist">
-          <button type="button" class="active" data-flow="flow-payout" role="tab">流程1 · 收益打款入账</button>
-          <button type="button" data-flow="flow-withdraw" role="tab">流程2 · 用户合并提现</button>
+        <p class="flow-page-intro">一张图走完：打款入待划转 → 划转应税入可提现 → 合并提现回首页。旁路、拦截、失败、跳过应税均接回主链；仍有待划转/可提现则再进划转或提现；本轮结束后可再打款。</p>
+        <div class="flow-split">
+          <div class="flow-rules">
+            <h3 class="flow-rules-title">规则说明</h3>
+            <div class="ix-step"><i>1</i><div><b>打款入待划转</b><span>已结算分口袋记全额待划转，不调应税、不加可提现。待入款不进本链，等下次打款。</span></div></div>
+            <div class="ix-step"><i>2</i><div><b>划转填单</b><span>顶部下拉选账户（个人/对公，不展示该户可提现）。各钱包自定义金额，可部分划转。</span></div></div>
+            <div class="ix-step"><i>3</i><div><b>确认时同意应税</b><span>未同意则弹窗；须勾选才能划转，不同意回填单。同意后不再弹出。</span></div></div>
+            <div class="ix-step"><i>4</i><div><b>应税入可提现</b><span>个人调钱包余额应税；对公跳过。失败则待划转不扣，回首页可再划转。成功扣待划转、税后入该户可提现。</span></div></div>
+            <div class="ix-step ok"><i>5</i><div><b>合并提现闭环</b><span>提现不再扣税。条件不合法回提现页。打款后回首页：有待划转再划转，有可提现再提现，都无可再打款。</span></div></div>
+          </div>
+          <div class="flow-diagram">
+            <div class="flow-svg-wrap">
+              <svg width="1280" height="1680" viewBox="0 0 1280 1680" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <marker id="flow-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                    <path d="M0,0 L8,4 L0,8 Z" fill="#94a3b8" />
+                  </marker>
+                  <marker id="flow-arrow-loop" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                    <path d="M0,0 L8,4 L0,8 Z" fill="#64748b" />
+                  </marker>
+                </defs>
+
+                <g class="flow-edges" marker-end="url(#flow-arrow)">
+                  <line x1="640" y1="60" x2="640" y2="80" />
+                  <polyline points="420,40 140,40 140,90" />
+                  <line x1="640" y1="150" x2="640" y2="180" />
+                  <line x1="640" y1="236" x2="640" y2="264" />
+                  <line x1="640" y1="328" x2="640" y2="348" />
+                  <line x1="640" y1="444" x2="640" y2="464" />
+                  <line x1="640" y1="560" x2="640" y2="580" />
+                  <line x1="640" y1="676" x2="640" y2="696" />
+                  <line x1="640" y1="752" x2="640" y2="772" />
+                  <line x1="640" y1="868" x2="640" y2="888" />
+                  <line x1="640" y1="952" x2="640" y2="980" />
+                  <line x1="640" y1="1044" x2="640" y2="1064" />
+                  <line x1="640" y1="1160" x2="640" y2="1180" />
+                  <line x1="640" y1="1244" x2="640" y2="1272" />
+                  <line x1="640" y1="1320" x2="640" y2="1340" />
+                  <line x1="640" y1="1436" x2="640" y2="1456" />
+                  <line x1="640" y1="1552" x2="640" y2="1572" />
+                  <line x1="560" y1="396" x2="248" y2="396" />
+                  <line x1="560" y1="512" x2="248" y2="512" />
+                  <line x1="720" y1="628" x2="980" y2="628" />
+                  <line x1="560" y1="820" x2="248" y2="820" />
+                  <line x1="560" y1="1112" x2="248" y2="1112" />
+                </g>
+
+                <g class="flow-edges flow-loop" marker-end="url(#flow-arrow-loop)">
+                  <polyline points="40,146 40,12 420,28" />
+                  <polyline points="140,360 140,296 420,296" />
+                  <polyline points="140,456 140,296 420,296" />
+                  <polyline points="248,512 360,512 360,580 560,580" />
+                  <polyline points="1200,628 1200,920 860,920" />
+                  <polyline points="140,820 24,820 24,208 420,208" />
+                  <polyline points="140,1076 140,1012 420,1012" />
+                  <polyline points="560,1388 24,1388 24,296 420,296" />
+                  <polyline points="720,1504 1248,1504 1248,1012 860,1012" />
+                  <polyline points="860,1596 1248,1596 1248,40 860,40" />
+                </g>
+
+                <g class="flow-nodes" font-family="Inter, PingFang SC, sans-serif">
+                  <rect x="420" y="20" width="440" height="40" rx="8" fill="#eff6ff" stroke="#2563eb" />
+                  <text x="640" y="45" text-anchor="middle" font-size="12" fill="#18222f">后台对收益批次发起打款</text>
+
+                  <rect x="40" y="90" width="200" height="56" rx="8" fill="#f1f5f9" stroke="#94a3b8" />
+                  <text x="140" y="112" text-anchor="middle" font-size="12" fill="#334155">待入款</text>
+                  <text x="140" y="130" text-anchor="middle" font-size="10" fill="#64748b">不进本链 · 回等待打款</text>
+
+                  <rect x="420" y="80" width="440" height="70" rx="8" fill="#f0fdf4" stroke="#16a34a" />
+                  <text x="640" y="108" text-anchor="middle" font-size="12" fill="#18222f">写入已结算 · 待划转增加全额</text>
+                  <text x="640" y="128" text-anchor="middle" font-size="10" fill="#64748b">不调应税 · 可提现不变 · 无实际到账/扣税字段</text>
+
+                  <rect x="420" y="180" width="440" height="56" rx="8" fill="#eff6ff" stroke="#2563eb" />
+                  <text x="640" y="204" text-anchor="middle" font-size="12" fill="#18222f">钱包首页：待划转可见</text>
+                  <text x="640" y="222" text-anchor="middle" font-size="10" fill="#64748b">可划转总额=三口袋合计 · 可提现仍为各账户税后余额</text>
+
+                  <rect x="420" y="264" width="440" height="64" rx="8" fill="#eff6ff" stroke="#2563eb" />
+                  <text x="640" y="290" text-anchor="middle" font-size="12" fill="#18222f">划转页：选账户 + 各钱包自定义金额</text>
+                  <text x="640" y="310" text-anchor="middle" font-size="10" fill="#64748b">个人/对公标识 · 下拉不展示该户可提现</text>
+
+                  <polygon points="640,348 720,396 640,444 560,396" fill="#fffbeb" stroke="#d97706" />
+                  <text x="640" y="400" text-anchor="middle" font-size="12" fill="#92400e">填写合法?</text>
+                  <text x="328" y="384" font-size="11" fill="#dc2626">否</text>
+                  <rect x="40" y="360" width="200" height="56" rx="8" fill="#fef2f2" stroke="#dc2626" />
+                  <text x="140" y="382" text-anchor="middle" font-size="12" fill="#991b1b">拦截提交</text>
+                  <text x="140" y="400" text-anchor="middle" font-size="10" fill="#64748b">回划转填单</text>
+                  <text x="652" y="456" font-size="11" fill="#16a34a">是</text>
+
+                  <polygon points="640,464 720,512 640,560 560,512" fill="#fffbeb" stroke="#d97706" />
+                  <text x="640" y="516" text-anchor="middle" font-size="12" fill="#92400e">已同意应税?</text>
+                  <text x="328" y="500" font-size="11" fill="#dc2626">否</text>
+                  <rect x="40" y="456" width="200" height="72" rx="8" fill="#fff7ed" stroke="#ea580c" />
+                  <text x="140" y="480" text-anchor="middle" font-size="12" fill="#18222f">弹出应税同意</text>
+                  <text x="140" y="498" text-anchor="middle" font-size="10" fill="#64748b">不同意 → 回填单</text>
+                  <text x="140" y="514" text-anchor="middle" font-size="10" fill="#16a34a">同意 → 续主链</text>
+                  <text x="652" y="572" font-size="11" fill="#16a34a">是</text>
+
+                  <polygon points="640,580 720,628 640,676 560,628" fill="#fffbeb" stroke="#d97706" />
+                  <text x="640" y="632" text-anchor="middle" font-size="12" fill="#92400e">对公账户?</text>
+                  <text x="732" y="616" font-size="11" fill="#16a34a">是</text>
+                  <rect x="980" y="596" width="200" height="64" rx="8" fill="#f1f5f9" stroke="#94a3b8" />
+                  <text x="1080" y="622" text-anchor="middle" font-size="12" fill="#334155">跳过应税</text>
+                  <text x="1080" y="642" text-anchor="middle" font-size="10" fill="#64748b">全额汇入可提现</text>
+                  <text x="628" y="688" font-size="11" fill="#dc2626">否</text>
+
+                  <rect x="420" y="696" width="440" height="56" rx="8" fill="#fff7ed" stroke="#ea580c" />
+                  <text x="640" y="720" text-anchor="middle" font-size="12" fill="#18222f">调用云账户 · 钱包余额应税</text>
+                  <text x="640" y="738" text-anchor="middle" font-size="10" fill="#64748b">税额以接口返回为准</text>
+
+                  <polygon points="640,772 720,820 640,868 560,820" fill="#fffbeb" stroke="#d97706" />
+                  <text x="640" y="824" text-anchor="middle" font-size="12" fill="#92400e">应税成功?</text>
+                  <text x="328" y="808" font-size="11" fill="#dc2626">否</text>
+                  <rect x="40" y="792" width="200" height="56" rx="8" fill="#fef2f2" stroke="#dc2626" />
+                  <text x="140" y="814" text-anchor="middle" font-size="12" fill="#991b1b">划转失败</text>
+                  <text x="140" y="832" text-anchor="middle" font-size="10" fill="#64748b">待划转不扣 · 回首页</text>
+                  <text x="652" y="880" font-size="11" fill="#16a34a">是</text>
+
+                  <rect x="420" y="888" width="440" height="64" rx="8" fill="#f0fdf4" stroke="#16a34a" />
+                  <text x="640" y="914" text-anchor="middle" font-size="12" fill="#18222f">扣待划转 · 税后入所选账户可提现</text>
+                  <text x="640" y="934" text-anchor="middle" font-size="10" fill="#64748b">写划转明细 · 同意记录保留</text>
+
+                  <rect x="420" y="980" width="440" height="64" rx="8" fill="#eff6ff" stroke="#2563eb" />
+                  <text x="640" y="1006" text-anchor="middle" font-size="12" fill="#18222f">提现页：选认证账户 + 到账方式</text>
+                  <text x="640" y="1026" text-anchor="middle" font-size="10" fill="#64748b">展示该户可提现 · 个人/对公 · 提现不再扣税</text>
+
+                  <polygon points="640,1064 720,1112 640,1160 560,1112" fill="#fffbeb" stroke="#d97706" />
+                  <text x="640" y="1116" text-anchor="middle" font-size="11" fill="#92400e">提现条件合法?</text>
+                  <text x="328" y="1100" font-size="11" fill="#dc2626">否</text>
+                  <rect x="40" y="1076" width="200" height="56" rx="8" fill="#fef2f2" stroke="#dc2626" />
+                  <text x="140" y="1098" text-anchor="middle" font-size="12" fill="#991b1b">拦截提交</text>
+                  <text x="140" y="1116" text-anchor="middle" font-size="10" fill="#64748b">回提现填单</text>
+                  <text x="652" y="1172" font-size="11" fill="#16a34a">是</text>
+
+                  <rect x="420" y="1180" width="440" height="64" rx="8" fill="#f0fdf4" stroke="#16a34a" />
+                  <text x="640" y="1206" text-anchor="middle" font-size="12" fill="#18222f">扣该户可提现并打款</text>
+                  <text x="640" y="1226" text-anchor="middle" font-size="10" fill="#64748b">写提现明细：到账用户 · 无实际到账字段</text>
+
+                  <rect x="420" y="1272" width="440" height="48" rx="8" fill="#eff6ff" stroke="#2563eb" />
+                  <text x="640" y="1302" text-anchor="middle" font-size="12" fill="#18222f">回到钱包首页</text>
+
+                  <polygon points="640,1340 720,1388 640,1436 560,1388" fill="#fffbeb" stroke="#d97706" />
+                  <text x="640" y="1392" text-anchor="middle" font-size="12" fill="#92400e">仍有待划转?</text>
+                  <text x="328" y="1376" font-size="11" fill="#16a34a">是 · 再划转</text>
+                  <text x="652" y="1448" font-size="11" fill="#64748b">否</text>
+
+                  <polygon points="640,1456 720,1504 640,1552 560,1504" fill="#fffbeb" stroke="#d97706" />
+                  <text x="640" y="1508" text-anchor="middle" font-size="12" fill="#92400e">仍有可提现?</text>
+                  <text x="732" y="1492" font-size="11" fill="#16a34a">是 · 再提现</text>
+                  <text x="628" y="1564" font-size="11" fill="#64748b">否</text>
+
+                  <rect x="420" y="1572" width="440" height="48" rx="8" fill="#f0fdf4" stroke="#16a34a" />
+                  <text x="640" y="1602" text-anchor="middle" font-size="12" fill="#18222f">本轮完成 · 可再打款（回起点）</text>
+                </g>
+              </svg>
+            </div>
+          </div>
         </div>
-
-        <div id="flow-payout" class="flow-pane active">
-          <p class="flow-page-intro">扣税发生在<strong>后台打款入账</strong>，不在用户点提现时。只有云账户应税接口扣税成功，才写入实际到账，并同步增加可提现。</p>
-          <div class="flow-split">
-            <div class="flow-rules">
-              <h3 class="flow-rules-title">规则说明</h3>
-              <div class="ix-step"><i>1</i><div><b>后台操作打款</b><span>运营对订单 / 收益批次发起打款。用户侧此时还不能把这笔钱提走。</span></div></div>
-              <div class="ix-step"><i>2</i><div><b>录入已结算收益</b><span>将该笔记入对应用户、对应钱包的已结算收益：收益金额=打款额，状态=扣税中，实际到账暂为 0。</span></div></div>
-              <div class="ix-step"><i>3</i><div><b>调取云账户「钱包余额应税」接口</b><span>用该笔已结算收益调应税接口，替换原提现扣税接口。税率与税额以接口返回为准。</span></div></div>
-              <div class="ix-step ok"><i>4</i><div><b>扣税成功 → 写入实际到账</b><span>实际到账金额 = 收益金额 − 接口返回税额。状态改为已到账。收益明细展示扣税文案。</span></div></div>
-              <div class="ix-step ok"><i>5</i><div><b>同时增加可提现余额</b><span>切点后：统一余额 += 实际到账金额；旧三钱包库存不回写。切点前历史库存保持冻结，只减不增。</span></div></div>
-              <div class="ix-step fail"><i>×</i><div><b>扣税失败</b><span>状态=到账失败，回写失败原因；不写实际到账；可提现不增加。用户可在收益卡片点说明 icon 看原因。</span></div></div>
-            </div>
-            <div class="flow-diagram">
-          <div class="flow-svg-wrap">
-            <svg width="1080" height="560" viewBox="0 0 1080 560" xmlns="http://www.w3.org/2000/svg">
-              <defs>
-                <marker id="flow-arrow-pay" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
-                  <path d="M0,0 L8,4 L0,8 Z" fill="#94a3b8" />
-                </marker>
-              </defs>
-              <g class="flow-edges" marker-end="url(#flow-arrow-pay)">
-                <line x1="540" y1="56" x2="540" y2="80" />
-                <line x1="540" y1="144" x2="540" y2="168" />
-                <line x1="540" y1="232" x2="540" y2="256" />
-                <polyline points="440,296 260,296" />
-                <line x1="540" y1="336" x2="540" y2="360" />
-                <line x1="540" y1="440" x2="540" y2="464" />
-              </g>
-              <g class="flow-nodes" font-family="Inter, PingFang SC, sans-serif">
-                <rect x="340" y="16" width="400" height="40" rx="8" fill="#eff6ff" stroke="#2563eb" />
-                <text x="540" y="41" text-anchor="middle" font-size="12" fill="#18222f">后台对收益批次发起打款</text>
-
-                <rect x="320" y="80" width="440" height="64" rx="8" fill="#f0fdf4" stroke="#16a34a" />
-                <text x="540" y="106" text-anchor="middle" font-size="12" fill="#18222f">写入已结算收益（收益金额）</text>
-                <text x="540" y="126" text-anchor="middle" font-size="10" fill="#64748b">分钱包流水 · 状态=扣税中 · 实际到账=0</text>
-
-                <rect x="320" y="168" width="440" height="64" rx="8" fill="#fff7ed" stroke="#ea580c" />
-                <text x="540" y="194" text-anchor="middle" font-size="12" fill="#18222f">调用云账户 · 钱包余额应税接口</text>
-                <text x="540" y="214" text-anchor="middle" font-size="10" fill="#64748b">替换原提现扣税 · 税额以返回为准</text>
-
-                <polygon points="540,256 640,296 540,336 440,296" fill="#fffbeb" stroke="#d97706" />
-                <text x="540" y="300" text-anchor="middle" font-size="12" fill="#92400e">扣税成功?</text>
-                <text x="328" y="284" font-size="11" fill="#dc2626">否</text>
-                <rect x="40" y="264" width="220" height="64" rx="8" fill="#fef2f2" stroke="#dc2626" />
-                <text x="150" y="290" text-anchor="middle" font-size="12" fill="#991b1b">到账失败</text>
-                <text x="150" y="310" text-anchor="middle" font-size="10" fill="#64748b">不增加可提现 · 记失败原因</text>
-                <text x="552" y="352" font-size="11" fill="#16a34a">是</text>
-
-                <rect x="320" y="360" width="440" height="80" rx="8" fill="#f0fdf4" stroke="#16a34a" />
-                <text x="540" y="390" text-anchor="middle" font-size="12" fill="#18222f">写入实际到账金额</text>
-                <text x="540" y="410" text-anchor="middle" font-size="10" fill="#64748b">实际到账 = 收益金额 − 税额</text>
-                <text x="540" y="426" text-anchor="middle" font-size="10" fill="#64748b">状态=已到账</text>
-
-                <rect x="320" y="464" width="440" height="80" rx="8" fill="#f0fdf4" stroke="#16a34a" />
-                <text x="540" y="494" text-anchor="middle" font-size="12" fill="#18222f">同时：可提现余额增加实际到账</text>
-                <text x="540" y="514" text-anchor="middle" font-size="10" fill="#64748b">切点后只加统一余额，禁止回写旧库存</text>
-                <text x="540" y="530" text-anchor="middle" font-size="10" fill="#64748b">用户收益明细可见动账后收益</text>
-              </g>
-            </svg>
-          </div>
-            </div>
-          </div>
-          <div class="flow-legend">
-            <span><i style="background:#eff6ff;border:1px solid #2563eb"></i>前端 / 操作</span>
-            <span><i style="background:#f0fdf4;border:1px solid #16a34a"></i>后端 / 写入</span>
-            <span><i style="background:#fff7ed;border:1px solid #ea580c"></i>异步 / 任务</span>
-            <span><i style="background:#fffbeb;border:1px solid #d97706"></i>校验 / 分支</span>
-            <span><i style="background:#fef2f2;border:1px solid #dc2626"></i>阻断 / 驳回</span>
-          </div>
-        </div>
-
-        <div id="flow-withdraw" class="flow-pane">
-          <p class="flow-page-intro">用户提现不再扣税。可提现 = 冻结旧库存 + 统一余额（已是税后实际到账）。一个入口一次打款。</p>
-          <div class="flow-split">
-            <div class="flow-rules">
-              <h3 class="flow-rules-title">规则说明</h3>
-              <div class="ix-step"><i>1</i><div><b>打开钱包首页</b><span>展示总收入、已提现、可提现。三张卡不再分别提现。</span></div></div>
-              <div class="ix-step"><i>2</i><div><b>校验到账账户</b><span>未绑定则阻断，引导去绑定。</span></div></div>
-              <div class="ix-step"><i>3</i><div><b>提交提现金额</b><span>金额须 ≤ 可提现。待入账不计入。文案提示合并前三口袋已并入新钱包。</span></div></div>
-              <div class="ix-step"><i>4</i><div><b>拆分扣减</b><span>旧项目 → 旧团队 → 旧活动 → 统一余额。拆分合计=申请额，打款仍一笔。</span></div></div>
-              <div class="ix-step ok"><i>5</i><div><b>写入统一提现记录</b><span>出现在顶部「提现明细」（合并后新数据）。各钱包查看明细里的提现 Tab 只保留合并前旧记录。</span></div></div>
-            </div>
-            <div class="flow-diagram">
-          <div class="flow-svg-wrap">
-            <svg width="1080" height="680" viewBox="0 0 1080 680" xmlns="http://www.w3.org/2000/svg">
-              <defs>
-                <marker id="flow-arrow-wd" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
-                  <path d="M0,0 L8,4 L0,8 Z" fill="#94a3b8" />
-                </marker>
-              </defs>
-              <g class="flow-edges" marker-end="url(#flow-arrow-wd)">
-                <line x1="540" y1="56" x2="540" y2="80" />
-                <line x1="540" y1="144" x2="540" y2="168" />
-                <polyline points="460,208 200,208" />
-                <line x1="540" y1="248" x2="540" y2="272" />
-                <line x1="540" y1="336" x2="540" y2="360" />
-                <polyline points="460,400 200,400" />
-                <line x1="540" y1="440" x2="540" y2="464" />
-                <line x1="540" y1="548" x2="540" y2="572" />
-              </g>
-              <g class="flow-nodes" font-family="Inter, PingFang SC, sans-serif">
-                <rect x="360" y="16" width="360" height="40" rx="8" fill="#eff6ff" stroke="#2563eb" />
-                <text x="540" y="41" text-anchor="middle" font-size="12" fill="#18222f">用户打开钱包页</text>
-
-                <rect x="320" y="80" width="440" height="64" rx="8" fill="#f0fdf4" stroke="#16a34a" />
-                <text x="540" y="106" text-anchor="middle" font-size="12" fill="#18222f">可提现 = 冻结旧库存 + 统一余额</text>
-                <text x="540" y="126" text-anchor="middle" font-size="10" fill="#64748b">待入账不计 · 此余额已是税后</text>
-
-                <polygon points="540,168 620,208 540,248 460,208" fill="#fffbeb" stroke="#d97706" />
-                <text x="540" y="212" text-anchor="middle" font-size="11" fill="#92400e">已绑提现账户?</text>
-                <text x="336" y="200" font-size="11" fill="#dc2626">否</text>
-                <rect x="40" y="188" width="160" height="40" rx="8" fill="#fef2f2" stroke="#dc2626" />
-                <text x="120" y="213" text-anchor="middle" font-size="11" fill="#991b1b">阻断 · 去绑定</text>
-                <text x="552" y="264" font-size="11" fill="#16a34a">是</text>
-
-                <rect x="360" y="272" width="360" height="64" rx="8" fill="#eff6ff" stroke="#2563eb" />
-                <text x="540" y="298" text-anchor="middle" font-size="12" fill="#18222f">首页唯一「提现」入口</text>
-                <text x="540" y="318" text-anchor="middle" font-size="10" fill="#64748b">不再分三个钱包提现</text>
-
-                <polygon points="540,360 620,400 540,440 460,400" fill="#fffbeb" stroke="#d97706" />
-                <text x="540" y="404" text-anchor="middle" font-size="11" fill="#92400e">金额≤可提现?</text>
-                <text x="336" y="392" font-size="11" fill="#dc2626">否</text>
-                <rect x="40" y="380" width="160" height="40" rx="8" fill="#fef2f2" stroke="#dc2626" />
-                <text x="120" y="405" text-anchor="middle" font-size="11" fill="#991b1b">拦截提交</text>
-                <text x="552" y="456" font-size="11" fill="#16a34a">是</text>
-
-                <rect x="320" y="464" width="440" height="84" rx="8" fill="#f0fdf4" stroke="#16a34a" />
-                <text x="540" y="494" text-anchor="middle" font-size="12" fill="#18222f">拆分扣减后一笔打款</text>
-                <text x="540" y="514" text-anchor="middle" font-size="10" fill="#64748b">旧项目 → 旧团队 → 旧活动 → 统一余额</text>
-                <text x="540" y="530" text-anchor="middle" font-size="10" fill="#64748b">提现不再调用应税接口</text>
-
-                <rect x="360" y="572" width="360" height="56" rx="8" fill="#fff7ed" stroke="#ea580c" />
-                <text x="540" y="596" text-anchor="middle" font-size="12" fill="#18222f">写入合并后提现明细</text>
-                <text x="540" y="614" text-anchor="middle" font-size="10" fill="#64748b">旧记录仍在各钱包提现明细</text>
-              </g>
-            </svg>
-          </div>
-            </div>
-          </div>
-          <div class="flow-legend">
-            <span><i style="background:#eff6ff;border:1px solid #2563eb"></i>前端 / 操作</span>
-            <span><i style="background:#f0fdf4;border:1px solid #16a34a"></i>后端 / 写入</span>
-            <span><i style="background:#fff7ed;border:1px solid #ea580c"></i>异步 / 任务</span>
-            <span><i style="background:#fffbeb;border:1px solid #d97706"></i>校验 / 分支</span>
-            <span><i style="background:#fef2f2;border:1px solid #dc2626"></i>阻断 / 驳回</span>
-          </div>
+        <div class="flow-legend">
+          <span><i style="background:#eff6ff;border:1px solid #2563eb"></i>前端 / 操作</span>
+          <span><i style="background:#f0fdf4;border:1px solid #16a34a"></i>后端 / 写入</span>
+          <span><i style="background:#fff7ed;border:1px solid #ea580c"></i>异步 / 任务</span>
+          <span><i style="background:#fffbeb;border:1px solid #d97706"></i>校验 / 分支</span>
+          <span><i style="background:#fef2f2;border:1px solid #dc2626"></i>阻断 / 驳回</span>
+          <span><i style="background:#f1f5f9;border:1px solid #94a3b8"></i>跳过 / 中性</span>
+          <span>虚线 = 回主链闭环</span>
         </div>
       </div>
     </div>
+
   </main>
 
   <div class="drawer-overlay" id="ruleOverlay" onclick="setRuleDrawer(false)"></div>
   <aside class="drawer" id="ruleDrawer" role="dialog" aria-labelledby="ruleTitle">
     <div class="drawer-header">
-      <h2 id="ruleTitle">FR-016 · v1 需求规则</h2>
+      <h2 id="ruleTitle">FR-016 · v3 需求规则</h2>
       <button class="drawer-close" type="button" onclick="setRuleDrawer(false)">×</button>
+    </div>
+    <div class="rule-tab-bar">
+      <button type="button" class="active" data-rule="rule-fe">前端需求</button>
+      <button type="button" data-rule="rule-admin">后台需求</button>
     </div>
     <div class="drawer-body">
       <div id="rule-fe" class="rule-panel active">
         <div class="rule-section">
           <h3><span>1</span>业务目标</h3>
           <div class="rule-content">
-            <p>一个提现入口。收益分钱包入账不变；切点后余额只写统一字段，旧三余额冻结。可提现 = 冻结旧库存 + 统一余额。</p>
+            <p>一个提现入口。后台打款先入伪钱包「待划转」（全额、不调应税）。用户划转所选实名账户时才调云账户钱包余额应税（对公跳过）。税后金额进入该账户可提现，再走合并提现。</p>
           </div>
         </div>
         <div class="rule-section">
-          <h3><span>2</span>页面</h3>
+          <h3><span>2</span>划转应税同意弹窗</h3>
+          <div class="rule-content">
+            <p>用户在划转页点「确认划转」时弹出。未勾选同意则不能真实划转；同意后后续不再弹出。通知全文：</p>
+            <p>依据国家税务总局最新要求，自2026年10月1日起，非对公合作用户个人所得税的纳税义务发生时点将调整为到达用户真实可提现钱包账户且用户可自主提现时点(即余额入账时点)。平台将在订单收益余额入账后，用户进行余额划转时为用户计算并扣除税款，平台或您的财税服务商将于金额入账次月为您代办相关税金申报。</p>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>3</span>页面</h3>
           <div class="rule-content">
             <ul>
-              <li><strong>钱包首页</strong>：今日入账贴在总收入旁；三格为已提现、可提现、提现。三张卡去掉操作按钮，灰色字段为累计已结算 / 累计待入账。</li>
-              <li><strong>提现页</strong>：可提现为新钱包统一余额；文案「合并前可提现余额 xx.xx 元(项目:xx;团队:xx,活动:xx)，已全部合并进新钱包的可提现余额里」。待入账不计。</li>
-              <li><strong>提现明细</strong>：顶栏右侧进入；展示累计提现 / 实际到账（无预扣税额），记录含实际到账、提现ID、申请时间、打款时间；「提现记录」旁提示「以下数据为钱包合并提现后的新数据，旧数据仍在各个钱包的提现明细页面查看」。</li>
-              <li><strong>查看明细</strong>：收益明细顶部统计累计已结算 / 实际到账 / 预扣税额；卡片标题为项目名称 + 收益金额，其下为实际到账金额与状态（扣税中 / 已到账 / 到账失败，失败可点 icon 看原因）；描述保留并追加扣税文案；底部为时间戳与动账后收益。提现明细同现网记录页，标题旁提示「以下数据为合并提现前的钱包提现记录」。</li>
+              <li><strong>钱包首页</strong>：今日入账贴在总收入旁；三格为可划转余额、可提现总额、提现账户。三张卡去掉操作按钮，灰色字段为可划转余额 / 已确认待入款。首次进入弹出改版公告。</li>
+              <li><strong>划转页</strong>：顶部下拉选账户（个人/对公标识，不展示该户可提现）；各钱包展示可划转余额并自定义金额。确认划转按钮下方为国税说明全文。</li>
+              <li><strong>提现页</strong>：先选认证账户（展示该户可提现 + 个人/对公），再选到账方式。金额 ≤ 该账户可提现。待入款、可划转余额不计。</li>
+              <li><strong>明细</strong>：含划转明细、提现明细两个 Tab。划转明细页头为累计已划转 / 实际到账 / 预扣税额；记录标题为划转至「昵称+脱敏证件号」，含分钱包划转金额、税额、状态（扣税中/划转成功/划转失败）、时间、动账后收益。提现明细去掉实际到账，增加到账用户（名称+脱敏证件号）。</li>
+              <li><strong>查看明细</strong>：收益明细无页头统计、无实际到账、无扣税描述，状态仅「已结算」。</li>
             </ul>
           </div>
         </div>
         <div class="rule-section">
-          <h3><span>3</span>交互</h3>
+          <h3><span>4</span>交互</h3>
           <div class="rule-content">
             <ul>
-              <li>未选到账方式：点确定 Toast「请选择到账方式」，停留在提现页。</li>
-              <li>金额为空或超合计：拦截，不提交。</li>
-              <li>待入款不计入可提现。</li>
-              <li>提现页提示：合并前可提现余额已全部并入新钱包可提现。</li>
-              <li>提现不再扣税。</li>
-            </ul>
-          </div>
-        </div>
-        <div class="rule-section">
-          <h3><span>4</span>收益打款入账</h3>
-          <div class="rule-content">
-            <ul>
-              <li>后台操作打款 → 将用户收益录入已结算收益（状态扣税中）。</li>
-              <li>调取云账户「钱包余额应税」接口；税额以返回为准。</li>
-              <li>扣税成功：写入实际到账金额，同时可提现（统一余额）增加实际到账；禁止回写旧库存。</li>
-              <li>扣税失败：到账失败并记原因，可提现不增加。</li>
+              <li>首次打开钱包首页弹出改版公告（插画+文字）：写清新版本优势（三个钱包一次提现、可部分划转、提现不再扣税），以及必须知道的两点——先划转再合并提现；国税要求提现前扣税、平台在划转时扣。点「我知道了」后本机不再弹出。</li>
+              <li>点确认划转未同意应税方案：弹出同意弹窗，不发生划转。</li>
+              <li>勾选同意并确认后完成本次划转，后续确认划转不再弹出。</li>
+              <li>未选到账方式：点确定 Toast「请选择到账方式」。</li>
+              <li>金额为空或超合计：拦截，不提交。可划转余额、待入款不计入可提现。</li>
+              <li>提现按所选认证账户可提现余额打款，不再扣税。</li>
             </ul>
           </div>
         </div>
         <div class="rule-section">
           <h3><span>5</span>业务流程</h3>
-          <div class="rule-content"><p>见页内「业务流程」Tab：流程1 收益打款入账、流程2 用户合并提现。</p></div>
+          <div class="rule-content"><p>见页内「业务流程」Tab 单张闭环总图：打款入待划转 → 划转应税 → 合并提现 → 回首页；仍有余额再划转/再提现，否则可再打款。</p></div>
+        </div>
+      </div>
+      <div id="rule-admin" class="rule-panel">
+        <div class="rule-section">
+          <h3><span>1</span>认证唯一性</h3>
+          <div class="rule-content">
+            <ul>
+              <li>云账户新接口：同一用户只能存在一种认证方式（个人或对公；个人仅一个身份证号）。</li>
+              <li>用户确认后写入唯一认证快照，后续入账与提现只认该快照，禁止再使用未选中的身份/对公资料。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>2</span>打款入待划转与划转应税</h3>
+          <div class="rule-content">
+            <ul>
+              <li>后台操作打款 → 录入已结算收益（分钱包流水），增加伪钱包待划转全额；入账时不调应税，可提现不变。</li>
+              <li>用户划转时：<strong>对公</strong>跳过钱包余额应税，全额进所选账户可提现；<strong>个人</strong>调应税，税额以返回为准，税后进可提现。</li>
+              <li>应税失败（仅个人）：划转失败，待划转不扣，可提现不加。</li>
+              <li>切点后不回写旧库存。提现按账户可提现打款，不再扣税。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>3</span>业务流程</h3>
+          <div class="rule-content"><p>见页内「业务流程」Tab。</p></div>
         </div>
       </div>
     </div>
@@ -515,17 +653,31 @@
       var id = document.querySelector('.page-view.active')?.id;
       return { 'view-fe': 'fe', 'view-flow': 'flow' }[id] || 'fe';
     }
-    function currentFlowKey() {
-      return document.querySelector('.flow-tab-bar button.active')?.dataset.flow || 'flow-payout';
-    }
     function syncPageUrl() {
       var params = new URLSearchParams();
       params.set('tab', currentTabKey());
-      if (currentTabKey() === 'flow') params.set('flow', currentFlowKey());
       history.replaceState(null, '', '?' + params.toString());
     }
-    function loadMockupFrame() {
-      document.getElementById('mockupFrame').src = 'wallet-merge-withdraw-demo.html?embed=1&v=16&screen=' + getActiveScreen();
+    function scrollToTile(screen) {
+      var tile = document.getElementById('tile-' + screen);
+      var scroller = document.getElementById('feBoardScroll');
+      if (!tile || !scroller) return;
+      var top = tile.getBoundingClientRect().top - scroller.getBoundingClientRect().top + scroller.scrollTop - 8;
+      scroller.scrollTop = Math.max(0, top);
+    }
+    function scaleWalletPhones() {
+      document.querySelectorAll('.board-phone').forEach(function (phone) {
+        var iframe = phone.querySelector('iframe');
+        if (!iframe) return;
+        var w = phone.clientWidth;
+        if (!w) return;
+        iframe.style.transform = 'scale(' + (w / 375) + ')';
+      });
+    }
+    function broadcastWalletTool(act) {
+      document.querySelectorAll('iframe.wallet-phone').forEach(function (frame) {
+        if (frame.contentWindow) frame.contentWindow.postMessage({ type: 'walletTool', act: act }, '*');
+      });
     }
     function setPreviewButtons(on) {
       document.querySelectorAll('[data-preview]').forEach(function (b) {
@@ -556,9 +708,12 @@
       setPreviewButtons(true);
       var req = layout.requestFullscreen || layout.webkitRequestFullscreen;
       if (req) {
-        req.call(layout).catch(function () { document.body.classList.add('preview-fs-fallback'); });
+        req.call(layout).catch(function () { document.body.classList.add('preview-fs-fallback'); }).finally(function () {
+          requestAnimationFrame(scaleWalletPhones);
+        });
       } else {
         document.body.classList.add('preview-fs-fallback');
+        requestAnimationFrame(scaleWalletPhones);
       }
     }
     var ruleDrawer = document.getElementById('ruleDrawer');
@@ -569,22 +724,26 @@
       toggleRuleBtn.classList.toggle('active', open);
     }
     toggleRuleBtn.onclick = function () { setRuleDrawer(!ruleDrawer.classList.contains('open')); };
+    document.querySelectorAll('.rule-tab-bar button').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('.rule-tab-bar button').forEach(function (b) { b.classList.remove('active'); });
+        document.querySelectorAll('.rule-panel').forEach(function (p) { p.classList.remove('active'); });
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.rule).classList.add('active');
+      });
+    });
     document.querySelectorAll('.scene-btn').forEach(function (btn) {
       btn.addEventListener('click', function () {
         document.querySelectorAll('.scene-btn').forEach(function (b) { b.classList.remove('active'); });
         btn.classList.add('active');
         var hint = document.getElementById('feSceneHint');
         if (hint) hint.textContent = btn.getAttribute('data-desc') || '';
-        loadMockupFrame();
-        syncPageUrl();
+        scrollToTile(btn.dataset.screen);
       });
     });
     document.querySelectorAll('[data-wallet-tool]').forEach(function (btn) {
       btn.addEventListener('click', function () {
-        var frame = document.getElementById('mockupFrame');
-        if (frame && frame.contentWindow) {
-          frame.contentWindow.postMessage({ type: 'walletTool', act: btn.getAttribute('data-wallet-tool') }, '*');
-        }
+        broadcastWalletTool(btn.getAttribute('data-wallet-tool'));
       });
     });
     document.querySelectorAll('[data-preview]').forEach(function (btn) {
@@ -592,6 +751,7 @@
     });
     document.addEventListener('fullscreenchange', function () {
       if (!document.fullscreenElement && !document.webkitFullscreenElement) exitPreview();
+      requestAnimationFrame(scaleWalletPhones);
     });
     document.querySelectorAll('.page-tab-bar button').forEach(function (btn) {
       btn.addEventListener('click', function () {
@@ -599,20 +759,10 @@
         document.querySelectorAll('.page-view').forEach(function (v) { v.classList.remove('active'); });
         btn.classList.add('active');
         document.getElementById(btn.dataset.page).classList.add('active');
-        if (btn.dataset.page === 'view-fe') loadMockupFrame();
         syncPageUrl();
+        requestAnimationFrame(scaleWalletPhones);
       });
     });
-    document.querySelectorAll('.flow-tab-bar button').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        document.querySelectorAll('.flow-tab-bar button').forEach(function (b) { b.classList.remove('active'); });
-        document.querySelectorAll('.flow-pane').forEach(function (p) { p.classList.remove('active'); });
-        btn.classList.add('active');
-        document.getElementById(btn.dataset.flow).classList.add('active');
-        syncPageUrl();
-      });
-    });
-    loadMockupFrame();
     (function boot() {
       var params = new URLSearchParams(location.search);
       var tab = params.get('tab');
@@ -623,11 +773,9 @@
           if (b.dataset.page === map[tab]) b.click();
         });
       }
-      var flow = params.get('flow');
-      if (flow) {
-        var fbtn = document.querySelector('.flow-tab-bar button[data-flow="' + flow + '"]');
-        if (fbtn) fbtn.click();
-      }
+      window.addEventListener('resize', scaleWalletPhones);
+      scaleWalletPhones();
+      setTimeout(scaleWalletPhones, 200);
     })();
   </script>
 </body>
