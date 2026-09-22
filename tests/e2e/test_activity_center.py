@@ -249,7 +249,7 @@ def test_detail_cases_named_and_claim_cta(page, demo_server):
     expect(page.locator("#detailBody")).to_contain_text("直播回放")
     case_a = page.locator(".case-block").nth(0).bounding_box()
     case_b = page.locator(".case-block").nth(1).bounding_box()
-    assert case_a and case_b and abs(case_a["y"] - case_b["y"]) < 6
+    assert case_a and case_b and case_b["y"] > case_a["y"] + case_a["height"] - 2
     expect(page.locator("#detailBody video")).to_have_attribute("src", "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4")
     expect(page.locator("#detailCta")).to_be_hidden()
     page.locator("#detailBody .case-media img").first.click()

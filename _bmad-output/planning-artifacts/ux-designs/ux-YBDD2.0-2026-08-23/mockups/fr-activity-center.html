@@ -509,7 +509,7 @@
     #previewPane { padding: 10px 12px 14px; min-height: 80px; }
     #previewPane .intro-html, #previewPane .phone-html { font-size: 12px; line-height: 1.65; }
     #previewPane .intro-html img, #previewPane .case-media img, #previewPane video { max-width: 100%; border-radius: 8px; display: block; }
-    #previewPane .case-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    #previewPane .case-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
     #previewPane .case-block { margin-bottom: 0; }
     #previewPane .case-name { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
     .board-limit-row { display: flex; align-items: center; gap: 8px; }
@@ -773,7 +773,7 @@
                   <li>页头固定「活动详情」，不放活动标题。信息卡片与 Tab/正文卡片各自白底圆角。</li>
                   <li>已下发封面才展示封面；浏览人数始终「x人浏览」；参加人数未下发则不展示。</li>
                   <li>隐藏活动不进显示池。深链打开隐藏 <code>activityId</code> 停在列表，不当详情。</li>
-                  <li>案例图片点击放大、长按保存（Demo toast）。案例视频用 Mock 地址可播。案例卡片两列平铺。</li>
+                  <li>案例图片点击放大、长按保存（Demo toast）。案例视频用 Mock 地址可播。案例一行一条，不并排。</li>
                   <li>登录能力已存在，本 FR 不单开未登录分支。</li>
                 </ul>
               </div>
@@ -2270,7 +2270,7 @@
       const detailRules = document.getElementById('sceneRulesDetail');
       if (listRules) listRules.hidden = scene !== 'list-all';
       if (detailRules) detailRules.hidden = scene !== 'detail-camp';
-      if (frame) frame.src = (SCENE_SRC[scene] || SCENE_SRC['list-all']) + '&v=fe-scene9';
+      if (frame) frame.src = (SCENE_SRC[scene] || SCENE_SRC['list-all']) + '&v=case-1col';
     }
 
     function setPreviewButtons(on) {
