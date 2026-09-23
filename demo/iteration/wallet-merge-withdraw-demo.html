@@ -175,6 +175,17 @@
     .sec-title { font-size: 16px; font-weight: 800; margin: 4px 4px 12px; }
     .sec-head { margin: 4px 4px 12px; }
     .sec-head .sec-title { margin: 0 0 4px; }
+    .rec-head {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      margin: 4px 4px 12px;
+    }
+    .rec-head .sec-title { margin: 0; flex-shrink: 0; }
+    .wd-kind {
+      height: 32px; border: 1px solid #ececec; border-radius: 8px; padding: 0 8px;
+      font-size: 13px; font-weight: 700; background: #fff; color: #1c2430;
+    }
+    .rec-sum-line { margin: -6px 4px 12px; font-size: 12px; color: #8b93a0; }
+    .rec-sum-line b { display: block; margin-top: 2px; font-size: 20px; font-weight: 800; color: #111; }
     .sec-hint { font-size: 12px; color: #9aa3af; font-weight: 400; line-height: 1.45; }
     .rec { background: #fff; border-radius: 16px; padding: 16px 14px; margin-bottom: 10px; }
     .rec-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
@@ -277,13 +288,46 @@
     .id-opt .meta { flex: 1; min-width: 0; }
     .id-opt b { display: block; font-size: 14px; }
     .id-opt span { font-size: 12px; color: #8b93a0; }
-    .id-opt .amt { font-size: 15px; font-weight: 800; color: #111; white-space: nowrap; }
+    .id-opt .amt { font-size: 13px; font-weight: 800; color: #111; white-space: nowrap; }
+    .wd-total {
+      background: #fff; border-radius: 16px; padding: 16px 16px 14px; margin-top: 4px;
+    }
+    .wd-total .k { font-size: 13px; color: #6b7280; }
+    .wd-total .v { font-size: 32px; font-weight: 800; letter-spacing: -0.5px; margin-top: 4px; color: #111; }
     .kind-tag {
       display: inline-block; margin-left: 6px; padding: 1px 6px; border-radius: 4px;
       font-size: 10px; font-style: normal; font-weight: 700; vertical-align: 1px; line-height: 1.4;
     }
     .kind-tag.kind-personal { background: #eff6ff; color: #2563eb; }
     .kind-tag.kind-corp { background: #ecfdf5; color: #047857; }
+    .acct-drop { position: relative; }
+    .acct-drop.open { z-index: 4; }
+    .acct-face {
+      width: 100%; min-height: 52px; border: 1px solid #ececec; border-radius: 12px;
+      background: #fff; padding: 8px 12px; text-align: left; cursor: pointer;
+      display: grid; grid-template-columns: 1fr auto; align-items: center; column-gap: 8px;
+    }
+    .acct-drop.open .acct-face { border-color: #ff5a2d; }
+    .drop-main { display: flex; align-items: center; gap: 6px; min-width: 0; }
+    .drop-main b { font-size: 14px; font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+    .drop-main .kind-tag { margin-left: 0; flex-shrink: 0; }
+    .drop-no { display: block; margin-top: 2px; font-size: 12px; color: #8b93a0; font-weight: 500; }
+    .drop-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .drop-bal { font-size: 13px; font-weight: 800; color: #111; white-space: nowrap; flex-shrink: 0; }
+    .drop-ph { color: #9aa3af; font-size: 15px; font-weight: 700; }
+    .acct-face > :first-child { grid-column: 1; grid-row: 1; min-width: 0; }
+    .drop-chev { color: #9aa3af; font-size: 12px; grid-column: 2; grid-row: 1; justify-self: end; align-self: center; }
+    .acct-menu {
+      position: absolute; left: 0; right: 0; top: calc(100% + 6px);
+      background: #fff; border: 1px solid #ececec; border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(16, 24, 40, .12); overflow: hidden;
+    }
+    .acct-opt {
+      display: block; width: 100%; border: none; border-bottom: 1px solid #f3f4f6;
+      background: #fff; padding: 10px 12px; text-align: left; cursor: pointer;
+    }
+    .acct-opt:last-child { border-bottom: none; }
+    .acct-opt.on { background: #fff7f3; }
     .notice-slot {
       margin-top: 14px; padding: 12px 4px 8px;
       color: #8b93a0; font-size: 12px; line-height: 1.7;
@@ -400,6 +444,8 @@
         pendingTransfer: { project: 80.60, team: 12.00, activity: 4.00 },
         transferWallet: 'project',
         tfAmt: { project: 0, team: 0, activity: 0 },
+        tfAcctOpen: false,
+        wdAcctOpen: false,
         recordsTab: 'transfer',
         noticeSeen: false,
         transfers: [
@@ -426,8 +472,12 @@
         pending: { project: 8.00, team: 0, activity: 0 },
         accountSelected: false,
         incomeWallet: 'project',
+        detailScope: 'wallet',
         detailTab: 'income',
+        wdKindFilter: 'all',
         records: [
+          { title: '提现到建设银行**** 8135', amt: 80.09, tax: 0, id: '202609201546008813501', apply: '2026.09.20 15:46:00', paid: '2026.09.20 16:10:00', split: { project: 0, team: 0, activity: 0, unified: 80.09 }, userName: '张三', userNo: '3301**********1234', cert: 'id1', payType: 'personal', status: 'paid' },
+          { title: '提现到对公账户', amt: 15.00, tax: 0, id: '202609181030002X', apply: '2026.09.18 10:30:00', paid: '2026.09.18 11:05:00', split: { project: 0, team: 0, activity: 0, unified: 15.00 }, userName: '杭州右豹文化传媒有限公司', userNo: '913301**********2X', cert: 'id3', payType: 'corp', status: 'paid' },
           { title: '提现到支付宝**** **** **** 2707', amt: 2.27, tax: 0, id: '202505211212346819547560188', apply: '2025.05.21 12:12:34', paid: '2025.05.22 12:36:36', split: { project: 2.27, team: 0, activity: 0, unified: 0 }, userName: '张三', userNo: '3301**********1234' },
           { title: '提现到支付宝**** **** **** 2707', amt: 193.72, tax: 0, id: '2025031514070005085536560188', apply: '2025.03.15 14:07:00', paid: '2025.03.16 14:31:02', split: { project: 193.72, team: 0, activity: 0, unified: 0 }, userName: '张三', userNo: '3301**********1234' },
           { title: '提现到**** **** **** 2707', amt: 0.10, tax: 0, id: '202501010022115142065560188', apply: '2025.01.01 00:22:11', paid: '2025.01.02 00:46:13', split: { project: 0.10, team: 0, activity: 0, unified: 0 }, userName: '张三', userNo: '1101**********8899' }
@@ -630,10 +680,37 @@
     function withdrawnSum() {
       return S.records.reduce(function (a, r) { return r2(a + r.amt); }, 0);
     }
+    function isMergedWithdraw(r) {
+      return !!(r && r.split && r2(r.split.unified || 0) > 0);
+    }
+    function mergedRecords() {
+      return S.records.filter(isMergedWithdraw);
+    }
     function recordsForWallet(id) {
       return S.records.filter(function (r) {
-        return r.split && r2(r.split[id] || 0) > 0;
+        return r.split && r2(r.split[id] || 0) > 0 && !isMergedWithdraw(r);
       });
+    }
+    function recordPayKind(r) {
+      if (r && (r.payType === 'corp' || r.payType === 'personal')) return r.payType;
+      var c = certByKey(r && r.cert);
+      return c && c.type === 'corp' ? 'corp' : 'personal';
+    }
+    function filterWdKind(rows) {
+      var kind = S.wdKindFilter || 'all';
+      if (kind === 'all') return rows;
+      return rows.filter(function (r) { return recordPayKind(r) === kind; });
+    }
+    function summaryWdHead(rows) {
+      var kind = S.wdKindFilter || 'all';
+      function opt(value, label) {
+        return '<option value="' + value + '"' + (kind === value ? ' selected' : '') + '>' + label + '</option>';
+      }
+      return '<div class="rec-head"><div class="sec-title">提现记录</div>' +
+        '<select class="wd-kind" data-act="wd-kind" aria-label="筛选提现方式">' +
+        opt('all', '全部') + opt('personal', '个人') + opt('corp', '对公') +
+        '</select></div>' +
+        '<div class="rec-sum-line">累计成功提现金额<b>' + money(successWdSum(rows)) + '</b></div>';
     }
     function splitAmount(amt) {
       var left = r2(amt);
@@ -662,7 +739,7 @@
     function renderHome() {
       var cards = KEYS.map(function (w) {
         return '<article class="w-card"><div class="top"><h2>' + w.name + '</h2>' +
-          '<button class="link-muted" type="button" data-act="income" data-wallet="' + w.id + '">查看明细 ›</button></div>' +
+          '<button class="link-muted" type="button" data-act="income" data-scope="wallet" data-wallet="' + w.id + '">查看明细 ›</button></div>' +
           '<div class="w-total">总收入(元)<br><b>' + money(S.income[w.id]) + '</b></div>' +
           '<div class="w-foot"><span>可划转余额 · ' + money(S.pendingTransfer[w.id]) + '</span><span>已确认待入款 · ' + money(S.pending[w.id]) + '</span></div></article>';
       }).join('');
@@ -670,7 +747,7 @@
         '<div class="home-nav"><button class="side" type="button" data-act="noop">‹</button>' +
         '<button class="rule-link" type="button" data-act="noop">规则说明</button></div>' +
         '<div class="hero-card"><div class="hero-top"><div class="hero-k">钱包总收入(元) <span class="shield">安全保障中</span></div>' +
-        '<button class="hero-detail" type="button" data-act="income" data-wallet="project">查看明细 ›</button></div>' +
+        '<button class="hero-detail" type="button" data-act="income" data-scope="summary">查看明细 ›</button></div>' +
         '<div class="hero-v-row"><div class="hero-v">' + money(incomeSum()) + '</div>' +
         '<span class="today-badge">今日+' + money(todaySum()) + '</span></div>' +
         '<div class="hero-3"><div><div class="k">可划转余额</div><div class="v">' + money(waitSum()) +
@@ -688,22 +765,32 @@
       var k = certKind(id);
       return '<em class="kind-tag kind-' + (k === '对公' ? 'corp' : 'personal') + '">' + k + '</em>';
     }
-    function certListHtml(showAmt) {
-      return '<div class="id-list">' + S.kyc.ids.map(function (id) {
+    function certFaceHtml(id, showBal) {
+      if (!id) return '<span class="drop-ph">请选择实名账户</span><span class="drop-chev">▾</span>';
+      var bal = showBal ? '<span class="drop-bal">余额:' + money(id.withdrawable || 0) + '</span>' : '';
+      return '<span><span class="drop-top"><span class="drop-main"><b>' + id.name + '</b>' + kindTag(id) + '</span>' + bal + '</span>' +
+        '<span class="drop-no">' + id.no + '</span></span><span class="drop-chev">▾</span>';
+    }
+    function certMenuHtml(open, pickAct, showBal) {
+      if (!open) return '';
+      return '<div class="acct-menu">' + S.kyc.ids.map(function (id) {
         var on = S.kyc.pick === id.key;
-        return '<button type="button" class="id-opt' + (on ? ' active' : '') + '" data-act="pick-cert" data-pick="' + id.key + '">' +
-          '<div class="meta"><b>' + id.name + kindTag(id) + '</b><span>' + id.no + '</span></div>' +
-          (showAmt ? '<div class="amt">' + money(id.withdrawable || 0) + '</div>' : '') +
-          '</button>';
+        var bal = showBal ? '<span class="drop-bal">余额:' + money(id.withdrawable || 0) + '</span>' : '';
+        return '<button type="button" class="acct-opt' + (on ? ' on' : '') + '" data-act="' + pickAct + '" data-pick="' + id.key + '">' +
+          '<span class="drop-top"><span class="drop-main"><b>' + id.name + '</b>' + kindTag(id) + '</span>' + bal + '</span>' +
+          '<span class="drop-no">' + id.no + '</span></button>';
       }).join('') + '</div>';
     }
+    function acctDropHtml(open, toggleAct, pickAct, showBal) {
+      return '<div class="acct-drop' + (open ? ' open' : '') + '">' +
+        '<button type="button" class="acct-face" data-act="' + toggleAct + '">' + certFaceHtml(selectedCert(), showBal) + '</button>' +
+        certMenuHtml(open, pickAct, showBal) + '</div>';
+    }
+    function wdCertSelectHtml() {
+      return acctDropHtml(!!S.wdAcctOpen, 'toggle-wd-acct', 'pick-wd-acct', true);
+    }
     function certSelectHtml() {
-      return '<select class="tf-select" data-act="pick-cert-select">' +
-        '<option value="">请选择划转账户</option>' +
-        S.kyc.ids.map(function (id) {
-          return '<option value="' + id.key + '"' + (S.kyc.pick === id.key ? ' selected' : '') + '>' +
-            '【' + certKind(id) + '】' + id.name + ' · ' + id.no + '</option>';
-        }).join('') + '</select>';
+      return acctDropHtml(!!S.tfAcctOpen, 'toggle-tf-acct', 'pick-tf-acct', false);
     }
     function shownTf(id) {
       var n = S.tfAmt[id];
@@ -719,7 +806,7 @@
       var total = KEYS.reduce(function (a, w) { return r2(a + (S.tfAmt[w.id] || 0)); }, 0);
       return navBar('划转', 'home', true) +
         '<div class="scroll wd-page">' +
-        '<div class="sec-lab" style="margin-top:4px">划转账户</div>' +
+        '<div class="sec-lab" style="margin-top:4px">选择实名账户</div>' +
         certSelectHtml() +
         '<div class="amt-card" style="margin-top:12px"><div class="amt-lab">各钱包划转金额</div>' +
         '<div class="tf-pockets">' + rows + '</div>' +
@@ -733,8 +820,9 @@
       var c = selectedCert();
       return navBar('提现', 'home', true) +
         '<div class="scroll wd-page">' +
-        '<div class="sec-lab">选择认证账户</div>' +
-        certListHtml(true) +
+        '<div class="wd-total"><div class="k">可提现总额(元)</div><div class="v">' + money(allAvail()) + '</div></div>' +
+        '<div class="sec-lab">选择实名账户</div>' +
+        wdCertSelectHtml() +
         '<button type="button" class="acct-row" data-act="pick-ccb"><div class="acct-k">到账方式</div>' +
         '<div class="acct-v"><span>' + acctLabel() + '</span><span class="chev">›</span></div></button>' +
         '<div class="amt-card">' +
@@ -743,7 +831,7 @@
         '<input id="amt" type="text" inputmode="decimal" value="' + shown + '" data-act="amt-keep" />' +
         '<button class="all-btn" type="button" data-act="all-amt">全部</button></div>' +
         '<div class="avail-line">该账户可提现 ' + (c ? money(c.withdrawable) : '--') + '</div>' +
-        '<div class="split-mini">先选认证账户（列表含可提现金额），再选到账方式。提现不再扣税。</div></div>' +
+        '<div class="split-mini">先下拉选择实名账户（个人/对公用标签，选项含余额），再选到账方式。提现不再扣税。</div></div>' +
         '<button class="ok-btn" type="button" data-act="submit-wd">确定</button></div>';
     }
     var STAT_TIPS = {
@@ -753,7 +841,10 @@
       'tf-tax': { title: '预扣税额', text: '划转时按国税要求扣除的税额合计。扣税中、失败单不计入实际到账。' },
       'inc-settled': { title: '累计已结算', text: '本钱包已结算入账的收益合计（税前）。' },
       'inc-net': { title: '实际到账', text: '扣税后实际进入可提现余额的金额。' },
-      'inc-tax': { title: '预扣税额', text: '根据国税总局要求，收益打款到账进行扣税。此处为累计已扣税额。' }
+      'inc-tax': { title: '预扣税额', text: '根据国税总局要求，收益打款到账进行扣税。此处为累计已扣税额。' },
+      'wd-wallet-total': { title: '累计提现', text: '本钱包已发起的提现金额合计，含历史分钱包提现。' },
+      'wd-wallet-net': { title: '实际到账', text: '本钱包提现扣税后实际打款到账的金额合计。' },
+      'wd-wallet-tax': { title: '预扣税额', text: '本钱包提现时已扣除的税额合计。合并提现后新单不再扣税，税额记在划转。' }
     };
     function tipIcon(key) {
       return '<button type="button" class="i-tip" data-act="stat-tip" data-tip="' + key + '">i</button>';
@@ -839,10 +930,10 @@
         '<button type="button" class="' + (tab === 'withdraw' ? 'active' : '') + '" data-act="records-tab" data-tab="withdraw">提现明细</button></div>';
       var body;
       if (tab === 'withdraw') {
-        body = recStats(S.records, 'wd-only') +
-          '<div class="sec-head"><div class="sec-title">提现记录</div>' +
-          '<p class="sec-hint">合并后新数据。旧记录仍在各钱包「查看明细」的提现明细中。</p></div>' +
-          (S.records.length ? S.records.map(recItem).join('') : '<article class="rec" style="color:#9aa3af;text-align:center">暂无提现记录</article>');
+        var merged = filterWdKind(mergedRecords());
+        body = summaryWdHead(merged) +
+          '<p class="sec-hint" style="margin:-4px 4px 12px">合并后新数据。旧记录仍在各钱包「查看明细」的提现明细中。</p>' +
+          wdRecordBlock(merged);
       } else {
         body = tfStats(S.transfers) +
           '<div class="sec-head"><div class="sec-title">划转记录</div>' +
@@ -860,7 +951,30 @@
         '<div class="inc-body">' + item.desc + '</div>' +
         '<div class="inc-foot"><span>' + item.time + '</span><span>动账后收益：' + money(item.after || 0) + '</span></div></article>';
     }
+    function wdNet(r) {
+      if (r && r.net != null && r.net !== '') return r2(r.net);
+      return r2((r && r.amt || 0) - (r && r.tax || 0));
+    }
+    function successWdSum(rows) {
+      return rows.reduce(function (a, r) {
+        if (r.status === 'failed' || r.status === 'taxing') return a;
+        return r2(a + (r.amt || 0));
+      }, 0);
+    }
+    function walletWdStats(rows) {
+      var sum = rows.reduce(function (a, r) { return r2(a + (r.amt || 0)); }, 0);
+      var net = rows.reduce(function (a, r) { return r2(a + wdNet(r)); }, 0);
+      var tax = rows.reduce(function (a, r) { return r2(a + (r.tax || 0)); }, 0);
+      return '<div class="stat-3">' +
+        '<div><div class="k">累计提现 ' + tipIcon('wd-wallet-total') + '</div><div class="v">' + money(sum) + '</div></div>' +
+        '<div><div class="k">实际到账 ' + tipIcon('wd-wallet-net') + '</div><div class="v">' + money(net) + '</div></div>' +
+        '<div><div class="k">预扣税额 ' + tipIcon('wd-wallet-tax') + '</div><div class="v">' + money(tax) + '</div></div></div>';
+    }
+    function wdRecordBlock(rows) {
+      return (rows.length ? rows.map(recItem).join('') : '<article class="rec" style="color:#9aa3af;text-align:center">暂无提现记录</article>');
+    }
     function renderIncome() {
+      var summary = S.detailScope === 'summary';
       var w = KEYS.filter(function (x) { return x.id === S.incomeWallet; })[0] || KEYS[0];
       var tab = S.detailTab || 'income';
       var tabs = '<div class="detail-tabs">' +
@@ -868,12 +982,17 @@
         '<button type="button" class="' + (tab === 'withdraw' ? 'active' : '') + '" data-act="detail-tab" data-tab="withdraw">提现明细</button></div>';
       var body;
       if (tab === 'withdraw') {
-        body = '<div class="page-pad" style="padding-top:0">' +
-          recList(recordsForWallet(w.id), '以下数据为合并提现前的钱包提现记录', false) + '</div>';
+        var wdRows = summary ? filterWdKind(mergedRecords()) : recordsForWallet(w.id);
+        var head = summary
+          ? summaryWdHead(wdRows)
+          : walletWdStats(wdRows) +
+            '<div class="sec-head"><div class="sec-title">提现记录</div>' +
+            '<p class="sec-hint">以下数据为该钱包的提现记录。</p></div>';
+        body = '<div class="page-pad" style="padding-top:0">' + head + wdRecordBlock(wdRows) + '</div>';
       } else {
-        var rows = S.incomes.filter(function (x) { return x.wallet === w.id; });
+        var rows = summary ? S.incomes.slice() : S.incomes.filter(function (x) { return x.wallet === w.id; });
         body = '<div class="page-pad" style="padding-top:0">' +
-          rows.map(incomeCard).join('') + '</div>';
+          (rows.length ? rows.map(incomeCard).join('') : '<article class="rec" style="color:#9aa3af;text-align:center">暂无收益明细</article>') + '</div>';
       }
       return navBar('查看明细', 'home', true) +
         '<div class="scroll" style="background:#f7f8fa">' + tabs + body + '</div>';
@@ -906,7 +1025,7 @@
     function submitWithdraw() {
       amountInput = readAmt();
       var c = selectedCert();
-      if (!c) { toast('请先选择认证账户'); return; }
+      if (!c) { toast('请先选择实名账户'); return; }
       if (!S.accountSelected) { toast('请选择到账方式'); return; }
       if (amountInput <= 0) { toast('请输入提现金额'); return; }
       if (amountInput > r2(c.withdrawable)) { toast('超出该账户可提现金额'); return; }
@@ -920,6 +1039,7 @@
         paid: '2026.09.20 16:10:00',
         split: { project: 0, team: 0, activity: 0, unified: amountInput },
         cert: c.key,
+        payType: c.type === 'corp' ? 'corp' : 'personal',
         userName: c.name,
         userNo: c.no
       });
@@ -949,7 +1069,7 @@
     function submitTransfer() {
       var amts = readTfAmts();
       var c = selectedCert();
-      if (!c) { toast('请选择划转账户'); return; }
+      if (!c) { toast('请选择实名账户'); return; }
       var total = KEYS.reduce(function (a, w) { return r2(a + (amts[w.id] || 0)); }, 0);
       if (total <= 0) { toast('请输入划转金额'); return; }
       for (var i = 0; i < KEYS.length; i++) {
@@ -997,14 +1117,6 @@
           if (line) line.textContent = '本次合计 ' + money(total) + ' / 可划转余额 ' + money(waitSum());
         });
       });
-      var sel = document.querySelector('select[data-act="pick-cert-select"]');
-      if (sel) {
-        sel.addEventListener('change', function () {
-          S.kyc.pick = sel.value || '';
-          var c = selectedCert();
-          S.kyc.cert = c && c.type === 'corp' ? 'corp' : (c ? 'personal' : S.kyc.cert);
-        });
-      }
     }
     function bindAmt(screenId, renderFn) {
       var input = document.getElementById('amt');
@@ -1038,6 +1150,8 @@
         id = 'transfer';
       }
       if (!renders[id]) id = 'home';
+      if (id !== 'transfer') S.tfAcctOpen = false;
+      if (id !== 'withdraw') S.wdAcctOpen = false;
       document.querySelectorAll('.screen').forEach(function (el) { el.classList.remove('active'); });
       var el = document.getElementById('screen-' + id);
       el.innerHTML = renders[id]();
@@ -1102,6 +1216,14 @@
       toast('账本已重置');
       showScreen('home');
     }
+    document.querySelector('.phone-frame').addEventListener('change', function (e) {
+      var sel = e.target.closest('select[data-act="wd-kind"]');
+      if (!sel) return;
+      S.wdKindFilter = sel.value || 'all';
+      var active = document.querySelector('.screen.active');
+      if (!active) return;
+      showScreen(active.id.replace('screen-', ''));
+    });
     document.querySelector('.phone-frame').addEventListener('click', function (e) {
       if (e.target.id === 'kycMask' || e.target.id === 'noticeMask') return;
       if (e.target.id === 'tipMask') {
@@ -1112,8 +1234,9 @@
       if (!node) return;
       var act = node.getAttribute('data-act');
       if (act === 'home' || act === 'withdraw' || act === 'records' || act === 'records-tf' || act === 'records-wd' || act === 'income' || act === 'books' || act === 'transfer') {
-        if (act === 'income' && node.dataset.wallet) {
-          S.incomeWallet = node.dataset.wallet;
+        if (act === 'income') {
+          if (node.dataset.scope) S.detailScope = node.dataset.scope === 'summary' ? 'summary' : 'wallet';
+          if (node.dataset.wallet) S.incomeWallet = node.dataset.wallet;
           S.detailTab = node.dataset.tab || 'income';
         }
         if (act === 'transfer') {
@@ -1167,6 +1290,40 @@
         confirmKyc();
         return;
       }
+      if (act === 'toggle-wd-acct') {
+        amountInput = readAmt();
+        S.wdAcctOpen = !S.wdAcctOpen;
+        document.getElementById('screen-withdraw').innerHTML = renderWithdraw();
+        bindAmt('withdraw', renderWithdraw);
+        return;
+      }
+      if (act === 'pick-wd-acct') {
+        amountInput = readAmt();
+        S.kyc.pick = node.getAttribute('data-pick') || '';
+        var pickedWd = selectedCert();
+        S.kyc.cert = pickedWd && pickedWd.type === 'corp' ? 'corp' : (pickedWd ? 'personal' : S.kyc.cert);
+        S.wdAcctOpen = false;
+        document.getElementById('screen-withdraw').innerHTML = renderWithdraw();
+        bindAmt('withdraw', renderWithdraw);
+        return;
+      }
+      if (act === 'toggle-tf-acct') {
+        readTfAmts();
+        S.tfAcctOpen = !S.tfAcctOpen;
+        document.getElementById('screen-transfer').innerHTML = renderTransfer();
+        bindTransfer();
+        return;
+      }
+      if (act === 'pick-tf-acct') {
+        readTfAmts();
+        S.kyc.pick = node.getAttribute('data-pick') || '';
+        var pickedTf = selectedCert();
+        S.kyc.cert = pickedTf && pickedTf.type === 'corp' ? 'corp' : (pickedTf ? 'personal' : S.kyc.cert);
+        S.tfAcctOpen = false;
+        document.getElementById('screen-transfer').innerHTML = renderTransfer();
+        bindTransfer();
+        return;
+      }
       if (act === 'pick-cert') {
         S.kyc.pick = node.getAttribute('data-pick') || '';
         var c = selectedCert();
@@ -1181,7 +1338,7 @@
         showScreen(document.querySelector('.screen.active').id.replace('screen-', ''));
       }
       if (act === 'all-amt') {
-        if (!selectedCert()) { toast('请先选择认证账户'); return; }
+        if (!selectedCert()) { toast('请先选择实名账户'); return; }
         amountInput = certAvail();
         document.getElementById('screen-withdraw').innerHTML = renderWithdraw();
         bindAmt('withdraw', renderWithdraw);
