@@ -86,6 +86,22 @@
       border: 1px solid rgba(255,255,255,0.55); border-radius: var(--radius-lg);
       box-shadow: var(--shadow);
     }
+    .admin-sub { display: flex; gap: 8px; margin-bottom: 10px; flex-shrink: 0; }
+    .admin-sub button {
+      height: 32px; padding: 0 14px; border-radius: 8px; border: 1px solid var(--border);
+      background: #fff; color: var(--text-secondary); cursor: pointer; font-size: 13px;
+    }
+    .admin-sub button.active { background: var(--primary); color: #fff; border-color: var(--primary); font-weight: 600; }
+    .admin-pane { display: none; flex: 1; min-height: 0; }
+    .admin-pane.active { display: flex; flex-direction: column; }
+    .filter-bar { display: flex; gap: 8px; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+    .filter-bar input, .filter-bar select { height: 32px; border: 1px solid var(--border); border-radius: 8px; padding: 0 10px; font-size: 12px; background: #fff; }
+    .cell-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .count-link { border: none; background: none; color: var(--primary); font-weight: 700; font-size: 14px; cursor: pointer; padding: 0; }
+    .sku-modal.wide { width: min(640px, calc(100vw - 48px)); }
+    .sku-modal table { width: 100%; border-collapse: collapse; }
+    .sku-modal th, .sku-modal td { padding: 8px 10px; border-bottom: 1px solid var(--border); font-size: 12px; text-align: left; word-break: break-all; }
+    .sku-modal th { color: var(--text-muted); font-size: 11px; }
     .admin-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--border); }
     .admin-toolbar h2 { font-size: 15px; }
     .admin-toolbar p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
@@ -197,6 +213,11 @@
       </div>
     </div>
     <div id="view-admin" class="page-view">
+      <div class="admin-sub" role="tablist">
+        <button type="button" class="active" data-admin="pane-sku">次数商品</button>
+        <button type="button" data-admin="pane-claims">领取记录</button>
+      </div>
+      <div id="pane-sku" class="admin-pane active">
       <div class="admin-card">
         <div class="admin-toolbar">
           <div>
@@ -211,6 +232,34 @@
           </thead>
           <tbody id="skuBody"></tbody>
         </table>
+      </div>
+      </div>
+      <div id="pane-claims" class="admin-pane">
+        <div class="admin-card">
+          <div class="admin-toolbar">
+            <div>
+              <h2>领取记录</h2>
+              <p>沿用 1.0 列表。回填信息只显示条数，点数字打开回填列表。</p>
+            </div>
+          </div>
+          <div class="filter-bar">
+            <input id="clQ" type="text" placeholder="用户 / 稿件">
+            <select id="clS">
+              <option value="">全部状态</option>
+              <option>待回填</option>
+              <option>已回填</option>
+              <option>已超时释放</option>
+            </select>
+            <button class="btn btn-ghost" type="button" id="clReset">重置</button>
+            <button class="btn btn-primary" type="button" id="clQuery">查询</button>
+          </div>
+          <table>
+            <thead>
+              <tr><th>ID</th><th>用户</th><th>稿件</th><th>项目名称</th><th>书籍信息</th><th>剪辑手</th><th>关键词</th><th>回填信息</th><th>状态</th><th>领取时间</th><th>操作</th></tr>
+            </thead>
+            <tbody id="clBody"></tbody>
+          </table>
+        </div>
       </div>
     </div>
   </main>
@@ -278,6 +327,16 @@
           </ul>
         </div>
       </div>
+      <div class="rule-section">
+        <h3><span>6</span>领取记录回填信息</h3>
+        <div class="rule-content">
+          <ul>
+            <li>管理后台增加「领取记录」，列表沿用 1.0：ID、用户、稿件、项目名称、书籍信息、剪辑手、关键词、回填信息、状态、领取时间、稿件详情。</li>
+            <li>回填信息列只显示<strong>条数</strong>。点数字打开回填信息列表，字段为帐号信息、作品链接、回填时间。</li>
+            <li>未回填条数为 0，点开为空列表。</li>
+          </ul>
+        </div>
+      </div>
       <!-- fr018-rules:end -->
       </div>
     </div>
@@ -309,6 +368,23 @@
     <div class="modal-actions">
       <button class="btn btn-ghost" type="button" id="skuCancel">取消</button>
       <button class="btn btn-primary" type="button" id="skuSave">确定</button>
+    </div>
+  </div>
+  <div class="sku-modal wide" id="fillModal" hidden role="dialog" aria-labelledby="fillTitle">
+    <h3 id="fillTitle">回填信息</h3>
+    <table>
+      <thead><tr><th>帐号信息</th><th>作品链接</th><th>回填时间</th></tr></thead>
+      <tbody id="fillBody"></tbody>
+    </table>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" type="button" id="fillClose">关闭</button>
+    </div>
+  </div>
+  <div class="sku-modal" id="claimDetail" hidden role="dialog" aria-labelledby="claimDetailTitle">
+    <h3 id="claimDetailTitle">稿件详情</h3>
+    <div id="claimDetailBody"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" type="button" id="claimDetailClose">关闭</button>
     </div>
   </div>
 
@@ -372,7 +448,10 @@
     });
     document.getElementById('addSku').addEventListener('click', function () { openSkuForm(null); });
     document.getElementById('skuCancel').addEventListener('click', closeSkuForm);
-    document.getElementById('skuOverlay').addEventListener('click', closeSkuForm);
+    document.getElementById('skuOverlay').addEventListener('click', function () {
+      closeSkuForm();
+      closeFill();
+    });
     document.getElementById('skuBody').addEventListener('click', function (e) {
       var btn = e.target.closest('[data-edit]');
       if (!btn) return;
@@ -411,6 +490,85 @@
       });
     });
     renderSkuTable();
+
+    var claims = [
+      { id: 'C-01', user: 'U-10086', work: '重生后我成了团宠', project: '番茄小说', book: '重生后我成了团宠', bookId: 'BK-20481', editor: '庭宇', kw: '团宠日常', status: '已回填', time: '今天 10:21', fills: [
+        { account: '抖音 / @北城', link: 'https://v.douyin.com/iR8k2a', at: '今天 11:02' },
+        { account: '视频号 / @北城', link: 'https://channels.weixin.qq.com/demo/C-01', at: '今天 10:40' }
+      ]},
+      { id: 'C-03', user: 'U-10221', work: '假千金', project: '番茄小说', book: '假千金', bookId: 'BK-18820', editor: '林夏', kw: '真假千金', status: '待回填', time: '昨天 09:40', fills: [] },
+      { id: 'C-05', user: 'U-10001', work: '穿书后我绑定了反派', project: '红果短剧', book: '穿书后我绑定了反派', bookId: 'BK-17602', editor: '庭宇', kw: '穿书反派', status: '已回填', time: '4天前', fills: [
+        { account: '抖音 / @南城', link: 'https://v.douyin.com/iQ1m9c', at: '4天前 18:20' }
+      ]},
+      { id: 'C-08', user: 'U-10086', work: '银发军官图集', project: '番茄小说', book: '银发军官把我宠上天', bookId: '7482019356', editor: '庭宇', kw: '年代甜宠', status: '已超时释放', time: '09-20 16:08', fills: [] }
+    ];
+    function claimStatus(st) {
+      if (st === '已回填') return '<span class="pill pill-on">已回填</span>';
+      if (st === '已超时释放') return '<span class="pill pill-off">已超时释放</span>';
+      return '<span class="pill" style="background:#fffbeb;color:#d97706">待回填</span>';
+    }
+    function renderClaims() {
+      var q = (document.getElementById('clQ').value || '').trim();
+      var s = document.getElementById('clS').value;
+      var rows = claims.filter(function (c) {
+        if (q && c.user.indexOf(q) === -1 && c.work.indexOf(q) === -1) return false;
+        if (s && c.status !== s) return false;
+        return true;
+      });
+      document.getElementById('clBody').innerHTML = rows.map(function (c) {
+        return '<tr><td>' + c.id + '</td><td>' + c.user + '</td><td>' + c.work + '</td><td>' + c.project + '</td>' +
+          '<td>' + c.book + '<div class="cell-sub">书籍 ID ' + c.bookId + '</div></td><td>' + c.editor + '</td><td>' + c.kw + '</td>' +
+          '<td><button class="count-link" type="button" data-fills="' + c.id + '">' + c.fills.length + '</button></td>' +
+          '<td>' + claimStatus(c.status) + '</td><td>' + c.time + '</td>' +
+          '<td><button class="link" type="button" data-claim="' + c.id + '">稿件详情</button></td></tr>';
+      }).join('') || '<tr><td colspan="11" style="text-align:center;color:#9aa5b4">无匹配</td></tr>';
+    }
+    function closeFill() {
+      document.getElementById('fillModal').hidden = true;
+      document.getElementById('claimDetail').hidden = true;
+      if (document.getElementById('skuModal').hidden) document.getElementById('skuOverlay').hidden = true;
+    }
+    document.getElementById('clBody').addEventListener('click', function (e) {
+      var fillBtn = e.target.closest('[data-fills]');
+      var detailBtn = e.target.closest('[data-claim]');
+      if (fillBtn) {
+        var row = claims.filter(function (c) { return c.id === fillBtn.getAttribute('data-fills'); })[0];
+        document.getElementById('fillTitle').textContent = '回填信息 · ' + row.id;
+        document.getElementById('fillBody').innerHTML = row.fills.map(function (f) {
+          return '<tr><td>' + f.account + '</td><td>' + f.link + '</td><td>' + f.at + '</td></tr>';
+        }).join('') || '<tr><td colspan="3" style="text-align:center;color:#9aa5b4">暂无回填</td></tr>';
+        document.getElementById('skuModal').hidden = true;
+        document.getElementById('claimDetail').hidden = true;
+        document.getElementById('skuOverlay').hidden = false;
+        document.getElementById('fillModal').hidden = false;
+      }
+      if (detailBtn) {
+        var detail = claims.filter(function (c) { return c.id === detailBtn.getAttribute('data-claim'); })[0];
+        document.getElementById('claimDetailTitle').textContent = '稿件详情 · ' + detail.work;
+        document.getElementById('claimDetailBody').innerHTML = '<p>领取 ' + detail.id + ' · ' + detail.user + '</p><p class="cell-sub" style="margin-top:8px">' + detail.project + ' · ' + detail.book + ' · ' + detail.kw + '</p>';
+        document.getElementById('skuModal').hidden = true;
+        document.getElementById('fillModal').hidden = true;
+        document.getElementById('skuOverlay').hidden = false;
+        document.getElementById('claimDetail').hidden = false;
+      }
+    });
+    document.getElementById('fillClose').addEventListener('click', closeFill);
+    document.getElementById('claimDetailClose').addEventListener('click', closeFill);
+    document.getElementById('clQuery').addEventListener('click', renderClaims);
+    document.getElementById('clReset').addEventListener('click', function () {
+      document.getElementById('clQ').value = '';
+      document.getElementById('clS').value = '';
+      renderClaims();
+    });
+    document.querySelectorAll('.admin-sub button').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('.admin-sub button').forEach(function (b) { b.classList.remove('active'); });
+        document.querySelectorAll('.admin-pane').forEach(function (p) { p.classList.remove('active'); });
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.admin).classList.add('active');
+      });
+    });
+    renderClaims();
 
     var ruleDrawer = document.getElementById('ruleDrawer');
     var ruleOverlay = document.getElementById('ruleOverlay');
