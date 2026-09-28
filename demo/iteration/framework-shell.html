@@ -544,10 +544,12 @@
       </div>
     </div>
   </main>
-  <script src="sidebar-nav.js?v=fr019"></script>
+  <script src="sidebar-nav.js?v=sprint0928"></script>
   <script>
     (function () {
       var STORAGE_KEY = 'ybdd-sprint-fr-status';
+      var REV_KEY = 'ybdd-sprint-fr-status-rev';
+      var STATUS_REV = '2026-09-28';
       var STATUS = {
         todo: { label: '待开始', cls: 'badge-status-todo', color: '#64748b' },
         dev: { label: '开发中', cls: 'badge-status-dev', color: '#0891b2' },
@@ -556,12 +558,20 @@
       };
       var CLASS_LIST = ['badge-status-todo', 'badge-status-dev', 'badge-status-live', 'badge-status-paused'];
 
+      function revMatches() {
+        try { return localStorage.getItem(REV_KEY) === STATUS_REV; }
+        catch (e) { return false; }
+      }
       function load() {
-        try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); }
+        try {
+          if (!revMatches()) return {};
+          return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+        }
         catch (e) { return {}; }
       }
       function save(map) {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(map));
+        localStorage.setItem(REV_KEY, STATUS_REV);
       }
       function applySelect(el, value) {
         var meta = STATUS[value] || STATUS.todo;
@@ -638,11 +648,13 @@
         }
       }
 
+      var shipped = revMatches();
       var stored = load();
       var selects = document.querySelectorAll('.status-select');
       selects.forEach(function (el) {
         var fr = el.getAttribute('data-fr');
         var value = STATUS[stored[fr]] ? stored[fr] : el.value;
+        if (!shipped) stored[fr] = value;
         applySelect(el, value);
         el.addEventListener('change', function () {
           stored[fr] = el.value;
@@ -652,6 +664,7 @@
           syncArchivePlacement();
         });
       });
+      if (!shipped) save(stored);
       updateSummary(selects);
       syncArchivePlacement();
     })();
