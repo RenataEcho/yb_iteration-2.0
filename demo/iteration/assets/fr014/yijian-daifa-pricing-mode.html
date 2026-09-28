@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>一键代发 · 领取次数收费说明</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    width: 1200px;
+    font-family: "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(165deg, #f2ede6 0%, #e8e2d9 100%);
+    color: #1a1816;
+    -webkit-font-smoothing: antialiased;
+  }
+  .sheet {
+    margin: 0 auto;
+    padding: 40px 44px 44px;
+  }
+  .card {
+    background: #fffefb;
+    border: 1px solid #ddd5c9;
+    border-radius: 16px;
+    padding: 32px 36px 36px;
+    box-shadow: 0 12px 40px rgba(26, 24, 22, 0.06);
+  }
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: #f4faf7;
+    border: 1px solid #c5ddd2;
+    font-size: 12px;
+    font-weight: 650;
+    color: #2a7054;
+  }
+  .brand i { width: 8px; height: 8px; border-radius: 50%; background: #2a7054; }
+  h1 {
+    margin-top: 16px;
+    font-size: 34px;
+    font-weight: 650;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+  .lead {
+    margin-top: 10px;
+    font-size: 15px;
+    line-height: 1.55;
+    color: #5c564f;
+    max-width: 52em;
+  }
+
+  .free {
+    margin-top: 24px;
+    padding: 20px 22px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #2a7054 0%, #1f5842 100%);
+    color: #fff;
+  }
+  .free b { font-size: 13px; letter-spacing: 0.06em; }
+  .free .big { margin-top: 6px; font-size: 32px; font-weight: 650; }
+  .free .big span { font-size: 15px; font-weight: 600; margin-left: 4px; }
+  .free p { margin-top: 8px; font-size: 13px; line-height: 1.5; opacity: 0.92; }
+
+  .sec {
+    margin-top: 28px;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #2a7054;
+    font-size: 16px;
+    font-weight: 650;
+  }
+  .sec small {
+    display: block;
+    margin-top: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #8a8279;
+  }
+
+  .diff {
+    margin-top: 12px;
+    padding: 16px 18px;
+    border-radius: 10px;
+    background: #faf8f5;
+    border: 1px solid #ebe4dc;
+    font-size: 13px;
+    line-height: 1.65;
+    color: #5c564f;
+  }
+  .diff ul { margin: 8px 0 0 18px; padding: 0; }
+  .diff li { margin: 4px 0; }
+  .diff b { color: #1a1816; }
+  .tag-comp {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: #fef3e2;
+    color: #9a5b10;
+    font-size: 11px;
+    font-weight: 650;
+  }
+  .tag-ours {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: #e8f3ed;
+    color: #1f5842;
+    font-size: 11px;
+    font-weight: 650;
+  }
+
+  table.main {
+    width: 100%;
+    margin-top: 12px;
+    border-collapse: collapse;
+    font-size: 13px;
+    border: 1px solid #e2dbd1;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .main thead th {
+    padding: 11px 12px;
+    background: #2a2724;
+    color: #f0ebe3;
+    font-size: 11px;
+    font-weight: 650;
+    text-align: left;
+  }
+  .main thead th.num { text-align: right; }
+  .main td {
+    padding: 12px;
+    border-top: 1px solid #ebe4dc;
+    vertical-align: top;
+    background: #fffefb;
+  }
+  .main td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .main tr.alt td { background: #faf8f5; }
+  .main .hl { font-weight: 650; color: #2a7054; }
+  .main .orig { color: #b8afa4; text-decoration: line-through; font-size: 11px; display: block; margin-top: 2px; }
+  .main .sub { font-size: 11px; color: #8a8279; margin-top: 3px; line-height: 1.4; }
+
+  .grid-buy {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 12px;
+  }
+  .buy {
+    padding: 14px;
+    border-radius: 10px;
+    background: #faf8f5;
+    border: 1px solid #ebe4dc;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+  .buy b { display: block; font-size: 18px; color: #9a3d32; }
+  .buy span { display: block; margin-top: 4px; font-size: 13px; color: #5c564f; font-weight: 600; }
+
+  .note {
+    margin-top: 14px;
+    padding: 14px 16px;
+    border-radius: 10px;
+    border: 1px dashed #d4cbc0;
+    font-size: 12px;
+    line-height: 1.6;
+    color: #6a635c;
+  }
+  .note b { color: #1a1816; }
+</style>
+</head>
+<body>
+<div class="sheet">
+  <article class="card">
+    <div class="brand"><i></i>一键代发</div>
+    <h1>领取次数 · 收费说明</h1>
+    <p class="lead">在右豹一键代发领取关键词前，需消耗「领取次数」。次数来源：<strong>每日免费</strong> + <strong>积分兑换</strong>（1 元 = 100 积分）。</p>
+
+    <div class="free">
+      <b>每日免费</b>
+      <div class="big">1<span>次 / 天</span></div>
+      <p>每账号每自然日可免费领取 1 次（零点刷新，不结转）。当日免费用完后，再使用积分兑换下表档位。</p>
+    </div>
+
+    <h2 class="sec">与竞品的区别 & 档位对照<small>下表在同一页面说明：竞品怎么卖、我们怎么卖、差在哪</small></h2>
+
+    <div class="diff">
+      <b>和竞品不一样的地方：</b>
+      <ul>
+        <li><span class="tag-comp">竞品</span> 用 <b>1 元 / 5 次（0.20 元/次）</b> 做首购；<span class="tag-ours">一键代发</span> 用 <b>每天免费 1 次</b> 代替首购，不设 1 元包。</li>
+        <li><span class="tag-comp">竞品</span> 直接付 <b>现金</b> 买次数；<span class="tag-ours">一键代发</span> 先买 <b>积分</b>（站内或惊人官网），再按档位兑换次数。</li>
+        <li><span class="tag-comp">竞品</span> 主力档 <b>30 元 / 15 次 = 2.00 元/次</b>；<span class="tag-ours">一键代发</span> 可选 <b>22 次 / 45 元（2.05 元/次）</b> 或 <b>30 次 / 57 元（1.90 元/次）</b>，并可用原价积分做划线优惠。</li>
+      </ul>
+    </div>
+
+    <table class="main">
+      <thead>
+        <tr>
+          <th>一键代发兑换</th>
+          <th class="num">现价积分</th>
+          <th class="num">原价积分</th>
+          <th class="num">约人民币</th>
+          <th class="num">元/次</th>
+          <th>竞品相近档位</th>
+          <th>与竞品差异</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="hl">（日免，非兑换）</td>
+          <td class="num">—</td>
+          <td class="num">—</td>
+          <td class="num">0 元</td>
+          <td class="num">0</td>
+          <td>首购 1 元 / 5 次<br><span class="sub">0.20 元/次</span></td>
+          <td>我们用日免 1 次替代首购，不占 4 档 SKU</td>
+        </tr>
+        <tr class="alt">
+          <td><b>1 次</b> 需要 300 积分</td>
+          <td class="num">300</td>
+          <td class="num">300</td>
+          <td class="num">3 元</td>
+          <td class="num">3.00</td>
+          <td>单次 3 元 / 1 次</td>
+          <td>锚价一致，均为 3 元/次</td>
+        </tr>
+        <tr>
+          <td><b>10 次</b> 需要 2,200 积分<span class="orig">原价 3,000（30 元）</span></td>
+          <td class="num">2,200</td>
+          <td class="num">3,000</td>
+          <td class="num">22 元</td>
+          <td class="num">2.20</td>
+          <td>小包 15 元 / 8 次<br><span class="sub">1.88 元/次</span></td>
+          <td>次数更多；折算略高但整包 22 元，可划线省 8 元</td>
+        </tr>
+        <tr class="alt">
+          <td><b>22 次</b> 需要 4,500 积分<span class="orig">原价 5,700（57 元）</span></td>
+          <td class="num">4,500</td>
+          <td class="num">5,700</td>
+          <td class="num">45 元</td>
+          <td class="num">2.05</td>
+          <td>标准包 ★ 30 元 / 15 次<br><span class="sub">2.00 元/次</span></td>
+          <td>单次略高 0.05 元，但多 7 次；整包 45 元 vs 30 元</td>
+        </tr>
+        <tr>
+          <td><b>30 次</b> 需要 5,700 积分<span class="orig">原价 7,500（75 元）</span></td>
+          <td class="num">5,700</td>
+          <td class="num">7,500</td>
+          <td class="num">57 元</td>
+          <td class="num">1.90</td>
+          <td>无同次数档<br><span class="sub">低于标准包 2.00</span></td>
+          <td>重度用户囤货；折算单价低于竞品主力档</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2 class="sec">积分怎么买<small>买到积分后，再在上表兑换领取次数</small></h2>
+    <div class="grid-buy">
+      <div class="buy"><b>880 积分</b><span>8.8 元 · 站内</span></div>
+      <div class="buy"><b>6,800 积分</b><span>68 元 · 站内</span></div>
+      <div class="buy"><b>12,800 积分</b><span>128 元 · 站内</span></div>
+    </div>
+    <div class="note">
+      <b>积分来源：</b>① 右豹站内购买上表档位；② 惊人官网购买积分，回到右豹兑换/充值后再换次数。
+      兑换按整包扣减（例：4,500 积分一次换 22 次）。原价积分 &gt; 现价时在 App 兑换浮层出示划线价。具体以 App 为准。
+    </div>
+  </article>
+</div>
+</body>
+</html>

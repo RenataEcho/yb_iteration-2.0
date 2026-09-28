@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FR-019 · 别名绑定 · 右豹迭代需求记录</title>
+  <style>
+    :root {
+      --primary: #2563eb; --primary-hover: #1d4ed8; --primary-light: #eff6ff; --primary-border: #bfdbfe;
+      --accent-rule: #0891b2; --accent-version: #7c3aed; --accent-fr: #d97706;
+      --success: #16a34a; --success-bg: #f0fdf4; --warning: #d97706; --warning-bg: #fffbeb;
+      --danger: #dc2626; --danger-bg: #fef2f2;
+      --surface: #fff; --surface-glass: rgba(255,255,255,0.72); --surface-hover: #f8fafc; --border: #e8edf3;
+      --text-primary: #18222f; --text-secondary: #4a5568; --text-muted: #9aa5b4;
+      --sidebar-w: 240px; --drawer-w: 480px; --radius-sm: 7px; --radius-lg: 14px;
+      --shadow: 0 8px 32px rgba(30,40,80,0.10);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 13px; color: var(--text-primary);
+      background: linear-gradient(135deg, #e0e7ff 0%, #f0f4f8 40%, #e0f2fe 100%);
+      background-attachment: fixed; min-height: 100vh;
+    }
+    .sidebar { position: fixed; inset: 0 auto 0 0; width: var(--sidebar-w); z-index: 200; display: flex; flex-direction: column; background: rgba(240,244,255,0.95); backdrop-filter: blur(20px); border-right: 1px solid rgba(148,163,196,0.22); }
+    .sidebar-brand { padding: 16px 14px 12px; border-bottom: 1px solid rgba(148,163,196,0.22); }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-icon { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, #2563eb, #7c3aed); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+    .brand-text { font-size: 14px; font-weight: 700; }
+    .brand-sub { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+    .sprint-pill { display: inline-block; margin-top: 10px; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 999px; background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+    .sidebar-scroll { flex: 1; overflow-y: auto; padding: 8px 0 16px; }
+    .sidebar-foot { padding: 10px 14px 14px; border-top: 1px solid rgba(148,163,196,0.22); font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+    .main { margin-left: var(--sidebar-w); padding: 16px 20px 40px; min-height: 100vh; }
+    .breadcrumb { padding: 4px 0 12px; font-size: 12px; color: var(--text-muted); }
+    .breadcrumb a { color: var(--primary); text-decoration: none; }
+    .page-header { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; }
+    .page-header h1 { font-size: 19px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .page-desc { font-size: 12px; color: var(--text-muted); max-width: 760px; line-height: 1.55; }
+    .badge { display: inline-flex; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: var(--radius-sm); }
+    .badge-fr { background: #fffbeb; color: var(--accent-fr); border: 1px solid #fde68a; }
+    .badge-version { background: #f5f3ff; color: var(--accent-version); border: 1px solid #ddd6fe; }
+    .page-tab-bar, .admin-tab-bar { display: flex; gap: 0; margin-bottom: 16px; background: var(--surface-glass); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.55); border-radius: var(--radius-lg); padding: 4px; box-shadow: var(--shadow); width: fit-content; }
+    .admin-tab-bar { margin: 12px 16px 0; }
+    .page-tab-bar button, .admin-tab-bar button { padding: 8px 20px; border: none; background: transparent; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--text-secondary); border-radius: 10px; }
+    .page-tab-bar button.active, .admin-tab-bar button.active { background: var(--primary); color: #fff; font-weight: 600; }
+    .page-view, .admin-pane { display: none; }
+    .page-view.active, .admin-pane.active { display: block; }
+    #view-fe.page-view.active { display: flex; flex-direction: column; height: calc(100vh - 188px); min-height: 560px; }
+    .btn { display: inline-flex; align-items: center; height: 34px; padding: 0 14px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid transparent; }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-rule { background: var(--primary-light); color: var(--primary); border-color: var(--primary-border); }
+    .btn-ghost { background: var(--surface); color: var(--text-secondary); border-color: var(--border); }
+    .btn-ghost-sm, .btn-sm { background: var(--surface); color: var(--text-secondary); border: 1px solid var(--border); height: 32px; padding: 0 12px; border-radius: var(--radius-sm); cursor: pointer; font-size: 12px; }
+    .glass-card { background: var(--surface-glass); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.55); border-radius: var(--radius-lg); box-shadow: var(--shadow); overflow: hidden; }
+    .demo-layout { display: flex; flex-direction: column; gap: 16px; }
+    #view-fe .demo-layout { flex: 1; min-height: 0; }
+    @media (max-width: 1024px) { .main { margin-left: 0; } .sidebar { display: none; } }
+    .scene-panel { padding: 16px 18px; flex-shrink: 0; }
+    .scene-panel h2 { font-size: 14px; font-weight: 700; }
+    .scene-lead { font-size: 13px; color: #6b7280; line-height: 1.5; margin-top: 4px; }
+    .scene-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .scene-btn { padding: 6px 12px; border-radius: 999px; border: 1px solid var(--border); background: #fff; font-size: 12px; cursor: pointer; color: #6b7280; }
+    .scene-btn:hover { border-color: var(--primary-border); color: var(--primary); }
+    .scene-btn.active { border-color: var(--primary-border); background: var(--primary-light); color: var(--primary); font-weight: 600; }
+    .scene-hint { margin-top: 10px; font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+    .mockup-board { padding: 14px 16px 16px; background: #fff; flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+    .board-scroll { overflow: auto; flex: 1; min-height: 0; padding: 4px 2px 8px; }
+    .board-row { display: grid; grid-template-columns: repeat(2, minmax(220px, 360px)); gap: 20px 18px; margin-top: 4px; }
+    .board-tile { min-width: 0; scroll-margin: 12px; }
+    .board-cap { font-size: 13px; font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+    .board-cap em { font-style: normal; font-weight: 500; color: var(--text-muted); font-size: 11px; }
+    .board-phone { width: 100%; aspect-ratio: 375 / 812; border-radius: 42px; overflow: hidden; background: #000; border: 10px solid #1c1c1e; box-shadow: 0 0 0 1px #3a3a3c, inset 0 0 0 1px rgba(255,255,255,.12), 0 16px 36px rgba(0,0,0,.2); position: relative; }
+    .board-phone iframe { width: 375px; height: 812px; border: 0; display: block; transform-origin: 0 0; background: #fff; position: absolute; top: 0; left: 0; }
+    table.mini { width: 100%; min-width: 0; }
+    .table-toolbar { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; gap: 10px; flex-wrap: wrap; }
+    .table-toolbar h3 { font-size: 14px; font-weight: 700; }
+    .toolbar-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .filter-bar { display: flex; flex-wrap: wrap; gap: 10px; padding: 0 16px 14px; align-items: flex-end; }
+    .filter-field { display: flex; flex-direction: column; gap: 4px; }
+    .filter-field label { font-size: 11px; color: var(--text-muted); }
+    .filter-field input, .filter-field select { height: 32px; padding: 0 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 12px; min-width: 130px; background: #fff; }
+    .filter-actions { display: flex; gap: 8px; margin-left: auto; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 960px; }
+    table.guest-table { min-width: 2200px; }
+    th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); font-size: 12px; vertical-align: top; }
+    th { font-size: 11px; font-weight: 600; color: var(--text-muted); background: rgba(248,250,252,0.9); white-space: nowrap; }
+    tr:hover td { background: var(--surface-hover); }
+    .link { color: var(--primary); cursor: pointer; background: none; border: none; padding: 0; margin-right: 10px; font-size: 12px; font-weight: 500; }
+    .link-danger { color: var(--danger); }
+    .tag { display: inline-flex; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+    .tag-ok { background: var(--success-bg); color: var(--success); }
+    .tag-warn { background: var(--warning-bg); color: var(--warning); }
+    .tag-muted { background: #f1f5f9; color: var(--text-muted); }
+    .tag-del { background: var(--danger-bg); color: var(--danger); }
+    .cell-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .drawer-overlay, .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.35); z-index: 500; opacity: 0; pointer-events: none; transition: opacity .25s; }
+    .drawer-overlay.open, .modal-overlay.open { opacity: 1; pointer-events: auto; }
+    .drawer { position: fixed; top: 0; right: 0; bottom: 0; width: var(--drawer-w); max-width: 100vw; z-index: 501; background: #fff; box-shadow: -8px 0 40px rgba(30,40,60,0.18); transform: translateX(100%); transition: transform .28s ease; display: flex; flex-direction: column; }
+    .drawer.open { transform: translateX(0); }
+    .drawer-header, .modal-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-size: 15px; font-weight: 700; }
+    .drawer-close { width: 28px; height: 28px; border: none; background: #f1f5f9; border-radius: 6px; cursor: pointer; }
+    .drawer-body, .modal-body { padding: 16px 20px; overflow: auto; }
+    .kv { display: grid; grid-template-columns: 96px 1fr; gap: 8px 10px; font-size: 13px; }
+    .kv i { font-style: normal; color: var(--text-muted); }
+    .rule-tab-bar { display: flex; padding: 0 16px; border-bottom: 1px solid var(--border); }
+    .rule-tab-bar button { padding: 10px 18px; border: none; background: none; cursor: pointer; font-size: 13px; color: var(--text-secondary); border-bottom: 2px solid transparent; margin-bottom: -1px; }
+    .rule-tab-bar button.active { color: var(--primary); font-weight: 600; border-bottom-color: var(--primary); }
+    .rule-panel { display: none; }
+    .rule-panel.active { display: block; }
+    .rule-section { margin-bottom: 20px; }
+    .rule-section h3 { font-size: 14px; color: var(--accent-rule); margin-bottom: 8px; }
+    .rule-content { font-size: 13px; color: var(--text-secondary); line-height: 1.65; }
+    .rule-content ul { padding-left: 18px; }
+    .rule-content li { margin-bottom: 5px; }
+    .modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(.96); width: 440px; max-width: calc(100vw - 32px); z-index: 501; background: #fff; border-radius: var(--radius-lg); box-shadow: 0 16px 48px rgba(30,40,60,.2); opacity: 0; pointer-events: none; }
+    .modal-overlay.open .modal { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
+    .form-field { margin-bottom: 12px; }
+    .form-field label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
+    .form-field input, .form-field select { width: 100%; height: 36px; padding: 0 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; }
+    .field-hint { margin-top: 4px; font-size: 11px; color: var(--text-muted); }
+    .modal-footer { padding: 12px 20px 16px; display: flex; justify-content: flex-end; gap: 8px; }
+    .flow-page-intro, .flow-panel-desc { padding: 16px 18px 0; font-size: 12px; color: var(--text-muted); line-height: 1.55; }
+    .flow-svg-wrap { overflow: auto; padding: 12px 18px 8px; max-height: 72vh; }
+    .flow-legend { display: flex; flex-wrap: wrap; gap: 12px; padding: 0 18px 18px; font-size: 11px; color: var(--text-muted); }
+    .flow-legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 4px; vertical-align: -2px; }
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: #1e293b; color: #fff; padding: 10px 18px; border-radius: 999px; font-size: 13px; opacity: 0; transition: .25s; z-index: 700; pointer-events: none; }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand">
+        <div class="brand-icon">迭</div>
+        <div>
+          <div class="brand-text">右豹迭代需求记录</div>
+          <div class="brand-sub">PRD Demo · 产品交付研发</div>
+        </div>
+      </div>
+      <span class="sprint-pill">YBDD2.0 · 迭代 v1</span>
+    </div>
+    <div class="sidebar-scroll" data-iteration-sidebar></div>
+    <div class="sidebar-foot">FR-019 · 别名绑定</div>
+  </aside>
+  <main class="main">
+    <nav class="breadcrumb"><a href="framework-shell.html">Sprint 概览</a><span> / 别名绑定</span></nav>
+    <header class="page-header">
+      <div>
+        <h1>别名绑定 <span class="badge badge-fr">FR-019</span><span class="badge badge-version">v1 当前</span></h1>
+        <p class="page-desc">申请记录只看别名、申请时间、审核状态、审核时间。另有一张没有记录的缺省页。后台别名管理可点开绑定用户数。</p>
+      </div>
+      <button class="btn btn-rule" id="toggleRuleDrawer" type="button">需求规则</button>
+    </header>
+    <div class="page-tab-bar">
+      <button type="button" class="active" data-page="view-fe">前端交互</button>
+      <button type="button" data-page="view-admin">管理后台</button>
+      <button type="button" data-page="view-flow">业务流程</button>
+    </div>
+
+    <div id="view-fe" class="page-view active">
+      <div class="demo-layout">
+        <div class="glass-card scene-panel">
+          <h2>别名绑定 · 前端交互 Demo</h2>
+          <p class="scene-lead">申请记录一页，卡片只含别名、申请时间、审核状态、审核时间。旁边是没有记录时的缺省页。</p>
+          <div class="scene-list">
+            <button class="scene-btn active" type="button" data-screen="records">申请记录</button>
+            <button class="scene-btn" type="button" data-screen="empty">缺省页</button>
+          </div>
+          <p class="scene-hint">点标签滚到对应手机。右上角「申请别名」打开弹窗。</p>
+        </div>
+        <div class="glass-card mockup-board">
+          <div class="board-scroll" id="feBoardScroll">
+            <div class="board-row">
+              <figure class="board-tile" id="tile-records">
+                <figcaption class="board-cap">申请记录 <em>申请中 · 已通过 · 已驳回</em></figcaption>
+                <div class="board-phone"><iframe class="alias-phone" title="申请记录" src="alias-bind-demo.html?embed=1&screen=records&v=5"></iframe></div>
+              </figure>
+              <figure class="board-tile" id="tile-empty">
+                <figcaption class="board-cap">缺省页 <em>还没有申请记录</em></figcaption>
+                <div class="board-phone"><iframe class="alias-phone" title="缺省页" src="alias-bind-demo.html?embed=1&screen=empty&v=5"></iframe></div>
+              </figure>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="view-admin" class="page-view">
+      <div class="glass-card">
+        <div class="admin-tab-bar">
+          <button type="button" class="active" data-admin="pane-apps">别名管理</button>
+          <button type="button" data-admin="pane-guests">游客记录</button>
+        </div>
+        <div id="pane-apps" class="admin-pane active">
+          <div class="table-toolbar">
+            <h3>别名管理</h3>
+            <div class="toolbar-actions">
+              <button class="btn btn-primary" type="button" id="openCreate">创建别名</button>
+              <button class="btn-ghost-sm" type="button" id="resetData">恢复示例数据</button>
+            </div>
+          </div>
+          <div class="filter-bar">
+            <div class="filter-field"><label>用户ID</label><input id="qUser" placeholder="U10088" /></div>
+            <div class="filter-field"><label>别名</label><input id="qAlias" placeholder="番茄" /></div>
+            <div class="filter-field"><label>状态</label>
+              <select id="qStatus"><option value="">全部</option><option>审核中</option><option>已通过</option><option>已驳回</option><option>已失效</option></select>
+            </div>
+            <div class="filter-field"><label>来源</label>
+              <select id="qSource"><option value="">全部</option><option>用户</option><option>后台创建</option></select>
+            </div>
+            <div class="filter-actions">
+              <button class="btn-ghost-sm" type="button" id="qReset">重置</button>
+              <button class="btn btn-primary" type="button" id="qGo">查询</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>申请ID</th><th>用户</th><th>别名</th><th>状态</th><th>来源</th><th>提交时间</th><th>处理时间</th><th>绑定用户数</th><th>操作</th></tr></thead>
+              <tbody id="appBody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div id="pane-guests" class="admin-pane">
+          <div class="table-toolbar">
+            <h3>游客记录</h3>
+            <button class="btn btn-primary" type="button" id="openSearch">模拟再搜别名</button>
+          </div>
+          <div class="filter-bar">
+            <div class="filter-field"><label>设备ID</label><input id="gDevice" placeholder="DEV-9F3A" /></div>
+            <div class="filter-field"><label>别名</label><input id="gAlias" placeholder="红果" /></div>
+            <div class="filter-field"><label>状态</label>
+              <select id="gStatus"><option value="">全部</option><option>未过期</option><option>已到期</option><option>运营失效</option></select>
+            </div>
+            <div class="filter-actions">
+              <button class="btn-ghost-sm" type="button" id="gReset">重置</button>
+              <button class="btn btn-primary" type="button" id="gGo">查询</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="guest-table">
+              <thead><tr><th>游客UUID</th><th>版本信息</th><th>来源</th><th>首次安装时间</th><th>最近启动时间</th><th>设备系统</th><th>系统版本</th><th>设备型号</th><th>设备ID</th><th>搜索别名</th><th>所属用户</th><th>绑定时间</th><th>失效时间</th><th>状态</th><th>注册正式用户</th><th>操作</th></tr></thead>
+              <tbody id="guestBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="view-flow" class="page-view">
+      <div class="glass-card flow-page">
+        <p class="flow-page-intro">用户申请和后台代填先去掉空格，再判断空串和占住。后台创建跳过审核直接生效。游客只有搜到仍有效的别名，且这台设备没有未过期记录时，才新开一条。</p>
+        <div class="flow-svg-wrap">
+          <svg width="1080" height="1120" viewBox="0 0 1080 1120">
+            <defs>
+              <marker id="flow-arrow-alias" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+                <path d="M0,0 L8,3 L0,6 Z" fill="#94a3b8" />
+              </marker>
+            </defs>
+            <g fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#flow-arrow-alias)">
+              <polyline points="360,60 360,100" />
+              <polyline points="870,60 870,122 470,122" />
+              <polyline points="360,144 360,184" />
+              <polyline points="290,222 190,222" />
+              <polyline points="40,222 16,222 16,8 360,8 360,16" />
+              <polyline points="360,260 360,300" />
+              <polyline points="280,338 210,338" />
+              <polyline points="40,338 16,338 16,222" />
+              <polyline points="360,376 360,416" />
+              <polyline points="450,454 1060,454 1060,754 470,754" />
+              <polyline points="360,492 360,532" />
+              <polyline points="360,576 360,616" />
+              <polyline points="430,654 640,654" />
+              <polyline points="810,654 1040,654 1040,8 360,8 360,16" />
+              <polyline points="360,692 360,732" />
+              <polyline points="450,942 640,942" />
+              <polyline points="360,980 360,1020" />
+            </g>
+            <g fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#flow-arrow-alias)">
+              <polyline points="360,776 360,820" />
+              <polyline points="360,864 360,904" />
+            </g>
+            <g font-family="PingFang SC, Microsoft YaHei, sans-serif" text-anchor="middle">
+              <rect x="250" y="16" width="220" height="44" rx="8" fill="#dbeafe" stroke="#2563eb" />
+              <text x="360" y="42" font-size="13" fill="#1e3a8a">用户填写别名</text>
+              <rect x="760" y="16" width="220" height="44" rx="8" fill="#ffedd5" stroke="#ea580c" />
+              <text x="870" y="42" font-size="13" fill="#9a3412">后台代用户填写别名</text>
+              <rect x="250" y="100" width="220" height="44" rx="8" fill="#dcfce7" stroke="#16a34a" />
+              <text x="360" y="126" font-size="13" fill="#14532d">删除其中空格</text>
+              <polygon points="360,184 430,222 360,260 290,222" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="360" y="226" font-size="12" fill="#854d0e">删完为空？</text>
+              <text x="230" y="214" font-size="11" fill="#dc2626" text-anchor="middle">是</text>
+              <rect x="40" y="200" width="150" height="44" rx="8" fill="#fee2e2" stroke="#dc2626" />
+              <text x="115" y="226" font-size="13" fill="#991b1b">不能提交</text>
+              <text x="372" y="286" font-size="11" fill="#16a34a" text-anchor="start">否</text>
+              <polygon points="360,300 440,338 360,376 280,338" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="360" y="342" font-size="12" fill="#854d0e">已被占住？</text>
+              <text x="240" y="330" font-size="11" fill="#dc2626" text-anchor="middle">是</text>
+              <rect x="40" y="316" width="170" height="44" rx="8" fill="#fee2e2" stroke="#dc2626" />
+              <text x="125" y="342" font-size="13" fill="#991b1b">不能提交</text>
+              <text x="372" y="402" font-size="11" fill="#16a34a" text-anchor="start">否</text>
+              <polygon points="360,416 450,454 360,492 270,454" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="360" y="458" font-size="12" fill="#854d0e">来源是后台？</text>
+              <text x="520" y="446" font-size="11" fill="#16a34a" text-anchor="start">是</text>
+              <text x="372" y="518" font-size="11" fill="#16a34a" text-anchor="start">否</text>
+              <rect x="250" y="532" width="220" height="44" rx="8" fill="#dcfce7" stroke="#16a34a" />
+              <text x="360" y="558" font-size="13" fill="#14532d">记为审核中并占住</text>
+              <polygon points="360,616 430,654 360,692 290,654" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="360" y="658" font-size="12" fill="#854d0e">审核通过？</text>
+              <text x="500" y="646" font-size="11" fill="#dc2626" text-anchor="start">否</text>
+              <rect x="640" y="632" width="170" height="44" rx="8" fill="#fee2e2" stroke="#dc2626" />
+              <text x="725" y="658" font-size="13" fill="#991b1b">驳回并释放</text>
+              <text x="372" y="718" font-size="11" fill="#16a34a" text-anchor="start">是</text>
+              <rect x="250" y="732" width="220" height="44" rx="8" fill="#dcfce7" stroke="#16a34a" />
+              <text x="360" y="758" font-size="13" fill="#14532d">别名生效</text>
+              <rect x="250" y="820" width="220" height="44" rx="8" fill="#dbeafe" stroke="#2563eb" />
+              <text x="360" y="846" font-size="13" fill="#1e3a8a">游客搜到有效别名</text>
+              <polygon points="360,904 450,942 360,980 270,942" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="360" y="946" font-size="12" fill="#854d0e">已有未过期？</text>
+              <text x="500" y="934" font-size="11" fill="#64748b" text-anchor="start">是</text>
+              <rect x="640" y="920" width="170" height="44" rx="8" fill="#f1f5f9" stroke="#94a3b8" />
+              <text x="725" y="946" font-size="13" fill="#475569">不新开</text>
+              <text x="372" y="1006" font-size="11" fill="#16a34a" text-anchor="start">否</text>
+              <rect x="250" y="1020" width="220" height="44" rx="8" fill="#dcfce7" stroke="#16a34a" />
+              <text x="360" y="1046" font-size="13" fill="#14532d">新开一条游客记录</text>
+            </g>
+          </svg>
+        </div>
+        <div class="flow-legend">
+          <span><i style="background:#dbeafe;border:1px solid #2563eb"></i>前端</span>
+          <span><i style="background:#ffedd5;border:1px solid #ea580c"></i>后台创建</span>
+          <span><i style="background:#dcfce7;border:1px solid #16a34a"></i>后端</span>
+          <span><i style="background:#fef9c3;border:1px solid #ca8a04"></i>校验</span>
+          <span><i style="background:#fee2e2;border:1px solid #dc2626"></i>阻断</span>
+          <span><i style="background:#f1f5f9;border:1px solid #94a3b8"></i>跳过</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="drawer-overlay" id="ruleOverlay"></div>
+  <aside class="drawer" id="ruleDrawer">
+    <div class="drawer-header"><h2>需求规则 · FR-019</h2><button class="drawer-close" type="button" id="closeRule">×</button></div>
+    <div class="rule-tab-bar">
+      <button type="button" class="active" data-rule="rule-fe">前端需求</button>
+      <button type="button" data-rule="rule-be">后台需求</button>
+    </div>
+    <div class="drawer-body">
+      <div class="rule-panel active" id="rule-fe">
+        <div class="rule-section"><h3>1 业务目标</h3><div class="rule-content">站内用户自己申请推广别名，并在申请记录里看审核进度。没有记录时是缺省页。</div></div>
+        <div class="rule-section"><h3>2 页面与入口</h3><div class="rule-content"><ul><li>申请记录只展示卡片：别名标题、申请时间、审核状态、审核时间。状态为申请中、已通过、已驳回。申请中没有审核时间，显示「—」。</li><li>没有申请时进入缺省页，说明还没有申请记录。</li><li>右上角「申请别名」打开弹窗。自己输入，去掉空格后的预览，提交后关闭弹窗并出现在列表里。</li></ul></div></div>
+        <div class="rule-section"><h3>3 交互规则</h3><div class="rule-content"><ul><li>提交前去掉空格，再拿去掉后的字去占位和匹配。</li><li>提交成功后前端状态为申请中，后台记为审核中。通过后才生效。</li><li>一个用户可以同时有多串有效别名，都能拿去让别人搜。</li></ul></div></div>
+        <div class="rule-section"><h3>4 边界规则</h3><div class="rule-content"><ul><li>去掉空格后为空，不能提交。</li><li>已被有效别名或审核中申请占住的字符串，不能再提交。</li><li>驳回或失效后，这串字释放，之后可以再发给别人。</li><li>用户不能自己把别名设为失效。</li></ul></div></div>
+        <div class="rule-section"><h3>5 业务流程</h3><div class="rule-content">见页内「业务流程」。</div></div>
+      </div>
+      <div class="rule-panel" id="rule-be">
+        <div class="rule-section"><h3>1 业务目标</h3><div class="rule-content">运营审核别名、代用户创建别名，并按设备和别名查看游客记录。</div></div>
+        <div class="rule-section"><h3>2 数据表与字段</h3><div class="rule-content"><ul><li>别名管理：申请 ID、用户、别名、状态（审核中 / 已通过 / 已驳回 / 已失效）、来源（用户 / 后台创建）、提交时间、处理时间、绑定用户数。点开人数看绑定用户：用户 ID、用户昵称、绑定类型（新用户 / 静默45天用户）、绑定时间。</li><li>游客记录：游客 UUID、版本信息、来源（小程序、小米、OPPO 等设备渠道）、首次安装时间、最近启动时间、设备系统（安卓、iOS）、系统版本、设备型号、设备 ID、搜索别名、所属用户（用户 ID 与昵称）、绑定时间、失效时间、状态（未过期 / 已到期 / 运营失效）、注册正式用户（用户 ID 与昵称，未注册为空）。</li></ul></div></div>
+        <div class="rule-section"><h3>3 列表与筛选</h3><div class="rule-content"><ul><li>别名管理：按用户、别名、状态、来源筛选。来源只有用户、后台创建。审核中可通过或驳回，已通过可失效。点绑定用户数打开绑定用户列表。行内进详情。</li><li>游客记录：按设备 ID、别名、状态筛选。行内进详情。</li><li>创建别名是弹窗：选用户、填别名。创建即已通过。</li></ul></div></div>
+        <div class="rule-section"><h3>4 边界规则</h3><div class="rule-content"><ul><li>后台创建不审核，但仍去掉空格。空的、已被占住的不能创建。</li><li>只有运营可以把已通过的别名设为失效。已进账号的绑定仍留在原所属用户。该别名下未过期的游客记录同时变为运营失效，原失效时间视为已到期。</li><li>一台设备同时只有一条未过期记录。已有未过期记录时，再搜别名不新开。</li><li>运营失效或自然到期之后，要再搜到一串仍有效的别名，才新开游客记录。搜已失效的字不新开。</li><li>注册时若同时有未过期的游客绑定和邀请码，账号上级取邀请码的人，设备上的绑定不清，等到它自己的失效时间。</li></ul></div></div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="drawer-overlay" id="detailOverlay"></div>
+  <aside class="drawer" id="detailDrawer">
+    <div class="drawer-header"><span id="detailTitle">详情</span><button class="drawer-close" type="button" id="closeDetail">×</button></div>
+    <div class="drawer-body" id="detailBody"></div>
+  </aside>
+
+  <div class="modal-overlay" id="createOverlay">
+    <div class="modal" role="dialog">
+      <div class="modal-header">创建别名</div>
+      <div class="modal-body">
+        <div class="form-field"><label>用户</label>
+          <select id="cUser"></select>
+        </div>
+        <div class="form-field">
+          <label>别名</label>
+          <input id="cAlias" type="text" placeholder="代用户填写" />
+          <div class="field-hint">去掉空格后创建。不审核，创建即生效。</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" type="button" id="cCancel">取消</button>
+        <button class="btn btn-primary" type="button" id="cOk">创建</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="searchOverlay">
+    <div class="modal" role="dialog">
+      <div class="modal-header">模拟游客再搜别名</div>
+      <div class="modal-body">
+        <div class="form-field"><label>设备 ID</label><input id="sDevice" placeholder="DEV-9F3A" /></div>
+        <div class="form-field">
+          <label>搜索别名</label>
+          <input id="sAlias" placeholder="青提" />
+          <div class="field-hint">该设备已有未过期记录时不新开。只有有效别名才会新开一条。</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" type="button" id="sCancel">取消</button>
+        <button class="btn btn-primary" type="button" id="sOk">记录这次搜索</button>
+      </div>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+
+  <script src="alias-bind-store.js?v=2"></script>
+  <script src="sidebar-nav.js?v=fr019"></script>
+  <script>
+    var toastTimer;
+    function toast(msg) {
+      var el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(function () { el.classList.remove('show'); }, 2200);
+    }
+    function tag(status) {
+      var cls = status === '已通过' || status === '未过期' ? 'tag-ok'
+        : status === '审核中' ? 'tag-warn'
+        : status === '已失效' || status === '运营失效' ? 'tag-del' : 'tag-muted';
+      return '<span class="tag ' + cls + '">' + status + '</span>';
+    }
+    function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]); }); }
+
+    function userCell(id) {
+      if (!id) return '—';
+      var name = AliasBind.userName(id);
+      return (name ? esc(name) : '—') + '<div class="cell-sub">' + esc(id) + '</div>';
+    }
+
+    function renderApps() {
+      var data = AliasBind.load();
+      var u = document.getElementById('qUser').value.trim();
+      var a = document.getElementById('qAlias').value.trim();
+      var st = document.getElementById('qStatus').value;
+      var src = document.getElementById('qSource').value;
+      var rows = data.apps.filter(function (row) {
+        if (u && row.userId.indexOf(u) < 0 && AliasBind.userName(row.userId).indexOf(u) < 0) return false;
+        if (a && row.alias.indexOf(a) < 0) return false;
+        if (st && row.status !== st) return false;
+        if (src && row.source !== src) return false;
+        return true;
+      });
+      document.getElementById('appBody').innerHTML = rows.map(function (row) {
+        var ops = '<button class="link" type="button" data-detail="' + row.id + '">详情</button>';
+        if (row.status === '审核中') {
+          ops += '<button class="link" type="button" data-approve="' + row.id + '">通过</button>';
+          ops += '<button class="link link-danger" type="button" data-reject="' + row.id + '">驳回</button>';
+        }
+        if (row.status === '已通过') ops += '<button class="link link-danger" type="button" data-kill="' + row.id + '">失效</button>';
+        var binds = row.binds || [];
+        var bindCell = '<button class="link" type="button" data-binds="' + row.id + '">' + binds.length + '</button>';
+        return '<tr><td>' + row.id + '</td><td>' + esc(AliasBind.userName(row.userId)) + '<div class="cell-sub">' + row.userId + '</div></td><td>' + esc(row.alias) + '</td><td>' + tag(row.status) + '</td><td>' + row.source + '</td><td>' + row.at + '</td><td>' + (row.reviewedAt || '—') + '</td><td>' + bindCell + '</td><td>' + ops + '</td></tr>';
+      }).join('') || '<tr><td colspan="9">没有记录</td></tr>';
+    }
+
+    function renderGuests() {
+      var data = AliasBind.load();
+      var d = document.getElementById('gDevice').value.trim();
+      var a = document.getElementById('gAlias').value.trim();
+      var st = document.getElementById('gStatus').value;
+      var rows = data.guests.filter(function (g) {
+        if (d && g.deviceId.indexOf(d) < 0) return false;
+        if (a && g.alias.indexOf(a) < 0) return false;
+        if (st && g.status !== st) return false;
+        return true;
+      });
+      document.getElementById('guestBody').innerHTML = rows.map(function (g) {
+        return '<tr><td>' + esc(g.guestUuid) + '</td><td>' + esc(g.version) + '</td><td>' + esc(g.channel) + '</td><td>' + esc(g.installedAt) + '</td><td>' + esc(g.launchedAt) + '</td><td>' + esc(g.os) + '</td><td>' + esc(g.osVersion) + '</td><td>' + esc(g.model) + '</td><td>' + esc(g.deviceId) + '</td><td>' + esc(g.alias) + '</td><td>' + userCell(g.ownerId) + '</td><td>' + esc(g.boundAt) + '</td><td>' + esc(g.expireAt) + '</td><td>' + tag(g.status) + '</td><td>' + userCell(g.registeredUserId) + '</td><td><button class="link" type="button" data-guest="' + g.id + '">详情</button></td></tr>';
+      }).join('') || '<tr><td colspan="16">没有记录</td></tr>';
+    }
+
+    function render() { renderApps(); renderGuests(); }
+
+    function openDetail(html, title) {
+      document.getElementById('detailTitle').textContent = title;
+      document.getElementById('detailBody').innerHTML = html;
+      document.getElementById('detailOverlay').classList.add('open');
+      document.getElementById('detailDrawer').classList.add('open');
+    }
+    function closeDetail() {
+      document.getElementById('detailOverlay').classList.remove('open');
+      document.getElementById('detailDrawer').classList.remove('open');
+    }
+    function bindListHtml(row) {
+      var binds = row.binds || [];
+      if (!binds.length) return '<p class="field-hint">还没有绑定用户</p>';
+      return '<table class="mini"><thead><tr><th>用户ID</th><th>用户昵称</th><th>绑定类型</th><th>绑定时间</th></tr></thead><tbody>' +
+        binds.map(function (b) {
+          return '<tr><td>' + esc(b.userId) + '</td><td>' + esc(b.name) + '</td><td>' + esc(b.type) + '</td><td>' + esc(b.boundAt || '—') + '</td></tr>';
+        }).join('') + '</tbody></table>';
+    }
+    function act(fn, id) {
+      var res = fn(id);
+      toast(res.message);
+      render();
+    }
+
+    document.getElementById('appBody').addEventListener('click', function (e) {
+      var t = e.target;
+      var data = AliasBind.load();
+      if (t.dataset.approve) act(AliasBind.approve, t.dataset.approve);
+      if (t.dataset.reject) act(AliasBind.reject, t.dataset.reject);
+      if (t.dataset.kill) act(AliasBind.invalidate, t.dataset.kill);
+      if (t.dataset.binds) {
+        var bound = data.apps.find(function (a) { return a.id === t.dataset.binds; });
+        if (!bound) return;
+        openDetail(bindListHtml(bound), '绑定用户 · ' + bound.alias);
+      }
+      if (t.dataset.detail) {
+        var row = data.apps.find(function (a) { return a.id === t.dataset.detail; });
+        if (!row) return;
+        openDetail('<div class="kv"><i>申请ID</i><b>' + row.id + '</b><i>用户</i><b>' + esc(AliasBind.userName(row.userId)) + ' ' + row.userId + '</b><i>别名</i><b>' + esc(row.alias) + '</b><i>状态</i><b>' + row.status + '</b><i>来源</i><b>' + row.source + '</b><i>提交</i><b>' + row.at + '</b><i>处理</i><b>' + (row.reviewedAt || '—') + '</b><i>绑定用户</i><b>' + (row.binds || []).length + '</b></div>' + bindListHtml(row), '别名详情');
+      }
+    });
+    document.getElementById('guestBody').addEventListener('click', function (e) {
+      var id = e.target.dataset && e.target.dataset.guest;
+      if (!id) return;
+      var g = AliasBind.load().guests.find(function (row) { return row.id === id; });
+      if (!g) return;
+      openDetail('<div class="kv"><i>游客UUID</i><b>' + esc(g.guestUuid) + '</b><i>版本信息</i><b>' + esc(g.version) + '</b><i>来源</i><b>' + esc(g.channel) + '</b><i>首次安装</i><b>' + esc(g.installedAt) + '</b><i>最近启动</i><b>' + esc(g.launchedAt) + '</b><i>设备系统</i><b>' + esc(g.os) + '</b><i>系统版本</i><b>' + esc(g.osVersion) + '</b><i>设备型号</i><b>' + esc(g.model) + '</b><i>设备 ID</i><b>' + esc(g.deviceId) + '</b><i>搜索别名</i><b>' + esc(g.alias) + '</b><i>所属用户</i><b>' + esc(AliasBind.userName(g.ownerId)) + ' ' + esc(g.ownerId) + '</b><i>绑定时间</i><b>' + esc(g.boundAt) + '</b><i>失效时间</i><b>' + esc(g.expireAt) + '</b><i>状态</i><b>' + esc(g.status) + '</b><i>注册用户</i><b>' + (g.registeredUserId ? esc(AliasBind.userName(g.registeredUserId)) + ' ' + esc(g.registeredUserId) : '—') + '</b></div>', '游客记录');
+    });
+
+    document.getElementById('qGo').onclick = renderApps;
+    document.getElementById('qReset').onclick = function () {
+      ['qUser', 'qAlias'].forEach(function (id) { document.getElementById(id).value = ''; });
+      document.getElementById('qStatus').value = '';
+      document.getElementById('qSource').value = '';
+      renderApps();
+    };
+    document.getElementById('gGo').onclick = renderGuests;
+    document.getElementById('gReset').onclick = function () {
+      document.getElementById('gDevice').value = '';
+      document.getElementById('gAlias').value = '';
+      document.getElementById('gStatus').value = '';
+      renderGuests();
+    };
+    document.getElementById('resetData').onclick = function () {
+      AliasBind.reset();
+      toast('已恢复示例数据');
+      render();
+    };
+
+    function openModal(id) { document.getElementById(id).classList.add('open'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+    document.getElementById('openCreate').onclick = function () {
+      document.getElementById('cUser').innerHTML = Object.keys(AliasBind.USERS).map(function (id) {
+        return '<option value="' + id + '">' + AliasBind.userName(id) + ' ' + id + '</option>';
+      }).join('');
+      document.getElementById('cAlias').value = '';
+      openModal('createOverlay');
+    };
+    document.getElementById('cCancel').onclick = function () { closeModal('createOverlay'); };
+    document.getElementById('cOk').onclick = function () {
+      var res = AliasBind.createAdmin(document.getElementById('cUser').value, document.getElementById('cAlias').value);
+      toast(res.message);
+      if (!res.ok) return;
+      closeModal('createOverlay');
+      render();
+    };
+    document.getElementById('openSearch').onclick = function () { openModal('searchOverlay'); };
+    document.getElementById('sCancel').onclick = function () { closeModal('searchOverlay'); };
+    document.getElementById('sOk').onclick = function () {
+      var res = AliasBind.searchGuest(document.getElementById('sDevice').value, document.getElementById('sAlias').value);
+      toast(res.message);
+      if (!res.ok) return;
+      closeModal('searchOverlay');
+      renderGuests();
+    };
+    document.getElementById('createOverlay').addEventListener('click', function (e) { if (e.target.id === 'createOverlay') closeModal('createOverlay'); });
+    document.getElementById('searchOverlay').addEventListener('click', function (e) { if (e.target.id === 'searchOverlay') closeModal('searchOverlay'); });
+    document.getElementById('closeDetail').onclick = closeDetail;
+    document.getElementById('detailOverlay').onclick = closeDetail;
+
+    function scaleAliasPhones() {
+      document.querySelectorAll('.board-phone').forEach(function (phone) {
+        var iframe = phone.querySelector('iframe');
+        if (!iframe) return;
+        var w = phone.clientWidth;
+        if (!w) return;
+        iframe.style.transform = 'scale(' + (w / 375) + ')';
+      });
+    }
+    function scrollToTile(screen) {
+      var tile = document.getElementById('tile-' + screen);
+      var scroller = document.getElementById('feBoardScroll');
+      if (!tile || !scroller) return;
+      var top = tile.getBoundingClientRect().top - scroller.getBoundingClientRect().top + scroller.scrollTop - 8;
+      scroller.scrollTop = Math.max(0, top);
+    }
+    document.querySelectorAll('.scene-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('.scene-btn').forEach(function (b) { b.classList.toggle('active', b === btn); });
+        scrollToTile(btn.dataset.screen);
+      });
+    });
+    function showPage(id) {
+      document.querySelectorAll('.page-tab-bar button').forEach(function (btn) { btn.classList.toggle('active', btn.dataset.page === id); });
+      document.querySelectorAll('.page-view').forEach(function (view) { view.classList.toggle('active', view.id === id); });
+      if (id === 'view-fe') requestAnimationFrame(scaleAliasPhones);
+      var rule = id === 'view-admin' ? 'rule-be' : 'rule-fe';
+      document.querySelectorAll('.rule-tab-bar button').forEach(function (btn) { btn.classList.toggle('active', btn.dataset.rule === rule); });
+      document.querySelectorAll('.rule-panel').forEach(function (p) { p.classList.toggle('active', p.id === rule); });
+    }
+    document.querySelectorAll('.page-tab-bar button').forEach(function (btn) {
+      btn.addEventListener('click', function () { showPage(btn.dataset.page); });
+    });
+    document.querySelectorAll('.admin-tab-bar button').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('.admin-tab-bar button').forEach(function (b) { b.classList.toggle('active', b === btn); });
+        document.querySelectorAll('.admin-pane').forEach(function (p) { p.classList.toggle('active', p.id === btn.dataset.admin); });
+      });
+    });
+    var ruleDrawer = document.getElementById('ruleDrawer');
+    var ruleOverlay = document.getElementById('ruleOverlay');
+    function toggleRule(open) {
+      ruleDrawer.classList.toggle('open', open);
+      ruleOverlay.classList.toggle('open', open);
+    }
+    document.getElementById('toggleRuleDrawer').onclick = function () { toggleRule(!ruleDrawer.classList.contains('open')); };
+    document.getElementById('closeRule').onclick = function () { toggleRule(false); };
+    ruleOverlay.onclick = function () { toggleRule(false); };
+    document.querySelectorAll('.rule-tab-bar button').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('.rule-tab-bar button').forEach(function (b) { b.classList.toggle('active', b === btn); });
+        document.querySelectorAll('.rule-panel').forEach(function (p) { p.classList.toggle('active', p.id === btn.dataset.rule); });
+      });
+    });
+    window.addEventListener('storage', render);
+
+    var tab = new URLSearchParams(location.search).get('tab');
+    if (tab === 'admin') showPage('view-admin');
+    if (tab === 'flow') showPage('view-flow');
+    render();
+    window.addEventListener('resize', scaleAliasPhones);
+    scaleAliasPhones();
+    setTimeout(scaleAliasPhones, 200);
+  </script>
+</body>
+</html>

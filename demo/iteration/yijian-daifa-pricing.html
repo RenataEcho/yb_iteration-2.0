@@ -1,0 +1,1267 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>一键代发 · 收费方案汇报</title>
+<style>
+  :root {
+    --bg: #e8e4dc;
+    --slide: #fffefb;
+    --ink: #141210;
+    --muted: #5c564f;
+    --faint: #8a8279;
+    --line: #ddd5c9;
+    --band: #f4f0e9;
+    --accent: #9a3d32;
+    --accent-soft: #f5ebe9;
+    --ok: #1f6b4f;
+    --ok-soft: #e8f3ed;
+    --warn: #b45309;
+    --lbb: #5a5550;
+    --comp: #b87318;
+    --p1: #2a7054;
+    --p2: #9a3d32;
+    --sans: "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+    --slide-w: min(1200px, calc(100vw - 200px));
+    --nav-w: 168px;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, p { margin: 0; }
+
+  /* —— 左侧汇报目录 —— */
+  .nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 20;
+    width: var(--nav-w);
+    height: 100vh;
+    padding: 20px 14px 24px;
+    background: #1a1816;
+    color: #a8a099;
+    font-size: 12px;
+    overflow-y: auto;
+  }
+  .nav-brand {
+    padding: 0 6px 16px;
+    border-bottom: 1px solid #333;
+    color: #f5f2ec;
+    font-size: 13px;
+    font-weight: 650;
+    line-height: 1.35;
+  }
+  .nav ol {
+    margin: 14px 0 0;
+    padding: 0 0 0 18px;
+    list-style: decimal;
+  }
+  .nav li { margin: 8px 0; }
+  .nav a {
+    color: #c4bdb4;
+    text-decoration: none;
+  }
+  .nav a:hover, .nav a:focus { color: #fff; }
+  .nav .hint {
+    margin-top: 20px;
+    padding: 0 6px;
+    font-size: 11px;
+    line-height: 1.45;
+    color: #6a645c;
+  }
+
+  /* —— 幻灯片容器 —— */
+  .deck {
+    margin-left: var(--nav-w);
+    padding: 24px 24px 80px;
+  }
+  .slide {
+    width: var(--slide-w);
+    max-width: 100%;
+    margin: 0 auto 20px;
+    padding: 40px 48px 44px;
+    background: var(--slide);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    box-shadow: 0 8px 32px rgba(20, 18, 16, 0.06);
+  }
+  .slide-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 3px solid var(--accent);
+  }
+  .slide-no {
+    flex-shrink: 0;
+    font-size: 11px;
+    font-weight: 650;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+  }
+  .slide-title {
+    flex: 1;
+    font-size: 26px;
+    font-weight: 650;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+  }
+  .slide-sub {
+    margin-top: 6px;
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 400;
+  }
+  .slide-meta {
+    flex-shrink: 0;
+    text-align: right;
+    color: var(--faint);
+    font-size: 11px;
+    line-height: 1.5;
+  }
+
+  /* 封面 */
+  .slide.cover {
+    min-height: 420px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-top: 6px solid var(--accent);
+    border-bottom: none;
+  }
+  .cover .kicker {
+    font-size: 12px;
+    font-weight: 650;
+    letter-spacing: 0.14em;
+    color: var(--accent);
+  }
+  .cover h1 {
+    margin-top: 12px;
+    font-size: 42px;
+    font-weight: 650;
+    letter-spacing: -0.03em;
+    line-height: 1.12;
+  }
+  .cover .deck-lead {
+    max-width: 36em;
+    margin-top: 16px;
+    color: var(--muted);
+    font-size: 17px;
+  }
+  .cover .assumptions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 32px;
+  }
+  .chip {
+    padding: 6px 12px;
+    border-radius: 4px;
+    background: var(--band);
+    color: var(--muted);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* 结论条 */
+  .takeaways {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .takeaway {
+    padding: 16px 18px;
+    border-radius: 4px;
+    border-left: 4px solid var(--line);
+    background: var(--band);
+  }
+  .takeaway strong {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 13px;
+    font-weight: 650;
+  }
+  .takeaway p {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.45;
+  }
+  .takeaway.ok { border-left-color: var(--ok); background: var(--ok-soft); }
+  .takeaway.ok strong { color: var(--ok); }
+  .takeaway.accent { border-left-color: var(--accent); background: var(--accent-soft); }
+  .takeaway.accent strong { color: var(--accent); }
+
+  /* KPI 行 */
+  .kpis {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: var(--line);
+  }
+  .kpi {
+    padding: 18px 16px;
+    background: var(--slide);
+    text-align: center;
+  }
+  .kpi label {
+    display: block;
+    color: var(--faint);
+    font-size: 11px;
+    font-weight: 650;
+    letter-spacing: 0.04em;
+  }
+  .kpi b {
+    display: block;
+    margin-top: 8px;
+    font-size: 28px;
+    font-weight: 650;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+  }
+  .kpi small {
+    display: block;
+    margin-top: 4px;
+    color: var(--muted);
+    font-size: 11px;
+  }
+  .kpi.highlight { background: var(--accent-soft); }
+  .kpi.highlight b { color: var(--accent); }
+
+  /* 主对比矩阵 */
+  .matrix-wrap {
+    margin-top: 8px;
+    overflow-x: auto;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+  }
+  .matrix {
+    width: 100%;
+    min-width: 720px;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  .matrix th,
+  .matrix td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+    vertical-align: middle;
+  }
+  .matrix thead th {
+    background: #2a2724;
+    color: #e8e4dc;
+    font-size: 12px;
+    font-weight: 650;
+  }
+  .matrix tbody tr:last-child td { border-bottom: 0; }
+  .matrix .metric {
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 600;
+    background: var(--band);
+    white-space: nowrap;
+  }
+  .matrix .num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .matrix .row-h {
+    font-weight: 650;
+    font-size: 13px;
+  }
+  .matrix .tag {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: 650;
+    vertical-align: 1px;
+  }
+  .tag-lbb { background: #e8e6e4; color: var(--lbb); }
+  .tag-comp { background: #fef3e2; color: var(--comp); }
+  .tag-p1 { background: var(--ok-soft); color: var(--p1); }
+  .tag-p2 { background: var(--accent-soft); color: var(--p2); }
+  .matrix .best { color: var(--ok); font-weight: 650; }
+  .matrix .gap { color: var(--warn); font-weight: 650; }
+  .matrix col.col-lbb { background: #faf9f8; }
+  .matrix td.col-lbb { background: #faf9f8; }
+  .matrix td.col-comp { background: #fffcf7; }
+  .matrix td.col-p1 { background: #f7fbf9; }
+  .matrix td.col-p2 { background: #fdf8f7; }
+
+  .ref-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    align-items: start;
+  }
+  .ref-card {
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .ref-card .head {
+    padding: 12px 16px;
+    font-size: 14px;
+    font-weight: 650;
+    color: #fff;
+  }
+  .ref-card.lbb .head { background: var(--lbb); }
+  .ref-card.comp .head { background: var(--comp); }
+  .ref-card.ours .head { background: var(--p1); }
+  .ref-card .body { padding: 14px 16px 16px; background: var(--slide); }
+  .ref-kpi {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .ref-kpi div {
+    padding: 10px;
+    border-radius: 4px;
+    background: var(--band);
+    text-align: center;
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .ref-kpi b {
+    display: block;
+    margin-top: 4px;
+    font-size: 16px;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .ref-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+  .ref-table th, .ref-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+  }
+  .ref-table th { color: var(--faint); font-weight: 650; font-size: 11px; }
+  .ref-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .ref-table tr:last-child td { border-bottom: 0; }
+  .ref-note { margin-top: 10px; font-size: 11px; color: var(--faint); line-height: 1.45; }
+
+  /* 条形对比 */
+  .bars { margin-top: 20px; }
+  .bar-row {
+    display: grid;
+    grid-template-columns: 140px 1fr 88px;
+    gap: 16px;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+  .bar-row .lbl {
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .bar-row .lbl small {
+    display: block;
+    color: var(--faint);
+    font-weight: 400;
+    font-size: 11px;
+  }
+  .bar-track {
+    height: 22px;
+    overflow: hidden;
+    border-radius: 2px;
+    background: var(--band);
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 2px;
+  }
+  .bar-fill.lbb { background: var(--lbb); }
+  .bar-fill.comp { background: var(--comp); }
+  .bar-fill.p1 { background: var(--p1); }
+  .bar-fill.p2 { background: linear-gradient(90deg, var(--p1) 68%, var(--p2) 68%); }
+  .bar-row .val {
+    text-align: right;
+    font-size: 15px;
+    font-weight: 650;
+    font-variant-numeric: tabular-nums;
+  }
+  .bar-legend {
+    display: flex;
+    gap: 16px;
+    margin-top: 8px;
+    color: var(--faint);
+    font-size: 11px;
+  }
+  .bar-legend i {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin-right: 4px;
+    border-radius: 1px;
+    vertical-align: -1px;
+  }
+
+  /* 两列对比 */
+  .dual {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .phase-card {
+    padding: 20px 22px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+  }
+  .phase-card.p1 { border-top: 4px solid var(--p1); }
+  .phase-card.p2 { border-top: 4px solid var(--p2); background: var(--accent-soft); }
+  .phase-card h3 { font-size: 18px; }
+  .phase-card .big {
+    margin: 14px 0 12px;
+    font-size: 36px;
+    font-weight: 650;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.03em;
+  }
+  .phase-card.p2 .big { color: var(--accent); }
+  .mini-table {
+    width: 100%;
+    font-size: 13px;
+    border-collapse: collapse;
+  }
+  .mini-table td {
+    padding: 7px 0;
+    border-top: 1px solid var(--line);
+  }
+  .mini-table td:first-child { color: var(--muted); }
+  .mini-table td:last-child {
+    text-align: right;
+    font-weight: 650;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* 价目 */
+  .packs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+  .pack {
+    padding: 16px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+  }
+  .pack.main {
+    border: 2px solid var(--p1);
+    background: var(--ok-soft);
+  }
+  .pack .tag { font-size: 10px; font-weight: 650; color: var(--faint); letter-spacing: 0.06em; }
+  .pack.main .tag { color: var(--p1); }
+  .pack h3 { margin-top: 8px; font-size: 15px; }
+  .pack .price {
+    margin-top: 12px;
+    font-size: 26px;
+    font-weight: 650;
+    font-variant-numeric: tabular-nums;
+  }
+  .pack .price span { font-size: 12px; color: var(--muted); font-weight: 500; }
+  .pack p { margin-top: 6px; color: var(--muted); font-size: 12px; }
+
+  .split-panels {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 16px;
+  }
+  .panel {
+    padding: 18px 20px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    font-size: 13px;
+  }
+  .panel h3 { font-size: 15px; margin-bottom: 8px; }
+  .panel p { color: var(--muted); margin-bottom: 10px; }
+  .panel table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+  .panel th, .panel td {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+  }
+  .panel .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .panel .ex {
+    margin-top: 10px;
+    padding: 10px;
+    background: var(--band);
+    border-radius: 4px;
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  .closing {
+    padding: 20px 22px;
+    border: 2px dashed var(--accent);
+    border-radius: 4px;
+    background: var(--accent-soft);
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  .closing b { color: var(--accent); }
+
+  .footnote {
+    margin-top: 16px;
+    color: var(--faint);
+    font-size: 11px;
+    line-height: 1.5;
+  }
+
+  .block-title {
+    margin: 24px 0 10px;
+    font-size: 13px;
+    font-weight: 650;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+  }
+  .block-title:first-of-type { margin-top: 0; }
+  .block-title.p1 { color: var(--p1); }
+  .block-title.p2 { color: var(--p2); }
+  .matrix .strike { color: var(--faint); text-decoration: line-through; }
+  .matrix .main-row td { background: #f3faf6; font-weight: 600; }
+  .matrix .off td { color: var(--faint); font-style: italic; }
+  .rule-box {
+    margin-top: 14px;
+    padding: 12px 14px;
+    border-radius: 4px;
+    background: var(--band);
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.55;
+  }
+  .rule-box b { color: var(--ink); }
+
+  @media (max-width: 960px) {
+    :root { --nav-w: 0px; }
+    .nav { display: none; }
+    .deck { margin-left: 0; padding: 12px; }
+    .slide { padding: 28px 20px; }
+    .takeaways, .kpis, .dual, .packs, .split-panels, .ref-grid, .ref-kpi { grid-template-columns: 1fr; }
+    .bar-row { grid-template-columns: 1fr; gap: 6px; }
+    .bar-row .val { text-align: left; }
+  }
+
+  @media print {
+    .nav { display: none; }
+    .deck { margin: 0; padding: 0; }
+    .slide {
+      width: 100%;
+      margin: 0;
+      box-shadow: none;
+      page-break-after: always;
+      break-after: page;
+    }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav" aria-label="汇报目录">
+  <div class="nav-brand">一键代发<br>收费方案</div>
+  <ol>
+    <li><a href="#s-cover">封面</a></li>
+    <li><a href="#s-summary">结论摘要</a></li>
+    <li><a href="#s-benchmark">领帮帮·竞品</a></li>
+    <li><a href="#s-matrix">指标对比</a></li>
+    <li><a href="#s-phase">一期 vs 二期</a></li>
+    <li><a href="#s-chart">净收益图</a></li>
+    <li><a href="#s-p1-tier">一期阶梯</a></li>
+    <li><a href="#s-p2-tier">二期阶梯</a></li>
+    <li><a href="#s-close">建议</a></li>
+  </ol>
+  <p class="hint">滚动浏览 · 打印时每页一张幻灯片</p>
+</nav>
+
+<div class="deck">
+
+  <!-- 1 封面 -->
+  <section class="slide cover" id="s-cover">
+    <p class="kicker">YBDD2.0 · FR-014 一键代发</p>
+    <h1>收费方案汇报</h1>
+    <p class="deck-lead">无首购优惠 · 每日免费 1 次领取；付费最小 5 次包。用原价/现价引导用户买<strong>22 次推荐包</strong>，在仍比单买小包装划算的前提下提高平台利润。</p>
+    <div class="assumptions">
+      <span class="chip">下载量 299,974 次</span>
+      <span class="chip">OSS 成本 7 万（0.23 元/次）</span>
+      <span class="chip">每日免费 1 次 / 人 / 日</span>
+      <span class="chip">2026-09-23 · v2</span>
+    </div>
+  </section>
+
+  <!-- 2 结论 -->
+  <section class="slide" id="s-summary">
+    <header class="slide-head">
+      <div>
+        <p class="slide-no">02 · 结论摘要</p>
+        <h2 class="slide-title">先讲结论：用户友好 + 分阶段变现</h2>
+        <p class="slide-sub">汇报时建议本页停留 30 秒，再进入数据对比。</p>
+      </div>
+      <div class="slide-meta">利润主推<br>22 次 / 4,510 积分</div>
+    </header>
+
+    <div class="takeaways">
+      <article class="takeaway ok">
+        <strong>免费替代首购</strong>
+        <p>每用户<strong>每天 1 次</strong>免费领取（后台可配工作日/节假日一致为 1）。去掉 1 元新人包，最小付费包 <b>5 次</b>。</p>
+      </article>
+      <article class="takeaway accent">
+        <strong>利润主推档（推荐包）</strong>
+        <p><b>22 次 / 4,510 积分（45.1 元）</b>，原价 <b>5,720</b> 积分划线；折合 <b>2.05 元/次</b>。C 端文案强调「比买 5 次包省 32%」。</p>
+      </article>
+      <article class="takeaway">
+        <strong>测算结果</strong>
+        <p>若付费流量全按推荐包成交：净收益约 <b>54.49 万</b>（较旧主推 1.82 方案 +7.09 万，较竞品标准包 +1.50 万）。二期开供给后约 <b>75.49 万</b>。</p>
+      </article>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi">
+        <label>推荐包折算</label>
+        <b>2.05</b>
+        <small>元/次 · 划线省 12.1 元</small>
+      </div>
+      <div class="kpi highlight">
+        <label>一期净收益（推荐包铺满）</label>
+        <b>54.49 万</b>
+        <small>较竞品 +1.50 万</small>
+      </div>
+      <div class="kpi">
+        <label>5 次锚定包</label>
+        <b>3.00</b>
+        <small>元/次 · 衬托推荐包</small>
+      </div>
+      <div class="kpi">
+        <label>二期净收益（示意）</label>
+        <b>75.49 万</b>
+        <small>+供给 0.70 元/次</small>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 对照参照 -->
+  <section class="slide" id="s-benchmark">
+    <header class="slide-head">
+      <div>
+        <p class="slide-no">03 · 对照基准</p>
+        <h2 class="slide-title">领帮帮历史 & 竞品价目（原始配置）</h2>
+        <p class="slide-sub">与下文「一键代发 v2」同口径：299,974 次下载 · OSS 7 万 · 价目铺满/历史折算。</p>
+      </div>
+    </header>
+
+    <div class="ref-grid">
+      <article class="ref-card lbb">
+        <div class="head">领帮帮 · 按天订阅（历史）</div>
+        <div class="body">
+          <div class="ref-kpi">
+            <div>历史净收益<b>43.47 万</b></div>
+            <div>测算收入<b>50.47 万</b></div>
+            <div>实现单价<b>1.68 元/次</b></div>
+          </div>
+          <table class="ref-table">
+            <thead>
+              <tr><th>在售档位</th><th class="num">售价</th><th>周期</th><th class="num">折算元/天</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>7 天卡</td><td class="num">25 元</td><td>7 天</td><td class="num">3.57</td></tr>
+              <tr><td>30 天卡</td><td class="num">99 元</td><td>30 天</td><td class="num">3.30</td></tr>
+              <tr><td>年卡</td><td class="num">730 元</td><td>365 天</td><td class="num">2.00</td></tr>
+            </tbody>
+          </table>
+          <table class="ref-table" style="margin-top:12px">
+            <thead><tr><th>测算项（同等 299,974 次）</th><th class="num">数值</th></tr></thead>
+            <tbody>
+              <tr><td>累计下载量</td><td class="num">299,974 次</td></tr>
+              <tr><td>OSS 成本</td><td class="num">7.00 万（0.23 元/次）</td></tr>
+              <tr><td>单次毛利（扣 OSS）</td><td class="num">1.45 元</td></tr>
+              <tr><td>历史累计收益（参考）</td><td class="num">504,693 元</td></tr>
+              <tr><td>历史 OSS 账单（参考）</td><td class="num">≈7 万 · 116 TB 量级</td></tr>
+            </tbody>
+          </table>
+          <p class="ref-note">模式：<b>按天卖</b>，非积分次数包。上表净收益 43.47 万为将历史收入按同等下载量折算后的对照值。</p>
+        </div>
+      </article>
+
+      <article class="ref-card comp">
+        <div class="head">竞品 · 按次积分（4 档同时在售）</div>
+        <div class="body">
+          <div class="ref-kpi">
+            <div>价目铺满净收益<b>52.99 万</b></div>
+            <div>测算收入<b>59.99 万</b></div>
+            <div>标准包单价<b>2.00 元/次</b></div>
+          </div>
+          <table class="ref-table">
+            <thead>
+              <tr><th>#</th><th>档位</th><th class="num">售价</th><th class="num">次数</th><th class="num">元/次</th><th>说明</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>1</td><td>首购体验</td><td class="num">1 元</td><td class="num">5</td><td class="num">0.20</td><td>限购拉新</td></tr>
+              <tr><td>2</td><td>单次</td><td class="num">3 元</td><td class="num">1</td><td class="num">3.00</td><td>价格锚点</td></tr>
+              <tr><td>3</td><td>小包</td><td class="num">15 元</td><td class="num">8</td><td class="num">1.88</td><td>中包</td></tr>
+              <tr><td>4</td><td>标准包 ★</td><td class="num">30 元</td><td class="num">15</td><td class="num">2.00</td><td>测算铺满假设</td></tr>
+            </tbody>
+          </table>
+          <table class="ref-table" style="margin-top:12px">
+            <thead><tr><th>测算项</th><th class="num">数值</th></tr></thead>
+            <tbody>
+              <tr><td>299,974 次 × 2.00 元</td><td class="num">59.99 万收入</td></tr>
+              <tr><td>减 OSS</td><td class="num">7.00 万</td></tr>
+              <tr><td>单次毛利</td><td class="num">1.77 元</td></tr>
+            </tbody>
+          </table>
+          <p class="ref-note">模式：<b>按次卖</b>。利润对比行默认「全量按标准包 2.00 元/次」成交，便于与一键代发推荐包 2.05 元/次对齐比较。</p>
+        </div>
+      </article>
+    </div>
+
+    <p class="block-title" style="margin-top:24px">一键代发 v2 · 与对照组差异一览</p>
+    <div class="matrix-wrap">
+      <table class="matrix">
+        <thead>
+          <tr>
+            <th class="metric">对比项</th>
+            <th>领帮帮</th>
+            <th>竞品</th>
+            <th>一键代发 v2</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="metric">收费形态</td>
+            <td class="col-lbb">订阅（7/30/365 天）</td>
+            <td class="col-comp">积分次数包</td>
+            <td class="col-p1">日免 1 次 + 积分包（最小 5 次）</td>
+          </tr>
+          <tr>
+            <td class="metric">拉新手段</td>
+            <td class="col-lbb">低价天卡</td>
+            <td class="col-comp">1 元 / 5 次首购</td>
+            <td class="col-p1">每日免费 1 次（无首购）</td>
+          </tr>
+          <tr>
+            <td class="metric">主力档</td>
+            <td class="col-lbb">30 天 99 元（按天）</td>
+            <td class="col-comp">30 元 / 15 次（2.00 元/次）</td>
+            <td class="col-p1 best">45.1 元 / 22 次（2.05 元/次）</td>
+          </tr>
+          <tr>
+            <td class="metric">同等下载净收益</td>
+            <td class="col-lbb num">43.47 万</td>
+            <td class="col-comp num">52.99 万</td>
+            <td class="col-p1 num best">54.49 万</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 4 指标矩阵 -->
+  <section class="slide" id="s-matrix">
+    <header class="slide-head">
+      <div>
+        <p class="slide-no">04 · 核心指标</p>
+        <h2 class="slide-title">四方案同一口径对比</h2>
+        <p class="slide-sub">列 = 方案；行 = 可汇报指标。绿色为相对竞品更优。</p>
+      </div>
+      <div class="slide-meta">单位：万元 / 元<br>除非另注</div>
+    </header>
+
+    <div class="matrix-wrap">
+      <table class="matrix">
+        <thead>
+          <tr>
+            <th class="metric">指标</th>
+            <th>领帮帮<span class="tag tag-lbb">历史</span></th>
+            <th>竞品<span class="tag tag-comp">标准包</span></th>
+            <th>一键代发 · 一期<span class="tag tag-p1">执行</span></th>
+            <th>一键代发 · 二期<span class="tag tag-p2">规划</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="metric">商业模式</td>
+            <td class="col-lbb">按天订阅</td>
+            <td class="col-comp">按次积分</td>
+            <td class="col-p1">按次积分 · 仅用户</td>
+            <td class="col-p2">积分 + 剪辑手服务费</td>
+          </tr>
+          <tr>
+            <td class="metric">用户侧折算单价</td>
+            <td class="col-lbb num">1.68 元</td>
+            <td class="col-comp num">2.00 元</td>
+            <td class="col-p1 num">2.05 元</td>
+            <td class="col-p2 num">2.05 元</td>
+          </tr>
+          <tr>
+            <td class="metric">平台每次收到</td>
+            <td class="col-lbb num">1.68 元</td>
+            <td class="col-comp num">2.00 元</td>
+            <td class="col-p1 num best">2.05 元</td>
+            <td class="col-p2 num best">2.75 元</td>
+          </tr>
+          <tr>
+            <td class="metric">预计总收入</td>
+            <td class="col-lbb num">50.47</td>
+            <td class="col-comp num">59.99</td>
+            <td class="col-p1 num best">61.49</td>
+            <td class="col-p2 num best">82.48</td>
+          </tr>
+          <tr>
+            <td class="metric">OSS（固定）</td>
+            <td class="col-lbb num">7.00</td>
+            <td class="col-comp num">7.00</td>
+            <td class="col-p1 num">7.00</td>
+            <td class="col-p2 num">7.00</td>
+          </tr>
+          <tr class="row-h">
+            <td class="metric">净收益</td>
+            <td class="col-lbb num">43.47</td>
+            <td class="col-comp num">52.99</td>
+            <td class="col-p1 num best">54.49</td>
+            <td class="col-p2 num best">75.49</td>
+          </tr>
+          <tr>
+            <td class="metric">单次毛利（扣 OSS）</td>
+            <td class="col-lbb num">1.45 元</td>
+            <td class="col-comp num">1.77 元</td>
+            <td class="col-p1 num best">1.82 元</td>
+            <td class="col-p2 num">—</td>
+          </tr>
+          <tr>
+            <td class="metric">较领帮帮</td>
+            <td class="col-lbb num">—</td>
+            <td class="col-comp num">+9.53</td>
+            <td class="col-p1 num best">+11.02</td>
+            <td class="col-p2 num best">+32.02</td>
+          </tr>
+          <tr>
+            <td class="metric">较竞品标准包</td>
+            <td class="col-lbb num gap">-9.52</td>
+            <td class="col-comp num">—</td>
+            <td class="col-p1 num best">+1.50</td>
+            <td class="col-p2 num best">+22.50</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="footnote">「净收益」= 预计收入 − OSS 7 万。一键代发按推荐包 22 次/4,510 积分（2.05 元/次）铺满测算；免费日次不计入上表收入。</p>
+  </section>
+
+  <!-- 4 一期二期 -->
+  <section class="slide" id="s-phase">
+    <header class="slide-head">
+      <div>
+        <p class="slide-no">05 · 阶段策略</p>
+        <h2 class="slide-title">一期 vs 二期：收谁、收多少</h2>
+        <p class="slide-sub">用户价目两期相同；差异仅在供给端是否开账。</p>
+      </div>
+    </header>
+
+    <div class="dual">
+      <article class="phase-card p1">
+        <p class="slide-no" style="margin-bottom:8px">一期 · 转化</p>
+        <h3>只收用户 · 剪辑手 0 元</h3>
+        <div class="big">54.49 万</div>
+        <table class="mini-table">
+          <tr><td>收费对象</td><td>用户 4 档 + 日免 1 次</td></tr>
+          <tr><td>推荐包收到</td><td>2.05 元/次</td></tr>
+          <tr><td>预计收入</td><td>61.49 万</td></tr>
+          <tr><td>较竞品</td><td style="color:var(--ok)">+1.50 万</td></tr>
+        </table>
+        <p class="footnote" style="margin-top:14px">无首购包；每日免费 1 次。最小付费 5 次。剪辑手服务费与 GB 账单为 0。</p>
+      </article>
+      <article class="phase-card p2">
+        <p class="slide-no" style="margin-bottom:8px">二期 · 变现</p>
+        <h3>用户不变 · 开剪辑手收费</h3>
+        <div class="big">75.49 万</div>
+        <table class="mini-table">
+          <tr><td>收费对象</td><td>用户 + 站内 + 站外</td></tr>
+          <tr><td>平台收到</td><td>2.75 元/次</td></tr>
+          <tr><td>供给折算</td><td>+0.70 元/次</td></tr>
+          <tr><td>较竞品</td><td style="color:var(--ok)">+22.50 万</td></tr>
+        </table>
+        <p class="footnote" style="margin-top:14px">切换：先站内分成服务费（≤500 元免收），再站外按月 GB 账单。欠费只限站外上传。</p>
+      </article>
+    </div>
+
+    <div class="matrix-wrap" style="margin-top:20px">
+      <table class="matrix">
+        <thead>
+          <tr>
+            <th class="metric">维度</th>
+            <th>一期</th>
+            <th>二期</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="metric">目标</td><td>验证付费、跑通积分 4 档</td><td>不涨用户价前提下超过竞品利润</td></tr>
+          <tr><td class="metric">站内剪辑手</td><td>不收费</td><td>当月入账分段 0% → 12%，从已结算分成扣</td></tr>
+          <tr><td class="metric">站外剪辑手</td><td>不收费</td><td>自然月累计上传 GB，0.80 – 1.20 元/GB</td></tr>
+          <tr><td class="metric">对用户</td><td colspan="2" style="text-align:center">无感知 · 仍只买积分次数</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 5 图表 -->
+  <section class="slide" id="s-chart">
+    <header class="slide-head">
+      <div>
+        <p class="slide-no">06 · 可视化</p>
+        <h2 class="slide-title">净收益横向对比</h2>
+        <p class="slide-sub">柱长按二期 75.49 万 = 100% 归一化（推荐包 2.05 元/次铺满）。</p>
+      </div>
+    </header>
+
+    <div class="bars">
+      <div class="bar-row">
+        <div class="lbl">领帮帮<small>历史净收益</small></div>
+        <div class="bar-track"><div class="bar-fill lbb" style="width:57.6%"></div></div>
+        <div class="val">43.47 万</div>
+      </div>
+      <div class="bar-row">
+        <div class="lbl">竞品标准包<small>用户 2.00 元/次</small></div>
+        <div class="bar-track"><div class="bar-fill comp" style="width:70.2%"></div></div>
+        <div class="val">52.99 万</div>
+      </div>
+      <div class="bar-row">
+        <div class="lbl">一键代发 · 一期<small>推荐包 2.05</small></div>
+        <div class="bar-track"><div class="bar-fill p1" style="width:72.2%"></div></div>
+        <div class="val">54.49 万</div>
+      </div>
+      <div class="bar-row">
+        <div class="lbl">一键代发 · 二期<small>2.05 + 供给 0.70</small></div>
+        <div class="bar-track"><div class="bar-fill p2" style="width:100%"></div></div>
+        <div class="val">75.49 万</div>
+      </div>
+    </div>
+    <p class="bar-legend">
+      <span><i style="background:var(--lbb)"></i>领帮帮</span>
+      <span><i style="background:var(--comp)"></i>竞品</span>
+      <span><i style="background:var(--p1)"></i>一期用户</span>
+      <span><i style="background:var(--p1)"></i><i style="background:var(--p2);margin-left:-6px"></i>二期用户+供给</span>
+    </p>
+
+    <div class="takeaways" style="margin-top:28px">
+      <article class="takeaway ok">
+        <strong>锚定 + 推荐</strong>
+        <p>5 次包 3.00 元/次做价格锚；22 次推荐包 2.05 元/次 + 划线原价，引导大额兑换。</p>
+      </article>
+      <article class="takeaway">
+        <strong>日免 1 次</strong>
+        <p>替代首购羊毛；用户日常够用，额外需求才买包，减少 0.2 元/次 级亏损单。</p>
+      </article>
+      <article class="takeaway">
+        <strong>推荐包毛利</strong>
+        <p>2.05 − 0.23 OSS ≈ 1.82 元/次毛利，高于旧方案 1.59，且一期净收益已超竞品。</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- 6 一期完整阶梯 -->
+  <section class="slide" id="s-p1-tier">
+    <header class="slide-head">
+      <div>
+        <p class="slide-no">07 · 一期阶梯配置</p>
+        <h2 class="slide-title">一期完整价目（可落后台 SKU）</h2>
+        <p class="slide-sub">无首购 · <b>每日免费 1 次</b> · 最小付费 <b>5 次</b> · 1 元 = 100 积分 · 最多 4 档在售</p>
+      </div>
+      <div class="slide-meta">阶段<br><span class="tag tag-p1">一期执行</span></div>
+    </header>
+
+    <p class="block-title">0 · 免费领取（不进 SKU 表）</p>
+    <div class="matrix-wrap">
+      <table class="matrix">
+        <thead>
+          <tr>
+            <th class="metric">项目</th>
+            <th>配置</th>
+            <th>说明</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="metric">每日免费次数</td>
+            <td><b>1 次 / 用户 / 自然日</b></td>
+            <td>后台 FR-014-26 可设工作日/节假日均为 1；零点刷新，不结转</td>
+          </tr>
+          <tr>
+            <td class="metric">与付费关系</td>
+            <td>先扣免费，再扣已购次数</td>
+            <td>免费用完且次数不足时，弹出 4 档兑换浮层</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="block-title p1">A · 用户 · 次数商品（4 档同时在售）</p>
+    <div class="matrix-wrap">
+      <table class="matrix">
+        <thead>
+          <tr>
+            <th class="metric">#</th>
+            <th>档位名称</th>
+            <th>C 端展示（x 次 / y 积分）</th>
+            <th class="num">次数</th>
+            <th class="num">现价积分</th>
+            <th class="num">原价积分</th>
+            <th class="num">约人民币</th>
+            <th class="num">折算元/次</th>
+            <th>限制 / 说明</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="metric num">1</td>
+            <td>补次包（锚定）</td>
+            <td><b>5 次需要 1,500 积分</b></td>
+            <td class="num">5</td>
+            <td class="num">1,500</td>
+            <td class="num">2,000</td>
+            <td class="num">15.00 元</td>
+            <td class="num">3.00</td>
+            <td>最小付费包；划线 75 折；单价最高，用于衬托推荐包</td>
+          </tr>
+          <tr>
+            <td class="metric num">2</td>
+            <td>周转包</td>
+            <td><b>10 次需要 2,200 积分</b></td>
+            <td class="num">10</td>
+            <td class="num">2,200</td>
+            <td class="num">3,000</td>
+            <td class="num">22.00 元</td>
+            <td class="num">2.10</td>
+            <td>划线约 73 折；略高于竞品 2.00，适合临时加量</td>
+          </tr>
+          <tr class="main-row">
+            <td class="metric num">3</td>
+            <td>推荐包 ★</td>
+            <td><b>22 次需要 4,510 积分</b></td>
+            <td class="num">22</td>
+            <td class="num">4,510</td>
+            <td class="num">5,720</td>
+            <td class="num">45.10 元</td>
+            <td class="num best">2.05</td>
+            <td><b>平台利润主推</b>；划线约 79 折；文案：比按补次包买 22 次省约 32%</td>
+          </tr>
+          <tr>
+            <td class="metric num">4</td>
+            <td>省心包（囤货）</td>
+            <td><b>30 次需要 5,700 积分</b></td>
+            <td class="num">30</td>
+            <td class="num">5,700</td>
+            <td class="num">7,500</td>
+            <td class="num">57.00 元</td>
+            <td class="num">1.90</td>
+            <td>单价更低但一次付 57 元；总毛利高，适合重度用户</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="block-title p1">B · 供给端 · 剪辑手（一期全部关闭）</p>
+    <div class="matrix-wrap">
+      <table class="matrix">
+        <thead>
+          <tr>
+            <th class="metric">对象</th>
+            <th>计费项</th>
+            <th>阶梯 / 费率</th>
+            <th>一期状态</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="off">
+            <td class="metric">站内剪辑手</td>
+            <td>收益服务费</td>
+            <td>分段 0% / 8% / 10% / 12%（见二期页）</td>
+            <td><b>不启用 · 账单 0</b></td>
+          </tr>
+          <tr class="off">
+            <td class="metric">站外剪辑手</td>
+            <td>上传资源费（GB）</td>
+            <td>1.20 / 1.00 / 0.80 元/GB 阶梯（见二期页）</td>
+            <td><b>不启用 · 账单 0</b></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="rule-box">
+      <b>定价逻辑：</b>① 日免 1 次替代首购；② 5 次包定高价锚点；③ 22 次推荐包在「划线折扣」与 2.05 元/次之间取利润最优；④ 30 次包给囤货客，不抢推荐包主视觉。
+      <b>C 端：</b>仅当原价积分 &gt; 现价积分时出示划线价；兑换扣整包。
+    </div>
+  </section>
+
+  <!-- 7 二期完整阶梯 -->
+  <section class="slide" id="s-p2-tier">
+    <header class="slide-head">
+      <div>
+        <p class="slide-no">07 · 二期阶梯配置</p>
+        <h2 class="slide-title">二期完整价目（用户不变 + 供给开账）</h2>
+        <p class="slide-sub">用户 4 档与一期完全相同；新增站内 / 站外剪辑手阶梯。不向 C 端用户加价。</p>
+      </div>
+      <div class="slide-meta">阶段<br><span class="tag tag-p2">二期规划</span></div>
+    </header>
+
+    <p class="block-title">A · 用户 · 次数商品（与一期相同，4 档不变）</p>
+    <div class="matrix-wrap">
+      <table class="matrix">
+        <thead>
+          <tr>
+            <th class="metric">#</th>
+            <th>档位</th>
+            <th>x 次 / y 积分</th>
+            <th class="num">次数</th>
+            <th class="num">现价积分</th>
+            <th class="num">原价积分</th>
+            <th class="num">约人民币</th>
+            <th class="num">元/次</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="metric num">1</td><td>补次包</td><td>5 次 / 1,500 积分</td><td class="num">5</td><td class="num">1,500</td><td class="num">2,000</td><td class="num">15 元</td><td class="num">3.00</td></tr>
+          <tr><td class="metric num">2</td><td>周转包</td><td>10 次 / 2,200 积分</td><td class="num">10</td><td class="num">2,200</td><td class="num">3,000</td><td class="num">22 元</td><td class="num">2.10</td></tr>
+          <tr class="main-row"><td class="metric num">3</td><td>推荐包 ★</td><td>22 次 / 4,510 积分</td><td class="num">22</td><td class="num">4,510</td><td class="num">5,720</td><td class="num">45.1 元</td><td class="num best">2.05</td></tr>
+          <tr><td class="metric num">4</td><td>省心包</td><td>30 次 / 5,700 积分</td><td class="num">30</td><td class="num">5,700</td><td class="num">7,500</td><td class="num">57 元</td><td class="num">1.90</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="block-title p2">B · 站内剪辑手 · 收益服务费（从已结算分成扣）</p>
+    <div class="matrix-wrap">
+      <table class="matrix">
+        <thead>
+          <tr>
+            <th class="metric">阶梯</th>
+            <th>当月入账区间（已结算给剪辑手）</th>
+            <th class="num">费率</th>
+            <th>计费规则</th>
+            <th class="num">区间示例</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="metric num">L0</td>
+            <td>0 – 500 元</td>
+            <td class="num">0%</td>
+            <td>整段免收</td>
+            <td class="num">入账 400 → 0 元</td>
+          </tr>
+          <tr>
+            <td class="metric num">L1</td>
+            <td>500 – 3,000 元</td>
+            <td class="num">8%</td>
+            <td>仅对超出 500 的部分</td>
+            <td class="num">2,000 → 120 元</td>
+          </tr>
+          <tr>
+            <td class="metric num">L2</td>
+            <td>3,000 – 10,000 元</td>
+            <td class="num">10%</td>
+            <td>仅对超出 3,000 的部分</td>
+            <td class="num">5,000 → 400 元</td>
+          </tr>
+          <tr>
+            <td class="metric num">L3</td>
+            <td>10,000 元以上</td>
+            <td class="num">12%</td>
+            <td>仅对超出 10,000 的部分</td>
+            <td class="num">12,000 → 440 元</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="footnote">5,000 元示例：L1 段 (3000−500)×8% = 200 + L2 段 (5000−3000)×10% = 200 → 合计 <b>400 元</b>。全量下载基准约 <b>0.20 元/次</b>。</p>
+
+    <p class="block-title p2">C · 站外剪辑手 · 上传资源费（自然月累计 GB）</p>
+    <div class="matrix-wrap">
+      <table class="matrix">
+        <thead>
+          <tr>
+            <th class="metric">阶梯</th>
+            <th>当月累计上传量</th>
+            <th class="num">单价</th>
+            <th>计费规则</th>
+            <th class="num">示例费用</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="metric num">G1</td>
+            <td>第 1 – 50 GB</td>
+            <td class="num">1.20 元/GB</td>
+            <td>先计低档位</td>
+            <td class="num">50 GB → 60 元</td>
+          </tr>
+          <tr>
+            <td class="metric num">G2</td>
+            <td>第 51 – 200 GB</td>
+            <td class="num">1.00 元/GB</td>
+            <td>超出 50 GB 部分</td>
+            <td class="num">100 GB 总量 → 110 元</td>
+          </tr>
+          <tr>
+            <td class="metric num">G3</td>
+            <td>200 GB 以上</td>
+            <td class="num">0.80 元/GB</td>
+            <td>超出 200 GB 部分</td>
+            <td class="num">500 GB 总量 → 450 元</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="footnote">100 GB = 50×1.20 + 50×1.00 = <b>110 元</b>（OSS 成本约 59 元）。全量基准约 <b>0.50 元/次</b>。用户侧 + 供给 ≈ <b>2.20 元/次</b>平台收到。</p>
+
+    <div class="rule-box">
+      <b>二期切换顺序：</b>① 站内 L0–L3 自动扣服务费 → ② 站外 G1–G3 月底 GB 账单。
+      欠费：站内从后续分成扣；站外暂停上传。C 端次数商品表与一期完全一致。
+    </div>
+  </section>
+
+  <!-- 8 建议 -->
+  <section class="slide" id="s-close">
+    <header class="slide-head">
+      <div>
+        <p class="slide-no">08 · 建议</p>
+        <h2 class="slide-title">汇报结论与下一步</h2>
+      </div>
+    </header>
+
+    <div class="closing">
+      <b>建议路径：</b>配置日免 1 次 + 四档（最小 5 次），运营与 UI 主推 <b>22 次 / 4,510 积分</b>推荐包；一期净收益测算 <b>54.49 万</b>，二期加供给约 <b>75.49 万</b>。
+    </div>
+    <p class="footnote" style="margin-top:20px">付费次数全按推荐包 2.05 元/次折算；免费日次不产生上表收入。供给 0.70 元/次为基准假设。</p>
+  </section>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FR-018 · 一键代发迭代 2.0 · 右豹迭代需求记录</title>
+  <style>
+    :root {
+      --primary: #2563eb; --primary-hover: #1d4ed8; --primary-light: #eff6ff; --primary-border: #bfdbfe;
+      --accent-rule: #0891b2; --accent-version: #7c3aed; --accent-fr: #d97706;
+      --surface: #fff; --surface-glass: rgba(255,255,255,0.72); --border: #e8edf3;
+      --text-primary: #18222f; --text-secondary: #4a5568; --text-muted: #9aa5b4;
+      --sidebar-w: 240px; --drawer-w: 480px; --radius-sm: 7px; --radius-lg: 14px;
+      --shadow: 0 8px 32px rgba(30,40,80,0.10);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 13px;
+      color: var(--text-primary);
+      background: linear-gradient(135deg, #e0e7ff 0%, #f0f4f8 40%, #e0f2fe 100%);
+      background-attachment: fixed; overflow: hidden;
+    }
+    .sidebar {
+      position: fixed; inset: 0 auto 0 0; width: var(--sidebar-w); z-index: 200;
+      display: flex; flex-direction: column;
+      background: rgba(240,244,255,0.95); backdrop-filter: blur(20px);
+      border-right: 1px solid rgba(148,163,196,0.22);
+    }
+    .sidebar-brand { padding: 16px 14px 12px; border-bottom: 1px solid rgba(148,163,196,0.22); }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: linear-gradient(135deg, #2563eb, #7c3aed); color: #fff;
+      display: flex; align-items: center; justify-content: center; font-weight: 700;
+    }
+    .brand-text { font-size: 14px; font-weight: 700; }
+    .brand-sub { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+    .sprint-pill {
+      display: inline-block; margin-top: 10px; font-size: 11px; font-weight: 600;
+      padding: 3px 8px; border-radius: 999px; background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0;
+    }
+    .sidebar-scroll { flex: 1; overflow-y: auto; padding: 8px 0 16px; }
+    .sidebar-foot { padding: 10px 14px 14px; border-top: 1px solid rgba(148,163,196,0.22); font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+    .main {
+      margin-left: var(--sidebar-w); height: 100%;
+      display: flex; flex-direction: column; min-width: 0;
+      padding: 16px 20px 16px;
+    }
+    .breadcrumb { padding: 4px 0 10px; font-size: 12px; color: var(--text-muted); flex-shrink: 0; }
+    .breadcrumb a { color: var(--primary); text-decoration: none; }
+    .page-header { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; flex-shrink: 0; }
+    .page-header h1 { font-size: 19px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .page-desc { font-size: 12px; color: var(--text-muted); max-width: 780px; line-height: 1.55; }
+    .badge { display: inline-flex; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: var(--radius-sm); }
+    .badge-fr { background: #fffbeb; color: var(--accent-fr); border: 1px solid #fde68a; }
+    .badge-version { background: #f5f3ff; color: var(--accent-version); border: 1px solid #ddd6fe; }
+    .btn {
+      display: inline-flex; align-items: center; height: 34px; padding: 0 14px;
+      border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid transparent;
+    }
+    .btn-rule { background: var(--primary-light); color: var(--primary); border-color: var(--primary-border); }
+    .btn-rule.active { background: var(--primary); color: #fff; }
+    .page-tab-bar {
+      display: flex; gap: 0; margin-bottom: 12px; flex-shrink: 0; width: fit-content;
+      background: var(--surface-glass); border: 1px solid rgba(255,255,255,0.55);
+      border-radius: var(--radius-lg); padding: 4px; box-shadow: var(--shadow);
+    }
+    .page-tab-bar button {
+      padding: 8px 18px; border: none; background: transparent; cursor: pointer;
+      font-size: 13px; color: var(--text-secondary); border-radius: 10px;
+    }
+    .page-tab-bar button.active { background: var(--primary); color: #fff; font-weight: 600; }
+    .page-view { display: none; flex: 1; min-height: 0; }
+    .page-view.active { display: flex; flex-direction: column; }
+    .demo-frame {
+      flex: 1; min-height: 0;
+      background: var(--surface-glass); backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.55); border-radius: var(--radius-lg);
+      box-shadow: var(--shadow); overflow: hidden;
+    }
+    .demo-frame iframe { width: 100%; height: 100%; border: none; display: block; background: #f4f6f8; }
+    .admin-card {
+      flex: 1; min-height: 0; overflow: auto;
+      background: var(--surface-glass); backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.55); border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+    }
+    .admin-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--border); }
+    .admin-toolbar h2 { font-size: 15px; }
+    .admin-toolbar p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .admin-card table { width: 100%; min-width: 880px; border-collapse: collapse; }
+    .admin-card th, .admin-card td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); font-size: 12px; white-space: nowrap; }
+    .admin-card th { font-size: 11px; color: var(--text-muted); background: rgba(248,250,252,0.9); }
+    .tag-thumb { height: 18px; width: auto; display: block; }
+    .link { border: none; background: none; color: var(--primary); cursor: pointer; font-size: 12px; padding: 0 8px 0 0; }
+    .pill { display: inline-flex; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+    .pill-on { background: #f0fdf4; color: #16a34a; }
+    .pill-off { background: #f1f5f9; color: var(--text-muted); }
+    .sku-overlay { position: fixed; inset: 0; background: rgba(15,23,42,.35); z-index: 450; }
+    .sku-modal {
+      position: fixed; z-index: 460; left: 50%; top: 50%; transform: translate(-50%, -50%);
+      width: min(440px, calc(100vw - 48px)); background: #fff; border-radius: 14px;
+      box-shadow: var(--shadow); padding: 18px 18px 16px;
+    }
+    .sku-modal h3 { font-size: 16px; margin-bottom: 12px; }
+    .field { margin-bottom: 12px; }
+    .field label { display: block; font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; }
+    .field input[type="number"], .field input[type="text"] {
+      width: 100%; height: 36px; border: 1px solid var(--border); border-radius: 8px; padding: 0 10px; font-size: 13px;
+    }
+    .req { color: #dc2626; margin-left: 2px; }
+    .tag-upload { display: flex; align-items: center; gap: 10px; }
+    .tag-upload input[type="file"] { font-size: 12px; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 4px; }
+    .drawer-overlay {
+      position: fixed; inset: 0; background: rgba(15,23,42,0.35); z-index: 500;
+      opacity: 0; pointer-events: none; transition: opacity 0.25s;
+    }
+    .drawer-overlay.open { opacity: 1; pointer-events: auto; }
+    .drawer {
+      position: fixed; top: 0; right: 0; bottom: 0; width: var(--drawer-w); z-index: 501;
+      background: rgba(255,255,255,0.98); backdrop-filter: blur(12px);
+      box-shadow: -8px 0 40px rgba(30,40,60,0.18);
+      transform: translateX(100%); transition: transform 0.28s ease;
+      display: flex; flex-direction: column;
+    }
+    .drawer.open { transform: translateX(0); }
+    .drawer-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .drawer-header h2 { font-size: 15px; font-weight: 700; }
+    .drawer-tools { display: flex; align-items: center; gap: 8px; }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-ghost { background: #fff; color: var(--text-secondary); border-color: var(--border); }
+    .drawer-close { width: 28px; height: 28px; border: none; background: #f1f5f9; border-radius: 6px; cursor: pointer; font-size: 16px; }
+    #ruleBody.is-editing .rule-content,
+    #ruleBody.is-editing h3 { outline: 1px dashed #93c5fd; outline-offset: 4px; border-radius: 6px; }
+    .rule-toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(12px);
+      background: #1e293b; color: #fff; padding: 10px 16px; border-radius: 999px; font-size: 13px;
+      opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 700;
+    }
+    .rule-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .drawer-body { flex: 1; overflow-y: auto; padding: 16px 20px 32px; }
+    .rule-section { margin-bottom: 22px; }
+    .rule-section h3 { font-size: 14px; font-weight: 700; color: var(--accent-rule); margin-bottom: 8px; }
+    .rule-section h3 span {
+      display: inline-flex; width: 22px; height: 22px; align-items: center; justify-content: center;
+      background: #ecfeff; color: var(--accent-rule); border-radius: 6px; font-size: 12px; margin-right: 8px;
+    }
+    .rule-content { font-size: 13px; color: var(--text-secondary); line-height: 1.65; }
+    .rule-content ul { padding-left: 18px; margin-top: 6px; }
+    .rule-content li { margin-bottom: 5px; }
+    .rule-content code { font-family: ui-monospace, monospace; font-size: 12px; background: #f1f5f9; padding: 1px 5px; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand">
+        <div class="brand-icon">迭</div>
+        <div>
+          <div class="brand-text">右豹迭代需求记录</div>
+          <div class="brand-sub">PRD Demo · 产品交付研发</div>
+        </div>
+      </div>
+      <span class="sprint-pill">YBDD2.0 · 迭代 v1</span>
+    </div>
+    <div class="sidebar-scroll" data-iteration-sidebar></div>
+    <div class="sidebar-foot">FR-018 · 前端迭代 Demo<br />管理后台 / 需求规则</div>
+  </aside>
+
+  <main class="main">
+    <nav class="breadcrumb">
+      <a href="framework-shell.html">Sprint 概览</a>
+      <span> / 一键代发 / 迭代 2.0</span>
+    </nav>
+    <header class="page-header">
+      <div>
+        <h1>
+          一键代发迭代 2.0
+          <span class="badge badge-fr">FR-018</span>
+          <span class="badge badge-version">v1 当前</span>
+        </h1>
+        <p class="page-desc">在一键代发 1.0 上增量。次数商品的标签图标和限制购买配在本需求的管理后台。不改 FR-014 历史页，不改收益池页。</p>
+      </div>
+      <div class="page-header-actions">
+        <button class="btn btn-rule" id="toggleRuleDrawer" type="button" aria-expanded="false">📋 需求规则</button>
+      </div>
+    </header>
+    <div class="page-tab-bar" role="tablist">
+      <button type="button" class="active" data-page="view-fe">前端迭代 Demo</button>
+      <button type="button" data-page="view-admin">管理后台</button>
+    </div>
+    <div id="view-fe" class="page-view active">
+      <div class="demo-frame">
+        <iframe title="一键代发迭代 2.0 前端迭代 Demo" src="yijian-daifa-iter2-demo.html?embed=1"></iframe>
+      </div>
+    </div>
+    <div id="view-admin" class="page-view">
+      <div class="admin-card">
+        <div class="admin-toolbar">
+          <div>
+            <h2>次数商品</h2>
+            <p>本迭代新增「标签」图标上传和「限制购买」。1.0 次数商品页不改。</p>
+          </div>
+          <button class="btn btn-primary" type="button" id="addSku">新增档位</button>
+        </div>
+        <table>
+          <thead>
+            <tr><th>档位</th><th>次数</th><th>积分</th><th>原价</th><th>标签</th><th>限制购买</th><th>状态</th><th>操作</th></tr>
+          </thead>
+          <tbody id="skuBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <div class="drawer-overlay" id="ruleOverlay"></div>
+  <aside class="drawer" id="ruleDrawer" role="dialog" aria-labelledby="ruleTitle">
+    <div class="drawer-header">
+      <h2 id="ruleTitle">FR-018 · v1 需求规则</h2>
+      <div class="drawer-tools">
+        <button class="btn btn-rule" id="editRules" type="button">编辑</button>
+        <button class="btn btn-primary" id="saveRules" type="button" hidden>保存</button>
+        <button class="btn btn-ghost" id="cancelRules" type="button" hidden>取消</button>
+        <button class="drawer-close" type="button" id="closeRuleDrawer">×</button>
+      </div>
+    </div>
+    <div class="drawer-body">
+      <div id="ruleBody">
+      <!-- fr018-rules:start -->
+      <div class="rule-section">
+        <h3><span>1</span>范围</h3>
+        <div class="rule-content">
+          <ul>
+            <li>新开迭代页，只覆盖本页列出的增量。FR-014 一键代发 1.0 历史页、FR-017 收益池与限时领次页都不改。</li>
+            <li>C 端视觉沿用 1.0：橙色主色、稿件详情、购买次数底部浮层、底栏「快捷提词 / 领取稿件」。剪辑供稿沿用现有 PC 列表。</li>
+          </ul>
+        </div>
+      </div>
+      <div class="rule-section">
+        <h3><span>2</span>积分档位营销标签</h3>
+        <div class="rule-content">
+          <div><br></div><ul>
+            
+            <li>次数商品配置在本需求的<strong>管理后台</strong>，不改 1.0「次数商品」页。</li>
+            <li>新增字段<strong>标签</strong>：按档位上传图标。C 端只展示这张图；未上传则不展示标签。</li>
+            <li>兑换浮层不展示「在售 x 档」。</li>
+            <li>点「立即兑换」：该档开启限制购买时提示「每人仅支持兑换 N 次」；未开启时提示「兑换成功」。</li><li>后台“次数商品”需要增加字段:标签、限购(需要配置系数,每人累计可购买几次)</li>
+          </ul>
+        </div>
+      </div>
+      <div class="rule-section">
+        <h3><span>3</span>详情页书籍链接</h3>
+        <div class="rule-content">
+          <ul>
+            <li>稿件详情在书籍 ID 下展示<strong>书籍链接</strong>，并提供「复制」。书籍ID也支持复制</li>
+            <li>领取前、领取后都展示。链接为空时不出现复制，快捷提词带过去的链接栏留空。</li>
+          </ul>
+        </div>
+      </div>
+      <div class="rule-section">
+        <h3><span>4</span>快捷提词</h3>
+        <div class="rule-content">
+          <ul>
+            <li>点「快捷提词」进入<strong>现有</strong>申请关键词页，不新建题词页。</li>
+            <li>把该稿件的<strong>书籍 ID</strong>和<strong>书籍链接</strong>带到题词页，关键词仍由用户填写。字段可改。</li>
+          </ul>
+        </div>
+      </div>
+      <div class="rule-section">
+        <h3><span>5</span>剪辑手回填信息</h3>
+        <div class="rule-content">
+          <ul>
+            <li>剪辑手 PC「稿件上传」列表增加列<strong>回填信息</strong>。</li>
+            <li>展示用户回填的作品链接。未回填显示「—」。</li>
+            <li>有多条回填时，列表只显示最近一次已填写的作品链接。</li>
+          </ul>
+        </div>
+      </div>
+      <!-- fr018-rules:end -->
+      </div>
+    </div>
+  </aside>
+  <div class="rule-toast" id="ruleToast" role="status"></div>
+  <div class="sku-overlay" id="skuOverlay" hidden></div>
+  <div class="sku-modal" id="skuModal" hidden role="dialog" aria-labelledby="skuModalTitle">
+    <h3 id="skuModalTitle">编辑档位</h3>
+    <div class="field"><label>次数<span class="req">*</span></label><input id="skuTimes" type="number" min="1" step="1"></div>
+    <div class="field"><label>积分<span class="req">*</span></label><input id="skuPoints" type="number" min="1" step="1"></div>
+    <div class="field"><label>原价<span class="req">*</span></label><input id="skuOrig" type="number" min="1" step="1"></div>
+    <div class="field">
+      <label>标签</label>
+      <div class="tag-upload">
+        <img id="tagPreview" class="tag-thumb" alt="" hidden>
+        <input id="tagFile" type="file" accept="image/*">
+        <button class="btn btn-ghost" type="button" id="tagClear">清除</button>
+      </div>
+      <p class="page-desc" style="margin-top:6px">上传图标。C 端按该图展示，不上传则不展示标签。</p>
+    </div>
+    <div class="field">
+      <label>限制购买</label>
+      <label><input id="skuLimit" type="checkbox"> 开启后设置每人可购买次数</label>
+    </div>
+    <div class="field" id="skuLimitWrap" hidden>
+      <label>每人可购买次数<span class="req">*</span></label>
+      <input id="skuLimitN" type="number" min="1" step="1" value="1">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" type="button" id="skuCancel">取消</button>
+      <button class="btn btn-primary" type="button" id="skuSave">确定</button>
+    </div>
+  </div>
+
+  <script>
+    var TAG_HOT = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='58' height='16' viewBox='0 0 58 16'%3E%3Crect width='58' height='16' rx='3' fill='%23ff3b30'/%3E%3Ctext x='29' y='11.5' text-anchor='middle' font-size='9' font-weight='700' fill='%23fff' font-family='PingFang SC,sans-serif'%3E限时优惠%3C/text%3E%3C/svg%3E";
+    var TAG_FRESH = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='58' height='16' viewBox='0 0 58 16'%3E%3Crect width='58' height='16' rx='3' fill='%2316a34a'/%3E%3Ctext x='29' y='11.5' text-anchor='middle' font-size='9' font-weight='700' fill='%23fff' font-family='PingFang SC,sans-serif'%3E新人首购%3C/text%3E%3C/svg%3E";
+    var skus = [
+      { id: 'S-10', times: 10, points: 120, orig: 200, tag: TAG_HOT, limit: true, limitN: 2, on: true },
+      { id: 'S-30', times: 30, points: 299, orig: 500, tag: TAG_FRESH, limit: true, limitN: 1, on: true },
+      { id: 'S-50', times: 50, points: 680, orig: 680, tag: '', limit: false, limitN: 0, on: true },
+      { id: 'S-100', times: 100, points: 1200, orig: 1200, tag: '', limit: false, limitN: 0, on: true }
+    ];
+    var editingId = null;
+    var draftTag = '';
+    function renderSkuTable() {
+      document.getElementById('skuBody').innerHTML = skus.map(function (s) {
+        var tag = s.tag ? '<img class="tag-thumb" alt="标签" src="' + s.tag + '">' : '—';
+        var limit = s.limit ? ('每人 ' + s.limitN + ' 次') : '不限制';
+        var st = s.on ? '<span class="pill pill-on">在售</span>' : '<span class="pill pill-off">下架</span>';
+        return '<tr><td>' + s.id + '</td><td>' + s.times + ' 次</td><td>' + s.points + '</td><td>' + s.orig + '</td><td>' + tag + '</td><td>' + limit + '</td><td>' + st + '</td><td><button class="link" type="button" data-edit="' + s.id + '">编辑</button></td></tr>';
+      }).join('');
+    }
+    function setTagPreview(src) {
+      var img = document.getElementById('tagPreview');
+      draftTag = src || '';
+      if (draftTag) { img.src = draftTag; img.hidden = false; }
+      else { img.removeAttribute('src'); img.hidden = true; }
+    }
+    function openSkuForm(row) {
+      editingId = row ? row.id : null;
+      document.getElementById('skuModalTitle').textContent = row ? '编辑档位' : '新增档位';
+      document.getElementById('skuTimes').value = row ? row.times : 5;
+      document.getElementById('skuPoints').value = row ? row.points : 200;
+      document.getElementById('skuOrig').value = row ? row.orig : 280;
+      document.getElementById('tagFile').value = '';
+      setTagPreview(row ? row.tag : '');
+      var on = !!(row && row.limit);
+      document.getElementById('skuLimit').checked = on;
+      document.getElementById('skuLimitN').value = row && row.limitN > 0 ? row.limitN : 1;
+      document.getElementById('skuLimitWrap').hidden = !on;
+      document.getElementById('skuOverlay').hidden = false;
+      document.getElementById('skuModal').hidden = false;
+    }
+    function closeSkuForm() {
+      document.getElementById('skuOverlay').hidden = true;
+      document.getElementById('skuModal').hidden = true;
+    }
+    document.getElementById('skuLimit').addEventListener('change', function () {
+      document.getElementById('skuLimitWrap').hidden = !this.checked;
+    });
+    document.getElementById('tagFile').addEventListener('change', function () {
+      var file = this.files && this.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function () { setTagPreview(String(reader.result || '')); };
+      reader.readAsDataURL(file);
+    });
+    document.getElementById('tagClear').addEventListener('click', function () {
+      document.getElementById('tagFile').value = '';
+      setTagPreview('');
+    });
+    document.getElementById('addSku').addEventListener('click', function () { openSkuForm(null); });
+    document.getElementById('skuCancel').addEventListener('click', closeSkuForm);
+    document.getElementById('skuOverlay').addEventListener('click', closeSkuForm);
+    document.getElementById('skuBody').addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-edit]');
+      if (!btn) return;
+      openSkuForm(skus.filter(function (s) { return s.id === btn.getAttribute('data-edit'); })[0]);
+    });
+    document.getElementById('skuSave').addEventListener('click', function () {
+      var times = Number(document.getElementById('skuTimes').value);
+      var points = Number(document.getElementById('skuPoints').value);
+      var orig = Number(document.getElementById('skuOrig').value);
+      var limit = document.getElementById('skuLimit').checked;
+      var limitN = Math.floor(Number(document.getElementById('skuLimitN').value));
+      if (!(times > 0) || !(points > 0) || !(orig > 0)) { toast('次数、积分与原价须为正数'); return; }
+      if (orig < points) { toast('原价须不小于当前积分'); return; }
+      if (limit && !(limitN > 0)) { toast('开启限制购买后，每人可购买次数须为正整数'); return; }
+      var row = editingId ? skus.filter(function (s) { return s.id === editingId; })[0] : null;
+      if (!row) {
+        row = { id: 'S-' + times, on: false };
+        skus.push(row);
+      }
+      row.times = times;
+      row.points = points;
+      row.orig = orig;
+      row.tag = draftTag;
+      row.limit = limit;
+      row.limitN = limit ? limitN : 0;
+      renderSkuTable();
+      closeSkuForm();
+      toast('已保存到本需求的次数商品');
+    });
+    document.querySelectorAll('.page-tab-bar button').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('.page-tab-bar button').forEach(function (b) { b.classList.remove('active'); });
+        document.querySelectorAll('.page-view').forEach(function (v) { v.classList.remove('active'); });
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.page).classList.add('active');
+      });
+    });
+    renderSkuTable();
+
+    var ruleDrawer = document.getElementById('ruleDrawer');
+    var ruleOverlay = document.getElementById('ruleOverlay');
+    var toggleRuleBtn = document.getElementById('toggleRuleDrawer');
+    function setRuleDrawer(open) {
+      ruleDrawer.classList.toggle('open', open);
+      ruleOverlay.classList.toggle('open', open);
+      toggleRuleBtn.classList.toggle('active', open);
+      toggleRuleBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+    toggleRuleBtn.addEventListener('click', function () {
+      setRuleDrawer(!ruleDrawer.classList.contains('open'));
+    });
+    document.getElementById('closeRuleDrawer').addEventListener('click', function () { setRuleDrawer(false); });
+    ruleOverlay.addEventListener('click', function () { setRuleDrawer(false); });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && !editing) setRuleDrawer(false);
+    });
+
+    var ruleBody = document.getElementById('ruleBody');
+    var editBtn = document.getElementById('editRules');
+    var saveBtn = document.getElementById('saveRules');
+    var cancelBtn = document.getElementById('cancelRules');
+    var editing = false;
+    var snapshot = '';
+
+    function toast(text) {
+      var el = document.getElementById('ruleToast');
+      el.textContent = text;
+      el.classList.add('show');
+      clearTimeout(toast._t);
+      toast._t = setTimeout(function () { el.classList.remove('show'); }, 1800);
+    }
+    function setEditing(on) {
+      editing = on;
+      ruleBody.classList.toggle('is-editing', on);
+      ruleBody.querySelectorAll('.rule-content, h3').forEach(function (el) {
+        el.contentEditable = on ? 'true' : 'false';
+      });
+      ruleBody.querySelectorAll('h3 span').forEach(function (el) {
+        el.contentEditable = 'false';
+      });
+      editBtn.hidden = on;
+      saveBtn.hidden = !on;
+      cancelBtn.hidden = !on;
+    }
+    function collectSections() {
+      return Array.prototype.map.call(ruleBody.querySelectorAll('.rule-section'), function (sec) {
+        var heading = sec.querySelector('h3').cloneNode(true);
+        var num = heading.querySelector('span');
+        if (num) num.remove();
+        return {
+          title: heading.textContent.replace(/\s+/g, ' ').trim(),
+          html: sec.querySelector('.rule-content').innerHTML
+            .replace(/\s+data-cursor-[a-z0-9-]+="[^"]*"/gi, '')
+            .trim()
+        };
+      });
+    }
+    editBtn.addEventListener('click', function () {
+      snapshot = ruleBody.innerHTML;
+      setRuleDrawer(true);
+      setEditing(true);
+    });
+    cancelBtn.addEventListener('click', function () {
+      ruleBody.innerHTML = snapshot;
+      setEditing(false);
+    });
+    saveBtn.addEventListener('click', function () {
+      var sections = collectSections().filter(function (s) { return s.title || s.html; });
+      if (!sections.length) {
+        toast('没有可保存的规则');
+        return;
+      }
+      saveBtn.disabled = true;
+      fetch('http://127.0.0.1:19889/fr018/rules', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sections: sections })
+      }).then(function (res) {
+        if (!res.ok) throw new Error('save failed');
+        return res.json();
+      }).then(function () {
+        setEditing(false);
+        toast('已写入需求规则');
+      }).catch(function () {
+        toast('保存失败，需求规则未改');
+      }).then(function () {
+        saveBtn.disabled = false;
+      });
+    });
+  </script>
+  <script src="sidebar-nav.js?v=fr019"></script>
+</body>
+</html>

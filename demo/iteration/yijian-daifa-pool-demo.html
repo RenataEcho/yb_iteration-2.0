@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>一键代发 · 广场收益池与限时领次</title>
+  <style>
+    :root {
+      --orange: #ff6b1a;
+      --orange-light: #fff3eb;
+      --orange-border: #ffd4b8;
+      --bg: #f5f6f8;
+      --surface: #fff;
+      --text: #1a2332;
+      --muted: #8a93a0;
+      --border: #ececec;
+      --ink: #16110e;
+      --gold: #e8c9a0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: #e8eaed; color: var(--text); min-height: 100vh;
+    }
+    .demo-shell { display: flex; flex-direction: column; align-items: center; padding: 20px 16px 40px; gap: 16px; }
+    .demo-header { width: 100%; max-width: 960px; background: #fff; border-radius: 12px; padding: 16px 20px; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
+    .demo-header h1 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+    .demo-header p { font-size: 13px; color: #6b7280; line-height: 1.5; }
+    .demo-nav { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .demo-nav button {
+      padding: 6px 12px; border-radius: 999px; border: 1px solid var(--border);
+      background: #fff; font-size: 12px; cursor: pointer; color: #6b7280;
+    }
+    .demo-nav button.active {
+      background: var(--orange-light); border-color: var(--orange-border); color: var(--orange); font-weight: 600;
+    }
+    .phone-frame {
+      width: 375px; height: 812px; border-radius: 36px; overflow: hidden; position: relative;
+      box-shadow: 0 20px 60px rgba(0,0,0,.18), inset 0 0 0 8px #1a1a1a; background: #fff;
+    }
+    .phone-notch {
+      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      width: 120px; height: 28px; background: #1a1a1a; border-radius: 0 0 16px 16px; z-index: 120;
+    }
+    .screen { display: none; flex-direction: column; height: 100%; overflow: hidden; background: var(--bg); }
+    .screen.active { display: flex; }
+    .status-bar {
+      height: 44px; flex-shrink: 0; display: flex; align-items: flex-end; justify-content: space-between;
+      padding: 0 20px 6px; font-size: 12px; font-weight: 600; background: #fff;
+    }
+    .nav-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 2px 8px 8px; flex-shrink: 0; background: #fff;
+    }
+    .nav-bar .back { width: 36px; height: 36px; border: none; background: none; font-size: 22px; cursor: pointer; }
+    .nav-bar .title { font-size: 17px; font-weight: 700; flex: 1; text-align: center; }
+    .nav-bar .side { width: 36px; }
+    .pool-band {
+      flex-shrink: 0; margin: 0 12px 8px; padding: 13px 14px 12px; border-radius: 14px;
+      position: relative; overflow: hidden; color: #f6efe6;
+      background:
+        radial-gradient(120% 130% at 108% -10%, rgba(255,140,60,.28) 0%, transparent 42%),
+        linear-gradient(152deg, #2c2219 0%, #16110e 54%, #0d0b09 100%);
+      box-shadow: 0 10px 22px rgba(22, 17, 14, .16), inset 0 1px 0 rgba(255, 214, 170, .14);
+    }
+    .pool-band::after {
+      content: ""; position: absolute; right: -18px; top: -22px; width: 110px; height: 110px;
+      border: 1px solid rgba(232, 201, 160, .16); border-radius: 50%; pointer-events: none;
+    }
+    .pool-top { display: flex; align-items: center; justify-content: space-between; position: relative; z-index: 1; }
+    .pool-kicker { font-size: 11px; font-weight: 700; letter-spacing: .14em; color: var(--gold); }
+    .pool-chip {
+      font-size: 10px; color: rgba(246, 239, 230, .62); padding: 2px 7px;
+      border: 1px solid rgba(232, 201, 160, .22); border-radius: 999px;
+    }
+    .pool-num {
+      position: relative; z-index: 1; margin-top: 6px;
+      font-size: 28px; font-weight: 760; letter-spacing: -.04em; font-variant-numeric: tabular-nums; line-height: 1;
+    }
+    .pool-num em { font-style: normal; font-size: 14px; margin-right: 3px; font-weight: 600; color: var(--gold); }
+    .pool-sub { position: relative; z-index: 1; margin-top: 6px; font-size: 11px; line-height: 1.4; color: rgba(246, 239, 230, .66); }
+    .project-row {
+      display: flex; gap: 10px; padding: 8px 12px 6px; background: #fff;
+      overflow-x: auto; flex-shrink: 0; scrollbar-width: none;
+    }
+    .project-row::-webkit-scrollbar { display: none; }
+    .proj {
+      flex: 0 0 64px; display: flex; flex-direction: column; align-items: center; gap: 4px;
+      padding: 6px 4px 4px; border: 1.5px solid transparent; border-radius: 10px;
+      background: none; cursor: pointer; color: #333;
+    }
+    .proj.on { border-color: #ffc9a3; background: var(--orange-light); }
+    .proj.on .proj-name { color: var(--orange); font-weight: 700; }
+    .proj-ico {
+      width: 44px; height: 44px; border-radius: 10px; color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 800; overflow: hidden; background: #f4f5f7;
+    }
+    .proj-ico img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .proj-name { font-size: 10px; line-height: 1.2; text-align: center; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .search-wrap { padding: 4px 12px 10px; background: #fff; flex-shrink: 0; }
+    .search-box {
+      display: flex; align-items: center; gap: 8px; height: 36px;
+      padding: 0 12px; border-radius: 18px; background: #fff;
+      box-shadow: 0 2px 8px rgba(20,24,32,.06); border: 1px solid #f0f0f0;
+    }
+    .search-box .ico { color: var(--orange); font-size: 14px; }
+    .search-box input { flex: 1; border: none; background: none; outline: none; font-size: 12px; }
+    .filter-row {
+      display: flex; gap: 8px; padding: 0 12px 10px; background: #fff;
+      overflow-x: auto; flex-shrink: 0; scrollbar-width: none;
+    }
+    .filter-row::-webkit-scrollbar { display: none; }
+    .dd {
+      flex-shrink: 0; height: 30px; padding: 0 10px; border-radius: 8px; border: none;
+      background: #f4f5f7; font-size: 12px; color: #333; cursor: pointer;
+    }
+    .dd.on { color: var(--orange); background: var(--orange-light); font-weight: 600; }
+    .plaza-banner {
+      position: relative; margin: 0 12px 10px; height: 88px; border-radius: 12px;
+      overflow: hidden; flex-shrink: 0; background: #1a1a1a;
+    }
+    .plaza-banner[hidden] { display: none !important; }
+    .bn-track { position: relative; width: 100%; height: 100%; }
+    .bn-slide {
+      position: absolute; inset: 0; opacity: 0; transition: opacity .35s;
+      cursor: pointer; border: none; padding: 0; background: #1a1a1a;
+    }
+    .bn-slide.on { opacity: 1; z-index: 1; }
+    .bn-slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .bn-slide .bn-cap {
+      position: absolute; inset: 0; padding: 12px 14px 18px;
+      background: linear-gradient(90deg, rgba(20,12,8,.72) 0%, rgba(20,12,8,.28) 58%, transparent 100%);
+      color: #fff; text-align: left; display: flex; flex-direction: column; justify-content: center;
+    }
+    .bn-slide .bn-cap b { display: block; font-size: 15px; line-height: 1.2; }
+    .bn-slide .bn-cap span { display: block; margin-top: 4px; font-size: 11px; opacity: .9; }
+    .bn-dots {
+      position: absolute; left: 0; right: 0; bottom: 6px; z-index: 2;
+      display: flex; justify-content: center; gap: 5px;
+    }
+    .bn-dot {
+      width: 6px; height: 6px; border-radius: 50%; border: none;
+      background: rgba(255,255,255,.4); cursor: pointer; padding: 0;
+    }
+    .bn-dot.on { background: #fff; width: 14px; border-radius: 99px; }
+    .float-box {
+      position: absolute; right: 12px; bottom: 70px; z-index: 36;
+      width: 68px; height: 74px; border: none; padding: 0; background: none; cursor: pointer;
+      animation: orb-float 2.8s ease-in-out infinite;
+    }
+    .float-box[hidden] { display: none !important; }
+    .float-box .orb-pulse {
+      position: absolute; inset: 2px -4px -2px; border-radius: 50%;
+      border: 1.5px solid rgba(255,107,26,.4); animation: orb-pulse 2s ease-out infinite;
+      pointer-events: none;
+    }
+    .float-box.locked .orb-pulse { border-color: rgba(148,163,184,.4); }
+    .float-badge {
+      position: absolute; top: 2px; right: -2px; z-index: 4;
+      min-width: 22px; height: 22px; padding: 0 5px; border-radius: 99px;
+      background: #fff; color: var(--orange); font-size: 11px; font-weight: 800;
+      display: grid; place-items: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,.16);
+    }
+    .float-box.locked .float-badge { color: #64748b; }
+    @keyframes orb-float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-7px); }
+    }
+    @keyframes orb-pulse {
+      0% { transform: scale(.92); opacity: .7; }
+      100% { transform: scale(1.18); opacity: 0; }
+    }
+    .mini-mbox { position: absolute; left: 10px; top: 14px; width: 46px; height: 48px; }
+    .mini-mbox .lid {
+      position: absolute; left: -3px; top: 0; width: 52px; height: 14px; z-index: 2;
+      background: linear-gradient(180deg, #ffd7a8, #ff8a3d 60%, #e85d12);
+      border-radius: 5px 5px 3px 3px; box-shadow: 0 3px 0 #9a3412;
+    }
+    .mini-mbox .body {
+      position: absolute; left: 2px; top: 12px; width: 42px; height: 32px;
+      background: linear-gradient(160deg, #ff8a3d, #ff6b1a 60%, #c2410c);
+      border-radius: 4px 4px 7px 7px;
+      box-shadow: 0 8px 14px rgba(194,65,12,.35);
+      color: #fff; font-size: 18px; font-weight: 800;
+      display: grid; place-items: center;
+    }
+    .mini-mbox .bow {
+      position: absolute; left: 50%; top: -4px; z-index: 3; width: 16px; height: 12px;
+      transform: translateX(-50%);
+      background:
+        radial-gradient(circle at 25% 50%, #fde68a 0 5px, transparent 6px),
+        radial-gradient(circle at 75% 50%, #fde68a 0 5px, transparent 6px);
+    }
+    .float-box.locked .mini-mbox .lid,
+    .float-box.locked .mini-mbox .body {
+      background: linear-gradient(160deg, #cbd5e1, #94a3b8);
+      box-shadow: 0 6px 12px rgba(15,23,42,.16);
+    }
+    .float-box.locked .mini-mbox .lid { box-shadow: 0 3px 0 #64748b; }
+    .scroll { flex: 1; overflow-y: auto; padding: 0 12px 12px; -webkit-overflow-scrolling: touch; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px 8px; }
+    .g-card { cursor: pointer; }
+    .thumb { position: relative; width: 100%; aspect-ratio: 3 / 4; border-radius: 8px; overflow: hidden; }
+    .cover-wrap { position: absolute; inset: 0; background: #2a2f3a; }
+    .cover-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .cover-wrap.cover-miss {
+      display: flex; align-items: center; justify-content: center; padding: 8px;
+      background: linear-gradient(160deg, #3a3f4a, #1c2028);
+    }
+    .cover-wrap.cover-miss .cover-img { display: none; }
+    .cover-wrap.cover-miss::after {
+      content: attr(data-book); color: #fff; font-size: 12px; font-weight: 700;
+      text-align: center; line-height: 1.35;
+    }
+    .kind-tag {
+      position: absolute; top: 6px; left: 6px; font-size: 10px; color: #fff;
+      background: rgba(0,0,0,.45); padding: 2px 6px; border-radius: 4px;
+    }
+    .thumb-bar {
+      position: absolute; left: 0; right: 0; bottom: 0; padding: 5px 6px;
+      background: linear-gradient(transparent, rgba(0,0,0,.55));
+      color: #fff; font-size: 10px; display: flex; justify-content: space-between;
+    }
+    .g-title {
+      margin-top: 6px; font-size: 12px; font-weight: 700; line-height: 1.35;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .g-src { margin-top: 3px; font-size: 11px; color: var(--muted); }
+    .empty { padding: 48px 20px; text-align: center; color: var(--muted); font-size: 13px; line-height: 1.6; }
+    .tabbar {
+      flex-shrink: 0; height: 58px; display: flex; border-top: 1px solid #f0f0f0; background: #fff;
+    }
+    .tabbar button {
+      flex: 1; border: none; background: none; font-size: 11px; color: #8a93a0; cursor: pointer;
+    }
+    .tabbar button.on { color: var(--orange); font-weight: 700; }
+    .tabbar b { display: block; font-size: 18px; line-height: 1.1; font-weight: 400; }
+    .guest-note {
+      margin: 0 12px 10px; padding: 12px; background: #fff; border-radius: 12px;
+      font-size: 12px; color: var(--muted); line-height: 1.5; text-align: center; flex-shrink: 0;
+    }
+    .guest-note button {
+      margin-top: 8px; height: 34px; padding: 0 16px; border: none; border-radius: 8px;
+      background: var(--orange); color: #fff; font-weight: 700; cursor: pointer;
+    }
+    .arena {
+      margin: 10px 12px 0; padding: 16px 14px 18px; border-radius: 16px; color: #f6efe6; text-align: center;
+      background:
+        radial-gradient(90% 120% at 50% 0%, rgba(255,140,60,.36) 0%, transparent 52%),
+        linear-gradient(160deg, #2c2219 0%, #16110e 60%, #0d0b09 100%);
+    }
+    .claim-badge {
+      display: inline-flex; padding: 3px 8px; border-radius: 999px; font-size: 11px; font-weight: 700;
+      background: rgba(255,107,26,.18); color: #ffc89a;
+    }
+    .claim-badge.mute { background: rgba(255,255,255,.1); color: #c4b6a6; }
+    .claim-badge.sold { background: #3b1512; color: #fca5a5; }
+    .claim-badge.ok { background: rgba(34,197,94,.16); color: #86efac; }
+    .arena h2 { margin-top: 8px; font-size: 22px; line-height: 1.25; letter-spacing: -.02em; }
+    .arena p { margin-top: 6px; font-size: 12px; line-height: 1.5; color: rgba(246,239,230,.68); }
+    .arena-cd {
+      margin-top: 10px; display: flex; align-items: center; justify-content: space-between;
+      font-size: 12px; color: var(--gold);
+    }
+    .arena-cd b { font-size: 16px; color: #fff; font-variant-numeric: tabular-nums; letter-spacing: .04em; }
+    .mbox-wrap {
+      position: relative; width: 148px; height: 148px; margin: 12px auto 4px;
+    }
+    .mbox-wrap.idle { animation: mbox-wobble 1.7s ease-in-out infinite; }
+    .mbox-wrap.lock { filter: grayscale(.35) brightness(.92); }
+    .mbox-lid {
+      position: absolute; left: 50%; top: 18px; z-index: 3;
+      width: 128px; height: 34px; transform: translateX(-50%);
+      background: linear-gradient(180deg, #ffe0b8 0%, #ff8a3d 55%, #e85d12 100%);
+      border-radius: 10px 10px 6px 6px;
+      box-shadow: 0 6px 0 #9a3412, 0 10px 16px rgba(0,0,0,.22);
+      transition: transform .5s cubic-bezier(.2,1.3,.3,1);
+    }
+    .mbox-bow {
+      position: absolute; left: 50%; top: -8px; width: 36px; height: 18px; transform: translateX(-50%);
+      background:
+        radial-gradient(circle at 22% 60%, #fde68a 0 9px, transparent 10px),
+        radial-gradient(circle at 78% 60%, #fde68a 0 9px, transparent 10px);
+    }
+    .mbox-bow::after {
+      content: ""; position: absolute; left: 50%; top: 7px; width: 10px; height: 10px;
+      transform: translateX(-50%) rotate(45deg);
+      background: #f59e0b; border-radius: 2px;
+    }
+    .mbox-body {
+      position: absolute; left: 50%; bottom: 10px;
+      width: 112px; height: 86px; transform: translateX(-50%);
+      background: linear-gradient(160deg, #ff9a4a, #ff6b1a 58%, #c2410c);
+      border-radius: 8px 8px 14px 14px;
+      box-shadow: 0 16px 28px rgba(194,65,12,.32), inset 0 1px 0 rgba(255,255,255,.28);
+    }
+    .mbox-ribbon {
+      position: absolute; left: 50%; top: 0; bottom: 0; width: 20px;
+      transform: translateX(-50%);
+      background: linear-gradient(180deg, #fde68a, #e8c9a0 70%, #d4a574);
+    }
+    .mbox-q {
+      position: absolute; inset: 0; display: grid; place-items: center;
+      color: #fff; font-size: 40px; font-weight: 800; text-shadow: 0 4px 0 rgba(154,52,18,.35);
+    }
+    .mbox-prize {
+      position: absolute; left: 50%; top: 34px; z-index: 4;
+      width: 68px; height: 68px; border-radius: 16px;
+      transform: translate(-50%, 18px) scale(.55); opacity: 0;
+      background: #fff; color: var(--orange);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      box-shadow: 0 10px 24px rgba(0,0,0,.28);
+      transition: .45s .12s cubic-bezier(.2,1.3,.3,1);
+    }
+    .mbox-prize em { font-style: normal; font-size: 26px; font-weight: 800; line-height: 1; }
+    .mbox-prize span { font-size: 11px; font-weight: 700; }
+    .mbox-wrap.open .mbox-lid { transform: translate(-18px, -54px) rotate(-22deg); }
+    .mbox-wrap.open .mbox-q { opacity: 0; }
+    .mbox-wrap.open .mbox-prize { opacity: 1; transform: translate(-50%, -6px) scale(1); }
+    .mbox-wrap.empty .mbox-lid { transform: translate(-10px, -28px) rotate(-12deg); opacity: .55; }
+    .mbox-wrap.empty .mbox-q { opacity: .25; }
+    .mbox-wrap.lock .mbox-q { font-size: 22px; }
+    @keyframes mbox-wobble {
+      0%, 100% { transform: rotate(-3deg) translateY(0); }
+      50% { transform: rotate(4deg) translateY(-4px); }
+    }
+    .stock {
+      margin-top: 8px; display: flex; justify-content: center; gap: 16px; font-size: 12px; color: rgba(246,239,230,.7);
+    }
+    .stock b { display: block; color: #fff; font-size: 16px; font-variant-numeric: tabular-nums; }
+    .ach { margin: 10px 12px 0; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+    .ach div { background: #fff; border-radius: 12px; padding: 10px 8px; text-align: center; }
+    .ach em { display: block; font-style: normal; font-size: 11px; color: var(--muted); }
+    .ach b { display: block; margin-top: 4px; font-size: 16px; }
+    .burst { pointer-events: none; position: absolute; inset: 0; overflow: hidden; z-index: 25; }
+    .burst i {
+      position: absolute; top: 28%; left: 50%; width: 7px; height: 7px; border-radius: 2px;
+      animation: burst-fly .7s ease-out forwards;
+    }
+    @keyframes burst-fly {
+      to { transform: translate(var(--x), var(--y)) rotate(180deg); opacity: 0; }
+    }
+    .rush {
+      display: none; position: absolute; inset: 0; z-index: 70;
+      background: rgba(14, 11, 9, .78); color: #fff;
+      align-items: center; justify-content: center; flex-direction: column; text-align: center;
+    }
+    .rush.show { display: flex; }
+    .rush .copy { margin-top: 8px; }
+    .rush .copy b { display: block; font-size: 26px; letter-spacing: -.02em; }
+    .rush .copy span { display: block; margin-top: 6px; font-size: 13px; color: var(--gold); }
+    .ticket {
+      margin: 10px 12px 0; background: #fff; border-radius: 14px; padding: 14px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .ticket-mark {
+      width: 56px; height: 56px; border-radius: 14px; flex-shrink: 0;
+      background: linear-gradient(160deg, #fff3eb, #ffd4b8); color: var(--orange);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      font-weight: 800;
+    }
+    .ticket-mark em { font-style: normal; font-size: 18px; line-height: 1; }
+    .ticket-mark span { font-size: 10px; }
+    .ticket b { display: block; font-size: 14px; }
+    .ticket p { margin-top: 4px; font-size: 12px; color: var(--muted); }
+    .board { margin: 10px 12px 0; background: #fff; border-radius: 14px; padding: 14px; }
+    .board-h { display: flex; align-items: baseline; justify-content: space-between; }
+    .board-h b { font-size: 13px; }
+    .board-h span { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+    .seats { margin-top: 10px; display: grid; grid-template-columns: repeat(10, 1fr); gap: 7px 6px; }
+    .seats i {
+      display: block; aspect-ratio: 1; border-radius: 3px 3px 5px 5px; background: #ececec;
+      position: relative;
+    }
+    .seats i::before {
+      content: ""; position: absolute; left: 6%; right: 6%; top: -22%; height: 30%;
+      border-radius: 2px 2px 1px 1px; background: inherit; filter: brightness(1.12);
+    }
+    .seats i.in { background: #ffb36a; }
+    .seats i.me { background: var(--orange); box-shadow: 0 0 0 2px #fff, 0 0 0 3px var(--orange); }
+    .seats i.wait { background: #e8eaed; }
+    .seats i.next { background: #ffe1c8; animation: seat-next .7s ease-in-out infinite alternate; }
+    @keyframes seat-next { from { transform: scale(.86); } to { transform: scale(1.08); } }
+    .live { margin: 10px 12px 0; background: #fff; border-radius: 14px; padding: 12px 14px; }
+    .live b { display: block; font-size: 13px; margin-bottom: 8px; }
+    .live li { list-style: none; font-size: 12px; color: #4a5568; padding: 5px 0; display: flex; gap: 8px; }
+    .live i { width: 6px; height: 6px; border-radius: 50%; background: var(--orange); margin-top: 6px; flex-shrink: 0; }
+    .live .ago { margin-left: auto; color: var(--muted); font-size: 11px; }
+    .rules {
+      margin: 10px 12px 16px; background: #fff; border-radius: 12px; padding: 14px;
+      font-size: 12px; color: #4a5568; line-height: 1.7;
+    }
+    .rules b { display: block; margin-bottom: 6px; color: var(--text); font-size: 13px; }
+    .foot { padding: 10px 16px 18px; background: #fff; border-top: 1px solid #f3f3f3; flex-shrink: 0; }
+    .btn-primary {
+      width: 100%; height: 46px; border: none; border-radius: 12px;
+      background: var(--orange); color: #fff; font-size: 16px; font-weight: 700; cursor: pointer;
+    }
+    .btn-primary:disabled { opacity: .45; cursor: not-allowed; }
+    .toast {
+      position: absolute; left: 50%; bottom: 88px; transform: translateX(-50%) translateY(12px);
+      background: #1e293b; color: #fff; padding: 8px 14px; border-radius: 999px; font-size: 12px;
+      opacity: 0; pointer-events: none; transition: .2s; z-index: 80; white-space: nowrap;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    body.embed-mode { background: var(--bg); }
+    body.embed-mode .demo-header, body.embed-mode .demo-nav { display: none !important; }
+    body.embed-mode .demo-shell { padding: 0; min-height: 100vh; }
+    body.embed-mode .phone-frame { width: 100%; max-width: 100%; height: 100vh; border-radius: 0; box-shadow: none; }
+    body.embed-mode .phone-notch { display: none; }
+  </style>
+</head>
+<body>
+  <div class="demo-shell">
+    <div class="demo-header">
+      <h1>FR-017 · 广场露出收益池与限时领次</h1>
+      <p>广场样式和 mock 还原 FR-014 原版。收益池在顶部。限次是右下盲盒浮标。卡片仍不展示金额。</p>
+      <div class="demo-nav" id="demoNav"></div>
+    </div>
+    <div class="phone-frame">
+      <div class="phone-notch"></div>
+      <div class="toast" id="toast"></div>
+      <div class="rush" id="rush">
+        <div class="mbox-wrap" id="rushBox">
+          <div class="mbox-lid"><span class="mbox-bow"></span></div>
+          <div class="mbox-body"><i class="mbox-ribbon"></i><span class="mbox-q">?</span></div>
+          <div class="mbox-prize"><em>1</em><span>次</span></div>
+        </div>
+        <div class="copy"><b>开出 代发次数 ×1</b><span>今日第 28 盒 · 压过 22 人</span></div>
+      </div>
+      <button class="float-box" id="plazaOrb" type="button" data-go="claim-open" hidden aria-label="今日盲盒，还剩 23 盒">
+        <i class="orb-pulse"></i>
+        <div class="mini-mbox"><span class="bow"></span><span class="lid"></span><span class="body">?</span></div>
+        <b class="float-badge">23</b>
+      </button>
+      <button class="float-box locked" id="guestOrb" type="button" data-note="未登录不能拆盒" hidden aria-label="今日盲盒已锁">
+        <i class="orb-pulse"></i>
+        <div class="mini-mbox"><span class="bow"></span><span class="lid"></span><span class="body">锁</span></div>
+        <b class="float-badge">锁</b>
+      </button>
+
+      <section class="screen" id="screen-plaza">
+        <div class="status-bar"><span>9:41</span><span>5G</span></div>
+        <div class="nav-bar"><span class="side"></span><div class="title">作品广场</div><span class="side"></span></div>
+        <div class="pool-band" id="plazaPool">
+          <div class="pool-top">
+            <div class="pool-kicker">代发收益池</div>
+            <div class="pool-chip">全员可见 · 非可提现</div>
+          </div>
+          <div class="pool-num"><em>¥</em>128,640.50</div>
+          <div class="pool-sub">领取稿件关联关键词累计产生的收益</div>
+        </div>
+        <div class="project-row" id="projectRow"></div>
+        <div class="search-wrap"><div class="search-box"><span class="ico">⌕</span><input id="feedSearch" placeholder="输入书名/稿件名搜索" /></div></div>
+        <div class="filter-row" id="feedFilters"></div>
+        <div class="plaza-banner" id="plazaBanner"></div>
+        <div class="scroll" id="feedList"></div>
+        <nav class="tabbar">
+          <button class="on" type="button"><b>⌂</b>广场</button>
+          <button type="button" data-note="我的领取是历史页，本增量不改"><b>☰</b>已领</button>
+        </nav>
+      </section>
+
+      <section class="screen" id="screen-plaza-guest">
+        <div class="status-bar"><span>9:41</span><span>5G</span></div>
+        <div class="nav-bar"><span class="side"></span><div class="title">作品广场</div><span class="side"></span></div>
+        <div class="guest-note">
+          代发收益池仅登录用户可见。
+          <button type="button" data-go="plaza">模拟登录</button>
+        </div>
+        <div class="project-row" id="guestProjectRow"></div>
+        <div class="search-wrap"><div class="search-box"><span class="ico">⌕</span><input placeholder="输入书名/稿件名搜索" readonly /></div></div>
+        <div class="filter-row" id="guestFilters"></div>
+        <div class="plaza-banner" id="guestBanner"></div>
+        <div class="scroll" id="guestList"></div>
+        <nav class="tabbar">
+          <button class="on" type="button"><b>⌂</b>广场</button>
+          <button type="button" data-note="未登录先登录"><b>☰</b>已领</button>
+        </nav>
+      </section>
+
+      <section class="screen" id="screen-claim-open">
+        <div class="status-bar"><span>9:41</span><span>5G</span></div>
+        <div class="nav-bar"><button class="back" type="button" data-go="plaza">‹</button><div class="title">今日盲盒</div><span class="side"></span></div>
+        <div class="scroll">
+          <div class="arena">
+            <span class="claim-badge">进行中 · 可拆</span>
+            <div class="mbox-wrap idle">
+              <div class="mbox-lid"><span class="mbox-bow"></span></div>
+              <div class="mbox-body"><i class="mbox-ribbon"></i><span class="mbox-q">?</span></div>
+            </div>
+            <h2>拆开才知道<br>是不是你的</h2>
+            <p>27 盒已被拆走。这一盒还在架上，慢一步就没了。</p>
+            <div class="stock"><div>已拆<b>27</b></div><div>还剩<b>23</b></div><div>你的号<b>#28</b></div></div>
+            <div class="arena-cd">今日开盒剩余 <b data-cd="end">02:19:41</b></div>
+          </div>
+          <div class="board">
+            <div class="board-h"><b>今日货架</b><span>第 28 盒正在闪</span></div>
+            <div class="seats" data-seats="27" data-next="28"></div>
+          </div>
+          <div class="live">
+            <b>刚刚有人拆走</b>
+            <ul>
+              <li><i></i>@北城 拆走第 26 盒<span class="ago">刚刚</span></li>
+              <li><i></i>@南城 拆走第 27 盒<span class="ago">12 秒前</span></li>
+              <li><i></i>@阿宁 拆走第 25 盒<span class="ago">41 秒前</span></li>
+            </ul>
+          </div>
+          <div class="rules"><b>怎么拆</b>每天 50 盒，每人每天最多拆 1 次。开出的是额外次数，不扣积分。扣次：免费 → 活动 → 已购。卡片仍不展示金额。</div>
+        </div>
+        <div class="foot"><button class="btn-primary" type="button" id="btnClaim">拆开这一盒</button></div>
+      </section>
+
+      <section class="screen" id="screen-claim-done">
+        <div class="status-bar"><span>9:41</span><span>5G</span></div>
+        <div class="nav-bar"><button class="back" type="button" data-go="plaza">‹</button><div class="title">今日盲盒</div><span class="side"></span></div>
+        <div class="burst" id="burst"></div>
+        <div class="scroll">
+          <div class="arena">
+            <span class="claim-badge ok">开出 · 已入袋</span>
+            <div class="mbox-wrap open">
+              <div class="mbox-lid"><span class="mbox-bow"></span></div>
+              <div class="mbox-body"><i class="mbox-ribbon"></i></div>
+              <div class="mbox-prize"><em>1</em><span>次</span></div>
+            </div>
+            <h2>你压过了 22 人</h2>
+            <p>今日第 28 盒开出次数 +1。这档不能再拆。</p>
+          </div>
+          <div class="ach">
+            <div><em>今日盒序</em><b>28/50</b></div>
+            <div><em>甩在后面</em><b>22 盒</b></div>
+            <div><em>开盒用时</em><b>0.8 秒</b></div>
+          </div>
+          <div class="ticket">
+            <div class="ticket-mark"><em>1</em><span>次</span></div>
+            <div>
+              <b>次数已入袋</b>
+              <p>比 @南城 快 12 秒。回广场开用。</p>
+            </div>
+          </div>
+          <div class="board">
+            <div class="board-h"><b>今日货架</b><span>你的盒已点亮</span></div>
+            <div class="seats" data-seats="28" data-me="28"></div>
+          </div>
+        </div>
+        <div class="foot"><button class="btn-primary" type="button" data-go="plaza">回广场开用</button></div>
+      </section>
+
+      <section class="screen" id="screen-claim-soldout">
+        <div class="status-bar"><span>9:41</span><span>5G</span></div>
+        <div class="nav-bar"><button class="back" type="button" data-go="plaza">‹</button><div class="title">今日盲盒</div><span class="side"></span></div>
+        <div class="scroll">
+          <div class="arena">
+            <span class="claim-badge sold">进行中 · 拆完</span>
+            <div class="mbox-wrap empty">
+              <div class="mbox-lid"><span class="mbox-bow"></span></div>
+              <div class="mbox-body"><i class="mbox-ribbon"></i><span class="mbox-q">空</span></div>
+            </div>
+            <h2>50 盒都拆完了</h2>
+            <p>今日盲盒已空。明天同一时间再上架。</p>
+          </div>
+          <div class="board">
+            <div class="board-h"><b>今日货架</b><span>50 / 50</span></div>
+            <div class="seats" data-seats="50"></div>
+          </div>
+          <div class="rules">发放量不够一整份时，也按拆完处理。免费次数和已购不动。</div>
+        </div>
+        <div class="foot"><button class="btn-primary" type="button" disabled>今日已拆完</button></div>
+      </section>
+
+      <section class="screen" id="screen-claim-soon">
+        <div class="status-bar"><span>9:41</span><span>5G</span></div>
+        <div class="nav-bar"><button class="back" type="button" data-go="plaza">‹</button><div class="title">今日盲盒</div><span class="side"></span></div>
+        <div class="scroll">
+          <div class="arena">
+            <span class="claim-badge mute">未开盒</span>
+            <div class="mbox-wrap lock">
+              <div class="mbox-lid"><span class="mbox-bow"></span></div>
+              <div class="mbox-body"><i class="mbox-ribbon"></i><span class="mbox-q">锁</span></div>
+            </div>
+            <h2>12:00 开盒</h2>
+            <p>货架还锁着。广场稿件仍可按原次数领。</p>
+            <div class="arena-cd">距开盒 <b>02:19:41</b></div>
+          </div>
+          <div class="board">
+            <div class="board-h"><b>今日货架</b><span>0 / 50 未上架</span></div>
+            <div class="seats" data-seats="0"></div>
+          </div>
+        </div>
+        <div class="foot"><button class="btn-primary" type="button" disabled>还没开盒</button></div>
+      </section>
+
+      <section class="screen" id="screen-claim-ended">
+        <div class="status-bar"><span>9:41</span><span>5G</span></div>
+        <div class="nav-bar"><button class="back" type="button" data-go="plaza">‹</button><div class="title">今日盲盒</div><span class="side"></span></div>
+        <div class="scroll">
+          <div class="arena">
+            <span class="claim-badge mute">已收官</span>
+            <div class="mbox-wrap empty">
+              <div class="mbox-lid"><span class="mbox-bow"></span></div>
+              <div class="mbox-body"><i class="mbox-ribbon"></i><span class="mbox-q">封</span></div>
+            </div>
+            <h2>这档已收官</h2>
+            <p>已经入袋的次数还在，只是不能再拆新盒。</p>
+          </div>
+          <div class="ticket">
+            <div class="ticket-mark"><em>1</em><span>次</span></div>
+            <div>
+              <b>你袋里还有次数</b>
+              <p>回广场照常用。</p>
+            </div>
+          </div>
+        </div>
+        <div class="foot"><button class="btn-primary" type="button" disabled>已收官</button></div>
+      </section>
+    </div>
+  </div>
+  <script src="yijian-daifa-store.js"></script>
+  <script>
+    var STORE = YJD.seed();
+    YJD.sweepOss(STORE);
+    var ITEMS = STORE.works.filter(function (it) { return YJD.plazaEligible(STORE, it); });
+    var PROJECTS = [{ id: '', name: '全部', mark: '全', color: '#94a3b8' }].concat(
+      YJD.enabledProjects(STORE).map(function (p) { return { id: p.name, name: p.name, logo: p.logo }; })
+    );
+    var FILTERS = [
+      { key: 'editor', label: '剪辑师', options: (function () {
+        var eds = [];
+        ITEMS.forEach(function (it) { if (eds.indexOf(it.editor) === -1) eds.push(it.editor); });
+        return eds;
+      })() },
+      { key: 'mat', label: '素材类型', options: YJD.enabledMats(STORE).map(function (m) { return m.name; }) },
+      { key: 'kind', label: '稿件类型', options: ['图集', '视频'] }
+    ];
+    var BANNERS = STORE.banners.filter(function (b) { return b.on; }).slice(0, 5);
+    var SCREENS = [
+      { id: 'plaza', label: '广场已登录' },
+      { id: 'plaza-guest', label: '广场未登录' },
+      { id: 'claim-open', label: '可领' },
+      { id: 'claim-done', label: '已领' },
+      { id: 'claim-soldout', label: '售罄' },
+      { id: 'claim-soon', label: '未开始' },
+      { id: 'claim-ended', label: '已结束' }
+    ];
+    var filters = { project: '', editor: '', mat: '', kind: '' };
+    var search = '';
+    var bannerIdx = 0;
+    var bannerTimer = null;
+    var remain = 2 * 3600 + 19 * 60 + 41;
+    function renderSeats() {
+      document.querySelectorAll('.seats[data-seats]').forEach(function (el) {
+        var taken = Number(el.dataset.seats) || 0;
+        var me = Number(el.dataset.me) || 0;
+        var next = Number(el.dataset.next) || 0;
+        var html = '';
+        for (var i = 1; i <= 50; i++) {
+          var cls = i <= taken ? 'in' : 'wait';
+          if (me && i === me) cls += ' me';
+          if (next && i === next) cls += ' next';
+          html += '<i class="' + cls + '"></i>';
+        }
+        el.innerHTML = html;
+      });
+    }
+    function pad2(n) { return n < 10 ? '0' + n : '' + n; }
+    function fmtCd(s) {
+      return pad2(Math.floor(s / 3600)) + ':' + pad2(Math.floor((s % 3600) / 60)) + ':' + pad2(s % 60);
+    }
+    function tickCd() {
+      document.querySelectorAll('[data-cd]').forEach(function (el) { el.textContent = fmtCd(remain); });
+      if (remain > 0) remain -= 1;
+    }
+
+    function coverMiss(img) {
+      img.style.display = 'none';
+      if (img.parentNode) img.parentNode.classList.add('cover-miss');
+    }
+    window.coverMiss = coverMiss;
+    function coverHtml(src, book, genre) {
+      return '<div class="cover-wrap" data-book="' + (book || '') + '" data-genre="' + (genre || '') + '">' +
+        '<img class="cover-img" src="' + (src || '') + '" alt="' + (genre || '') + '封面 ' + (book || '') + '" onerror="coverMiss(this)" /></div>';
+    }
+    function visibleItems() {
+      return ITEMS.filter(function (it) {
+        if (search && it.title.indexOf(search) === -1 && it.book.indexOf(search) === -1) return false;
+        if (filters.project && it.project !== filters.project) return false;
+        if (filters.editor && it.editor !== filters.editor) return false;
+        if (filters.mat && it.mat !== filters.mat) return false;
+        if (filters.kind && it.kind !== filters.kind) return false;
+        return true;
+      });
+    }
+    function gridHtml(list) {
+      if (!list.length) return '<div class="empty">没有可领取的稿件<br/>占用中的稿件已对他人隐藏</div>';
+      return '<div class="grid">' + list.map(function (it) {
+        return '<div class="g-card" data-note="稿件卡片不展示金额">' +
+          '<div class="thumb">' + coverHtml(it.cover, it.book, it.genre) +
+          '<span class="kind-tag">' + it.kind + '</span>' +
+          '<div class="thumb-bar"><span>' + it.editor + '</span><span>' + it.time + '</span></div></div>' +
+          '<div class="g-title">' + it.title + '</div>' +
+          '<div class="g-src">' + it.project + '</div></div>';
+      }).join('') + '</div>';
+    }
+    function renderProjects(elId, current) {
+      var el = document.getElementById(elId);
+      el.innerHTML = PROJECTS.map(function (p) {
+        var ico = p.logo
+          ? '<span class="proj-ico"><img src="' + p.logo + '" alt="' + p.name + '" /></span>'
+          : '<span class="proj-ico" style="background:' + (p.color || '#94a3b8') + '">' + (p.mark || '') + '</span>';
+        return '<button class="proj' + (current === p.id ? ' on' : '') + '" type="button" data-project="' + p.id + '">' +
+          ico + '<span class="proj-name">' + p.name + '</span></button>';
+      }).join('');
+    }
+    function renderFilters(elId) {
+      document.getElementById(elId).innerHTML = FILTERS.map(function (f) {
+        var cur = filters[f.key];
+        return '<button class="dd' + (cur ? ' on' : '') + '" type="button" data-filter="' + f.key + '">' +
+          (cur || f.label) + ' ▾</button>';
+      }).join('');
+    }
+    function renderBanner(elId) {
+      var el = document.getElementById(elId);
+      if (!BANNERS.length) { el.hidden = true; el.innerHTML = ''; return; }
+      el.hidden = false;
+      var dots = BANNERS.length >= 2
+        ? '<div class="bn-dots">' + BANNERS.map(function (_, i) {
+          return '<button class="bn-dot' + (i === 0 ? ' on' : '') + '" type="button" data-bn="' + i + '"></button>';
+        }).join('') + '</div>' : '';
+      el.innerHTML = '<div class="bn-track">' + BANNERS.map(function (b, i) {
+        return '<button class="bn-slide' + (i === 0 ? ' on' : '') + '" type="button">' +
+          '<img src="' + b.img + '" alt="' + b.title + '" />' +
+          '<div class="bn-cap"><b>' + b.title + '</b><span>' + (b.sub || '') + '</span></div></button>';
+      }).join('') + '</div>' + dots;
+    }
+    function showBanner(i) {
+      if (!BANNERS.length) return;
+      bannerIdx = ((i % BANNERS.length) + BANNERS.length) % BANNERS.length;
+      ['plazaBanner', 'guestBanner'].forEach(function (id) {
+        var root = document.getElementById(id);
+        root.querySelectorAll('.bn-slide').forEach(function (el, n) { el.classList.toggle('on', n === bannerIdx); });
+        root.querySelectorAll('.bn-dot').forEach(function (el, n) { el.classList.toggle('on', n === bannerIdx); });
+      });
+    }
+    function renderFeed() {
+      renderProjects('projectRow', filters.project);
+      renderFilters('feedFilters');
+      document.getElementById('feedList').innerHTML = gridHtml(visibleItems());
+    }
+    function toast(text) {
+      var el = document.getElementById('toast');
+      el.textContent = text;
+      el.classList.add('show');
+      clearTimeout(toast._t);
+      toast._t = setTimeout(function () { el.classList.remove('show'); }, 1800);
+    }
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(function (s) { s.classList.toggle('active', s.id === 'screen-' + id); });
+      document.querySelectorAll('.demo-nav button').forEach(function (b) { b.classList.toggle('active', b.dataset.screen === id); });
+      document.getElementById('plazaOrb').hidden = id !== 'plaza';
+      document.getElementById('guestOrb').hidden = id !== 'plaza-guest';
+      if (id === 'claim-done') spawnBurst();
+      if (window.parent !== window) window.parent.postMessage({ type: 'poolScreen', screen: id }, '*');
+    }
+    function spawnBurst() {
+      var box = document.getElementById('burst');
+      if (!box) return;
+      var colors = ['#ff6b1a', '#ffb36a', '#e8c9a0', '#fff'];
+      box.innerHTML = '';
+      for (var i = 0; i < 14; i++) {
+        var n = document.createElement('i');
+        var ang = (i / 14) * Math.PI * 2;
+        n.style.setProperty('--x', Math.round(Math.cos(ang) * 90) + 'px');
+        n.style.setProperty('--y', Math.round(Math.sin(ang) * 70 - 20) + 'px');
+        n.style.background = colors[i % colors.length];
+        n.style.animationDelay = (i * 0.02) + 's';
+        box.appendChild(n);
+      }
+    }
+    document.getElementById('demoNav').innerHTML = SCREENS.map(function (s) {
+      return '<button type="button" data-screen="' + s.id + '">' + s.label + '</button>';
+    }).join('');
+    renderProjects('projectRow', '');
+    renderProjects('guestProjectRow', '');
+    renderFilters('feedFilters');
+    renderFilters('guestFilters');
+    renderBanner('plazaBanner');
+    renderBanner('guestBanner');
+    document.getElementById('feedList').innerHTML = gridHtml(ITEMS);
+    document.getElementById('guestList').innerHTML = gridHtml(ITEMS);
+    document.getElementById('feedSearch').addEventListener('input', function () {
+      search = this.value.trim();
+      renderFeed();
+    });
+    document.body.addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-screen]');
+      if (btn && btn.closest('.demo-nav')) { showScreen(btn.dataset.screen); return; }
+      var go = e.target.closest('[data-go]');
+      if (go) { showScreen(go.dataset.go); return; }
+      var proj = e.target.closest('[data-project]');
+      if (proj && proj.closest('#projectRow')) {
+        filters.project = proj.dataset.project;
+        renderFeed();
+        return;
+      }
+      var filterBtn = e.target.closest('[data-filter]');
+      if (filterBtn && filterBtn.closest('#feedFilters')) {
+        var key = filterBtn.dataset.filter;
+        var f = FILTERS.find(function (x) { return x.key === key; });
+        var opts = [''].concat(f.options);
+        var idx = opts.indexOf(filters[key]);
+        filters[key] = opts[(idx + 1) % opts.length];
+        renderFeed();
+        return;
+      }
+      var dot = e.target.closest('[data-bn]');
+      if (dot) { showBanner(Number(dot.dataset.bn)); return; }
+      var note = e.target.closest('[data-note]');
+      if (note) toast(note.dataset.note);
+    });
+    renderSeats();
+    tickCd();
+    setInterval(tickCd, 1000);
+    document.getElementById('btnClaim').addEventListener('click', function () {
+      var rush = document.getElementById('rush');
+      var box = document.getElementById('rushBox');
+      rush.classList.add('show');
+      box.classList.remove('open');
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () { box.classList.add('open'); });
+      });
+      setTimeout(function () {
+        rush.classList.remove('show');
+        box.classList.remove('open');
+        toast('开出 1 次，今日第 28 盒');
+        showScreen('claim-done');
+      }, 1100);
+    });
+    if (BANNERS.length >= 2) {
+      bannerTimer = setInterval(function () { showBanner(bannerIdx + 1); }, 3000);
+    }
+    var params = new URLSearchParams(location.search);
+    if (params.get('embed') === '1') document.body.classList.add('embed-mode');
+    var start = params.get('screen') || 'plaza';
+    if (start === 'home' || start === 'home-guest') start = start === 'home-guest' ? 'plaza-guest' : 'plaza';
+    showScreen(start);
+  </script>
+</body>
+</html>

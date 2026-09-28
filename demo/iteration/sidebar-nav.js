@@ -22,7 +22,10 @@
     'fr-ai-keyword': '<path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"/>',
     'fr-opc-yijian-daifa': '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M8 12h8"/><path d="M8 16h5"/><circle cx="8" cy="8" r="1"/>',
     'fr-zhulu-board': '<path d="M8 21V11"/><path d="M12 21V7"/><path d="M16 21V3"/><path d="M4 21h16"/>',
-    'fr-wallet-merge-withdraw': '<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/>'
+    'fr-wallet-merge-withdraw': '<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/>',
+    'fr-opc-yijian-daifa-pool': '<path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>',
+    'fr-yijian-daifa-iter2': '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M8 12h8"/><path d="M8 16h5"/><circle cx="8" cy="8" r="1"/>',
+    'fr-alias-bind': '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>'
   };
   var ICON_FALLBACK = '<circle cx="12" cy="12" r="4"/>';
   var ICON_CHEVRON_LEFT = '<path d="m15 18-6-6 6-6"/>';
@@ -56,7 +59,10 @@
         { id: 'fr-ai-keyword', label: 'AI申词', href: 'fr-ai-keyword.html', fr: 'FR-013' },
         { id: 'fr-opc-yijian-daifa', label: '一键代发', href: 'fr-opc-yijian-daifa.html', fr: 'FR-014', defaultStatus: 'live' },
         { id: 'fr-zhulu-board', label: '双节逐鹿榜', href: 'fr-zhulu-board.html', fr: 'FR-015' },
-        { id: 'fr-wallet-merge-withdraw', label: '奖钱包合并提现', href: 'fr-wallet-merge-withdraw.html', fr: 'FR-016' }
+        { id: 'fr-wallet-merge-withdraw', label: '奖钱包合并提现', href: 'fr-wallet-merge-withdraw.html', fr: 'FR-016' },
+        { id: 'fr-opc-yijian-daifa-pool', label: '收益池与限时领次', href: 'fr-opc-yijian-daifa-pool.html', fr: 'FR-017' },
+        { id: 'fr-yijian-daifa-iter2', label: '一键代发迭代 2.0', href: 'fr-yijian-daifa-iter2.html', fr: 'FR-018' },
+        { id: 'fr-alias-bind', label: '别名绑定', href: 'fr-alias-bind.html', fr: 'FR-019' }
       ]
     },
     {

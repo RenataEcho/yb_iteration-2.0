@@ -2,7 +2,7 @@
 name: 右豹迭代需求记录后台
 description: 产品侧迭代需求 Demo 与规则交付台；玻璃拟态 B 端风格，继承右豹管理后台原型视觉语言。
 status: draft
-updated: 2026-08-27
+updated: 2026-09-23
 colors:
   primary: '#2563eb'
   primary-hover: '#1d4ed8'
@@ -248,6 +248,21 @@ components:
 - 胶囊按钮组；选中 = primary 浅底 + 主色字；未选中 = 透明 + 边框。
 - 与右侧 mockup 状态联动。
 
+### C 端温和提示（提现风控）
+
+[ASSUMPTION] 不新增色彩 token，也不改后台玻璃拟态。这条提示只出现在钱包 Demo 的手机框里，沿用已有提现页的白卡片，而不是本文件的 Confirm Modal。
+
+| 部位 | 沿用 |
+|------|------|
+| 遮罩 | 手机框内全屏，`rgba(15, 23, 42, 0.52)`，与钱包 Demo `.kyc-mask` 相同 |
+| 卡片 | 白底、圆角 16px、左右留白，短文案，一张卡片只说一件事 |
+| 标题 | 17px / 800，颜色用正文深色，不用 `{colors.danger}` |
+| 正文 | 13px，行高约 1.55，灰色正文 |
+| 按钮 | 一颗全宽主按钮，沿用提现页橙色渐变；文案「好的」 |
+| 图标 | 不放警告三角、红色叉、盾牌 |
+
+参考位置：[`demo/iteration/wallet-merge-withdraw-demo.html`](../../../../demo/iteration/wallet-merge-withdraw-demo.html) 的 `.kyc-sheet` / `.tip-box`。应税同意卡（政策长文 + 勾选 + 双按钮）不作为这条提示的样式。
+
 ### Sprint 侧栏分组
 
 - 分组标签 11px uppercase muted；与业务模块分组视觉一致，前缀图标区分（迭代 = 紫色小点）。
@@ -266,3 +281,4 @@ components:
 - 不要加入登录、头像菜单、通知铃铛（无权限产品 Demo 台）。
 - 不要堆运营向大盘组件作为框架默认（除非该 Sprint 有变更）。
 - 不要用角标浮窗替代结构化规则抽屉（角标可作为后续增强层）。
+- 提现风控提示不要用后台确认弹窗（400px、取消 + 危险确认），也不要写成红色告警。

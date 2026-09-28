@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-pitch-store="fr014-user-guide-v2">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>一键代发</title>
+  <style>
+    :root {
+      --orange: #ff6b1a;
+      --ink: #1a2332;
+      --muted: #6f675e;
+      --paper: #f6f0e7;
+      --card: #fffaf3;
+      --line: #eadfce;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: #ece6dc;
+      color: var(--ink);
+    }
+    .phone {
+      width: 375px;
+      margin: 0 auto;
+      background: var(--paper);
+      min-height: 100vh;
+      padding: 20px 16px 28px;
+    }
+    .hero {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    .hero img {
+      width: 72px; height: 72px;
+      border-radius: 14px;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+    .kicker { font-size: 11px; letter-spacing: .14em; font-weight: 700; color: var(--orange); }
+    h1 { font-size: 24px; line-height: 1.25; margin: 2px 0 4px; }
+    .sub { font-size: 13px; line-height: 1.5; color: var(--muted); }
+
+    .deal {
+      background: #2a2118;
+      color: #f4ece3;
+      border-radius: 14px;
+      padding: 14px 14px 13px;
+      margin-bottom: 14px;
+    }
+    .deal b { display: block; font-size: 16px; line-height: 1.4; color: #fff; margin-bottom: 6px; }
+    .deal p { font-size: 13px; line-height: 1.55; color: #d8cfc4; }
+    .deal em { font-style: normal; color: #ffd4b8; }
+
+    h2 {
+      font-size: 13px;
+      color: var(--orange);
+      margin: 16px 0 8px;
+      letter-spacing: .04em;
+    }
+    .steps {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .step {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px 10px 11px;
+    }
+    .step i {
+      display: block;
+      font-style: normal;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--orange);
+      margin-bottom: 3px;
+    }
+    .step b { display: block; font-size: 13px; line-height: 1.35; }
+    .step span { display: block; margin-top: 3px; font-size: 11px; color: var(--muted); line-height: 1.4; }
+
+    .list {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .row {
+      display: grid;
+      grid-template-columns: 86px 1fr;
+      gap: 8px;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      font-size: 12.5px;
+      line-height: 1.5;
+    }
+    .row:last-child { border-bottom: 0; }
+    .row dt { color: #9a3412; font-weight: 700; }
+    .row dd { color: #3d3832; }
+    .row.warn { background: #fffde8; }
+    .row.warn dt { color: #854d0e; }
+    .notice {
+      background: #fffde8;
+      border: 1px solid #f3e08a;
+      border-radius: 12px;
+      padding: 12px 13px;
+      margin: 12px 0 4px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #3d3832;
+    }
+    .notice b { display: block; color: #854d0e; font-size: 13px; margin-bottom: 4px; }
+
+    .foot {
+      margin-top: 16px;
+      text-align: center;
+      font-size: 12px;
+      color: #9a9186;
+      line-height: 1.55;
+    }
+    .bar {
+      width: 375px;
+      margin: 0 auto;
+      padding: 10px 4px 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .bar .hint { font-size: 11px; }
+    .bar .actions { display: flex; gap: 8px; }
+    .bar button {
+      border: 0;
+      background: var(--orange);
+      color: #fff;
+      border-radius: 8px;
+      padding: 7px 12px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    .bar .btn-ghost {
+      background: #fff;
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+    .phone.is-editing {
+      outline: 2px dashed var(--orange);
+      outline-offset: 4px;
+    }
+    .phone.is-editing :focus { background: #fff7ed; outline: none; }
+    .phone.is-editing .deal :focus { background: #3a3128; }
+    @media (min-width: 420px) {
+      body { padding: 16px 0 40px; }
+      .phone { border-radius: 18px; box-shadow: 0 12px 32px rgba(26,35,50,.08); }
+    }
+  </style>
+</head>
+<body>
+  <div class="bar">
+    <span class="hint">点「编辑」改字，完成会记在本机</span>
+    <div class="actions">
+      <button type="button" class="btn-ghost" id="pitchReset">还原</button>
+      <button type="button" id="pitchEdit" aria-pressed="false">编辑</button>
+    </div>
+  </div>
+  <article class="phone sheet">
+    <header class="hero">
+      <img class="no-edit" src="assets/fr014/yjdf-story-empty.png" alt="" />
+      <div>
+        <p class="kicker">一键代发</p>
+        <h1>不用剪，领了就发</h1>
+        <p class="sub">成片已在广场。你领走、发出去、回填。</p>
+      </div>
+    </header>
+
+    <section class="deal">
+      <b>领取之后，这个词赚到的钱，按约定分给剪辑手。</b>
+      <p>领取时选中的关键词会和这份成片绑在一起。出单按领取当时的分成拆开：<em>剪辑手拿约定的一份，你拿剩下的。</em>必须回填才算数，回填后不能改词。</p>
+    </section>
+
+    <div class="notice">
+      <b>领取前请确认</b>
+      为确保作品收益分成准确，每个关键词仅可领取一个作品。领取前请确认作品信息，感谢您的理解与配合。
+    </div>
+
+    <h2>怎么用</h2>
+    <div class="steps">
+      <div class="step"><i>1</i><b>有过审的词</b><span>没有已通过的词，领不了</span></div>
+      <div class="step"><i>2</i><b>广场挑成片</b><span>预览不算领，看清和剪辑手的分成</span></div>
+      <div class="step"><i>3</i><b>选词领取</b><span>扣 1 次不退，一词只能领一个作品</span></div>
+      <div class="step"><i>4</i><b>发 · 回填 · 分成</b><span>24 小时发布回填，出单自动根据分成比例进行分成</span></div>
+    </div>
+
+    <h2>发片注意</h2>
+    <dl class="list">
+      <div class="row"><dt>一套怎么发</dt><dd>一套发四平台。视频号先转视频；快手、小红书继续图集。先垂直，别拆碎乱发。</dd></div>
+      <div class="row"><dt>低于 100</dt><dd>先看号能不能推。推不动就删，领新稿。部分号发不了偏 AI 的内容。</dd></div>
+      <div class="row"><dt>高于 5000</dt><dd>立刻用小号引流到你的关键词，否则只有曝光没有单。</dd></div>
+      <div class="row"><dt>被限 / 审不过</dt><dd>删掉换稿重发，不要在一条被限的作品上反复改。</dd></div>
+      <div class="row"><dt>盯评论</dt><dd>出现别人的口令或项目名，立刻删评，防止截流。</dd></div>
+      <div class="row"><dt>24 小时回填</dt><dd>不回填次数不退，稿回广场。第 4 次超时停权。下载约 3 天。</dd></div>
+    </dl>
+
+    <h2>AI漫画类价格底线</h2>
+    <dl class="list">
+      <div class="row"><dt>制作成本</dt><dd>外面自制一套 70～100 张，成本大约 3～10 元。你领的是现成片。</dd></div>
+      <div class="row"><dt>新人特惠</dt><dd>每日免费1次，是鼓励用心运营，不是让你囤、也不是让你浪费。</dd></div>
+      <div class="row warn"><dt>乱发成本</dt><dd>废号批量乱发、糟蹋素材，之后单次 3 元一次，这就是成本价。</dd></div>
+    </dl>
+
+    <p class="foot">领一套，发一套，回填一套。<br />分成与次数以 App 当时展示为准</p>
+  </article>
+  <script src="yijian-daifa-pitch-edit.js?v=guide1"></script>
+</body>
+</html>

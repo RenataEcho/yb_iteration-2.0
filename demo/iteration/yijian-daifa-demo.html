@@ -470,10 +470,19 @@
       display: flex; align-items: center; justify-content: center; font-size: 13px;
     }
     .notice-grid p { font-size: 11px; line-height: 1.4; color: #4b5563; font-weight: 600; }
+    .notice-lead {
+      margin: 0 0 10px; font-size: 12px; line-height: 1.55; color: #7c2d12; text-align: left;
+    }
     .notice-foot {
       margin-top: 10px; padding-top: 8px; border-top: 1px solid #ffe0c7;
       font-size: 11px; color: #6b7280; text-align: center; line-height: 1.45;
     }
+    .kw-note {
+      margin: 0 16px 8px; padding: 8px 10px; border-radius: 8px;
+      background: #fff7f0; color: #7c2d12; font-size: 12px; line-height: 1.5;
+    }
+    .kw-row.is-used { color: #9ca3af; }
+    .kw-used { font-size: 11px; color: #9ca3af; font-weight: 600; }
     .empty { padding: 72px 20px; text-align: center; color: var(--muted); font-size: 13px; line-height: 1.6; }
     .poster { margin: 12px 0 20px; border-radius: 16px; overflow: hidden; background: #16110e; color: #fff; }
     .poster-hero {
@@ -610,6 +619,7 @@
           <h3>选择该项目关键词</h3>
           <button class="x" type="button" id="kwClose">×</button>
         </div>
+        <p class="kw-note" id="kwNote" hidden>为确保作品收益分成准确，每个关键词仅可领取一个作品。领取前请确认作品信息，感谢您的理解与配合。</p>
         <div class="kw-search">
           <div class="search-box">
             <span class="ico" aria-hidden="true">⌕</span>
@@ -1139,6 +1149,7 @@
     function noticeHtml() {
       return '<div class="notice" id="detailNotice">' +
         '<div class="notice-h"><i>!</i>注意事项</div>' +
+        '<p class="notice-lead">为确保作品收益分成准确，每个关键词仅可领取一个作品。领取前请确认作品信息，感谢您的理解与配合。</p>' +
         '<div class="notice-grid">' +
         '<div><div class="notice-ico">日</div><p>24小时内<br/>完成发布</p></div>' +
         '<div><div class="notice-ico">链</div><p>未按时回填<br/>任务失效</p></div>' +
@@ -1274,16 +1285,31 @@
       var q = state.kwQuery;
       return q ? all.filter(function (k) { return k.indexOf(q) !== -1; }) : all;
     }
+    function keywordAlreadyClaimed(name) {
+      return myClaims().some(function (c) {
+        return c.kw === name && c.status !== '已超时';
+      });
+    }
     function renderKwList() {
       var list = currentKws();
       document.getElementById('kwList').innerHTML = list.length
         ? list.map(function (k) {
-          return '<button class="kw-row' + (state.kwPick === k ? ' on' : '') + '" type="button" data-k="' + k + '">' +
-            '<span>' + k + '</span><i class="kw-check">✓</i></button>';
+          var used = keywordAlreadyClaimed(k);
+          return '<button class="kw-row' + (used ? ' is-used' : '') + (state.kwPick === k ? ' on' : '') + '" type="button" data-k="' + k + '" data-used="' + (used ? '1' : '0') + '">' +
+            '<span>' + k + '</span>' +
+            (used ? '<span class="kw-used">已领取作品</span>' : '<i class="kw-check">✓</i>') +
+            '</button>';
         }).join('')
         : '<p class="quota" style="padding:16px">暂无已通过申词</p>';
       document.querySelectorAll('#kwList .kw-row').forEach(function (el) {
-        el.onclick = function () { state.kwPick = el.dataset.k; renderKwList(); };
+        el.onclick = function () {
+          if (el.dataset.used === '1') {
+            toast('该关键词已领取过作品，请更换关键词');
+            return;
+          }
+          state.kwPick = el.dataset.k;
+          renderKwList();
+        };
       });
     }
     function openKwSheet(mode) {
@@ -1291,6 +1317,7 @@
       state.kwPick = '';
       state.kwQuery = '';
       document.getElementById('kwSearch').value = '';
+      document.getElementById('kwNote').hidden = state.kwMode !== 'claim';
       renderKwList();
       document.getElementById('kwMask').classList.add('show');
       document.getElementById('kwSheet').classList.add('show');
@@ -1843,6 +1870,9 @@
       }
       if (YJD.keywordBookConflict(STORE, it && it.project, name, it && it.bookId)) {
         return '请选择与该稿件书籍一致的已通过关键词';
+      }
+      if (keywordAlreadyClaimed(name)) {
+        return '该关键词已领取过作品，请更换关键词';
       }
       return '';
     }
