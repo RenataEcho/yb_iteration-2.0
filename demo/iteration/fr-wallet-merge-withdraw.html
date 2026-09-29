@@ -318,14 +318,14 @@
           </div>
           <div class="scene-list">
             <button class="scene-btn active" type="button" data-screen="home" data-desc="可划转余额；首次进入弹出改版公告；顶栏划转+提现；三卡仅查看明细">钱包首页</button>
-            <button class="scene-btn" type="button" data-screen="home-notice" data-desc="首页改版公告：插画说明优势（一次提现、可部分划转、提现不再扣税）+ 先划转再提现、划转时扣税">弹窗·改版公告</button>
+            <button class="scene-btn" type="button" data-screen="home-notice" data-desc="首页改版公告：无顶部路径图；插画说明优势（一次提现、可部分划转、提现不再扣税）+ 先划转再提现、划转时扣税">弹窗·改版公告</button>
             <button class="scene-btn" type="button" data-screen="transfer" data-desc="下拉选择实名账户，个人/对公用标签；各钱包单独填金额">划转页</button>
             <button class="scene-btn" type="button" data-screen="withdraw" data-desc="顶部可提现总额；下拉选实名账户，个人/对公用标签，选项含余额">提现页</button>
             <button class="scene-btn" type="button" data-screen="records-tf" data-desc="累计已划转 / 实际到账 / 预扣税额；记录含分钱包金额、税额、状态、动账后收益">划转明细</button>
             <button class="scene-btn" type="button" data-screen="records-wd" data-desc="累计提现；到账用户=名称+脱敏证件号；无实际到账字段">提现明细</button>
             <button class="scene-btn" type="button" data-screen="income" data-desc="收益卡片：项目、金额、已结算、时间、动账后收益；无页头统计/实际到账/扣税文案">查看明细</button>
             <button class="scene-btn" type="button" data-screen="books" data-desc="总收入 ≠ 可提现；旧库存只减不增">账本对照</button>
-            <button class="scene-btn" type="button" data-screen="kyc-tax" data-desc="点确认划转弹出应税同意；勾选同意后才能划转；同意后不再弹出">弹窗·应税同意</button>
+            <button class="scene-btn" type="button" data-screen="kyc-tax" data-desc="标题为请阅读相关协议并同意；勾选《用户余额划转协议》后才能划转；协议名高亮可点">弹窗·应税同意</button>
           </div>
           <p class="scene-hint" id="feSceneHint">点标签滚动到对应页面。区域内可滑动查看全部手机。</p>
           <div class="scene-tools">
@@ -340,31 +340,31 @@
               <div class="board-row">
                 <figure class="board-tile" id="tile-home">
                   <figcaption class="board-cap">钱包首页 <em>可划转余额 · 改版公告</em></figcaption>
-                  <div class="board-phone"><iframe class="wallet-phone" title="钱包首页" src="wallet-merge-withdraw-demo.html?embed=1&v=38&screen=home"></iframe></div>
+                  <div class="board-phone"><iframe class="wallet-phone" title="钱包首页" src="wallet-merge-withdraw-demo.html?embed=1&v=41&screen=home"></iframe></div>
                 </figure>
                 <figure class="board-tile" id="tile-transfer">
                   <figcaption class="board-cap">划转页 <em>实名账户标签 · 分钱包金额</em></figcaption>
-                  <div class="board-phone"><iframe class="wallet-phone" title="划转页" src="wallet-merge-withdraw-demo.html?embed=1&v=38&screen=transfer"></iframe></div>
+                  <div class="board-phone"><iframe class="wallet-phone" title="划转页" src="wallet-merge-withdraw-demo.html?embed=1&v=41&screen=transfer"></iframe></div>
                 </figure>
                 <figure class="board-tile" id="tile-withdraw">
                   <figcaption class="board-cap">提现页 <em>顶部总额 · 实名标签</em></figcaption>
-                  <div class="board-phone"><iframe class="wallet-phone" title="提现页" src="wallet-merge-withdraw-demo.html?embed=1&v=38&screen=withdraw"></iframe></div>
+                  <div class="board-phone"><iframe class="wallet-phone" title="提现页" src="wallet-merge-withdraw-demo.html?embed=1&v=41&screen=withdraw"></iframe></div>
                 </figure>
                 <figure class="board-tile" id="tile-records-tf">
                   <figcaption class="board-cap">划转明细 <em>已划转 · 到账 · 税额</em></figcaption>
-                  <div class="board-phone"><iframe class="wallet-phone" title="划转明细" src="wallet-merge-withdraw-demo.html?embed=1&v=38&screen=records-tf"></iframe></div>
+                  <div class="board-phone"><iframe class="wallet-phone" title="划转明细" src="wallet-merge-withdraw-demo.html?embed=1&v=41&screen=records-tf"></iframe></div>
                 </figure>
                 <figure class="board-tile" id="tile-records-wd">
                   <figcaption class="board-cap">提现明细 <em>到账用户 · 无实际到账</em></figcaption>
-                  <div class="board-phone"><iframe class="wallet-phone" title="提现明细" src="wallet-merge-withdraw-demo.html?embed=1&v=38&screen=records-wd"></iframe></div>
+                  <div class="board-phone"><iframe class="wallet-phone" title="提现明细" src="wallet-merge-withdraw-demo.html?embed=1&v=41&screen=records-wd"></iframe></div>
                 </figure>
                 <figure class="board-tile" id="tile-income">
                   <figcaption class="board-cap">查看明细 <em>已结算 · 无扣税</em></figcaption>
-                  <div class="board-phone"><iframe class="wallet-phone" title="查看明细" src="wallet-merge-withdraw-demo.html?embed=1&v=38&screen=income"></iframe></div>
+                  <div class="board-phone"><iframe class="wallet-phone" title="查看明细" src="wallet-merge-withdraw-demo.html?embed=1&v=41&screen=income"></iframe></div>
                 </figure>
                 <figure class="board-tile" id="tile-books">
                   <figcaption class="board-cap">账本对照 <em>可划转余额 ≠ 可提现</em></figcaption>
-                  <div class="board-phone"><iframe class="wallet-phone" title="账本对照" src="wallet-merge-withdraw-demo.html?embed=1&v=38&screen=books"></iframe></div>
+                  <div class="board-phone"><iframe class="wallet-phone" title="账本对照" src="wallet-merge-withdraw-demo.html?embed=1&v=41&screen=books"></iframe></div>
                 </figure>
               </div>
             </section>
@@ -373,11 +373,11 @@
               <div class="board-row">
                 <figure class="board-tile" id="tile-home-notice">
                   <figcaption class="board-cap">改版公告 <em>进首页弹出</em></figcaption>
-                  <div class="board-phone"><iframe class="wallet-phone" title="改版公告" src="wallet-merge-withdraw-demo.html?embed=1&v=38&screen=home-notice"></iframe></div>
+                  <div class="board-phone"><iframe class="wallet-phone" title="改版公告" src="wallet-merge-withdraw-demo.html?embed=1&v=41&screen=home-notice"></iframe></div>
                 </figure>
                 <figure class="board-tile" id="tile-kyc-tax">
                   <figcaption class="board-cap">同意应税方案 <em>确认划转时</em></figcaption>
-                  <div class="board-phone"><iframe class="wallet-phone" title="应税同意弹窗" src="wallet-merge-withdraw-demo.html?embed=1&v=38&screen=kyc-tax"></iframe></div>
+                  <div class="board-phone"><iframe class="wallet-phone" title="应税同意弹窗" src="wallet-merge-withdraw-demo.html?embed=1&v=41&screen=kyc-tax"></iframe></div>
                 </figure>
               </div>
             </section>
@@ -581,8 +581,11 @@
         <div class="rule-section">
           <h3><span>2</span>划转应税同意弹窗</h3>
           <div class="rule-content">
-            <p>用户在划转页点「确认划转」时弹出。未勾选同意则不能真实划转；同意后后续不再弹出。通知全文：</p>
-            <p>依据国家税务总局最新要求，自2026年10月1日起，非对公合作用户个人所得税的纳税义务发生时点将调整为到达用户真实可提现钱包账户且用户可自主提现时点(即余额入账时点)。平台将在订单收益余额入账后，用户进行余额划转时为用户计算并扣除税款，平台或您的财税服务商将于金额入账次月为您代办相关税金申报。</p>
+            <p>用户在划转页点「确认划转」时弹出。标题为「请阅读相关协议并同意」，不展示灰字说明。勾选前缀固定为「我已阅读并同意」，后面的协议名高亮可点。协议已配置时，未勾选不能划转；同意后后续不再弹出。</p>
+            <p>弹窗橙色高亮（标签 + 正文）和《余额划转协议》（名称 + 正文）都由后台配置，前端不写死。未配置的一块不展示。下面是当前示例，上线以后台下发为准：</p>
+            <p>标签：先算税、后提现。</p>
+            <p>正文：依据国家税务总局最新要求，自2026年10月1日起，非对公合作用户个人所得税的纳税义务发生时点将调整为到达用户真实可提现钱包账户且用户可自主提现时点(即余额入账时点)。平台将在订单收益余额入账后，用户进行余额划转时为用户计算并扣除税款，平台或您的财税服务商将于金额入账次月为您代办相关税金申报。</p>
+            <p>协议示例名：《用户余额划转协议》。点开正文为占位，正式协议由后台配置。</p>
           </div>
         </div>
         <div class="rule-section">
@@ -590,8 +593,8 @@
           <div class="rule-content">
             <ul>
               <li><strong>钱包首页</strong>：今日入账贴在总收入旁；三格为可划转余额、可提现总额、提现账户。三张卡去掉操作按钮，灰色字段为可划转余额 / 已确认待入款。首次进入弹出改版公告。</li>
-              <li><strong>划转页</strong>：标题为选择实名账户。下拉中个人/对公用标签展示，不做文字前缀，且不展示该户可提现。各钱包展示可划转余额并自定义金额。确认划转按钮下方为国税说明全文。</li>
-              <li><strong>提现页</strong>：顶部展示可提现总额。下拉选择实名账户，个人/对公用标签展示、不做文字前缀，选项含「余额:xx.xx」。再选到账方式。金额 ≤ 该账户余额。待入款、可划转余额不计。</li>
+              <li><strong>划转页</strong>：标题为选择实名账户。下拉中个人/对公用标签展示，不做文字前缀，且不展示该户可提现。各钱包展示可划转余额并自定义金额。「确认划转」按钮下方的说明由后台配置，未配置不展示。Demo 示例与弹窗高亮正文相同，但是独立字段。</li>
+              <li><strong>提现页</strong>：顶部展示可提现总额。下拉选择实名账户，个人/对公用标签展示、不做文字前缀，选项含「余额:xx.xx」。再选到账方式。金额 ≤ 该账户余额。待入款、可划转余额不计。「确定」按钮下方的说明由后台配置，未配置不展示。Demo 示例为「提现不再扣税。」</li>
               <li><strong>明细</strong>：含划转明细、提现明细两个 Tab。划转明细页头为累计已划转 / 实际到账 / 预扣税额；记录标题为划转至「昵称+脱敏证件号」，含分钱包划转金额、税额、状态（扣税中/划转成功/划转失败）、时间、动账后收益。提现明细去掉实际到账，增加到账用户（名称+脱敏证件号）。</li>
               <li><strong>查看明细</strong>：收益明细无页头统计、无实际到账、无扣税描述，状态仅「已结算」。顶部总收入入口的提现明细不展示页头大统计；「提现记录」右侧下拉筛选全部/个人/对公，累计成功提现金额显示在标题下方并随筛选变化。各钱包入口的提现明细保留累计提现、实际到账、预扣税额，三项均有说明图标。</li>
             </ul>
@@ -601,8 +604,8 @@
           <h3><span>4</span>交互</h3>
           <div class="rule-content">
             <ul>
-              <li>首次打开钱包首页弹出改版公告（插画+文字）：写清新版本优势（三个钱包一次提现、可部分划转、提现不再扣税），以及必须知道的两点——先划转再合并提现；国税要求提现前扣税、平台在划转时扣。点「我知道了」后本机不再弹出。</li>
-              <li>点确认划转未同意应税方案：弹出同意弹窗，不发生划转。</li>
+              <li>首次打开钱包首页弹出改版公告（插画+文字，顶部不放路径图）：写清新版本优势（三个钱包一次提现、可部分划转、提现不再扣税），以及必须知道的两点——先划转再合并提现；国税要求提现前扣税、平台在划转时扣。点「我知道了」后本机不再弹出。</li>
+              <li>点确认划转未同意协议：弹出「请阅读相关协议并同意」，不发生划转。须勾选「我已阅读并同意《用户余额划转协议》」。</li>
               <li>勾选同意并确认后完成本次划转，后续确认划转不再弹出。</li>
               <li>未选到账方式：点确定 Toast「请选择到账方式」。</li>
               <li>金额为空或超合计：拦截，不提交。可划转余额、待入款不计入可提现。</li>
@@ -637,7 +640,19 @@
           </div>
         </div>
         <div class="rule-section">
-          <h3><span>3</span>业务流程</h3>
+          <h3><span>3</span>文案配置</h3>
+          <div class="rule-content">
+            <p>下面四段彼此独立，都由后台配置下发。前端只渲染，不写死。某一段没配，对应位置不展示。</p>
+            <ul>
+              <li><strong>划转弹窗高亮</strong>：橙色区域的标签和正文。示例标签「先算税、后提现」。</li>
+              <li><strong>余额划转协议</strong>：协议名称和正文。勾选行展示「我已阅读并同意」+ 高亮协议名，点击打开正文。</li>
+              <li><strong>划转页底部</strong>：「确认划转」按钮下方的一段说明。</li>
+              <li><strong>提现页底部</strong>：「确定」按钮下方的一段说明。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="rule-section">
+          <h3><span>4</span>业务流程</h3>
           <div class="rule-content"><p>见页内「业务流程」Tab。</p></div>
         </div>
       </div>
