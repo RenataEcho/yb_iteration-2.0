@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FR-021 · 2.0优化 · 右豹迭代需求记录</title>
+  <style>
+    :root {
+      --primary: #2563eb; --primary-hover: #1d4ed8; --primary-light: #eff6ff; --primary-border: #bfdbfe;
+      --accent-rule: #0891b2; --accent-version: #7c3aed; --accent-fr: #d97706;
+      --surface: #fff; --surface-glass: rgba(255,255,255,0.72); --border: #e8edf3;
+      --text-primary: #18222f; --text-secondary: #4a5568; --text-muted: #9aa5b4;
+      --sidebar-w: 240px; --drawer-w: 480px; --radius-sm: 7px; --radius-lg: 14px;
+      --shadow: 0 8px 32px rgba(30,40,80,0.10);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 13px;
+      color: var(--text-primary);
+      background: linear-gradient(135deg, #e0e7ff 0%, #f0f4f8 40%, #e0f2fe 100%);
+      background-attachment: fixed; min-height: 100vh;
+    }
+    .sidebar {
+      position: fixed; inset: 0 auto 0 0; width: var(--sidebar-w); z-index: 200;
+      display: flex; flex-direction: column;
+      background: rgba(240,244,255,0.95); backdrop-filter: blur(20px);
+      border-right: 1px solid rgba(148,163,196,0.22);
+    }
+    .sidebar-brand { padding: 16px 14px 12px; border-bottom: 1px solid rgba(148,163,196,0.22); }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: linear-gradient(135deg, #2563eb, #7c3aed); color: #fff;
+      display: flex; align-items: center; justify-content: center; font-weight: 700;
+    }
+    .brand-text { font-size: 14px; font-weight: 700; }
+    .brand-sub { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+    .sprint-pill {
+      display: inline-block; margin-top: 10px; font-size: 11px; font-weight: 600;
+      padding: 3px 8px; border-radius: 999px; background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0;
+    }
+    .sidebar-scroll { flex: 1; overflow-y: auto; padding: 8px 0 16px; }
+    .sidebar-foot { padding: 10px 14px 14px; border-top: 1px solid rgba(148,163,196,0.22); font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+    .main { margin-left: var(--sidebar-w); padding: 16px 20px 40px; min-height: 100vh; }
+    .breadcrumb { padding: 4px 0 12px; font-size: 12px; color: var(--text-muted); }
+    .breadcrumb a { color: var(--primary); text-decoration: none; }
+    .page-header { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; }
+    .page-header h1 { font-size: 19px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .page-desc { font-size: 12px; color: var(--text-muted); max-width: 820px; line-height: 1.55; }
+    .badge { display: inline-flex; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: var(--radius-sm); }
+    .badge-fr { background: #fffbeb; color: var(--accent-fr); border: 1px solid #fde68a; }
+    .badge-version { background: #f5f3ff; color: var(--accent-version); border: 1px solid #ddd6fe; }
+    .page-tab-bar, .admin-tab-bar {
+      display: flex; gap: 0; margin-bottom: 16px;
+      background: var(--surface-glass); backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.55); border-radius: var(--radius-lg);
+      padding: 4px; box-shadow: var(--shadow); width: fit-content;
+    }
+    .admin-tab-bar { margin: 12px 16px 0; }
+    .page-tab-bar button, .admin-tab-bar button {
+      padding: 8px 20px; border: none; background: transparent; cursor: pointer;
+      font-size: 13px; color: var(--text-secondary); border-radius: 10px;
+    }
+    .page-tab-bar button.active, .admin-tab-bar button.active { background: var(--primary); color: #fff; font-weight: 600; }
+    .page-view { display: none; }
+    .page-view.active { display: block; }
+    #view-fe.page-view.active { display: flex; flex-direction: column; height: calc(100vh - 188px); min-height: 560px; }
+    #view-admin.page-view.active { min-height: calc(100vh - 188px); }
+    .btn {
+      display: inline-flex; align-items: center; height: 34px; padding: 0 14px;
+      border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid transparent;
+    }
+    .btn-rule { background: var(--primary-light); color: var(--primary); border-color: var(--primary-border); }
+    .btn-ghost { background: var(--surface); color: var(--text-secondary); border: 1px solid var(--border); text-decoration: none; }
+    .btn-preview {
+      display: inline-flex; align-items: center; flex-shrink: 0; height: 32px; padding: 0 12px;
+      border-radius: 999px; cursor: pointer; border: 1px solid var(--border); background: #fff;
+      color: var(--text-secondary); font-size: 12px; font-weight: 600;
+    }
+    .btn-preview:hover, .btn-preview[aria-pressed="true"] { border-color: var(--primary-border); background: var(--primary-light); color: var(--primary); }
+    .glass-card {
+      background: var(--surface-glass); backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.55); border-radius: var(--radius-lg);
+      box-shadow: var(--shadow); overflow: hidden;
+    }
+    #view-fe .demo-layout { display: flex; flex-direction: column; gap: 12px; height: 100%; }
+    .demo-layout:fullscreen, .demo-layout:-webkit-full-screen,
+    body.preview-fs-fallback .demo-layout.is-preview {
+      width: 100%; height: 100%; padding: 16px; gap: 12px; overflow: auto;
+      background: linear-gradient(135deg, #e0e7ff 0%, #f0f4f8 40%, #e0f2fe 100%);
+    }
+    body.preview-fs-fallback .demo-layout.is-preview { position: fixed; inset: 0; z-index: 400; }
+    .scene-panel { padding: 16px 18px; flex-shrink: 0; }
+    .scene-panel h2 { font-size: 14px; font-weight: 700; }
+    .scene-lead, .scene-hint { font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-top: 6px; }
+    .scene-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+    .scene-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .scene-btn {
+      padding: 6px 12px; border-radius: 999px; border: 1px solid var(--border);
+      background: #fff; font-size: 12px; cursor: pointer; color: #6b7280;
+    }
+    .scene-btn.active { border-color: var(--primary-border); background: var(--primary-light); color: var(--primary); font-weight: 600; }
+    .mockup-board { padding: 14px 16px 16px; background: #fff; flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; }
+    .board-phone {
+      width: min(360px, 100%); aspect-ratio: 375 / 812; border-radius: 42px; overflow: hidden;
+      background: #000; border: 10px solid #1c1c1e; position: relative; flex-shrink: 0;
+    }
+    .board-phone iframe {
+      width: 375px; height: 812px; border: 0; position: absolute; top: 0; left: 0;
+      transform-origin: 0 0; background: #fff;
+    }
+    .admin-demo-wrap { height: calc(100vh - 280px); min-height: 520px; padding: 0 16px 16px; }
+    .admin-demo-wrap iframe { width: 100%; height: 100%; border: 0; border-radius: 12px; background: #f5f6f8; border: 1px solid var(--border); }
+    .admin-lead { padding: 14px 18px 0; font-size: 12px; color: var(--text-muted); line-height: 1.55; }
+    .drawer-overlay {
+      position: fixed; inset: 0; background: rgba(15,23,42,0.35); z-index: 500;
+      opacity: 0; pointer-events: none; transition: opacity 0.25s;
+    }
+    .drawer-overlay.open { opacity: 1; pointer-events: auto; }
+    .drawer {
+      position: fixed; top: 0; right: 0; bottom: 0; width: min(960px, 100%); z-index: 501;
+      background: rgba(255,255,255,0.98); backdrop-filter: blur(12px);
+      box-shadow: -8px 0 40px rgba(30,40,60,0.18);
+      transform: translateX(100%); transition: transform 0.28s ease;
+      display: flex; flex-direction: column;
+    }
+    .drawer.open { transform: translateX(0); }
+    .drawer-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-shrink: 0; }
+    .drawer-header h2 { font-size: 15px; font-weight: 700; }
+    .drawer-header-actions { display: flex; align-items: center; gap: 8px; }
+    .drawer-close { width: 28px; height: 28px; border: none; background: #f1f5f9; border-radius: 6px; cursor: pointer; font-size: 16px; }
+    .drawer-body { flex: 1; min-height: 0; padding: 0; }
+    .drawer-body iframe { width: 100%; height: 100%; border: 0; display: block; background: #fff; }
+    .btn-ghost-sm { background: var(--surface); color: var(--text-secondary); border: 1px solid var(--border); height: 32px; padding: 0 12px; border-radius: var(--radius-sm); cursor: pointer; font-size: 12px; text-decoration: none; display: inline-flex; align-items: center; }
+    @media (max-width: 1024px) { .main { margin-left: 0; } .sidebar { display: none; } }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand">
+        <div class="brand-icon">迭</div>
+        <div>
+          <div class="brand-text">右豹迭代需求记录</div>
+          <div class="brand-sub">PRD Demo · 产品交付研发</div>
+        </div>
+      </div>
+      <span class="sprint-pill">YBDD2.0 · 迭代 v1</span>
+    </div>
+    <div class="sidebar-scroll" data-iteration-sidebar></div>
+    <div class="sidebar-foot">FR-021 · 页内 Tab<br />前端交互 / 管理后台</div>
+  </aside>
+
+  <main class="main">
+    <nav class="breadcrumb">
+      <a href="framework-shell.html">Sprint 概览</a>
+      <span> / 2.0优化</span>
+    </nav>
+    <header class="page-header">
+      <div>
+        <h1>
+          2.0优化
+          <span class="badge badge-fr">FR-021</span>
+          <span class="badge badge-version">v1 当前</span>
+        </h1>
+        <p class="page-desc">创作者首页 V125：C 端减噪、找项目工具、学院 C 端；学院管理后台为「课程管理（复用知识库）+ 分类管理」。完整交互真源为 <code>creator-home-2-opt-demo.html</code>，本页按场景 Tab 嵌入预览。</p>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <a class="btn btn-ghost" href="creator-home-2-opt-demo.html" target="_blank" rel="noopener">新窗口完整 Demo</a>
+        <button class="btn btn-rule" id="toggleRuleDrawer" type="button">需求规则</button>
+      </div>
+    </header>
+
+    <div class="page-tab-bar" role="tablist">
+      <button type="button" class="active" data-page="view-fe" role="tab">前端交互</button>
+      <button type="button" data-page="view-admin" role="tab">管理后台</button>
+    </div>
+
+    <div id="view-fe" class="page-view active">
+      <div class="demo-layout" id="feDemo">
+        <div class="glass-card scene-panel">
+          <div class="scene-head">
+            <div>
+              <h2>用户端（C 端 App）</h2>
+              <p class="scene-lead">首页减噪：新手学院 vs 活动中心双卡、三格数据、设置工作台、找项目与今日路径气泡。下方 Tab 可切换变现 / 工具 / 数据；学院中心从首页「新手学院」卡片进入。</p>
+            </div>
+            <button class="btn-preview" type="button" data-preview="fe" aria-pressed="false">全屏预览</button>
+          </div>
+          <div class="scene-list" id="feSceneList">
+            <button class="scene-btn active" type="button" data-screen="home">创作者首页</button>
+            <button class="scene-btn" type="button" data-screen="academy">学院中心</button>
+            <button class="scene-btn" type="button" data-screen="cash">变现</button>
+            <button class="scene-btn" type="button" data-screen="tools">工具</button>
+            <button class="scene-btn" type="button" data-screen="data">数据</button>
+          </div>
+          <p class="scene-hint">点场景切换手机内画面。路径气泡可拖拽。</p>
+        </div>
+        <div class="glass-card mockup-board">
+          <div class="board-phone">
+            <iframe id="feDemoFrame" title="2.0优化 · C 端 Demo" src="about:blank"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="view-admin" class="page-view">
+      <div class="glass-card">
+        <p class="admin-lead">学院管理后台：「课程管理」对接现有知识库（列表增字段「课程分类」）；「分类管理」提供 C 端频道分类 list。本 FR 不做新人推荐 / 学习数据菜单。</p>
+        <div class="admin-tab-bar" role="tablist">
+          <button type="button" class="active" data-admin-page="courses">课程管理</button>
+          <button type="button" data-admin-page="categories">分类管理</button>
+        </div>
+        <div class="admin-demo-wrap">
+          <iframe id="adminDemoFrame" title="2.0优化 · 学院管理后台" src="about:blank"></iframe>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="drawer-overlay" id="ruleOverlay" aria-hidden="true">
+    <aside class="drawer" id="ruleDrawer" aria-label="需求规则">
+      <div class="drawer-header">
+        <h2>FR-021 · 需求规则（开发视角 · 表格式）</h2>
+        <div class="drawer-header-actions">
+          <a class="btn-ghost-sm" href="fr-creator-home-2-opt-rules.html" target="_blank" rel="noopener">新窗口打开 / 打印</a>
+          <button class="drawer-close" type="button" id="closeRuleDrawer" aria-label="关闭">×</button>
+        </div>
+      </div>
+      <div class="drawer-body">
+        <iframe title="FR-021 需求规则" src="fr-creator-home-2-opt-rules.html"></iframe>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    (function () {
+      var DEMO = 'creator-home-2-opt-demo.html';
+      var VER = '10';
+      var feFrame = document.getElementById('feDemoFrame');
+      var adminFrame = document.getElementById('adminDemoFrame');
+      var currentFeScreen = 'home';
+      var currentAdminPage = 'courses';
+
+      function demoUrl(opts) {
+        var q = ['embed=1', 'v=' + VER];
+        if (opts.surface) q.push('surface=' + opts.surface);
+        if (opts.screen) q.push('screen=' + opts.screen);
+        if (opts.adminPage) q.push('adminPage=' + opts.adminPage);
+        return DEMO + '?' + q.join('&');
+      }
+
+      function applyFeScreen(screen, forceReload) {
+        currentFeScreen = screen || 'home';
+        if (forceReload || !feFrame.src || feFrame.src.indexOf('about:blank') >= 0) {
+          feFrame.src = demoUrl({ surface: 'c', screen: currentFeScreen });
+          return;
+        }
+        try {
+          if (feFrame.contentWindow && feFrame.contentWindow.__rbDemoApply) {
+            feFrame.contentWindow.__rbDemoApply({ surface: 'c', screen: currentFeScreen });
+            return;
+          }
+        } catch (e) { /* cross-origin guard */ }
+        feFrame.src = demoUrl({ surface: 'c', screen: currentFeScreen });
+      }
+
+      function applyAdminPage(pageId) {
+        currentAdminPage = pageId || 'courses';
+        document.querySelectorAll('.admin-tab-bar button').forEach(function (b) {
+          b.classList.toggle('active', b.dataset.adminPage === currentAdminPage);
+        });
+        try {
+          if (adminFrame.contentWindow && adminFrame.contentWindow.__rbDemoApply) {
+            adminFrame.contentWindow.__rbDemoApply({ surface: 'admin', adminPage: currentAdminPage });
+            return;
+          }
+        } catch (e) { /* ignore */ }
+        adminFrame.src = demoUrl({ surface: 'admin', adminPage: currentAdminPage });
+      }
+
+      function scalePhone() {
+        var phone = document.querySelector('.board-phone');
+        var iframe = feFrame;
+        if (!phone || !iframe || !phone.clientWidth) return;
+        iframe.style.transform = 'scale(' + (phone.clientWidth / 375) + ')';
+      }
+
+      function showPage(id) {
+        document.querySelectorAll('.page-tab-bar button').forEach(function (btn) {
+          btn.classList.toggle('active', btn.dataset.page === id);
+        });
+        document.querySelectorAll('.page-view').forEach(function (view) {
+          view.classList.toggle('active', view.id === id);
+        });
+        if (id === 'view-fe') {
+          if (!feFrame.src || feFrame.src.indexOf('about:blank') >= 0) applyFeScreen(currentFeScreen, true);
+          requestAnimationFrame(scalePhone);
+        }
+        if (id === 'view-admin') {
+          if (!adminFrame.src || adminFrame.src.indexOf('about:blank') >= 0) applyAdminPage(currentAdminPage);
+        }
+      }
+
+      document.querySelectorAll('.page-tab-bar button').forEach(function (btn) {
+        btn.onclick = function () { showPage(btn.dataset.page); };
+      });
+
+      document.querySelectorAll('#feSceneList .scene-btn').forEach(function (btn) {
+        btn.onclick = function () {
+          document.querySelectorAll('#feSceneList .scene-btn').forEach(function (b) {
+            b.classList.toggle('active', b === btn);
+          });
+          applyFeScreen(btn.dataset.screen, false);
+        };
+      });
+
+      document.querySelectorAll('.admin-tab-bar button').forEach(function (btn) {
+        btn.onclick = function () { applyAdminPage(btn.dataset.adminPage); };
+      });
+
+      feFrame.addEventListener('load', function () { requestAnimationFrame(scalePhone); });
+
+      var layout = document.getElementById('feDemo');
+      function setPreviewButtons(on) {
+        document.querySelectorAll('[data-preview]').forEach(function (b) {
+          b.textContent = on ? '退出全屏' : '全屏预览';
+          b.setAttribute('aria-pressed', on ? 'true' : 'false');
+        });
+      }
+      function exitPreview() {
+        document.body.classList.remove('preview-fs-fallback');
+        if (layout) layout.classList.remove('is-preview');
+        setPreviewButtons(false);
+        if (document.fullscreenElement || document.webkitFullscreenElement) {
+          var ex = document.exitFullscreen || document.webkitExitFullscreen;
+          if (ex) ex.call(document);
+        }
+        requestAnimationFrame(scalePhone);
+      }
+      document.querySelectorAll('[data-preview]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          if (!layout) return;
+          if (document.fullscreenElement || document.webkitFullscreenElement || document.body.classList.contains('preview-fs-fallback')) {
+            exitPreview();
+            return;
+          }
+          layout.classList.add('is-preview');
+          setPreviewButtons(true);
+          var req = layout.requestFullscreen || layout.webkitRequestFullscreen;
+          if (req) {
+            var pending = req.call(layout);
+            if (pending && pending.catch) pending.catch(function () { document.body.classList.add('preview-fs-fallback'); });
+          } else {
+            document.body.classList.add('preview-fs-fallback');
+          }
+          requestAnimationFrame(scalePhone);
+        });
+      });
+      document.addEventListener('fullscreenchange', function () {
+        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+          document.body.classList.remove('preview-fs-fallback');
+          if (layout) layout.classList.remove('is-preview');
+          setPreviewButtons(false);
+          requestAnimationFrame(scalePhone);
+        }
+      });
+
+      var overlay = document.getElementById('ruleOverlay');
+      var drawer = document.getElementById('ruleDrawer');
+      function openRule() {
+        overlay.classList.add('open');
+        drawer.classList.add('open');
+        overlay.setAttribute('aria-hidden', 'false');
+      }
+      function closeRule() {
+        overlay.classList.remove('open');
+        drawer.classList.remove('open');
+        overlay.setAttribute('aria-hidden', 'true');
+      }
+      document.getElementById('toggleRuleDrawer').onclick = openRule;
+      document.getElementById('closeRuleDrawer').onclick = closeRule;
+      overlay.onclick = function (e) { if (e.target === overlay) closeRule(); };
+
+      var tab = new URLSearchParams(location.search).get('tab');
+      if (tab === 'admin') showPage('view-admin');
+      else showPage('view-fe');
+
+      window.addEventListener('resize', scalePhone);
+      setTimeout(scalePhone, 300);
+    })();
+  </script>
+  <script src="sidebar-nav.js?v=20261007"></script>
+</body>
+</html>
