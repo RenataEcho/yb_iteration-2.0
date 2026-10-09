@@ -28,6 +28,7 @@
     'fr-opc-yijian-daifa-pool': '<path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>',
     'fr-yijian-daifa-iter2': '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M8 12h8"/><path d="M8 16h5"/><circle cx="8" cy="8" r="1"/>',
     'fr-alias-bind': '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
+    'fr-yijian-daifa-iter3': '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h10"/><path d="M7 13h10"/><path d="M7 17h6"/>',
     'fr-creator-home-2-opt': '<path d="M3 9.5 12 4l9 5.5V20a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z"/><path d="M12 4v6.5"/>'
   };
   var ICON_FALLBACK = '<circle cx="12" cy="12" r="4"/>';
@@ -66,7 +67,9 @@
         { id: 'fr-opc-yijian-daifa-pool', label: '收益池与限时领次', href: 'fr-opc-yijian-daifa-pool.html', fr: 'FR-017', defaultStatus: 'paused' },
         { id: 'fr-yijian-daifa-iter2', label: '一键代发迭代 2.0', href: 'fr-yijian-daifa-iter2.html', fr: 'FR-018', defaultStatus: 'live' },
         { id: 'fr-alias-bind', label: '别名绑定', href: 'fr-alias-bind.html', fr: 'FR-019', defaultStatus: 'dev' },
-        { id: 'fr-creator-home-2-opt', label: '2.0优化', href: 'fr-creator-home-2-opt.html', fr: 'FR-021', defaultStatus: 'todo' }
+        { id: 'fr-yijian-daifa-iter3', label: '一键代发迭代 3.0', href: 'fr-yijian-daifa-iter3.html', fr: 'FR-020', defaultStatus: 'todo' },
+        { id: 'fr-creator-home-2-opt', label: '2.0优化', href: 'fr-creator-home-2-opt.html', fr: 'FR-021', defaultStatus: 'todo' },
+        { id: 'fr-yijian-daifa-ops', label: '代发运营合作模式', href: 'fr-yijian-daifa-ops.html', fr: 'FR-022', defaultStatus: 'todo' }
       ]
     },
     {

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FR-022 · 代发运营合作模式 · 右豹迭代需求记录</title>
+  <style>
+    :root {
+      --primary: #2563eb; --primary-hover: #1d4ed8; --primary-light: #eff6ff; --primary-border: #bfdbfe;
+      --accent-version: #7c3aed; --accent-fr: #d97706;
+      --surface: #fff; --surface-glass: rgba(255,255,255,0.72); --border: #e8edf3;
+      --text-primary: #18222f; --text-secondary: #4a5568; --text-muted: #9aa5b4;
+      --sidebar-w: 240px; --radius-sm: 7px; --radius-lg: 14px;
+      --shadow: 0 8px 32px rgba(30,40,80,0.10);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 13px;
+      color: var(--text-primary);
+      background: linear-gradient(135deg, #e0e7ff 0%, #f0f4f8 40%, #e0f2fe 100%);
+      background-attachment: fixed; min-height: 100vh;
+    }
+    .sidebar {
+      position: fixed; inset: 0 auto 0 0; width: var(--sidebar-w); z-index: 200;
+      display: flex; flex-direction: column;
+      background: rgba(240,244,255,0.95); backdrop-filter: blur(20px);
+      border-right: 1px solid rgba(148,163,196,0.22);
+    }
+    .sidebar-brand { padding: 16px 14px 12px; border-bottom: 1px solid rgba(148,163,196,0.22); }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: linear-gradient(135deg, #2563eb, #7c3aed); color: #fff;
+      display: flex; align-items: center; justify-content: center; font-weight: 700;
+    }
+    .brand-text { font-size: 14px; font-weight: 700; }
+    .brand-sub { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+    .sprint-pill {
+      display: inline-block; margin-top: 10px; font-size: 11px; font-weight: 600;
+      padding: 3px 8px; border-radius: 999px; background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0;
+    }
+    .sidebar-scroll { flex: 1; overflow-y: auto; padding: 8px 0 16px; }
+    .sidebar-foot { padding: 10px 14px 14px; border-top: 1px solid rgba(148,163,196,0.22); font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+    .main { margin-left: var(--sidebar-w); padding: 16px 20px 40px; min-height: 100vh; }
+    .breadcrumb { padding: 4px 0 12px; font-size: 12px; color: var(--text-muted); }
+    .breadcrumb a { color: var(--primary); text-decoration: none; }
+    .page-header { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; }
+    .page-header h1 { font-size: 19px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .page-desc { font-size: 12px; color: var(--text-muted); max-width: 760px; line-height: 1.55; }
+    .badge { display: inline-flex; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: var(--radius-sm); }
+    .badge-fr { background: #fffbeb; color: var(--accent-fr); border: 1px solid #fde68a; }
+    .badge-version { background: #f5f3ff; color: var(--accent-version); border: 1px solid #ddd6fe; }
+    .btn {
+      display: inline-flex; align-items: center; height: 34px; padding: 0 14px;
+      border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid transparent;
+      text-decoration: none;
+    }
+    .btn-ghost { background: var(--surface); color: var(--text-secondary); border: 1px solid var(--border); }
+    .glass-card {
+      background: var(--surface-glass); backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.55); border-radius: var(--radius-lg);
+      box-shadow: var(--shadow); overflow: hidden;
+    }
+    .mockup-panel { padding: 20px 16px 28px; display: flex; justify-content: center; }
+    .mockup-frame-wrap {
+      width: 100%; max-width: 375px; border-radius: 28px; overflow: hidden;
+      background: #1e293b; box-shadow: 0 16px 48px rgba(0,0,0,0.18); aspect-ratio: 375 / 812;
+    }
+    .mockup-frame-wrap iframe { width: 100%; height: 100%; border: none; display: block; background: #fff; }
+    @media (max-width: 1024px) { .main { margin-left: 0; } .sidebar { display: none; } }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand">
+        <div class="brand-icon">迭</div>
+        <div>
+          <div class="brand-text">右豹迭代需求记录</div>
+          <div class="brand-sub">PRD Demo · 产品交付研发</div>
+        </div>
+      </div>
+      <span class="sprint-pill">YBDD2.0 · 迭代 v1</span>
+    </div>
+    <div class="sidebar-scroll" data-iteration-sidebar></div>
+    <div class="sidebar-foot">FR-022 · 用户端<br />本版不挂 PC</div>
+  </aside>
+
+  <main class="main">
+    <nav class="breadcrumb">
+      <a href="framework-shell.html">Sprint 概览</a>
+      <span> / 代发运营合作模式</span>
+    </nav>
+    <header class="page-header">
+      <div>
+        <h1>
+          代发运营合作模式
+          <span class="badge badge-fr">FR-022</span>
+          <span class="badge badge-version">v1 当前</span>
+        </h1>
+        <p class="page-desc">用户端还原代发 1.0 的手机壳和广场，并加上任务协作 / 帐号运营。本版只挂用户端，不挂 PC。</p>
+      </div>
+      <a class="btn btn-ghost" href="yijian-daifa-ops-demo.html" target="_blank" rel="noopener">新窗口打开用户端</a>
+    </header>
+    <div class="glass-card mockup-panel">
+      <div class="mockup-frame-wrap">
+        <iframe id="opsFrame" title="代发运营合作模式 · 用户端" src="yijian-daifa-ops-demo.html?embed=1"></iframe>
+      </div>
+    </div>
+  </main>
+  <script src="sidebar-nav.js?v=fr022"></script>
+</body>
+</html>
