@@ -2,7 +2,7 @@
   var STORAGE_KEY = 'iteration-sidebar-groups';
   var STATUS_STORAGE_KEY = 'ybdd-sprint-fr-status';
   var STATUS_REV_KEY = 'ybdd-sprint-fr-status-rev';
-  var STATUS_REV = '2026-09-28b';
+  var STATUS_REV = '2026-10-09';
   var COLLAPSE_STORAGE_KEY = 'iteration-sidebar-collapsed';
   var COLLAPSED_CLASS = 'sidebar-collapsed';
 
@@ -52,7 +52,7 @@
         { id: 'fr-finance-brand-refund', label: '品牌退款', href: 'fr-finance-brand-refund.html', fr: 'FR-003', defaultStatus: 'live' },
         { id: 'fr-project-estimated-data', label: '预估数据', href: 'fr-project-estimated-data.html', fr: 'FR-004', defaultStatus: 'live' },
         { id: 'fr-project-order-optimize', label: '订单优化', href: 'fr-project-order-optimize.html', fr: 'FR-005', defaultStatus: 'live' },
-        { id: 'fr-activity-center', label: '活动中心', href: 'fr-activity-center.html', fr: 'FR-006', defaultStatus: 'dev' },
+        { id: 'fr-activity-center', label: '活动中心', href: 'fr-activity-center.html', fr: 'FR-006', defaultStatus: 'live' },
         { id: 'fr-project-order-distribute', label: '订单分发', href: 'fr-project-order-distribute.html', fr: 'FR-007', defaultStatus: 'live' },
         { id: 'fr-gift-center', label: '礼品中心', href: 'fr-gift-center.html', fr: 'FR-008', defaultStatus: 'paused' },
         { id: 'fr-ai-workbench', label: 'AI工作台', href: 'fr-ai-workbench.html', fr: 'FR-009', defaultStatus: 'live' },
@@ -64,8 +64,8 @@
         { id: 'fr-zhulu-board', label: '双节逐鹿榜', href: 'fr-zhulu-board.html', fr: 'FR-015', defaultStatus: 'live' },
         { id: 'fr-wallet-merge-withdraw', label: '奖钱包合并提现', href: 'fr-wallet-merge-withdraw.html', fr: 'FR-016', defaultStatus: 'dev' },
         { id: 'fr-opc-yijian-daifa-pool', label: '收益池与限时领次', href: 'fr-opc-yijian-daifa-pool.html', fr: 'FR-017', defaultStatus: 'paused' },
-        { id: 'fr-yijian-daifa-iter2', label: '一键代发迭代 2.0', href: 'fr-yijian-daifa-iter2.html', fr: 'FR-018', defaultStatus: 'todo' },
-        { id: 'fr-alias-bind', label: '别名绑定', href: 'fr-alias-bind.html', fr: 'FR-019', defaultStatus: 'todo' },
+        { id: 'fr-yijian-daifa-iter2', label: '一键代发迭代 2.0', href: 'fr-yijian-daifa-iter2.html', fr: 'FR-018', defaultStatus: 'live' },
+        { id: 'fr-alias-bind', label: '别名绑定', href: 'fr-alias-bind.html', fr: 'FR-019', defaultStatus: 'dev' },
         { id: 'fr-creator-home-2-opt', label: '2.0优化', href: 'fr-creator-home-2-opt.html', fr: 'FR-021', defaultStatus: 'todo' }
       ]
     },
