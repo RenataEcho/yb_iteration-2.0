@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FR-020 · 一键代发迭代 3.0 · 右豹迭代需求记录</title>
+  <style>
+    :root {
+      --primary: #2563eb; --primary-hover: #1d4ed8; --primary-light: #eff6ff; --primary-border: #bfdbfe;
+      --accent-rule: #0891b2; --accent-version: #7c3aed; --accent-fr: #d97706;
+      --success: #16a34a; --success-bg: #f0fdf4; --warning: #d97706; --warning-bg: #fffbeb;
+      --danger: #dc2626; --danger-bg: #fef2f2;
+      --surface: #fff; --surface-glass: rgba(255,255,255,0.72); --surface-hover: #f8fafc; --border: #e8edf3;
+      --text-primary: #18222f; --text-secondary: #4a5568; --text-muted: #9aa5b4;
+      --sidebar-w: 240px; --drawer-w: 480px; --radius-sm: 7px; --radius-lg: 14px;
+      --shadow: 0 8px 32px rgba(30,40,80,0.10);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 13px; color: var(--text-primary); background: linear-gradient(135deg, #e0e7ff 0%, #f0f4f8 40%, #e0f2fe 100%); background-attachment: fixed; min-height: 100vh; }
+    .sidebar { position: fixed; inset: 0 auto 0 0; width: var(--sidebar-w); z-index: 200; display: flex; flex-direction: column; background: rgba(240,244,255,0.95); backdrop-filter: blur(20px); border-right: 1px solid rgba(148,163,196,0.22); }
+    .sidebar-brand { padding: 16px 14px 12px; border-bottom: 1px solid rgba(148,163,196,0.22); }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-icon { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, #2563eb, #7c3aed); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+    .brand-text { font-size: 14px; font-weight: 700; }
+    .brand-sub { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+    .sprint-pill { display: inline-block; margin-top: 10px; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 999px; background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+    .sidebar-scroll { flex: 1; overflow-y: auto; padding: 8px 0 16px; }
+    .sidebar-foot { padding: 10px 14px 14px; border-top: 1px solid rgba(148,163,196,0.22); font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+    .main { margin-left: var(--sidebar-w); padding: 16px 20px 40px; min-height: 100vh; }
+    .breadcrumb { padding: 4px 0 12px; font-size: 12px; color: var(--text-muted); }
+    .breadcrumb a { color: var(--primary); text-decoration: none; }
+    .page-header { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; }
+    .page-header h1 { font-size: 19px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .page-desc { font-size: 12px; color: var(--text-muted); max-width: 760px; line-height: 1.55; }
+    .badge { display: inline-flex; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: var(--radius-sm); }
+    .badge-fr { background: #fffbeb; color: var(--accent-fr); border: 1px solid #fde68a; }
+    .badge-version { background: #f5f3ff; color: var(--accent-version); border: 1px solid #ddd6fe; }
+    .page-tab-bar, .admin-tab-bar, .channel-tab-bar { display: flex; gap: 0; margin-bottom: 16px; background: var(--surface-glass); border: 1px solid rgba(255,255,255,0.55); border-radius: var(--radius-lg); padding: 4px; box-shadow: var(--shadow); width: fit-content; }
+    .admin-tab-bar, .channel-tab-bar { margin: 12px 16px 0; }
+    .filter-field[hidden] { display: none; }
+    .mode-line { display: grid; grid-template-columns: 1fr 148px; gap: 12px; align-items: start; }
+    .mode-line .form-field { margin-bottom: 12px; }
+    .checks label { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; }
+    .checks input { width: 16px; height: 16px; flex: none; }
+    .page-tab-bar button, .admin-tab-bar button, .channel-tab-bar button { padding: 8px 20px; border: none; background: transparent; cursor: pointer; font-size: 13px; color: var(--text-secondary); border-radius: 10px; }
+    .page-tab-bar button.active, .admin-tab-bar button.active, .channel-tab-bar button.active { background: var(--primary); color: #fff; font-weight: 600; }
+    .page-view, .admin-pane { display: none; }
+    .page-view.active, .admin-pane.active { display: block; }
+    #view-fe.page-view.active, #view-pc.page-view.active { display: flex; flex-direction: column; height: calc(100vh - 188px); min-height: 560px; }
+    .btn { display: inline-flex; align-items: center; height: 34px; padding: 0 14px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid transparent; }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-rule { background: var(--primary-light); color: var(--primary); border-color: var(--primary-border); }
+    .btn-ghost-sm { background: #fff; color: var(--text-secondary); border: 1px solid var(--border); height: 32px; padding: 0 12px; border-radius: var(--radius-sm); cursor: pointer; font-size: 12px; }
+    .glass-card { background: var(--surface-glass); border: 1px solid rgba(255,255,255,0.55); border-radius: var(--radius-lg); box-shadow: var(--shadow); overflow: hidden; }
+    .scene-panel { padding: 16px 18px; flex-shrink: 0; }
+    .scene-panel h2 { font-size: 14px; }
+    .scene-lead, .scene-hint { font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-top: 6px; }
+    .scene-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .scene-btn { padding: 6px 12px; border-radius: 999px; border: 1px solid var(--border); background: #fff; font-size: 12px; cursor: pointer; color: #6b7280; }
+    .scene-btn.active { border-color: var(--primary-border); background: var(--primary-light); color: var(--primary); font-weight: 600; }
+    .scene-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+    .btn-preview {
+      display: inline-flex; align-items: center; flex-shrink: 0; height: 32px; padding: 0 12px;
+      border-radius: 999px; cursor: pointer; border: 1px solid var(--border); background: #fff;
+      color: var(--text-secondary); font-size: 12px; font-weight: 600;
+    }
+    .btn-preview:hover, .btn-preview[aria-pressed="true"] { border-color: var(--primary-border); background: var(--primary-light); color: var(--primary); }
+    #view-fe .demo-layout, #view-pc .demo-layout { display: flex; flex-direction: column; gap: 12px; height: 100%; }
+    .demo-layout:fullscreen, .demo-layout:-webkit-full-screen,
+    body.preview-fs-fallback .demo-layout.is-preview {
+      width: 100%; height: 100%; padding: 16px; gap: 12px; overflow: auto;
+      background: linear-gradient(135deg, #e0e7ff 0%, #f0f4f8 40%, #e0f2fe 100%);
+    }
+    body.preview-fs-fallback .demo-layout.is-preview { position: fixed; inset: 0; z-index: 400; }
+    .demo-layout:fullscreen .mockup-board,
+    .demo-layout:-webkit-full-screen .mockup-board,
+    body.preview-fs-fallback .demo-layout.is-preview .mockup-board { flex: 1; min-height: 0; }
+    .demo-layout:fullscreen .board-row,
+    .demo-layout:-webkit-full-screen .board-row,
+    body.preview-fs-fallback .demo-layout.is-preview .board-row {
+      grid-template-columns: repeat(auto-fill, minmax(280px, 360px));
+    }
+    .mockup-board { padding: 14px 16px 16px; background: #fff; flex: 1; min-height: 0; display: flex; flex-direction: column; }
+    .board-scroll { overflow: auto; flex: 1; min-height: 0; }
+    #view-pc .board-scroll { display: flex; flex-direction: column; }
+    .board-row { display: flex; flex-wrap: wrap; gap: 20px 18px; align-items: flex-start; }
+    .board-tile:not(.board-wide) { width: min(360px, 100%); }
+    .board-wide { flex: 1 1 100%; width: 100%; max-width: none; }
+    .board-cap { font-size: 13px; font-weight: 700; margin-bottom: 8px; }
+    .board-cap em { font-style: normal; font-weight: 500; color: var(--text-muted); font-size: 11px; margin-left: 6px; }
+    .board-phone { width: 100%; aspect-ratio: 375 / 812; border-radius: 42px; overflow: hidden; background: #000; border: 10px solid #1c1c1e; position: relative; }
+    .board-phone iframe { width: 375px; height: 812px; border: 0; position: absolute; top: 0; left: 0; transform-origin: 0 0; background: #fff; }
+    .board-pc { flex: 1; min-height: 640px; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: #fff; }
+    .board-pc iframe { width: 100%; height: 100%; border: 0; }
+    .table-toolbar { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; gap: 10px; }
+    .table-toolbar h3 { font-size: 14px; }
+    .table-toolbar p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .filter-bar { display: flex; flex-wrap: wrap; gap: 10px; padding: 0 16px 14px; align-items: flex-end; }
+    .ed-kpi { padding: 4px 16px 12px; }
+    .ed-kpi-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+    .ed-kpi-head span { font-size: 12px; font-weight: 700; }
+    .ed-kpi-head em { font-style: normal; font-size: 11px; color: var(--text-muted); }
+    .ed-stats { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+    .ed-stat { display: flex; flex-direction: column; gap: 8px; min-height: 72px; padding: 12px 14px; border-radius: 12px; background: #fff; border: 1px solid var(--border); }
+    .ed-stat span { font-size: 12px; color: var(--text-muted); line-height: 1.3; }
+    .ed-stat strong { font-size: 22px; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; }
+    .ed-stat.earn { border-color: var(--primary-border); background: var(--primary-light); }
+    .ed-stat.earn strong { color: var(--primary); }
+    .ed-stat.ok strong { color: var(--success); }
+    .ed-stat.warn strong { color: var(--warning); }
+    .batch-bar { display: none; align-items: center; gap: 12px; flex-wrap: wrap; margin: 0 16px 12px; padding: 10px 12px; background: var(--primary-light); border: 1px solid var(--primary-border); border-radius: var(--radius-sm); font-size: 12px; }
+    .batch-bar.show { display: flex; }
+    .batch-bar .batch-info { color: var(--primary); font-weight: 600; }
+    .batch-bar .batch-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-left: auto; }
+    .btn-sm { height: 30px; padding: 0 12px; font-size: 12px; }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn-danger-ghost { background: var(--danger-bg); color: var(--danger); border: 1px solid #fecaca; height: 30px; padding: 0 12px; border-radius: var(--radius-sm); cursor: pointer; font-size: 12px; }
+    th.col-check, td.col-check { width: 40px; text-align: center; }
+    th.col-check input, td.col-check input { cursor: pointer; width: 15px; height: 15px; }
+    tr.selected td { background: rgba(37,99,235,0.06); }
+    .filter-field { display: flex; flex-direction: column; gap: 4px; }
+    .filter-field label { font-size: 11px; color: var(--text-muted); }
+    .filter-field input, .filter-field select, .form-field input, .form-field select { height: 32px; padding: 0 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 12px; background: #fff; }
+    .filter-field input, .filter-field select { min-width: 140px; }
+    .table-wrap { overflow: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 880px; }
+    th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); font-size: 12px; vertical-align: top; }
+    th { font-size: 11px; color: var(--text-muted); background: rgba(248,250,252,.9); white-space: nowrap; }
+    .link { color: var(--primary); background: none; border: none; padding: 0; margin-right: 10px; font-size: 12px; cursor: pointer; }
+    .tag { display: inline-flex; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+    .tag-ok { background: var(--success-bg); color: var(--success); }
+    .tag-warn { background: var(--warning-bg); color: var(--warning); }
+    .tag-muted { background: #f1f5f9; color: #64748b; }
+    .link-danger { color: var(--danger); }
+    .book-cover { width: 36px; height: 48px; object-fit: cover; border-radius: 4px; background: #e2e8f0; display: block; }
+    .cell-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; word-break: break-all; }
+    .checks { display: flex; gap: 12px; flex-wrap: wrap; font-size: 13px; }
+    .form-field { margin-bottom: 12px; }
+    .form-field label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
+    .mode-share { display: grid; gap: 10px; }
+    .mode-share .field-note { margin: 4px 0 0; font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+    .form-field input, .form-field select { width: 100%; height: 36px; font-size: 13px; }
+    .form-field .checks input { width: 16px; height: 16px; flex: none; }
+    .field-hint { margin-top: 4px; font-size: 11px; color: var(--text-muted); }
+    .drawer-overlay, .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,.35); z-index: 500; opacity: 0; pointer-events: none; }
+    .drawer-overlay.open, .modal-overlay.open { opacity: 1; pointer-events: auto; }
+    .drawer { position: fixed; top: 0; right: 0; bottom: 0; width: var(--drawer-w); max-width: 100%; z-index: 501; background: #fff; transform: translateX(100%); transition: transform .28s; display: flex; flex-direction: column; }
+    .drawer.wide { width: min(920px, 100%); }
+    .drawer table { min-width: 720px; }
+    .drawer.open { transform: translateX(0); }
+    .drawer-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-weight: 700; }
+    .drawer-close { width: 28px; height: 28px; border: none; background: #f1f5f9; border-radius: 6px; cursor: pointer; }
+    .drawer-body { padding: 16px 20px 28px; overflow: auto; }
+    .rule-tab-bar { display: flex; padding: 0 16px; border-bottom: 1px solid var(--border); }
+    .rule-tab-bar button { padding: 10px 18px; border: none; background: none; cursor: pointer; font-size: 13px; color: var(--text-secondary); border-bottom: 2px solid transparent; margin-bottom: -1px; }
+    .rule-tab-bar button.active { color: var(--primary); font-weight: 600; border-bottom-color: var(--primary); }
+    .rule-panel { display: none; }
+    .rule-panel.active { display: block; }
+    .rule-section { margin-bottom: 18px; }
+    .rule-section h3 { font-size: 14px; color: var(--accent-rule); margin-bottom: 6px; }
+    .rule-content { font-size: 13px; color: var(--text-secondary); line-height: 1.65; }
+    .rule-content ul { padding-left: 18px; }
+    .rule-content li { margin-bottom: 4px; }
+    .modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 440px; max-width: calc(100vw - 32px); z-index: 501; background: #fff; border-radius: 14px; box-shadow: var(--shadow); display: none; }
+    .modal.wide { width: 560px; }
+    .modal.sheet { width: 960px; }
+    .sheet-table { width: 100%; border-collapse: collapse; min-width: 0; }
+    .sheet-table th, .sheet-table td { padding: 8px; vertical-align: middle; }
+    .sheet-table th { font-size: 12px; }
+    .sheet-table input, .sheet-table select { width: 100%; height: 32px; padding: 0 8px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 12px; background: #fff; }
+    .sheet-sort { width: 52px; text-align: center; color: var(--text-muted); }
+    .sheet-op { width: 52px; }
+    .sheet-add { margin-top: 8px; }
+    #kwBody table { min-width: 0; }
+    .modal-overlay.open .modal { display: block; }
+    .modal-header, .modal-footer { padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; }
+    .modal-footer { justify-content: flex-end; gap: 8px; }
+    .modal-body { padding: 0 18px 8px; }
+    .flow-page-intro { padding: 16px 18px 0; font-size: 12px; color: var(--text-muted); line-height: 1.55; }
+    .flow-svg-wrap { overflow: auto; max-height: 72vh; padding: 8px 12px; }
+    .flow-legend { display: flex; flex-wrap: wrap; gap: 12px; padding: 4px 18px 16px; font-size: 11px; color: var(--text-muted); }
+    .flow-legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 4px; vertical-align: -2px; }
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(12px); background: #1e293b; color: #fff; padding: 10px 16px; border-radius: 999px; font-size: 13px; opacity: 0; z-index: 700; transition: .2s; }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .kv { display: grid; grid-template-columns: 108px 1fr; gap: 8px 10px; font-size: 13px; }
+    .kv i { font-style: normal; color: var(--text-muted); }
+    .ledger-page { padding: 4px 2px 24px; }
+    .ledger-page h2 { font-size: 16px; margin: 0 0 6px; }
+    .ledger-page .lead { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin: 0 0 14px; }
+    .ledger-page h3 { font-size: 14px; margin: 16px 0 8px; }
+    .ledger-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .ledger-card { border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; background: #fff; }
+    .ledger-card .ledger-side { font-size: 11px; font-weight: 700; color: var(--primary); margin-bottom: 8px; }
+    .ledger-card .ledger-head { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
+    .ledger-card .ledger-title { font-size: 13px; font-weight: 700; line-height: 1.5; }
+    .ledger-card .ledger-amt { font-size: 16px; font-weight: 700; color: #16a34a; white-space: nowrap; }
+    .ledger-card .ledger-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.65; margin: 8px 0; }
+    .ledger-card .ledger-meta { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--text-muted); }
+    .tpl { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; font-size: 13px; }
+    .tpl th, .tpl td { padding: 10px 12px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
+    .tpl th { background: #f8fafc; color: var(--text-muted); font-weight: 600; }
+    .tpl code { font-size: 12px; }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand"><div class="brand-icon">迭</div><div><div class="brand-text">右豹迭代需求记录</div><div class="brand-sub">PRD Demo · 产品交付研发</div></div></div>
+      <span class="sprint-pill">YBDD2.0 · 迭代 v1</span>
+    </div>
+    <div class="sidebar-scroll" data-iteration-sidebar></div>
+    <div class="sidebar-foot">FR-020 · 一键代发迭代 3.0<br>不改 FR-014 / FR-017 / FR-018</div>
+  </aside>
+  <main class="main">
+    <nav class="breadcrumb"><a href="framework-shell.html">Sprint 概览</a><span> / 一键代发迭代 3.0</span></nav>
+    <header class="page-header">
+      <div>
+        <h1>一键代发迭代 3.0 <span class="badge badge-fr">FR-020</span><span class="badge badge-version">v1 当前</span></h1>
+        <p class="page-desc">用户领取帐号运营稿件时不选词。详情标题旁是项目、运营模式、稿件类型，分成是这条稿件剪辑手的分成比例。订单结算后按这个比例切分，用户拿走剩下的。管理后台是剪辑手管理和稿件管理。代运营合作模式可多选任务协作、帐号运营，分成比例单独填一个百分比。稿件管理的回填作品是数量，点数字看列表。剪辑手 PC 只留上传 list 的右豹稿件和站外稿件。</p>
+      </div>
+      <button class="btn btn-rule" id="toggleRuleDrawer" type="button">需求规则</button>
+    </header>
+    <div class="page-tab-bar">
+      <button type="button" class="active" data-page="view-fe">前端交互</button>
+      <button type="button" data-page="view-pc">剪辑手 PC</button>
+      <button type="button" data-page="view-admin">管理后台</button>
+      <button type="button" data-page="view-flow">业务流程</button>
+      <button type="button" data-page="view-ledger">用户收益入账</button>
+    </div>
+
+    <div id="view-fe" class="page-view active">
+      <div class="demo-layout" id="feDemo">
+        <div class="glass-card scene-panel">
+          <div class="scene-head">
+            <div>
+              <h2>用户端</h2>
+              <p class="scene-lead">素材类型和其他筛选项一样用底部浮层，点确定后生效。广场是宫格。视频素材按一个项目、一本书、一名剪辑手收成一个包，点进详情再选单条稿件领取。图集和视频每领 1 个，数量少 1 个；已经领取的再次下载只能去已领记录。点领取稿件按剪辑手收费方式扣费，然后下载并保存到相册。保存完成前可以中断下载，次数不退。第一次保存成功后提示去回填或稍后。已领列表没有复制链接。未回填是立即回填，已回填改为追加回填，并显示回填作品数量。点回填作品数量弹出开发规则：打开现有的该关键词作品列表即可。底部收益沿用收益日历。</p>
+            </div>
+            <button class="btn-preview" type="button" data-preview="fe" aria-pressed="false">全屏预览</button>
+          </div>
+          <div class="scene-list">
+            <button class="scene-btn active" type="button" data-screen="plaza">作品广场</button>
+            <button class="scene-btn" type="button" data-screen="detail-platform">帐号运营详情</button>
+            <button class="scene-btn" type="button" data-screen="detail-pack">视频包</button>
+            <button class="scene-btn" type="button" data-screen="detail-charge">定制收费</button>
+            <button class="scene-btn" type="button" data-screen="detail-charge-points">定制扣积分</button>
+            <button class="scene-btn" type="button" data-screen="detail-charge-short">积分不足</button>
+            <button class="scene-btn" type="button" data-screen="detail-exchange">兑换次数</button>
+            <button class="scene-btn" type="button" data-screen="claims">已领列表</button>
+            <button class="scene-btn" type="button" data-screen="earn">收益</button>
+          </div>
+          <p class="scene-hint">点场景滚到对应画面。稿件详情按状态直接摆出来：视频包、定制收费还有免费次数（标题下有积分价格，不弹确认）、定制收费扣积分（确认兑换只显示应扣积分和当前余额）、积分不足（直接摆出购买引导）、平台规则兑换次数。</p>
+        </div>
+        <div class="glass-card mockup-board">
+          <div class="board-scroll" id="feBoardScroll">
+            <div class="board-row">
+              <figure class="board-tile" id="tile-plaza"><figcaption class="board-cap">作品广场 <em>代发运营模式</em></figcaption><div class="board-phone"><iframe title="作品广场" src="yijian-daifa-iter3-demo.html?embed=1&screen=plaza&v=55"></iframe></div></figure>
+              <figure class="board-tile" id="tile-detail-platform"><figcaption class="board-cap">帐号运营 <em>供稿者分成、用户分成</em></figcaption><div class="board-phone"><iframe title="帐号运营详情" src="yijian-daifa-iter3-demo.html?embed=1&screen=detail-platform&v=58"></iframe></div></figure>
+              <figure class="board-tile" id="tile-detail-pack"><figcaption class="board-cap">稿件详情 <em>视频包</em></figcaption><div class="board-phone"><iframe title="视频包" src="yijian-daifa-iter3-demo.html?embed=1&screen=detail-pack&v=58"></iframe></div></figure>
+              <figure class="board-tile" id="tile-detail-charge"><figcaption class="board-cap">稿件详情 <em>标题下积分价格，还有免费次数</em></figcaption><div class="board-phone"><iframe title="定制收费" src="yijian-daifa-iter3-demo.html?embed=1&screen=detail-charge&v=59"></iframe></div></figure>
+              <figure class="board-tile" id="tile-detail-charge-points"><figcaption class="board-cap">稿件详情 <em>确认兑换，应扣积分和余额</em></figcaption><div class="board-phone"><iframe title="定制扣积分" src="yijian-daifa-iter3-demo.html?embed=1&screen=detail-charge-points&v=61"></iframe></div></figure>
+              <figure class="board-tile" id="tile-detail-charge-short"><figcaption class="board-cap">稿件详情 <em>积分不足，去购买积分</em></figcaption><div class="board-phone"><iframe title="积分不足" src="yijian-daifa-iter3-demo.html?embed=1&screen=detail-charge-short&v=61"></iframe></div></figure>
+              <figure class="board-tile" id="tile-detail-exchange"><figcaption class="board-cap">稿件详情 <em>平台规则，兑换次数</em></figcaption><div class="board-phone"><iframe title="兑换次数" src="yijian-daifa-iter3-demo.html?embed=1&screen=detail-exchange&v=58"></iframe></div></figure>
+              <figure class="board-tile" id="tile-claims"><figcaption class="board-cap">已领列表 <em>追加回填、回填作品数量</em></figcaption><div class="board-phone"><iframe title="已领列表" src="yijian-daifa-iter3-demo.html?embed=1&screen=claims&v=51"></iframe></div></figure>
+              <figure class="board-tile" id="tile-earn"><figcaption class="board-cap">收益日历 <em>日 / 月 / 年，点日期看详情</em></figcaption><div class="board-phone"><iframe title="收益日历" src="yijian-daifa-iter3-demo.html?embed=1&screen=earn&v=38"></iframe></div></figure>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="view-pc" class="page-view">
+      <div class="demo-layout" id="pcDemo">
+        <div class="glass-card scene-panel">
+          <div class="scene-head">
+            <div>
+              <h2>剪辑手 PC</h2>
+              <p class="scene-lead">剪辑手 PC 不再放剪辑任务和任务稿件。上传 list 保留右豹稿件和站外稿件。点上传稿件先选代发运营模式。回填数据点数字看回填作品。</p>
+            </div>
+            <button class="btn-preview" type="button" data-preview="pc" aria-pressed="false">全屏预览</button>
+          </div>
+        </div>
+        <div class="glass-card mockup-board">
+          <div class="board-scroll">
+            <div class="board-pc"><iframe title="剪辑手上传" src="yijian-daifa-iter3-demo.html?embed=1&screen=editor&v=55"></iframe></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="view-admin" class="page-view">
+      <div class="glass-card">
+        <div class="admin-tab-bar">
+          <button type="button" class="active" data-admin="pane-editors">剪辑手管理</button>
+          <button type="button" data-admin="pane-works">稿件管理</button>
+        </div>
+        <div id="pane-editors" class="admin-pane active">
+          <div class="table-toolbar"><div><h3>剪辑手</h3><p>复刻一键代发 1.0 剪辑手管理。代运营合作模式至少选一个。分成比例单独填 0 到 100。必填右豹 ID、昵称、备注、发布平台。稿件需要审核默认是。</p></div><button class="btn btn-primary" type="button" id="openEditor">录入</button></div>
+          <div class="ed-kpi">
+            <div class="ed-kpi-head"><span>数据统计</span><em>按当前筛选汇总</em></div>
+            <div class="ed-stats" id="edStats" style="grid-template-columns:repeat(4,minmax(0,1fr))"></div>
+          </div>
+          <div class="filter-bar">
+            <div class="filter-field"><label>右豹 ID / 昵称</label><input id="edQ" placeholder="YB10086 / 周凯"></div>
+            <div class="filter-field"><label>状态</label><select id="edS"><option value="">全部</option><option>已录入</option><option>已停用</option></select></div>
+            <div class="filter-actions" style="display:flex;gap:8px"><button class="btn-ghost-sm" type="button" id="edReset">重置</button><button class="btn btn-primary" type="button" id="edGo">查询</button></div>
+          </div>
+          <div class="table-wrap"><table><thead><tr><th>ID</th><th>右豹 ID</th><th>昵称</th><th>代运营合作模式</th><th>分成比例</th><th>发布平台</th><th>稿件需要审核</th><th>可上传项目</th><th>稿件数据</th><th>收益数据</th><th>状态</th><th>录入时间</th><th>操作</th></tr></thead><tbody id="edBody"></tbody></table></div>
+        </div>
+        <div id="pane-works" class="admin-pane">
+          <div class="channel-tab-bar" id="wkChannelBar">
+            <button type="button" class="active" data-wkch="右豹">右豹稿件</button>
+            <button type="button" data-wkch="站外">站外稿件</button>
+          </div>
+          <div class="table-toolbar"><div><h3 id="wkTitle">右豹稿件</h3><p>复刻一键代发 1.0 稿件表。回填作品是数量，点数字看列表。已删除只写在稿件状态。</p></div></div>
+          <div class="filter-bar">
+            <div class="filter-field"><label>标题 / ID</label><input id="wkQ" placeholder="掌心宠"></div>
+            <div class="filter-field" id="wkOccField"><label>占用</label><select id="wkO"><option value="">全部</option><option>空闲</option><option>占用中</option><option>已完成</option></select></div>
+            <div class="filter-field" id="wkAuditField"><label>审核</label><select id="wkA"><option value="">全部</option><option>审核中</option><option>已通过</option><option>已驳回</option></select></div>
+            <div class="filter-field" id="wkOffStField" hidden><label>状态</label><select id="wkOffS"><option value="">全部</option><option>空闲</option><option>部分领取</option><option>已领完</option></select></div>
+            <div class="filter-field"><label>稿件状态</label><select id="wkFileS"><option value="">全部</option><option>正常</option><option>已删除</option></select></div>
+            <div class="filter-actions" style="display:flex;gap:8px"><button class="btn-ghost-sm" type="button" id="wkReset">重置</button><button class="btn btn-primary" type="button" id="wkGo">查询</button></div>
+          </div>
+          <div class="table-wrap"><table><thead id="wkHead"></thead><tbody id="wkBody"></tbody></table></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="view-flow" class="page-view">
+      <div class="glass-card">
+        <p class="flow-page-intro">用户领走稿件且订单已结算后，按剪辑手的分成比例切分。剪辑手拿走应结算乘以快照，用户拿走剩下的。</p>
+        <div class="flow-svg-wrap">
+          <svg width="1100" height="1680" viewBox="0 0 1100 1680">
+            <defs>
+              <marker id="flow-arrow-20" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#94a3b8"/></marker>
+            </defs>
+            <g fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#flow-arrow-20)">
+              <polyline points="430,64 430,96"/>
+              <polyline points="350,136 190,136"/>
+              <polyline points="40,136 18,136 18,8 430,8 430,16"/>
+              <polyline points="430,176 430,208"/>
+              <polyline points="430,256 430,288"/>
+              <polyline points="430,448 430,480"/>
+              <polyline points="350,328 190,328"/>
+              <polyline points="40,328 18,328 18,232 300,232"/>
+              <polyline points="430,368 430,400"/>
+              <polyline points="510,520 760,520"/>
+              <polyline points="940,520 1064,520 1064,232 560,232"/>
+              <polyline points="430,560 430,592"/>
+              <polyline points="430,640 430,672"/>
+              <polyline points="430,720 430,752"/>
+              <polyline points="430,800 430,832"/>
+              <polyline points="430,880 430,912"/>
+              <polyline points="350,952 240,952"/>
+              <polyline points="430,992 430,1024"/>
+              <polyline points="430,1072 430,1104"/>
+              <polyline points="350,1144 190,1144"/>
+              <polyline points="430,1184 430,1216"/>
+              <polyline points="115,1168 115,1352 300,1352"/>
+              <polyline points="430,1264 430,1328"/>
+              <polyline points="430,1376 430,1408"/>
+              <polyline points="430,1456 430,1488"/>
+              <polyline points="350,1528 210,1528"/>
+              <polyline points="430,1568 430,1600"/>
+            </g>
+            <g font-family="PingFang SC, Microsoft YaHei, sans-serif" text-anchor="middle">
+              <rect x="300" y="16" width="260" height="48" rx="8" fill="#dcfce7" stroke="#16a34a"/>
+              <text x="430" y="36" font-size="13" fill="#14532d">录入剪辑手</text>
+              <text x="430" y="52" font-size="10" fill="#166534">右豹 ID · 合作模式 · 分成比例</text>
+              <polygon points="430,96 510,136 430,176 350,136" fill="#fef9c3" stroke="#ca8a04"/>
+              <text x="430" y="132" font-size="12" fill="#854d0e">必填齐全？</text>
+              <text x="250" y="128" font-size="11" fill="#dc2626">否</text>
+              <rect x="40" y="112" width="150" height="48" rx="8" fill="#fee2e2" stroke="#dc2626"/>
+              <text x="115" y="140" font-size="13" fill="#991b1b">不能保存</text>
+              <text x="444" y="198" font-size="11" fill="#16a34a" text-anchor="start">是</text>
+              <rect x="300" y="208" width="260" height="48" rx="8" fill="#dcfce7" stroke="#16a34a"/>
+              <text x="430" y="236" font-size="13" fill="#14532d">剪辑手已录入</text>
+              <polygon points="430,288 510,328 430,368 350,328" fill="#fef9c3" stroke="#ca8a04"/>
+              <text x="430" y="332" font-size="12" fill="#854d0e">项目已授权？</text>
+              <text x="250" y="320" font-size="11" fill="#dc2626">否</text>
+              <rect x="40" y="304" width="150" height="48" rx="8" fill="#fee2e2" stroke="#dc2626"/>
+              <text x="115" y="332" font-size="13" fill="#991b1b">不能提交</text>
+              <text x="444" y="390" font-size="11" fill="#16a34a" text-anchor="start">是</text>
+              <rect x="300" y="400" width="260" height="48" rx="8" fill="#dcfce7" stroke="#16a34a"/>
+              <text x="430" y="428" font-size="13" fill="#14532d">提交审核</text>
+              <polygon points="430,480 510,520 430,560 350,520" fill="#fef9c3" stroke="#ca8a04"/>
+              <text x="430" y="524" font-size="12" fill="#854d0e">申请通过？</text>
+              <text x="620" y="512" font-size="11" fill="#64748b" text-anchor="start">否</text>
+              <rect x="760" y="496" width="180" height="48" rx="8" fill="#f1f5f9" stroke="#94a3b8"/>
+              <text x="850" y="524" font-size="13" fill="#475569">不下发任务</text>
+              <text x="444" y="582" font-size="11" fill="#16a34a" text-anchor="start">是</text>
+              <rect x="300" y="592" width="260" height="48" rx="8" fill="#dcfce7" stroke="#16a34a"/>
+              <text x="430" y="620" font-size="13" fill="#14532d">稿件进入广场</text>
+              <rect x="300" y="672" width="260" height="48" rx="8" fill="#dbeafe" stroke="#2563eb"/>
+              <text x="430" y="692" font-size="13" fill="#1e3a8a">剪辑手上传稿件</text>
+              <text x="430" y="708" font-size="10" fill="#64748b">右豹或站外，此时不分成</text>
+              <rect x="300" y="752" width="260" height="48" rx="8" fill="#dbeafe" stroke="#2563eb"/>
+              <text x="430" y="772" font-size="13" fill="#1e3a8a">打开稿件详情</text>
+              <text x="430" y="788" font-size="10" fill="#64748b">看到剪辑手分成比例</text>
+              <rect x="300" y="832" width="260" height="48" rx="8" fill="#dbeafe" stroke="#2563eb"/>
+              <text x="430" y="852" font-size="13" fill="#1e3a8a">作品广场筛选</text>
+              <text x="430" y="868" font-size="10" fill="#64748b">帐号代发 / 关键词领取</text>
+              <polygon points="430,912 510,952 430,992 350,952" fill="#fef9c3" stroke="#ca8a04"/>
+              <text x="430" y="956" font-size="12" fill="#854d0e">帐号代发？</text>
+              <text x="268" y="944" font-size="11" fill="#64748b">否</text>
+              <rect x="40" y="928" width="200" height="48" rx="8" fill="#dbeafe" stroke="#2563eb"/>
+              <text x="140" y="948" font-size="12" fill="#1e3a8a">关键词领取</text>
+              <text x="140" y="964" font-size="10" fill="#64748b">领取时不选词</text>
+              <text x="444" y="1014" font-size="11" fill="#16a34a" text-anchor="start">是</text>
+              <rect x="300" y="1024" width="260" height="48" rx="8" fill="#dbeafe" stroke="#2563eb"/>
+              <text x="430" y="1044" font-size="13" fill="#1e3a8a">领取这一条稿件</text>
+              <text x="430" y="1060" font-size="10" fill="#64748b">消耗 1 次，没有稿件包</text>
+              <polygon points="430,1104 510,1144 430,1184 350,1144" fill="#fef9c3" stroke="#ca8a04"/>
+              <text x="430" y="1148" font-size="12" fill="#854d0e">是稿件包？</text>
+              <text x="250" y="1136" font-size="11" fill="#64748b">否</text>
+              <rect x="40" y="1120" width="150" height="48" rx="8" fill="#dbeafe" stroke="#2563eb"/>
+              <text x="115" y="1140" font-size="13" fill="#1e3a8a">领取这一条</text>
+              <text x="115" y="1156" font-size="10" fill="#64748b">消耗 1 次</text>
+              <text x="444" y="1206" font-size="11" fill="#16a34a" text-anchor="start">是</text>
+              <rect x="300" y="1216" width="260" height="48" rx="8" fill="#dbeafe" stroke="#2563eb"/>
+              <text x="430" y="1236" font-size="13" fill="#1e3a8a">不会出现</text>
+              <text x="430" y="1252" font-size="10" fill="#64748b">一个任务一条稿件</text>
+              <rect x="300" y="1328" width="260" height="48" rx="8" fill="#dcfce7" stroke="#16a34a"/>
+              <text x="430" y="1348" font-size="13" fill="#14532d">下发同一个关键词</text>
+              <text x="430" y="1364" font-size="10" fill="#166534">下载保存后只下发一次</text>
+              <rect x="300" y="1408" width="260" height="48" rx="8" fill="#dbeafe" stroke="#2563eb"/>
+              <text x="430" y="1428" font-size="13" fill="#1e3a8a">领取记录点卡片</text>
+              <text x="430" y="1444" font-size="10" fill="#64748b">进详情后再下载</text>
+              <polygon points="430,1488 520,1528 430,1568 340,1528" fill="#fef9c3" stroke="#ca8a04"/>
+              <text x="430" y="1524" font-size="11" fill="#854d0e">已领走且</text>
+              <text x="430" y="1540" font-size="11" fill="#854d0e">订单已产出？</text>
+              <text x="268" y="1520" font-size="11" fill="#64748b">否</text>
+              <rect x="40" y="1504" width="170" height="48" rx="8" fill="#f1f5f9" stroke="#94a3b8"/>
+              <text x="125" y="1532" font-size="13" fill="#475569">两份分成为 0</text>
+              <text x="444" y="1590" font-size="11" fill="#16a34a" text-anchor="start">是</text>
+              <rect x="300" y="1600" width="260" height="48" rx="8" fill="#dcfce7" stroke="#16a34a"/>
+              <text x="430" y="1620" font-size="13" fill="#14532d">按分成比例切分</text>
+              <text x="430" y="1636" font-size="10" fill="#166534">用户拿走剩下的，没有官方留下</text>
+            </g>
+          </svg>
+        </div>
+        <div class="flow-legend">
+          <span><i style="background:#dbeafe;border:1px solid #2563eb"></i>前端</span>
+          <span><i style="background:#dcfce7;border:1px solid #16a34a"></i>后端</span>
+          <span><i style="background:#fef9c3;border:1px solid #ca8a04"></i>校验</span>
+          <span><i style="background:#fee2e2;border:1px solid #dc2626"></i>阻断</span>
+          <span><i style="background:#f1f5f9;border:1px solid #94a3b8"></i>跳过</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="view-ledger" class="page-view">
+      <div class="glass-card ledger-page">
+        <h2>用户收益入账</h2>
+        <p class="lead">沿用代发 1.0：订单已结算后，写入既有项目收益明细，不另建账本。用户侧金额是用户分成，剪辑手侧金额是剪辑手分成。官方留下不写这条分账。待结算不写。广场、稿件详情、领取记录仍不展示金额。</p>
+        <h3>描述模板</h3>
+        <table class="tpl">
+          <thead><tr><th>侧</th><th>描述</th><th>金额</th></tr></thead>
+          <tbody>
+            <tr><td>用户侧</td><td>「{项目名称}-{关键词}」(作品稿件「{稿件ID}」)于{时间}获得代发作品分账{用户分成}元</td><td>用户分成</td></tr>
+            <tr><td>剪辑手侧</td><td>「{项目名称}-{关键词}」(作品稿件「{稿件ID}」)于{时间}获得代发作品分账{剪辑手分成}元</td><td>剪辑手分成</td></tr>
+          </tbody>
+        </table>
+        <h3>示例</h3>
+        <p class="lead">番茄小说、关键词团宠日常、稿件 M-06、剪辑手周凯、2026-09-10 02:43:53 已结算 10 元。领取时快照是周凯的分成比例 50%。剪辑手分成 5 元，用户分成 5 元，加起来等于应结算。没有官方留下。</p>
+        <div class="ledger-grid">
+          <div class="ledger-card">
+            <div class="ledger-side">用户侧 · 项目收益明细</div>
+            <div class="ledger-head">
+              <div class="ledger-title">您的账户于[2026-09-10 02:43:53]番茄小说结算收益到账5元</div>
+              <div class="ledger-amt">+5.00</div>
+            </div>
+            <div class="ledger-desc">「番茄小说-团宠日常」(作品稿件「M-06」)于2026-09-10 02:43:53获得代发作品分账5元</div>
+            <div class="ledger-meta"><span>2026-09-10 02:43:53</span><span class="tag tag-ok">已结算</span></div>
+          </div>
+          <div class="ledger-card">
+            <div class="ledger-side">剪辑手侧 · 项目收益明细</div>
+            <div class="ledger-head">
+              <div class="ledger-title">您的账户于[2026-09-10 02:43:53]番茄小说作品代发收益到账5元</div>
+              <div class="ledger-amt">+5.00</div>
+            </div>
+            <div class="ledger-desc">「番茄小说-团宠日常」(作品稿件「M-06」)于2026-09-10 02:43:53获得代发作品分账5元</div>
+            <div class="ledger-meta"><span>2026-09-10 02:43:53</span><span class="tag tag-ok">已结算</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="drawer-overlay" id="ruleOverlay"></div>
+  <aside class="drawer" id="ruleDrawer">
+    <div class="drawer-header"><h2>FR-020 · v1 需求规则</h2><button class="drawer-close" type="button" id="closeRule">×</button></div>
+    <div class="rule-tab-bar">
+      <button type="button" class="active" data-rule="rule-fe">前端需求</button>
+      <button type="button" data-rule="rule-be">后台需求</button>
+    </div>
+    <div class="drawer-body">
+      <div class="rule-panel active" id="rule-fe">
+        <div class="rule-section"><h3>1 业务目标</h3><div class="rule-content">用户领取帐号运营稿件时看到供稿者分成和用户分成，不用自己选词。剪辑手 PC 不放剪辑任务和任务稿件。</div></div>
+        <div class="rule-section"><h3>2 页面与入口</h3><div class="rule-content"><ul>
+          <li>作品广场顶部项目只有一行，一行 5 个。超过 5 个显示滑动条。长按项目可设为常用或取消常用。排序是常用在前，然后按后台排序值从大到小。作品广场只列出还没领取的稿件。已经领取的从广场去掉，已领列表仍能进入。素材类型、代发运营模式、剪辑师、稿件类型都用底部浮层，点选项只是选中，点确定后列表才变。素材类型有全部、AI漫画、图文素材、混剪素材、口播素材、解说营销。广场是宫格。视频素材按一个项目、一本书、一名剪辑手显示成一个包，进入详情后再选单条稿件领取。图集和视频每领取 1 个，数量少 1 个。已经领取的稿件不能在广场详情里再次下载，再次下载只能去已领记录。代发运营模式：全部、任务协作、帐号运营。</li>
+          <li>稿件详情标题旁是项目名称、运营模式、稿件类型。定制收费稿件在标题正下方显示积分价格，不写「定制收费」。平台积分规则稿件不显示这条价格。稿件作者、关键词、供稿者分成、用户分成放在同一行。书籍信息是书籍名称、书籍 ID、书籍链接、书籍类型，不显示项目名称。书籍名称、书籍 ID、书籍链接可以复制。任务协作在领取成功前，关键词固定显示「未领取」，领取成功后显示用户领取时选择的关键词。帐号运营在领取成功前关键词脱敏，领取成功后显示完整关键词。领取步骤旁边有「剪辑师提醒」，切过去是剪辑师上传这条稿件时写的提示语和推荐文案。</li>
+          <li>帐号运营是一个任务、一个关键词、一条稿件，没有稿件包。点领取稿件直接领取这一条，按剪辑手收费方式扣费，然后下载并保存到相册。保存完成前可以中断下载，已扣的次数或积分不退，不下发关键词。第一次保存成功后弹出回填提示，可以稍后留下或去回填。底部与 1.0 相同。还没领完时是剩余次数、快捷提词、领取稿件。领完后是添加水印、下载并发布到抖音。领取过程不出现选择关键词。</li>
+          <li>已领列表沿用现有列表。去掉复制链接。未回填是立即回填，已回填改为追加回填，并显示回填作品数量。点回填作品数量弹出开发规则：打开现有的该关键词作品列表即可，不在这里新建作品列表。点卡片进入稿件详情，可以再次下载，不再扣次。</li>
+          <li>底部增加收益，版式沿用收益日历。标题「收益日历」单独占导航栏，不和数据区叠在一起。总收益卡片在上，日历在下，两块分开。白卡片只显示已结算总收益(元)，不显示未结算。日历可切日、月、年：日视图是本月收益和日历，月视图是本年各月，年视图是近三年。日历底部说明：此收益数据仅统计帐号代发稿件类型的分成；分成将会入账至项目收益钱包；日历每个日期可点击查看每天关于代发入账的明细。详情卡片标题是项目方-关键词和金额，描述是「代发收益入账」，下面是时间戳。</li>
+          <li>剪辑手 PC 不出现剪辑任务，上传 list 不出现任务稿件。右豹稿件和站外稿件仍在。上传稿件先选代发运营模式：任务协作是用户自由关键词领取稿件；帐号运营是剪辑手提供关键词和稿件，用户一键领取。上传 list 显示回填数据，点数字打开回填作品，列有媒体平台、帐号 ID、帐号昵称、作品链接、发布时间、回填时间。</li>
+        </ul></div></div>
+        <div class="rule-section"><h3>3 交互规则</h3><div class="rule-content"><ul>
+          <li>一名用户只领走并下载这一条稿件。领走之后不能再领。</li>
+          <li>本轮剪辑手 PC 不出现剪辑任务，也不出现任务稿件。</li>
+          <li>帐号运营领取成功并保存到相册后，系统下发这条稿件上的关键词。用户这次领取里不填写、不挑选关键词。</li>
+          <li>领取按稿件剪辑手的收费方式扣费。免费次数全平台共用。平台积分规则：优先扣 1 次，次数不够再按平台档位兑换次数，兑换并扣次成功后才下载；不走定制扣积分确认。定制不走平台档位。有免费次数仍扣 1 次，不弹扣积分确认。没有免费次数且余额够扣时，先弹出确认兑换，只写出应扣积分和当前余额，应扣积分等于标题下的积分价格；不写定制收费，不写剪辑手是谁。确认兑换后才扣。取消则不扣、不领取、不写已领。余额低于应扣积分时不弹确认兑换，改为弹出积分不足，写出需要的积分、当前余额和还差多少，并可去购买积分。买够后回到确认兑换。这两步不扣、不下载、不写已领，不打开平台档位兑换。</li>
+          <li>帐号代发不会出现稿件包，也没有分次领取、一次全部领取和包内素材。</li>
+          <li>这条稿件领走之后不能再领。</li>
+          <li>用户还没领走，或订单还没结算，剪辑手分成和用户分成都是 0。</li>
+        </ul></div></div>
+        <div class="rule-section"><h3>4 边界规则</h3><div class="rule-content"><ul>
+          <li>剩余次数不足 1 次时，不能领成功。</li>
+          <li>未领取成功的详情不提供下载。</li>
+          <li>帐号运营没有稿件包，一条稿件对应一次领取。</li>
+        </ul></div></div>
+        <div class="rule-section"><h3>5 业务流程</h3><div class="rule-content">见页内「业务流程」。</div></div>
+      </div>
+      <div class="rule-panel" id="rule-be">
+        <div class="rule-section"><h3>1 业务目标</h3><div class="rule-content">管理后台复刻一键代发 1.0 的剪辑手管理和稿件管理。代运营合作模式是多选，分成比例是单独一个百分比。稿件管理的回填作品是数量。入账按稿件剪辑手的分成比例切分，用户拿走剩余。</div></div>
+        <div class="rule-section"><h3>2 数据表与字段</h3><div class="rule-content"><ul>
+          <li>剪辑手管理与一键代发 1.0 相同。代运营合作模式多选任务协作、帐号运营，这个控件不出现比例，选中后也不展开比例。分成比例单独填 0 到 100 的一个百分比。任务协作是用户自由关键词领取稿件。帐号运营是剪辑手提供关键词和稿件，用户一键领取。备注和来源只进详情。表头统计剪辑手数量、累计稿件数量、累计稿件大小、累计结算收益。</li>
+          <li>列表和详情里，合作模式只显示已选名称，分成比例只显示那一个百分比。</li>
+          <li>稿件管理有右豹稿件、站外稿件。右豹含发布技巧、素材类型、占用、审核。站外没有这四项，状态是空闲、部分领取、已领完。两栏都有稿件状态（正常 / 已删除）和回填作品。</li>
+          <li>回填作品格内是数量。点数量打开列表，列是媒体平台、帐号 ID、帐号昵称、作品链接、发布时间、回填时间。数量等于条数。0 也可点，列表为空。已删除只出现在稿件状态，回填作品数量仍单独保留。</li>
+          <li>收益拆站内稿件收益和站外稿件收益，各自点开抽屉。</li>
+          <li>本页不出现官方帐号、剪辑任务、任务稿件。不移植批量审核、二维码和 OSS 删除。站外分享链接点了只提示已复制。</li>
+        </ul></div></div>
+        <div class="rule-section"><h3>3 列表与筛选</h3><div class="rule-content"><ul>
+          <li>剪辑手可按右豹 ID、昵称、状态查询。录入和编辑用弹窗。行内可看详情、停用、启用。名下仍有稿件不能删除。</li>
+          <li>稿件可按标题或 ID 查询。右豹还可按占用、审核筛选；站外按空闲、部分领取、已领完筛选。两栏都可按稿件状态筛选。点回填作品的数量打开列表。</li>
+        </ul></div></div>
+        <div class="rule-section"><h3>4 边界规则</h3><div class="rule-content"><ul>
+          <li>缺右豹 ID、昵称、分成比例、备注，或发布平台一个都没选，或合作模式一个都没选，不能保存。分成比例是 0 到 100。两个模式都没选时提示至少选一个合作模式。</li>
+          <li>用户领走稿件且订单已结算之后，才按领取时写下的剪辑手分成比例切分。剪辑手分成是应结算乘以快照，四舍五入到分。用户分成是应结算减去剪辑手分成。待结算不切。之后改剪辑手比例，不重算已经切出的分成。</li>
+          <li>本页不改 FR-014、FR-017、FR-018 的历史页。</li>
+        </ul></div></div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="modal-overlay" id="edOverlay"><div class="modal" role="dialog">
+    <div class="modal-header"><b id="edModalTitle">录入剪辑手</b><button class="drawer-close" type="button" id="edClose">×</button></div>
+    <div class="modal-body">
+      <div class="form-field"><label>右豹 ID</label><input id="edYb" placeholder="YB10086"></div>
+      <div class="form-field"><label>昵称</label><input id="edName" placeholder="周凯"></div>
+      <div class="mode-line">
+        <div class="form-field"><label>代运营合作模式</label><div class="checks" id="edModes">
+          <label><input type="checkbox" value="任务协作"> 任务协作</label>
+          <label><input type="checkbox" value="帐号运营"> 帐号运营</label>
+        </div></div>
+        <div class="form-field"><label>分成比例</label><input id="edShare" type="number" min="0" max="100" placeholder="40"></div>
+      </div>
+      <div class="form-field"><label>备注</label><input id="edNote" placeholder="客服接入"></div>
+      <div class="form-field"><label>稿件需要审核</label><select id="edReview"><option>是</option><option>否</option></select></div>
+      <div class="form-field"><label>发布平台</label><div class="checks" id="edPlatforms">
+        <label><input type="checkbox" value="右豹"> 右豹</label>
+        <label><input type="checkbox" value="站外"> 站外</label>
+      </div></div>
+      <div class="form-field"><label>可上传项目</label><div class="checks" id="edProjects">
+        <label><input type="checkbox" value="番茄小说"> 番茄小说</label>
+        <label><input type="checkbox" value="红果短剧"> 红果短剧</label>
+      </div></div>
+    </div>
+    <div class="modal-footer"><button class="btn-ghost-sm" type="button" id="edCancel">取消</button><button class="btn btn-primary" type="button" id="edSave">保存</button></div>
+  </div></div>
+
+  <div class="drawer-overlay" id="detailOverlay"></div>
+  <aside class="drawer" id="detailDrawer"><div class="drawer-header"><span id="detailTitle">详情</span><button class="drawer-close" type="button" id="detailClose">×</button></div><div class="drawer-body" id="detailBody"></div></aside>
+  <div class="toast" id="toast"></div>
+  <script>
+    function esc(s) {
+      return String(s == null ? '' : s).replace(/[&<>"']/g, function (ch) {
+        return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch];
+      });
+    }
+    function toast(text) {
+      var el = document.getElementById('toast');
+      el.textContent = text;
+      el.classList.add('show');
+      clearTimeout(toast._t);
+      toast._t = setTimeout(function () { el.classList.remove('show'); }, 1800);
+    }
+    function openModal(id) { document.getElementById(id).classList.add('open'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+    var editors = [
+      { id: 'E-01', ybId: 'YB10086', name: '周凯', modes: ['任务协作', '帐号运营'], share: '40%', review: '是', platforms: ['右豹', '站外'], projects: '番茄小说、红果短剧', uploaded: 12, claimed: 4, sizeMb: 186, onsite: 1280, offsite: 360, status: '已录入', time: '09-12 10:20', note: '客服转来，两种渠道都开通', source: '客服' },
+      { id: 'E-02', ybId: 'YB10091', name: '陈予', modes: ['任务协作'], share: '30%', review: '是', platforms: ['右豹'], projects: '红果短剧', uploaded: 6, claimed: 2, sizeMb: 74, onsite: 640, offsite: 0, status: '已录入', time: '09-18 15:04', note: '只开通右豹', source: '客服' },
+      { id: 'E-03', ybId: 'YB10102', name: '苏晚', modes: ['帐号运营'], share: '35%', review: '否', platforms: ['右豹', '站外'], projects: '番茄小说', uploaded: 3, claimed: 1, sizeMb: 28, onsite: 210, offsite: 90, status: '已停用', time: '09-20 11:30', note: '停用后不能上传', source: '运营' }
+    ];
+    var edSeq = 4;
+    var editingId = '';
+    function money(n) { return (Math.round(n * 100) / 100).toFixed(2); }
+    function edTag(label) {
+      var cls = (label === '已录入' || label === '是') ? 'tag-ok' : 'tag-muted';
+      return '<span class="tag ' + cls + '">' + esc(label) + '</span>';
+    }
+    function filteredEditors() {
+      var q = (document.getElementById('edQ').value || '').trim();
+      var s = document.getElementById('edS').value;
+      return editors.filter(function (e) {
+        if (q && e.ybId.indexOf(q) === -1 && e.name.indexOf(q) === -1) return false;
+        if (s && e.status !== s) return false;
+        return true;
+      });
+    }
+    function renderEditors() {
+      var rows = filteredEditors();
+      var uploaded = 0, size = 0, earn = 0;
+      rows.forEach(function (e) { uploaded += e.uploaded; size += e.sizeMb; earn += e.onsite + e.offsite; });
+      document.getElementById('edStats').innerHTML =
+        '<div class="ed-stat"><span>剪辑手数量</span><strong>' + rows.length + '</strong></div>' +
+        '<div class="ed-stat"><span>累计稿件数量</span><strong>' + uploaded + '</strong></div>' +
+        '<div class="ed-stat"><span>累计稿件大小</span><strong>' + size + ' MB</strong></div>' +
+        '<div class="ed-stat earn"><span>累计结算收益</span><strong>' + money(earn) + '</strong></div>';
+      document.getElementById('edBody').innerHTML = rows.map(function (e) {
+        return '<tr><td>' + esc(e.id) + '</td><td>' + esc(e.ybId) + '</td><td>' + esc(e.name) + '</td><td>' + esc(e.modes.join('、')) + '</td><td>' + esc(e.share) + '</td>' +
+          '<td>' + esc(e.platforms.join('、')) + '</td><td>' + edTag(e.review) + '</td><td>' + esc(e.projects) + '</td>' +
+          '<td>已上传 ' + e.uploaded + '<div class="cell-sub">已被领取 ' + e.claimed + '</div><div class="cell-sub">累计 ' + e.sizeMb + ' MB</div></td>' +
+          '<td><button class="link" type="button" data-earn="' + e.id + '" data-side="onsite">站内稿件收益 ' + money(e.onsite) + '</button>' +
+          '<div><button class="link" type="button" data-earn="' + e.id + '" data-side="offsite">站外稿件收益 ' + money(e.offsite) + '</button></div></td>' +
+          '<td>' + edTag(e.status) + '</td><td>' + esc(e.time) + '</td>' +
+          '<td><button class="link" type="button" data-ed="' + e.id + '">详情</button>' +
+          '<button class="link" type="button" data-edit="' + e.id + '">编辑</button>' +
+          (e.status === '已录入'
+            ? '<button class="link" type="button" data-stop="' + e.id + '">停用</button>'
+            : '<button class="link" type="button" data-start="' + e.id + '">启用</button>') +
+          '<button class="link link-danger" type="button" data-del="' + e.id + '">删除</button></td></tr>';
+      }).join('') || '<tr><td colspan="13">没有匹配的剪辑手</td></tr>';
+    }
+    function findEd(id) { return editors.filter(function (e) { return e.id === id; })[0]; }
+    function openDetail(title, html, wide) {
+      document.getElementById('detailTitle').textContent = title;
+      document.getElementById('detailBody').innerHTML = html;
+      document.getElementById('detailDrawer').classList.toggle('wide', !!wide);
+      document.getElementById('detailDrawer').classList.add('open');
+      document.getElementById('detailOverlay').classList.add('open');
+    }
+    function closeDetail() {
+      document.getElementById('detailDrawer').classList.remove('open', 'wide');
+      document.getElementById('detailOverlay').classList.remove('open');
+    }
+    function fillEditorForm(e) {
+      document.getElementById('edYb').value = e ? e.ybId : '';
+      document.getElementById('edName').value = e ? e.name : '';
+      document.getElementById('edShare').value = e ? String(e.share).replace('%', '') : '';
+      Array.prototype.forEach.call(document.querySelectorAll('#edModes input'), function (el) {
+        el.checked = !!(e && e.modes.indexOf(el.value) !== -1);
+      });
+      document.getElementById('edNote').value = e ? e.note : '';
+      document.getElementById('edReview').value = e ? e.review : '是';
+      Array.prototype.forEach.call(document.querySelectorAll('#edPlatforms input'), function (el) {
+        el.checked = !!(e && e.platforms.indexOf(el.value) !== -1);
+      });
+      Array.prototype.forEach.call(document.querySelectorAll('#edProjects input'), function (el) {
+        el.checked = !!(e && e.projects.split('、').indexOf(el.value) !== -1);
+      });
+    }
+    function openEditorForm(id) {
+      editingId = id || '';
+      document.getElementById('edModalTitle').textContent = id ? '编辑剪辑手' : '录入剪辑手';
+      fillEditorForm(id ? findEd(id) : null);
+      openModal('edOverlay');
+    }
+    document.getElementById('edBody').onclick = function (ev) {
+      var t = ev.target;
+      var id = t.getAttribute('data-ed') || t.getAttribute('data-edit') || t.getAttribute('data-stop') || t.getAttribute('data-start') || t.getAttribute('data-del') || t.getAttribute('data-earn');
+      if (!id) return;
+      var e = findEd(id);
+      if (!e) return;
+      if (t.getAttribute('data-ed')) {
+        openDetail('剪辑手详情', '<dl class="kv"><dt>右豹 ID</dt><dd>' + esc(e.ybId) + '</dd><dt>昵称</dt><dd>' + esc(e.name) + '</dd><dt>代运营合作模式</dt><dd>' + esc(e.modes.join('、')) + '</dd><dt>分成比例</dt><dd>' + esc(e.share) + '</dd><dt>发布平台</dt><dd>' + esc(e.platforms.join('、')) + '</dd><dt>稿件需要审核</dt><dd>' + esc(e.review) + '</dd><dt>可上传项目</dt><dd>' + esc(e.projects) + '</dd><dt>备注</dt><dd>' + esc(e.note) + '</dd><dt>来源</dt><dd>' + esc(e.source) + '</dd></dl>');
+      } else if (t.getAttribute('data-edit')) {
+        openEditorForm(id);
+      } else if (t.getAttribute('data-stop')) {
+        e.status = '已停用';
+        renderEditors();
+        toast('已停用，不能再上传');
+      } else if (t.getAttribute('data-start')) {
+        e.status = '已录入';
+        renderEditors();
+        toast('已启用');
+      } else if (t.getAttribute('data-del')) {
+        if (e.uploaded > 0) { toast('名下仍有稿件，不能删除'); return; }
+        editors = editors.filter(function (x) { return x.id !== id; });
+        renderEditors();
+        toast('已删除');
+      } else if (t.getAttribute('data-earn')) {
+        var side = t.getAttribute('data-side');
+        var amount = side === 'onsite' ? e.onsite : e.offsite;
+        var title = side === 'onsite' ? '站内稿件收益' : '站外稿件收益';
+        var mid = side === 'onsite' ? '<td>团宠日常</td>' : '<td>假千金 · B88218</td>';
+        openDetail(title, '<p>' + esc(e.name) + ' · 累计已结算 ' + money(amount) + '</p><div class="table-wrap"><table><thead><tr><th>日期</th><th>' + (side === 'onsite' ? '关键词' : '书籍') + '</th><th>已结算收益</th></tr></thead><tbody><tr><td>09-26</td>' + mid + '<td>' + money(amount) + '</td></tr></tbody></table></div>');
+      }
+    };
+    document.getElementById('openEditor').onclick = function () { openEditorForm(''); };
+    document.getElementById('edGo').onclick = renderEditors;
+    document.getElementById('edReset').onclick = function () {
+      document.getElementById('edQ').value = '';
+      document.getElementById('edS').value = '';
+      renderEditors();
+    };
+    document.getElementById('edClose').onclick = document.getElementById('edCancel').onclick = function () { closeModal('edOverlay'); };
+    document.getElementById('edOverlay').onclick = function (ev) { if (ev.target.id === 'edOverlay') closeModal('edOverlay'); };
+    document.getElementById('edSave').onclick = function () {
+      var ybId = document.getElementById('edYb').value.trim();
+      var name = document.getElementById('edName').value.trim();
+      var share = document.getElementById('edShare').value.trim();
+      var note = document.getElementById('edNote').value.trim();
+      var review = document.getElementById('edReview').value;
+      var modes = Array.prototype.map.call(document.querySelectorAll('#edModes input:checked'), function (el) { return el.value; });
+      var platforms = Array.prototype.map.call(document.querySelectorAll('#edPlatforms input:checked'), function (el) { return el.value; });
+      var projects = Array.prototype.map.call(document.querySelectorAll('#edProjects input:checked'), function (el) { return el.value; });
+      if (!ybId || !name || !note) { toast('请填写右豹 ID、昵称、备注'); return; }
+      if (!modes.length) { toast('至少选一个合作模式'); return; }
+      var shareN = Number(share);
+      if (share === '' || !(shareN >= 0 && shareN <= 100)) { toast('分成比例要在 0 到 100'); return; }
+      if (!platforms.length) { toast('发布平台至少选一个'); return; }
+      var shareText = String(shareN) + '%';
+      if (editors.some(function (e) { return e.ybId === ybId && e.id !== editingId; })) { toast('这个右豹 ID 已经录入'); return; }
+      if (editingId) {
+        var row = findEd(editingId);
+        row.ybId = ybId; row.name = name; row.modes = modes; row.share = shareText; row.note = note; row.review = review;
+        row.platforms = platforms; row.projects = projects.join('、') || '—';
+        toast('已保存');
+      } else {
+        editors.unshift({ id: 'E-0' + (edSeq++), ybId: ybId, name: name, modes: modes, share: shareText, review: review, platforms: platforms, projects: projects.join('、') || '—', uploaded: 0, claimed: 0, sizeMb: 0, onsite: 0, offsite: 0, status: '已录入', time: '刚刚', note: note, source: '运营' });
+        toast('已录入');
+      }
+      closeModal('edOverlay');
+      renderEditors();
+    };
+    document.getElementById('detailClose').onclick = closeDetail;
+    document.getElementById('detailOverlay').onclick = closeDetail;
+
+    var works = [
+      { id: 'M-20481', channel: '右豹', title: '掌心宠口播', project: '番茄小说', book: '我成了老公掌心宠', bookId: '7128491023', info: '18.6 MB (1)', fileName: '掌心宠口播.mp4', tip: '开头露出书名', editor: '周凯', kind: '视频', mat: '口播', occ: '空闲', audit: '已通过', fileStatus: '正常', time: '09-26 11:20', fills: [
+        { platform: '抖音', accountId: 'dy_zhoukai', nick: '周凯', link: 'https://v.douyin.com/aaa', publish: '09-26 18:02', fillTime: '09-26 18:40' },
+        { platform: '快手', accountId: 'ks_linxiao', nick: '林晓', link: 'https://v.kuaishou.com/bbb', publish: '09-26 19:11', fillTime: '09-26 19:30' }
+      ] },
+      { id: 'M-20490', channel: '右豹', title: '团宠图集', project: '番茄小说', book: '重生后我成了团宠', bookId: 'B88201', info: '6.2 MB (6)', fileName: '团宠图集', tip: '封面用角色特写', editor: '周凯', kind: '图集', mat: '图文', occ: '空闲', audit: '审核中', fileStatus: '正常', time: '09-28 14:06', fills: [] },
+      { id: 'M-20502', channel: '右豹', title: '退婚口播', project: '红果短剧', book: '退婚当天', bookId: 'B77302', info: '12.4 MB (1)', fileName: '退婚口播.mp4', tip: '前 5 秒用退婚冲突', editor: '陈予', kind: '视频', mat: '口播', occ: '已完成', audit: '已通过', fileStatus: '已删除', time: '09-22 09:18', fills: [
+        { platform: '抖音', accountId: 'dy_chenyu', nick: '陈予', link: 'https://v.douyin.com/ddd', publish: '09-22 16:08', fillTime: '09-22 16:40' }
+      ] },
+      { id: 'X-20411', channel: '站外', title: '掌心宠站外文件夹', project: '番茄小说', book: '我成了老公掌心宠', bookId: '7128491023', info: '8个素材(已领2个) · 24.0 MB', editor: '周凯', kind: '视频', offStatus: '部分领取', fileStatus: '正常', time: '09-26 11:20', shareUrl: 'https://share.example/X-20411', fills: [
+        { platform: '抖音', accountId: 'dy_suwan', nick: '苏晚', link: 'https://v.douyin.com/ccc', publish: '09-26 20:15', fillTime: '09-26 20:48' }
+      ] },
+      { id: 'X-20420', channel: '站外', title: '团宠站外夹', project: '番茄小说', book: '重生后我成了团宠', bookId: 'B88201', info: '4个素材(已领0个) · 9.0 MB', editor: '陈予', kind: '图集', offStatus: '空闲', fileStatus: '正常', time: '09-28 15:02', shareUrl: 'https://share.example/X-20420', fills: [] },
+      { id: 'X-20433', channel: '站外', title: '真千金站外夹', project: '红果短剧', book: '豪门真千金', bookId: 'B77319', info: '3个素材(已领3个) · 12.0 MB', editor: '苏晚', kind: '视频', offStatus: '已领完', fileStatus: '已删除', time: '09-21 18:44', shareUrl: 'https://share.example/X-20433', fills: [
+        { platform: '快手', accountId: 'ks_suwan', nick: '苏晚', link: 'https://v.kuaishou.com/eee', publish: '09-21 19:02', fillTime: '09-21 19:26' }
+      ] }
+    ];
+    var wkChannel = '右豹';
+    function findWork(id) { return works.filter(function (w) { return w.id === id; })[0]; }
+    function wkTag(label) {
+      var cls = 'tag-ok';
+      if (label === '已删除' || label === '已驳回' || label === '已领完' || label === '已完成') cls = 'tag-muted';
+      else if (label === '审核中' || label === '占用中' || label === '部分领取') cls = 'tag-warn';
+      return '<span class="tag ' + cls + '">' + esc(label) + '</span>';
+    }
+    function filteredWorks() {
+      var q = (document.getElementById('wkQ').value || '').trim();
+      var occ = document.getElementById('wkO').value;
+      var audit = document.getElementById('wkA').value;
+      var offSt = document.getElementById('wkOffS').value;
+      var fileSt = document.getElementById('wkFileS').value;
+      return works.filter(function (w) {
+        if (w.channel !== wkChannel) return false;
+        if (q && w.title.indexOf(q) === -1 && w.id.indexOf(q) === -1) return false;
+        if (fileSt && w.fileStatus !== fileSt) return false;
+        if (wkChannel === '站外') return !offSt || w.offStatus === offSt;
+        if (occ && w.occ !== occ) return false;
+        if (audit && w.audit !== audit) return false;
+        return true;
+      });
+    }
+    function fillTable(fills) {
+      var head = '<tr><th>媒体平台</th><th>帐号ID</th><th>帐号昵称</th><th>作品链接</th><th>发布时间</th><th>回填时间</th></tr>';
+      var rows = fills || [];
+      var body = rows.map(function (f) {
+        var shown = String(f.link || '').replace(/^https?:\/\//, '');
+        return '<tr><td>' + esc(f.platform) + '</td><td>' + esc(f.accountId) + '</td><td>' + esc(f.nick) + '</td><td><a class="link" href="' + esc(f.link) + '">' + esc(shown) + '</a></td><td>' + esc(f.publish) + '</td><td>' + esc(f.fillTime) + '</td></tr>';
+      }).join('');
+      return '<div class="table-wrap"><table><thead>' + head + '</thead><tbody>' + body + '</tbody></table></div>' +
+        (rows.length ? '' : '<p class="field-hint">没有回填作品</p>');
+    }
+    function workOps(w) {
+      var html = '<button class="link" type="button" data-wdetail="' + esc(w.id) + '">详情</button>';
+      if (w.fileStatus !== '已删除' && w.channel === '站外') {
+        html += '<button class="link" type="button" data-wshare="' + esc(w.id) + '">分享链接</button>';
+      }
+      if (w.fileStatus !== '已删除') {
+        html += '<button class="link link-danger" type="button" data-wdel="' + esc(w.id) + '">删除</button>';
+      }
+      return html;
+    }
+    function renderWorks() {
+      var off = wkChannel === '站外';
+      document.getElementById('wkHead').innerHTML = off
+        ? '<tr><th>ID</th><th>标题</th><th>项目</th><th>书</th><th>稿件信息</th><th>剪辑手</th><th>类型</th><th>状态</th><th>稿件状态</th><th>回填作品</th><th>上传时间</th><th>操作</th></tr>'
+        : '<tr><th>ID</th><th>标题</th><th>项目</th><th>书</th><th>稿件信息</th><th>发布技巧</th><th>剪辑手</th><th>类型</th><th>素材类型</th><th>占用</th><th>审核</th><th>稿件状态</th><th>回填作品</th><th>上传时间</th><th>操作</th></tr>';
+      var rows = filteredWorks();
+      document.getElementById('wkBody').innerHTML = rows.map(function (w) {
+        var book = esc(w.book) + '<div class="cell-sub">书籍 ID ' + esc(w.bookId) + '</div>';
+        var info = esc(w.info) + (w.fileName ? '<div class="cell-sub">' + esc(w.fileName) + '</div>' : '');
+        var fills = '<button class="link" type="button" data-fills="' + esc(w.id) + '">' + (w.fills || []).length + '</button>';
+        var start = '<tr><td>' + esc(w.id) + '</td><td>' + esc(w.title) + '</td><td>' + esc(w.project) + '</td><td>' + book + '</td><td>' + info + '</td>';
+        if (off) {
+          return start + '<td>' + esc(w.editor) + '</td><td>' + esc(w.kind) + '</td><td>' + wkTag(w.offStatus) + '</td><td>' + wkTag(w.fileStatus) + '</td><td>' + fills + '</td><td>' + esc(w.time) + '</td><td>' + workOps(w) + '</td></tr>';
+        }
+        return start + '<td>' + esc(w.tip || '—') + '</td><td>' + esc(w.editor) + '</td><td>' + esc(w.kind) + '</td><td>' + esc(w.mat) + '</td><td>' + wkTag(w.occ) + '</td><td>' + wkTag(w.audit) + '</td><td>' + wkTag(w.fileStatus) + '</td><td>' + fills + '</td><td>' + esc(w.time) + '</td><td>' + workOps(w) + '</td></tr>';
+      }).join('') || '<tr><td colspan="' + (off ? 12 : 15) + '">没有匹配的稿件</td></tr>';
+    }
+    function setWkChannel(ch) {
+      wkChannel = ch;
+      document.querySelectorAll('#wkChannelBar button').forEach(function (btn) {
+        btn.classList.toggle('active', btn.getAttribute('data-wkch') === ch);
+      });
+      document.getElementById('wkTitle').textContent = ch === '站外' ? '站外稿件' : '右豹稿件';
+      document.getElementById('wkOccField').hidden = ch === '站外';
+      document.getElementById('wkAuditField').hidden = ch === '站外';
+      document.getElementById('wkOffStField').hidden = ch !== '站外';
+      renderWorks();
+    }
+    document.getElementById('wkChannelBar').onclick = function (ev) {
+      var ch = ev.target.getAttribute && ev.target.getAttribute('data-wkch');
+      if (ch) setWkChannel(ch);
+    };
+    document.getElementById('wkGo').onclick = renderWorks;
+    document.getElementById('wkReset').onclick = function () {
+      document.getElementById('wkQ').value = '';
+      document.getElementById('wkO').value = '';
+      document.getElementById('wkA').value = '';
+      document.getElementById('wkOffS').value = '';
+      document.getElementById('wkFileS').value = '';
+      renderWorks();
+    };
+    document.getElementById('wkBody').onclick = function (ev) {
+      var t = ev.target;
+      var fillId = t.getAttribute('data-fills');
+      var detailId = t.getAttribute('data-wdetail');
+      var shareId = t.getAttribute('data-wshare');
+      var delId = t.getAttribute('data-wdel');
+      var id = fillId || detailId || shareId || delId;
+      if (!id) return;
+      var w = findWork(id);
+      if (!w) return;
+      if (fillId) {
+        openDetail('回填作品 · ' + w.title, fillTable(w.fills), true);
+        return;
+      }
+      if (shareId) { toast('已复制'); return; }
+      if (delId) {
+        w.fileStatus = '已删除';
+        renderWorks();
+        toast('稿件状态已改为已删除');
+        return;
+      }
+      var extra = w.channel === '站外'
+        ? '<dt>状态</dt><dd>' + esc(w.offStatus) + '</dd>'
+        : '<dt>发布技巧</dt><dd>' + esc(w.tip || '—') + '</dd><dt>素材类型</dt><dd>' + esc(w.mat) + '</dd><dt>占用</dt><dd>' + esc(w.occ) + '</dd><dt>审核</dt><dd>' + esc(w.audit) + '</dd>';
+      openDetail('稿件详情', '<dl class="kv"><dt>ID</dt><dd>' + esc(w.id) + '</dd><dt>标题</dt><dd>' + esc(w.title) + '</dd><dt>项目</dt><dd>' + esc(w.project) + '</dd><dt>书</dt><dd>' + esc(w.book) + '</dd>' + extra + '<dt>稿件状态</dt><dd>' + esc(w.fileStatus) + '</dd><dt>回填作品</dt><dd>' + (w.fills || []).length + '</dd></dl>');
+    };
+
+    function scalePhones() {
+      document.querySelectorAll('.board-phone').forEach(function (phone) {
+        var iframe = phone.querySelector('iframe');
+        if (!iframe || !phone.clientWidth) return;
+        iframe.style.transform = 'scale(' + (phone.clientWidth / 375) + ')';
+      });
+    }
+    function setPreviewButtons(on) {
+      document.querySelectorAll('[data-preview]').forEach(function (b) {
+        b.textContent = on ? '退出全屏' : '全屏预览';
+        b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
+    }
+    function isPreviewOn() {
+      return !!(document.fullscreenElement || document.webkitFullscreenElement || document.body.classList.contains('preview-fs-fallback'));
+    }
+    function exitPreview() {
+      document.body.classList.remove('preview-fs-fallback');
+      document.querySelectorAll('.demo-layout').forEach(function (el) { el.classList.remove('is-preview'); });
+      setPreviewButtons(false);
+      if (document.fullscreenElement || document.webkitFullscreenElement) {
+        var exitFs = document.exitFullscreen || document.webkitExitFullscreen;
+        if (exitFs) {
+          var done = exitFs.call(document);
+          if (done && done.catch) done.catch(function () {});
+        }
+      }
+      requestAnimationFrame(scalePhones);
+    }
+    function togglePreview(which) {
+      var layout = document.getElementById(which === 'pc' ? 'pcDemo' : 'feDemo');
+      if (!layout) return;
+      if (isPreviewOn()) { exitPreview(); return; }
+      layout.classList.add('is-preview');
+      setPreviewButtons(true);
+      var req = layout.requestFullscreen || layout.webkitRequestFullscreen;
+      if (req) {
+        var pending = req.call(layout);
+        if (pending && pending.catch) pending.catch(function () { document.body.classList.add('preview-fs-fallback'); });
+      } else {
+        document.body.classList.add('preview-fs-fallback');
+      }
+      requestAnimationFrame(scalePhones);
+    }
+    function showPage(id) {
+      exitPreview();
+      document.querySelectorAll('.page-tab-bar button').forEach(function (btn) { btn.classList.toggle('active', btn.dataset.page === id); });
+      document.querySelectorAll('.page-view').forEach(function (view) { view.classList.toggle('active', view.id === id); });
+      var rule = (id === 'view-admin' || id === 'view-ledger') ? 'rule-be' : 'rule-fe';
+      document.querySelectorAll('.rule-tab-bar button').forEach(function (btn) { btn.classList.toggle('active', btn.dataset.rule === rule); });
+      document.querySelectorAll('.rule-panel').forEach(function (p) { p.classList.toggle('active', p.id === rule); });
+      if (id === 'view-fe') requestAnimationFrame(scalePhones);
+    }
+    document.querySelectorAll('.page-tab-bar button').forEach(function (btn) { btn.onclick = function () { showPage(btn.dataset.page); }; });
+    document.querySelectorAll('.admin-tab-bar button').forEach(function (btn) {
+      btn.onclick = function () {
+        document.querySelectorAll('.admin-tab-bar button').forEach(function (b) { b.classList.toggle('active', b === btn); });
+        document.querySelectorAll('.admin-pane').forEach(function (p) { p.classList.toggle('active', p.id === btn.dataset.admin); });
+      };
+    });
+    document.querySelectorAll('[data-preview]').forEach(function (btn) {
+      btn.addEventListener('click', function () { togglePreview(btn.getAttribute('data-preview')); });
+    });
+    function onFsChange() {
+      if (document.fullscreenElement || document.webkitFullscreenElement) {
+        setPreviewButtons(true);
+        requestAnimationFrame(scalePhones);
+        return;
+      }
+      if (document.body.classList.contains('preview-fs-fallback')) return;
+      document.querySelectorAll('.demo-layout').forEach(function (el) { el.classList.remove('is-preview'); });
+      setPreviewButtons(false);
+      requestAnimationFrame(scalePhones);
+    }
+    document.addEventListener('fullscreenchange', onFsChange);
+    document.addEventListener('webkitfullscreenchange', onFsChange);
+    document.querySelectorAll('.scene-btn').forEach(function (btn) {
+      btn.onclick = function () {
+        document.querySelectorAll('.scene-btn').forEach(function (b) { b.classList.toggle('active', b === btn); });
+        var tile = document.getElementById('tile-' + btn.dataset.screen);
+        var scroller = document.getElementById('feBoardScroll');
+        if (!tile || !scroller) return;
+        scroller.scrollTop = Math.max(0, tile.getBoundingClientRect().top - scroller.getBoundingClientRect().top + scroller.scrollTop - 8);
+      };
+    });
+    var ruleDrawer = document.getElementById('ruleDrawer');
+    var ruleOverlay = document.getElementById('ruleOverlay');
+    function toggleRule(open) { ruleDrawer.classList.toggle('open', open); ruleOverlay.classList.toggle('open', open); }
+    document.getElementById('toggleRuleDrawer').onclick = function () { toggleRule(!ruleDrawer.classList.contains('open')); };
+    document.getElementById('closeRule').onclick = function () { toggleRule(false); };
+    ruleOverlay.onclick = function () { toggleRule(false); };
+    document.querySelectorAll('.rule-tab-bar button').forEach(function (btn) {
+      btn.onclick = function () {
+        document.querySelectorAll('.rule-tab-bar button').forEach(function (b) { b.classList.toggle('active', b === btn); });
+        document.querySelectorAll('.rule-panel').forEach(function (p) { p.classList.toggle('active', p.id === btn.dataset.rule); });
+      };
+    });
+    var tab = new URLSearchParams(location.search).get('tab');
+    if (tab === 'pc') showPage('view-pc');
+    if (tab === 'admin') showPage('view-admin');
+    if (tab === 'flow') showPage('view-flow');
+    if (tab === 'ledger') showPage('view-ledger');
+    renderEditors();
+    renderWorks();
+    window.addEventListener('resize', scalePhones);
+    scalePhones();
+    setTimeout(scalePhones, 200);
+  </script>
+  <script src="sidebar-nav.js?v=sprint0928c"></script>
+</body>
+</html>
