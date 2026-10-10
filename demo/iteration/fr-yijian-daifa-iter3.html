@@ -1078,7 +1078,20 @@
     });
     var ruleDrawer = document.getElementById('ruleDrawer');
     var ruleOverlay = document.getElementById('ruleOverlay');
-    function toggleRule(open) { ruleDrawer.classList.toggle('open', open); ruleOverlay.classList.toggle('open', open); }
+    function placeRuleDrawer() {
+      if (!ruleDrawer.classList.contains('open')) return;
+      var bar = document.querySelector('.page-tab-bar');
+      var bottom = bar ? bar.getBoundingClientRect().bottom : 0;
+      var top = Math.max(0, Math.ceil(bottom + 8));
+      if (top > window.innerHeight - 160) top = 0;
+      ruleDrawer.style.top = top + 'px';
+    }
+    function toggleRule(open) {
+      ruleDrawer.classList.toggle('open', open);
+      ruleOverlay.classList.toggle('open', open);
+      if (open) placeRuleDrawer();
+      else ruleDrawer.style.top = '';
+    }
     document.getElementById('toggleRuleDrawer').onclick = function () { toggleRule(!ruleDrawer.classList.contains('open')); };
     document.getElementById('closeRule').onclick = function () { toggleRule(false); };
     ruleOverlay.onclick = function () { toggleRule(false); };
@@ -1109,7 +1122,8 @@
     }
     renderEditors();
     renderWorks();
-    window.addEventListener('resize', scalePhones);
+    window.addEventListener('resize', function () { scalePhones(); placeRuleDrawer(); });
+    window.addEventListener('scroll', placeRuleDrawer, true);
     scalePhones();
     setTimeout(scalePhones, 200);
   </script>

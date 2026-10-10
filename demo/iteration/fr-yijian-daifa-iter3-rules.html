@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FR-020 · 需求规则（开发视角）</title>
+  <style>
+    :root {
+      --border: #d0d7de; --head: #f6f8fa; --text: #24292f; --muted: #57606a;
+      --accent: #0969da; --warn: #9a6700; --warn-bg: #fff8c5;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; padding: 20px 22px 48px;
+      font: 12px/1.55 Inter, "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: var(--text); background: #fff;
+    }
+    h1 { font-size: 18px; margin: 0 0 6px; }
+    .meta { color: var(--muted); margin-bottom: 18px; max-width: 920px; }
+    .rule-tab-bar {
+      display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px;
+      position: sticky; top: 0; background: #fff; padding: 8px 0; z-index: 2;
+      border-bottom: 1px solid var(--border);
+    }
+    .rule-tab-bar button {
+      border: 1px solid var(--border); background: var(--head); padding: 6px 14px;
+      border-radius: 6px; cursor: pointer; font-size: 12px; color: var(--text);
+    }
+    .rule-tab-bar button.active { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 600; }
+    .panel { display: none; }
+    .panel.active { display: block; }
+    h2 { font-size: 14px; margin: 22px 0 8px; color: var(--accent); }
+    h2:first-child { margin-top: 0; }
+    p.lead { color: var(--muted); margin: 0 0 10px; max-width: 960px; }
+    table.tpl {
+      width: 100%; border-collapse: collapse; margin: 0 0 18px;
+      border: 1px solid var(--border); font-size: 11px;
+    }
+    table.tpl th, table.tpl td {
+      border: 1px solid var(--border); padding: 8px 10px; text-align: left; vertical-align: top;
+    }
+    table.tpl th {
+      background: var(--head); font-weight: 600; color: var(--muted);
+      white-space: nowrap; position: sticky; top: var(--tab-h, 42px); z-index: 1;
+    }
+    table.tpl tr:nth-child(even) td { background: #fafbfc; }
+    @media print {
+      .rule-tab-bar { position: static; }
+      .panel { display: block !important; page-break-before: always; }
+      #p-index { page-break-before: avoid; }
+      table.tpl th { position: static; top: auto; }
+    }
+  </style>
+</head>
+<body>
+  <h1>FR-020 · 一键代发迭代 3.0 · 需求规则</h1>
+  <p class="meta">同一条规则只保留一行。功能索引是跳转摘要，细则在对应 Tab。</p>
+
+  <div class="rule-tab-bar" role="tablist">
+    <button type="button" class="active" data-panel="p-index">功能索引</button>
+    <button type="button" data-panel="p-plaza">作品广场</button>
+    <button type="button" data-panel="p-detail">稿件详情</button>
+    <button type="button" data-panel="p-account">帐号运营</button>
+    <button type="button" data-panel="p-task">任务协作</button>
+    <button type="button" data-panel="p-claims">已领回填</button>
+    <button type="button" data-panel="p-earn">收益日历</button>
+    <button type="button" data-panel="p-pc">剪辑手 PC</button>
+    <button type="button" data-panel="p-admin">管理后台</button>
+    <button type="button" data-panel="p-edge">边界</button>
+  </div>
+
+  <div id="p-index" class="panel active">
+    <h2>本页覆盖范围</h2>
+    <table class="tpl">
+      <thead><tr><th>范围</th><th>本页规则</th><th>Demo 锚点</th></tr></thead>
+      <tbody>
+        <tr><td>作品广场</td><td>项目一行五个，广场只列未领稿件。</td><td>作品广场</td></tr>
+        <tr><td>稿件详情</td><td>标题旁标项目、模式和类型。</td><td>稿件详情</td></tr>
+        <tr><td>帐号运营</td><td>一条稿件直接领，不选词。</td><td>稿件详情</td></tr>
+        <tr><td>任务协作</td><td>领取要选词，可先领后填。</td><td>已领列表</td></tr>
+        <tr><td>已领回填</td><td>已领列表改为立即回填或追加回填。</td><td>已领列表</td></tr>
+        <tr><td>收益日历</td><td>只显示已结算总收益。</td><td>收益日历</td></tr>
+        <tr><td>剪辑手 PC</td><td>不放剪辑任务和任务稿件。</td><td>剪辑手 PC</td></tr>
+        <tr><td>剪辑手管理</td><td>合作模式多选，各自填比例。</td><td>剪辑手管理</td></tr>
+        <tr><td>稿件管理</td><td>回填作品是数量。</td><td>稿件管理</td></tr>
+        <tr><td>业务流程</td><td>见页内「业务流程」。三张分开：帐号运营模式领取、用户无词领取、分成模式。</td><td>业务流程</td></tr>
+        <tr><td>边界</td><td>剩余次数不足 1 次不能领成功。保存缺项会被拦住。</td><td>剪辑手管理</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div id="p-plaza" class="panel">
+    <table class="tpl">
+      <thead><tr><th>项</th><th>规则</th><th>不做</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>项目行</td>
+          <td>一行 5 个，超出出滑动条。长按可设为常用或取消常用。常用在前，其余按后台排序值从大到小。</td>
+          <td>不在广场列出已领取稿件。已领列表仍能进入。</td>
+        </tr>
+        <tr>
+          <td>广场</td>
+          <td>宫格。</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>筛选</td>
+          <td>素材类型、代发运营模式、剪辑师、稿件类型都用底部浮层。点选项只是选中，点确定后列表才变。</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>素材类型</td>
+          <td>全部、AI漫画、图文素材、混剪素材、口播素材、解说营销。</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>代发运营模式</td>
+          <td>全部、任务协作、帐号运营。</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>视频素材</td>
+          <td>按一个项目、一本书、一名剪辑手显示成一个包。进入详情后再选单条稿件领取。</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>数量</td>
+          <td>图集和视频每领取 1 个，数量少 1 个。</td>
+          <td>已经领取的稿件不能在广场详情里再次下载。再次下载只能去已领记录。</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div id="p-detail" class="panel">
+    <table class="tpl">
+      <thead><tr><th>项</th><th>规则</th><th>不做</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>标题旁</td>
+          <td>项目名称、运营模式、稿件类型。</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>积分价格</td>
+          <td>定制收费稿件在标题正下方显示积分价格。</td>
+          <td>不写「定制收费」。平台积分规则稿件不显示这条价格。</td>
+        </tr>
+        <tr>
+          <td>同一行</td>
+          <td>稿件作者、关键词、供稿者分成、用户分成放在同一行。</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>未切分</td>
+          <td>用户还没领走，或订单还没结算，剪辑手分成和用户分成都是 0。</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>书籍信息</td>
+          <td>书籍名称、书籍 ID、书籍链接、书籍类型。书籍名称、书籍 ID、书籍链接可以复制。</td>
+          <td>不显示项目名称。</td>
+        </tr>
+        <tr>
+          <td>任务协作关键词</td>
+          <td>领取成功前固定显示「未领取」。领取成功后显示用户领取时选择的关键词。</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>帐号运营关键词</td>
+          <td>领取成功前脱敏。领取成功后显示完整关键词。</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>剪辑师提醒</td>
+          <td>领取步骤旁边有「剪辑师提醒」。切过去是剪辑师上传这条稿件时写的一段提醒。</td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div id="p-account" class="panel">
+    <table class="tpl">
+      <thead><tr><th>项</th><th>规则</th><th>不做</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>结构</td>
+          <td>一个任务、一个关键词、一条稿件。一条稿件对应一次领取。</td>
+          <td>没有稿件包。也没有分次领取、一次全部领取和包内素材。</td>
+        </tr>
+        <tr>
+          <td>领取</td>
+          <td>点领取稿件直接领取这一条，然后下载并保存到相册。一名用户只领走并下载这一条稿件。</td>
+          <td>领走之后不能再领。领取过程不出现选择关键词。</td>
+        </tr>
+        <tr>
+          <td>下发词</td>
+          <td>领取成功并保存到相册后，系统下发这条稿件上的关键词。</td>
+          <td>用户这次领取里不填写、不挑选关键词。保存完成前中断下载，不下发关键词。</td>
+        </tr>
+        <tr>
+          <td>中断</td>
+          <td>保存完成前可以中断下载。</td>
+          <td>已扣的次数或积分不退。</td>
+        </tr>
+        <tr>
+          <td>回填提示</td>
+          <td>第一次保存成功后弹出回填提示，可以稍后留下或去回填。</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>底部</td>
+          <td>与 1.0 相同。还没领完时是剩余次数、快捷提词、领取稿件。领完后是添加水印、下载并发布到抖音。</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>扣费</td>
+          <td>按这条稿件剪辑手的收费方式扣费。免费次数全平台共用。</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>平台积分</td>
+          <td>优先扣 1 次。次数不够再按平台档位兑换次数，兑换并扣次成功后才下载。</td>
+          <td>不走定制扣积分确认。</td>
+        </tr>
+        <tr>
+          <td>定制有次数</td>
+          <td>定制不走平台档位。有免费次数仍扣 1 次。</td>
+          <td>不弹扣积分确认。</td>
+        </tr>
+        <tr>
+          <td>定制确认</td>
+          <td>没有免费次数且余额够扣时，先弹出确认兑换。只写出应扣积分和当前余额。应扣积分等于标题下的积分价格。确认兑换后才扣。</td>
+          <td>不写定制收费，不写剪辑手是谁。取消则不扣、不领取、不写已领。</td>
+        </tr>
+        <tr>
+          <td>积分不足</td>
+          <td>余额低于应扣积分时不弹确认兑换，改为弹出积分不足。写出需要的积分、当前余额和还差多少，并可去购买积分。买够后回到确认兑换。</td>
+          <td>这两步不扣、不下载、不写已领，不打开平台档位兑换。</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div id="p-task" class="panel">
+    <table class="tpl">
+      <thead><tr><th>项</th><th>规则</th><th>不做</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>选词</td>
+          <td>领取要选择关键词。选项里固定有「暂无关键词,先领稿件稍后申请词」。</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>先领后填</td>
+          <td>选了这项按剪辑手收费方式扣次数或积分，只完成领取，不下载。弹窗提示尽快申请关键词，并说明 1 小时内没有填写关键词，该稿件过期释放。</td>
+          <td>释放后已扣次数和积分都不退。</td>
+        </tr>
+        <tr>
+          <td>未填下载</td>
+          <td>未填写时点下载只提示「请先到领取记录页面填写关键词」。</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>1 小时内</td>
+          <td>领取记录该字段是「填写关键词」。点开底部浮层选择这名用户这本书的关键词。</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>超时</td>
+          <td>满 1 小时未填写，字段改为「超时未填写关键词」。</td>
+          <td>不能再填，也不能下载。</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div id="p-claims" class="panel">
+    <table class="tpl">
+      <thead><tr><th>项</th><th>规则</th><th>不做</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>列表</td>
+          <td>沿用现有列表。</td>
+          <td>去掉复制链接。</td>
+        </tr>
+        <tr>
+          <td>回填</td>
+          <td>未回填是立即回填。已回填改为追加回填，并显示回填作品数量。</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>回填作品</td>
+          <td>点回填作品数量弹出开发规则：打开现有的该关键词作品列表即可。</td>
+          <td>不在这里新建作品列表。</td>
+        </tr>
+        <tr>
+          <td>再次下载</td>
+          <td>点卡片进入稿件详情，可以再次下载，不再扣次。</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>填写关键词</td>
+          <td>先领后填还没填词时，点「填写关键词」不进详情。</td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div id="p-earn" class="panel">
+    <table class="tpl">
+      <thead><tr><th>项</th><th>规则</th><th>不做</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>入口</td>
+          <td>底部增加收益，版式沿用收益日历。</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>标题</td>
+          <td>标题「收益日历」单独占导航栏。</td>
+          <td>不和数据区叠在一起。</td>
+        </tr>
+        <tr>
+          <td>布局</td>
+          <td>总收益卡片在上，日历在下，两块分开。</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>总收益</td>
+          <td>白卡片只显示已结算总收益(元)。</td>
+          <td>不显示未结算。</td>
+        </tr>
+        <tr>
+          <td>日</td>
+          <td>日视图是本月收益和日历。</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>月</td>
+          <td>月视图是本年各月。</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>年</td>
+          <td>年视图是近三年。</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>底部说明</td>
+          <td>此收益数据仅统计帐号代发稿件类型的分成。分成将会入账至项目收益钱包。每个日期可点击查看每天关于代发入账的明细。</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>详情卡片</td>
+          <td>标题是项目方-关键词和金额。描述是「代发收益入账」。下面是时间戳。</td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div id="p-pc" class="panel">
+    <table class="tpl">
+      <thead><tr><th>项</th><th>规则</th><th>不做</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>范围</td>
+          <td>右豹稿件和站外稿件仍在。</td>
+          <td>不出现剪辑任务。上传 list 不出现任务稿件。</td>
+        </tr>
+        <tr>
+          <td>上传模式</td>
+          <td>上传稿件先选代发运营模式。任务协作是用户自由关键词领取稿件。帐号运营是剪辑手在书籍链接旁边单选一个已通过关键词，候选只含当前剪辑师、当前项目、当前书籍 ID。</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>剪辑师提醒</td>
+          <td>给领取人只留一个「剪辑师提醒」文本域。</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>回填</td>
+          <td>上传 list 显示回填数据，点数字打开回填作品。列有媒体平台、帐号 ID、帐号昵称、作品链接、发布时间、回填时间。</td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div id="p-admin" class="panel">
+    <h2>剪辑手管理</h2>
+    <table class="tpl">
+      <thead><tr><th>项</th><th>规则</th><th>不做</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>范围</td>
+          <td>剪辑手管理与一键代发 1.0 相同。</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>合作模式</td>
+          <td>代运营合作模式多选任务协作、帐号运营。勾选后才出现该模式的比例，0 到 100，两个模式的比例分开填。</td>
+          <td>未勾选的模式不显示比例。</td>
+        </tr>
+        <tr>
+          <td>收费方式</td>
+          <td>稿件收费方式是跟随平台或定制。定制时出现单次积分，写成单次 x 积分。</td>
+          <td>跟随平台不填积分。</td>
+        </tr>
+        <tr>
+          <td>备注和来源</td>
+          <td>只进详情。</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>表头</td>
+          <td>统计剪辑手数量、累计稿件数量、累计稿件大小、累计结算收益。</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>列表和详情</td>
+          <td>已选模式带上自己的比例。稿件收费方式为定制时写出单次积分。</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>查询</td>
+          <td>可按右豹 ID、昵称、状态查询。</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>录入</td>
+          <td>录入和编辑用弹窗。行内可看详情、停用、启用。</td>
+          <td>名下仍有稿件不能删除。</td>
+        </tr>
+        <tr>
+          <td>收益</td>
+          <td>收益拆站内稿件收益和站外稿件收益，各自点开抽屉。</td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+    <h2>稿件管理</h2>
+    <table class="tpl">
+      <thead><tr><th>项</th><th>规则</th><th>不做</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>分栏</td>
+          <td>有右豹稿件、站外稿件。两栏都有稿件状态（正常 / 已删除）和回填作品。</td>
+          <td>不出现官方帐号、剪辑任务、任务稿件。不移植批量审核、二维码和 OSS 删除。</td>
+        </tr>
+        <tr>
+          <td>右豹</td>
+          <td>含发布技巧、素材类型、占用、审核。还可按占用、审核筛选。</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>站外</td>
+          <td>没有发布技巧、素材类型、占用、审核。状态是空闲、部分领取、已领完。按空闲、部分领取、已领完筛选。分享链接点了只提示已复制。</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>查询</td>
+          <td>可按标题或 ID 查询。两栏都可按稿件状态筛选。</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>回填作品</td>
+          <td>格内是数量。点数量打开列表，列是媒体平台、帐号 ID、帐号昵称、作品链接、发布时间、回填时间。数量等于条数。0 也可点，列表为空。</td>
+          <td>已删除只出现在稿件状态，回填作品数量仍单独保留。</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div id="p-edge" class="panel">
+    <table class="tpl">
+      <thead><tr><th>项</th><th>规则</th><th>不做</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>剩余次数</td>
+          <td>剩余次数不足 1 次时，不能领成功。</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>未领取</td>
+          <td>未领取成功的详情不提供下载。</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>保存</td>
+          <td>缺右豹 ID、昵称、备注，或发布平台一个都没选，或合作模式一个都没选，不能保存。已选模式的比例要在 0 到 100。定制时单次积分要是大于 0 的整数。两个模式都没选时提示至少选一个合作模式。</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>切分时机</td>
+          <td>用户领走稿件且订单已结算之后，才按领取时写下的、这条稿件所属模式的分成比例切分。</td>
+          <td>待结算不切。</td>
+        </tr>
+        <tr>
+          <td>剪辑手分成</td>
+          <td>应结算乘以快照，四舍五入到分。</td>
+          <td>之后改剪辑手比例，不重算已经切出的分成。</td>
+        </tr>
+        <tr>
+          <td>用户分成</td>
+          <td>应结算减去剪辑手分成。用户拿走剩余。</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>历史页</td>
+          <td></td>
+          <td>不改 FR-014、FR-017、FR-018 的历史页。</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    function pinHead() {
+      var bar = document.querySelector('.rule-tab-bar');
+      if (!bar) return;
+      document.documentElement.style.setProperty('--tab-h', Math.ceil(bar.getBoundingClientRect().height) + 'px');
+    }
+    document.querySelectorAll('.rule-tab-bar button').forEach(function (btn) {
+      btn.onclick = function () {
+        document.querySelectorAll('.rule-tab-bar button').forEach(function (b) {
+          b.classList.toggle('active', b === btn);
+        });
+        document.querySelectorAll('.panel').forEach(function (p) {
+          p.classList.toggle('active', p.id === btn.dataset.panel);
+        });
+        window.scrollTo(0, 0);
+      };
+    });
+    pinHead();
+    window.addEventListener('resize', pinHead);
+    var hash = location.hash.replace(/^#/, '');
+    if (/^p-[a-z0-9-]+$/.test(hash)) {
+      var t = document.querySelector('[data-panel="' + hash + '"]');
+      if (t) t.click();
+    }
+  </script>
+</body>
+</html>
