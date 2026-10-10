@@ -90,6 +90,9 @@
       background: linear-gradient(135deg, #e0e7ff 0%, #f0f4f8 40%, #e0f2fe 100%);
     }
     body.preview-fs-fallback .demo-layout.is-preview { position: fixed; inset: 0; z-index: 400; }
+    .demo-layout:fullscreen .mockup-board,
+    .demo-layout:-webkit-full-screen .mockup-board,
+    body.preview-fs-fallback .demo-layout.is-preview .mockup-board { flex: 1; min-height: 0; }
     .scene-panel { padding: 16px 18px; flex-shrink: 0; }
     .scene-panel h2 { font-size: 14px; font-weight: 700; }
     .scene-lead, .scene-hint { font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-top: 6px; }
@@ -100,9 +103,14 @@
       background: #fff; font-size: 12px; cursor: pointer; color: #6b7280;
     }
     .scene-btn.active { border-color: var(--primary-border); background: var(--primary-light); color: var(--primary); font-weight: 600; }
-    .mockup-board { padding: 14px 16px 16px; background: #fff; flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; }
+    .mockup-board { padding: 14px 16px 16px; background: #fff; flex: 1; min-height: 0; display: flex; flex-direction: column; }
+    .board-scroll { overflow: auto; flex: 1; min-height: 0; }
+    .board-row { display: flex; flex-wrap: wrap; gap: 20px 18px; align-items: flex-start; }
+    .board-tile { width: min(360px, 100%); margin: 0; }
+    .board-cap { font-size: 13px; font-weight: 700; margin-bottom: 8px; }
+    .board-cap em { font-style: normal; font-weight: 500; color: var(--text-muted); font-size: 11px; margin-left: 6px; }
     .board-phone {
-      width: min(360px, 100%); aspect-ratio: 375 / 812; border-radius: 42px; overflow: hidden;
+      width: 100%; aspect-ratio: 375 / 812; border-radius: 42px; overflow: hidden;
       background: #000; border: 10px solid #1c1c1e; position: relative; flex-shrink: 0;
     }
     .board-phone iframe {
@@ -163,7 +171,7 @@
           <span class="badge badge-fr">FR-021</span>
           <span class="badge badge-version">v1 当前</span>
         </h1>
-        <p class="page-desc">创作者首页 V125：C 端减噪、找项目工具、学院 C 端；学院管理后台为「课程管理（复用知识库）+ 分类管理」。完整交互真源为 <code>creator-home-2-opt-demo.html</code>，本页按场景 Tab 嵌入预览。</p>
+        <p class="page-desc">创作者首页 V125：C 端减噪、找项目工具、学院 C 端；学院管理后台为「课程管理（复用知识库）+ 分类管理」。完整交互真源为 <code>creator-home-2-opt-demo.html</code>。前端按每个页面的状态并排摆出，点场景滚到对应画面。</p>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
         <a class="btn btn-ghost" href="creator-home-2-opt-demo.html" target="_blank" rel="noopener">新窗口完整 Demo</a>
@@ -182,22 +190,32 @@
           <div class="scene-head">
             <div>
               <h2>用户端（C 端 App）</h2>
-              <p class="scene-lead">首页减噪：新手学院 vs 活动中心双卡、三格数据、设置工作台、找项目与今日路径气泡。下方 Tab 可切换变现 / 工具 / 数据；学院中心从首页「新手学院」卡片进入。</p>
+              <p class="scene-lead">首页、商学院、变现、工具、数据、数据分析、晒成果按各自页面状态直接摆开。点进单台手机仍可操作该页。</p>
             </div>
             <button class="btn-preview" type="button" data-preview="fe" aria-pressed="false">全屏预览</button>
           </div>
           <div class="scene-list" id="feSceneList">
             <button class="scene-btn active" type="button" data-screen="home">创作者首页</button>
-            <button class="scene-btn" type="button" data-screen="academy">学院中心</button>
+            <button class="scene-btn" type="button" data-screen="academy">商学院</button>
             <button class="scene-btn" type="button" data-screen="cash">变现</button>
             <button class="scene-btn" type="button" data-screen="tools">工具</button>
             <button class="scene-btn" type="button" data-screen="data">数据</button>
+            <button class="scene-btn" type="button" data-screen="analysis">数据分析</button>
+            <button class="scene-btn" type="button" data-screen="share">晒成果</button>
           </div>
-          <p class="scene-hint">点场景切换手机内画面。路径气泡可拖拽。</p>
+          <p class="scene-hint">点场景滚到对应画面。每台手机是该页的一个状态，不再在同一台里来回切换。</p>
         </div>
         <div class="glass-card mockup-board">
-          <div class="board-phone">
-            <iframe id="feDemoFrame" title="2.0优化 · C 端 Demo" src="about:blank"></iframe>
+          <div class="board-scroll" id="feBoardScroll">
+            <div class="board-row">
+              <figure class="board-tile" id="tile-home"><figcaption class="board-cap">创作者首页 <em>金刚区、双卡、找项目</em></figcaption><div class="board-phone"><iframe title="创作者首页" src="creator-home-2-opt-demo.html?embed=1&surface=c&screen=home&v=16"></iframe></div></figure>
+              <figure class="board-tile" id="tile-academy"><figcaption class="board-cap">商学院 <em>频道与课程列表</em></figcaption><div class="board-phone"><iframe title="商学院" src="creator-home-2-opt-demo.html?embed=1&surface=c&screen=academy&v=16"></iframe></div></figure>
+              <figure class="board-tile" id="tile-cash"><figcaption class="board-cap">变现 <em>赛道与项目列表</em></figcaption><div class="board-phone"><iframe title="变现" src="creator-home-2-opt-demo.html?embed=1&surface=c&screen=cash&v=16"></iframe></div></figure>
+              <figure class="board-tile" id="tile-tools"><figcaption class="board-cap">工具 <em>场景与工具市场</em></figcaption><div class="board-phone"><iframe title="工具" src="creator-home-2-opt-demo.html?embed=1&surface=c&screen=tools&v=16"></iframe></div></figure>
+              <figure class="board-tile" id="tile-data"><figcaption class="board-cap">数据 <em>收益总览</em></figcaption><div class="board-phone"><iframe title="数据" src="creator-home-2-opt-demo.html?embed=1&surface=c&screen=data&v=16"></iframe></div></figure>
+              <figure class="board-tile" id="tile-analysis"><figcaption class="board-cap">数据分析 <em>收益趋势、日历、项目分析</em></figcaption><div class="board-phone"><iframe title="数据分析" src="creator-home-2-opt-demo.html?embed=1&surface=c&screen=analysis&v=16"></iframe></div></figure>
+              <figure class="board-tile" id="tile-share"><figcaption class="board-cap">晒成果 <em>按当前分析页生成海报</em></figcaption><div class="board-phone"><iframe title="晒成果" src="creator-home-2-opt-demo.html?embed=1&surface=c&screen=share&v=16"></iframe></div></figure>
+            </div>
           </div>
         </div>
       </div>
@@ -205,10 +223,11 @@
 
     <div id="view-admin" class="page-view">
       <div class="glass-card">
-        <p class="admin-lead">学院管理后台：「课程管理」对接现有知识库（列表增字段「课程分类」）；「分类管理」提供 C 端频道分类 list。本 FR 不做新人推荐 / 学习数据菜单。</p>
+        <p class="admin-lead">学院管理后台：「课程管理」含知识库对接和「学院直播课」；「分类管理」提供频道分类；「学习数据」还原基础统计（详情 UV、学习人数、完成率、收藏、直播预约）。</p>
         <div class="admin-tab-bar" role="tablist">
           <button type="button" class="active" data-admin-page="courses">课程管理</button>
           <button type="button" data-admin-page="categories">分类管理</button>
+          <button type="button" data-admin-page="analytics">学习数据</button>
         </div>
         <div class="admin-demo-wrap">
           <iframe id="adminDemoFrame" title="2.0优化 · 学院管理后台" src="about:blank"></iframe>
@@ -235,33 +254,15 @@
   <script>
     (function () {
       var DEMO = 'creator-home-2-opt-demo.html';
-      var VER = '10';
-      var feFrame = document.getElementById('feDemoFrame');
+      var VER = '12';
       var adminFrame = document.getElementById('adminDemoFrame');
-      var currentFeScreen = 'home';
       var currentAdminPage = 'courses';
 
       function demoUrl(opts) {
         var q = ['embed=1', 'v=' + VER];
         if (opts.surface) q.push('surface=' + opts.surface);
-        if (opts.screen) q.push('screen=' + opts.screen);
         if (opts.adminPage) q.push('adminPage=' + opts.adminPage);
         return DEMO + '?' + q.join('&');
-      }
-
-      function applyFeScreen(screen, forceReload) {
-        currentFeScreen = screen || 'home';
-        if (forceReload || !feFrame.src || feFrame.src.indexOf('about:blank') >= 0) {
-          feFrame.src = demoUrl({ surface: 'c', screen: currentFeScreen });
-          return;
-        }
-        try {
-          if (feFrame.contentWindow && feFrame.contentWindow.__rbDemoApply) {
-            feFrame.contentWindow.__rbDemoApply({ surface: 'c', screen: currentFeScreen });
-            return;
-          }
-        } catch (e) { /* cross-origin guard */ }
-        feFrame.src = demoUrl({ surface: 'c', screen: currentFeScreen });
       }
 
       function applyAdminPage(pageId) {
@@ -278,11 +279,12 @@
         adminFrame.src = demoUrl({ surface: 'admin', adminPage: currentAdminPage });
       }
 
-      function scalePhone() {
-        var phone = document.querySelector('.board-phone');
-        var iframe = feFrame;
-        if (!phone || !iframe || !phone.clientWidth) return;
-        iframe.style.transform = 'scale(' + (phone.clientWidth / 375) + ')';
+      function scalePhones() {
+        document.querySelectorAll('.board-phone').forEach(function (phone) {
+          var iframe = phone.querySelector('iframe');
+          if (!iframe || !phone.clientWidth) return;
+          iframe.style.transform = 'scale(' + (phone.clientWidth / 375) + ')';
+        });
       }
 
       function showPage(id) {
@@ -292,10 +294,7 @@
         document.querySelectorAll('.page-view').forEach(function (view) {
           view.classList.toggle('active', view.id === id);
         });
-        if (id === 'view-fe') {
-          if (!feFrame.src || feFrame.src.indexOf('about:blank') >= 0) applyFeScreen(currentFeScreen, true);
-          requestAnimationFrame(scalePhone);
-        }
+        if (id === 'view-fe') requestAnimationFrame(scalePhones);
         if (id === 'view-admin') {
           if (!adminFrame.src || adminFrame.src.indexOf('about:blank') >= 0) applyAdminPage(currentAdminPage);
         }
@@ -310,7 +309,10 @@
           document.querySelectorAll('#feSceneList .scene-btn').forEach(function (b) {
             b.classList.toggle('active', b === btn);
           });
-          applyFeScreen(btn.dataset.screen, false);
+          var tile = document.getElementById('tile-' + btn.dataset.screen);
+          var scroller = document.getElementById('feBoardScroll');
+          if (!tile || !scroller) return;
+          scroller.scrollTop = Math.max(0, tile.getBoundingClientRect().top - scroller.getBoundingClientRect().top + scroller.scrollTop - 8);
         };
       });
 
@@ -318,7 +320,9 @@
         btn.onclick = function () { applyAdminPage(btn.dataset.adminPage); };
       });
 
-      feFrame.addEventListener('load', function () { requestAnimationFrame(scalePhone); });
+      document.querySelectorAll('.board-phone iframe').forEach(function (frame) {
+        frame.addEventListener('load', function () { requestAnimationFrame(scalePhones); });
+      });
 
       var layout = document.getElementById('feDemo');
       function setPreviewButtons(on) {
@@ -335,7 +339,7 @@
           var ex = document.exitFullscreen || document.webkitExitFullscreen;
           if (ex) ex.call(document);
         }
-        requestAnimationFrame(scalePhone);
+        requestAnimationFrame(scalePhones);
       }
       document.querySelectorAll('[data-preview]').forEach(function (btn) {
         btn.addEventListener('click', function () {
@@ -353,7 +357,7 @@
           } else {
             document.body.classList.add('preview-fs-fallback');
           }
-          requestAnimationFrame(scalePhone);
+          requestAnimationFrame(scalePhones);
         });
       });
       document.addEventListener('fullscreenchange', function () {
@@ -361,7 +365,7 @@
           document.body.classList.remove('preview-fs-fallback');
           if (layout) layout.classList.remove('is-preview');
           setPreviewButtons(false);
-          requestAnimationFrame(scalePhone);
+          requestAnimationFrame(scalePhones);
         }
       });
 
@@ -385,8 +389,8 @@
       if (tab === 'admin') showPage('view-admin');
       else showPage('view-fe');
 
-      window.addEventListener('resize', scalePhone);
-      setTimeout(scalePhone, 300);
+      window.addEventListener('resize', scalePhones);
+      setTimeout(scalePhones, 300);
     })();
   </script>
   <script src="sidebar-nav.js?v=sprint1009b"></script>

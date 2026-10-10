@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>首页稿 · 金刚区与商学院</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#e7e9ee;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",Arial,sans-serif;color:#252836}
+  .stage{display:flex;gap:28px;justify-content:center;align-items:flex-start;padding:28px 20px 48px;flex-wrap:wrap}
+  .phone{width:390px;min-height:780px;background:#f6f7fb;border-radius:24px;box-shadow:0 22px 60px rgba(20,25,40,.18);overflow:hidden;position:relative;padding-bottom:74px}
+  .statusbar{height:34px;padding:10px 14px 0;display:flex;justify-content:space-between;font-size:13px;font-weight:700;background:linear-gradient(#fff5f1,#fff8f5)}
+  .top{padding:8px 14px 6px;background:linear-gradient(180deg,#fff5f0 0%,#fff8f6 70%,rgba(255,255,255,0) 100%)}
+  .user-row{display:flex;align-items:center;justify-content:space-between}
+  .user{display:flex;align-items:center;gap:10px}
+  .avatar{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(145deg,#222,#666);color:#fff;font-weight:800;font-size:13px}
+  .name{font-size:16px;font-weight:800;line-height:1}
+  .tags{display:flex;gap:6px;margin-top:6px}
+  .tag{font-size:9px;color:#8b5a3a;background:#fff2dc;border-radius:4px;padding:3px 5px}
+  .inbox{width:30px;height:30px;border-radius:10px;display:grid;place-items:center;background:#fff;position:relative;box-shadow:0 4px 14px rgba(62,50,40,.06)}
+  .badge{position:absolute;top:-5px;right:-5px;background:#ff335a;color:#fff;font-size:9px;font-weight:800;border-radius:999px;min-width:18px;height:18px;display:grid;place-items:center;border:2px solid #fff}
+  .search{margin-top:10px;background:#fff;border:1px solid #ff9b85;border-radius:20px;height:36px;display:flex;align-items:center;padding:0 12px;color:#999;font-size:12px}
+  .search b{margin-left:auto;color:#ff4d22;font-weight:700;padding-left:8px;border-left:1px solid #ffe1d7}
+  .banner{margin:10px 12px 0;border-radius:16px;padding:12px 14px;background:linear-gradient(120deg,#ffe7df,#fff5f0 55%,#ffd55f 120%);min-height:88px;position:relative}
+  .banner .eyebrow{font-size:12px;color:#ff3c24;font-weight:800}
+  .banner h2{font-size:22px;line-height:1.15;margin:6px 0 8px;color:#6b2b20}
+  .banner .cta{border:0;background:rgba(255,255,255,.75);color:#7f392d;border-radius:999px;font-size:11px;padding:6px 16px}
+  .banner .emoji{position:absolute;right:16px;bottom:6px;font-size:42px}
+  .section{margin:12px 12px 0}
+  .shortcut{background:#fff;border-radius:16px;padding:16px 4px 14px;box-shadow:0 3px 10px rgba(45,55,85,.04);display:grid;grid-template-columns:repeat(4,1fr)}
+  .shortcut button{border:0;background:transparent;padding:0;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;color:#252836}
+  .ico{width:44px;height:44px;border-radius:14px;position:relative;display:grid;place-items:center;overflow:hidden;background:linear-gradient(165deg,rgba(255,255,255,.7) 0%,rgba(255,228,214,.34) 48%,rgba(255,186,156,.28) 100%);border:1px solid rgba(255,255,255,.96);box-shadow:0 10px 18px rgba(255,88,46,.2),inset 0 1px 0 rgba(255,255,255,1),inset 0 -14px 18px rgba(255,96,48,.28);backdrop-filter:blur(16px) saturate(1.8);-webkit-backdrop-filter:blur(16px) saturate(1.8)}
+  .ico:before{content:"";position:absolute;width:36px;height:36px;right:-6px;bottom:-8px;border-radius:50%;background:radial-gradient(circle,var(--glow,rgba(255,110,60,.98)),rgba(255,77,34,0) 70%)}
+  .ico:after{content:"";position:absolute;left:1px;right:1px;top:1px;height:42%;border-radius:13px 13px 10px 10px;background:linear-gradient(180deg,rgba(255,255,255,.92),rgba(255,255,255,0));pointer-events:none}
+  .shortcut button:nth-child(1) .ico{--glow:rgba(255,138,88,.98)}
+  .shortcut button:nth-child(2) .ico{--glow:rgba(255,92,36,.98)}
+  .shortcut button:nth-child(3) .ico{--glow:rgba(255,112,64,.98)}
+  .shortcut button:nth-child(4) .ico{--glow:rgba(255,64,40,.96)}
+  .ico svg{width:24px;height:24px;position:relative;z-index:1;display:block;filter:drop-shadow(0 1px 1px rgba(160,40,10,.18))}
+  .shortcut span{font-size:12px;font-weight:600;line-height:1.2}
+  .hint{margin:8px 4px 0;font-size:11px;color:#9a6a5e;background:#fff8f4;border-radius:8px;padding:8px 10px;display:none}
+  .hint.show{display:block}
+  .stats{background:#fff;border-radius:15px;padding:12px;box-shadow:0 3px 10px rgba(45,55,85,.025)}
+  .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .stat{background:#fafbfe;border-radius:10px;padding:8px}
+  .stat .label{font-size:10px;color:#999}
+  .stat b{display:block;margin-top:3px;color:#ef5134;font-size:16px}
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+  .card{border:0;text-align:left;border-radius:12px;padding:10px;cursor:pointer;box-shadow:0 2px 8px rgba(42,48,70,.025)}
+  .card.academy{background:linear-gradient(180deg,#fff,#fff9f6)}
+  .card.activity{background:linear-gradient(180deg,#fff,#fffaf1)}
+  .card b{font-size:13px}
+  .cover{height:66px;border-radius:9px;margin-top:8px;padding:9px;color:#fff;position:relative}
+  .card.academy .cover{background:linear-gradient(135deg,#ff8b68,#ffb899)}
+  .card.activity .cover{background:linear-gradient(135deg,#ff9d38,#ff6d45)}
+  .cover small{font-size:9px;opacity:.9}
+  .cover strong{display:block;font-size:13px;margin-top:4px;width:80%}
+  .dots{display:flex;justify-content:center;gap:4px;margin-top:7px}
+  .dots i{width:12px;height:3px;border-radius:3px;background:#ffd8cf}
+  .dots i.on{background:#ff4d22}
+  .nav{position:absolute;left:0;right:0;bottom:0;height:74px;background:#fff;border-top:1px solid #eceef2;display:grid;grid-template-columns:repeat(5,1fr)}
+  .nav div{display:grid;place-items:center;align-content:center;font-size:9px;color:#758096}
+  .nav div.on{color:#ff4d22}
+  .sub{position:absolute;inset:0;background:#f6f7fb;transform:translateX(100%);transition:.25s;z-index:3;display:flex;flex-direction:column}
+  .sub.show{transform:none}
+  .sub head,.sub-head{height:48px;display:flex;align-items:center;gap:8px;padding:0 12px;background:#fff;font-weight:800}
+  .sub-head button{border:0;background:none;font-size:20px;cursor:pointer}
+  .sub p{margin:16px;color:#57606a;font-size:13px;line-height:1.6}
+  .notes{width:min(420px,100%);font-size:13px;line-height:1.55}
+  .notes h1{font-size:18px;margin:0 0 8px}
+  .notes table{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden}
+  .notes th,.notes td{border-bottom:1px solid #eceef3;padding:8px 10px;text-align:left;vertical-align:top}
+  .notes th{background:#f6f8fa;font-size:12px;color:#57606a}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="phone" id="phone">
+    <div class="statusbar"><span>12:40</span><span>▮▮ ◉</span></div>
+    <div class="top">
+      <div class="user-row">
+        <div class="user">
+          <div class="avatar">周</div>
+          <div>
+            <div class="name">小周</div>
+            <div class="tags"><span class="tag">新人创作者</span></div>
+          </div>
+        </div>
+        <div class="inbox">✉<span class="badge">2</span></div>
+      </div>
+      <div class="search"><span>⌕　搜索项目 / 课程</span><b>搜索</b></div>
+    </div>
+    <div class="banner">
+      <div class="eyebrow">本周主推</div>
+      <h2>先看清项目<br/>再决定怎么做</h2>
+      <button class="cta" type="button">去看看</button>
+      <div class="emoji">🐆</div>
+    </div>
+    <div class="section">
+      <div class="shortcut" id="grid">
+        <button type="button" data-go="stay" data-name="新手学院"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="sgBook" x1="3" y1="4" x2="21" y2="20" gradientUnits="userSpaceOnUse"><stop stop-color="#ff9a6a"/><stop offset="1" stop-color="#e83a12"/></linearGradient></defs><path fill="url(#sgBook)" d="M3.2 6.1c2.2-1.1 4.3-.8 6.3.6v12.1c-2-1.2-4.1-1.3-6.3-.4V6.1z"/><path fill="url(#sgBook)" opacity=".82" d="M20.8 6.1c-2.2-1.1-4.3-.8-6.3.6v12.1c2-1.2 4.1-1.3 6.3-.4V6.1z"/><path fill="#fff" opacity=".72" d="M11.15 7.1h1.7v10.6h-1.7z"/></svg></span><span>新手学院</span></button>
+        <button type="button" data-go="opc" data-name="收益榜单"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="sgRank" x1="4" y1="20" x2="20" y2="4" gradientUnits="userSpaceOnUse"><stop stop-color="#ffb07a"/><stop offset="1" stop-color="#ff3d18"/></linearGradient></defs><rect x="4" y="13" width="4" height="7" rx="1.4" fill="url(#sgRank)" opacity=".55"/><rect x="10" y="8.5" width="4" height="11.5" rx="1.4" fill="url(#sgRank)" opacity=".8"/><rect x="16" y="4.5" width="4" height="15.5" rx="1.4" fill="url(#sgRank)"/></svg></span><span>收益榜单</span></button>
+        <button type="button" data-go="org" data-name="社群中心"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="sgOrg" x1="4" y1="4" x2="20" y2="20" gradientUnits="userSpaceOnUse"><stop stop-color="#ffb089"/><stop offset="1" stop-color="#ff4a22"/></linearGradient></defs><circle cx="8.2" cy="8" r="2.5" fill="url(#sgOrg)"/><circle cx="15.6" cy="8.4" r="2.15" fill="url(#sgOrg)" opacity=".8"/><path fill="url(#sgOrg)" d="M3.6 18.2c.5-2.7 2.4-4 4.6-4s4.1 1.3 4.6 4v.6H3.6v-.6z"/><path fill="url(#sgOrg)" opacity=".75" d="M12.2 18.4c.4-2.2 2-3.4 3.8-3.4 1.7 0 3.2 1.1 3.7 3.2v.6h-7.5v-.4z"/></svg></span><span>社群中心</span></button>
+        <button type="button" data-go="invite" data-name="邀请好友"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="sgInvite" x1="4" y1="3" x2="20" y2="21" gradientUnits="userSpaceOnUse"><stop stop-color="#ff9a70"/><stop offset="1" stop-color="#ff3414"/></linearGradient></defs><circle cx="9.2" cy="8.2" r="2.7" fill="url(#sgInvite)"/><path fill="url(#sgInvite)" d="M3.8 18.4c.6-2.8 2.5-4.3 5.4-4.3s4.8 1.5 5.4 4.3v.6H3.8v-.6z"/><circle cx="17.5" cy="7.4" r="3.5" fill="#fff"/><path d="M17.5 5.6v3.6M15.7 7.4h3.6" stroke="url(#sgInvite)" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg></span><span>邀请好友</span></button>
+      </div>
+      <div class="hint" id="hint">新手学院落点未定。这次点击留在首页，不进入商学院。</div>
+    </div>
+    <div class="section stats">
+      <div class="stats-grid">
+        <div class="stat"><div class="label">今日预计收益</div><b>128.00</b></div>
+        <div class="stat"><div class="label">任务数</div><b>3</b></div>
+        <div class="stat"><div class="label">可提现</div><b>86.00</b></div>
+      </div>
+    </div>
+    <div class="section cards">
+      <button class="card academy" type="button" id="openAcademy">
+        <b>🎓 商学院</b>
+        <div class="cover"><small>新人必看</small><strong>从接项目到结算</strong></div>
+        <div class="dots"><i class="on"></i><i></i></div>
+      </button>
+      <button class="card activity" type="button">
+        <b>🔥 活动中心</b>
+        <div class="cover"><small>限时</small><strong>本周收益加成</strong></div>
+        <div class="dots"><i class="on"></i><i></i></div>
+      </button>
+    </div>
+    <div class="nav">
+      <div class="on">首页</div><div>变现</div><div>工具</div><div>数据</div><div>我的</div>
+    </div>
+    <div class="sub" id="sub">
+      <div class="sub-head"><button type="button" id="back">‹</button><span id="subTitle">商学院</span></div>
+      <p id="subBody"></p>
+    </div>
+  </div>
+  <aside class="notes">
+    <h1>首页稿 · 金刚区</h1>
+    <p>位置在 Banner 正下方、三格数据之上。学习卡标题是「商学院」。首页没有路径气泡，也没有绑定邀请码。</p>
+    <table>
+      <thead><tr><th>入口</th><th>点击之后</th></tr></thead>
+      <tbody>
+        <tr><td>新手学院</td><td>留在首页</td></tr>
+        <tr><td>收益榜单</td><td>现有 OPC 经营榜单</td></tr>
+        <tr><td>社群中心</td><td>现有机构详情页列表</td></tr>
+        <tr><td>邀请好友</td><td>现有邀请落地页</td></tr>
+        <tr><td>商学院卡</td><td>商学院</td></tr>
+      </tbody>
+    </table>
+  </aside>
+</div>
+<script>
+  const sub = document.getElementById('sub');
+  const title = document.getElementById('subTitle');
+  const body = document.getElementById('subBody');
+  const hint = document.getElementById('hint');
+  const pages = {
+    opc: ['OPC 经营榜单', '打开现有 OPC 经营榜单。与首页横滑榜里的 OPC 卡是同一页。'],
+    org: ['机构详情页列表', '打开现有机构详情页列表。本页不新建列表。'],
+    invite: ['邀请落地页', '打开现有邀请落地页。这不是首页的绑定邀请码。'],
+    academy: ['商学院', '学习卡的标题和这一页的标题都是「商学院」。频道、课程、直播仍走商学院体验合同。']
+  };
+  document.getElementById('grid').addEventListener('click', (event) => {
+    const button = event.target.closest('button');
+    if (!button) return;
+    if (button.dataset.go === 'stay') {
+      hint.classList.add('show');
+      sub.classList.remove('show');
+      return;
+    }
+    hint.classList.remove('show');
+    const page = pages[button.dataset.go];
+    title.textContent = page[0];
+    body.textContent = page[1];
+    sub.classList.add('show');
+  });
+  document.getElementById('openAcademy').addEventListener('click', () => {
+    hint.classList.remove('show');
+    title.textContent = pages.academy[0];
+    body.textContent = pages.academy[1];
+    sub.classList.add('show');
+  });
+  document.getElementById('back').addEventListener('click', () => sub.classList.remove('show'));
+</script>
+</body>
+</html>

@@ -1975,6 +1975,26 @@
 <div class="banner-emoji">😎</div>
 </div>
 </div>
+<style id="shortcut-grid-v127">
+#shortcutGrid{background:#fff;border-radius:16px;padding:16px 4px 14px;box-shadow:0 3px 10px rgba(45,55,85,.04);display:grid;grid-template-columns:repeat(4,1fr)}
+#shortcutGrid button{border:0;background:transparent;padding:0;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;color:#252836}
+#shortcutGrid .ico{width:44px;height:44px;border-radius:14px;position:relative;display:grid;place-items:center;overflow:hidden;background:linear-gradient(165deg,rgba(255,255,255,.7) 0%,rgba(255,228,214,.34) 48%,rgba(255,186,156,.28) 100%);border:1px solid rgba(255,255,255,.96);box-shadow:0 10px 18px rgba(255,88,46,.2),inset 0 1px 0 rgba(255,255,255,1),inset 0 -14px 18px rgba(255,96,48,.28);backdrop-filter:blur(16px) saturate(1.8);-webkit-backdrop-filter:blur(16px) saturate(1.8)}
+#shortcutGrid .ico::before{content:"";position:absolute;width:36px;height:36px;right:-6px;bottom:-8px;border-radius:50%;background:radial-gradient(circle,var(--glow,rgba(255,110,60,.98)),rgba(255,77,34,0) 70%);filter:blur(1px)}
+#shortcutGrid .ico::after{content:"";position:absolute;left:1px;right:1px;top:1px;height:42%;border-radius:13px 13px 10px 10px;background:linear-gradient(180deg,rgba(255,255,255,.92),rgba(255,255,255,0));pointer-events:none}
+#shortcutGrid button:nth-child(1) .ico{--glow:rgba(255,138,88,.98)}
+#shortcutGrid button:nth-child(2) .ico{--glow:rgba(255,92,36,.98)}
+#shortcutGrid button:nth-child(3) .ico{--glow:rgba(255,112,64,.98)}
+#shortcutGrid button:nth-child(4) .ico{--glow:rgba(255,64,40,.96)}
+#shortcutGrid svg{width:24px;height:24px;position:relative;z-index:1;display:block;filter:drop-shadow(0 1px 1px rgba(160,40,10,.18))}
+#shortcutGrid span{font-size:12px;font-weight:600;line-height:1.2}
+#pathFloat{display:none!important;visibility:hidden!important;pointer-events:none!important}
+</style>
+<div class="section" id="shortcutGrid">
+<button type="button" data-shortcut="newbie"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="sgBook" x1="3" y1="4" x2="21" y2="20" gradientUnits="userSpaceOnUse"><stop stop-color="#ff9a6a"/><stop offset="1" stop-color="#e83a12"/></linearGradient></defs><path fill="url(#sgBook)" d="M3.2 6.1c2.2-1.1 4.3-.8 6.3.6v12.1c-2-1.2-4.1-1.3-6.3-.4V6.1z"/><path fill="url(#sgBook)" opacity=".82" d="M20.8 6.1c-2.2-1.1-4.3-.8-6.3.6v12.1c2-1.2 4.1-1.3 6.3-.4V6.1z"/><path fill="#fff" opacity=".72" d="M11.15 7.1h1.7v10.6h-1.7z"/></svg></span><span>新手学院</span></button>
+<button type="button" data-shortcut="rank"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="sgRank" x1="4" y1="20" x2="20" y2="4" gradientUnits="userSpaceOnUse"><stop stop-color="#ffb07a"/><stop offset="1" stop-color="#ff3d18"/></linearGradient></defs><rect x="4" y="13" width="4" height="7" rx="1.4" fill="url(#sgRank)" opacity=".55"/><rect x="10" y="8.5" width="4" height="11.5" rx="1.4" fill="url(#sgRank)" opacity=".8"/><rect x="16" y="4.5" width="4" height="15.5" rx="1.4" fill="url(#sgRank)"/></svg></span><span>收益榜单</span></button>
+<button type="button" data-shortcut="org"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="sgOrg" x1="4" y1="4" x2="20" y2="20" gradientUnits="userSpaceOnUse"><stop stop-color="#ffb089"/><stop offset="1" stop-color="#ff4a22"/></linearGradient></defs><circle cx="8.2" cy="8" r="2.5" fill="url(#sgOrg)"/><circle cx="15.6" cy="8.4" r="2.15" fill="url(#sgOrg)" opacity=".8"/><path fill="url(#sgOrg)" d="M3.6 18.2c.5-2.7 2.4-4 4.6-4s4.1 1.3 4.6 4v.6H3.6v-.6z"/><path fill="url(#sgOrg)" opacity=".75" d="M12.2 18.4c.4-2.2 2-3.4 3.8-3.4 1.7 0 3.2 1.1 3.7 3.2v.6h-7.5v-.4z"/></svg></span><span>社群中心</span></button>
+<button type="button" data-shortcut="invite"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="sgInvite" x1="4" y1="3" x2="20" y2="21" gradientUnits="userSpaceOnUse"><stop stop-color="#ff9a70"/><stop offset="1" stop-color="#ff3414"/></linearGradient></defs><circle cx="9.2" cy="8.2" r="2.7" fill="url(#sgInvite)"/><path fill="url(#sgInvite)" d="M3.8 18.4c.6-2.8 2.5-4.3 5.4-4.3s4.8 1.5 5.4 4.3v.6H3.8v-.6z"/><circle cx="17.5" cy="7.4" r="3.5" fill="#fff"/><path d="M17.5 5.6v3.6M15.7 7.4h3.6" stroke="url(#sgInvite)" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg></span><span>邀请好友</span></button>
+</div>
 <div class="section stats">
 <div class="stats-grid">
 <div class="stat"><div class="label">今日预计收益</div><b>829.23</b><small>较昨日 <span style="color:#ff684a">上涨18%</span></small></div>
@@ -1983,7 +2003,7 @@
 </div>
 <div class="newbie-grid">
 <div class="newbie-card" data-carousel="academy">
-<div class="newbie-head"><b>学院中心</b><span>›</span></div>
+<div class="newbie-head"><b>商学院</b><span>›</span></div>
 <div class="newbie-slide active"><div class="newbie-cover"><div class="kicker">新人必看 · 3分钟上手</div><strong>右豹OPC经营入门指南</strong><i>🎓</i></div><div class="newbie-desc">从接项目到结算，快速跑通第一单</div></div>
 <div class="newbie-slide"><div class="newbie-cover"><div class="kicker">新手第2课</div><strong>如何挑选适合自己的项目</strong><i>🧭</i></div><div class="newbie-desc">看懂收益、门槛与项目难度</div></div>
 <div class="carousel-dots"><i class="active"></i><i></i></div>
@@ -2696,8 +2716,10 @@
 </div>
 
 <div class="app-page academy-center-page" id="academyCenterPage">
-  <div class="academy-header"><button id="academyBack" aria-label="返回">‹</button><b>学院中心</b><span></span></div>
+  <div class="academy-header"><button id="academyBack" aria-label="返回">‹</button><b>商学院</b><span></span></div>
   <div class="academy-body">
+    <label class="academy-search"><span class="sr-only">搜索课名、项目名称、分类</span><input id="academySearchInput" type="search" placeholder="搜索课名、项目名称、分类" autocomplete="off"></label>
+    <div class="academy-empty" id="academySearchEmpty" hidden>没有找到相关课程</div>
     <div class="academy-newbie" id="academyNewbie">
       <div class="academy-newbie-icon">豹</div>
       <div class="academy-newbie-copy"><b>新人第一次来右豹？</b><p>10分钟快速了解平台、项目与收益流程</p><button data-academy-open="新人入门">开始学习 ›</button></div>
@@ -2707,6 +2729,7 @@
       <button class="active" data-academy-tab="project"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"></rect><path d="m10 9 5 3-5 3z"></path></svg><span>项目教学</span></button>
       <button data-academy-tab="case"><svg viewBox="0 0 24 24"><path d="M5 4h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"></path><path d="M7 9h10M7 13h7M7 17h4"></path></svg><span>案例拆解</span></button>
       <button data-academy-tab="advanced"><svg viewBox="0 0 24 24"><path d="M4 17 10 11l4 3 6-7"></path><path d="M15 7h5v5"></path></svg><span>进阶技巧</span></button>
+      <button data-academy-tab="live"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M7 8a7 7 0 0 0 0 8M17 8a7 7 0 0 1 0 8"></path></svg><span>直播课程</span></button>
       <button data-academy-tab="mine"><svg viewBox="0 0 24 24"><path d="M5 4.5A2.5 2.5 0 0 1 7.5 2H19v17H7.5A2.5 2.5 0 0 0 5 21.5z"></path><path d="M5 4.5v17M9 7h6M9 11h6"></path></svg><span>我的学习</span></button>
     </div>
     <div id="academyNormalList" class="academy-list">
@@ -2718,6 +2741,10 @@
       <div class="academy-course academy-hidden" data-kind="case" data-course-type="gallery" data-course-title="一条作品是怎么跑到10W+的？"><div class="academy-cover ac-dark"><small>爆款案例</small><strong>10W+作品<br>完整拆解</strong></div><div class="academy-info"><b>一条作品是怎么跑到10W+的？</b><p><i>爆款拆解</i> 12分钟</p></div><span>›</span></div>
       <div class="academy-course academy-hidden" data-kind="advanced" data-course-type="gallery" data-course-title="如何提高作品出单率？"><div class="academy-cover ac-green"><small>进阶技巧</small><strong>提升<br>作品出单率</strong></div><div class="academy-info"><b>如何提高作品出单率？</b><p><i>运营技巧</i> 图文 · 5分钟</p></div><span>›</span></div>
       <div class="academy-course academy-hidden" data-kind="advanced" data-course-type="video" data-course-title="账号运营中的5个关键动作"><div class="academy-cover ac-orange"><small>进阶技巧</small><strong>账号运营<br>实战方法</strong></div><div class="academy-info"><b>账号运营中的5个关键动作</b><p><i>运营技巧</i> 视频 · 9分钟</p></div><span>›</span></div>
+      <div class="academy-course academy-live academy-hidden" data-kind="live" data-course-type="live" data-course-title="番茄小说开播说明会" data-project="番茄小说" data-platform="抖音" data-live-time="10月12日 20:00" data-live-state="pending" data-live-url="https://live.douyin.com/" data-replay-url="" data-views="860" data-favs="42"><div class="academy-cover ac-orange"><small>直播课程</small><strong>番茄小说<br>开播说明会</strong><span class="live-status is-pending">待开始</span></div><div class="academy-info"><b>番茄小说开播说明会</b><p>抖音 · 10月12日 20:00</p><p class="course-stats"><span>观看 860</span><span>收藏 42</span></p></div><span>›</span></div>
+      <div class="academy-course academy-live academy-hidden" data-kind="live" data-course-type="live" data-course-title="知乎故事实战答疑" data-project="知乎故事" data-platform="飞书" data-live-time="" data-live-state="live" data-live-url="https://meetings.feishu.cn/" data-replay-url="" data-views="1288" data-favs="76"><div class="academy-cover ac-blue"><small>直播课程</small><strong>知乎故事<br>实战答疑</strong><span class="live-status is-live"><i class="live-status-dot" aria-hidden="true"></i>直播中</span></div><div class="academy-info"><b>知乎故事实战答疑</b><p>飞书 · 正在直播</p><p class="course-stats"><span>观看 1,288</span><span>收藏 76</span></p></div><span>›</span></div>
+      <div class="academy-course academy-live academy-hidden" data-kind="live" data-course-type="live" data-course-title="红果短剧复盘" data-project="红果短剧" data-platform="企业微信" data-live-time="10月8日 19:00" data-live-state="ended" data-live-url="" data-replay-url="https://work.weixin.qq.com/" data-views="2104" data-favs="133"><div class="academy-cover ac-red"><small>直播课程</small><strong>红果短剧<br>复盘</strong><span class="live-status is-ended">直播已结束</span></div><div class="academy-info"><b>红果短剧复盘</b><p>企业微信 · 10月8日 19:00</p><p class="course-stats"><span>观看 2,104</span><span>收藏 133</span></p></div><span>›</span></div>
+      <div class="academy-course academy-live academy-hidden" data-kind="live" data-course-type="live" data-course-title="右豹OPC晚课" data-project="右豹OPC" data-platform="企业微信" data-live-time="" data-live-state="reserved" data-live-url="https://work.weixin.qq.com/" data-replay-url="" data-views="540" data-favs="31" id="academyReservedLive"><div class="academy-cover ac-dark"><small>直播课程</small><strong>右豹OPC<br>晚课</strong><span class="live-status is-pending">待开始</span></div><div class="academy-info"><b>右豹OPC晚课</b><p class="live-when">企业微信 · 即将开播</p><p class="course-stats"><span>观看 540</span><span>收藏 31</span></p></div><span>›</span></div>
     </div>
     <div class="academy-mine" id="academyMine">
       <div class="academy-mine-tabs"><button class="active" data-academy-mine="recent">最近学习</button><button data-academy-mine="fav">我的收藏</button></div>
@@ -2733,10 +2760,26 @@
   </div>
 </div>
 
+<div class="app-page" id="messagePage">
+  <div class="academy-header"><button id="messageBack" type="button" aria-label="返回">‹</button><b>消息</b><span></span></div>
+  <div class="msg-list" id="messageList"></div>
+</div>
+<div class="live-leave" id="liveLeave" hidden>
+  <div class="live-leave-card" role="dialog" aria-modal="true" aria-labelledby="liveLeaveTitle">
+    <b id="liveLeaveTitle">即将离开右豹</b>
+    <p id="liveLeaveCopy"></p>
+    <div class="live-leave-actions"><button type="button" id="liveLeaveStay">留下</button><button type="button" id="liveLeaveGo">继续</button></div>
+  </div>
+</div>
 <div class="app-page academy-course-detail-page" id="academyCourseDetailPage">
   <div class="acd-header"><button id="academyCourseBack" aria-label="返回">‹</button><b>课程详情</b><button id="academyCourseFav" class="acd-fav" aria-label="收藏">☆</button></div>
   <div class="acd-scroll">
-    <section class="acd-hero"><h1 id="acdTitle">知乎故事项目完整教学</h1><div class="acd-tags"><span>项目教学</span><i id="acdType">图文课程</i></div><p id="acdDesc">从项目领取、作品发布到回填收益，带你完整了解项目的实际操作流程。</p></section>
+    <section class="acd-hero"><h1 id="acdTitle">知乎故事项目完整教学</h1><div class="acd-tags"><span>项目教学</span><i id="acdType">图文课程</i></div><p id="acdDesc">从项目领取、作品发布到回填收益，带你完整了解项目的实际操作流程。</p><p class="acd-stats" id="acdStats">观看 <b id="acdViews">0</b> · 收藏 <b id="acdFavs">0</b></p></section>
+    <section class="acd-live" id="acdLive" hidden>
+      <p class="acd-live-plat" id="acdLivePlat"></p>
+      <p class="acd-live-time" id="acdLiveTime"></p>
+      <button type="button" class="live-act" id="acdLiveAct" data-live-act>查看</button>
+    </section>
     <section class="acd-content">
       <div id="acdGallery" class="acd-article">
         <p class="acd-copy" id="acdCopyA">知乎故事适合刚开始做项目的人。先在变现页确认项目规则、可发平台和结算方式，再领取作品与关键词，按要求发布并保留作品链接。</p>
@@ -2775,6 +2818,7 @@
           <div class="acd-vzoom-toast" id="acdZoomToast" hidden aria-live="polite">100%</div>
         </div>
         <div class="acd-video-note" id="acdVideoNote">上次观看至 03:16 · 点击播放可继续观看</div>
+        <button type="button" class="acd-live-cta" id="acdLiveCta" hidden>预约</button>
       </div>
     </section>
     <section class="acd-recommend">
@@ -2920,6 +2964,8 @@
   $('#searchBtn').onclick=()=>{const v=$('#searchInput').value.trim(); toast(v?'正在搜索：'+v:'请输入项目或任务名称');};
   $('#searchInput').addEventListener('keydown',e=>{if(e.key==='Enter')$('#searchBtn').click();});
   $$('[data-action]').forEach(el=>el.addEventListener('click',()=>{ const map={message:'打开消息中心',training:'进入公益培训课',guide:'打开OPC经营入门指南',community:'正在打开官方群',rankMore:'查看完整榜单',feedMore:'查看全部动态',orgMore:'查看全部服务机构'}; toast(map[el.dataset.action]||'已点击'); }));
+  const shortcutMap={newbie:'新手学院落点未定，留在首页',rank:'打开「OPC经营数据榜」完整榜单',org:'打开机构详情页列表',invite:'打开邀请落地页'};
+  $$('#shortcutGrid [data-shortcut]').forEach(btn=>btn.addEventListener('click',()=>toast(shortcutMap[btn.dataset.shortcut])));
   $('#bottomNav').onclick=e=>{const n=e.target.closest('.nav-item');if(!n)return;$$('.nav-item').forEach(x=>x.classList.remove('active'));n.classList.add('active');toast('切换到「'+n.dataset.nav+'」');};
   const toTop=$('#toTop'); window.addEventListener('scroll',()=>toTop.classList.toggle('show',window.scrollY>500)); toTop.onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
 </script>
@@ -5922,6 +5968,7 @@ document.getElementById('marketList').innerHTML=toolMocks.map((x,i)=>`<div class
   const app=document.getElementById('app');
   const home=document.getElementById('homePage');
   if(!app||!home||document.getElementById('v113InviteEntry'))return;
+  return;
 
   /* Insert one new component only. Do not rewrite any existing homepage node. */
   const entry=document.createElement('div');
@@ -6086,6 +6133,56 @@ document.getElementById('marketList').innerHTML=toolMocks.map((x,i)=>`<div class
 #academyCenterPage .academy-list{padding-top:4px}.academy-course{width:100%;padding:13px 0;display:grid;grid-template-columns:108px minmax(0,1fr) 16px;gap:11px;align-items:center;border-bottom:1px solid #f0f1f2;cursor:pointer}.academy-course.academy-hidden{display:none!important}.academy-cover{width:108px;height:66px;border-radius:11px;padding:9px;color:#fff;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}.academy-cover:after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.12),transparent)}.academy-cover>*{position:relative;z-index:1}.academy-cover small{font-size:8px;opacity:.83;font-weight:700}.academy-cover strong{font-size:12px;line-height:14px}.ac-blue{background:linear-gradient(145deg,#2869c5,#6f9fe2)}.ac-orange{background:linear-gradient(145deg,#f16641,#ff9d73)}.ac-red{background:linear-gradient(145deg,#e94e40,#fb8669)}.ac-purple{background:linear-gradient(145deg,#594b98,#927fd0)}.ac-dark{background:linear-gradient(145deg,#2d323a,#68717e)}.ac-green{background:linear-gradient(145deg,#34774f,#72a980)}.academy-info>b{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:12.5px;font-weight:800;line-height:18px}.academy-info>p{font-size:9px;color:#9ea4ac;margin:6px 0 0}.academy-info>p i{font-style:normal;padding:2px 5px;border-radius:5px;background:#f5f6f7;color:#7f858d;margin-right:4px}.academy-course>span{font-size:17px;color:#c8ccd1}.academy-mine{display:none}.academy-mine.active{display:block}.academy-mine-tabs{height:42px;display:flex;align-items:end;gap:22px;border-bottom:1px solid #f0f1f2}.academy-mine-tabs button{height:42px;border:0;background:transparent;padding:0;position:relative;font-size:10.5px;color:#969ca4;font-weight:700}.academy-mine-tabs button.active{color:#30353d;font-weight:900}.academy-mine-tabs button.active:after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:2px;border-radius:2px;background:#ef6b3c}.academy-mine-panel{display:none}.academy-mine-panel.active{display:block}.academy-progress{height:4px;border-radius:4px;background:#f0f1f2;margin-top:7px;overflow:hidden}.academy-progress i{display:block;height:100%;background:#ed7146;border-radius:4px}.academy-info>em{display:block;font-style:normal;font-size:8.5px;color:#9da3ab;margin-top:4px}
 </style>
 
+
+<style id="academy-opt-2026-10-10-style">
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+#academyCenterPage .academy-search{display:block;margin:0 0 12px}
+#academyCenterPage .academy-search input{width:100%;height:36px;border-radius:9999px;border:1px solid #eceef3;background:#f6f7fb;padding:0 14px;font-size:12px;color:#252836}
+#academyCenterPage .academy-empty{padding:28px 8px;text-align:center;color:#9498a8;font-size:12px}
+#academyCenterPage.is-searching #academyNormalList{display:block!important}
+#academyCenterPage.is-searching #academyMine{display:block!important}
+#academyCenterPage.is-searching .academy-mine-panel{display:block!important}
+#academyCenterPage.is-searching .academy-mine-tabs{display:none}
+#academyCenterPage .academy-channel-nav{grid-template-columns:repeat(5,1fr)!important;height:auto}
+.course-stats{display:flex;gap:10px;margin:4px 0 0;font-size:10px;color:#9498a8;font-weight:500}
+.live-act{margin-top:6px;height:26px;padding:0 12px;border:0;border-radius:9999px;background:#ff4d22;color:#fff;font-size:11px;font-weight:800}
+.live-act.is-reserved,.live-act:disabled{background:#fff1ec;color:#ff4d22}
+.live-status{position:absolute;top:6px;right:6px;z-index:2;display:inline-flex;align-items:center;gap:3px;height:16px;padding:0 5px;border-radius:4px;background:rgba(0,0,0,.55);color:#fff;font-size:8px;font-weight:800;line-height:16px;white-space:nowrap}
+.live-status.is-live{background:#ff3157}
+.live-status-dot{width:5px;height:5px;border-radius:50%;background:#fff;box-shadow:0 0 0 0 rgba(255,255,255,.75);animation:livePulse 1.2s ease-out infinite}
+.acd-live-cta{display:flex;align-items:center;justify-content:center;width:100%;height:40px;margin-top:12px;border:0;border-radius:999px;background:#ff4d22;color:#fff;font-size:15px;font-weight:800}
+.acd-live-cta[hidden]{display:none!important}
+.acd-live-cta.is-reserved,.acd-live-cta:disabled{background:#fff1ec;color:#ff4d22}
+#academyCourseDetailPage.is-live-course .acd-duration{display:none}
+#academyCourseDetailPage.is-live-course.is-before .acd-play{visibility:hidden;pointer-events:none}
+.live-dot{position:absolute;top:8px;right:8px;z-index:2;width:8px;height:8px;border-radius:50%;background:#ff3157;box-shadow:0 0 0 0 rgba(255,49,87,.6);animation:livePulse 1.2s ease-out infinite}
+@keyframes livePulse{70%{box-shadow:0 0 0 6px rgba(255,49,87,0)}100%{box-shadow:0 0 0 0 rgba(255,49,87,0)}}
+@media (prefers-reduced-motion: reduce){.live-dot{animation:none}}
+.acd-stats{margin:8px 0 0;font-size:10px;color:#9498a8}
+.acd-stats b{font-weight:800;color:#252836}
+.acd-live{background:#fff;margin-top:9px;padding:16px 15px 18px}
+.acd-live-plat{margin:0;font-size:13px;font-weight:800}
+.acd-live-time{margin:6px 0 0;font-size:12px;color:#9498a8}
+#academyCourseDetailPage.is-live-course .acd-vcontrols,
+#academyCourseDetailPage.is-live-course .acd-vzoom,
+#academyCourseDetailPage.is-live-course #acdExpandBtn{display:none!important}
+#academyCourseDetailPage.is-live-course.is-on-air .acd-vpreview-badge::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:#ff3157;margin-right:4px;vertical-align:1px;animation:livePulse 1.2s ease-out infinite}
+#academyCourseDetailPage.is-live-course .acd-live{display:none}
+#messagePage{background:#fff;z-index:40}
+#messagePage.active ~ #bottomNav,#messagePage.active ~ .bottom-nav{display:none!important;visibility:hidden!important;pointer-events:none!important}
+.msg-list{padding:8px 15px 24px}
+.msg-item,.msg-empty{display:block;width:100%;text-align:left;border:0;background:#fff;border-bottom:1px solid #f0f1f2;padding:14px 0;font-size:13px;color:#252836}
+.msg-item small{display:block;margin-top:4px;color:#9498a8;font-size:11px}
+.msg-empty{color:#9498a8;text-align:center;border:0;padding-top:40px}
+.live-leave{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.32);display:flex;align-items:flex-end;justify-content:center}
+.live-leave[hidden]{display:none}
+.live-leave-card{width:min(390px,100%);background:#fff;border-radius:12px 12px 0 0;padding:18px 16px 22px}
+.live-leave-card b{font-size:15px}
+.live-leave-card p{margin:8px 0 0;font-size:12px;color:#9498a8;line-height:1.5}
+.live-leave-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+.live-leave-actions button{height:34px;padding:0 14px;border-radius:9999px;border:0;background:#f6f7fb;font-size:12px;font-weight:800}
+#liveLeaveGo{background:#ff4d22;color:#fff}
+</style>
 <script id="academy-center-v117-script">
 (function(){
  const page=document.getElementById('academyCenterPage'),home=document.getElementById('homePage'),card=document.querySelector('.newbie-card[data-carousel="academy"]'); if(!page||!home||!card)return;
@@ -6172,7 +6269,7 @@ document.getElementById('marketList').innerHTML=toolMocks.map((x,i)=>`<div class
  const tagSpan=document.querySelector('#academyCourseDetailPage .acd-tags span');
  const gallery=document.getElementById('acdGallery'),video=document.getElementById('acdVideo'),videoTitle=document.getElementById('acdVideoTitle');
  const recList=document.getElementById('acdRecommendList'),recEmpty=document.getElementById('acdRecommendEmpty');
- const kindLabels=window.__academyKindLabels={project:'项目教学',case:'案例拆解',advanced:'进阶技巧'};
+ const kindLabels=window.__academyKindLabels={project:'项目教学',case:'案例拆解',advanced:'进阶技巧',live:'直播课程'};
  const coverClass=['ac-blue','ac-orange','ac-red','ac-purple','ac-dark','ac-green'];
  const catalog=new Map();
  document.querySelectorAll('#academyCenterPage .academy-course[data-course-type]').forEach(function(el){
@@ -6192,7 +6289,7 @@ document.getElementById('marketList').innerHTML=toolMocks.map((x,i)=>`<div class
    if(!recList)return;
    const currentTitle=current.dataset.courseTitle||current.querySelector('.academy-info b')?.textContent;
    const kind=current.dataset.kind||'project';
-   const pool=[...catalog.values()].filter(c=>c.title!==currentTitle);
+   const pool=[...catalog.values()].filter(c=>c.title!==currentTitle&&c.type!=='live');
    const same=pool.filter(c=>c.kind===kind);
    const other=pool.filter(c=>c.kind!==kind);
    const picks=same.concat(other).slice(0,4);
@@ -6249,6 +6346,7 @@ document.getElementById('marketList').innerHTML=toolMocks.map((x,i)=>`<div class
      window.__acdVideoConfigure({title:name,kicker:kindLabels[kind]||'课程',durationLabel:dur,resumeSec:resume});
    }else if(window.__acdVideoReset){window.__acdVideoReset()}
    renderRecommendations(el);
+   if(window.__academyPaintLiveDetail) window.__academyPaintLiveDetail(el);
  }
  window.__academyOpenCourse=openCourse;
  document.querySelectorAll('#academyCenterPage .academy-course[data-course-type]').forEach(function(el){
@@ -6292,7 +6390,7 @@ document.getElementById('marketList').innerHTML=toolMocks.map((x,i)=>`<div class
      if(timeDur)timeDur.textContent=fmt(durationSec);
      if(durBadge)durBadge.textContent=fmt(durationSec);
      if(progWrap)progWrap.setAttribute('aria-valuenow',String(Math.round(pct)));
-     if(note&&!playing&&currentSec>0)note.textContent='上次观看至 '+fmt(currentSec)+' · 点击播放可继续观看';
+     if(note&&!playing)note.textContent=currentSec>0?('上次观看至 '+fmt(currentSec)+' · 点击播放可继续观看'):'点击播放开始观看';
    }
    function stopTick(){if(tick){clearInterval(tick);tick=null}}
    function pause(){playing=false;stopTick();player.classList.remove('is-playing');if(controls)controls.hidden=false;if(pauseBtn)pauseBtn.textContent='▶'}
@@ -6498,7 +6596,7 @@ body.rb-embed-fr.rb-admin-mode{background:#f5f6f8!important}
   const aBtn=document.getElementById('rbViewAdmin');
   const ctx=document.getElementById('rbDemoContext');
   const root=adminHost.attachShadow({mode:'open'});
-  root.innerHTML="<style>\n*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,\"PingFang SC\",\"Microsoft YaHei\",sans-serif;background:#f5f6f8;color:#25282d;font-size:14px}\nbutton,input,select,textarea{font:inherit}.shell{display:grid;grid-template-columns:220px 1fr;min-height:100vh}.side{background:#17191d;color:#fff;padding:22px 14px}.brand{font-size:20px;font-weight:900;padding:0 12px 24px}.brand small{display:block;font-size:10px;color:#777d87;margin-top:5px;font-weight:500}.menu-title{font-size:11px;color:#686e77;padding:14px 12px 7px}.menu{height:44px;border-radius:9px;padding:0 12px;display:flex;align-items:center;gap:10px;color:#aeb3bb;font-size:13px;margin-bottom:4px;cursor:pointer}.menu:hover{background:#22252a}.menu.on{background:#ee6a3b;color:#fff;font-weight:800}.menu i{font-style:normal;width:18px;text-align:center}.main{min-width:0}.top{height:64px;background:#fff;border-bottom:1px solid #e9eaec;display:flex;align-items:center;justify-content:space-between;padding:0 26px;position:sticky;top:0;z-index:10}.crumb{font-size:13px;color:#92979f}.user{font-size:12px;color:#747a82}.content{padding:24px 26px}.pagehead{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px}.pagehead h1{font-size:24px;margin:0;font-weight:900}.pagehead p{font-size:12px;color:#999fa6;margin:6px 0 0}.primary{border:0;background:#ed693a;color:#fff;height:38px;padding:0 18px;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer}.secondary{height:38px;border:1px solid #dddfe2;background:#fff;border-radius:8px;padding:0 16px;font-size:12px;cursor:pointer}.danger{color:#d64d3d}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}.stat{background:#fff;border:1px solid #e9eaec;border-radius:11px;padding:16px}.stat span{font-size:11px;color:#969ca4}.stat b{display:block;font-size:24px;margin-top:6px}.filter{background:#fff;border:1px solid #e9eaec;border-radius:11px;padding:14px;display:flex;gap:9px;align-items:center;margin-bottom:14px;flex-wrap:wrap}.input,.select{height:34px;border:1px solid #dddfe3;border-radius:7px;background:#fff;padding:0 10px;font-size:12px;color:#60666e}.input{width:210px}.select{width:130px}.search{height:34px;border:0;border-radius:7px;background:#2c3036;color:#fff;padding:0 14px;font-size:12px;cursor:pointer}.reset{border:0;background:transparent;color:#8e949b;font-size:12px;cursor:pointer}.tablebox{background:#fff;border:1px solid #e8e9eb;border-radius:11px;overflow:auto}.table{width:100%;border-collapse:collapse;font-size:12px;min-width:1050px}.table th{height:42px;text-align:left;background:#fafafa;color:#858b93;font-weight:700;padding:0 12px;border-bottom:1px solid #ececef;white-space:nowrap}.table td{padding:12px;border-bottom:1px solid #f0f1f2;vertical-align:middle}.coursecell{display:flex;align-items:center;gap:9px;min-width:220px}.cover{width:62px;height:38px;border-radius:7px;display:grid;place-items:center;color:#fff;font-size:9px;font-weight:800;flex:none}.c1{background:linear-gradient(135deg,#3977c9,#80a9e2)}.c2{background:linear-gradient(135deg,#ee6940,#ff9b74)}.c3{background:linear-gradient(135deg,#6551a0,#a084d1)}.c4{background:linear-gradient(135deg,#387653,#7bad8b)}.name{font-weight:800;font-size:12px}.id{font-size:10px;color:#aaa;margin-top:3px}.badge{display:inline-block;padding:4px 7px;border-radius:5px;font-size:10px;background:#f4f5f6;color:#70767e}.status{display:flex;align-items:center;gap:6px;white-space:nowrap}.dot{width:7px;height:7px;border-radius:50%;background:#40ad70}.dot.off{background:#aaa}.dot.draft{background:#e8a63b}.ops{display:flex;gap:10px;white-space:nowrap}.link{border:0;background:transparent;color:#e66739;font-size:11px;padding:0;cursor:pointer}.gray{color:#777d85}.page{display:none}.page.on{display:block}.formbox{background:#fff;border:1px solid #e8e9eb;border-radius:11px;padding:22px;max-width:980px}.formtitle{font-size:16px;font-weight:900;padding-bottom:14px;border-bottom:1px solid #eee;margin-bottom:18px}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:17px 22px}.field label{display:block;font-size:12px;font-weight:750;margin-bottom:7px}.req{color:#ef6537}.field input,.field select,.field textarea{width:100%;border:1px solid #dfe1e4;border-radius:8px;padding:0 11px;font-size:12px;background:#fff}.field input,.field select{height:38px}.field textarea{height:82px;padding-top:10px;resize:none}.full{grid-column:1/-1}.upload{height:92px;border:1px dashed #cfd2d6;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#9ca1a8;font-size:11px;background:#fafafa;cursor:pointer}.upload b{font-size:23px;font-weight:400;color:#bbb;margin-bottom:4px}.radio{display:flex;gap:9px}.radio button{height:38px;border:1px solid #dedfe2;background:#fff;border-radius:8px;padding:0 18px;font-size:12px;color:#777;cursor:pointer}.radio button.on{border-color:#ef7041;background:#fff5f0;color:#e76739;font-weight:800}.contenteditor{margin-top:21px;border-top:1px solid #eee;padding-top:19px}.editorhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.editorhead b{font-size:14px}.editorhead span{font-size:11px;color:#999}.galleryrow{border:1px solid #e7e8ea;border-radius:9px;padding:11px;display:grid;grid-template-columns:28px 105px 1fr 60px;gap:11px;align-items:center;margin-bottom:9px}.drag{color:#bbb;font-size:15px;cursor:grab}.thumb{height:62px;border-radius:8px;background:linear-gradient(135deg,#ee6a40,#ff9b73);color:#fff;display:grid;place-items:center;font-size:10px}.caption{height:34px;border:1px solid #e0e2e4;border-radius:7px;padding:0 9px;font-size:11px}.del{border:0;background:transparent;color:#e66a43;font-size:11px;cursor:pointer}.addimg{height:38px;border:1px dashed #ef9b7c;background:#fff8f4;color:#e76b3d;border-radius:8px;width:100%;font-size:12px;cursor:pointer}.videoeditor{display:none}.videoarea{border:1px dashed #d5d7da;background:#fafafa;border-radius:10px;padding:17px;display:flex;align-items:center;gap:15px}.videothumb{width:150px;height:86px;border-radius:9px;background:#2d3239;color:#fff;display:grid;place-items:center;font-size:25px}.videoinfo b{font-size:12px}.videoinfo p{font-size:11px;color:#999;margin:6px 0}.foot{margin-top:20px;padding-top:16px;border-top:1px solid #eee;display:flex;justify-content:flex-end;gap:9px}.catrow{background:#fff;border:1px solid #e8e9eb;border-radius:10px;padding:14px 16px;display:grid;grid-template-columns:40px 1fr 110px 100px 140px 140px;align-items:center;margin-bottom:9px;font-size:12px}.caticon{width:31px;height:31px;border-radius:8px;background:#fff1ea;color:#e86839;display:grid;place-items:center}.switch{width:34px;height:19px;border-radius:10px;background:#ec6c3e;position:relative;cursor:pointer}.switch:after{content:'';width:15px;height:15px;background:#fff;border-radius:50%;position:absolute;right:2px;top:2px}.switch.off{background:#c7c9cc}.switch.off:after{left:2px;right:auto}.hint{font-size:11px;color:#999;margin-top:13px}.emptybox{padding:40px;text-align:center;color:#aaa}.toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%);background:#24282e;color:#fff;padding:9px 16px;border-radius:20px;font-size:11px;opacity:0;transition:.2s;z-index:99;pointer-events:none}.toast.show{opacity:1}.newbie-list{margin-top:8px}.analytics-note{background:#fff9f5;border:1px solid #f5ded3;color:#8a6a5c;padding:12px 14px;border-radius:9px;font-size:11px;margin-bottom:14px}\n.kb-notice{max-width:920px;line-height:1.85;font-size:13px;color:#4a5058}.kb-notice p{margin:0 0 12px}.kb-notice ul{margin:8px 0 0;padding-left:18px;color:#60666e;font-size:12px;line-height:1.75}\n@media(max-width:900px){.shell{grid-template-columns:170px 1fr}.stats{grid-template-columns:repeat(2,1fr)}.formgrid{grid-template-columns:1fr}.full{grid-column:auto}.content{padding:18px}.catrow{grid-template-columns:38px 1fr 90px 100px}.catrow>*:nth-child(3),.catrow>*:nth-child(4){display:none}}\n</style>\n<div class=\"shell\">\n<aside class=\"side\">\n  <div class=\"brand\">\u53f3\u8c79\u7ba1\u7406\u540e\u53f0<small>RIGHTBAO ADMIN</small></div>\n  <div class=\"menu-title\">\u5b66\u9662\u4e2d\u5fc3</div>\n  <div class=\"menu on\" data-page=\"courses\"><i>\u25a4</i>\u8bfe\u7a0b\u7ba1\u7406</div>\n  <div class=\"menu\" data-page=\"categories\"><i>\u25a6</i>\u5206\u7c7b\u7ba1\u7406</div>\n  <div class=\"menu-title\">\u5176\u4ed6\u4e1a\u52a1</div>\n  <div class=\"menu\"><i>\u25c7</i>\u9879\u76ee\u7ba1\u7406</div>\n  <div class=\"menu\"><i>\u2318</i>\u5de5\u5177\u7ba1\u7406</div>\n</aside>\n<main class=\"main\">\n<header class=\"top\"><div class=\"crumb\" id=\"crumb\">\u5b66\u9662\u4e2d\u5fc3 / \u8bfe\u7a0b\u7ba1\u7406</div><div class=\"user\">\u8fd0\u8425\u7ba1\u7406\u5458 \u25be</div></header>\n<div class=\"content\">\n\n<section class=\"page on\" id=\"courses\">\n<div class=\"pagehead\"><div><h1>\u8bfe\u7a0b\u7ba1\u7406</h1><p>\u672c\u529f\u80fd\u590d\u7528\u73b0\u6709\u300c\u77e5\u8bc6\u5e93\u7ba1\u7406\u300d\uff0c\u672c FR \u4e0d\u5355\u72ec\u5efa\u8bfe\u7a0b CRUD \u9875\u9762\u3002</p></div></div>\n<div class=\"formbox kb-notice\">\n<p><strong>\u5b9e\u73b0\u8bf4\u660e\uff08\u5f00\u53d1\u5bf9\u63a5\uff09</strong></p>\n<p>\u4f7f\u7528\u73b0\u6709\u7684\u77e5\u8bc6\u5e93\u7ba1\u7406\uff1b\u5728\u73b0\u6709\u77e5\u8bc6\u5e93\u5217\u8868\u4e0a\u589e\u52a0\u5b57\u6bb5\u300c\u8bfe\u7a0b\u5206\u7c7b\u300d\u3002\u8be5\u5b57\u6bb5\u7684\u53ef\u9009\u503c\u6765\u81ea\u672c\u540e\u53f0\u300c\u5206\u7c7b\u7ba1\u7406\u300d\u4e2d\u5df2\u542f\u7528\u7684\u5206\u7c7b list\uff08\u9879\u76ee\u6559\u5b66 / \u6848\u4f8b\u62c6\u89e3 / \u8fdb\u9636\u6280\u5de7\u7b49\uff09\u3002</p>\n<ul>\n<li>\u77e5\u8bc6\u5e93\u5df2\u6709\u5927\u91cf\u8bfe\u7a0b\u5185\u5bb9\uff0c\u672c\u9879\u4ec5\u8865\u5206\u7c7b\u5b57\u6bb5\u4e0e C \u7aef\u5b66\u9662\u5c55\u793a\u94fe\u8def\u3002</li>\n<li>C \u7aef\u5b66\u9662\u5217\u8868\u6309\u300c\u8bfe\u7a0b\u5206\u7c7b\u300d\u8fc7\u6ee4\u5bf9\u5e94\u9891\u9053\uff1b\u672a\u5206\u7c7b\u5185\u5bb9\u6309\u73b0\u6709\u77e5\u8bc6\u5e93\u89c4\u5219\u5904\u7406\u3002</li>\n<li>\u9884\u89c8\u3001\u4e0a\u4e0b\u67b6\u3001\u5185\u5bb9\u7f16\u8f91\u7b49\u80fd\u529b\u7ee7\u7eed\u5728\u77e5\u8bc6\u5e93\u7ba1\u7406\u4e2d\u5b8c\u6210\u3002</li>\n</ul>\n</div>\n</section>\n\n<section class=\"page\" id=\"categories\">\n<div class=\"pagehead\"><div><h1>\u5206\u7c7b\u7ba1\u7406</h1><p>\u7ba1\u7406\u5b66\u9662\u5185\u5bb9\u5206\u7c7b\uff0c\u524d\u7aef\u6309\u542f\u7528\u72b6\u6001\u548c\u6392\u5e8f\u5c55\u793a</p></div><button class=\"primary\" id=\"newCat\">\uff0b \u65b0\u5efa\u5206\u7c7b</button></div>\n<div id=\"catList\">\n<div class=\"catrow\"><div class=\"caticon\">\u25b7</div><b>\u9879\u76ee\u6559\u5b66</b><span>12\u95e8\u8bfe\u7a0b</span><span>\u6392\u5e8f 100</span><div class=\"status\"><div class=\"switch\"></div>&nbsp; \u5df2\u542f\u7528</div><div class=\"ops\"><button class=\"link\">\u7f16\u8f91</button><button class=\"link gray\">\u8c03\u6574\u6392\u5e8f</button></div></div>\n<div class=\"catrow\"><div class=\"caticon\">\u25a4</div><b>\u6848\u4f8b\u62c6\u89e3</b><span>18\u95e8\u8bfe\u7a0b</span><span>\u6392\u5e8f 90</span><div class=\"status\"><div class=\"switch\"></div>&nbsp; \u5df2\u542f\u7528</div><div class=\"ops\"><button class=\"link\">\u7f16\u8f91</button><button class=\"link gray\">\u8c03\u6574\u6392\u5e8f</button></div></div>\n<div class=\"catrow\"><div class=\"caticon\">\u2197</div><b>\u8fdb\u9636\u6280\u5de7</b><span>9\u95e8\u8bfe\u7a0b</span><span>\u6392\u5e8f 80</span><div class=\"status\"><div class=\"switch\"></div>&nbsp; \u5df2\u542f\u7528</div><div class=\"ops\"><button class=\"link\">\u7f16\u8f91</button><button class=\"link gray\">\u8c03\u6574\u6392\u5e8f</button></div></div>\n</div>\n<div class=\"hint\">\u201c\u6211\u7684\u5b66\u4e60\u201d\u4e3a\u7528\u6237\u5b66\u4e60\u8d44\u4ea7\u5165\u53e3\uff0c\u4e0d\u5c5e\u4e8e\u8bfe\u7a0b\u5206\u7c7b\uff0c\u4e0d\u5728\u6b64\u5904\u914d\u7f6e\u3002</div>\n</section>\n\n</div></main></div>\n<div class=\"toast\" id=\"toast\"></div>\n";
+  root.innerHTML="<style>\n*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,\"PingFang SC\",\"Microsoft YaHei\",sans-serif;background:#f5f6f8;color:#25282d;font-size:14px}\nbutton,input,select,textarea{font:inherit}.shell{display:grid;grid-template-columns:220px 1fr;min-height:100vh}.side{background:#17191d;color:#fff;padding:22px 14px}.brand{font-size:20px;font-weight:900;padding:0 12px 24px}.brand small{display:block;font-size:10px;color:#777d87;margin-top:5px;font-weight:500}.menu-title{font-size:11px;color:#686e77;padding:14px 12px 7px}.menu{height:44px;border-radius:9px;padding:0 12px;display:flex;align-items:center;gap:10px;color:#aeb3bb;font-size:13px;margin-bottom:4px;cursor:pointer}.menu:hover{background:#22252a}.menu.on{background:#ee6a3b;color:#fff;font-weight:800}.menu i{font-style:normal;width:18px;text-align:center}.main{min-width:0}.top{height:64px;background:#fff;border-bottom:1px solid #e9eaec;display:flex;align-items:center;justify-content:space-between;padding:0 26px;position:sticky;top:0;z-index:10}.crumb{font-size:13px;color:#92979f}.user{font-size:12px;color:#747a82}.content{padding:24px 26px}.pagehead{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px}.pagehead h1{font-size:24px;margin:0;font-weight:900}.pagehead p{font-size:12px;color:#999fa6;margin:6px 0 0}.primary{border:0;background:#ed693a;color:#fff;height:38px;padding:0 18px;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer}.secondary{height:38px;border:1px solid #dddfe2;background:#fff;border-radius:8px;padding:0 16px;font-size:12px;cursor:pointer}.danger{color:#d64d3d}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}.stat{background:#fff;border:1px solid #e9eaec;border-radius:11px;padding:16px}.stat span{font-size:11px;color:#969ca4}.stat b{display:block;font-size:24px;margin-top:6px}.filter{background:#fff;border:1px solid #e9eaec;border-radius:11px;padding:14px;display:flex;gap:9px;align-items:center;margin-bottom:14px;flex-wrap:wrap}.input,.select{height:34px;border:1px solid #dddfe3;border-radius:7px;background:#fff;padding:0 10px;font-size:12px;color:#60666e}.input{width:210px}.select{width:130px}.search{height:34px;border:0;border-radius:7px;background:#2c3036;color:#fff;padding:0 14px;font-size:12px;cursor:pointer}.reset{border:0;background:transparent;color:#8e949b;font-size:12px;cursor:pointer}.tablebox{background:#fff;border:1px solid #e8e9eb;border-radius:11px;overflow:auto}.table{width:100%;border-collapse:collapse;font-size:12px;min-width:1050px}.table th{height:42px;text-align:left;background:#fafafa;color:#858b93;font-weight:700;padding:0 12px;border-bottom:1px solid #ececef;white-space:nowrap}.table td{padding:12px;border-bottom:1px solid #f0f1f2;vertical-align:middle}.coursecell{display:flex;align-items:center;gap:9px;min-width:220px}.cover{width:62px;height:38px;border-radius:7px;display:grid;place-items:center;color:#fff;font-size:9px;font-weight:800;flex:none}.c1{background:linear-gradient(135deg,#3977c9,#80a9e2)}.c2{background:linear-gradient(135deg,#ee6940,#ff9b74)}.c3{background:linear-gradient(135deg,#6551a0,#a084d1)}.c4{background:linear-gradient(135deg,#387653,#7bad8b)}.name{font-weight:800;font-size:12px}.id{font-size:10px;color:#aaa;margin-top:3px}.badge{display:inline-block;padding:4px 7px;border-radius:5px;font-size:10px;background:#f4f5f6;color:#70767e}.status{display:flex;align-items:center;gap:6px;white-space:nowrap}.dot{width:7px;height:7px;border-radius:50%;background:#40ad70}.dot.off{background:#aaa}.dot.draft{background:#e8a63b}.ops{display:flex;gap:10px;white-space:nowrap}.link{border:0;background:transparent;color:#e66739;font-size:11px;padding:0;cursor:pointer}.gray{color:#777d85}.page{display:none}.page.on{display:block}.formbox{background:#fff;border:1px solid #e8e9eb;border-radius:11px;padding:22px;max-width:980px}.formtitle{font-size:16px;font-weight:900;padding-bottom:14px;border-bottom:1px solid #eee;margin-bottom:18px}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:17px 22px}.field label{display:block;font-size:12px;font-weight:750;margin-bottom:7px}.req{color:#ef6537}.field input,.field select,.field textarea{width:100%;border:1px solid #dfe1e4;border-radius:8px;padding:0 11px;font-size:12px;background:#fff}.field input,.field select{height:38px}.field textarea{height:82px;padding-top:10px;resize:none}.full{grid-column:1/-1}.upload{height:92px;border:1px dashed #cfd2d6;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#9ca1a8;font-size:11px;background:#fafafa;cursor:pointer}.upload b{font-size:23px;font-weight:400;color:#bbb;margin-bottom:4px}.radio{display:flex;gap:9px}.radio button{height:38px;border:1px solid #dedfe2;background:#fff;border-radius:8px;padding:0 18px;font-size:12px;color:#777;cursor:pointer}.radio button.on{border-color:#ef7041;background:#fff5f0;color:#e76739;font-weight:800}.contenteditor{margin-top:21px;border-top:1px solid #eee;padding-top:19px}.editorhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.editorhead b{font-size:14px}.editorhead span{font-size:11px;color:#999}.galleryrow{border:1px solid #e7e8ea;border-radius:9px;padding:11px;display:grid;grid-template-columns:28px 105px 1fr 60px;gap:11px;align-items:center;margin-bottom:9px}.drag{color:#bbb;font-size:15px;cursor:grab}.thumb{height:62px;border-radius:8px;background:linear-gradient(135deg,#ee6a40,#ff9b73);color:#fff;display:grid;place-items:center;font-size:10px}.caption{height:34px;border:1px solid #e0e2e4;border-radius:7px;padding:0 9px;font-size:11px}.del{border:0;background:transparent;color:#e66a43;font-size:11px;cursor:pointer}.addimg{height:38px;border:1px dashed #ef9b7c;background:#fff8f4;color:#e76b3d;border-radius:8px;width:100%;font-size:12px;cursor:pointer}.videoeditor{display:none}.videoarea{border:1px dashed #d5d7da;background:#fafafa;border-radius:10px;padding:17px;display:flex;align-items:center;gap:15px}.videothumb{width:150px;height:86px;border-radius:9px;background:#2d3239;color:#fff;display:grid;place-items:center;font-size:25px}.videoinfo b{font-size:12px}.videoinfo p{font-size:11px;color:#999;margin:6px 0}.foot{margin-top:20px;padding-top:16px;border-top:1px solid #eee;display:flex;justify-content:flex-end;gap:9px}.catrow{background:#fff;border:1px solid #e8e9eb;border-radius:10px;padding:14px 16px;display:grid;grid-template-columns:40px 1fr 110px 100px 140px 140px;align-items:center;margin-bottom:9px;font-size:12px}.caticon{width:31px;height:31px;border-radius:8px;background:#fff1ea;color:#e86839;display:grid;place-items:center}.switch{width:34px;height:19px;border-radius:10px;background:#ec6c3e;position:relative;cursor:pointer}.switch:after{content:'';width:15px;height:15px;background:#fff;border-radius:50%;position:absolute;right:2px;top:2px}.switch.off{background:#c7c9cc}.switch.off:after{left:2px;right:auto}.hint{font-size:11px;color:#999;margin-top:13px}.emptybox{padding:40px;text-align:center;color:#aaa}.toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%);background:#24282e;color:#fff;padding:9px 16px;border-radius:20px;font-size:11px;opacity:0;transition:.2s;z-index:99;pointer-events:none}.toast.show{opacity:1}.newbie-list{margin-top:8px}.analytics-note{background:#fff9f5;border:1px solid #f5ded3;color:#8a6a5c;padding:12px 14px;border-radius:9px;font-size:11px;margin-bottom:14px}\n.kb-notice{max-width:920px;line-height:1.85;font-size:13px;color:#4a5058}.kb-notice p{margin:0 0 12px}.kb-notice ul{margin:8px 0 0;padding-left:18px;color:#60666e;font-size:12px;line-height:1.75}\n@media(max-width:900px){.shell{grid-template-columns:170px 1fr}.stats{grid-template-columns:repeat(2,1fr)}.formgrid{grid-template-columns:1fr}.full{grid-column:auto}.content{padding:18px}.catrow{grid-template-columns:38px 1fr 90px 100px}.catrow>*:nth-child(3),.catrow>*:nth-child(4){display:none}}\n.subnav{display:flex;gap:8px;margin:0 0 14px}.subnav button{height:32px;border:1px solid #e4e6ea;background:#fff;border-radius:8px;padding:0 12px;font-size:12px;cursor:pointer}.subnav button.on{border-color:#ed693a;background:#fff4ef;color:#ed693a;font-weight:800}.course-live-panel{display:none}.course-live-panel.on{display:block}\\n</style>\n<div class=\"shell\">\n<aside class=\"side\">\n  <div class=\"brand\">右豹管理后台<small>RIGHTBAO ADMIN</small></div>\n  <div class=\"menu-title\">学院中心</div>\n  <div class=\"menu on\" data-page=\"courses\"><i>▤</i>课程管理</div>\n  <div class=\"menu\" data-page=\"categories\"><i>▦</i>分类管理</div>\n  <div class=\"menu\" data-page=\"analytics\"><i>▤</i>学习数据</div>\n  <div class=\"menu-title\">其他业务</div>\n  <div class=\"menu\"><i>◇</i>项目管理</div>\n  <div class=\"menu\"><i>⌘</i>工具管理</div>\n</aside>\n<main class=\"main\">\n<header class=\"top\"><div class=\"crumb\" id=\"crumb\">学院中心 / 课程管理</div><div class=\"user\">运营管理员 ▾</div></header>\n<div class=\"content\">\n\n<section class=\"page on\" id=\"courses\">\n<div class=\"pagehead\"><div><h1>课程管理</h1><p>知识库课程仍走现有知识库。直播在「学院直播课」单独配置。</p></div></div>\n<div class=\"subnav\" id=\"courseSub\"><button type=\"button\" class=\"on\" data-course-sub=\"kb\">知识库</button><button type=\"button\" data-course-sub=\"live\">学院直播课</button></div>\n<div id=\"courseKb\" class=\"formbox kb-notice\">\n<p><strong>实现说明（开发对接）</strong></p>\n<p>使用现有的知识库管理；在现有知识库列表上增加字段「课程分类」。该字段的可选值来自本后台「分类管理」中已启用的分类 list（项目教学 / 案例拆解 / 进阶技巧等）。</p>\n<ul>\n<li>知识库已有大量课程内容，本项仅补分类字段与 C 端学院展示链路。</li>\n<li>C 端学院列表按「课程分类」过滤对应频道；未分类内容按现有知识库规则处理。</li>\n<li>预览、上下架、内容编辑等能力继续在知识库管理中完成。</li>\n</ul>\n</div>\n<div id=\"courseLive\" class=\"course-live-panel\">\n<div class=\"formbox\">\n<div class=\"formtitle\">学院直播课</div>\n<div class=\"formgrid\">\n<div class=\"field\"><label>课名 <span class=\"req\">*</span></label><input id=\"liveTitle\" maxlength=\"40\" placeholder=\"例如：番茄小说开播说明会\"></div>\n<div class=\"field\"><label>项目名称</label><input id=\"liveProject\" maxlength=\"20\" placeholder=\"例如：番茄小说\"></div>\n<div class=\"field\"><label>开播时间</label><input id=\"liveTime\" placeholder=\"例如：10月12日 20:00\"></div>\n<div class=\"field\"><label>平台</label><select id=\"livePlatform\"><option>飞书</option><option>抖音</option><option>企业微信</option></select></div>\n<div class=\"field full\"><label>直播链接</label><input id=\"liveUrl\" placeholder=\"https://\"></div>\n<div class=\"field full\"><label>回放链接</label><input id=\"liveReplay\" placeholder=\"https://\"></div>\n</div>\n<div class=\"foot\"><button type=\"button\" class=\"primary\" id=\"liveSave\">保存</button></div>\n</div>\n<div class=\"tablebox\" style=\"margin-top:14px\"><table class=\"table\" id=\"liveTable\"><thead><tr><th>课名</th><th>项目名称</th><th>开播时间</th><th>平台</th><th>直播链接</th><th>回放链接</th></tr></thead><tbody></tbody></table></div>\n</div>\n</section>\n\n<section class=\"page\" id=\"analytics\">\n<div class=\"pagehead\"><div><h1>学习数据</h1><p>查看基础学习效果，不建设复杂教务体系。</p></div></div>\n<div class=\"analytics-note\">查看基础学习效果，不建设复杂教务体系。图文完课为正文最后一块，视频为播放进度 ≥ 90%。观看人数沿用详情 UV，收藏人数沿用收藏。</div>\n<div class=\"stats\" id=\"analyticsStats\"></div>\n<div class=\"filter\">\n<input class=\"input\" id=\"analyticsQ\" placeholder=\"课程名\">\n<select class=\"select\" id=\"analyticsSort\"><option value=\"uv\">按详情 UV</option><option value=\"rate\">按完成率</option><option value=\"name\">按课程名</option></select>\n<button type=\"button\" class=\"search\" id=\"analyticsGo\">查询</button>\n</div>\n<div class=\"tablebox\"><table class=\"table\" id=\"analyticsTable\"><thead><tr><th>课程</th><th>详情 UV</th><th>学习人数</th><th>完成率</th><th>收藏</th><th>直播预约</th></tr></thead><tbody></tbody></table></div>\n</section>\n\n<section class=\"page\" id=\"categories\">\n<div class=\"pagehead\"><div><h1>分类管理</h1><p>管理学院内容分类，前端按启用状态和排序展示</p></div><button class=\"primary\" id=\"newCat\">＋ 新建分类</button></div>\n<div id=\"catList\">\n<div class=\"catrow\"><div class=\"caticon\">▷</div><b>项目教学</b><span>12门课程</span><span>排序 100</span><div class=\"status\"><div class=\"switch\"></div>&nbsp; 已启用</div><div class=\"ops\"><button class=\"link\">编辑</button><button class=\"link gray\">调整排序</button></div></div>\n<div class=\"catrow\"><div class=\"caticon\">▤</div><b>案例拆解</b><span>18门课程</span><span>排序 90</span><div class=\"status\"><div class=\"switch\"></div>&nbsp; 已启用</div><div class=\"ops\"><button class=\"link\">编辑</button><button class=\"link gray\">调整排序</button></div></div>\n<div class=\"catrow\"><div class=\"caticon\">↗</div><b>进阶技巧</b><span>9门课程</span><span>排序 80</span><div class=\"status\"><div class=\"switch\"></div>&nbsp; 已启用</div><div class=\"ops\"><button class=\"link\">编辑</button><button class=\"link gray\">调整排序</button></div></div>\n</div>\n<div class=\"hint\">“我的学习”为用户学习资产入口，不属于课程分类，不在此处配置。</div>\n</section>\n\n</div></main></div>\n<div class=\"toast\" id=\"toast\"></div>\n";
   try {
     (function(root,adminHost){ 
 const pages=root.querySelectorAll('.page'), menus=root.querySelectorAll('.menu[data-page]'), crumb=root.getElementById('crumb'), toast=root.getElementById('toast');
@@ -6507,13 +6605,119 @@ function msg(t){toast.textContent=t;toast.classList.add('show');clearTimeout(tim
 function show(id){
  pages.forEach(p=>p.classList.toggle('on',p.id===id));
  menus.forEach(m=>m.classList.toggle('on',m.dataset.page===id));
- const names={courses:'课程管理',categories:'分类管理'};
+ const names={courses:'课程管理',categories:'分类管理',analytics:'学习数据'};
  crumb.textContent='学院中心 / '+(names[id]||'课程管理');
  adminHost.scrollTop=0;
 }
 menus.forEach(m=>m.onclick=()=>show(m.dataset.page));
-root.getElementById('newCat').onclick=()=>msg('模拟：打开新建分类弹窗');
-root.querySelectorAll('.switch').forEach(s=>s.onclick=()=>{s.classList.toggle('off');const wrap=s.parentElement;wrap.lastChild.textContent=s.classList.contains('off')?' 已停用':' 已启用';msg(s.classList.contains('off')?'分类已停用':'分类已启用')});
+const catStyle=document.createElement('style');
+catStyle.textContent='#catMask{position:fixed;inset:0;background:rgba(20,22,26,.45);z-index:80;display:none;align-items:center;justify-content:center}#catMask.show{display:flex}#catDialog{width:420px;max-width:calc(100vw - 32px);background:#fff;border-radius:12px;padding:20px 22px 18px;box-shadow:0 16px 40px rgba(0,0,0,.16)}#catDialog h3{margin:0 0 14px;font-size:16px}#catDialog .actions{display:flex;justify-content:flex-end;gap:8px;margin-top:8px}#catDialog .row2{display:grid;grid-template-columns:1fr 120px;gap:12px}';
+root.appendChild(catStyle);
+const catMask=document.createElement('div');
+catMask.id='catMask';
+catMask.innerHTML='<div id="catDialog" role="dialog" aria-modal="true" aria-labelledby="catDialogTitle"><h3 id="catDialogTitle">新建分类</h3><div class="field"><label>分类名称 <span class="req">*</span></label><input id="catName" maxlength="12" placeholder="例如：新手入门"></div><div class="row2"><div class="field"><label>图标</label><input id="catIcon" maxlength="2" placeholder="▷"></div><div class="field"><label>排序</label><input id="catSort" type="number" min="0" max="999" value="70"></div></div><div class="actions"><button type="button" class="secondary" id="catCancel">取消</button><button type="button" class="primary" id="catSave">保存</button></div></div>';
+root.appendChild(catMask);
+const cats=[
+ {kind:'project',name:'项目教学',icon:'▷',courses:12,sort:100,on:true},
+ {kind:'case',name:'案例拆解',icon:'▤',courses:18,sort:90,on:true},
+ {kind:'advanced',name:'进阶技巧',icon:'↗',courses:9,sort:80,on:true}
+];
+let catSeq=3, editingKind=null;
+function sortedCats(){return cats.slice().sort((a,b)=>b.sort-a.sort||a.name.localeCompare(b.name,'zh'))}
+function bindChannel(btn){
+ if(btn.dataset.bound)return;
+ btn.dataset.bound='1';
+ btn.addEventListener('click',function(){
+  document.querySelectorAll('#academyChannelNav button').forEach(x=>x.classList.toggle('active',x===btn));
+  const mine=btn.dataset.academyTab==='mine';
+  const normal=document.getElementById('academyNormalList');
+  document.getElementById('academyMine').classList.toggle('active',mine);
+  if(normal)normal.style.display=mine?'none':'block';
+  if(!mine) document.querySelectorAll('#academyNormalList .academy-course').forEach(c=>c.classList.toggle('academy-hidden',c.dataset.kind!==btn.dataset.academyTab));
+ });
+}
+function syncChannels(){
+ const nav=document.getElementById('academyChannelNav');
+ if(!nav)return;
+ const mine=nav.querySelector('[data-academy-tab="mine"]');
+ const labels=window.__academyKindLabels||(window.__academyKindLabels={});
+ sortedCats().forEach(c=>{
+  labels[c.kind]=c.name;
+  let btn=nav.querySelector('button[data-academy-tab="'+c.kind+'"]');
+  if(!btn){
+   btn=document.createElement('button');
+   btn.type='button';
+   btn.dataset.academyTab=c.kind;
+   btn.innerHTML='<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"></rect></svg><span></span>';
+   const liveAnchor=nav.querySelector('[data-academy-tab="live"]');
+  nav.insertBefore(btn,liveAnchor||mine);
+   bindChannel(btn);
+  }
+  const span=btn.querySelector('span');
+  if(span)span.textContent=c.name;
+  btn.style.display=c.on?'':'none';
+  const liveAnchor=nav.querySelector('[data-academy-tab="live"]');
+  nav.insertBefore(btn,liveAnchor||mine);
+ });
+ const liveBtn=nav.querySelector('[data-academy-tab="live"]');
+ if(liveBtn&&mine) nav.insertBefore(liveBtn,mine);
+ const liveN=nav.querySelector('[data-academy-tab="live"]')?1:0;
+ const visible=sortedCats().filter(c=>c.on).length+1+liveN;
+ nav.style.gridTemplateColumns='repeat('+Math.min(visible,5)+',1fr)';
+ nav.style.height=visible>4?'auto':'';
+ document.querySelectorAll('#academyCenterPage .academy-course[data-kind]').forEach(el=>{
+  const c=cats.find(x=>x.kind===el.dataset.kind);
+  const small=c&&el.querySelector('.academy-cover small');
+  if(small)small.textContent=c.name;
+ });
+}
+function renderCats(){
+ const list=root.getElementById('catList');
+ list.innerHTML=sortedCats().map(c=>'<div class="catrow" data-kind="'+c.kind+'"><div class="caticon"></div><b></b><span>'+c.courses+'门课程</span><span>排序 '+c.sort+'</span><div class="status"><div class="switch'+(c.on?'':' off')+'"></div><span class="cat-state">'+(c.on?'已启用':'已停用')+'</span></div><div class="ops"><button class="link" type="button" data-act="edit">编辑</button><button class="link gray" type="button" data-act="sort">调整排序</button></div></div>').join('');
+ list.querySelectorAll('.catrow').forEach(row=>{
+  const c=cats.find(x=>x.kind===row.dataset.kind);
+  row.querySelector('.caticon').textContent=c.icon||'▷';
+  row.querySelector('b').textContent=c.name;
+  row.querySelector('.switch').onclick=()=>{c.on=!c.on;renderCats();msg(c.on?'分类已启用':'分类已停用')};
+  row.querySelector('[data-act="edit"]').onclick=()=>openCat(c.kind,false);
+  row.querySelector('[data-act="sort"]').onclick=()=>openCat(c.kind,true);
+ });
+ syncChannels();
+}
+function openCat(kind,focusSort){
+ editingKind=kind;
+ const c=kind?cats.find(x=>x.kind===kind):null;
+ root.getElementById('catDialogTitle').textContent=c?(focusSort?'调整排序':'编辑分类'):'新建分类';
+ root.getElementById('catName').value=c?c.name:'';
+ root.getElementById('catIcon').value=c?c.icon:'';
+ root.getElementById('catSort').value=c?c.sort:70;
+ catMask.classList.add('show');
+ setTimeout(()=>root.getElementById(focusSort?'catSort':'catName').focus(),30);
+}
+function closeCat(){catMask.classList.remove('show');editingKind=null}
+root.getElementById('newCat').onclick=()=>openCat(null,false);
+root.getElementById('catCancel').onclick=closeCat;
+catMask.addEventListener('click',e=>{if(e.target===catMask)closeCat()});
+root.getElementById('catSave').onclick=()=>{
+ const name=root.getElementById('catName').value.trim();
+ if(!name){msg('请填写分类名称');return}
+ if(cats.some(c=>c.name===name&&c.kind!==editingKind)){msg('分类名称已存在');return}
+ const sort=parseInt(root.getElementById('catSort').value,10);
+ const icon=(root.getElementById('catIcon').value.trim()||'▷').slice(0,2);
+ const sortVal=Number.isFinite(sort)?sort:0;
+ if(editingKind){
+  const c=cats.find(x=>x.kind===editingKind);
+  c.name=name;c.icon=icon;c.sort=sortVal;
+  msg('分类已更新');
+ }else{
+  catSeq+=1;
+  cats.push({kind:'cat'+catSeq,name,icon,courses:0,sort:sortVal,on:true});
+  msg('分类已创建');
+ }
+ closeCat();
+ renderCats();
+};
+renderCats();
  })(root,adminHost);
   } catch(e) {
     console.error('Academy admin demo init error',e);
@@ -6560,6 +6764,25 @@ root.querySelectorAll('.switch').forEach(s=>s.onclick=()=>{s.classList.toggle('o
     if(screen==='academy'){
       const card=document.querySelector('.newbie-card[data-carousel="academy"]');
       if(card)card.click();
+      return;
+    }
+    if(screen==='analysis'||screen==='share'){
+      const app=document.getElementById('app');
+      const analysisPage=document.getElementById('analysisPage');
+      if(!analysisPage)return;
+      document.querySelectorAll('.app-page').forEach(function(p){p.classList.remove('active')});
+      if(app)app.classList.add('analysis-mode');
+      analysisPage.classList.add('active');
+      analysisPage.scrollTop=0;
+      if(screen==='share'){
+        const fab=document.getElementById('v92ShareFab');
+        const viewer=document.getElementById('v92ShareViewer');
+        if(fab)fab.click();
+        else if(viewer){
+          viewer.classList.add('show');
+          viewer.setAttribute('aria-hidden','false');
+        }
+      }
     }
   }
 
@@ -6770,5 +6993,407 @@ root.querySelectorAll('.switch').forEach(s=>s.onclick=()=>{s.classList.toggle('o
 .acd-photo{display:block;width:100%;height:auto;max-height:none;aspect-ratio:16/9;object-fit:cover;border-radius:8px;margin:0 0 16px;background:#2a1208}
 #academyCourseDetailPage.is-article .acd-recommend{margin-top:9px}
 </style>
+
+<script id="academy-opt-2026-10-10">
+(function(){
+ const page=document.getElementById('academyCenterPage');
+ if(!page) return;
+ const META={
+  '右豹OPC经营入门指南':{project:'右豹OPC',views:'1,280',favs:'86'},
+  '知乎故事项目完整教学':{project:'知乎故事',views:'3,260',favs:'210'},
+  '番茄小说发布完整流程':{project:'番茄小说',views:'1,980',favs:'96'},
+  '红果短剧项目操作教学':{project:'红果短剧',views:'1,540',favs:'88'},
+  '从0到月收益过万，他做对了什么？':{project:'知乎故事',views:'2,430',favs:'164'},
+  '一条作品是怎么跑到10W+的？':{project:'番茄小说',views:'1,760',favs:'121'},
+  '如何提高作品出单率？':{project:'红果短剧',views:'980',favs:'73'},
+  '账号运营中的5个关键动作':{project:'番茄小说',views:'1,120',favs:'64'},
+  '右豹变现赛道与项目讲解':{project:'右豹OPC',views:'860',favs:'40'}
+ };
+ const input=document.getElementById('academySearchInput');
+ const empty=document.getElementById('academySearchEmpty');
+ const normal=document.getElementById('academyNormalList');
+ const mine=document.getElementById('academyMine');
+ const nav=document.getElementById('academyChannelNav');
+ const messages=[];
+ const reserved=document.getElementById('academyReservedLive');
+ if(reserved){
+   const start=new Date(Date.now()+60*60*1000);
+   const label=(start.getMonth()+1)+'月'+start.getDate()+'日 '+String(start.getHours()).padStart(2,'0')+':'+String(start.getMinutes()).padStart(2,'0');
+   reserved.dataset.liveTime=label;
+   const when=reserved.querySelector('.live-when');
+   if(when) when.textContent='企业微信 · '+label;
+   messages.push({title:'右豹OPC晚课',text:'「右豹OPC晚课」将于 1 小时后开播',platform:'企业微信'});
+ }
+ document.querySelectorAll('#academyCenterPage .academy-course').forEach(function(el){
+   const key=el.dataset.courseTitle;
+   const meta=META[key];
+   if(meta){
+     el.dataset.project=meta.project;
+     el.dataset.views=meta.views;
+     el.dataset.favs=meta.favs;
+   }
+   if(el.dataset.courseType==='live') return;
+   if(el.querySelector('.course-stats')||!el.querySelector('.academy-info')) return;
+   const row=document.createElement('p');
+   row.className='course-stats';
+   const a=document.createElement('span');
+   const b=document.createElement('span');
+   a.textContent='观看 '+(el.dataset.views||'0');
+   b.textContent='收藏 '+(el.dataset.favs||'0');
+   row.append(a,b);
+   el.querySelector('.academy-info').appendChild(row);
+ });
+ function kindName(el){
+   const labels=window.__academyKindLabels||{};
+   return (el.querySelector('.academy-cover small')||{}).textContent||labels[el.dataset.kind]||'';
+ }
+ function match(el,q){
+   const blob=[el.dataset.courseTitle||'', el.dataset.project||'', kindName(el), (el.querySelector('.academy-info b')||{}).textContent||''].join(' ').toLowerCase();
+   return blob.indexOf(q)>=0;
+ }
+ function applySearch(){
+   const q=(input.value||'').trim().toLowerCase();
+   page.classList.toggle('is-searching', !!q);
+   if(!q){
+     empty.hidden=true;
+     const active=nav.querySelector('button.active');
+     if(active) active.click();
+     return;
+   }
+   const seen=new Set();
+   let hits=0;
+   document.querySelectorAll('#academyCenterPage .academy-course').forEach(function(el){
+     const title=el.dataset.courseTitle||'';
+     const ok=match(el,q) && !seen.has(title);
+     if(ok) seen.add(title);
+     el.classList.toggle('academy-hidden', !ok);
+     if(ok) hits+=1;
+   });
+   empty.hidden=hits>0;
+ }
+ function placeLiveTab(){
+   const liveBtn=nav.querySelector('[data-academy-tab="live"]');
+   const mineBtn=nav.querySelector('[data-academy-tab="mine"]');
+   if(liveBtn&&mineBtn) nav.insertBefore(liveBtn, mineBtn);
+ }
+ placeLiveTab();
+ setTimeout(placeLiveTab, 300);
+ input.addEventListener('input', applySearch);
+ nav.addEventListener('click', function(){
+   if(!input.value) return;
+   input.value='';
+   page.classList.remove('is-searching');
+   empty.hidden=true;
+ }, true);
+
+ function toast(msg){
+   const t=document.createElement('div');
+   t.textContent=msg;
+   t.style.cssText='position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:#24282e;color:#fff;padding:8px 14px;border-radius:20px;font-size:12px;z-index:90';
+   document.body.appendChild(t);
+   setTimeout(function(){ t.remove(); }, 1400);
+ }
+ window.__academyToast=toast;
+ let pendingLeave=null;
+ const leave=document.getElementById('liveLeave');
+ function openLeave(card){
+   const platform=card.dataset.platform||'';
+   const state=card.dataset.liveState;
+   const url=state==='ended'?card.dataset.replayUrl:card.dataset.liveUrl;
+   if(!url){ toast('暂无法打开'); return; }
+   pendingLeave={url:url, platform:platform};
+   document.getElementById('liveLeaveCopy').textContent='即将离开右豹，打开'+platform;
+   leave.hidden=false;
+ }
+ document.getElementById('liveLeaveStay').onclick=function(){ leave.hidden=true; pendingLeave=null; };
+ document.getElementById('liveLeaveGo').onclick=function(){
+   if(!pendingLeave) return;
+   const url=pendingLeave.url, platform=pendingLeave.platform;
+   leave.hidden=true; pendingLeave=null;
+   toast('已跳转'+platform);
+   window.open(url,'_blank','noopener');
+ };
+ function handleAct(card, btn){
+   if(!card) return;
+   const state=card.dataset.liveState;
+   if(state==='pending'){
+     card.dataset.liveState='reserved';
+     card.querySelectorAll('[data-live-act]').forEach(function(b){ b.textContent='已预约'; b.disabled=true; b.classList.add('is-reserved'); });
+     toast('已预约，开播前 1 小时发送站内信');
+     return;
+   }
+   if(state==='reserved') return;
+   openLeave(card);
+ }
+ page.addEventListener('click', function(e){
+   const btn=e.target.closest('[data-live-act]');
+   if(!btn) return;
+   e.preventDefault(); e.stopPropagation();
+   handleAct(btn.closest('.academy-course'), btn);
+ }, true);
+ document.getElementById('acdPlayBtn').addEventListener('click', function(e){
+   const card=window.__academyLiveCard;
+   if(!card) return;
+   e.preventDefault();
+   e.stopImmediatePropagation();
+   handleAct(card, e.currentTarget);
+   if(window.__academyPaintLiveDetail) window.__academyPaintLiveDetail(card);
+ }, true);
+ document.getElementById('acdLiveCta').addEventListener('click', function(e){
+   const card=window.__academyLiveCard;
+   if(!card) return;
+   e.preventDefault();
+   e.stopPropagation();
+   handleAct(card, e.currentTarget);
+   if(window.__academyPaintLiveDetail) window.__academyPaintLiveDetail(card);
+ });
+ document.getElementById('acdLiveAct').addEventListener('click', function(e){
+   e.preventDefault(); e.stopPropagation();
+   const title=document.getElementById('acdTitle').textContent;
+   const card=[...document.querySelectorAll('#academyNormalList .academy-live')].find(function(el){ return el.dataset.courseTitle===title; });
+   handleAct(card, e.currentTarget);
+ });
+ window.__academyLiveCard=null;
+ window.__academyPaintLiveDetail=function(el){
+   const isLive=el.dataset.courseType==='live';
+   const detail=document.getElementById('academyCourseDetailPage');
+   const g=document.getElementById('acdGallery');
+   const v=document.getElementById('acdVideo');
+   const views=document.getElementById('acdViews');
+   const favs=document.getElementById('acdFavs');
+   const recSub=document.querySelector('#academyCourseDetailPage .acd-rec-sub');
+   if(views) views.textContent=el.dataset.views||'0';
+   if(favs) favs.textContent=el.dataset.favs||'0';
+   if(detail){
+     detail.classList.toggle('is-live-course', isLive);
+     if(isLive) detail.classList.remove('is-article');
+   }
+   window.__academyLiveCard=isLive?el:null;
+   if(!isLive){
+     if(detail) detail.classList.remove('is-on-air');
+     if(g) g.style.display=el.dataset.courseType==='video'?'none':'block';
+     if(v) v.style.display=el.dataset.courseType==='video'?'block':'none';
+     if(recSub) recSub.textContent='来自同一知识库，优先推荐相同「课程分类」的内容';
+     const badge=document.querySelector('.acd-vpreview-badge');
+     if(badge) badge.textContent='预览';
+     const hint=document.getElementById('acdVideoFrameHint');
+     if(hint && el.dataset.courseType==='video') hint.textContent='演示预览画面 · 正式环境为知识库视频流';
+     const play=document.getElementById('acdPlayBtn');
+     if(play){ play.disabled=false; play.setAttribute('aria-label','播放预览'); }
+     const cta=document.getElementById('acdLiveCta');
+     if(cta) cta.hidden=true;
+     if(detail) detail.classList.remove('is-before');
+     return;
+   }
+   if(g) g.style.display='none';
+   if(v) v.style.display='block';
+   const state=el.dataset.liveState;
+   const platform=el.dataset.platform||'';
+   const when=state==='live'?'正在直播':(el.dataset.liveTime||'');
+   const label=state==='pending'?'预约':state==='reserved'?'已预约':state==='ended'?'查看回放':'查看';
+   const before=state==='pending'||state==='reserved';
+   const type=document.getElementById('acdType');
+   if(type) type.textContent='直播课程 · '+platform;
+   const tag=document.querySelector('#academyCourseDetailPage .acd-tags span');
+   if(tag) tag.textContent='直播课程';
+   const desc=document.getElementById('acdDesc');
+   if(desc) desc.textContent=(el.dataset.project||'')+' · '+platform+(when?' · '+when:'');
+   const kicker=document.getElementById('acdVideoFrameKicker');
+   const frameTitle=document.getElementById('acdVideoTitle');
+   const hint=document.getElementById('acdVideoFrameHint');
+   const badge=document.querySelector('.acd-vpreview-badge');
+   const dur=document.getElementById('acdDurationBadge');
+   const note=document.getElementById('acdVideoNote');
+   const play=document.getElementById('acdPlayBtn');
+   if(kicker) kicker.textContent=platform;
+   if(frameTitle) frameTitle.textContent=el.dataset.courseTitle||'';
+   if(hint) hint.textContent=state==='ended'?'回放在'+platform+'，不在产品内播放':'直播在'+platform+'，不在产品内播放';
+   if(badge) badge.textContent=state==='ended'?'直播已结束':state==='live'?'直播中':'待开始';
+   if(note) note.textContent=state==='reserved'?'已预约，开播前 1 小时发送站内信':(platform+' · '+(when||''));
+   if(play){
+     play.disabled=state==='reserved';
+     play.setAttribute('aria-label', state==='live'?'查看':label);
+   }
+   const cta=document.getElementById('acdLiveCta');
+   if(cta){
+     cta.hidden=state==='live';
+     cta.textContent=label;
+     cta.disabled=state==='reserved'||(state==='ended'&&!el.dataset.replayUrl);
+     cta.classList.toggle('is-reserved', state==='reserved');
+   }
+   if(detail){
+     detail.classList.toggle('is-on-air', state==='live');
+     detail.classList.toggle('is-before', before);
+   }
+   const recList=document.getElementById('acdRecommendList');
+   const recEmpty=document.getElementById('acdRecommendEmpty');
+   if(recSub) recSub.textContent='其他直播课程';
+   if(recList){
+     recList.innerHTML='';
+     const others=[...document.querySelectorAll('#academyNormalList .academy-live')].filter(function(c){ return c.dataset.courseTitle!==el.dataset.courseTitle; });
+     others.forEach(function(c){
+       const btn=document.createElement('button');
+       btn.type='button';
+       btn.className='acd-rec-item';
+       btn.innerHTML='<span class="acd-rec-cover ac-orange"></span><div><b></b><small></small></div><span>›</span>';
+       btn.querySelector('.acd-rec-cover').textContent=c.dataset.platform||'直播';
+       btn.querySelector('b').textContent=c.dataset.courseTitle||'';
+       btn.querySelector('small').textContent=(c.dataset.platform||'')+' · '+(c.dataset.liveState==='live'?'正在直播':(c.dataset.liveTime||''));
+       btn.addEventListener('click', function(ev){ ev.stopPropagation(); if(window.__academyOpenCourse) window.__academyOpenCourse(c); });
+       recList.appendChild(btn);
+     });
+     if(recEmpty) recEmpty.hidden=others.length>0;
+   }
+ };
+ function renderMessages(){
+   const list=document.getElementById('messageList');
+   list.innerHTML='';
+   if(!messages.length){
+     const p=document.createElement('p');
+     p.className='msg-empty';
+     p.textContent='没有新消息';
+     list.appendChild(p);
+     return;
+   }
+   messages.forEach(function(m){
+     const btn=document.createElement('button');
+     btn.type='button';
+     btn.className='msg-item';
+     btn.innerHTML='<b></b><small></small>';
+     btn.querySelector('b').textContent=m.text;
+     btn.querySelector('small').textContent='学院直播 · '+m.platform;
+     btn.onclick=function(){
+       const card=document.querySelector('#academyNormalList .academy-live[data-course-title="'+m.title+'"]');
+       document.getElementById('messagePage').classList.remove('active');
+       if(card && window.__academyOpenCourse) window.__academyOpenCourse(card);
+     };
+     list.appendChild(btn);
+   });
+ }
+ const msgPage=document.getElementById('messagePage');
+ function openMessages(){
+   renderMessages();
+   document.querySelectorAll('.app-page').forEach(function(p){ p.classList.remove('active'); });
+   msgPage.classList.add('active');
+   const nav=document.getElementById('bottomNav');
+   if(nav) nav.style.display='none';
+   const pf=document.getElementById('pathFloat');
+   if(pf){ pf.classList.remove('open'); pf.style.display='none'; }
+ }
+ document.getElementById('messageBack').onclick=function(){
+   msgPage.classList.remove('active');
+   document.getElementById('homePage').classList.add('active');
+   const nav=document.getElementById('bottomNav');
+   if(nav) nav.style.display='grid';
+   const pf=document.getElementById('pathFloat');
+   if(pf) pf.style.display='';
+ };
+ const inbox=document.querySelector('.inbox');
+ if(inbox) inbox.addEventListener('click', function(e){ e.preventDefault(); e.stopImmediatePropagation(); openMessages(); }, true);
+
+ const ANALYTICS=[
+  {name:'知乎故事项目完整教学', uv:'3,260', learners:'980', rate:'64%', fav:'210', book:'—'},
+  {name:'番茄小说发布完整流程', uv:'1,980', learners:'640', rate:'51%', fav:'96', book:'—'},
+  {name:'红果短剧项目操作教学', uv:'1,540', learners:'430', rate:'47%', fav:'88', book:'—'},
+  {name:'知乎故事实战答疑', uv:'1,288', learners:'—', rate:'—', fav:'76', book:'128'},
+  {name:'番茄小说开播说明会', uv:'860', learners:'—', rate:'—', fav:'42', book:'36'},
+  {name:'右豹OPC晚课', uv:'540', learners:'—', rate:'—', fav:'31', book:'19'},
+  {name:'红果短剧复盘', uv:'2,104', learners:'—', rate:'—', fav:'133', book:'0'}
+ ];
+ function bootAdmin(root){
+   const sub=root.getElementById('courseSub');
+   if(sub && !sub.dataset.bound){
+     sub.dataset.bound='1';
+     sub.querySelectorAll('button').forEach(function(btn){
+       btn.onclick=function(){
+         sub.querySelectorAll('button').forEach(function(b){ b.classList.toggle('on', b===btn); });
+         const live=btn.dataset.courseSub==='live';
+         root.getElementById('courseKb').style.display=live?'none':'block';
+         root.getElementById('courseLive').classList.toggle('on', live);
+       };
+     });
+   }
+   function lives(){ return [...document.querySelectorAll('#academyNormalList .academy-live')]; }
+   function renderLiveTable(){
+     const body=root.querySelector('#liveTable tbody');
+     if(!body) return;
+     body.innerHTML='';
+     lives().forEach(function(el){
+       const tr=document.createElement('tr');
+       [el.dataset.courseTitle, el.dataset.project, el.dataset.liveState==='live'?'正在直播':el.dataset.liveTime, el.dataset.platform, el.dataset.liveUrl||'—', el.dataset.replayUrl||'—'].forEach(function(val){
+         const td=document.createElement('td');
+         td.textContent=val||'';
+         tr.appendChild(td);
+       });
+       body.appendChild(tr);
+     });
+   }
+   const save=root.getElementById('liveSave');
+   if(save && !save.dataset.bound){
+     save.dataset.bound='1';
+     save.onclick=function(){
+       const title=root.getElementById('liveTitle').value.trim();
+       if(!title){ const toast=root.getElementById('toast'); if(toast){ toast.textContent='请填写课名'; toast.classList.add('show'); setTimeout(function(){ toast.classList.remove('show'); },1400);} return; }
+       const card=document.createElement('div');
+       card.className='academy-course academy-live academy-hidden';
+       card.dataset.kind='live';
+       card.dataset.courseType='live';
+       card.dataset.courseTitle=title;
+       card.dataset.project=root.getElementById('liveProject').value.trim();
+       card.dataset.platform=root.getElementById('livePlatform').value;
+       card.dataset.liveTime=root.getElementById('liveTime').value.trim();
+       card.dataset.liveUrl=root.getElementById('liveUrl').value.trim();
+       card.dataset.replayUrl=root.getElementById('liveReplay').value.trim();
+       card.dataset.liveState='pending';
+       card.dataset.views='0';
+       card.dataset.favs='0';
+       card.innerHTML='<div class="academy-cover ac-orange"><small>直播课程</small><strong></strong><span class="live-status is-pending">待开始</span></div><div class="academy-info"><b></b><p class="live-when"></p><p class="course-stats"><span>观看 0</span><span>收藏 0</span></p></div><span>›</span>';
+       card.querySelector('strong').textContent=title;
+       card.querySelector('.academy-info b').textContent=title;
+       card.querySelector('.live-when').textContent=card.dataset.platform+' · '+(card.dataset.liveTime||'');
+       card.addEventListener('click', function(){ if(window.__academyOpenCourse) window.__academyOpenCourse(card); });
+       document.getElementById('academyNormalList').appendChild(card);
+       renderLiveTable();
+       root.getElementById('liveTitle').value='';
+     };
+   }
+   renderLiveTable();
+   function renderAnalytics(){
+     const q=(root.getElementById('analyticsQ').value||'').trim();
+     const sort=root.getElementById('analyticsSort').value;
+     let rows=ANALYTICS.filter(function(r){ return !q || r.name.indexOf(q)>=0; });
+     rows.sort(function(a,b){
+       if(sort==='name') return a.name.localeCompare(b.name,'zh');
+       if(sort==='rate') return (parseInt(b.rate,10)||0)-(parseInt(a.rate,10)||0);
+       return (parseInt(String(b.uv).replace(/,/g,''),10)||0)-(parseInt(String(a.uv).replace(/,/g,''),10)||0);
+     });
+     const body=root.querySelector('#analyticsTable tbody');
+     body.innerHTML='';
+     if(!rows.length){
+       const tr=document.createElement('tr');
+       const td=document.createElement('td');
+       td.colSpan=6; td.textContent='没有找到相关课程';
+       tr.appendChild(td); body.appendChild(tr);
+     } else rows.forEach(function(r){
+       const tr=document.createElement('tr');
+       [r.name,r.uv,r.learners,r.rate,r.fav,r.book].forEach(function(val){ const td=document.createElement('td'); td.textContent=val; tr.appendChild(td); });
+       body.appendChild(tr);
+     });
+     const stats=root.getElementById('analyticsStats');
+     const sum=function(key){ return rows.reduce(function(n,r){ return n+(parseInt(String(r[key]).replace(/,/g,''),10)||0); },0); };
+     stats.innerHTML='<div class="stat"><span>详情 UV</span><b>'+sum('uv').toLocaleString('zh-CN')+'</b></div><div class="stat"><span>收藏</span><b>'+sum('fav').toLocaleString('zh-CN')+'</b></div><div class="stat"><span>直播预约</span><b>'+sum('book').toLocaleString('zh-CN')+'</b></div><div class="stat"><span>课程</span><b>'+rows.length+'</b></div>';
+   }
+   const go=root.getElementById('analyticsGo');
+   if(go && !go.dataset.bound){ go.dataset.bound='1'; go.onclick=renderAnalytics; }
+   if(root.getElementById('analyticsTable')) renderAnalytics();
+ }
+ function boot(){
+   const host=document.getElementById('rbAdminHost');
+   if(!host||!host.shadowRoot||!host.shadowRoot.getElementById('courseSub')){ setTimeout(boot,40); return; }
+   bootAdmin(host.shadowRoot);
+ }
+ boot();
+})();
+</script>
 </body>
 </html>
