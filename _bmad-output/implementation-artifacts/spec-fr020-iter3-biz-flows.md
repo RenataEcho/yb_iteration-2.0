@@ -12,7 +12,7 @@ route: 'one-shot'
 
 **Problem:** FR-020 迭代页的「业务流程」还是一张过期总图，筛选项、选词和稿件包都与定稿不一致。帐号运营领取、用户无词领取、分成被画在同一条路上。
 
-**Approach:** 只改 `demo/iteration/fr-yijian-daifa-iter3.html` 的业务流程。按定稿 PRD 拆成三张可切换的图：帐号运营模式领取、用户无词领取、分成模式。不改历史迭代页，不改 2026-10-09 代发运营合作模式。
+**Approach:** 只改 `demo/iteration/fr-yijian-daifa-iter3.html` 的业务流程。按定稿 PRD 拆成三张可切换的图：帐号运营模式领取、用户无词领取、分成模式。不改历史迭代页。2026-10-09 代发运营合作模式已撤回，本规格不依赖它。
 
 ## Suggested Review Order
 

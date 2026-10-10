@@ -68,8 +68,7 @@
         { id: 'fr-yijian-daifa-iter2', label: '一键代发迭代 2.0', href: 'fr-yijian-daifa-iter2.html', fr: 'FR-018', defaultStatus: 'live' },
         { id: 'fr-alias-bind', label: '别名绑定', href: 'fr-alias-bind.html', fr: 'FR-019', defaultStatus: 'dev' },
         { id: 'fr-yijian-daifa-iter3', label: '一键代发迭代 3.0', href: 'fr-yijian-daifa-iter3.html', fr: 'FR-020', defaultStatus: 'todo' },
-        { id: 'fr-creator-home-2-opt', label: '2.0优化', href: 'fr-creator-home-2-opt.html', fr: 'FR-021', defaultStatus: 'todo' },
-        { id: 'fr-yijian-daifa-ops', label: '代发运营合作模式', href: 'fr-yijian-daifa-ops.html', fr: 'FR-022', defaultStatus: 'todo' }
+        { id: 'fr-creator-home-2-opt', label: '2.0优化', href: 'fr-creator-home-2-opt.html', fr: 'FR-021', defaultStatus: 'todo' }
       ]
     },
     {

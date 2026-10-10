@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>新手学院 · 后台</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; background: #f5f6f8; color: #25282d; font-size: 14px; }
+    button, input, select, textarea { font: inherit; color: inherit; }
+    button { cursor: pointer; }
+    .shell { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }
+    .side { background: #17191d; color: #fff; padding: 22px 14px; }
+    .brand { font-size: 20px; font-weight: 900; padding: 0 12px 24px; }
+    .brand small { display: block; font-size: 10px; color: #777d87; margin-top: 5px; font-weight: 500; }
+    .menu-title { font-size: 11px; color: #686e77; padding: 14px 12px 7px; }
+    .menu { width: 100%; height: 44px; border: 0; border-radius: 9px; padding: 0 12px; display: flex; align-items: center; gap: 10px; color: #aeb3bb; font-size: 13px; margin-bottom: 4px; background: none; text-align: left; white-space: nowrap; }
+    .menu:hover { background: #22252a; }
+    .menu.on { background: #ee6a3b; color: #fff; font-weight: 800; }
+    .menu i { font-style: normal; width: 18px; text-align: center; }
+    .main { min-width: 0; }
+    .top { height: 64px; background: #fff; border-bottom: 1px solid #e9eaec; display: flex; align-items: center; justify-content: space-between; padding: 0 26px; position: sticky; top: 0; z-index: 10; }
+    .crumb { font-size: 13px; color: #92979f; }
+    .user { font-size: 12px; color: #747a82; }
+    .content { padding: 24px 26px 40px; }
+    .pagehead { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 18px; }
+    .pagehead h1 { font-size: 24px; margin: 0; font-weight: 900; }
+    .pagehead p { font-size: 12px; color: #999fa6; margin: 6px 0 0; line-height: 1.6; }
+    .primary { border: 0; background: #ed693a; color: #fff; height: 38px; padding: 0 18px; border-radius: 8px; font-size: 12px; font-weight: 800; white-space: nowrap; }
+    .primary:disabled { opacity: .45; }
+    .link { border: 0; background: none; color: #ed693a; font-size: 12px; padding: 0; }
+    .link.danger { color: #d64d3d; }
+    .link:disabled { color: #c5c8ce; cursor: default; }
+    .tablebox { background: #fff; border: 1px solid #e8e9eb; border-radius: 11px; overflow: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid #f0f1f3; vertical-align: middle; white-space: nowrap; }
+    th { font-size: 12px; color: #8b919a; font-weight: 600; background: #fafbfc; }
+    .pill { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: 999px; font-size: 11px; background: #f3f4f6; color: #6b7280; }
+    .pill.on { background: #fff1ec; color: #ed693a; }
+    .cover-chip { display: inline-flex; width: 44px; height: 44px; border-radius: 8px; background: #fff1ec; color: #ed693a; align-items: center; justify-content: center; text-align: center; font-size: 11px; font-weight: 700; line-height: 1.25; }
+    .logo { width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; background: #fff1ec; color: #ed693a; font-weight: 800; }
+    .ops { display: flex; gap: 12px; }
+    .sheet { background: #fff; border: 1px solid #e8e9eb; border-radius: 11px; padding: 18px; max-width: 560px; }
+    .qr { width: 160px; height: 160px; border: 1px dashed #c5c8ce; border-radius: 12px; display: grid; place-items: center; text-align: center; color: #8b919a; font-size: 12px; background: #fafbfc; overflow: hidden; }
+    .qr img { width: 100%; height: 100%; object-fit: cover; }
+    .mask { position: fixed; inset: 0; background: rgba(20, 22, 26, .45); display: none; align-items: center; justify-content: center; z-index: 40; padding: 24px; }
+    .mask.show { display: flex; }
+    dialog, .dialog { width: 520px; max-width: 100%; max-height: calc(100vh - 48px); overflow: auto; background: #fff; border-radius: 12px; padding: 18px 20px 16px; }
+    .dialog h3 { margin: 0 0 6px; font-size: 16px; }
+    .lead { margin: 0 0 14px; font-size: 12px; color: #8a9098; line-height: 1.6; }
+    .field { margin-bottom: 12px; }
+    .field label { display: block; font-size: 13px; margin-bottom: 6px; }
+    .req { color: #ed693a; }
+    .field input, .field select, .field textarea { width: 100%; border: 1px solid #dddfe3; border-radius: 8px; background: #fff; padding: 8px 10px; font-size: 13px; }
+    .field textarea { min-height: 96px; resize: vertical; }
+    .micro { font-size: 11px; color: #999; margin-top: 6px; }
+    .actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px; }
+    .secondary { height: 38px; border: 1px solid #dddfe2; background: #fff; border-radius: 8px; padding: 0 16px; font-size: 12px; }
+    .toast { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%); background: rgba(20, 22, 26, .88); color: #fff; border-radius: 10px; padding: 8px 12px; font-size: 12px; z-index: 50; }
+    .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 16px; }
+    .stat { background: #fff; border: 1px solid #e9eaec; border-radius: 11px; padding: 16px; }
+    .stat span { font-size: 11px; color: #969ca4; }
+    .stat b { display: block; font-size: 24px; margin-top: 6px; }
+    .subtabs { display: flex; gap: 8px; margin-bottom: 12px; }
+    .subtabs button { height: 32px; border-radius: 8px; border: 1px solid #e8e9eb; background: #fff; padding: 0 12px; font-size: 12px; color: #60666e; }
+    .subtabs button.on { background: #fff1ec; color: #ed693a; border-color: #f3c2b0; font-weight: 700; }
+    .clip { max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .pill.run { background: #fff7e8; color: #b86e00; }
+    .pill.done { background: #eefaf3; color: #1f8a4c; }
+    .pill.reject { background: #fdecec; color: #d64d3d; }
+    .dialog { width: 640px; }
+    .detail { display: grid; grid-template-columns: 112px 1fr; gap: 12px 16px; margin: 4px 0 16px; font-size: 13px; }
+    .detail dt { margin: 0; color: #8b919a; }
+    .detail dd { margin: 0; word-break: break-all; }
+    .empty { padding: 28px 14px; text-align: center; color: #999fa6; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside class="side">
+      <div class="brand">右豹学院<small>管理后台</small></div>
+      <div class="menu-title">新手学院</div>
+      <button class="menu" type="button" data-page="nb-courses"><i>课</i>新手课程</button>
+      <button class="menu" type="button" data-page="nb-projects"><i>项</i>新手项目</button>
+      <button class="menu" type="button" data-page="nb-keywords"><i>词</i>新手关键词</button>
+      <button class="menu" type="button" data-page="nb-service"><i>服</i>客服</button>
+    </aside>
+    <div class="main">
+      <div class="top"><div class="crumb" id="crumb">学院中心 / 新手学院 / 新手课程</div><div class="user">运营 · 李姐</div></div>
+      <div class="content" id="content"></div>
+    </div>
+  </div>
+  <div class="mask" id="mask"><div class="dialog" id="dialog" role="dialog" aria-modal="true"></div></div>
+  <script>
+    (function () {
+      var KEY = 'rb-newbie-admin-v3';
+      var names = { 'nb-courses': '新手课程', 'nb-projects': '新手项目', 'nb-keywords': '新手关键词', 'nb-service': '客服' };
+      var catalog = [
+        { id: 'zhihu', name: '知乎故事' },
+        { id: 'fanqie', name: '番茄小说' },
+        { id: 'hongguo', name: '红果短剧' }
+      ];
+      function seed() {
+        return {
+          courses: [
+            { id: 'c1', title: '右豹怎么赚到收益？', line: '先了解平台，再开始做项目', cover: '认识右豹', mins: '2 分钟', video: 'course-earn.mp4', html: '你负责推广，平台连接项目。发布之后记得提交链接。收益按项目规则计算。', sort: 1, on: true },
+            { id: 'c2', title: '第一次做项目，从哪里开始？', line: '选项目、看规则、准备发布账号', cover: '选好项目', mins: '3 分钟', video: 'course-start.mp4', html: '先确认你能在哪里发布。不要只看收益数字。', sort: 2, on: true },
+            { id: 'c3', title: '关键词、作品、回填是什么？', line: '把操作里常见的词，一次看明白', cover: '操作词典', mins: '2 分钟', video: 'course-words.mp4', html: '关键词用来识别订单归属。作品是准备发布的内容。回填是提交已发布链接。', sort: 3, on: true },
+            { id: 'c4', title: '发布后，怎么查看收益？', line: '看懂数据更新、结算与提现', cover: '查看收益', mins: '2 分钟', video: 'course-income.mp4', html: '先看数据更新说明。预估收益和已结算不是一回事。', sort: 4, on: true }
+          ],
+          projects: [
+            { id: 'zhihu', name: '知乎故事', mark: '知', rate: '拉新 10.5 元', sort: 1, publishReq: '1. 关键词与作品对应\n使用本次领取的关键词，内容要和这本书对应。\n\n2. 关键词使用方式\n把关键词放在标题或口播里，不要改字。\n\n3. 内容规范与发布平台\n画面清晰、不侵权。发到抖音等短视频平台后，回到右豹提交视频链接。' },
+            { id: 'fanqie', name: '番茄小说', mark: '番', rate: '拉新 4 元', sort: 2, publishReq: '1. 关键词与作品对应\n使用本次领取的关键词，内容要和这本书对应。\n\n2. 关键词使用方式\n口播或字幕里完整出现关键词。\n\n3. 内容规范与发布平台\n按番茄小说的内容规范制作。发到抖音等短视频平台后，回到右豹提交视频链接。' },
+            { id: 'hongguo', name: '红果短剧', mark: '果', rate: '拉新 8 元', sort: 3, publishReq: '1. 关键词与作品对应\n使用本次领取的关键词，内容要和这部剧对应。\n\n2. 关键词使用方式\n标题和口播都要带上关键词。\n\n3. 内容规范与发布平台\n保留剧情悬念，不要剧透结局。发到抖音等短视频平台后，回到右豹提交视频链接。' }
+          ],
+          keywords: [
+            { id: 'k1', project: 'zhihu', book: '星河故事', bookId: 'BK10086', bookLink: 'https://book.youbao.example/BK10086', word: '星河故事726', userId: 'U10086', audit: '已通过', refill: 'https://v.douyin.com/demo-first', batchId: 'B2026101001', createdAt: '2026-10-10 18:20' },
+            { id: 'k2', project: 'zhihu', book: '星河故事', bookId: 'BK10086', bookLink: 'https://book.youbao.example/BK10086', word: '星河故事801', userId: '', audit: '待审核', refill: '', batchId: 'B2026101001', createdAt: '2026-10-10 18:20' },
+            { id: 'k3', project: 'fanqie', book: '番茄好书', bookId: 'BK20018', bookLink: 'https://book.youbao.example/BK20018', word: '番茄好书518', userId: '', audit: '已驳回', refill: '', batchId: 'B2026101001', createdAt: '2026-10-10 18:20' }
+          ],
+          batches: [
+            { id: 'B2026101001', project: 'zhihu', count: 2, status: 'done', time: '2026-10-10 18:20' }
+          ],
+          qr: ''
+        };
+      }
+      function load() {
+        try {
+          var raw = localStorage.getItem(KEY);
+          if (!raw) return seed();
+          var data = JSON.parse(raw);
+          if (!data.courses || !data.projects || !data.keywords) return seed();
+          return data;
+        } catch (e) { return seed(); }
+      }
+      function save(data) {
+        try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) {}
+      }
+      var data = load();
+      if (!data.batches) data.batches = [];
+      var seededProjects = seed().projects;
+      data.projects.forEach(function (p) {
+        if (p.publishReq == null) {
+          var hit = seededProjects.filter(function (s) { return s.id === p.id; })[0];
+          p.publishReq = hit ? hit.publishReq : '';
+        }
+      });
+      var page = 'nb-courses';
+      var kwTab = 'list';
+      var toastTimer;
+      function toast(msg) {
+        var el = document.getElementById('toast');
+        if (!el) {
+          el = document.createElement('div');
+          el.id = 'toast';
+          el.className = 'toast';
+          document.body.appendChild(el);
+        }
+        el.textContent = msg;
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () { el.remove(); }, 1600);
+      }
+      function esc(s) {
+        return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+          return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+        });
+      }
+      function projectName(id) {
+        var hit = catalog.filter(function (p) { return p.id === id; })[0];
+        return hit ? hit.name : id;
+      }
+      function openDialog(html, onReady) {
+        var mask = document.getElementById('mask');
+        var box = document.getElementById('dialog');
+        box.innerHTML = html;
+        mask.classList.add('show');
+        function close() { mask.classList.remove('show'); box.innerHTML = ''; }
+        mask.onclick = function (e) { if (e.target === mask) close(); };
+        var cancel = box.querySelector('[data-close]');
+        if (cancel) cancel.onclick = close;
+        if (onReady) onReady(box, close);
+      }
+      function render() {
+        document.querySelectorAll('.menu').forEach(function (b) { b.classList.toggle('on', b.dataset.page === page); });
+        document.getElementById('crumb').textContent = '学院中心 / 新手学院 / ' + names[page];
+        if (page === 'nb-courses') renderCourses();
+        else if (page === 'nb-projects') renderProjects();
+        else if (page === 'nb-keywords') renderKeywords();
+        else renderService();
+      }
+      function renderCourses() {
+        var rows = data.courses.slice().sort(function (a, b) { return a.sort - b.sort; });
+        document.getElementById('content').innerHTML = '<div class="pagehead"><div><h1>新手课程</h1><p>C 端按排序展示已上架课程。不下架到零：至少保留一门上架。不记学习进度，不写入学习数据。</p></div><button class="primary" id="add" type="button">＋ 新增课程</button></div><div class="tablebox"><table><thead><tr><th>排序</th><th>封面</th><th>标题</th><th>一句话</th><th>时长</th><th>状态</th><th>操作</th></tr></thead><tbody>' + rows.map(function (c) {
+          return '<tr><td>' + c.sort + '</td><td><span class="cover-chip">' + esc(c.cover) + '</span></td><td>' + esc(c.title) + '</td><td>' + esc(c.line) + '</td><td>' + esc(c.mins) + '</td><td><span class="pill' + (c.on ? ' on' : '') + '">' + (c.on ? '上架' : '下架') + '</span></td><td class="ops"><button class="link" type="button" data-edit="' + c.id + '">编辑</button><button class="link danger" type="button" data-del="' + c.id + '">删除</button></td></tr>';
+        }).join('') + '</tbody></table></div>';
+        document.getElementById('add').onclick = function () { courseDialog(null); };
+        document.querySelectorAll('[data-edit]').forEach(function (b) { b.onclick = function () { courseDialog(b.dataset.edit); }; });
+        document.querySelectorAll('[data-del]').forEach(function (b) { b.onclick = function () { removeCourse(b.dataset.del); }; });
+      }
+      function courseDialog(id) {
+        var row = id ? data.courses.filter(function (c) { return c.id === id; })[0] : { title: '', line: '', cover: '', mins: '', video: '', html: '', sort: data.courses.length + 1, on: true };
+        openDialog('<h3>' + (id ? '编辑课程' : '新增课程') + '</h3><p class="lead">讲解是一整段，正式产品用富文本保存。</p>' +
+          field('标题', 'fTitle', row.title, true) + field('一句话', 'fLine', row.line, true) +
+          '<div class="field"><label>封面字 <span class="req">*</span></label><input id="fCover" maxlength="8" value="' + esc(row.cover) + '"><div class="micro">显示在课程封面方块里，建议 4 个字。</div></div>' +
+          field('时长', 'fMins', row.mins, true) + field('视频', 'fVideo', row.video, true) +
+          '<div class="field"><label>讲解 <span class="req">*</span></label><textarea id="fHtml">' + esc(row.html) + '</textarea></div>' +
+          '<div class="field"><label>排序 <span class="req">*</span></label><input id="fSort" type="number" min="0" value="' + row.sort + '"><div class="micro">数字越小，C 端越靠前。</div></div>' +
+          '<div class="field"><label>状态</label><select id="fOn"><option value="on"' + (row.on ? ' selected' : '') + '>上架</option><option value="off"' + (row.on ? '' : ' selected') + '>下架</option></select></div>' +
+          '<div class="actions"><button class="secondary" type="button" data-close>取消</button><button class="primary" id="ok" type="button">保存</button></div>', function (box, close) {
+          box.querySelector('#ok').onclick = function () {
+            var next = {
+              id: id || ('c' + Date.now()),
+              title: val('fTitle'), line: val('fLine'), cover: val('fCover'), mins: val('fMins'),
+              video: val('fVideo'), html: val('fHtml'), sort: Number(val('fSort')), on: document.getElementById('fOn').value === 'on'
+            };
+            if (!next.title || !next.line || !next.cover || !next.mins || !next.video || !next.html) { toast('请把带星号的项填完整'); return; }
+            if (!Number.isInteger(next.sort) || next.sort < 0) { toast('排序需要是大于等于 0 的整数'); return; }
+            var ons = data.courses.filter(function (c) { return c.on && c.id !== next.id; }).length + (next.on ? 1 : 0);
+            if (ons < 1) { toast('至少保留一门上架课程'); return; }
+            if (id) data.courses = data.courses.map(function (c) { return c.id === id ? next : c; });
+            else data.courses.push(next);
+            save(data); close(); render(); toast('已保存。C 端只展示上架课程');
+          };
+        });
+      }
+      function removeCourse(id) {
+        var row = data.courses.filter(function (c) { return c.id === id; })[0];
+        if (row && row.on && data.courses.filter(function (c) { return c.on; }).length <= 1) { toast('至少保留一门上架课程'); return; }
+        openDialog('<h3>删除课程</h3><p class="lead">删除后 C 端不再出现这节课。已上架的最后一门不能删。</p><div class="actions"><button class="secondary" type="button" data-close>取消</button><button class="primary" id="ok" type="button">删除</button></div>', function (box, close) {
+          box.querySelector('#ok').onclick = function () {
+            data.courses = data.courses.filter(function (c) { return c.id !== id; });
+            save(data); close(); render(); toast('已删除');
+          };
+        });
+      }
+      function renderProjects() {
+        var rows = data.projects.slice().sort(function (a, b) { return a.sort - b.sort; });
+        document.getElementById('content').innerHTML = '<div class="pagehead"><div><h1>新手项目</h1><p>从现有项目里挑选，只决定新手学院里展示谁。从这里移除不会让项目在变现里下架。</p></div><button class="primary" id="add" type="button">＋ 新增项目</button></div><div class="tablebox"><table><thead><tr><th>排序</th><th>图标</th><th>展示名</th><th>收益文案</th><th>操作</th></tr></thead><tbody>' + rows.map(function (p) {
+          return '<tr><td>' + p.sort + '</td><td><span class="logo">' + esc(p.mark) + '</span></td><td>' + esc(p.name) + '</td><td>' + esc(p.rate) + '</td><td class="ops"><button class="link" type="button" data-edit="' + p.id + '">编辑</button><button class="link danger" type="button" data-del="' + p.id + '">移除</button></td></tr>';
+        }).join('') + '</tbody></table></div>';
+        document.getElementById('add').onclick = function () { projectDialog(null); };
+        document.querySelectorAll('[data-edit]').forEach(function (b) { b.onclick = function () { projectDialog(b.dataset.edit); }; });
+        document.querySelectorAll('[data-del]').forEach(function (b) { b.onclick = function () { removeProject(b.dataset.del); }; });
+      }
+      function projectDialog(id) {
+        var row = id ? data.projects.filter(function (p) { return p.id === id; })[0] : null;
+        var options = catalog.filter(function (p) {
+          return !data.projects.some(function (have) { return have.id === p.id && have.id !== id; });
+        }).map(function (p) {
+          return '<option value="' + p.id + '"' + (row && row.id === p.id ? ' selected' : '') + '>' + esc(p.name) + '</option>';
+        }).join('');
+        if (!options) { toast('现有项目都已经在新手学院里'); return; }
+        openDialog('<h3>' + (id ? '编辑项目' : '新增项目') + '</h3><p class="lead">关联的是已经在变现里的项目。这里没有上下架。</p>' +
+          '<div class="field"><label>关联项目 <span class="req">*</span></label><select id="fProject"' + (id ? ' disabled' : '') + '>' + options + '</select></div>' +
+          field('展示名', 'fName', row ? row.name : '', true) +
+          '<div class="field"><label>图标字 <span class="req">*</span></label><input id="fMark" maxlength="2" value="' + esc(row ? row.mark : '') + '"><div class="micro">C 端项目格里的短标识，1 到 2 个字。</div></div>' +
+          field('收益文案', 'fRate', row ? row.rate : '', true) +
+          '<div class="field"><label>发布前要求 <span class="req">*</span></label><textarea id="fPublish">' + esc(row && row.publishReq ? row.publishReq : '') + '</textarea><div class="micro">C 端第 4 步点「查看」时原样展示。换行会保留。</div></div>' +
+          '<div class="field"><label>排序 <span class="req">*</span></label><input id="fSort" type="number" min="0" value="' + (row ? row.sort : data.projects.length + 1) + '"></div>' +
+          '<div class="actions"><button class="secondary" type="button" data-close>取消</button><button class="primary" id="ok" type="button">保存</button></div>', function (box, close) {
+          if (!id) {
+            var sel = box.querySelector('#fProject');
+            box.querySelector('#fName').value = projectName(sel.value);
+            sel.onchange = function () { box.querySelector('#fName').value = projectName(sel.value); };
+          }
+          box.querySelector('#ok').onclick = function () {
+            var pid = id || box.querySelector('#fProject').value;
+            var next = { id: pid, name: val('fName'), mark: val('fMark'), rate: val('fRate'), publishReq: val('fPublish'), sort: Number(val('fSort')) };
+            if (!next.name || !next.mark || !next.rate || !next.publishReq) { toast('请把带星号的项填完整'); return; }
+            if (!Number.isInteger(next.sort) || next.sort < 0) { toast('排序需要是大于等于 0 的整数'); return; }
+            if (id) data.projects = data.projects.map(function (p) { return p.id === id ? next : p; });
+            else data.projects.push(next);
+            save(data); close(); render(); toast('已保存。没有改变项目本身的上下架');
+          };
+        });
+      }
+      function removeProject(id) {
+        var used = data.keywords.some(function (k) { return k.project === id; });
+        openDialog('<h3>从新手学院移除</h3><p class="lead">只从新手学院拿掉。变现里的项目保持原样。' + (used ? '这个项目下还有新手关键词，会一起从新手配置里移除；已经分出去的词记录仍保留给对应用户。' : '') + '</p><div class="actions"><button class="secondary" type="button" data-close>取消</button><button class="primary" id="ok" type="button">移除</button></div>', function (box, close) {
+          box.querySelector('#ok').onclick = function () {
+            data.projects = data.projects.filter(function (p) { return p.id !== id; });
+            data.keywords = data.keywords.filter(function (k) { return k.project !== id || k.userId; });
+            save(data); close(); render(); toast('已从新手学院移除');
+          };
+        });
+      }
+      function renderKeywords() {
+        var assigned = data.keywords.filter(function (k) { return k.userId; }).length;
+        var free = data.keywords.length - assigned;
+        var stats = '<div class="stats"><div class="stat"><span>关键词数</span><b>' + data.keywords.length + '</b></div><div class="stat"><span>已分配数</span><b>' + assigned + '</b></div><div class="stat"><span>未分配数</span><b>' + free + '</b></div></div>';
+        var tabs = '<div class="subtabs"><button type="button" id="tabList" class="' + (kwTab === 'list' ? 'on' : '') + '">关键词列表</button><button type="button" id="tabBatch" class="' + (kwTab === 'batches' ? 'on' : '') + '">申词记录</button></div>';
+        var body = kwTab === 'batches' ? batchTable() : keywordTable();
+        document.getElementById('content').innerHTML = '<div class="pagehead"><div><h1>新手关键词</h1><p>一个关键词只分给一个人。回填信息来自用户在项目详情页提交的作品链接。已分配的词不能删除。</p></div><button class="primary" id="add" type="button">批量新增</button></div>' + stats + tabs + body;
+        document.getElementById('add').onclick = batchDialog;
+        document.getElementById('tabList').onclick = function () { kwTab = 'list'; render(); };
+        document.getElementById('tabBatch').onclick = function () { kwTab = 'batches'; render(); };
+        document.querySelectorAll('[data-view]').forEach(function (b) { b.onclick = function () { viewKeyword(b.dataset.view); }; });
+        document.querySelectorAll('[data-del]').forEach(function (b) { b.onclick = function () { removeKeyword(b.dataset.del); }; });
+      }
+      function keywordTable() {
+        if (!data.keywords.length) return '<div class="tablebox"><div class="empty">还没有关键词。用批量新增，按书籍生成。</div></div>';
+        return '<div class="tablebox"><table><thead><tr><th>关键词</th><th>新手项目</th><th>书籍 ID</th><th>书籍链接</th><th>关键词状态</th><th>审核状态</th><th>用户 ID</th><th>回填信息</th><th>操作</th></tr></thead><tbody>' + data.keywords.map(function (k) {
+          var status = k.userId ? '<span class="pill on">已分配</span>' : '<span class="pill">未分配</span>';
+          var refill = k.refill ? '<span class="clip" title="' + esc(k.refill) + '">' + esc(k.refill) + '</span>' : '<span class="pill">未回填</span>';
+          return '<tr><td>' + esc(k.word) + '</td><td>' + esc(projectName(k.project)) + '</td><td>' + esc(k.bookId) + '</td><td><span class="clip" title="' + esc(k.bookLink) + '">' + esc(k.bookLink) + '</span></td><td>' + status + '</td><td>' + auditPill(k.audit) + '</td><td>' + (k.userId ? esc(k.userId) : '—') + '</td><td>' + refill + '</td><td class="ops"><button class="link" type="button" data-view="' + k.id + '">查看详情</button><button class="link danger" type="button" data-del="' + k.id + '"' + (k.userId ? ' disabled' : '') + '>删除</button></td></tr>';
+        }).join('') + '</tbody></table></div>';
+      }
+      function batchTable() {
+        var rows = (data.batches || []).slice();
+        if (!rows.length) return '<div class="tablebox"><div class="empty">还没有申词批次。</div></div>';
+        return '<div class="tablebox"><table><thead><tr><th>申词批次</th><th>生词项目</th><th>生词数量</th><th>执行状态</th><th>生成时间</th></tr></thead><tbody>' + rows.map(function (b) {
+          var status = b.status === 'done' ? '<span class="pill done">已完成</span>' : '<span class="pill run">执行中</span>';
+          return '<tr><td>' + esc(b.id) + '</td><td>' + esc(projectName(b.project)) + '</td><td>' + b.count + '</td><td>' + status + '</td><td>' + esc(b.time) + '</td></tr>';
+        }).join('') + '</tbody></table></div>';
+      }
+      function auditPill(audit) {
+        var cls = audit === '已通过' ? 'done' : audit === '已驳回' ? 'reject' : 'run';
+        return '<span class="pill ' + cls + '">' + esc(audit || '待审核') + '</span>';
+      }
+      function detailItem(label, value) {
+        return '<dt>' + label + '</dt><dd>' + value + '</dd>';
+      }
+      function viewKeyword(id) {
+        var row = data.keywords.filter(function (k) { return k.id === id; })[0];
+        if (!row) return;
+        openDialog('<h3>关键词详情</h3><p class="lead">只读。已分配的词不能改、不能删除。审核状态为待审核、已通过或已驳回。</p><dl class="detail">' +
+          detailItem('关键词', esc(row.word)) +
+          detailItem('新手项目', esc(projectName(row.project))) +
+          detailItem('书籍名称', esc(row.book || '—')) +
+          detailItem('书籍 ID', esc(row.bookId)) +
+          detailItem('书籍链接', esc(row.bookLink)) +
+          detailItem('关键词状态', row.userId ? '已分配' : '未分配') +
+          detailItem('审核状态', esc(row.audit || '待审核')) +
+          detailItem('已分配用户 ID', row.userId ? esc(row.userId) : '未分配') +
+          detailItem('回填信息', row.refill ? esc(row.refill) : '未回填') +
+          detailItem('申词批次', esc(row.batchId || '—')) +
+          detailItem('生成时间', esc(row.createdAt || '—')) +
+          '</dl><div class="actions"><button class="secondary" type="button" data-close>关闭</button></div>');
+      }
+      function batchDialog() {
+        if (!data.projects.length) { toast('请先配置新手项目'); return; }
+        var options = data.projects.map(function (p) { return '<option value="' + p.id + '">' + esc(p.name) + '</option>'; }).join('');
+        openDialog('<h3>批量新增</h3><p class="lead">选一个项目，每行填一个书籍 ID 或一条书籍链接。AI 按每本书的数量直接生成关键词，生成结果进入未分配。</p>' +
+          '<div class="field"><label>生词项目 <span class="req">*</span></label><select id="fProject">' + options + '</select></div>' +
+          '<div class="field"><label>书籍 ID 或书籍链接 <span class="req">*</span></label><textarea id="fBooks" placeholder="BK10086&#10;https://book.youbao.example/BK20018"></textarea><div class="micro">一行一个。链接会按地址识别，其余按书籍 ID。</div></div>' +
+          '<div class="field"><label>每个书生成的关键词数量 <span class="req">*</span></label><input id="fCount" type="number" min="1" max="50" value="2"></div>' +
+          '<div class="actions"><button class="secondary" type="button" data-close>取消</button><button class="primary" id="ok" type="button">AI 批量生成</button></div>', function (box, close) {
+          box.querySelector('#ok').onclick = function () {
+            var lines = box.querySelector('#fBooks').value.split(/\n+/).map(function (line) { return line.trim(); }).filter(Boolean);
+            var seen = {};
+            var books = [];
+            lines.forEach(function (line) {
+              if (seen[line]) return;
+              seen[line] = 1;
+              books.push(parseBookLine(line));
+            });
+            var per = Number(val('fCount'));
+            if (!books.length) { toast('请至少填写一个书籍 ID 或链接'); return; }
+            if (!Number.isInteger(per) || per < 1 || per > 50) { toast('每个书的关键词数量要是 1 到 50 的整数'); return; }
+            var project = box.querySelector('#fProject').value;
+            var batch = { id: nextBatchId(), project: project, count: books.length * per, status: 'run', time: nowText() };
+            close();
+            startBatch(batch, books, per);
+          };
+        });
+      }
+      function parseBookLine(line) {
+        if (/^https?:\/\//i.test(line)) {
+          var id = line.replace(/[?#].*$/, '').split('/').filter(Boolean).pop() || ('BK' + Math.floor(Math.random() * 100000));
+          return { bookId: id, bookLink: line };
+        }
+        return { bookId: line, bookLink: 'https://book.youbao.example/' + encodeURIComponent(line) };
+      }
+      function makeWord(bookId) {
+        var base = String(bookId).replace(/[^\u4e00-\u9fa5A-Za-z0-9]/g, '').slice(-6) || '书';
+        var word = '';
+        do {
+          word = base + Math.floor(100 + Math.random() * 900);
+        } while (data.keywords.some(function (k) { return k.word === word; }));
+        return word;
+      }
+      function nextBatchId() {
+        var d = new Date();
+        function p(n) { return n < 10 ? '0' + n : '' + n; }
+        var day = '' + d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate());
+        var n = (data.batches || []).filter(function (b) { return String(b.id).indexOf('B' + day) === 0; }).length + 1;
+        return 'B' + day + (n < 10 ? '0' + n : '' + n);
+      }
+      function nowText() {
+        var d = new Date();
+        function p(n) { return n < 10 ? '0' + n : '' + n; }
+        return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+      }
+      function startBatch(batch, books, per) {
+        data.batches = data.batches || [];
+        data.batches.unshift(batch);
+        save(data);
+        kwTab = 'batches';
+        render();
+        toast('批次 ' + batch.id + ' 执行中');
+        setTimeout(function () {
+          var made = 0;
+          books.forEach(function (book) {
+            var i;
+            for (i = 0; i < per; i++) {
+              data.keywords.push({
+                id: 'k' + Date.now() + made,
+                project: batch.project,
+                book: book.bookId,
+                bookId: book.bookId,
+                bookLink: book.bookLink,
+                word: makeWord(book.bookId),
+                userId: '',
+                audit: '待审核',
+                refill: '',
+                batchId: batch.id,
+                createdAt: batch.time
+              });
+              made += 1;
+            }
+          });
+          data.batches.forEach(function (b) {
+            if (b.id === batch.id) { b.status = 'done'; b.count = made; }
+          });
+          save(data);
+          if (page === 'nb-keywords') render();
+          toast('批次 ' + batch.id + ' 已完成，生成 ' + made + ' 个关键词');
+        }, 900);
+      }
+      function removeKeyword(id) {
+        var row = data.keywords.filter(function (k) { return k.id === id; })[0];
+        if (!row || row.userId) { toast('已经分配的词不能删除'); return; }
+        openDialog('<h3>删除关键词</h3><p class="lead">还没分配，删除后不能再被领取。</p><div class="actions"><button class="secondary" type="button" data-close>取消</button><button class="primary" id="ok" type="button">删除</button></div>', function (box, close) {
+          box.querySelector('#ok').onclick = function () {
+            data.keywords = data.keywords.filter(function (k) { return k.id !== id; });
+            save(data); close(); render(); toast('已删除');
+          };
+        });
+      }
+      function renderService() {
+        document.getElementById('content').innerHTML = '<div class="pagehead"><div><h1>客服</h1><p>只配置一张二维码。C 端底部客服栏和「官方稿件已经领完」弹窗用的是同一张。</p></div></div><div class="sheet"><div class="qr" id="qrBox">' + (data.qr ? '<img alt="客服二维码" src="' + esc(data.qr) + '">' : '尚未上传<br>客服二维码') + '</div><div class="field" style="margin-top:14px"><label>更换二维码</label><input id="qrFile" type="file" accept="image/png,image/jpeg,image/webp"></div><div class="micro">png / jpg / webp。换图后两处一起更新。</div><div class="actions"><button class="primary" id="saveQr" type="button">保存</button></div></div>';
+        var pending = data.qr;
+        document.getElementById('qrFile').onchange = function () {
+          var file = this.files && this.files[0];
+          if (!file) return;
+          if (!/^image\//.test(file.type)) { toast('请上传图片'); return; }
+          var reader = new FileReader();
+          reader.onload = function () {
+            pending = reader.result;
+            document.getElementById('qrBox').innerHTML = '<img alt="客服二维码" src="' + pending + '">';
+          };
+          reader.readAsDataURL(file);
+        };
+        document.getElementById('saveQr').onclick = function () {
+          if (!pending) { toast('请先上传二维码'); return; }
+          data.qr = pending;
+          save(data);
+          toast('已保存。客服栏和稿件领完弹窗都会用这张图');
+        };
+      }
+      function field(label, id, value, required) {
+        return '<div class="field"><label>' + label + (required ? ' <span class="req">*</span>' : '') + '</label><input id="' + id + '" value="' + esc(value) + '"></div>';
+      }
+      function val(id) { return document.getElementById(id).value.trim(); }
+      document.querySelectorAll('.menu').forEach(function (b) {
+        b.onclick = function () { go(b.dataset.page, true); };
+      });
+      function go(next, notify) {
+        page = names[next] ? next : 'nb-courses';
+        render();
+        if (notify && window.parent !== window) {
+          try { window.parent.postMessage({ type: 'rb-admin-tab', page: page }, '*'); } catch (e) {}
+        }
+      }
+      window.__rbNewbieAdmin = function (next) { go(next, false); };
+      var initial = new URLSearchParams(location.search).get('page');
+      go(initial || 'nb-courses', false);
+    })();
+  </script>
+</body>
+</html>

@@ -57,19 +57,3 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-014-c3-claim-gates.md`
   summary: `test_fr_shell_admin_and_flow` 仍断言外壳 `.badge-version` 含 v14，页已是 v15
   evidence: 预存于 b9cb708；C3 Never 不许改外壳页，也不许删旧断言，整文件验证会红这一条
-
-- source_spec: `_bmad-output/implementation-artifacts/spec-fr022-daifa-ops-mode.md`
-  summary: PC 上传增加运营模式；帐号运营只绑定剪辑手本人、本书、已通过的一个关键词；按字节系 ID、知乎系链接、海外系任务库校验；剪辑手档案可多选合作模式并各设比例。
-  evidence: 用户选择先做广场和领取。上传和档案比例是另一条可单独验收的供给链路。
-
-- source_spec: `_bmad-output/implementation-artifacts/spec-fr022-daifa-ops-mode.md`
-  summary: 已回填后可继续回填，后台和剪辑手 PC 展示每一条回填数据。
-  evidence: 用户选择先做广场和领取。继续回填不阻塞两种领取路径的预览。
-
-- source_spec: `_bmad-output/implementation-artifacts/spec-fr022-daifa-ops-mode.md`
-  summary: 海外故事、海外短剧的快捷题词跳到对应海外任务详情领取口令。
-  evidence: 用户选择先做广场和领取。海外题词不改变任务协作选词和帐号运营跳过选词。
-
-- source_spec: `_bmad-output/implementation-artifacts/spec-fr022-daifa-ops-mode.md`
-  summary: 侧栏相对当前 HEAD 还包含「一键代发迭代 3.0」条目和图标。
-  evidence: 这是本故事开始前 sidebar-nav.js 已有的未提交改动，不是本版追加 FR-022 时新写的。

@@ -1985,8 +1985,10 @@
 #shortcutGrid button:nth-child(2) .ico{--glow:rgba(255,92,36,.98)}
 #shortcutGrid button:nth-child(3) .ico{--glow:rgba(255,112,64,.98)}
 #shortcutGrid button:nth-child(4) .ico{--glow:rgba(255,64,40,.96)}
-#shortcutGrid svg{width:24px;height:24px;position:relative;z-index:1;display:block;filter:drop-shadow(0 1px 1px rgba(160,40,10,.18))}
-#shortcutGrid span{font-size:12px;font-weight:600;line-height:1.2}
+#shortcutGrid svg,#shortcutGrid .ico img{width:24px;height:24px;position:relative;z-index:1;display:block;object-fit:contain;filter:drop-shadow(0 1px 1px rgba(160,40,10,.18))}
+#shortcutGrid span{font-size:12px;font-weight:600;line-height:1.2;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#shortcutGrid.is-empty{display:block}
+#shortcutGrid .shortcut-empty{margin:0;padding:8px 12px 4px;text-align:center;color:#9aa0ad;font-size:12px}
 #pathFloat{display:none!important;visibility:hidden!important;pointer-events:none!important}
 </style>
 <div class="section" id="shortcutGrid">
@@ -1995,6 +1997,7 @@
 <button type="button" data-shortcut="org"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="sgOrg" x1="4" y1="4" x2="20" y2="20" gradientUnits="userSpaceOnUse"><stop stop-color="#ffb089"/><stop offset="1" stop-color="#ff4a22"/></linearGradient></defs><circle cx="8.2" cy="8" r="2.5" fill="url(#sgOrg)"/><circle cx="15.6" cy="8.4" r="2.15" fill="url(#sgOrg)" opacity=".8"/><path fill="url(#sgOrg)" d="M3.6 18.2c.5-2.7 2.4-4 4.6-4s4.1 1.3 4.6 4v.6H3.6v-.6z"/><path fill="url(#sgOrg)" opacity=".75" d="M12.2 18.4c.4-2.2 2-3.4 3.8-3.4 1.7 0 3.2 1.1 3.7 3.2v.6h-7.5v-.4z"/></svg></span><span>社群中心</span></button>
 <button type="button" data-shortcut="invite"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="sgInvite" x1="4" y1="3" x2="20" y2="21" gradientUnits="userSpaceOnUse"><stop stop-color="#ff9a70"/><stop offset="1" stop-color="#ff3414"/></linearGradient></defs><circle cx="9.2" cy="8.2" r="2.7" fill="url(#sgInvite)"/><path fill="url(#sgInvite)" d="M3.8 18.4c.6-2.8 2.5-4.3 5.4-4.3s4.8 1.5 5.4 4.3v.6H3.8v-.6z"/><circle cx="17.5" cy="7.4" r="3.5" fill="#fff"/><path d="M17.5 5.6v3.6M15.7 7.4h3.6" stroke="url(#sgInvite)" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg></span><span>邀请好友</span></button>
 </div>
+<script src="shortcut-grid-config.js?v=5"></script>
 <div class="section stats">
 <div class="stats-grid">
 <div class="stat"><div class="label">今日预计收益</div><b>829.23</b><small>较昨日 <span style="color:#ff684a">上涨18%</span></small></div>
@@ -2855,6 +2858,7 @@
 <script>
   const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
   const toast = msg => { const t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(window.__tt); window.__tt=setTimeout(()=>t.classList.remove('show'),1500); };
+  window.toast = toast;
   const showSheet=(title,desc)=>{ $('#sheetTitle').textContent=title; $('#sheetDesc').textContent=desc; $('#mask').classList.add('show'); $('#sheet').classList.add('show'); };
   const hideSheet=()=>{ $('#mask').classList.remove('show'); $('#sheet').classList.remove('show'); };
 
@@ -2964,8 +2968,7 @@
   $('#searchBtn').onclick=()=>{const v=$('#searchInput').value.trim(); toast(v?'正在搜索：'+v:'请输入项目或任务名称');};
   $('#searchInput').addEventListener('keydown',e=>{if(e.key==='Enter')$('#searchBtn').click();});
   $$('[data-action]').forEach(el=>el.addEventListener('click',()=>{ const map={message:'打开消息中心',training:'进入公益培训课',guide:'打开OPC经营入门指南',community:'正在打开官方群',rankMore:'查看完整榜单',feedMore:'查看全部动态',orgMore:'查看全部服务机构'}; toast(map[el.dataset.action]||'已点击'); }));
-  const shortcutMap={newbie:'新手学院落点未定，留在首页',rank:'打开「OPC经营数据榜」完整榜单',org:'打开机构详情页列表',invite:'打开邀请落地页'};
-  $$('#shortcutGrid [data-shortcut]').forEach(btn=>btn.addEventListener('click',()=>toast(shortcutMap[btn.dataset.shortcut])));
+  if(window.RBShortcut) window.RBShortcut.render();
   $('#bottomNav').onclick=e=>{const n=e.target.closest('.nav-item');if(!n)return;$$('.nav-item').forEach(x=>x.classList.remove('active'));n.classList.add('active');toast('切换到「'+n.dataset.nav+'」');};
   const toTop=$('#toTop'); window.addEventListener('scroll',()=>toTop.classList.toggle('show',window.scrollY>500)); toTop.onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
 </script>
@@ -6722,13 +6725,17 @@ renderCats();
   } catch(e) {
     console.error('Academy admin demo init error',e);
   }
+  if(window.RBShortcut){
+    try{ window.RBShortcut.installAdmin(root); }catch(err){ console.error('Shortcut admin init error',err); }
+  }
 
   function setMode(mode){
     const admin=mode==='admin';
     document.body.classList.toggle('rb-admin-mode',admin);
     cBtn.classList.toggle('on',!admin);
     aBtn.classList.toggle('on',admin);
-    ctx.textContent=admin?'B端 · 学院中心管理后台':'C端 · V125';
+    ctx.textContent=admin?'B端 · 管理后台':'C端 · V125';
+    if(!admin && window.RBShortcut) window.RBShortcut.render();
     try{sessionStorage.setItem('rb-demo-workspace',mode)}catch(e){}
   }
   cBtn.addEventListener('click',()=>setMode('c'));
@@ -6764,6 +6771,24 @@ renderCats();
     if(screen==='academy'){
       const card=document.querySelector('.newbie-card[data-carousel="academy"]');
       if(card)card.click();
+      return;
+    }
+    if(screen==='course-article'||screen==='course-video'){
+      document.querySelectorAll('.app-page').forEach(function(p){p.classList.remove('active');});
+      const title=screen==='course-video'?'右豹OPC经营入门指南':'知乎故事项目完整教学';
+      const el=document.querySelector('#academyNormalList .academy-course[data-course-title="'+title+'"]');
+      if(window.__academyOpenCourse&&el)window.__academyOpenCourse(el);
+      return;
+    }
+    if(screen==='demand'){
+      const items=document.querySelectorAll('#bottomNav .nav-item');
+      const el=items[2];
+      if(el&&typeof el.onclick==='function')el.onclick();
+      else if(el)el.click();
+      setTimeout(function(){
+        const btn=document.getElementById('openDemand');
+        if(btn)btn.click();
+      },80);
       return;
     }
     if(screen==='analysis'||screen==='share'){

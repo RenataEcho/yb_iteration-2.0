@@ -6,10 +6,7 @@ updated: 2026-10-10
 topic: 一键代发3.0 · 剪辑手 PC 优化
 sources:
   - demo/iteration/yijian-daifa-pc.html
-  - demo/iteration/yijian-daifa-ops-pc.html
   - demo/iteration/yijian-daifa-pc-guide.md
-  - _bmad-output/planning-artifacts/prds/prd-YBDD2.0-2026-10-09/prd.md
-  - _bmad-output/implementation-artifacts/spec-fr022-daifa-ops-mode.md
 colors:
   orange: '#ff6b1a'
   orange-light: '#fff3eb'
@@ -86,7 +83,7 @@ components:
 
 ## Brand & Style
 
-剪辑供稿是创作者中心里的电脑工作台：深色顶栏、浅灰画布、白色内容面，橙色只表示当前步骤、主按钮和可点的导航。这一轮不换品牌。`[ASSUMPTION]` 视觉以 `demo/iteration/yijian-daifa-pc.html` 的 `:root` 和上传弹窗为准；运营模式字段的位置对照 `yijian-daifa-ops-pc.html`。这一轮新增：书籍类型芯片、比单条上传更宽的批量任务表、书籍链接旁边的关键词下拉、书籍分组下的剪辑师提醒文本域。
+剪辑供稿是创作者中心里的电脑工作台：深色顶栏、浅灰画布、白色内容面，橙色只表示当前步骤、主按钮和可点的导航。这一轮不换品牌。`[ASSUMPTION]` 视觉以 `demo/iteration/yijian-daifa-pc.html` 的 `:root` 和上传弹窗为准。运营模式字段沿用这份 PC 页已有字段的位置。这一轮新增：书籍类型芯片、比单条上传更宽的批量任务表、书籍链接旁边的关键词下拉、书籍分组下的剪辑师提醒文本域。
 
 ## Colors
 

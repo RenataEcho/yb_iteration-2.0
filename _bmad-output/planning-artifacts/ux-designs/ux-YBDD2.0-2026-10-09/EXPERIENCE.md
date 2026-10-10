@@ -6,11 +6,8 @@ updated: 2026-10-10
 topic: 一键代发3.0 · 剪辑手 PC 优化
 sources:
   - demo/iteration/yijian-daifa-pc.html
-  - demo/iteration/yijian-daifa-ops-pc.html
   - demo/iteration/yijian-daifa-pc-guide.md
   - _bmad-output/specs/spec-fr014-yijian-daifa/剪辑供稿-操作说明.md
-  - _bmad-output/planning-artifacts/prds/prd-YBDD2.0-2026-10-09/prd.md
-  - _bmad-output/implementation-artifacts/spec-fr022-daifa-ops-mode.md
 ---
 
 # EXPERIENCE · 一键代发 3.0 · 剪辑手 PC

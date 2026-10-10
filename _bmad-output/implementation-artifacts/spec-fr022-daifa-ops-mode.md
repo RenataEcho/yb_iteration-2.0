@@ -2,12 +2,14 @@
 title: '代发运营合作模式预览 · 广场与领取'
 type: 'feature'
 created: '2026-10-09'
-status: 'done'
+status: 'withdrawn'
 review_loop_iteration: 0
 baseline_commit: '6cebc3a67058d2cd299a51320cb5c2c6b3ab3de0'
 context:
   - '{project-root}/_bmad-output/planning-artifacts/prds/prd-YBDD2.0-2026-10-09/prd.md'
 ---
+
+2026-10-10 随需求撤回。专属演示页、测试和侧栏入口在同一变更里删除。
 
 <frozen-after-approval reason="human-owned intent — do not modify unless human renegotiates">
 
