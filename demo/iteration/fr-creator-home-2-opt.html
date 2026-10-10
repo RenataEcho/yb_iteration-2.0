@@ -56,7 +56,7 @@
       border: 1px solid rgba(255,255,255,0.55); border-radius: var(--radius-lg);
       padding: 4px; box-shadow: var(--shadow); width: fit-content;
     }
-    .admin-tab-bar { margin: 12px 16px 0; }
+    .admin-tab-bar { margin: 12px 16px 0; flex-wrap: wrap; width: auto; max-width: 100%; }
     .page-tab-bar button, .admin-tab-bar button {
       padding: 8px 20px; border: none; background: transparent; cursor: pointer;
       font-size: 13px; color: var(--text-secondary); border-radius: 10px;
@@ -97,14 +97,19 @@
     .scene-panel h2 { font-size: 14px; font-weight: 700; }
     .scene-lead, .scene-hint { font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-top: 6px; }
     .scene-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
-    .scene-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .scene-bands { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
+    .scene-band { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+    .scene-band-name { font-size: 11px; font-weight: 700; color: var(--text-muted); min-width: 72px; }
     .scene-btn {
       padding: 6px 12px; border-radius: 999px; border: 1px solid var(--border);
       background: #fff; font-size: 12px; cursor: pointer; color: #6b7280;
     }
     .scene-btn.active { border-color: var(--primary-border); background: var(--primary-light); color: var(--primary); font-weight: 600; }
     .mockup-board { padding: 14px 16px 16px; background: #fff; flex: 1; min-height: 0; display: flex; flex-direction: column; }
-    .board-scroll { overflow: auto; flex: 1; min-height: 0; }
+    .board-scroll { overflow: auto; flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 18px; }
+    .board-band { width: 100%; }
+    .board-band + .board-band { margin-top: 18px; padding-top: 16px; border-top: 1px dashed var(--border); }
+    .board-band-name { margin: 0 0 12px; font-size: 12px; font-weight: 700; color: var(--text-secondary); }
     .board-row { display: flex; flex-wrap: wrap; gap: 20px 18px; align-items: flex-start; }
     .board-tile { width: min(360px, 100%); margin: 0; }
     .board-cap { font-size: 13px; font-weight: 700; margin-bottom: 8px; }
@@ -120,6 +125,11 @@
     .admin-demo-wrap { height: calc(100vh - 280px); min-height: 520px; padding: 0 16px 16px; }
     .admin-demo-wrap iframe { width: 100%; height: 100%; border: 0; border-radius: 12px; background: #f5f6f8; border: 1px solid var(--border); }
     .admin-lead { padding: 14px 18px 0; font-size: 12px; color: var(--text-muted); line-height: 1.55; }
+    .flow-svg-wrap { overflow: auto; padding: 16px 18px 8px; max-height: 72vh; }
+    .flow-svg-wrap svg { display: block; margin: 0 auto; min-width: 1360px; }
+    .flow-edges line, .flow-edges polyline { stroke: #94a3b8; stroke-width: 1.5; fill: none; }
+    .flow-legend { display: flex; flex-wrap: wrap; gap: 12px; padding: 0 18px 20px; font-size: 11px; color: var(--text-muted); }
+    .flow-legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 4px; vertical-align: -2px; }
     .drawer-overlay {
       position: fixed; inset: 0; background: rgba(15,23,42,0.35); z-index: 500;
       opacity: 0; pointer-events: none; transition: opacity 0.25s;
@@ -156,7 +166,7 @@
       <span class="sprint-pill">YBDD2.0 · 迭代 v1</span>
     </div>
     <div class="sidebar-scroll" data-iteration-sidebar></div>
-    <div class="sidebar-foot">FR-021 · 页内 Tab<br />前端交互 / 管理后台</div>
+    <div class="sidebar-foot">FR-021 · 页内 Tab<br />前端交互 / 管理后台 / 业务流程</div>
   </aside>
 
   <main class="main">
@@ -171,7 +181,7 @@
           <span class="badge badge-fr">FR-021</span>
           <span class="badge badge-version">v1 当前</span>
         </h1>
-        <p class="page-desc">创作者首页 V125：C 端减噪、找项目工具、学院 C 端；学院管理后台为「课程管理（复用知识库）+ 分类管理」。完整交互真源为 <code>creator-home-2-opt-demo.html</code>。前端按每个页面的状态并排摆出，点场景滚到对应画面。</p>
+        <p class="page-desc">创作者首页 V125：C 端减噪、找项目工具、学院 C 端。首页金刚区来自管理后台「金刚区配置」。学院后台另有菜单「新手学院」：新手课程、新手项目、新手关键词、客服。完整交互真源为 <code>creator-home-2-opt-demo.html</code> 与 <code>newbie-academy-admin-demo.html</code>。</p>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
         <a class="btn btn-ghost" href="creator-home-2-opt-demo.html" target="_blank" rel="noopener">新窗口完整 Demo</a>
@@ -182,6 +192,7 @@
     <div class="page-tab-bar" role="tablist">
       <button type="button" class="active" data-page="view-fe" role="tab">前端交互</button>
       <button type="button" data-page="view-admin" role="tab">管理后台</button>
+      <button type="button" data-page="view-flow" role="tab">业务流程</button>
     </div>
 
     <div id="view-fe" class="page-view active">
@@ -190,32 +201,86 @@
           <div class="scene-head">
             <div>
               <h2>用户端（C 端 App）</h2>
-              <p class="scene-lead">首页、商学院、变现、工具、数据、数据分析、晒成果按各自页面状态直接摆开。点进单台手机仍可操作该页。</p>
+              <p class="scene-lead">按纬度分排。新手学院单独一条。变现、数据、分析和晒成果在同一条；工具和提工具需求在另一条。</p>
             </div>
             <button class="btn-preview" type="button" data-preview="fe" aria-pressed="false">全屏预览</button>
           </div>
-          <div class="scene-list" id="feSceneList">
-            <button class="scene-btn active" type="button" data-screen="home">创作者首页</button>
-            <button class="scene-btn" type="button" data-screen="academy">商学院</button>
-            <button class="scene-btn" type="button" data-screen="cash">变现</button>
-            <button class="scene-btn" type="button" data-screen="tools">工具</button>
-            <button class="scene-btn" type="button" data-screen="data">数据</button>
-            <button class="scene-btn" type="button" data-screen="analysis">数据分析</button>
-            <button class="scene-btn" type="button" data-screen="share">晒成果</button>
+          <div class="scene-bands" id="feSceneList">
+            <div class="scene-band">
+              <span class="scene-band-name">首页与学院</span>
+              <button class="scene-btn active" type="button" data-screen="home">创作者首页</button>
+              <button class="scene-btn" type="button" data-screen="academy">商学院</button>
+              <button class="scene-btn" type="button" data-screen="course-article">图文详情</button>
+              <button class="scene-btn" type="button" data-screen="course-video">视频详情</button>
+            </div>
+            <div class="scene-band">
+              <span class="scene-band-name">新手学院</span>
+              <button class="scene-btn" type="button" data-screen="nb-step1">STEP 1</button>
+              <button class="scene-btn" type="button" data-screen="nb-course">课程详情</button>
+              <button class="scene-btn" type="button" data-screen="nb-step2">选中项目</button>
+              <button class="scene-btn" type="button" data-screen="nb-keyword">领取关键词</button>
+              <button class="scene-btn" type="button" data-screen="nb-official">官方稿件</button>
+              <button class="scene-btn" type="button" data-screen="nb-kw-short">关键词不足</button>
+              <button class="scene-btn" type="button" data-screen="nb-ms-short">稿件不足</button>
+              <button class="scene-btn" type="button" data-screen="nb-refill">发布回填</button>
+              <button class="scene-btn" type="button" data-screen="nb-filled">回填成功</button>
+            </div>
+            <div class="scene-band">
+              <span class="scene-band-name">变现与数据</span>
+              <button class="scene-btn" type="button" data-screen="cash">变现</button>
+              <button class="scene-btn" type="button" data-screen="data">数据</button>
+              <button class="scene-btn" type="button" data-screen="analysis">数据分析</button>
+              <button class="scene-btn" type="button" data-screen="share">晒成果</button>
+            </div>
+            <div class="scene-band">
+              <span class="scene-band-name">工具</span>
+              <button class="scene-btn" type="button" data-screen="tools">工具</button>
+              <button class="scene-btn" type="button" data-screen="demand">提工具需求</button>
+            </div>
           </div>
           <p class="scene-hint">点场景滚到对应画面。每台手机是该页的一个状态，不再在同一台里来回切换。</p>
         </div>
         <div class="glass-card mockup-board">
           <div class="board-scroll" id="feBoardScroll">
-            <div class="board-row">
-              <figure class="board-tile" id="tile-home"><figcaption class="board-cap">创作者首页 <em>金刚区、双卡、找项目</em></figcaption><div class="board-phone"><iframe title="创作者首页" src="creator-home-2-opt-demo.html?embed=1&surface=c&screen=home&v=16"></iframe></div></figure>
-              <figure class="board-tile" id="tile-academy"><figcaption class="board-cap">商学院 <em>频道与课程列表</em></figcaption><div class="board-phone"><iframe title="商学院" src="creator-home-2-opt-demo.html?embed=1&surface=c&screen=academy&v=16"></iframe></div></figure>
-              <figure class="board-tile" id="tile-cash"><figcaption class="board-cap">变现 <em>赛道与项目列表</em></figcaption><div class="board-phone"><iframe title="变现" src="creator-home-2-opt-demo.html?embed=1&surface=c&screen=cash&v=16"></iframe></div></figure>
-              <figure class="board-tile" id="tile-tools"><figcaption class="board-cap">工具 <em>场景与工具市场</em></figcaption><div class="board-phone"><iframe title="工具" src="creator-home-2-opt-demo.html?embed=1&surface=c&screen=tools&v=16"></iframe></div></figure>
-              <figure class="board-tile" id="tile-data"><figcaption class="board-cap">数据 <em>收益总览</em></figcaption><div class="board-phone"><iframe title="数据" src="creator-home-2-opt-demo.html?embed=1&surface=c&screen=data&v=16"></iframe></div></figure>
-              <figure class="board-tile" id="tile-analysis"><figcaption class="board-cap">数据分析 <em>收益趋势、日历、项目分析</em></figcaption><div class="board-phone"><iframe title="数据分析" src="creator-home-2-opt-demo.html?embed=1&surface=c&screen=analysis&v=16"></iframe></div></figure>
-              <figure class="board-tile" id="tile-share"><figcaption class="board-cap">晒成果 <em>按当前分析页生成海报</em></figcaption><div class="board-phone"><iframe title="晒成果" src="creator-home-2-opt-demo.html?embed=1&surface=c&screen=share&v=16"></iframe></div></figure>
-            </div>
+            <section class="board-band">
+              <h3 class="board-band-name">首页与学院</h3>
+              <div class="board-row">
+                <figure class="board-tile" id="tile-home"><figcaption class="board-cap">创作者首页 <em>金刚区、双卡、找项目</em></figcaption><div class="board-phone"><iframe title="创作者首页" src="creator-home-2-opt-demo.html?embed=1&surface=c&screen=home&v=22"></iframe></div></figure>
+                <figure class="board-tile" id="tile-academy"><figcaption class="board-cap">商学院 <em>频道与课程列表</em></figcaption><div class="board-phone"><iframe title="商学院" src="creator-home-2-opt-demo.html?embed=1&surface=c&screen=academy&v=20"></iframe></div></figure>
+                <figure class="board-tile" id="tile-course-article"><figcaption class="board-cap">课程详情 <em>图文，正文和推荐课程</em></figcaption><div class="board-phone"><iframe title="图文课程详情" src="creator-home-2-opt-demo.html?embed=1&surface=c&screen=course-article&v=20"></iframe></div></figure>
+                <figure class="board-tile" id="tile-course-video"><figcaption class="board-cap">课程详情 <em>视频播放</em></figcaption><div class="board-phone"><iframe title="视频课程详情" src="creator-home-2-opt-demo.html?embed=1&surface=c&screen=course-video&v=20"></iframe></div></figure>
+              </div>
+            </section>
+            <section class="board-band">
+              <h3 class="board-band-name">新手学院</h3>
+              <div class="board-row">
+                <figure class="board-tile" id="tile-nb-step1"><figcaption class="board-cap">STEP 1 <em>先弄懂，入门必看</em></figcaption><div class="board-phone"><iframe title="新手学院 STEP 1" src="newbie-academy-demo.html?scene=step1&v=7"></iframe></div></figure>
+                <figure class="board-tile" id="tile-nb-course"><figcaption class="board-cap">课程详情 <em>右豹怎么赚到收益</em></figcaption><div class="board-phone"><iframe title="新手学院课程详情" src="newbie-academy-demo.html?scene=course&v=7"></iframe></div></figure>
+                <figure class="board-tile" id="tile-nb-step2"><figcaption class="board-cap">STEP 2 <em>已选中知乎故事</em></figcaption><div class="board-phone"><iframe title="新手学院选中项目" src="newbie-academy-demo.html?scene=step2&v=7"></iframe></div></figure>
+                <figure class="board-tile" id="tile-nb-keyword"><figcaption class="board-cap">领取关键词 <em>已领取，一个词只分给一个人</em></figcaption><div class="board-phone"><iframe title="领取关键词" src="newbie-academy-demo.html?scene=keyword&v=7"></iframe></div></figure>
+                <figure class="board-tile" id="tile-nb-official"><figcaption class="board-cap">官方稿件 <em>使用官方稿件，或改用自己的稿件</em></figcaption><div class="board-phone"><iframe title="选择官方稿件" src="newbie-academy-demo.html?scene=official&v=7"></iframe></div></figure>
+                <figure class="board-tile" id="tile-nb-kw-short"><figcaption class="board-cap">关键词不足 <em>官方词已领完，去申请关键词</em></figcaption><div class="board-phone"><iframe title="关键词不足" src="newbie-academy-demo.html?scene=kw-short&v=7"></iframe></div></figure>
+                <figure class="board-tile" id="tile-nb-ms-short"><figcaption class="board-cap">稿件不足 <em>官方稿件已领完，可自己做视频</em></figcaption><div class="board-phone"><iframe title="稿件不足" src="newbie-academy-demo.html?scene=ms-short&v=7"></iframe></div></figure>
+                <figure class="board-tile" id="tile-nb-refill"><figcaption class="board-cap">发布回填 <em>开发规则：打开对应项目的回填页面</em></figcaption><div class="board-phone"><iframe title="发布回填" src="newbie-academy-demo.html?scene=refill&v=7"></iframe></div></figure>
+                <figure class="board-tile" id="tile-nb-filled"><figcaption class="board-cap">回填成功 <em>第一次发布完成</em></figcaption><div class="board-phone"><iframe title="回填成功" src="newbie-academy-demo.html?scene=filled&v=7"></iframe></div></figure>
+              </div>
+            </section>
+            <section class="board-band">
+              <h3 class="board-band-name">变现与数据</h3>
+              <div class="board-row">
+                <figure class="board-tile" id="tile-cash"><figcaption class="board-cap">变现 <em>赛道与项目列表</em></figcaption><div class="board-phone"><iframe title="变现" src="creator-home-2-opt-demo.html?embed=1&surface=c&screen=cash&v=20"></iframe></div></figure>
+                <figure class="board-tile" id="tile-data"><figcaption class="board-cap">数据 <em>收益总览</em></figcaption><div class="board-phone"><iframe title="数据" src="creator-home-2-opt-demo.html?embed=1&surface=c&screen=data&v=20"></iframe></div></figure>
+                <figure class="board-tile" id="tile-analysis"><figcaption class="board-cap">数据分析 <em>收益趋势、日历、项目分析</em></figcaption><div class="board-phone"><iframe title="数据分析" src="creator-home-2-opt-demo.html?embed=1&surface=c&screen=analysis&v=20"></iframe></div></figure>
+                <figure class="board-tile" id="tile-share"><figcaption class="board-cap">晒成果 <em>按当前分析页生成海报</em></figcaption><div class="board-phone"><iframe title="晒成果" src="creator-home-2-opt-demo.html?embed=1&surface=c&screen=share&v=20"></iframe></div></figure>
+              </div>
+            </section>
+            <section class="board-band">
+              <h3 class="board-band-name">工具</h3>
+              <div class="board-row">
+                <figure class="board-tile" id="tile-tools"><figcaption class="board-cap">工具 <em>场景与工具市场</em></figcaption><div class="board-phone"><iframe title="工具" src="creator-home-2-opt-demo.html?embed=1&surface=c&screen=tools&v=20"></iframe></div></figure>
+                <figure class="board-tile" id="tile-demand"><figcaption class="board-cap">提工具需求 <em>工具页里的需求入口</em></figcaption><div class="board-phone"><iframe title="提工具需求" src="creator-home-2-opt-demo.html?embed=1&surface=c&screen=demand&v=20"></iframe></div></figure>
+              </div>
+            </section>
           </div>
         </div>
       </div>
@@ -223,14 +288,163 @@
 
     <div id="view-admin" class="page-view">
       <div class="glass-card">
-        <p class="admin-lead">学院管理后台：「课程管理」含知识库对接和「学院直播课」；「分类管理」提供频道分类；「学习数据」还原基础统计（详情 UV、学习人数、完成率、收藏、直播预约）。</p>
+        <p class="admin-lead">「金刚区配置」决定首页 Banner 下方入口。学院侧仍是「课程管理」「分类管理」「学习数据」。新手学院单独四个配置页，不进学习数据。</p>
         <div class="admin-tab-bar" role="tablist">
+          <button type="button" data-admin-page="shortcuts">金刚区配置</button>
           <button type="button" class="active" data-admin-page="courses">课程管理</button>
           <button type="button" data-admin-page="categories">分类管理</button>
           <button type="button" data-admin-page="analytics">学习数据</button>
+          <button type="button" data-admin-page="nb-courses">新手课程</button>
+          <button type="button" data-admin-page="nb-projects">新手项目</button>
+          <button type="button" data-admin-page="nb-keywords">新手关键词</button>
+          <button type="button" data-admin-page="nb-service">客服</button>
         </div>
         <div class="admin-demo-wrap">
           <iframe id="adminDemoFrame" title="2.0优化 · 学院管理后台" src="about:blank"></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div id="view-flow" class="page-view">
+      <div class="glass-card flow-page">
+        <div class="flow-svg-wrap">
+          <svg width="1360" height="1280" viewBox="0 0 1360 1280" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <marker id="flow-arrow-1" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                <path d="M0,0 L8,4 L0,8 Z" fill="#94a3b8" />
+              </marker>
+            </defs>
+            <g class="flow-edges" marker-end="url(#flow-arrow-1)">
+              <line x1="580" y1="104" x2="580" y2="134" />
+              <line x1="580" y1="222" x2="580" y2="252" />
+              <line x1="580" y1="300" x2="580" y2="324" />
+              <line x1="580" y1="372" x2="580" y2="402" />
+              <line x1="580" y1="490" x2="580" y2="520" />
+              <line x1="580" y1="608" x2="580" y2="638" />
+              <line x1="580" y1="726" x2="580" y2="756" />
+              <line x1="580" y1="824" x2="580" y2="854" />
+              <line x1="580" y1="942" x2="580" y2="972" />
+              <line x1="580" y1="1012" x2="580" y2="1036" />
+              <line x1="580" y1="1124" x2="580" y2="1148" />
+              <line x1="460" y1="178" x2="306" y2="178" />
+              <line x1="201" y1="214" x2="201" y2="238" />
+              <polyline points="96,178 20,178 20,16 580,16 580,36" />
+              <polyline points="400,1184 20,1184 20,16 580,16 580,36" />
+              <polyline points="460,446 306,446" stroke-dasharray="4 3" />
+              <polyline points="201,420 201,312 500,312 500,324" />
+              <polyline points="201,472 201,840 580,840 580,854" stroke-dasharray="4 3" />
+              <line x1="700" y1="564" x2="900" y2="564" />
+              <polyline points="1015,520 1015,312 700,312 700,324" />
+              <polyline points="1015,608 1015,622 1300,622 1300,898 700,898" stroke-dasharray="4 3" />
+              <line x1="700" y1="682" x2="900" y2="682" />
+              <polyline points="1015,654 1015,638 1240,638 1240,312 730,312 730,324" />
+              <line x1="460" y1="898" x2="306" y2="898" />
+              <polyline points="96,898 48,898 48,312 430,312 430,324" />
+              <line x1="760" y1="1184" x2="900" y2="1184" />
+            </g>
+            <g class="flow-nodes" font-family="Inter, PingFang SC, sans-serif">
+              <rect x="400" y="36" width="360" height="68" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="580" y="62" text-anchor="middle" font-size="12" fill="#1e40af">选择项目</text>
+              <text x="580" y="80" text-anchor="middle" font-size="10" fill="#64748b">领词前可改选</text>
+              <text x="580" y="94" text-anchor="middle" font-size="10" fill="#64748b">领词后收成一行</text>
+
+              <polygon points="580,134 700,178 580,222 460,178" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="580" y="182" text-anchor="middle" font-size="11" fill="#854d0e">还有可分配的词？</text>
+              <text x="360" y="170" font-size="10" fill="#dc2626">否</text>
+              <text x="592" y="244" font-size="10" fill="#16a34a">是</text>
+
+              <rect x="96" y="142" width="210" height="72" rx="6" fill="#fecaca" stroke="#dc2626" />
+              <text x="201" y="168" text-anchor="middle" font-size="12" fill="#991b1b">关键词不足</text>
+              <text x="201" y="186" text-anchor="middle" font-size="10" fill="#991b1b">官方词已领完</text>
+              <text x="201" y="200" text-anchor="middle" font-size="10" fill="#991b1b">需要自行申请词</text>
+              <text x="28" y="170" font-size="10" fill="#dc2626">稍后再说</text>
+              <text x="214" y="230" font-size="10" fill="#1e40af">去申请关键词</text>
+
+              <rect x="96" y="238" width="210" height="40" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="201" y="262" text-anchor="middle" font-size="12" fill="#1e40af">现有申请关键词页</text>
+
+              <rect x="400" y="252" width="360" height="48" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="580" y="272" text-anchor="middle" font-size="12" fill="#1e40af">领取关键词</text>
+              <text x="580" y="288" text-anchor="middle" font-size="10" fill="#64748b">一个词只给一个人</text>
+
+              <rect x="400" y="324" width="360" height="48" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="580" y="344" text-anchor="middle" font-size="12" fill="#1e40af">准备发布稿件</text>
+              <text x="580" y="360" text-anchor="middle" font-size="10" fill="#64748b">领词后不能更换项目</text>
+
+              <polygon points="580,402 700,446 580,490 460,446" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="580" y="450" text-anchor="middle" font-size="11" fill="#854d0e">官方还是自己的？</text>
+              <text x="592" y="510" font-size="10" fill="#16a34a">使用官方稿件</text>
+              <text x="318" y="438" font-size="10" fill="#2563eb">使用自己的稿件</text>
+
+              <rect x="96" y="420" width="210" height="52" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="201" y="442" text-anchor="middle" font-size="12" fill="#1e40af">使用自己的稿件</text>
+              <text x="201" y="458" text-anchor="middle" font-size="10" fill="#64748b">不在这里上传</text>
+              <text x="210" y="380" font-size="10" fill="#2563eb">可改回官方</text>
+
+              <polygon points="580,520 700,564 580,608 460,564" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="580" y="568" text-anchor="middle" font-size="11" fill="#854d0e">该书还有可领稿件？</text>
+              <text x="760" y="556" font-size="10" fill="#dc2626">否</text>
+              <text x="592" y="628" font-size="10" fill="#16a34a">是</text>
+
+              <rect x="900" y="520" width="230" height="88" rx="6" fill="#fecaca" stroke="#dc2626" />
+              <text x="1015" y="544" text-anchor="middle" font-size="12" fill="#991b1b">稿件不足</text>
+              <text x="1015" y="562" text-anchor="middle" font-size="10" fill="#991b1b">官方稿件已经领完</text>
+              <text x="1015" y="578" text-anchor="middle" font-size="10" fill="#991b1b">自行制作视频</text>
+              <text x="1015" y="594" text-anchor="middle" font-size="10" fill="#991b1b">客服二维码</text>
+              <text x="1024" y="420" font-size="10" fill="#dc2626">我知道了</text>
+              <text x="860" y="888" font-size="10" fill="#2563eb">改用自己的稿件</text>
+
+              <polygon points="580,638 700,682 580,726 460,682" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="580" y="686" text-anchor="middle" font-size="11" fill="#854d0e">领取次数够？</text>
+              <text x="760" y="674" font-size="10" fill="#dc2626">否</text>
+              <text x="592" y="746" font-size="10" fill="#16a34a">是</text>
+
+              <rect x="900" y="654" width="230" height="56" rx="6" fill="#fecaca" stroke="#dc2626" />
+              <text x="1015" y="678" text-anchor="middle" font-size="12" fill="#991b1b">次数不足，请先</text>
+              <text x="1015" y="696" text-anchor="middle" font-size="12" fill="#991b1b">兑换领取次数</text>
+
+              <rect x="400" y="756" width="360" height="68" rx="6" fill="#dcfce7" stroke="#16a34a" />
+              <text x="580" y="782" text-anchor="middle" font-size="12" fill="#166534">领取并下载稿件</text>
+              <text x="580" y="800" text-anchor="middle" font-size="10" fill="#64748b">按书随机一份、扣次</text>
+              <text x="580" y="814" text-anchor="middle" font-size="10" fill="#64748b">不进作品广场</text>
+
+              <polygon points="580,854 700,898 580,942 460,898" fill="#fef9c3" stroke="#ca8a04" />
+              <text x="580" y="902" text-anchor="middle" font-size="11" fill="#854d0e">稿件已准备？</text>
+              <text x="360" y="890" font-size="10" fill="#dc2626">否</text>
+              <text x="592" y="962" font-size="10" fill="#16a34a">是</text>
+
+              <rect x="96" y="872" width="210" height="52" rx="6" fill="#fecaca" stroke="#dc2626" />
+              <text x="201" y="894" text-anchor="middle" font-size="12" fill="#991b1b">回填不可点</text>
+              <text x="201" y="910" text-anchor="middle" font-size="10" fill="#991b1b">稿件没准备好</text>
+
+              <rect x="400" y="972" width="360" height="40" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="580" y="996" text-anchor="middle" font-size="12" fill="#1e40af">我已发布，立即回填</text>
+
+              <rect x="400" y="1036" width="360" height="88" rx="6" fill="#ffedd5" stroke="#ea580c" />
+              <text x="580" y="1060" text-anchor="middle" font-size="12" fill="#9a3412">开发规则</text>
+              <text x="580" y="1078" text-anchor="middle" font-size="10" fill="#9a3412">打开对应项目的回填页面</text>
+              <text x="580" y="1094" text-anchor="middle" font-size="10" fill="#9a3412">带入当前关键词</text>
+              <text x="580" y="1110" text-anchor="middle" font-size="10" fill="#9a3412">模拟回填成功</text>
+
+              <rect x="400" y="1148" width="360" height="72" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="580" y="1172" text-anchor="middle" font-size="12" fill="#1e40af">做得好，第一次发布</text>
+              <text x="580" y="1188" text-anchor="middle" font-size="12" fill="#1e40af">完成啦！</text>
+              <text x="580" y="1206" text-anchor="middle" font-size="10" fill="#64748b">本次回填待审核</text>
+              <text x="120" y="1152" font-size="10" fill="#64748b">稍后再去</text>
+              <text x="120" y="1168" font-size="10" fill="#64748b">停在 STEP 2</text>
+              <text x="778" y="1168" font-size="10" fill="#1e40af">去做项目</text>
+
+              <rect x="900" y="1164" width="210" height="40" rx="6" fill="#dbeafe" stroke="#2563eb" />
+              <text x="1005" y="1188" text-anchor="middle" font-size="12" fill="#1e40af">现有变现页</text>
+            </g>
+          </svg>
+        </div>
+        <div class="flow-legend">
+          <span><i style="background:#dbeafe;border:1px solid #2563eb"></i>前端 / 用户操作</span>
+          <span><i style="background:#dcfce7;border:1px solid #16a34a"></i>后端判定 / 写入</span>
+          <span><i style="background:#ffedd5;border:1px solid #ea580c"></i>异步 / 审核</span>
+          <span><i style="background:#fef9c3;border:1px solid #ca8a04"></i>校验</span>
+          <span><i style="background:#fecaca;border:1px solid #dc2626"></i>阻断</span>
         </div>
       </div>
     </div>
@@ -254,7 +468,7 @@
   <script>
     (function () {
       var DEMO = 'creator-home-2-opt-demo.html';
-      var VER = '12';
+      var VER = '18';
       var adminFrame = document.getElementById('adminDemoFrame');
       var currentAdminPage = 'courses';
 
@@ -270,6 +484,16 @@
         document.querySelectorAll('.admin-tab-bar button').forEach(function (b) {
           b.classList.toggle('active', b.dataset.adminPage === currentAdminPage);
         });
+        if (String(currentAdminPage).indexOf('nb-') === 0) {
+          try {
+            if (adminFrame.contentWindow && adminFrame.contentWindow.__rbNewbieAdmin) {
+              adminFrame.contentWindow.__rbNewbieAdmin(currentAdminPage);
+              return;
+            }
+          } catch (e) { /* ignore */ }
+          adminFrame.src = 'newbie-academy-admin-demo.html?page=' + currentAdminPage + '&v=5';
+          return;
+        }
         try {
           if (adminFrame.contentWindow && adminFrame.contentWindow.__rbDemoApply) {
             adminFrame.contentWindow.__rbDemoApply({ surface: 'admin', adminPage: currentAdminPage });
@@ -298,6 +522,10 @@
         if (id === 'view-admin') {
           if (!adminFrame.src || adminFrame.src.indexOf('about:blank') >= 0) applyAdminPage(currentAdminPage);
         }
+        var tabName = { 'view-fe': 'fe', 'view-admin': 'admin', 'view-flow': 'flow' }[id] || 'fe';
+        var params = new URLSearchParams(location.search);
+        params.set('tab', tabName);
+        history.replaceState(null, '', '?' + params.toString());
       }
 
       document.querySelectorAll('.page-tab-bar button').forEach(function (btn) {
@@ -387,7 +615,29 @@
 
       var tab = new URLSearchParams(location.search).get('tab');
       if (tab === 'admin') showPage('view-admin');
+      else if (tab === 'flow') showPage('view-flow');
       else showPage('view-fe');
+
+      window.addEventListener('message', function (ev) {
+        var data = ev.data;
+        if (data && data.type === 'rb-admin-tab' && data.page) {
+          currentAdminPage = data.page;
+          document.querySelectorAll('.admin-tab-bar button').forEach(function (b) {
+            b.classList.toggle('active', b.dataset.adminPage === currentAdminPage);
+          });
+          return;
+        }
+        if (!data || data.type !== 'rb-open-tile') return;
+        showPage('view-fe');
+        var tile = document.getElementById(data.tile);
+        var scroller = document.getElementById('feBoardScroll');
+        if (!tile || !scroller) return;
+        var screen = data.screen || (data.tile ? String(data.tile).replace(/^tile-/, '') : '');
+        document.querySelectorAll('#feSceneList .scene-btn').forEach(function (b) {
+          b.classList.toggle('active', b.dataset.screen === screen);
+        });
+        scroller.scrollTop = Math.max(0, tile.getBoundingClientRect().top - scroller.getBoundingClientRect().top + scroller.scrollTop - 8);
+      });
 
       window.addEventListener('resize', scalePhones);
       setTimeout(scalePhones, 300);
