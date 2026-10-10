@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>PRD Validation: 一键代发迭代 3.0</title>
+<style>
+  :root {
+    --bg: #fafaf9;
+    --surface: #ffffff;
+    --border: #e7e5e4;
+    --text: #1c1917;
+    --muted: #78716c;
+    --verdict-strong: #16a34a;
+    --verdict-adequate: #65a30d;
+    --verdict-thin: #d97706;
+    --verdict-broken: #dc2626;
+    --sev-low: #64748b;
+    --sev-medium: #ca8a04;
+    --sev-high: #ea580c;
+    --sev-critical: #dc2626;
+    --grade-exc: #16a34a;
+    --grade-good: #65a30d;
+    --grade-fair: #d97706;
+    --grade-poor: #dc2626;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    font-size: 15px;
+  }
+  .container { max-width: 960px; margin: 0 auto; padding: 32px 24px 64px; }
+  header.report-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 24px;
+  }
+  .title h1 { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
+  .title .subtitle { color: var(--muted); font-size: 13px; margin-top: 4px; font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+  .grade {
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-weight: 600;
+    color: white;
+    font-size: 15px;
+    white-space: nowrap;
+  }
+  .grade-excellent { background: var(--grade-exc); }
+  .grade-good { background: var(--grade-good); }
+  .grade-fair { background: var(--grade-fair); }
+  .grade-poor { background: var(--grade-poor); }
+  .synthesis {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--muted);
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin-bottom: 24px;
+    font-size: 15.5px;
+  }
+  .synthesis p { margin: 0 0 10px; }
+  .synthesis p:last-child { margin-bottom: 0; }
+  .dimension-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .dim-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+  .dim-card .dim-name { font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  .dim-card .dim-verdict { font-size: 14px; font-weight: 600; }
+  section.dimension, section.reviewer-section { margin-bottom: 14px; }
+  section.dimension details, section.reviewer-section details {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  section summary {
+    padding: 14px 20px;
+    cursor: pointer;
+    user-select: none;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  section summary::-webkit-details-marker { display: none; }
+  section summary::before {
+    content: "▸";
+    display: inline-block;
+    color: var(--muted);
+    transition: transform 0.15s ease;
+  }
+  section details[open] summary::before { transform: rotate(90deg); }
+  section summary h2 {
+    display: inline;
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+    flex: 1;
+  }
+  .verdict-pill {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: white;
+  }
+  .verdict-strong { background: var(--verdict-strong); }
+  .verdict-adequate { background: var(--verdict-adequate); }
+  .verdict-thin { background: var(--verdict-thin); }
+  .verdict-broken { background: var(--verdict-broken); }
+  .dim-body { padding: 4px 20px 18px; }
+  .dim-judgment { color: var(--text); font-size: 14.5px; }
+  .dim-judgment p { margin: 0 0 10px; }
+  .findings-list { padding: 0 20px 4px; }
+  article.finding {
+    padding: 14px 0;
+    border-top: 1px solid var(--border);
+  }
+  article.finding:first-child { border-top: none; }
+  article.finding header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+  }
+  .badge {
+    font-size: 10.5px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    line-height: 1.4;
+  }
+  .badge-sev-low { background: rgba(100, 116, 139, 0.12); color: var(--sev-low); }
+  .badge-sev-medium { background: rgba(202, 138, 4, 0.14); color: var(--sev-medium); }
+  .badge-sev-high { background: rgba(234, 88, 12, 0.14); color: var(--sev-high); }
+  .badge-sev-critical { background: rgba(220, 38, 38, 0.14); color: var(--sev-critical); }
+  .finding-title { margin: 0; font-size: 15px; font-weight: 500; flex: 1; min-width: 200px; }
+  .finding-location { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12.5px; color: var(--muted); }
+  .finding-note, .finding-fix { margin-top: 6px; font-size: 14px; }
+  .finding-fix strong { color: var(--muted); font-weight: 500; }
+  .mechanical {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-top: 24px;
+    font-size: 14px;
+  }
+  .mechanical h3 { margin: 0 0 10px; font-size: 14px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .mechanical ul { margin: 0; padding-left: 20px; }
+  .mechanical li { margin-bottom: 4px; color: var(--text); }
+  footer.report-footer {
+    margin-top: 40px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--muted);
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  footer .meta { display: flex; gap: 24px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="report-header">
+      <div class="title">
+        <h1>一键代发迭代 3.0 — Validation Report</h1>
+        <div class="subtitle">_bmad-output/planning-artifacts/prds/prd-YBDD2.0-2026-09-28/prd.md</div>
+      </div>
+      <div class="grade grade-poor">Poor</div>
+    </header>
+
+    <div class="synthesis">
+      <p>作为内部上线增量（FR-020），本稿论题清楚：补上「官方帐号批量申词 → 剪辑任务 → 用户领稿下发词 → 订单后从官方切分」这一条链路，且明确不改写 FR-014 / FR-017 / FR-018。范围边界、Non-Goals、账本时点与反指标大体够用。主要风险在钱的「一对多」场景：同一关键词 / 同一任务多稿件、多人领取或分次多次下发时，FR-12 的守恒式与入账对象未闭合；另有一批成单规则仍以 [ASSUMPTION] 挂着，却被 §11 写成「无阶段阻塞项」，会让决策与实现误以为已闭环。</p>
+    </div>
+
+    <div class="dimension-summary">
+      <div class="dim-card"><div class="dim-name">决策就绪</div><div class="dim-verdict" style="color: var(--verdict-adequate)">adequate</div></div>
+      <div class="dim-card"><div class="dim-name">实质</div><div class="dim-verdict" style="color: var(--verdict-strong)">strong</div></div>
+      <div class="dim-card"><div class="dim-name">战略连贯</div><div class="dim-verdict" style="color: var(--verdict-strong)">strong</div></div>
+      <div class="dim-card"><div class="dim-name">完成度</div><div class="dim-verdict" style="color: var(--verdict-thin)">thin</div></div>
+      <div class="dim-card"><div class="dim-name">范围诚实</div><div class="dim-verdict" style="color: var(--verdict-adequate)">adequate</div></div>
+      <div class="dim-card"><div class="dim-name">下游可用</div><div class="dim-verdict" style="color: var(--verdict-adequate)">adequate</div></div>
+      <div class="dim-card"><div class="dim-name">形态契合</div><div class="dim-verdict" style="color: var(--verdict-strong)">strong</div></div>
+    </div>
+
+    <section class="dimension">
+      <details>
+        <summary>
+          <h2>决策就绪</h2>
+          <span class="verdict-pill verdict-adequate">adequate</span>
+        </summary>
+        <div class="dim-body">
+          <div class="dim-judgment">
+            <p>取舍写得直白：Non-Users 点名不要「领任务即分成」「指定任务」「改历史页」「线上剪辑」；§9 用禁止句钉死钱与词的时点；§11 关闭了比例填写与稿件包领法两项。对内部门户增量而言，决策者能判断「做 / 不做这条链路」和「钱何时切」。弱在：若干实现必答项（任务领取池规则、结算快照、一用户 ID 一条官方帐号、一通过词一条任务）仍落在假设上，却没有对应的 [NOTE FOR PM] 张力标注；§11「无阶段阻塞项」语气偏满，异议方会觉得异议被收进假设而不是摆上台面。</p>
+          </div>
+        </div>
+        <div class="findings-list">
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">Open Questions 与假设负载不一致</h3>
+              <span class="finding-location">§11 / §12 / FR-4 / FR-12</span>
+            </header>
+            <div class="finding-note">§11 写「无阶段阻塞项……其余推断留在 §12，不挡住体验稿」，但 FR-4 领取资格与互斥、FR-12「已结算才切」与比例快照都是成单规则，不是体验稿可绕开的装饰。</div>
+            <div class="finding-fix"><strong>Fix:</strong> 把钱与任务领取的关键假设升为已拍板决策，或在 §11 显式列为「实现前必须确认」；在真实张力处加 [NOTE FOR PM]。</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">取舍有结果、少写「放弃了什么」</h3>
+              <span class="finding-location">§1 / §2.2</span>
+            </header>
+            <div class="finding-note">Non-Users 列举了被排除的人，但未写成「相对指定派单 / 领任务预付，本刀选择自领池 + 延后切分，代价是……」。</div>
+            <div class="finding-fix"><strong>Fix:</strong> 用一两句补上选定方案的代价（例如自领导致冷门书任务无人领、延后切分影响剪辑手积极性）。</div>
+          </article>
+        </div>
+      </details>
+    </section>
+
+    <section class="dimension">
+      <details>
+        <summary>
+          <h2>实质</h2>
+          <span class="verdict-pill verdict-strong">strong</span>
+        </summary>
+        <div class="dim-body">
+          <div class="dim-judgment">
+            <p>Vision 钉的是具体缺口（「官方若要拿一批书、一批词……中间没有一条从官方帐号出发的链路」），换成别的代发产品就站不住。JTBD 与 UJ 直接驱动 FR 分组；Constraints / Ledger 是产品特有时点，不是套话。SM 带反指标（SM-C1 / SM-C2）。三人称谓嵌在旅程里，没有多余人设章节。</p>
+          </div>
+        </div>
+        <div class="findings-list">
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">「官方帐号」列在 Target User</h3>
+              <span class="finding-location">§2.1</span>
+            </header>
+            <div class="finding-note">正文把它写成挂账主体（「关键词收益记在这个帐号上」），不是可作业的人。</div>
+            <div class="finding-fix"><strong>Fix:</strong> 挪到 Glossary / Ledger，Jobs 只保留运营 / 剪辑手 / 用户。</div>
+          </article>
+        </div>
+      </details>
+    </section>
+
+    <section class="dimension">
+      <details>
+        <summary>
+          <h2>战略连贯</h2>
+          <span class="verdict-pill verdict-strong">strong</span>
+        </summary>
+        <div class="dim-body">
+          <div class="dim-judgment">
+            <p>全篇押在一条增量论题上：官方供词链路补齐，且收益「先归官方、领走+订单后再切」。FR-1…FR-12 按运营 → 剪辑 → 领取 → 包 → 下载 → 切分排成一条弧。MVP（§6）与 Non-Goals（§5）同向。Primary SM 验证「不下发自选词」「不提前切分」，对准论题。</p>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <section class="dimension">
+      <details open>
+        <summary>
+          <h2>完成度</h2>
+          <span class="verdict-pill verdict-thin">thin</span>
+        </summary>
+        <div class="dim-body">
+          <div class="dim-judgment">
+            <p>多数 FR 带可测 Consequences。一旦进入「一关键词 / 一任务 → 多稿件 → 多用户领取 / 分次多次下发 → 一笔订单」，FR-12 的对象与守恒式不够用；关键词是否可被多次下发给多人，也与既有一键代发词唯一性未对齐。若干关键行为仅以假设句出现，验收口径仍飘。</p>
+          </div>
+        </div>
+        <div class="findings-list">
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-critical">critical</span>
+              <h3 class="finding-title">一订单多领取时切分对象与守恒冲突</h3>
+              <span class="finding-location">FR-12 / UJ-5 / §8</span>
+            </header>
+            <div class="finding-note">FR-12 要求「剪辑手分成 + 用户分成 + 留在官方帐号的剩余 = 这笔官方关键词收益」，同时又写「用户分成记给领走该稿件的用户」「剪辑手分成记给上传并被领走的那条稿件的剪辑手」。同一剪辑任务可多稿件（FR-5），分次可多次下发同一平台关键词（FR-10）。多人领走或多稿被领后，若各按「官方关键词收益 × 比例」各记一笔，守恒式必然破；若只切一次，则「记给谁」未定义。</div>
+            <div class="finding-fix"><strong>Fix:</strong> 明确切分粒度（按订单一次 / 按领取事件 / 按稿件），并写清多领取并存时的入账人与是否拆分基数。</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">「下发关键词」与词可复用次数未闭合</h3>
+              <span class="finding-location">FR-7 / FR-10 / §3</span>
+            </header>
+            <div class="finding-note">FR-7「用户得到的关键词等于该稿件所属剪辑任务上的那个平台关键词」；FR-10「每一次成功领取各下发 1 次关键词……仍是……同一个平台关键词」。未说明同一词可否同时挂在多名用户名下、分次多次下发是幂等授予还是多次占用，以及与 FR-014 既有词占用规则如何衔接。</div>
+            <div class="finding-fix"><strong>Fix:</strong> 写明下发的库存语义（共享只读 / 每次占用 / 幂等），并引用底座合同中不可破坏的约束。</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">领取池关键规则仅以假设充当验收</h3>
+              <span class="finding-location">FR-4</span>
+            </header>
+            <div class="finding-note">「可领的剪辑手 = …」「一条剪辑任务同时只能被一名剪辑手领取」整段标 [ASSUMPTION]，却是 UJ-2 / SM 可测行为的前提。</div>
+            <div class="finding-fix"><strong>Fix:</strong> 确认为合同条款并去掉假设标签，或列入 §11 阻塞项。</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">稿件包部分领取后的下载边界</h3>
+              <span class="finding-location">FR-11 / FR-10</span>
+            </header>
+            <div class="finding-note">FR-11「从这张详情可以下载已领取的内容」未定义分次场景下详情展示未领素材还是仅已领素材、下载按钮范围。</div>
+            <div class="finding-fix"><strong>Fix:</strong> 为分次领取补一条可测后果（仅已领素材可下；未领素材不可下）。</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">批量申词的提交单元过粗</h3>
+              <span class="finding-location">FR-2</span>
+            </header>
+            <div class="finding-note">「一次提交可以包含多条书籍关键词申请」未给出每条申请必含字段、书籍如何被选入、与现有审核流的衔接（谁点「通过」）。</div>
+            <div class="finding-fix"><strong>Fix:</strong> 补最小字段集与「沿用现有关键词审核态机」的显式引用。</div>
+          </article>
+        </div>
+      </details>
+    </section>
+
+    <section class="dimension">
+      <details>
+        <summary>
+          <h2>范围诚实</h2>
+          <span class="verdict-pill verdict-adequate">adequate</span>
+        </summary>
+        <div class="dim-body">
+          <div class="dim-judgment">
+            <p>§5 Non-Goals、各节 Out of Scope、§6.2 把「不改历史页 / 不指定人 / 不领任务即分 / 不写死比例」写死，省略是显式的。[ASSUMPTION] 多数进了 §12。问题是：两处裸标签无正文；§11 把未确认推断说成不挡交付；相对「可开建」语气，钱路径假设密度偏高。</p>
+          </div>
+        </div>
+        <div class="findings-list">
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">裸 [ASSUMPTION] 无陈述</h3>
+              <span class="finding-location">§2.3 UJ-3 / §5</span>
+            </header>
+            <div class="finding-note">UJ-3 边缘案例句末与 Non-Goals「不新建用户题词页」后仅有标签，读者无法从正文还原假设内容（虽 §12 有汇总）。</div>
+            <div class="finding-fix"><strong>Fix:</strong> 写成完整 [ASSUMPTION: …]，与索引逐字对应。</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">「不挡住体验稿」掩盖实现阻塞</h3>
+              <span class="finding-location">§11</span>
+            </header>
+            <div class="finding-note">对体验稿成立，但对工程 / SPEC 读者，「无阶段阻塞项」易被读成可开建合同已齐。</div>
+            <div class="finding-fix"><strong>Fix:</strong> 拆成「体验稿无阻塞」与「成单 / 账务实现前待确认清单」。</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">addendum.md 缺失</h3>
+              <span class="finding-location">工作区</span>
+            </header>
+            <div class="finding-note">同目录无 addendum；增量边界全靠 prd 正文，可接受，但无附录承接更细账务/审核引用。</div>
+            <div class="finding-fix"><strong>Fix:</strong> 若底座合同有长引用，可另附 addendum；否则在 §0 保持「以 spec-fr014 为准」即可。</div>
+          </article>
+        </div>
+      </details>
+    </section>
+
+    <section class="dimension">
+      <details>
+        <summary>
+          <h2>下游可用</h2>
+          <span class="verdict-pill verdict-adequate">adequate</span>
+        </summary>
+        <div class="dim-body">
+          <div class="dim-judgment">
+            <p>§3 Glossary 密度高且被 FR/UJ/SM 复用；FR-1…12、UJ-1…5、SM-1…4 / SM-C1…C2 连续可溯。§0 声明本文 FR-n 非全库编号、迭代页为 FR-020。主要摩擦是近义词漂移与假设正文不全。</p>
+          </div>
+        </div>
+        <div class="findings-list">
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">「剪辑师」与「剪辑手」混用</h3>
+              <span class="finding-location">FR-6 / §3</span>
+            </header>
+            <div class="finding-note">FR-6「剪辑师、素材类型、稿件类型同样是下拉」，Glossary 与其余正文统一为「剪辑手」。</div>
+            <div class="finding-fix"><strong>Fix:</strong> 全文统一为「剪辑手」，若 UI 文案必须用「剪辑师」则在 Glossary 注明「界面文案别名」。</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">领取类型与词类型双轨</h3>
+              <span class="finding-location">§3 / FR-6</span>
+            </header>
+            <div class="finding-note">Glossary 有映射，但 FR 后果句有时用领取类型、有时用词类型，抽验收句需二次翻译。</div>
+            <div class="finding-fix"><strong>Fix:</strong> FR 后果句固定「领取类型=帐号代发 ⇒ 平台关键词稿件」句式。</div>
+          </article>
+        </div>
+      </details>
+    </section>
+
+    <section class="dimension">
+      <details>
+        <summary>
+          <h2>形态契合</h2>
+          <span class="verdict-pill verdict-strong">strong</span>
+        </summary>
+        <div class="dim-body">
+          <div class="dim-judgment">
+            <p>形态匹配棕地消费/创作者平台上的一条能力增量：多角色 UJ 有负载、Ledger Boundaries 服务分账、明确「新开迭代页 / 不回改历史页」、对齐既有 demo 迭代壳。与「不改写 FR-014/017/018」的增量纪律一致。</p>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <div class="mechanical">
+      <h3>Mechanical notes</h3>
+      <ul>
+        <li>addendum.md 不存在。memlog 早期有「剪辑手领取任务获得分成」，正文已纠正为延后切分，以 prd 为准。</li>
+        <li>Glossary drift：「剪辑师」(FR-6) vs 「剪辑手」；「帐号代发/本人发布」与「平台关键词/自有关键词」双名并存但有映射。</li>
+        <li>ID continuity：FR-1…12、UJ-1…5、SM-1…4、SM-C1…C2 连续；§0 已区分本文 FR-n 与迭代页 FR-020。</li>
+        <li>Assumptions Index：§12 覆盖主要假设；§2.3 UJ-3、§5、§8 存在无正文或过短的 [ASSUMPTION]，无法与索引逐字 roundtrip。</li>
+        <li>UJ 具名：赵敏、周凯、林晓。对内部增量，必要章节齐备；NFR 以 Constraints + Ledger 代替空泛非功能表，形状合适。</li>
+      </ul>
+    </div>
+
+    <footer class="report-footer">
+      <div class="meta">
+        <span>Rubric: .claude/skills/bmad-prd/assets/prd-validation-checklist.md</span>
+        <span>Generated: 2026-09-28T18:55:00+08:00</span>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

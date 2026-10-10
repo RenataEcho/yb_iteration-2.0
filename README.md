@@ -13,6 +13,7 @@
 | FR-010 | 代理迭代V1.0 | `demo/iteration/fr-agent-cert.html` |
 | FR-016 | 奖钱包合并提现 | `demo/iteration/fr-wallet-merge-withdraw.html` |
 | FR-019 | 别名绑定 | `demo/iteration/fr-alias-bind.html` |
+| FR-020 | 一键代发迭代 3.0 | `demo/iteration/fr-yijian-daifa-iter3.html` |
 | FR-021 | 2.0优化 | `demo/iteration/fr-creator-home-2-opt.html` |
 
 ## 归档需求

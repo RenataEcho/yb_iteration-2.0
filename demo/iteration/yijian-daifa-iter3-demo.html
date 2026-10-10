@@ -1,0 +1,2303 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>一键代发迭代 3.0 · 前端 Demo</title>
+  <style>
+    /* 视觉沿用一键代发 1.0：yijian-daifa-demo.html / yijian-daifa-pc.html，不另起配色和组件 */
+    :root {
+      --orange: #ff6b1a;
+      --orange-light: #fff3eb;
+      --orange-border: #ffd4b8;
+      --bg: #f5f6f8;
+      --text: #1a2332;
+      --muted: #8a93a0;
+      --border: #ececec;
+      --nav: #1a2332;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body, #app { height: 100%; }
+    body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; background: var(--bg); color: var(--text); }
+    body.embed-mode { background: #fff; margin: 0; }
+    .stage { height: 100%; position: relative; background: var(--bg); }
+    .screen { display: none; flex-direction: column; height: 100%; overflow: hidden; background: var(--bg); position: relative; }
+    .screen.on { display: flex; }
+    .status-bar { height: 44px; flex-shrink: 0; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 20px 6px; font-size: 12px; font-weight: 600; background: #fff; }
+    .nav-bar { display: flex; align-items: center; justify-content: space-between; padding: 2px 8px 8px; flex-shrink: 0; background: #fff; }
+    .nav-bar .back { width: 36px; height: 36px; border: none; background: none; font-size: 22px; cursor: pointer; }
+    .nav-bar .title { font-size: 17px; font-weight: 700; flex: 1; text-align: center; margin-right: 36px; }
+    body.embed-mode .status-bar { display: none; }
+    body.embed-mode .nav-bar { padding-top: 10px; }
+    body.embed-mode.pc .side { display: none; }
+    body.embed-mode.pc .layout { grid-template-columns: 1fr; }
+    .project-bar { background: #fff; flex-shrink: 0; }
+    .project-row { display: flex; flex-wrap: nowrap; gap: 8px; padding: 8px 12px 4px; background: #fff; overflow-x: auto; flex-shrink: 0; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+    .project-row::-webkit-scrollbar { display: none; }
+    .project-scroll { display: none; width: 88px; margin: 0 auto 8px; padding-bottom: 6px; position: relative; }
+    .project-scroll.show { display: block; }
+    .project-scroll .track { display: block; width: 28px; height: 3px; margin: 0 auto; background: #ffd8c8; border-radius: 99px; position: relative; overflow: hidden; }
+    .project-scroll i { position: absolute; left: 0; top: 0; height: 100%; width: 50%; background: var(--orange); border-radius: 99px; }
+    .project-scroll::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: #e6e8ee; }
+    .proj { flex: 0 0 calc((100% - 32px) / 5); width: calc((100% - 32px) / 5); display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px 2px 4px; border: 1.5px solid transparent; border-radius: 10px; background: none; cursor: pointer; color: #333; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+    .proj.on { border-color: #ffc9a3; background: var(--orange-light); }
+    .proj.on .proj-name { color: var(--orange); font-weight: 700; }
+    .proj-ico { position: relative; width: 44px; height: 44px; border-radius: 10px; overflow: visible; background: #f4f5f7; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: #fff; }
+    .proj-ico img { border-radius: 10px; }
+    .proj-pin { position: absolute; right: -4px; top: -4px; min-width: 14px; height: 14px; padding: 0 2px; border-radius: 7px; background: var(--orange); color: #fff; font-size: 9px; font-style: normal; font-weight: 700; line-height: 14px; text-align: center; }
+    .proj-ico img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .proj-name { font-size: 10px; line-height: 1.2; text-align: center; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .search-wrap { padding: 8px 12px 10px; background: #fff; flex-shrink: 0; }
+    .search-box .ico { color: var(--orange); }
+    .pack-list { display: flex; flex-direction: column; gap: 10px; }
+    .pack-card { display: flex; align-items: center; gap: 12px; padding: 12px; background: #fff; border-radius: 12px; cursor: pointer; }
+    .pack-cover { position: relative; width: 72px; height: 96px; border-radius: 8px; overflow: hidden; flex-shrink: 0; }
+    .pack-cover .cover-wrap { position: absolute; inset: 0; }
+    .pack-main { flex: 1; min-width: 0; }
+    .pack-title { font-size: 15px; font-weight: 700; line-height: 1.35; }
+    .pack-meta { margin-top: 4px; font-size: 12px; color: #6b7280; line-height: 1.35; }
+    .pack-side { flex-shrink: 0; width: 44px; height: 44px; border-radius: 10px; background: var(--orange); color: #fff; font-size: 16px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+    .ep-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; font-size: 14px; }
+    .ep-head span { color: var(--orange); font-weight: 700; }
+    .ep-row { display: flex; flex-wrap: wrap; gap: 8px; }
+    .ep { width: 36px; height: 36px; border: 1px solid #eee; border-radius: 8px; background: #fff; color: #222; font-size: 14px; cursor: pointer; }
+    .ep.on { border-color: var(--orange); color: var(--orange); font-weight: 700; }
+    .ep.got { background: #f3f4f6; color: #9aa0a8; }
+    .play-btn { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); width: 56px; height: 56px; border: none; border-radius: 50%; background: rgba(255,255,255,.92); color: #111; font-size: 20px; cursor: pointer; z-index: 2; }
+    .v-bar { position: absolute; left: 12px; right: 12px; bottom: 14px; height: 3px; background: rgba(255,255,255,.3); border-radius: 99px; z-index: 2; }
+    .v-prog { height: 100%; width: 0; background: #fff; border-radius: 99px; }
+    .v-end { display: none; position: absolute; inset: 0; background: rgba(0,0,0,.55); color: #fff; font-size: 13px; align-items: center; justify-content: center; text-align: center; padding: 16px; z-index: 3; }
+    .v-end.show { display: flex; }
+    .search-box { display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 12px; border-radius: 18px; background: #fff; box-shadow: 0 2px 8px rgba(20,24,32,.06); border: 1px solid #f0f0f0; }
+    .search-box .ico { color: var(--orange); font-size: 14px; }
+    .search-box input { flex: 1; border: none; background: none; outline: none; font-size: 12px; }
+    .filter-block { position: relative; background: #fff; flex-shrink: 0; z-index: 42; }
+    .filter-row { display: flex; gap: 8px; padding: 0 12px 10px; background: #fff; overflow-x: auto; flex-shrink: 0; scrollbar-width: none; }
+    .filter-row::-webkit-scrollbar { display: none; }
+    .dd { flex-shrink: 0; height: 30px; padding: 0 10px; border-radius: 8px; border: none; background: #f4f5f7; font-size: 12px; color: #333; cursor: pointer; }
+    .dd.on { color: var(--orange); background: var(--orange-light); font-weight: 600; }
+    .dd-mask { position: absolute; inset: 0; background: rgba(20,24,32,.45); z-index: 60; }
+    .pick-sheet { position: absolute; left: 0; right: 0; bottom: 0; z-index: 61; background: #f3f5f8; border-radius: 16px 16px 0 0; padding: 16px 16px 12px; }
+    .pick-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .pick-head h3 { font-size: 16px; font-weight: 700; }
+    .pick-x { width: 32px; height: 32px; border: none; background: none; font-size: 22px; line-height: 1; color: #333; cursor: pointer; }
+    .pick-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .pick-opt { height: 44px; border: none; border-radius: 10px; background: #fff; color: #222; font-size: 14px; cursor: pointer; }
+    .pick-opt.on { color: var(--orange); font-weight: 700; }
+    .pick-ok { margin-top: 18px; width: 100%; height: 46px; border: none; border-radius: 12px; background: var(--orange); color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; }
+    .pick-home { width: 120px; height: 5px; margin: 12px auto 2px; border-radius: 999px; background: #111; }
+    .scroll { flex: 1; overflow-y: auto; padding: 0 12px 12px; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px 8px; }
+    .g-card { cursor: pointer; }
+    .thumb { position: relative; width: 100%; aspect-ratio: 3 / 4; border-radius: 8px; overflow: hidden; }
+    .cover-wrap { position: absolute; inset: 0; background: #2a2f3a; }
+    .cover-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .kind-tag { position: absolute; top: 6px; left: 6px; font-size: 10px; color: #fff; background: rgba(0,0,0,.45); padding: 2px 6px; border-radius: 4px; }
+    .thumb-bar { position: absolute; left: 0; right: 0; bottom: 0; padding: 5px 6px; background: linear-gradient(transparent, rgba(0,0,0,.55)); color: #fff; font-size: 10px; display: flex; justify-content: space-between; }
+    .g-title { margin-top: 6px; font-size: 12px; font-weight: 700; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .g-src { margin-top: 3px; font-size: 11px; color: var(--muted); }
+    .card { background: #fff; border-radius: 12px; padding: 12px; margin-bottom: 12px; }
+    .btn-primary, .btn-ghost { height: 46px; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; }
+    .btn-primary { border: none; background: var(--orange); color: #fff; width: 100%; }
+    .btn-primary:disabled { opacity: .45; cursor: not-allowed; }
+    .btn-ghost { border: 1px solid #e5e7eb; background: #fff; color: #333; }
+    .foot { padding: 10px 16px 18px; background: #fff; border-top: 1px solid #f3f3f3; flex-shrink: 0; }
+    .foot-claim { display: flex; align-items: center; gap: 8px; }
+    .foot-done { align-items: flex-start; }
+    .foot-dl { flex: 1; min-width: 0; }
+    .foot-note { margin-top: 6px; font-size: 11px; line-height: 1.4; color: var(--muted); text-align: center; }
+    .quota-chip { min-width: 58px; text-align: center; }
+    .quota-chip span { display: block; font-size: 10px; color: var(--muted); }
+    .quota-chip b { display: block; font-size: 16px; color: var(--orange); line-height: 1.2; }
+    .btn-tip { width: 58px; height: 46px; border: 1px solid #ffd4b8; border-radius: 12px; background: var(--orange-light); color: var(--orange); font-size: 11px; font-weight: 700; cursor: pointer; }
+    .foot-claim .btn-primary, .foot-claim .btn-ghost { flex: 1; width: auto; font-size: 13px; line-height: 1.2; padding: 0 8px; }
+    .foot-dl .btn-primary { width: 100%; flex: none; height: auto; min-height: 46px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; padding: 6px 8px; line-height: 1.2; }
+    .foot-dl .btn-primary b { font-size: 14px; font-weight: 700; line-height: 1.2; }
+    .foot-dl .btn-primary span { font-size: 10px; font-weight: 400; line-height: 1.2; opacity: .88; }
+    .media-full { position: relative; width: 100%; aspect-ratio: 1; background: #1a1a1a; overflow: hidden; }
+    .media-full .cover-wrap { position: absolute; inset: 0; }
+    .media-badge { position: absolute; top: 10px; right: 10px; z-index: 2; background: rgba(0,0,0,.55); color: #fff; font-size: 11px; padding: 3px 8px; border-radius: 999px; }
+    .detail-pad { padding: 0 12px; }
+    #screen-detail .scroll, .detail-screen .scroll { padding: 0 0 20px; }
+    .pills { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 12px; }
+    .pill { font-size: 11px; padding: 3px 8px; border-radius: 999px; background: var(--orange-light); color: #c2410c; }
+    .stat-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+    .stat { background: #fff; border-radius: 10px; padding: 10px 8px; text-align: center; }
+    .stat b { display: block; font-size: 14px; margin-top: 4px; }
+    .stat span { font-size: 11px; color: var(--muted); }
+    .head-card { padding: 10px 12px 8px; }
+    .head-title { display: flex; align-items: flex-start; flex-wrap: wrap; gap: 6px; }
+    .head-name { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+    .point-price { margin: 0; font-size: 13px; line-height: 1.2; font-weight: 700; color: #c2410c; }
+    .point-price span { margin-right: 4px; font-size: 11px; font-weight: 500; color: #8a93a0; }
+    .pay-rows { margin: 12px 0 16px; text-align: left; }
+    .pay-row { display: flex; justify-content: space-between; align-items: baseline; padding: 10px 0; border-top: 1px solid #f0f1f3; font-size: 13px; color: #6b7280; }
+    .pay-row b { font-size: 20px; color: #111827; font-variant-numeric: tabular-nums; }
+    .head-card h3 { margin: 0; font-size: 17px; line-height: 1.3; }
+    .head-card .pills { margin: 0; }
+    .head-card .work-time { margin: 4px 0 8px; font-size: 12px; line-height: 1.2; color: #8a93a0; }
+    .head-card .stat-row { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
+    .head-card .stat { padding: 0; }
+    .head-card .stat span, .head-card .stat b { white-space: nowrap; }
+    .head-card .stat span { font-size: 10px; }
+    .head-card .stat b { margin-top: 2px; font-size: 13px; }
+    .kv { display: grid; grid-template-columns: 76px 1fr; gap: 8px 10px; font-size: 13px; align-items: center; }
+    .kv dt { color: var(--muted); }
+    .copy-line { display: flex; align-items: center; gap: 8px; min-width: 0; }
+    .copy-line span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .copy-btn { flex-shrink: 0; border: none; background: none; color: var(--orange); font-size: 12px; cursor: pointer; padding: 0; }
+    .steps { margin: 0; padding-left: 0; list-style: none; font-size: 12px; color: #4b5563; line-height: 1.7; }
+    .steps b { color: var(--orange); }
+    .detail-tabs { display: flex; gap: 18px; margin: -2px 0 10px; border-bottom: 1px solid #f0f1f4; }
+    .detail-tabs button { border: none; background: none; padding: 0 0 8px; font-size: 14px; font-weight: 700; color: #8a93a0; cursor: pointer; position: relative; }
+    .detail-tabs button.on { color: #1a2332; }
+    .detail-tabs button.on::after { content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--orange); border-radius: 2px; }
+    .remind-label { margin: 0 0 4px; font-size: 12px; color: var(--muted); }
+    .remind-text { margin: 0 0 12px; font-size: 13px; line-height: 1.6; color: #1a2332; white-space: pre-wrap; }
+    .remind-text:last-child { margin-bottom: 0; }
+    .kw-mask { position: absolute; inset: 0; background: rgba(20,24,32,.4); z-index: 70; display: none; }
+    .kw-mask.show { display: block; }
+    .kw-sheet { position: absolute; left: 0; right: 0; bottom: 0; z-index: 71; display: none; background: #fff; border-radius: 16px 16px 0 0; max-height: 78%; flex-direction: column; overflow: hidden; }
+    .kw-sheet.show { display: flex; }
+    .kw-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 16px 8px; }
+    .kw-head h3 { font-size: 16px; }
+    .kw-head .x { border: none; background: none; font-size: 20px; width: 32px; cursor: pointer; color: #666; }
+    .kw-list { flex: 1; overflow-y: auto; padding: 0 8px 8px; }
+    .kw-row { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 13px 10px; border: none; background: none; font-size: 14px; color: #222; cursor: pointer; text-align: left; }
+    .kw-row.on { color: var(--orange); font-weight: 700; }
+    .kw-check { width: 20px; height: 20px; border-radius: 50%; background: var(--orange); color: #fff; font-size: 12px; display: none; align-items: center; justify-content: center; }
+    .kw-row.on .kw-check { display: flex; }
+    .kw-foot { padding: 10px 16px 18px; }
+    .mode-opt { display: block; width: 100%; text-align: left; margin: 8px 0; padding: 14px 12px; border: 1px solid #eee; border-radius: 12px; background: #fff; cursor: pointer; }
+    .mode-opt.on { border-color: var(--orange); background: var(--orange-light); }
+    .mode-opt b { display: block; font-size: 15px; color: #222; }
+    .mode-opt.on b { color: var(--orange); }
+    .mode-opt span { display: block; margin-top: 4px; font-size: 12px; color: var(--muted); line-height: 1.45; }
+    .mode-opt em { font-style: normal; color: var(--orange); font-weight: 700; }
+    .load-mask { position: absolute; inset: 0; background: rgba(20,24,32,.4); z-index: 70; display: none; }
+    .load-mask.show { display: block; }
+    .load-box { position: absolute; left: 50%; top: 46%; transform: translate(-50%,-50%); z-index: 72; display: none; background: #fff; border-radius: 16px; padding: 22px 22px 16px; text-align: center; width: 248px; box-shadow: 0 16px 40px rgba(0,0,0,.18); }
+    .load-box.show { display: block; }
+    .load-box #loadText { font-size: 15px; font-weight: 600; color: #1a2332; }
+    .load-abort { display: block; width: 100%; height: 40px; margin-top: 14px; border: 1px solid #e5e7eb; border-radius: 12px; background: #fff; color: #222; font-size: 15px; font-weight: 600; cursor: pointer; }
+    .backfill-pop { position: absolute; left: 22px; right: 22px; top: 46%; transform: translateY(-50%); z-index: 73; background: #fff; border-radius: 16px; padding: 20px 16px 16px; text-align: center; box-shadow: 0 16px 40px rgba(0,0,0,.18); }
+    .backfill-pop h3 { font-size: 17px; font-weight: 700; }
+    .backfill-pop p { margin: 10px 0 16px; font-size: 13px; color: #4b5563; line-height: 1.65; }
+    .backfill-actions { display: flex; gap: 8px; }
+    .backfill-actions button { flex: 1; height: 44px; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; }
+    .backfill-later { border: 1px solid #e5e7eb; background: #fff; color: #222; }
+    .backfill-go { border: none; background: var(--orange); color: #fff; }
+    .fill-count { border: none; background: none; padding: 0; color: var(--orange); font-size: 12px; font-weight: 700; cursor: pointer; }
+    .fill-note { margin: 0 16px 8px; font-size: 12px; color: var(--muted); line-height: 1.5; }
+    .spin { width: 34px; height: 34px; border: 3px solid #ffe4d1; border-top-color: var(--orange); border-radius: 50%; margin: 0 auto 12px; animation: spin .7s linear infinite; }
+    .spin.done { animation: none; border-color: var(--orange); background: var(--orange); }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .c-card { background: #fff; border-radius: 14px; margin-bottom: 12px; border: 1px solid #eee; box-shadow: 0 2px 8px rgba(20,24,32,.05); }
+    .c-kw { padding: 12px 12px 0; font-size: 16px; font-weight: 700; }
+    .c-kw-btn { border: none; background: none; padding: 0; color: var(--orange); font-size: 16px; font-weight: 700; cursor: pointer; }
+    .c-kw-timeout { color: var(--muted); font-weight: 700; }
+    .kw-row.defer span { white-space: normal; line-height: 1.45; }
+    .c-top { display: flex; gap: 10px; padding: 10px 12px 12px; }
+    .c-hit { cursor: pointer; }
+    .c-cover { position: relative; width: 64px; height: 84px; border-radius: 8px; overflow: hidden; flex-shrink: 0; }
+    .c-cover .cover-wrap { position: absolute; inset: 0; }
+    .c-play { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 22px; height: 22px; border-radius: 50%; background: rgba(255,255,255,.9); font-size: 9px; display: flex; align-items: center; justify-content: center; }
+    .c-info { flex: 1; min-width: 0; }
+    .c-line { font-size: 13px; color: #222; line-height: 1.45; font-weight: 600; }
+    .c-sub { font-size: 12px; color: #6b7280; margin-top: 4px; line-height: 1.5; }
+    .c-dl { color: var(--orange); }
+    .c-dl.out { color: #dc2626; }
+    .c-tools { display: flex; align-items: center; gap: 6px; margin: 0 10px 10px; padding: 6px 8px; background: #f6f7f9; border-radius: 10px; }
+    .c-tools button { flex: 1; height: 34px; border: none; background: none; color: #6b7280; font-size: 13px; font-weight: 500; cursor: pointer; }
+    .c-tools button.primary { flex: 1.2; border-radius: 8px; background: var(--orange); color: #fff; font-weight: 700; }
+    .seg { display: flex; margin: 0 0 12px; padding: 4px; background: #eceef2; border-radius: 10px; flex-shrink: 0; }
+    .seg button { flex: 1; height: 32px; border: none; background: none; border-radius: 8px; font-size: 13px; color: #8a93a0; cursor: pointer; }
+    .seg button.on { background: #fff; color: var(--orange); font-weight: 700; }
+    .earn-screen { background: #f6f7fb; }
+    .earn-screen .status-bar, .earn-screen .nav-bar { background: #fff; color: #1a2332; }
+    .earn-screen .nav-bar { border-bottom: 1px solid #f0f0f0; }
+    .earn-screen .nav-bar .title, .earn-screen .nav-bar .back { color: #1a2332; }
+    .earn-scroll { min-height: 0; display: flex; flex-direction: column; gap: 12px; padding: 12px; background: #f6f7fb; }
+    .earn-total { margin: 0; background: #fff; border-radius: 16px; padding: 14px 16px 16px; box-shadow: 0 1px 2px rgba(20, 24, 32, .04); }
+    .earn-total .earn-k { font-size: 13px; color: #8a93a0; }
+    .earn-total .earn-v { margin-top: 6px; font-size: 30px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.05; color: #1a2332; }
+    .earn-sheet { margin-top: 12px; background: #fff; border-radius: 16px; overflow: hidden; }
+    .earn-tabs { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid #f2f3f5; }
+    .earn-tabs button { height: 46px; border: none; background: none; font-size: 15px; color: #8a93a0; cursor: pointer; position: relative; }
+    .earn-tabs button.on { color: #1a2332; font-weight: 700; }
+    .earn-tabs button.on::after { content: ""; position: absolute; left: 50%; bottom: 0; width: 28px; height: 3px; margin-left: -14px; border-radius: 99px 99px 0 0; background: var(--orange); }
+    .earn-row { display: flex; align-items: center; gap: 10px; padding: 14px; border-top: 1px solid #f4f5f7; }
+    .earn-sheet .earn-row:first-of-type { border-top: none; }
+    .earn-logo { width: 32px; height: 32px; border-radius: 8px; background: var(--orange); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 800; flex-shrink: 0; }
+    .earn-row-main { flex: 1; min-width: 0; display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 50px; align-items: center; }
+    .earn-row-copy { min-width: 0; }
+    .earn-row-copy b { display: block; font-size: 15px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .earn-row-copy span { display: block; margin-top: 4px; font-size: 12px; color: #b0b6c0; }
+    .earn-row-amt { font-size: 16px; font-weight: 700; color: var(--orange); white-space: nowrap; }
+    .cal-card { margin: 0; background: #fff; border-radius: 16px; padding: 4px 12px 14px; box-shadow: 0 1px 2px rgba(20, 24, 32, .04); }
+    .cal-tools { display: flex; justify-content: space-between; align-items: center; gap: 8px; min-height: 48px; padding: 8px 2px; border-bottom: 1px solid #f2f3f5; }
+    .cal-grain { display: flex; align-items: center; gap: 16px; }
+    .cal-grain button { position: relative; border: none; background: none; padding: 2px 0 8px; font-size: 16px; color: #8a93a0; cursor: pointer; }
+    .cal-grain button.on { color: #ff5a36; font-weight: 700; }
+    .cal-grain button.on::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; border-radius: 99px; background: #ff5a36; }
+    .cal-nav { display: flex; align-items: center; gap: 2px; background: #f3f4f6; border-radius: 999px; padding: 4px; }
+    .cal-nav b { font-size: 13px; min-width: 88px; text-align: center; font-weight: 700; }
+    .cal-nav button { width: 22px; height: 22px; border: none; border-radius: 50%; background: #fff; color: #64748b; cursor: pointer; font-size: 14px; line-height: 1; }
+    .cal-sum { margin: 12px 2px 10px; font-size: 14px; color: #8a93a0; }
+    .cal-sum b { color: #ff5a36; font-size: 18px; margin-left: 6px; font-weight: 800; }
+    .earn-note { padding: 0 4px 8px; font-size: 12px; line-height: 1.7; color: #8a93a0; }
+    .earn-note p { margin: 0; }
+    .earn-detail-card { background: #fff; border-radius: 14px; padding: 14px; }
+    .earn-detail-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+    .earn-detail-top b { font-size: 15px; line-height: 1.4; }
+    .earn-detail-top strong { color: var(--orange); font-size: 18px; white-space: nowrap; }
+    .earn-detail-card p { margin-top: 8px; font-size: 13px; color: #5c6675; }
+    .earn-detail-time { margin-top: 10px; font-size: 12px; color: #9aa3af; }
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px 4px; text-align: center; }
+    .cal-grid-3 { grid-template-columns: repeat(3, 1fr); gap: 10px 8px; }
+    .cal-wd { font-size: 12px; color: #b0b6c0; padding: 2px 0 6px; }
+    button.cal-cell { width: 100%; border: none; background: transparent; cursor: pointer; font: inherit; color: inherit; }
+    .cal-cell { border-radius: 10px; min-height: 46px; padding: 6px 0 4px; }
+    .cal-grid-3 .cal-cell { min-height: 58px; padding: 10px 0; }
+    .cal-cell .d { font-size: 14px; font-weight: 700; color: #1a2332; line-height: 1.2; white-space: nowrap; }
+    .cal-cell .a { font-size: 10px; margin-top: 3px; color: #ff5a36; line-height: 1.1; }
+    .cal-cell.hot { background: #fff1ec; }
+    .cal-cell.zero { background: #f3f4f6; }
+    .cal-cell.zero .d { color: #c5cad3; font-weight: 600; }
+    .cal-cell.future .d { color: #1a2332; font-weight: 600; }
+    .cal-cell.zero .a { color: #c5cad3; }
+    .cal-list { margin-top: 8px; }
+    .cal-list button, .earn-line { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 12px 4px; border: none; border-bottom: 1px solid #f4f4f4; background: none; text-align: left; font-size: 14px; }
+    .cal-list b, .earn-line b { color: #ff4d4f; font-weight: 800; white-space: nowrap; }
+    .earn-line { align-items: flex-start; }
+    .earn-line p { font-size: 13px; line-height: 1.55; color: #1a2332; }
+    .earn-line span { display: block; margin-top: 4px; font-size: 12px; color: #9aa3af; }
+    .tabbar { flex-shrink: 0; height: 58px; display: flex; border-top: 1px solid #f0f0f0; background: #fff; }
+    .tabbar button { flex: 1; border: none; background: none; font-size: 11px; color: #8a93a0; cursor: pointer; }
+    .tabbar button.on { color: var(--orange); font-weight: 700; }
+    .tabbar b { display: block; font-size: 18px; line-height: 1.1; font-weight: 400; }
+    .empty { padding: 48px 16px; text-align: center; color: var(--muted); font-size: 13px; }
+    .toast { position: absolute; left: 50%; bottom: 88px; transform: translateX(-50%) translateY(20px); background: #1e293b; color: #fff; padding: 8px 14px; border-radius: 999px; font-size: 12px; opacity: 0; transition: .2s; pointer-events: none; z-index: 80; white-space: nowrap; }
+    .toast.stay { white-space: normal; max-width: 232px; text-align: center; line-height: 1.45; border-radius: 12px; }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .ms-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 12px 0; border-bottom: 1px solid #f4f4f4; font-size: 14px; }
+    .ms-row .ms-name { flex: 1; min-width: 0; }
+    .ms-side { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+    .ms-row span { font-size: 12px; color: var(--muted); }
+    .ms-row span.on { color: var(--orange); font-weight: 700; }
+    .ms-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+    .ms-head h3 { font-size: 14px; }
+    .ms-dl { border: none; background: none; padding: 0; font-size: 13px; font-weight: 600; color: var(--orange); cursor: pointer; }
+    .ms-dl:disabled { color: #c5c9d1; cursor: not-allowed; }
+    body.pc { background: #e8eaed; }
+    body.pc .pc-shell { margin: 0; max-width: none; min-height: 100%; border-radius: 0; box-shadow: none; background: #fff; display: flex; flex-direction: column; height: 100%; position: relative; }
+    .task-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+    .task-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(168px, 200px)); gap: 12px; justify-content: start; }
+    .task-card { background: #fff; border: 1px solid #e6e8eb; border-radius: 10px; overflow: hidden; }
+    .task-cover { position: relative; aspect-ratio: 3 / 4; background: #2a2f3a; }
+    .task-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .task-flag { position: absolute; top: 8px; left: 8px; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: rgba(0,0,0,.55); color: #fff; }
+    .task-flag.on { background: #16a34a; }
+    .task-body { padding: 8px 10px 10px; }
+    .task-title { font-size: 13px; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .task-meta { margin-top: 4px; font-size: 11px; color: var(--muted); line-height: 1.4; word-break: break-all; }
+    .task-meta a { color: var(--orange); text-decoration: none; }
+    .task-brief { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .task-card .pc-btn { width: 100%; margin-top: 8px; }
+    .pc-drawer-mask { position: absolute; inset: 0; background: rgba(15,23,42,.35); z-index: 30; }
+    .pc-drawer { position: absolute; top: 0; right: 0; bottom: 0; width: 420px; max-width: 92%; z-index: 31; background: #fff; box-shadow: -8px 0 32px rgba(0,0,0,.16); display: flex; flex-direction: column; }
+    .pc-drawer.wide { width: 760px; max-width: 96%; }
+    .pc-drawer table { width: 100%; border-collapse: collapse; min-width: 0; }
+    .pc-drawer th, .pc-drawer td { padding: 8px 10px; border-bottom: 1px solid #e6e8eb; font-size: 12px; text-align: left; white-space: nowrap; }
+    .pc-drawer-hd { padding: 16px 18px; border-bottom: 1px solid #e6e8eb; display: flex; justify-content: space-between; align-items: center; }
+    .pc-drawer-hd h2 { font-size: 15px; }
+    .pc-drawer-x { width: 28px; height: 28px; border: none; background: #f1f5f9; border-radius: 6px; cursor: pointer; }
+    .pc-drawer-bd { flex: 1; overflow: auto; padding: 16px 18px 20px; }
+    .pc-drawer-top { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 14px; }
+    .pc-drawer-top img { width: 72px; height: 96px; object-fit: cover; border-radius: 8px; background: #2a2f3a; flex-shrink: 0; }
+    .pc-drawer-top b { display: block; font-size: 16px; line-height: 1.35; margin-bottom: 8px; }
+    .pc-kv { display: grid; grid-template-columns: 72px 1fr; gap: 10px 12px; font-size: 13px; align-items: start; }
+    .pc-kv i { font-style: normal; color: var(--muted); }
+    .pc-kv .brief { font-weight: 500; line-height: 1.6; white-space: pre-wrap; }
+    .pc-drawer-ft { padding: 12px 18px 16px; border-top: 1px solid #e6e8eb; }
+    .pc-drawer-ft .pc-btn { width: 100%; }
+    .topbar { height: 52px; background: var(--nav); color: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 18px; flex-shrink: 0; }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; }
+    .brand i { width: 26px; height: 26px; border-radius: 6px; background: var(--orange); display: grid; place-items: center; font-size: 12px; font-style: normal; }
+    .brand-sub { font-size: 12px; font-weight: 500; color: #cbd5e1; margin-left: 8px; }
+    .who { font-size: 12px; color: #cbd5e1; }
+    .layout { display: grid; grid-template-columns: 200px 1fr; min-height: 0; flex: 1; }
+    .side { background: #f8fafc; border-right: 1px solid #e6e8eb; padding: 12px 8px; }
+    .side .hint { font-size: 10px; color: #94a3b8; padding: 6px 10px 8px; }
+    .nav-btn { display: block; width: 100%; text-align: left; border: none; background: none; padding: 9px 12px; border-radius: 8px; font-size: 13px; color: #94a3b8; cursor: pointer; }
+    .nav-btn.on { background: var(--orange-light); color: var(--orange); font-weight: 700; }
+    .main { background: #f4f5f7; padding: 18px 20px 28px; min-width: 0; overflow: auto; }
+    .main h1 { font-size: 18px; margin-bottom: 4px; }
+    .desc { font-size: 12px; color: var(--muted); margin-bottom: 16px; line-height: 1.5; }
+    .pc-card { background: #fff; border: 1px solid #e6e8eb; border-radius: 10px; padding: 14px 16px; margin-bottom: 12px; }
+    .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 12px; }
+    .pc-btn { height: 34px; padding: 0 14px; border-radius: 8px; border: none; cursor: pointer; font-size: 13px; font-weight: 600; background: var(--orange); color: #fff; }
+    .pc-btn.ghost { background: #fff; border: 1px solid #e6e8eb; color: #475569; }
+    .pc-btn[disabled] { opacity: .45; cursor: not-allowed; }
+    .pc-sums { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; margin: 0 0 12px; }
+    .pc-sum { padding: 10px 12px; border-radius: 10px; background: #fff; border: 1px solid #e6e8eb; }
+    .pc-sum span { display: block; font-size: 11px; color: var(--muted); }
+    .pc-sum strong { display: block; margin-top: 6px; font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .pc-sum.earn { border-color: var(--orange-border); background: var(--orange-light); }
+    .pc-sum.earn strong { color: var(--orange); }
+    .pc-sum.ok strong { color: #16a34a; }
+    .pc-sum.warn strong { color: #d97706; }
+    .pc-filters { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; margin: 0 0 12px; }
+    .pc-filters .field { margin-bottom: 0; }
+    .pc-filters .field input, .pc-filters .field select { width: 140px; height: 32px; padding: 0 10px; border: 1px solid #e6e8eb; border-radius: 8px; font: inherit; font-size: 12px; background: #fff; }
+    .pc-filters .field label { font-size: 11px; }
+    .table-scroll { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid #e6e8eb; vertical-align: top; }
+    th { font-size: 11px; color: var(--muted); white-space: nowrap; }
+    .tag { display: inline-flex; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+    .tag-ok { background: #f0fdf4; color: #16a34a; }
+    .tag-warn { background: #fffbeb; color: #d97706; }
+    .field { margin-bottom: 12px; }
+    .field label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+    .field input { width: 100%; height: 34px; padding: 0 10px; border: 1px solid #e6e8eb; border-radius: 8px; font: inherit; }
+    .file-row { display: flex; gap: 8px; align-items: flex-end; }
+    .file-row .field { flex: 1; margin-bottom: 0; }
+    .channel-tab-bar { display: flex; gap: 0; margin: 0 0 12px; border-bottom: 1px solid #e6e8eb; }
+    .channel-tab-bar button { padding: 8px 16px; border: none; background: none; cursor: pointer; font-size: 13px; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px; }
+    .channel-tab-bar button.on { color: var(--orange); font-weight: 700; border-bottom-color: var(--orange); }
+    .cell-sub { font-size: 11px; color: var(--muted); margin-top: 2px; word-break: break-all; }
+    .cell-sub a { color: var(--orange); text-decoration: none; }
+    .folder-ico { margin-right: 6px; }
+    .link { background: none; border: none; color: var(--orange); cursor: pointer; font-size: 12px; font-weight: 600; padding: 0; margin-right: 10px; }
+    .link.danger { color: #dc2626; }
+    .up-modal.narrow { width: min(420px, calc(100% - 40px)); }
+    .tag-muted { background: #f1f5f9; color: #64748b; }
+    .tag-del { background: #fef2f2; color: #dc2626; }
+    .list-table { min-width: 1180px; }
+    .pc-modal-mask { position: absolute; inset: 0; background: rgba(15,23,42,.35); z-index: 40; }
+    .pc-modal { position: absolute; left: 50%; top: 72px; transform: translateX(-50%); width: 440px; max-width: calc(100% - 32px); background: #fff; border-radius: 12px; z-index: 41; box-shadow: 0 16px 48px rgba(0,0,0,.16); }
+    .pc-modal-hd, .pc-modal-ft { padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; }
+    .pc-modal-hd { border-bottom: 1px solid #e6e8eb; }
+    .pc-modal-hd h2 { font-size: 15px; }
+    .pc-modal-bd { padding: 16px 18px 4px; }
+    .pc-modal-ft { justify-content: flex-end; gap: 8px; }
+    .pack-pick { width: 100%; text-align: left; border: 1px solid #e6e8eb; background: #fff; border-radius: 10px; padding: 12px; cursor: pointer; }
+    .pack-pick.on { border-color: var(--orange); background: var(--orange-light); }
+    .pack-pick b { display: block; font-size: 13px; margin-bottom: 4px; }
+    .pack-pick span { font-size: 12px; color: var(--muted); line-height: 1.5; }
+    .up-overlay { position: absolute; inset: 0; background: rgba(15,23,42,.35); z-index: 40; }
+    .up-modal {
+      position: absolute; left: 50%; top: 50%; width: min(920px, calc(100% - 40px)); max-height: calc(100% - 48px);
+      transform: translate(-50%, -50%); z-index: 41; background: #fff; border-radius: 12px;
+      box-shadow: 0 24px 64px rgba(0,0,0,.22); display: flex; flex-direction: column; overflow: hidden;
+    }
+    .up-head { padding: 22px 28px 4px; display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+    .up-head h2 { font-size: 17px; letter-spacing: -0.02em; }
+    .up-head p { font-size: 12px; color: var(--muted); margin-top: 6px; line-height: 1.5; }
+    .up-modal .steps { display: flex; align-items: flex-start; padding: 18px 28px 4px; margin: 0; }
+    .step { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 72px; color: var(--muted); font-size: 12px; font-weight: 500; }
+    .step i { width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid var(--border); display: grid; place-items: center; font-style: normal; font-weight: 700; font-size: 12px; background: #fff; color: var(--muted); }
+    .step span { white-space: nowrap; }
+    .step.on { color: var(--text); font-weight: 600; }
+    .step.on i { border-color: var(--orange); background: var(--orange); color: #fff; }
+    .step.done { color: var(--text); }
+    .step.done i { border-color: #ffd4b8; background: var(--orange-light); color: var(--orange); }
+    .step-line { flex: 1; height: 1.5px; background: var(--border); margin: 13px 10px 0; }
+    .step.done + .step-line { background: #ffd4b8; }
+    .up-body { padding: 8px 28px 20px; overflow-y: auto; flex: 1; }
+    .up-foot { padding: 14px 28px 18px; border-top: 1px solid #f1f5f9; display: flex; justify-content: flex-end; gap: 8px; }
+    .up-group { padding: 16px 0 2px; }
+    .up-group + .up-group { border-top: 1px solid #f1f5f9; margin-top: 4px; }
+    .up-group-title { font-size: 11px; font-weight: 700; letter-spacing: .08em; color: #94a3b8; margin-bottom: 12px; }
+    .up-modal .field { margin-bottom: 0; }
+    .up-modal .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 14px; }
+    .up-modal .field label { font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 6px; }
+    .up-modal .field input, .up-modal .field select, .up-modal .field textarea { border-radius: 10px; border: 1px solid #e2e8f0; background: #f8fafc; width: 100%; font: inherit; }
+    .up-modal .field input, .up-modal .field select { height: 40px; padding: 0 12px; }
+    .up-modal .field textarea { min-height: 72px; padding: 10px 12px; resize: vertical; }
+    .up-modal .field input[readonly] { background: #f1f5f9; color: #64748b; }
+    .pack-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .pack-card { border: 1px solid var(--border); border-radius: 10px; padding: 16px; text-align: left; background: #fff; cursor: pointer; min-height: 96px; }
+    .pack-card.on { border-color: var(--orange); background: var(--orange-light); }
+    .pack-card b { display: block; font-size: 14px; margin-bottom: 6px; }
+    .pack-card span { font-size: 12px; color: var(--muted); line-height: 1.5; }
+    .pack-sum { margin-top: 14px; padding: 12px; border-radius: 8px; background: #f8fafc; font-size: 13px; line-height: 1.7; }
+    .up-modal .btn { height: 34px; width: auto; padding: 0 14px; border-radius: 8px; border: none; cursor: pointer; font-size: 13px; font-weight: 600; }
+    .up-modal .btn-primary { width: auto; height: 34px; border-radius: 8px; font-size: 13px; font-weight: 600; background: var(--orange); color: #fff; }
+    .up-modal .btn.danger { background: #dc2626; color: #fff; }
+    .up-modal .btn-ghost { width: auto; height: 34px; border-radius: 8px; font-size: 13px; font-weight: 600; border: 1px solid #e6e8eb; background: #fff; color: #475569; }
+    .excel-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; }
+    .excel-wrap table { min-width: 520px; }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <script>
+    var q = new URLSearchParams(location.search);
+    if (q.get('embed') === '1') document.body.classList.add('embed-mode');
+    var boot = q.get('screen') || 'plaza';
+    var earnGrain = 'day';
+    var earnDay = 29;
+    var earnYear = 2026;
+    var earnMonth = 9;
+    var EARN_TODAY = { y: 2026, m: 9, d: 29 };
+    var EARN_SEP = { 1: 173.66, 2: 57.39, 3: 61.24, 4: 47.93, 5: 37.50, 6: 146.38, 7: 172.27, 8: 47.83, 9: 102.40, 10: 113.78, 11: 87.45, 12: 26.80, 13: 19.50, 14: 15.81, 15: 6.26, 16: 15.44, 17: 12.50, 18: 0, 19: 0, 20: 6.99, 21: 12.52, 22: 31.30, 23: 22.79, 24: 0, 25: 30.15, 26: 6.56, 27: 0, 28: 11.78, 29: 6.26 };
+    var EARN_SETTLED = 1860.20;
+    var EARN_PENDING = 248.60;
+    var EARN_POOL = [
+      { project: '番茄小说', word: '团宠日常' },
+      { project: '番茄小说', word: '真假千金' },
+      { project: '番茄小说', word: '读心术' },
+      { project: '番茄小说', word: '闪婚' },
+      { project: '红果短剧', word: '退婚流' },
+      { project: '红果短剧', word: '真千金' },
+      { project: '红果短剧', word: '真千金回府' },
+      { project: '红果漫剧', word: '读心失效' }
+    ];
+    var EARN_WEEK = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+    if (boot === 'detail-own') boot = 'plaza';
+    var view = boot;
+    var project = '';
+    var favProjects = {};
+    var favAsk = '';
+    var projPress = 0;
+    var projHold = false;
+    var openDd = '';
+    var ddDraft = '';
+    var picked = { claim: '', editor: '', mat: '', kind: '' };
+    var GRID_MATS = ['AI漫画', '图文素材'];
+    var openPack = '';
+    var FILTERS = [
+      { key: 'claim', label: '代发运营模式', options: [['', '全部'], ['own', '任务协作'], ['platform', '帐号运营']] },
+      { key: 'editor', label: '剪辑师', options: [['', '全部'], ['周凯', '周凯'], ['陈予', '陈予'], ['苏晚', '苏晚']] },
+      { key: 'mat', label: '素材类型', options: [['', '全部'], ['AI漫画', 'AI漫画'], ['图文素材', '图文素材'], ['混剪素材', '混剪素材'], ['口播素材', '口播素材'], ['解说营销', '解说营销']] },
+      { key: 'kind', label: '稿件类型', options: [['', '全部'], ['视频', '视频'], ['图集', '图集']] }
+    ];
+    var search = '';
+    var quotaLeft = (boot === 'detail-exchange' || boot === 'detail-charge-points' || boot === 'detail-charge-short') ? 0 : 1;
+    var points = q.get('points') ? Number(q.get('points')) : (boot === 'detail-charge-short' ? 10 : 80);
+    if (!isFinite(points) || points < 0) points = 80;
+    var EDITOR_FEE = {
+      '周凯': { charge: 'platform', share: '50%' },
+      '苏晚': { charge: 'custom', cost: 30, share: '35%' },
+      '陈予': { charge: 'custom', cost: 50, share: '40%' }
+    };
+    var COUNT_SKUS = [
+      { times: 1, points: 100 },
+      { times: 5, points: 400 }
+    ];
+    var detailPane = 'steps';
+    var chargeAsk = boot === 'detail-charge-points';
+    var buyOpen = boot === 'detail-exchange';
+    var skuPick = 0;
+    var ptsShort = boot === 'detail-charge-short';
+    var ptsShortKind = boot === 'detail-charge-short' ? 'custom' : '';
+    var ptsBuy = false;
+    var modeSheet = false;
+    var modePick = '';
+    var loading = false;
+    var loadText = '正在下载稿件';
+    var loadDone = false;
+    var loadTimer = null;
+    var loadGen = 0;
+    var backfillPrompt = false;
+    var fillListId = '';
+    var editorProject = '';
+    var editorOpen = '';
+    var fillOpen = '';
+    var editorPane = 'list';
+    var workQuery = { id: '', word: '', project: '', state: '', kind: '', mat: '', occ: '', fileStatus: '', upload: '', audit: '' };
+    var listTab = '右豹';
+    var uploadKey = '';
+    var uploadOpen = false;
+    var upMode = '任务协作';
+    var upKeyword = '';
+    var upProject = '番茄小说';
+    var upBookName = '我成了老公掌心宠';
+    var upBookId = '7128491023';
+    var upBookLink = 'https://book.example/7128491023';
+    var upRemind = '';
+    var listSeq = 3;
+    var listRows = [
+      { id: 'M-20481', channel: '右豹', title: '掌心宠口播', project: '番茄小说', book: '我成了老公掌心宠', bookId: '7128491023', info: '18.6 MB (1)', fileName: '掌心宠口播.mp4', tip: '开头露出书名', editor: '周凯', kind: '视频', mat: '口播', occ: '空闲', fileStatus: '正常', upload: '已上传', audit: '已通过', time: '09-26 11:20', mode: '帐号运营', fills: [
+        { platform: '抖音', accountId: 'dy_zhoukai', nick: '周凯', link: 'https://v.douyin.com/aaa', publish: '09-26 18:02', fillTime: '09-26 18:40' },
+        { platform: '快手', accountId: 'ks_linxiao', nick: '林晓', link: 'https://v.kuaishou.com/bbb', publish: '09-26 19:11', fillTime: '09-26 19:30' }
+      ] },
+      { id: 'M-20490', channel: '右豹', title: '团宠图集', project: '番茄小说', book: '重生后我成了团宠', bookId: 'B88201', info: '6.2 MB (6)', fileName: '团宠图集', tip: '封面用角色特写', editor: '周凯', kind: '图集', mat: '图文', occ: '空闲', fileStatus: '正常', upload: '已上传', audit: '审核中', time: '09-28 14:06', mode: '任务协作', fills: [] },
+      { id: 'X-20411', channel: '站外', title: '掌心宠站外文件夹', project: '番茄小说', book: '我成了老公掌心宠', bookId: '7128491023', info: '8个素材(已领2个) · 24.0 MB', fileName: '', kind: '视频', fileStatus: '正常', upload: '已上传', time: '09-26 11:20', mode: '任务协作', fills: [
+        { platform: '抖音', accountId: 'dy_suwan', nick: '苏晚', link: 'https://v.douyin.com/ccc', publish: '09-26 20:15', fillTime: '09-26 20:48' }
+      ] }
+    ];
+    var delTaskId = '';
+    var upStep = 1;
+    var upScope = '单个任务';
+    var upPack = '文件夹';
+    var upPicked = false;
+    var upKind = '视频';
+    var upMat = '口播';
+    var editorTasks = [
+      { id: 't1', taskNo: 'TK-88201', title: '团宠日常', project: '番茄小说', bookId: 'B88201', link: 'https://book.example/B88201', keyword: '团宠日常', words: 2, cover: 'assets/fr014/cover-m01.jpg', publish: '09-28 10:00', brief: '口播 15 到 30 秒。开头 3 秒露出书名，片尾打上关键词字幕。', got: false, pack: null, kws: [
+        { word: '团宠日常', status: '已通过', info: '—', fills: [] },
+        { word: '全家团宠', status: '已通过', info: '—', fills: [] }
+      ] },
+      { id: 't2', taskNo: 'TK-88218', title: '假千金双版本', project: '番茄小说', bookId: 'B88218', link: 'https://book.example/B88218', keyword: '真假千金', words: 3, cover: 'assets/fr014/cover-m03.jpg', publish: '09-27 18:30', brief: '同一本书做两个版本，A 口播、B 混剪，各自 20 秒以内。', got: true, pack: { size: '28.4 MB', qty: 3, fileName: '假千金双版本稿件包', kind: '视频', mat: '口播', occ: '占用中', fileStatus: '正常', upload: '已上传', audit: '已通过', time: '09-27 19:02' }, kws: [
+        { word: '真假千金', status: '已回填', got: true, size: '12.4 MB', qty: 1, fileName: '版本A口播.mp4', kind: '视频', mat: '口播', occ: '占用中', fileStatus: '正常', upload: '已上传', audit: '已通过', time: '09-27 19:02', fills: [
+          { userId: 'U-10021', platform: '抖音', nick: '周凯', accountId: 'dy_zhoukai', link: 'https://v.douyin.com/aaa', time: '09-27 21:06' },
+          { userId: 'U-10022', platform: '抖音', nick: '周凯02', accountId: 'dy_zhoukai02', link: 'https://v.douyin.com/bbb', time: '09-27 21:40' }
+        ] },
+        { word: '假千金日常', status: '已通过', got: true, size: '8.2 MB', qty: 1, fileName: '版本B混剪.mp4', kind: '视频', mat: '混剪', occ: '空闲', fileStatus: '正常', upload: '已上传', audit: '审核中', time: '09-27 20:10', fills: [] },
+        { word: '双版本对比', status: '已通过', got: true, size: '6.1 MB', qty: 1, fileName: '对比成片.mp4', kind: '视频', mat: '口播', occ: '空闲', fileStatus: '正常', upload: '上传失败', audit: '已驳回', reject: '片尾没有关键词', time: '09-27 21:06', fills: [] }
+      ] },
+      { id: 't3', taskNo: 'TK-77302', title: '退婚当天', project: '红果短剧', bookId: 'B77302', link: 'https://book.example/B77302', keyword: '退婚流', words: 1, cover: 'assets/fr014/cover-m02.jpg', publish: '09-28 09:00', brief: '前 5 秒用退婚冲突，不要剧透结局。', got: false, pack: null, kws: [
+        { word: '退婚流', status: '已通过', info: '—', fills: [] }
+      ] },
+      { id: 't4', taskNo: 'TK-88244', title: '全员读心', project: '番茄小说', bookId: 'B88244', link: 'https://book.example/B88244', keyword: '读心术', words: 4, cover: 'assets/fr014/cover-m04.jpg', publish: '09-26 14:20', brief: '图集 6 张，每张带一句旁白，封面用角色特写。', got: false, pack: null, kws: [
+        { word: '读心术', status: '已通过', info: '—', fills: [] },
+        { word: '全员读心', status: '已通过', info: '—', fills: [] },
+        { word: '读心日常', status: '已通过', info: '—', fills: [] },
+        { word: '心声曝光', status: '已通过', info: '—', fills: [] }
+      ] },
+      { id: 't5', taskNo: 'TK-77319', title: '豪门真千金', project: '红果短剧', bookId: 'B77319', link: 'https://book.example/B77319', keyword: '真千金', words: 2, cover: 'assets/fr014/cover-m05.jpg', publish: '09-27 11:00', brief: '真假千金对比剪，片中露出书籍 ID。', got: true, pack: null, kws: [
+        { word: '豪门真千金', status: '已通过', got: true, fills: [] },
+        { word: '真千金回归', status: '已通过', got: true, fills: [] }
+      ] },
+      { id: 't6', taskNo: 'TK-88260', title: '闪婚大佬', project: '番茄小说', bookId: 'B88260', link: 'https://book.example/B88260', keyword: '闪婚', words: 1, cover: 'assets/fr014/cover-m06.jpg', publish: '09-28 16:40', brief: '闪婚开场，30 秒内讲完钩子，结尾留关键词。', got: false, pack: null, kws: [
+        { word: '闪婚', status: '已通过', info: '—', fills: [] }
+      ] },
+      { id: 't7', taskNo: 'TK-66108', title: '读心失效', project: '红果漫剧', bookId: 'B66108', link: 'https://book.example/B66108', keyword: '读心失效', words: 2, cover: 'assets/fr014/cover-m04.jpg', publish: '09-25 20:10', brief: '漫剧节奏，每 3 秒一个切点，不要长镜头。', got: false, pack: null, kws: [
+        { word: '读心失效', status: '已通过', info: '—', fills: [] },
+        { word: '读心反转', status: '已通过', info: '—', fills: [] }
+      ] },
+      { id: 't8', taskNo: 'TK-77340', title: '真千金回府', project: '红果短剧', bookId: 'B77340', link: 'https://book.example/B77340', keyword: '真千金回府', words: 1, cover: 'assets/fr014/cover-m05.jpg', publish: '09-28 08:15', brief: '回府名场面开头，口播说明书名和关键词。', got: true, pack: { size: '16.2 MB', qty: 2, fileName: '真千金回府稿件包', kind: '图集', mat: '混剪', occ: '空闲', fileStatus: '正常', upload: '已上传', audit: '审核中', time: '09-28 09:18' }, kws: [
+        { word: '真千金回府', status: '已回填', got: true, size: '16.2 MB', qty: 2, fileName: '回府图集', kind: '图集', mat: '混剪', occ: '空闲', fileStatus: '正常', upload: '已上传', audit: '已通过', time: '09-28 09:18', fills: [
+          { userId: 'U-10088', platform: '抖音', nick: '苏晚', accountId: 'dy_suwan', link: 'https://v.douyin.com/ccc', time: '09-28 10:02' }
+        ] }
+      ] }
+    ];
+    var files = [];
+    var projects = [
+      { id: '', name: '全部', mark: '全', color: '#94a3b8' },
+      { id: '番茄小说', name: '番茄小说', logo: 'assets/fr014/logo-fanqie.jpg', sort: 90 },
+      { id: '红果短剧', name: '红果短剧', logo: 'assets/fr014/logo-hongguo-drama.jpg', sort: 70 },
+      { id: '红果漫剧', name: '红果漫剧', logo: 'assets/fr014/logo-hongguo-comic.jpg', sort: 55 },
+      { id: '知乎', name: '知乎', logo: 'assets/fr014/logo-zhihu.jpg', sort: 40 },
+      { id: '七猫小说', name: '七猫小说', mark: '猫', color: '#f59e0b', sort: 30 },
+      { id: '书旗小说', name: '书旗小说', mark: '旗', color: '#10b981', sort: 20 },
+      { id: '起点读书', name: '起点读书', mark: '起', color: '#6366f1', sort: 8 }
+    ];
+    var claimProject = '';
+    var claimStatus = '未回填';
+    var now = Date.now();
+    var claimRows = [
+      { id: 'c1', work: 'p1', status: '未回填', time: '今天 10:21', downloadedAt: now - 3600000, expireAt: now + 2 * 86400000 + 5 * 3600000, fills: [], backfillPrompted: true },
+      { id: 'c2', work: 'p3', status: '已回填', time: '昨天 18:06', downloadedAt: now - 86400000, expireAt: now + 86400000, fills: [
+        { entry: 'daifa', platform: '抖音', nick: '林晓', link: 'https://v.douyin.com/daifa1', time: '昨天 19:12' },
+        { entry: 'daifa', platform: '抖音', nick: '林晓', link: 'https://v.douyin.com/daifa2', time: '昨天 20:03' },
+        { entry: 'other', platform: '快手', nick: '林晓', link: 'https://v.kuaishou.com/other', time: '昨天 21:00' }
+      ], backfillPrompted: true },
+      { id: 'c3', work: 'p5', status: '已超时', time: '09-20 11:02', downloadedAt: now - 3 * 86400000, expireAt: now - 3600000, fills: [], backfillPrompted: true }
+    ];
+    var works = [
+      { id: 'p1', go: 'detail-platform', kw: 'platform', title: '团宠日常', book: '重生后我成了团宠', project: '番茄小说', editor: '周凯', mat: '口播素材', kind: '视频', cover: 'assets/fr014/cover-m01.jpg', word: '团宠日常', supplier: '30%', userRate: '20%', time: '1小时前', clips: ['口播成片'], got: [true] },
+      { id: 'p2', go: 'detail-platform', kw: 'platform', title: '假千金双版本', book: '假千金', project: '番茄小说', editor: '周凯', mat: '混剪素材', kind: '视频', cover: 'assets/fr014/cover-m03.jpg', word: '真假千金', supplier: '30%', userRate: '20%', time: '2小时前', clips: ['真假千金成片'], got: [false] },
+      { id: 'p3', go: 'detail-platform', kw: 'platform', title: '退婚当天', book: '退婚后我继承了家业', project: '红果短剧', editor: '陈予', mat: '口播素材', kind: '视频', cover: 'assets/fr014/cover-m02.jpg', word: '退婚流', supplier: '30%', userRate: '20%', time: '昨天', clips: ['退婚成片'], got: [true] },
+      { id: 'p4', go: 'detail-platform', kw: 'platform', title: '全员读心', book: '读心术在豪门失效了', project: '番茄小说', editor: '苏晚', mat: '混剪素材', kind: '图集', cover: 'assets/fr014/cover-m04.jpg', word: '读心术', supplier: '30%', userRate: '20%', time: '3小时前', clips: ['读心图集'], got: [false] },
+      { id: 'p5', go: 'detail-platform', kw: 'platform', title: '豪门真千金', book: '真千金她不忍了', project: '红果短剧', editor: '陈予', mat: '口播素材', kind: '图集', cover: 'assets/fr014/cover-m05.jpg', word: '真千金', supplier: '30%', userRate: '20%', time: '昨天', clips: ['真千金图集'], got: [true] },
+      { id: 'p6', go: 'detail-platform', kw: 'platform', title: '闪婚大佬', book: '闪婚当天大佬马甲掉了', project: '番茄小说', editor: '苏晚', mat: '混剪素材', kind: '视频', cover: 'assets/fr014/cover-m06.jpg', word: '闪婚', supplier: '30%', userRate: '20%', time: '30分钟前', clips: ['闪婚成片'], got: [false] },
+      { id: 'p8', go: 'detail-platform', kw: 'platform', title: '假千金对比', book: '假千金', project: '番茄小说', editor: '周凯', mat: '混剪素材', kind: '视频', cover: 'assets/fr014/cover-m03.jpg', word: '假千金日常', supplier: '30%', userRate: '20%', time: '2小时前', clips: ['对比成片'], got: [false] },
+      { id: 'p9', go: 'detail-platform', kw: 'platform', title: '闪婚开场', book: '闪婚当天大佬马甲掉了', project: '番茄小说', editor: '苏晚', mat: '混剪素材', kind: '视频', cover: 'assets/fr014/cover-m06.jpg', word: '闪婚开场', supplier: '30%', userRate: '20%', time: '1小时前', clips: ['开场成片'], got: [false] },
+      { id: 'p7', go: 'detail-platform', kw: 'own', title: '自有词口播', book: '我在豪门当团宠', project: '番茄小说', editor: '周凯', mat: '口播素材', kind: '视频', cover: 'assets/fr014/cover-m01.jpg', word: '团宠口播', supplier: '30%', userRate: '20%', time: '4小时前', clips: ['自有词成片'], got: [false] },
+      { id: 'p18', go: 'detail-platform', kw: 'own', title: '团宠口播二', book: '我在豪门当团宠', project: '番茄小说', editor: '周凯', mat: '口播素材', kind: '视频', cover: 'assets/fr014/cover-m01.jpg', word: '团宠续集', supplier: '30%', userRate: '20%', time: '5小时前', clips: ['续集成片'], got: [false] },
+      { id: 'p10', go: 'detail-platform', kw: 'platform', title: '团宠漫画', book: '重生后我成了团宠', project: '番茄小说', editor: '周凯', mat: 'AI漫画', kind: '图集', cover: 'assets/fr014/cover-m01.jpg', word: '团宠漫画', supplier: '30%', userRate: '20%', time: '1小时前', clips: ['漫画1'], got: [false] },
+      { id: 'p11', go: 'detail-platform', kw: 'platform', title: '退婚漫画', book: '退婚后我继承了家业', project: '红果短剧', editor: '陈予', mat: 'AI漫画', kind: '图集', cover: 'assets/fr014/cover-m02.jpg', word: '退婚漫画', supplier: '30%', userRate: '20%', time: '2小时前', clips: ['漫画2'], got: [false] },
+      { id: 'p12', go: 'detail-platform', kw: 'platform', title: '闪婚漫画', book: '闪婚当天大佬马甲掉了', project: '番茄小说', editor: '苏晚', mat: 'AI漫画', kind: '图集', cover: 'assets/fr014/cover-m06.jpg', word: '闪婚漫画', supplier: '30%', userRate: '20%', time: '3小时前', clips: ['漫画3'], got: [false] },
+      { id: 'p13', go: 'detail-platform', kw: 'platform', title: '假千金图文', book: '假千金', project: '番茄小说', editor: '周凯', mat: '图文素材', kind: '图集', cover: 'assets/fr014/cover-m03.jpg', word: '假千金图文', supplier: '30%', userRate: '20%', time: '1小时前', clips: ['图文1'], got: [false] },
+      { id: 'p14', go: 'detail-platform', kw: 'platform', title: '读心图文', book: '读心术在豪门失效了', project: '番茄小说', editor: '苏晚', mat: '图文素材', kind: '图集', cover: 'assets/fr014/cover-m04.jpg', word: '读心图文', supplier: '30%', userRate: '20%', time: '2小时前', clips: ['图文2'], got: [false] },
+      { id: 'p15', go: 'detail-platform', kw: 'platform', title: '真千金解说', book: '真千金她不忍了', project: '红果短剧', editor: '陈予', mat: '解说营销', kind: '视频', cover: 'assets/fr014/cover-m05.jpg', word: '真千金解说', supplier: '30%', userRate: '20%', time: '1小时前', clips: ['解说成片'], got: [false] },
+      { id: 'p16', go: 'detail-platform', kw: 'platform', title: '真千金营销', book: '真千金她不忍了', project: '红果短剧', editor: '陈予', mat: '解说营销', kind: '视频', cover: 'assets/fr014/cover-m05.jpg', word: '真千金营销', supplier: '30%', userRate: '20%', time: '2小时前', clips: ['营销成片'], got: [false] },
+      { id: 'p17', go: 'detail-platform', kw: 'own', title: '闪婚营销', book: '闪婚当天大佬马甲掉了', project: '番茄小说', editor: '苏晚', mat: '解说营销', kind: '视频', cover: 'assets/fr014/cover-m06.jpg', word: '闪婚营销', supplier: '30%', userRate: '20%', time: '30分钟前', clips: ['营销口播'], got: [false] }
+    ];
+    works.forEach(function (w) { if (w.keywordOut == null) w.keywordOut = w.got.some(Boolean); });
+    var currentId = (boot === 'detail-pack' || boot === 'detail-charge' || boot === 'detail-charge-points' || boot === 'detail-charge-short') ? 'p6' : ((boot === 'detail-platform' || boot === 'detail-exchange') ? 'p10' : 'p1');
+    var pendingToast = '';
+    var EDITOR_NOTE = {
+      p6: '开头 3 秒露出书名，片尾停在关键词。\n闪婚当天马甲掉了，他才知道老婆是谁。',
+      p9: '开场不要配解说，用原声停两秒。\n婚礼刚开始，马甲就掉了。',
+      p10: '封面用角色特写，按页序发出去。\n重生后我成了团宠。这一组漫画看完再去搜书。',
+      p17: '口播把关键词放在第一句。\n闪婚当天大佬马甲掉了，评论区置顶关键词。'
+    };
+    var PASSED_KW = [
+      { word: '掌心宠溺', project: '番茄小说', bookId: '7128491023' },
+      { word: '掌心日常', project: '番茄小说', bookId: '7128491023' },
+      { word: '别人的词', project: '番茄小说', bookId: '7128491023', editor: '苏晚' },
+      { word: '待审核甜宠', project: '番茄小说', bookId: '7128491023', status: '待审核' }
+    ];
+    function findWork(id) {
+      var hit = works.filter(function (w) { return w.id === id; })[0];
+      return hit || works[0];
+    }
+    function editorNote(w) {
+      if (w.remind) return w.remind;
+      if (w.note) return w.note;
+      if (EDITOR_NOTE[w.id]) return EDITOR_NOTE[w.id];
+      return '按剪辑师上传时留下的提醒发布。';
+    }
+    function keywordNeeded() { return listTab === '站外' || upMode === '帐号运营'; }
+    function keywordChoices() {
+      var fromTasks = [];
+      editorTasks.forEach(function (t) {
+        (t.kws || []).forEach(function (k) {
+          if (k.status === '已通过' || k.status === '已回填') fromTasks.push({ word: k.word, project: t.project, bookId: t.bookId });
+        });
+      });
+      return PASSED_KW.concat(fromTasks).filter(function (k) {
+        return k.editor !== '苏晚' && k.status !== '待审核' && k.project === upProject && String(k.bookId) === String(upBookId);
+      }).map(function (k) { return k.word; }).filter(function (word, i, list) { return list.indexOf(word) === i; });
+    }
+    function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]; }); }
+    function cover(src) {
+      return '<div class="cover-wrap"><img class="cover-img" src="' + src + '" alt=""></div>';
+    }
+    function toast(msg) {
+      var el = document.getElementById('toast');
+      if (!el) return;
+      el.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(toast._t);
+      toast._t = setTimeout(function () { el.classList.remove('show'); }, 1600);
+    }
+    function claimName(kw) { return kw === 'own' ? '任务协作' : '帐号运营'; }
+    function daifaFills(row) { return ((row && row.fills) || []).filter(function (f) { return f.entry === 'daifa'; }); }
+    function ensureClaim(workId) {
+      var row = claimRows.filter(function (c) { return c.work === workId; })[0];
+      if (!row) {
+        row = { id: 'c' + Date.now(), work: workId, status: '未回填', time: '刚刚', downloadedAt: 0, expireAt: Date.now() + 3 * 86400000, fills: [], backfillPrompted: false };
+        claimRows.unshift(row);
+      }
+      return row;
+    }
+    function go(id) {
+      loadGen += 1;
+      if (loadTimer) { clearTimeout(loadTimer); loadTimer = null; }
+      loading = false;
+      loadDone = false;
+      backfillPrompt = false;
+      fillListId = '';
+      modeSheet = false;
+      modePick = '';
+      chargeAsk = false;
+      buyOpen = false;
+      ptsShort = false;
+      ptsShortKind = '';
+      ptsBuy = false;
+      favAsk = '';
+      detailPane = 'steps';
+      view = id;
+      openDd = '';
+      draw();
+    }
+    function shell(title, back, body, foot, tab, overlay) {
+      return '<section class="screen on">' +
+        '<div class="status-bar"><span>9:41</span><span>5G</span></div>' +
+        '<div class="nav-bar">' +
+        (back ? '<button class="back" type="button" data-go="' + back + '">‹</button>' : '<span style="width:36px"></span>') +
+        '<div class="title">' + title + '</div><span style="width:36px"></span></div>' +
+        body + (foot || '') +
+        (tab ? '<nav class="tabbar"><button type="button" data-go="plaza"' + (tab === 'plaza' ? ' class="on"' : '') + '><b>⌂</b>广场</button><button type="button" data-go="claims"' + (tab === 'claims' ? ' class="on"' : '') + '><b>☰</b>已领</button><button type="button" data-go="earn"' + (tab === 'earn' ? ' class="on"' : '') + '><b>¥</b>收益</button></nav>' : '') +
+        (overlay || '') +
+        '<div class="toast" id="toast"></div></section>';
+    }
+    function pickSheet() {
+      var current = FILTERS.filter(function (f) { return f.key === openDd; })[0];
+      if (!current) return '';
+      var opts = current.options.map(function (opt) {
+        return '<button class="pick-opt' + (ddDraft === opt[0] ? ' on' : '') + '" type="button" data-ddkey="' + current.key + '" data-val="' + opt[0] + '">' + opt[1] + '</button>';
+      }).join('');
+      return '<div class="dd-mask" id="ddMask"></div><div class="pick-sheet"><div class="pick-head"><h3>选择' + current.label + '</h3><button class="pick-x" type="button" id="ddClose">×</button></div><div class="pick-grid">' + opts + '</div><button class="pick-ok" type="button" id="ddOk">确定</button><div class="pick-home"></div></div>';
+    }
+    function plazaList() {
+      return works.filter(function (w) {
+        if (w.got.some(Boolean)) return false;
+        if (picked.mat && w.mat !== picked.mat) return false;
+        if (project && w.project !== project) return false;
+        if (picked.claim && w.kw !== picked.claim) return false;
+        if (picked.editor && w.editor !== picked.editor) return false;
+        if (picked.kind && w.kind !== picked.kind) return false;
+        if (search && (w.title + w.book).indexOf(search) < 0) return false;
+        return true;
+      });
+    }
+    function isListMat(mat) { return GRID_MATS.indexOf(mat) < 0; }
+    function packMates(w) {
+      return works.filter(function (x) {
+        return isListMat(x.mat) && x.project === w.project && x.book === w.book && x.editor === w.editor;
+      });
+    }
+    function packLeft(w) {
+      return packMates(w).filter(function (x) { return !x.got.some(Boolean); });
+    }
+    function gridCard(w) {
+      return '<div class="g-card" data-go="' + w.go + '" data-id="' + w.id + '"><div class="thumb">' + cover(w.cover) +
+        '<span class="kind-tag">' + claimName(w.kw) + '</span>' +
+        '<div class="thumb-bar"><span>' + w.kind + '</span><span>' + esc(w.editor) + '</span></div></div>' +
+        '<div class="g-title">' + esc(w.title) + '</div><div class="g-src">' + esc(w.book) + '</div></div>';
+    }
+    function packCard(w) {
+      return '<div class="g-card" data-go="' + w.go + '" data-id="' + w.id + '"><div class="thumb">' + cover(w.cover) +
+        '<span class="kind-tag">库存 ' + packLeft(w).length + '</span>' +
+        '<div class="thumb-bar"><span>' + esc(w.project) + '</span><span>' + esc(w.editor) + '</span></div></div>' +
+        '<div class="g-title">' + esc(w.book) + '</div><div class="g-src">视频素材包</div></div>';
+    }
+    function plazaCards(list) {
+      var seen = {};
+      var html = [];
+      list.forEach(function (w) {
+        if (!isListMat(w.mat)) { html.push(gridCard(w)); return; }
+        var key = w.project + '\n' + w.book + '\n' + w.editor;
+        if (seen[key]) return;
+        seen[key] = true;
+        html.push(packCard(w));
+      });
+      if (!html.length) return '<div class="empty">这个筛选下没有稿件</div>';
+      return '<div class="grid">' + html.join('') + '</div>';
+    }
+    function projectCatalog() {
+      var head = projects.filter(function (p) { return !p.id; });
+      var rest = projects.filter(function (p) { return p.id; }).slice().sort(function (a, b) {
+        var fa = favProjects[a.id] ? 1 : 0;
+        var fb = favProjects[b.id] ? 1 : 0;
+        if (fa !== fb) return fb - fa;
+        return (b.sort || 0) - (a.sort || 0);
+      });
+      return head.concat(rest);
+    }
+    function projectChip(p, selected, attr) {
+      var pin = p.id && favProjects[p.id] ? '<i class="proj-pin">常</i>' : '';
+      return '<button class="proj' + (selected ? ' on' : '') + '" type="button" ' + attr + '="' + p.id + '">' +
+        '<span class="proj-ico"' + (p.logo ? '' : ' style="background:' + (p.color || '#94a3b8') + '"') + '>' +
+        (p.logo ? '<img src="' + p.logo + '" alt="">' : p.mark) + pin + '</span>' +
+        '<span class="proj-name">' + p.name + '</span></button>';
+    }
+    function projectBar(list, selected, attr, rowId, barId) {
+      var real = list.filter(function (p) { return p.id; }).length;
+      var scroll = real > 5;
+      return '<div class="project-bar"><div class="project-row' + (scroll ? ' can-scroll' : '') + '" id="' + rowId + '">' +
+        list.map(function (p) { return projectChip(p, selected === p.id, attr); }).join('') +
+        '</div><div class="project-scroll' + (scroll ? ' show' : '') + '" id="' + barId + '"><span class="track"><i></i></span></div></div>';
+    }
+    function favDialog() {
+      if (!favAsk) return '';
+      var p = projects.filter(function (x) { return x.id === favAsk; })[0];
+      if (!p) return '';
+      var on = !!favProjects[p.id];
+      return '<div class="load-mask show" id="favMask"></div><div class="backfill-pop"><h3>' + esc(p.name) + '</h3><p>' +
+        (on ? '这个项目已设为常用，排在其他项目前面。取消后按后台排序回到原位。' : '设为常用后，这个项目排在未设常用的项目前面。同组内仍按后台排序，数值大的在前。') +
+        '</p><div class="backfill-actions"><button class="backfill-later" type="button" id="favClose">关闭</button><button class="backfill-go" type="button" id="favToggle">' +
+        (on ? '取消常用' : '设为常用') + '</button></div></div>';
+    }
+    function plaza() {
+      var list = plazaList();
+      var cards = plazaCards(list);
+      var body = projectBar(projectCatalog(), project, 'data-proj', 'plazaProjects', 'plazaScroll') +
+        '<div class="search-wrap"><div class="search-box"><span class="ico">⌕</span><input id="feedSearch" placeholder="输入书籍ID/书名等搜索列表内容" value="' + esc(search) + '"></div></div>' +
+        '<div class="filter-block"><div class="filter-row">' + FILTERS.map(function (f) {
+          var val = picked[f.key];
+          var hit = f.options.filter(function (o) { return o[0] === val; })[0];
+          var label = val && hit ? hit[1] : f.label;
+          return '<button class="dd' + (val || openDd === f.key ? ' on' : '') + '" type="button" data-open="' + f.key + '">' + label + '</button>';
+        }).join('') + '</div></div>' +
+        '<div class="scroll">' + cards + '</div>';
+      return shell('作品广场', '', body, '', 'plaza', pickSheet() + favDialog());
+    }
+    function maskWord(word) {
+      var chars = Array.from(word || '');
+      if (chars.length <= 1) return '*';
+      if (chars.length === 2) return chars[0] + '*';
+      return chars[0] + new Array(chars.length - 1).join('*') + chars[chars.length - 1];
+    }
+    function keywordText(w) {
+      if (w.keywordOut) return w.word;
+      return w.kw === 'own' ? '未领取' : maskWord(w.word);
+    }
+    var DEFER_KW = '暂无关键词,先领稿件稍后申请词';
+    var BOOK_USER_KW = { '我在豪门当团宠': ['豪门团宠', '团宠日常'] };
+    var ownPickOpen = false;
+    var ownHoldPop = false;
+    var kwSheetClaimId = '';
+    var kwDlTip = false;
+    function userBookKeywords(w) {
+      return (BOOK_USER_KW[w.book] || []).slice();
+    }
+    function kwChooseSheet(title, words, defer) {
+      var rows = '';
+      if (defer) rows += '<button class="kw-row defer" type="button" data-kwpick="defer"><span>' + DEFER_KW + '</span><i class="kw-check">✓</i></button>';
+      words.forEach(function (word) {
+        rows += '<button class="kw-row" type="button" data-kwpick="' + esc(word) + '"><span>' + esc(word) + '</span><i class="kw-check">✓</i></button>';
+      });
+      return '<div class="kw-mask show" id="ownKwMask"></div><div class="kw-sheet show"><div class="kw-head"><h3>' + title + '</h3><button class="x" type="button" id="ownKwClose">×</button></div><div class="kw-list">' + rows + '</div></div>';
+    }
+    var BOOK_META = {
+      '重生后我成了团宠': { id: 'B88201', link: 'https://book.example/B88201', type: '女频小说' },
+      '假千金': { id: 'B88218', link: 'https://book.example/B88218', type: '女频小说' },
+      '退婚后我继承了家业': { id: 'B77302', link: 'https://book.example/B77302', type: '古言' },
+      '读心术在豪门失效了': { id: 'B88244', link: 'https://book.example/B88244', type: '女频小说' },
+      '真千金她不忍了': { id: 'B77319', link: 'https://book.example/B77319', type: '古言' },
+      '闪婚当天大佬马甲掉了': { id: 'B88260', link: 'https://book.example/B88260', type: '现言' },
+      '我在豪门当团宠': { id: 'B88290', link: 'https://book.example/B88290', type: '现言' }
+    };
+    function bookMeta(w) {
+      return BOOK_META[w.book] || { id: '—', link: '', type: '—' };
+    }
+    function copyLine(label, value) {
+      return '<dt>' + label + '</dt><dd class="copy-line"><span>' + esc(value) + '</span><button class="copy-btn" type="button" data-copy="' + esc(value) + '">复制</button></dd>';
+    }
+    function detailHead(w, extra, media) {
+      var book = bookMeta(w);
+      var mediaHtml = media || ('<div class="media-full">' + cover(w.cover) + '<span class="media-badge">' + w.kind + '</span></div>');
+      var rule = editorRule(w);
+      var price = rule.charge === 'custom' ? '<p class="point-price"><span>积分价格</span>' + rule.cost + ' 积分</p>' : '';
+      return '<div class="scroll">' + mediaHtml +
+        '<div class="detail-pad"><div class="card head-card" style="margin-top:8px"><div class="head-title"><div class="head-name"><h3>' + w.title + '</h3>' + price + '</div>' +
+        '<div class="pills"><span class="pill">' + esc(w.project) + '</span><span class="pill">' + claimName(w.kw) + '</span><span class="pill">' + esc(w.kind) + '</span></div></div>' +
+        '<p class="work-time">' + w.time + '</p>' +
+        '<div class="stat-row"><div class="stat"><span>稿件作者</span><b>' + w.editor + '</b></div>' +
+        '<div class="stat"><span>关键词</span><b>' + keywordText(w) + '</b></div>' +
+        '<div class="stat"><span>供稿者分成</span><b>' + (w.supplier || '—') + '</b></div>' +
+        '<div class="stat"><span>用户分成</span><b>' + (w.userRate || '—') + '</b></div></div></div>' +
+        '<dl class="kv card">' + copyLine('书籍名称', w.book) + copyLine('书籍ID', book.id) + copyLine('书籍链接', book.link) +
+        '<dt>书籍类型</dt><dd>' + esc(book.type) + '</dd></dl>' +
+        (extra || '') + '</div></div>';
+    }
+    function leftClips(w) {
+      return w.clips.filter(function (_, i) { return !w.got[i]; });
+    }
+    function unitName(w) { return w.kind === '图集' ? '组图集' : '个视频'; }
+    function previewMedia(w) {
+      return '<div class="media-full" id="clipPreview">' + cover(w.cover) +
+        '<span class="media-badge">试看 5 秒</span>' +
+        '<button class="play-btn" type="button" id="playClip" aria-label="预览5秒">▶</button>' +
+        '<div class="v-bar"><div class="v-prog" id="vProg"></div></div>' +
+        '<div class="v-end" id="vEnd">试看结束，领取后查看完整稿件</div></div>';
+    }
+    function episodeExtra(w) {
+      var mates = packMates(w);
+      var left = packLeft(w).length;
+      var eps = mates.map(function (m, i) {
+        var taken = m.got.some(Boolean);
+        return '<button type="button" class="ep' + (m.id === w.id ? ' on' : '') + (taken ? ' got' : '') + '" data-ep="' + m.id + '">' + (i + 1) + '</button>';
+      }).join('');
+      return '<div class="card ep-card"><div class="ep-head"><b>剩余素材</b><span>剩 ' + left + ' 个</span></div><div class="ep-row">' + eps + '</div></div>';
+    }
+    function manuscriptDetail(back) {
+      var w = findWork(currentId);
+      var listMat = isListMat(w.mat);
+      var left = leftClips(w);
+      var any = w.got.some(Boolean);
+      var all = !left.length;
+      var extra = listMat ? episodeExtra(w) : '';
+      if (!any) extra += detailGuide(w);
+      var foot = '<div class="foot"><div class="foot-claim' + (all && back === 'claims' ? ' foot-done' : '') + '">';
+      if (!all) {
+        foot += '<div class="quota-chip"><span>剩余次数</span><b>' + quotaLeft + '</b></div>' +
+          '<button class="btn-tip" type="button" id="quickKw">快捷提词</button>' +
+          '<button class="btn-primary" type="button" id="openMode">领取稿件</button>';
+      } else if (back === 'claims') {
+        foot += '<button class="btn-ghost" type="button" id="wmBtn">添加水印</button>' +
+          '<button class="btn-primary" type="button" id="dyPublish">下载并发布到抖音</button>';
+      } else {
+        foot += '<p class="foot-note">这条稿件已领取，再次下载请到已领记录。</p>';
+      }
+      foot += '</div></div>';
+      var overlay = '';
+      if (loading) {
+        var abortBtn = loadDone ? '' : '<button class="load-abort" type="button" id="abortDl">中断下载</button>';
+        overlay += '<div class="load-mask show"></div><div class="load-box show"><div class="spin' + (loadDone ? ' done' : '') + '" id="loadSpin"></div><div id="loadText">' + loadText + '</div>' + abortBtn + '</div>';
+      }
+      if (backfillPrompt) {
+        overlay += '<div class="load-mask show" id="backfillMask"></div><div class="backfill-pop"><h3>稿件已保存到相册</h3><p>这是本次领取的第一次保存成功。可以现在去回填，也可以先留在已领取详情，稍后从我的领取再回填。</p><div class="backfill-actions"><button class="backfill-later" type="button" id="backfillLater">稍后</button><button class="backfill-go" type="button" id="backfillGo">去回填</button></div></div>';
+      }
+      overlay += payOverlay(w);
+      if (ownPickOpen && w.kw === 'own') overlay += kwChooseSheet('选择关键词', userBookKeywords(w), true);
+      if (ownHoldPop) overlay += '<div class="load-mask show" id="holdMask"></div><div class="backfill-pop"><h3>尽快申请关键词</h3><p>1 小时内没有填写关键词，该稿件过期释放。</p><div class="backfill-actions"><button class="backfill-go" type="button" id="holdOk">知道了</button></div></div>';
+      return shell('稿件详情', back || 'plaza', detailHead(w, extra, listMat ? previewMedia(w) : ''), foot, '', overlay);
+    }
+    function detailGuide(w) {
+      var note = editorNote(w);
+      var onRemind = detailPane === 'remind';
+      var steps = '<ol class="steps">' +
+        '<li><b>1.</b> 确认剩余次数（按钮旁可见）</li>' +
+        '<li><b>2.</b> 领取这一条稿件。有免费次数先扣 1 次，没有则按剪辑手收费</li>' +
+        '<li><b>3.</b> 下载稿件并保存到相册</li>' +
+        '<li><b>4.</b> 24 小时内回填发布</li></ol>';
+      var remind = '<p class="remind-text">' + esc(note || '剪辑师没有留下提醒') + '</p>';
+      return '<div class="card"><div class="detail-tabs">' +
+        '<button type="button" data-dtab="steps"' + (onRemind ? '' : ' class="on"') + '>领取步骤</button>' +
+        '<button type="button" data-dtab="remind"' + (onRemind ? ' class="on"' : '') + '>剪辑师提醒</button></div>' +
+        (onRemind ? remind : steps) + '</div>';
+    }
+    function editorRule(w) {
+      return EDITOR_FEE[w.editor] || { charge: 'platform' };
+    }
+    function requestClaim() {
+      var w = findWork(currentId);
+      if (w.got.some(Boolean)) { toast('这条素材已领取'); return; }
+      var rule = editorRule(w);
+      if (rule.charge === 'custom') {
+        if (quotaLeft >= 1) { startDownload(currentId, true); return; }
+        if (points < rule.cost) {
+          chargeAsk = false;
+          ptsShort = true;
+          ptsShortKind = 'custom';
+          draw();
+          return;
+        }
+        chargeAsk = true;
+        draw();
+        return;
+      }
+      if (quotaLeft < 1) { buyOpen = true; skuPick = 0; draw(); return; }
+      startDownload(currentId, true);
+    }
+    function confirmCustomClaim() {
+      var w = findWork(currentId);
+      var rule = editorRule(w);
+      chargeAsk = false;
+      if (quotaLeft >= 1) {
+        startDownload(currentId, true);
+        return;
+      }
+      if (points < rule.cost) {
+        ptsShort = true;
+        ptsShortKind = 'custom';
+        draw();
+        return;
+      }
+      points -= rule.cost;
+      startDownload(currentId, 'points');
+    }
+    function payOverlay(w) {
+      var html = '';
+      var rule = editorRule(w);
+      if (chargeAsk && rule.charge === 'custom' && quotaLeft < 1 && points >= rule.cost) {
+        html += '<div class="load-mask show" id="chargeMask"></div><div class="backfill-pop"><h3>确认兑换</h3><div class="pay-rows"><div class="pay-row"><span>应扣积分</span><b>' + rule.cost + '</b></div><div class="pay-row"><span>当前余额</span><b>' + points + '</b></div></div><div class="backfill-actions"><button class="backfill-later" type="button" id="chargeCancel">取消</button><button class="backfill-go" type="button" id="chargeOk">确认兑换</button></div></div>';
+      }
+      if (buyOpen) {
+        var rows = COUNT_SKUS.map(function (sku, i) {
+          return '<button class="kw-row' + (skuPick === i ? ' on' : '') + '" type="button" data-sku="' + i + '"><span>' + sku.times + ' 次</span><span>' + sku.points + ' 积分</span></button>';
+        }).join('');
+        html += '<div class="kw-mask show" id="buyMask"></div><div class="kw-sheet show"><div class="kw-head"><h3>兑换领取次数</h3><button class="x" type="button" id="buyClose">×</button></div><p class="fill-note">积分余额 ' + points + '。次数不够时按平台档位用积分兑换。免费次数全平台共用。</p><div class="kw-list">' + rows + '</div><div class="kw-foot"><button class="btn-primary" type="button" id="buyOk">兑换</button></div></div>';
+      }
+      if (ptsShort) {
+        var shortText = ptsShortKind === 'custom'
+          ? ('领取 1 次需要 ' + rule.cost + ' 积分。当前余额 ' + points + '，还差 ' + (rule.cost - points) + '。')
+          : (function () {
+            var sku = COUNT_SKUS[skuPick] || COUNT_SKUS[0];
+            return '兑换 ' + sku.times + ' 次需要 ' + sku.points + ' 积分。当前余额 ' + points + '，还差 ' + (sku.points - points) + '。';
+          })();
+        html += '<div class="load-mask show" id="ptsShortMask"></div><div class="backfill-pop"><h3>积分不足</h3><p>' + shortText + '</p><div class="backfill-actions"><button class="backfill-later" type="button" id="ptsLater">再看看</button><button class="backfill-go" type="button" id="ptsGoBuy">去购买积分</button></div></div>';
+      }
+      if (ptsBuy) {
+        var buyNote = ptsShortKind === 'custom' ? '购买后回到确认兑换。' : '购买后回到兑换，再用积分换领取次数。';
+        html += '<div class="load-mask show"></div><div class="backfill-pop"><h3>购买积分</h3><p>' + buyNote + '</p><div class="backfill-actions"><button class="backfill-go" type="button" data-buypack="880">880 积分</button></div><div class="backfill-actions" style="margin-top:8px"><button class="backfill-later" type="button" id="ptsBuyClose">取消</button></div></div>';
+      }
+      return html;
+    }
+    function fmtClock(ts) {
+      if (!ts) return '未下载';
+      var d = new Date(ts);
+      var pad = function (n) { return n < 10 ? '0' + n : '' + n; };
+      return (d.getMonth() + 1) + '月' + d.getDate() + '日 ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+    }
+    function dlCountdown(c) {
+      if (c && c.status === '已超时') return { text: '回填已超时', expired: true };
+      var left = (c.expireAt || 0) - Date.now();
+      if (left <= 0) return { text: '下载已失效', expired: true };
+      var d = Math.floor(left / 86400000);
+      var h = Math.floor((left % 86400000) / 3600000);
+      return { text: '还可下载 ' + d + '天' + h + '时', expired: false };
+    }
+    function claims() {
+      var seen = {};
+      claimRows.forEach(function (c) {
+        var w = findWork(c.work);
+        if (w.project) seen[w.project] = true;
+      });
+      var projs = projectCatalog().filter(function (p) { return !p.id || seen[p.id]; });
+      var rows = claimRows.filter(function (c) {
+        var w = findWork(c.work);
+        if (claimProject && w.project !== claimProject) return false;
+        if (claimStatus && c.status !== claimStatus) return false;
+        return true;
+      });
+      var cards = rows.length ? rows.map(function (c) {
+        var w = findWork(c.work);
+        var cd = dlCountdown(c);
+        var kwHtml = c.kwState === 'fill'
+          ? '<button class="c-kw-btn" type="button" data-cid="' + c.id + '" data-act="pickkw">填写关键词</button>'
+          : c.kwState === 'timeout'
+            ? '<span class="c-kw-timeout">超时未填写关键词</span>'
+            : (c.pickedWord || keywordText(w));
+        return '<div class="c-card"><div class="c-kw">' + kwHtml + '</div><div class="c-hit" data-go="detail-download" data-id="' + w.id + '">' +
+          '<div class="c-top"><div class="c-cover">' + cover(w.cover) +
+          (w.kind === '视频' ? '<span class="c-play">▶</span>' : '') + '</div>' +
+          '<div class="c-info"><p class="c-line">' + w.title + '</p>' +
+          '<p class="c-sub">项目 ' + w.project + ' · 作者 ' + w.editor + '</p>' +
+          '<p class="c-sub">领取时间 ' + c.time + '</p>' +
+          '<p class="c-sub">下载时间 ' + fmtClock(c.downloadedAt) + '</p>' +
+          '<p class="c-sub c-dl' + (cd.expired ? ' out' : '') + '">' + cd.text + '</p>' +
+          (c.status === '已回填' ? '<p class="c-sub"><button class="fill-count" type="button" data-cid="' + c.id + '" data-act="fills">回填作品 ' + daifaFills(c).length + '</button></p>' : '') +
+          '</div></div></div>' +
+          '<div class="c-tools">' +
+          '<button type="button" data-cid="' + c.id + '" data-act="dl">下载</button>' +
+          '<button class="primary" type="button" data-cid="' + c.id + '" data-act="fill">' + (c.status === '已回填' ? '追加回填' : '立即回填') + '</button>' +
+          '</div></div>';
+      }).join('') : '<div class="empty">暂无记录~</div>';
+      var body = '<div class="scroll">' +
+        projectBar(projs, claimProject, 'data-cproj', 'claimProjects', 'claimScroll') +
+        '<div class="seg">' + ['未回填', '已回填', '已超时'].map(function (t) {
+          return '<button type="button" class="' + (claimStatus === t ? 'on' : '') + '" data-cst="' + t + '">' + t + '</button>';
+        }).join('') + '</div>' + cards + '</div>';
+      var kwExtra = '';
+      if (kwSheetClaimId) {
+        var sheetRow = claimRows.filter(function (c) { return c.id === kwSheetClaimId; })[0];
+        if (sheetRow) kwExtra = kwChooseSheet('选择关键词', userBookKeywords(findWork(sheetRow.work)), false);
+      }
+      return shell('我的领取', '', body, '', 'claims', fillSheet() + favDialog() + kwExtra);
+    }
+    function fillSheet() {
+      if (!fillListId) return '';
+      var row = claimRows.filter(function (c) { return c.id === fillListId; })[0];
+      if (!row) return '';
+      var w = findWork(row.work);
+      return '<div class="load-mask show" id="fillMask"></div><div class="backfill-pop"><h3>开发规则</h3><p>打开现有的该关键词作品列表即可。</p><p>关键词「' + esc(w.word) + '」。不在这里新建作品列表。</p><div class="backfill-actions"><button class="backfill-go" type="button" id="fillListClose">知道了</button></div></div>';
+    }
+    function abortDownload() {
+      if (!loading || loadDone) return;
+      loadGen += 1;
+      if (loadTimer) { clearTimeout(loadTimer); loadTimer = null; }
+      loading = false;
+      loadDone = false;
+      backfillPrompt = false;
+      draw();
+    }
+    function startDownload(workId, deduct) {
+      if (loading) return;
+      var w = findWork(workId);
+      currentId = workId;
+      if (deduct === true || deduct === 'points') {
+        if (w.got.some(Boolean)) return;
+        if (deduct === true) {
+          if (quotaLeft < 1) {
+            buyOpen = true;
+            draw();
+            return;
+          }
+          quotaLeft -= 1;
+        }
+        chargeAsk = false;
+        buyOpen = false;
+        w.got = w.got.map(function () { return true; });
+        w.keywordOut = false;
+        ensureClaim(workId);
+      }
+      if (view === 'plaza' || view === 'claims') view = 'detail-download';
+      modeSheet = false;
+      modePick = '';
+      loading = true;
+      loadDone = false;
+      loadText = '正在下载稿件';
+      backfillPrompt = false;
+      var gen = ++loadGen;
+      draw();
+      var steps = ['正在下载稿件', '正在保存到相册', '已保存到相册'];
+      var i = 0;
+      function next() {
+        if (gen !== loadGen) return;
+        i += 1;
+        if (i < steps.length) {
+          loadText = steps[i];
+          if (i === steps.length - 1) loadDone = true;
+          draw();
+          loadTimer = setTimeout(next, 700);
+          return;
+        }
+        var work = findWork(workId);
+        work.keywordOut = true;
+        var row = ensureClaim(workId);
+        var firstSave = !row.backfillPrompted;
+        row.downloadedAt = Date.now();
+        if (firstSave) row.backfillPrompted = true;
+        loading = false;
+        loadDone = false;
+        loadTimer = null;
+        backfillPrompt = firstSave;
+        draw();
+      }
+      loadTimer = setTimeout(next, 700);
+    }
+    function startClaim() {
+      startDownload(currentId, true);
+    }
+    function downloadDetail() {
+      return manuscriptDetail('claims');
+    }
+    function paneTabs() {
+      return '<div class="channel-tab-bar">' +
+        '<button type="button" data-epane="list" class="on">上传 list</button></div>';
+    }
+    function flatTasks() {
+      var rows = [];
+      editorTasks.forEach(function (t) {
+        (t.kws || []).forEach(function (k, i) {
+          rows.push({
+            id: t.id + '-' + i,
+            taskNo: t.taskNo + '-' + (i + 1),
+            title: t.title,
+            project: t.project,
+            bookId: t.bookId,
+            link: t.link,
+            cover: t.cover,
+            publish: t.publish,
+            brief: t.brief,
+            keyword: k.word,
+            kw: k
+          });
+        });
+      });
+      return rows;
+    }
+    function findFlat(id) {
+      var hit = null;
+      flatTasks().forEach(function (r) { if (r.id === id) hit = r; });
+      return hit;
+    }
+    function rowState(k) {
+      return k.status === '已回填' ? '已完成' : '未完成';
+    }
+    function stateTag(state) {
+      if (state === '已完成') return '<span class="tag tag-ok">已完成</span>';
+      return '<span class="tag tag-warn">未完成</span>';
+    }
+    function occTag(occ) {
+      if (!occ) return '—';
+      if (occ === '空闲') return '<span class="tag tag-ok">空闲</span>';
+      if (occ === '占用中' || occ === '部分领取') return '<span class="tag tag-warn">' + occ + '</span>';
+      return '<span class="tag tag-muted">' + occ + '</span>';
+    }
+    function fileTag(s) {
+      if (!s) return '—';
+      return s === '已删除' ? '<span class="tag tag-del">已删除</span>' : '<span class="tag tag-ok">正常</span>';
+    }
+    function uploadTag(s) {
+      if (!s) return '—';
+      if (s === '已上传') return '<span class="tag tag-ok">已上传</span>';
+      if (s === '上传中') return '<span class="tag tag-warn">上传中</span>';
+      return '<span class="tag tag-del">上传失败</span>';
+    }
+    function auditTag(s, reason) {
+      if (!s) return '—';
+      if (s === '已通过') return '<span class="tag tag-ok">已通过</span>';
+      if (s === '审核中') return '<span class="tag tag-warn">审核中</span>';
+      return '<span class="tag tag-del">已驳回</span>' + (reason ? '<div class="cell-sub">原因：' + reason + '</div>' : '');
+    }
+    function msInfo(size, qty, fileName) {
+      if (!size) return '—';
+      return size + ' (' + (qty || 1) + ')<div class="cell-sub">' + fileName + '</div>';
+    }
+    function findListRow(id) {
+      var hit = null;
+      listRows.forEach(function (r) { if (r.id === id) hit = r; });
+      return hit;
+    }
+    function fillCountBtn(row) {
+      var n = (row.fills || []).length;
+      return '<button class="link" type="button" data-fills="' + row.id + '">' + n + '</button>';
+    }
+    function fillDrawer(row) {
+      var fills = row.fills || [];
+      var body = fills.length
+        ? '<div class="table-scroll"><table class="list-table"><thead><tr><th>媒体平台</th><th>帐号ID</th><th>帐号昵称</th><th>作品链接</th><th>发布时间</th><th>回填时间</th></tr></thead><tbody>' +
+          fills.map(function (f) {
+            return '<tr><td>' + esc(f.platform) + '</td><td>' + esc(f.accountId) + '</td><td>' + esc(f.nick) + '</td><td><a href="' + esc(f.link) + '" data-wlink="' + esc(f.link) + '">' + esc(String(f.link).replace('https://', '')) + '</a></td><td>' + esc(f.publish) + '</td><td>' + esc(f.fillTime) + '</td></tr>';
+          }).join('') + '</tbody></table></div>'
+        : '<div class="empty">还没有回填作品。</div>';
+      return '<div class="pc-drawer-mask" id="fillMask"></div><aside class="pc-drawer wide">' +
+        '<div class="pc-drawer-hd"><h2>回填作品 · ' + esc(row.title) + '</h2><button class="pc-drawer-x" type="button" id="fillClose">×</button></div>' +
+        '<div class="pc-drawer-bd">' + body + '</div></aside>';
+    }
+    function pcOpt(list, current) {
+      return '<option value="">全部</option>' + list.map(function (name) {
+        return '<option' + (current === name ? ' selected' : '') + '>' + name + '</option>';
+      }).join('');
+    }
+    function workFilterBar() {
+      var q = workQuery;
+      return '<div class="pc-filters" id="workFilter">' +
+        '<div class="field"><label>任务 ID</label><input id="wqId" value="' + esc(q.id) + '" placeholder="TK-88218"></div>' +
+        '<div class="field"><label>关键词</label><input id="wqWord" value="' + esc(q.word) + '" placeholder="真假千金"></div>' +
+        '<div class="field"><label>项目</label><select id="wqProject">' + pcOpt(['番茄小说', '红果短剧', '红果漫剧'], q.project) + '</select></div>' +
+        '<div class="field"><label>任务状态</label><select id="wqState">' + pcOpt(['未完成', '已完成'], q.state) + '</select></div>' +
+        '<div class="field"><label>类型</label><select id="wqKind">' + pcOpt(['视频', '图集'], q.kind) + '</select></div>' +
+        '<div class="field"><label>素材类型</label><select id="wqMat">' + pcOpt(['口播', '混剪'], q.mat) + '</select></div>' +
+        '<div class="field"><label>占用</label><select id="wqOcc">' + pcOpt(['空闲', '占用中', '部分领取'], q.occ) + '</select></div>' +
+        '<div class="field"><label>稿件状态</label><select id="wqFile">' + pcOpt(['正常', '已删除'], q.fileStatus) + '</select></div>' +
+        '<div class="field"><label>上传</label><select id="wqUpload">' + pcOpt(['已上传', '上传中', '上传失败'], q.upload) + '</select></div>' +
+        '<div class="field"><label>审核</label><select id="wqAudit">' + pcOpt(['已通过', '审核中', '已驳回'], q.audit) + '</select></div>' +
+        '<button class="pc-btn ghost" type="button" id="wqReset">重置</button>' +
+        '<button class="pc-btn" type="button" id="wqGo">查询</button></div>';
+    }
+    function taskRows() {
+      return flatTasks().filter(function (r) {
+        var k = r.kw;
+        var q = workQuery;
+        if (q.id && r.taskNo.indexOf(q.id) === -1) return false;
+        if (q.word && r.keyword.indexOf(q.word) === -1) return false;
+        if (q.project && r.project !== q.project) return false;
+        if (q.state && rowState(k) !== q.state) return false;
+        if (q.kind && k.kind !== q.kind) return false;
+        if (q.mat && k.mat !== q.mat) return false;
+        if (q.occ && k.occ !== q.occ) return false;
+        if (q.fileStatus && k.fileStatus !== q.fileStatus) return false;
+        if (q.upload && k.upload !== q.upload) return false;
+        if (q.audit && k.audit !== q.audit) return false;
+        return true;
+      });
+    }
+    function readWorkQuery() {
+      function val(id) {
+        var el = document.getElementById(id);
+        return el ? (el.value || '').trim() : '';
+      }
+      workQuery = {
+        id: val('wqId'), word: val('wqWord'), project: val('wqProject'), state: val('wqState'),
+        kind: val('wqKind'), mat: val('wqMat'), occ: val('wqOcc'), fileStatus: val('wqFile'),
+        upload: val('wqUpload'), audit: val('wqAudit')
+      };
+    }
+    function workStatBar(rows) {
+      function n(pred) { return rows.filter(pred).length; }
+      var items = [
+        ['任务数', rows.length, 'earn'],
+        ['已完成', n(function (r) { return rowState(r.kw) === '已完成'; }), 'ok'],
+        ['未完成', n(function (r) { return rowState(r.kw) !== '已完成'; }), 'warn'],
+        ['已上传', n(function (r) { return r.kw.upload === '已上传'; }), ''],
+        ['审核中', n(function (r) { return r.kw.audit === '审核中'; }), '']
+      ];
+      return '<div class="pc-sums">' + items.map(function (it) {
+        return '<div class="pc-sum' + (it[2] ? ' ' + it[2] : '') + '"><span>' + it[0] + '</span><strong>' + it[1] + '</strong></div>';
+      }).join('') + '</div>';
+    }
+    function hasUpload(k) {
+      return !!(k && (k.upload === '已上传' || k.upload === '上传中' || k.upload === '上传失败' || k.fileName));
+    }
+    function writeUpload(k, kind, mat) {
+      if (!k || hasUpload(k)) return false;
+      k.upload = '已上传';
+      k.kind = kind || k.kind || '视频';
+      k.mat = mat || k.mat || '口播';
+      k.size = k.size || '12.0 MB';
+      k.qty = 1;
+      k.fileName = k.fileName || ((k.word || '稿件') + (k.kind === '图集' ? '' : '.mp4'));
+      k.fileStatus = k.fileStatus || '正常';
+      k.occ = k.occ || '空闲';
+      k.audit = k.audit || '审核中';
+      k.time = k.time || '09-29 23:40';
+      return true;
+    }
+    function taskOps(r) {
+      var k = r.kw;
+      var html = '';
+      if (!hasUpload(k)) {
+        html += k.got
+          ? '<button class="link" type="button" data-upload="' + r.id + '">上传稿件</button>'
+          : '<button class="link" type="button" data-noupload>上传稿件</button>';
+      }
+      html += '<button class="link danger" type="button" data-del-task="' + r.id + '">删除</button>';
+      return html;
+    }
+    function taskTable() {
+      var rows = taskRows();
+      var head = workFilterBar() + workStatBar(rows);
+      if (!rows.length) return head + '<div class="empty">没有匹配的任务稿件</div>';
+      return head + '<div class="table-scroll"><table class="list-table"><thead><tr>' +
+        '<th>任务ID</th><th>项目</th><th>任务信息</th><th>任务关键词</th><th>任务状态</th><th>稿件信息</th>' +
+        '<th>类型</th><th>素材类型</th><th>占用</th><th>稿件状态</th><th>上传</th><th>审核</th><th>上传时间</th><th>回填信息</th><th>操作</th>' +
+        '</tr></thead><tbody>' + rows.map(function (r) {
+          var k = r.kw;
+          var state = rowState(k);
+          var n = (k.fills || []).length;
+          return '<tr><td>' + r.taskNo + '</td><td>' + r.project + '</td>' +
+            '<td>' + r.title + '<div class="cell-sub">书籍 ID ' + r.bookId + '</div>' +
+            '<div class="cell-sub"><a href="' + r.link + '" data-blink="' + r.link + '">' + r.link.replace('https://', '') + '</a></div></td>' +
+            '<td>' + r.keyword + '</td>' +
+            '<td>' + stateTag(state) + '</td>' +
+            '<td>' + msInfo(k.size, k.qty, k.fileName) + '</td>' +
+            '<td>' + (k.kind || '—') + '</td>' +
+            '<td>' + (k.mat || '—') + '</td>' +
+            '<td>' + occTag(k.occ) + '</td>' +
+            '<td>' + fileTag(k.fileStatus) + '</td>' +
+            '<td>' + uploadTag(k.upload) + '</td>' +
+            '<td>' + auditTag(k.audit, k.reject) + '</td>' +
+            '<td>' + (k.time || '—') + '</td>' +
+            '<td><button class="link" type="button" data-fills="' + r.id + '">' + n + '</button></td>' +
+            '<td>' + taskOps(r) + '</td></tr>';
+        }).join('') + '</tbody></table></div>';
+    }
+    function legacyTable() {
+      var rows = listRows.filter(function (r) { return r.channel === listTab; });
+      if (!rows.length) return '<div class="empty">这一栏还没有稿件。点上传稿件交一份。</div>';
+      if (listTab === '站外') {
+        return '<div class="table-scroll"><table class="list-table"><thead><tr><th>ID</th><th>标题</th><th>项目</th><th>书</th><th>稿件信息</th><th>类型</th><th>代发运营模式</th><th>稿件状态</th><th>上传</th><th>上传时间</th><th>回填数据</th><th>操作</th></tr></thead><tbody>' +
+          rows.map(function (r) {
+            return '<tr><td>' + esc(r.id) + '</td><td><span class="folder-ico">📁</span>' + esc(r.title) + '</td><td>' + esc(r.project) + '</td>' +
+              '<td>' + esc(r.book) + '<div class="cell-sub">书籍 ID ' + esc(r.bookId) + '</div></td>' +
+              '<td>' + esc(r.info) + '</td><td>' + esc(r.kind) + '</td><td>' + esc(r.mode) + '</td>' +
+              '<td><span class="tag tag-ok">' + esc(r.fileStatus) + '</span></td><td><span class="tag tag-ok">' + esc(r.upload) + '</span></td><td>' + esc(r.time) + '</td>' +
+              '<td>' + fillCountBtn(r) + '</td>' +
+              '<td><button class="link" type="button" data-legacy="share">分享链接</button></td></tr>';
+          }).join('') + '</tbody></table></div>';
+      }
+      return '<div class="table-scroll"><table class="list-table"><thead><tr><th>ID</th><th>标题</th><th>项目</th><th>书</th><th>稿件信息</th><th>发布技巧</th><th>剪辑手</th><th>类型</th><th>素材类型</th><th>占用</th><th>稿件状态</th><th>上传</th><th>审核</th><th>上传时间</th><th>代发运营模式</th><th>回填数据</th><th>操作</th></tr></thead><tbody>' +
+        rows.map(function (r) {
+          return '<tr><td>' + esc(r.id) + '</td><td>' + esc(r.title) + '</td><td>' + esc(r.project) + '</td>' +
+            '<td>' + esc(r.book) + '<div class="cell-sub">书籍 ID ' + esc(r.bookId) + '</div></td>' +
+            '<td>' + esc(r.info) + (r.fileName ? '<div class="cell-sub">' + esc(r.fileName) + '</div>' : '') + '</td>' +
+            '<td>' + esc(r.tip || '—') + '</td><td>' + esc(r.editor || '周凯') + '</td><td>' + esc(r.kind) + '</td><td>' + esc(r.mat || '—') + '</td>' +
+            '<td>' + occTag(r.occ) + '</td><td>' + fileTag(r.fileStatus) + '</td><td>' + uploadTag(r.upload) + '</td><td>' + auditTag(r.audit) + '</td><td>' + esc(r.time) + '</td>' +
+            '<td>' + esc(r.mode) + '</td><td>' + fillCountBtn(r) + '</td>' +
+            '<td><button class="link" type="button" disabled>删除</button></td></tr>';
+        }).join('') + '</tbody></table></div>';
+    }
+    function batchMatches() {
+      var names = ['真假千金', '假千金日常', '团宠日常', '随便取的名字'];
+      return names.map(function (name) {
+        var hit = null;
+        flatTasks().forEach(function (r) { if (r.kw.got && r.keyword === name && !hasUpload(r.kw)) hit = r; });
+        return { name: name, task: hit };
+      });
+    }
+    function modeCard(name, note) {
+      return '<button class="pack-card' + (upMode === name ? ' on' : '') + '" type="button" data-upmode="' + name + '"><b>' + name + '</b><span>' + note + '</span></button>';
+    }
+    function uploadModal() {
+      if (!uploadOpen) return '';
+      var steps = ['填字段', '选成片', '确认上传'].map(function (label, i) {
+        var n = i + 1;
+        var cls = n === upStep ? ' on' : (n < upStep ? ' done' : '');
+        return '<div class="step' + cls + '"><i>' + n + '</i><span>' + label + '</span></div>' +
+          (n < 3 ? '<div class="step-line" aria-hidden="true"></div>' : '');
+      }).join('');
+      var off = listTab === '站外';
+      var needKw = keywordNeeded();
+      var choices = keywordChoices();
+      var kwOptions = (!upProject || !upBookId)
+        ? '<option value="">先填项目和书籍 ID</option>'
+        : (!choices.length
+          ? '<option value="">这个项目的这本书还没有你在右豹侧审核通过的关键词</option>'
+          : '<option value="">选择一个已通过关键词</option>' + choices.map(function (word) {
+            return '<option' + (upKeyword === word ? ' selected' : '') + '>' + esc(word) + '</option>';
+          }).join(''));
+      var linkField = '<div class="field"><label>书籍链接</label><input id="upBookLink" value="' + esc(upBookLink) + '"></div>';
+      var kwField = '<div class="field"><label>已通过关键词</label><select id="upKeyword">' + kwOptions + '</select></div>';
+      var bookLinkRow = needKw
+        ? '<div class="field-row">' + linkField + kwField + '</div>'
+        : '<div class="field" style="margin-top:14px">' + linkField + '</div>';
+      var modeGroup = off ? '' : '<div class="up-group"><div class="up-group-title">代发运营模式</div><div class="pack-grid">' +
+        modeCard('任务协作', '用户自由关键词领取稿件') +
+        modeCard('帐号运营', '剪辑手提供关键词和稿件，用户一键领取') +
+        '</div></div>';
+      var step1 = modeGroup +
+        '<div class="up-group"><div class="up-group-title">投向</div>' +
+        '<div class="field-row"><div class="field"><label>选择项目</label><select id="upProject">' +
+        ['番茄小说', '红果短剧', '红果漫剧'].map(function (name) {
+          return '<option' + (upProject === name ? ' selected' : '') + '>' + name + '</option>';
+        }).join('') + '</select></div>' +
+        '<div class="field"><label>稿件类型</label><select id="upKind"><option' + (upKind === '图集' ? ' selected' : '') + '>图集</option><option' + (upKind === '视频' ? ' selected' : '') + '>视频</option></select></div></div>' +
+        '<div class="field-row"><div class="field"><label>素材类型</label><select id="upMat"><option' + (upMat === '口播' ? ' selected' : '') + '>口播</option><option' + (upMat === '混剪' ? ' selected' : '') + '>混剪</option><option' + (upMat === '图文' ? ' selected' : '') + '>图文</option></select></div>' +
+        '<div class="field"><label>剪辑手</label><input readonly value="周凯" /></div></div></div>' +
+        '<div class="up-group"><div class="up-group-title">书籍</div>' +
+        '<div class="field-row"><div class="field"><label>书籍名称</label><input id="upBookName" value="' + esc(upBookName) + '"></div>' +
+        '<div class="field"><label>书籍 ID</label><input id="upBookId" value="' + esc(upBookId) + '"></div></div>' +
+        bookLinkRow +
+        '<div class="field" style="margin-top:14px"><label>剪辑师提醒</label><textarea id="upRemind" placeholder="给领取的人留一句提醒">' + esc(upRemind) + '</textarea></div></div>';
+      var hint = '<div class="pack-sum">' + (upMode === '帐号运营'
+        ? '帐号运营：剪辑手提供关键词和稿件，用户一键领取。'
+        : '任务协作：用户自由关键词领取稿件。') + (upPicked ? ' 已选' + upPack + '。' : ' 尚未选择文件夹或压缩包。') + '</div>';
+      var step2 = '<div class="up-group-title">成片</div><div class="pack-grid">' +
+        '<button class="pack-card' + (upPack === '文件夹' ? ' on' : '') + '" type="button" data-pack="文件夹"><b>文件夹</b><span>图集一个文件夹为一组，文件名作标题。</span></button>' +
+        '<button class="pack-card' + (upPack === '压缩包' ? ' on' : '') + '" type="button" data-pack="压缩包"><b>压缩包</b><span>支持 zip。先解压，再按同一命名约定解析。</span></button></div>' +
+        '<div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">' +
+        '<button class="btn btn-ghost" type="button" id="upPickReal">选择本地成片</button>' +
+        '<button class="btn btn-primary" type="button" id="upUseDemo">使用演示文件夹</button></div>' + hint;
+      var fileName = (upMode === '帐号运营' && upKeyword ? upKeyword : upBookName || '稿件') + (upKind === '图集' ? '' : '.mp4');
+      var kwLabel = needKw ? (upKeyword || '—') : '用户领取时自选';
+      var step3 = '<p class="desc" style="margin-bottom:10px">确认后写入当前「' + listTab + '稿件」。剪辑师提醒会跟到用户侧稿件详情。回填数据从 0 开始，有用户回填后再点数字查看。</p><div class="excel-wrap"><table><thead><tr><th>代发运营模式</th><th>关键词</th><th>项目</th><th>书籍</th><th>成片</th><th>剪辑师提醒</th></tr></thead><tbody><tr><td>' +
+        esc(off ? '—' : upMode) + '</td><td>' + esc(kwLabel) + '</td><td>' + esc(upProject) + '</td><td>' + esc(upBookName) + '</td><td>' + esc(fileName) + '</td><td>' + esc(upRemind || '—') + '</td></tr></tbody></table></div>';
+      var body = upStep === 1 ? step1 : (upStep === 2 ? step2 : step3);
+      return '<div class="up-overlay" id="upMask"></div><div class="up-modal" role="dialog" aria-labelledby="upTitle">' +
+        '<div class="up-head"><div><h2 id="upTitle">' + (off ? '上传站外稿件' : '上传稿件') + '</h2><p>' + (off
+          ? '书籍链接旁边选一个你在这个项目、这本书上已经通过的关键词。'
+          : '任务协作由用户自选关键词。帐号运营在书籍链接旁边选一个已通过关键词。') + '</p></div>' +
+        '<button class="pc-drawer-x" type="button" id="upClose">×</button></div>' +
+        '<div class="steps">' + steps + '</div><div class="up-body">' + body + '</div>' +
+        '<div class="up-foot">' +
+        (upStep > 1 ? '<button class="btn btn-ghost" type="button" id="upBack">上一步</button>' : '') +
+        (upStep < 3 ? '<button class="btn btn-primary" type="button" id="upNext">下一步</button>' : '<button class="btn btn-primary" type="button" id="upPublish">开始上传</button>') +
+        '</div></div>';
+    }
+    function delModal() {
+      var row = findFlat(delTaskId);
+      if (!row) return '';
+      return '<div class="up-overlay" id="delMask"></div><div class="up-modal narrow" role="dialog" aria-labelledby="delTitle">' +
+        '<div class="up-head"><div><h2 id="delTitle">删除任务稿件</h2><p>' + row.taskNo + ' · ' + row.keyword + '</p></div>' +
+        '<button class="pc-drawer-x" type="button" id="delCancel">×</button></div>' +
+        '<div class="up-body"><p class="desc">删除后这一行不再出现在任务稿件里。</p></div>' +
+        '<div class="up-foot"><button class="btn btn-ghost" type="button" id="delBack">取消</button>' +
+        '<button class="btn danger" type="button" id="delOk">删除</button></div></div>';
+    }
+    function editor() {
+      document.body.classList.add('pc');
+      var projects = ['全部'].concat(editorTasks.reduce(function (list, t) {
+        if (list.indexOf(t.project) < 0) list.push(t.project);
+        return list;
+      }, []));
+      var shown = flatTasks().filter(function (t) { return !editorProject || t.project === editorProject; });
+      var tags = '<div class="task-tags">' + projects.map(function (name) {
+        var on = (name === '全部' && !editorProject) || name === editorProject;
+        return '<button class="dd' + (on ? ' on' : '') + '" type="button" data-tproj="' + (name === '全部' ? '' : name) + '">' + name + '</button>';
+      }).join('') + '</div>';
+      var cards = shown.length ? '<div class="task-grid">' + shown.map(function (t) {
+        return '<article class="task-card"><div class="task-cover"><img src="' + t.cover + '" alt="">' +
+          '<span class="task-flag' + (t.kw.got ? ' on' : '') + '">' + (t.kw.got ? '已领取' : '未领取') + '</span></div>' +
+          '<div class="task-body"><div class="task-title">' + t.title + '</div>' +
+          '<p class="task-meta">书籍 ID ' + t.bookId + '</p>' +
+          '<p class="task-meta">书籍链接 <a href="' + t.link + '" data-blink="' + t.link + '">' + t.link.replace('https://', '') + '</a></p>' +
+          '<p class="task-meta">关键词 ' + t.keyword + '</p>' +
+          '<p class="task-meta task-brief">制作要求 ' + t.brief + '</p>' +
+          (t.kw.got ? '<button class="pc-btn ghost" type="button" data-open-task="' + t.id + '">已领取</button>' : '<button class="pc-btn" type="button" data-open-task="' + t.id + '">领取</button>') +
+          '</div></article>';
+      }).join('') + '</div>' : '<div class="empty">这个项目下没有任务</div>';
+      if (listTab !== '站外') listTab = '右豹';
+      editorPane = 'list';
+      var body = '<div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><h1>上传 list</h1><button class="pc-btn" type="button" id="openUpload">上传稿件</button></div>' +
+          '<p class="desc">' + (listTab === '站外' ? '站外稿件以文件夹呈现，可分享链接。回填数据点数字查看回填作品。' : '右豹稿件与后台同字段，不展示下载链接。回填数据点数字查看回填作品。') + '</p>' +
+          '<div class="channel-tab-bar"><button type="button" data-listch="右豹"' + (listTab === '右豹' ? ' class="on"' : '') + '>右豹稿件</button>' +
+          '<button type="button" data-listch="站外"' + (listTab === '站外' ? ' class="on"' : '') + '>站外稿件</button></div>' +
+          legacyTable();
+      var opened = null;
+      var fillRow = fillOpen ? findListRow(fillOpen) : null;
+      var drawer = '';
+      if (fillRow) drawer = fillDrawer(fillRow);
+      else if (opened) {
+        drawer = '<div class="pc-drawer-mask" id="taskDrawerMask"></div><aside class="pc-drawer">' +
+          '<div class="pc-drawer-hd"><h2>任务详情</h2><button class="pc-drawer-x" type="button" id="taskDrawerClose">×</button></div>' +
+          '<div class="pc-drawer-bd"><div class="pc-drawer-top"><img src="' + opened.cover + '" alt=""><div><b>' + opened.title + '</b>' +
+          '<span class="tag ' + (opened.kw.got ? 'tag-ok' : 'tag-warn') + '">' + (opened.kw.got ? '已领取' : '未领取') + '</span></div></div>' +
+          '<div class="pc-kv"><i>书籍 ID</i><b>' + opened.bookId + '</b>' +
+          '<i>书籍链接</i><b><a href="' + opened.link + '" data-blink="' + opened.link + '">' + opened.link.replace('https://', '') + '</a></b>' +
+          '<i>关键词</i><b>' + opened.keyword + '</b>' +
+          '<i>发布时间</i><b>' + opened.publish + '</b>' +
+          '<i>制作要求</i><b class="brief">' + opened.brief + '</b></div></div>' +
+          '<div class="pc-drawer-ft">' +
+          (opened.kw.got ? '<button class="pc-btn" type="button" disabled>已领取</button>' : '<button class="pc-btn" type="button" id="taskClaim" data-take="' + opened.id + '">领取</button>') +
+          '</div></aside>';
+      }
+      return '<div class="pc-shell"><header class="topbar"><div class="brand"><i>右</i> 右豹<span class="brand-sub">创作者中心 · 已有 PC</span></div><div class="who">剪辑手 · 周凯</div></header>' +
+        '<div class="layout"><aside class="side"><div class="hint">以下为已有业务线，本增量不改</div>' +
+        '<button class="nav-btn" type="button">项目中心</button><button class="nav-btn" type="button">作品管理</button><button class="nav-btn" type="button">收益中心</button>' +
+        '<div class="hint" style="margin-top:12px">本增量</div><button class="nav-btn on" type="button" data-epane="tasks">剪辑供稿</button></aside>' +
+        '<main class="main">' + paneTabs() + body + '</main></div>' + drawer + uploadModal() + delModal() + '<div class="toast" id="toast"></div></div>';
+    }
+    function money2(n) { return (Math.round(n * 100) / 100).toFixed(2); }
+    function isFutureDay(y, m, d) {
+      if (y > EARN_TODAY.y) return true;
+      if (y < EARN_TODAY.y) return false;
+      if (m > EARN_TODAY.m) return true;
+      if (m < EARN_TODAY.m) return false;
+      return d > EARN_TODAY.d;
+    }
+    function dayAmount(y, m, d) {
+      if (isFutureDay(y, m, d)) return null;
+      if (y === 2026 && m === 9 && Object.prototype.hasOwnProperty.call(EARN_SEP, d)) return EARN_SEP[d];
+      return 0;
+    }
+    function monthSum(y, m) {
+      var n = new Date(y, m, 0).getDate();
+      var sum = 0;
+      var any = false;
+      for (var d = 1; d <= n; d++) {
+        var v = dayAmount(y, m, d);
+        if (v == null) continue;
+        any = true;
+        sum += v;
+      }
+      return any ? Math.round(sum * 100) / 100 : 0;
+    }
+    function monthAmount(y, m) {
+      if (y > EARN_TODAY.y) return null;
+      if (y === EARN_TODAY.y && m > EARN_TODAY.m) return null;
+      return monthSum(y, m);
+    }
+    function yearSum(y) {
+      var sum = 0;
+      for (var m = 1; m <= 12; m++) {
+        var v = monthAmount(y, m);
+        if (v != null) sum += v;
+      }
+      return Math.round(sum * 100) / 100;
+    }
+    function yearAmount(y) {
+      if (y > EARN_TODAY.y) return null;
+      return yearSum(y);
+    }
+    function shiftEarn(step) {
+      if (earnGrain === 'year') { earnYear += step; return; }
+      if (earnGrain === 'month') { earnYear += step; return; }
+      earnMonth += step;
+      if (earnMonth > 12) { earnMonth = 1; earnYear += 1; }
+      if (earnMonth < 1) { earnMonth = 12; earnYear -= 1; }
+    }
+    function earnDateTitle(y, m, d) {
+      if (y === EARN_TODAY.y && m === EARN_TODAY.m && d === EARN_TODAY.d) return '今天';
+      var prev = new Date(EARN_TODAY.y, EARN_TODAY.m - 1, EARN_TODAY.d - 1);
+      if (y === prev.getFullYear() && m === prev.getMonth() + 1 && d === prev.getDate()) return '昨天';
+      return m + '月' + d + '日';
+    }
+    function earnDays(y, m) {
+      var count = new Date(y, m, 0).getDate();
+      var days = [];
+      for (var d = count; d >= 1; d--) {
+        var amt = dayAmount(y, m, d);
+        if (amt > 0) days.push(d);
+      }
+      return days;
+    }
+    function earnCell(label, amt, attrs) {
+      var cls = 'cal-cell';
+      var sub = '';
+      if (amt == null) cls += ' future';
+      else if (amt > 0) { cls += ' hot'; sub = '<div class="a">' + money2(amt) + '</div>'; }
+      else { cls += ' zero'; sub = '<div class="a">0.00</div>'; }
+      var inner = '<div class="d">' + label + '</div>' + sub;
+      if (amt == null || !attrs) return '<div class="' + cls + '">' + inner + '</div>';
+      return '<button type="button" class="' + cls + '" ' + attrs + '>' + inner + '</button>';
+    }
+    function earnNavLabel() {
+      if (earnGrain === 'year') return (earnYear - 2) + ' - ' + earnYear;
+      if (earnGrain === 'month') return earnYear + '年';
+      return earnYear + '年' + earnMonth + '月';
+    }
+    function earnSumLabel() {
+      if (earnGrain === 'year') return '累计收益(元)';
+      if (earnGrain === 'month') return '本年收益(元)';
+      return '本月收益(元)';
+    }
+    function earnSumValue() {
+      if (earnGrain === 'year') {
+        var sum = 0;
+        for (var y = earnYear - 2; y <= earnYear; y++) {
+          var v = yearAmount(y);
+          if (v != null) sum += v;
+        }
+        return Math.round(sum * 100) / 100;
+      }
+      if (earnGrain === 'month') return yearSum(earnYear);
+      return monthSum(earnYear, earnMonth);
+    }
+    function earnStampText(y, m, d, time) {
+      var mm = m < 10 ? '0' + m : String(m);
+      var dd = d < 10 ? '0' + d : String(d);
+      return y + '年' + mm + '月' + dd + '日' + (time ? ' ' + time : '');
+    }
+    function pad2(n) { return n < 10 ? '0' + n : String(n); }
+    function splitCents(cents, n, seed) {
+      var weights = [];
+      var sumW = 0;
+      var i;
+      for (i = 0; i < n; i++) {
+        var w = 3 + ((seed + i * 5) % 5);
+        weights.push(w);
+        sumW += w;
+      }
+      var parts = [];
+      var used = 0;
+      for (i = 0; i < n; i++) {
+        var share = i === n - 1 ? cents - used : Math.max(1, Math.round(cents * weights[i] / sumW));
+        if (i < n - 1 && used + share > cents - (n - i - 1)) share = cents - used - (n - i - 1);
+        parts.push(share);
+        used += share;
+      }
+      return parts;
+    }
+    function dayLines(y, m, d) {
+      if (!(y === 2026 && m === 9) || !Object.prototype.hasOwnProperty.call(EARN_SEP, d)) return [];
+      var cents = Math.round(EARN_SEP[d] * 100);
+      if (!(cents > 0)) return [];
+      var n = cents >= 8000 ? 4 : cents >= 3000 ? 3 : 2;
+      if (cents < n) n = 1;
+      return splitCents(cents, n, d).map(function (share, i) {
+        var pick = EARN_POOL[(d + i * 3) % EARN_POOL.length];
+        return {
+          project: pick.project,
+          word: pick.word,
+          time: pad2(8 + ((d + i * 5) % 12)) + ':' + pad2((d * 7 + i * 13) % 60) + ':' + pad2((d * 11 + i * 17) % 60),
+          amt: share / 100
+        };
+      }).sort(function (a, b) { return a.time < b.time ? 1 : -1; });
+    }
+    function earnLineCard(y, m, d, line) {
+      return '<article class="earn-detail-card"><div class="earn-detail-top"><b>' + esc(line.project + '-' + line.word) + '</b><strong>+' + money2(line.amt) + '</strong></div><p>代发收益入账</p><div class="earn-detail-time">' + earnStampText(y, m, d, line.time) + '</div></article>';
+    }
+    function earnNote() {
+      return '<div class="earn-note"><p>此收益数据仅统计帐号运营稿件类型的分成。</p><p>分成将会入账至项目收益钱包。</p><p>日历每个日期可点击查看每天关于代发入账的明细。</p></div>';
+    }
+    function earnCalendar() {
+      var grains = ['day', 'month', 'year'].map(function (g) {
+        var name = g === 'day' ? '日' : g === 'month' ? '月' : '年';
+        return '<button type="button" data-earn-grain="' + g + '"' + (earnGrain === g ? ' class="on"' : '') + '>' + name + '</button>';
+      }).join('');
+      var body = '';
+      if (earnGrain === 'year') {
+        var years = '';
+        for (var y = earnYear - 2; y <= earnYear; y++) years += earnCell(y + '年', yearAmount(y), 'data-earn-year="' + y + '"');
+        body = '<div class="cal-grid cal-grid-3">' + years + '</div>';
+      } else if (earnGrain === 'month') {
+        var months = '';
+        for (var m = 1; m <= 12; m++) months += earnCell(m + '月', monthAmount(earnYear, m), 'data-earn-pick="' + m + '"');
+        body = '<div class="cal-grid cal-grid-3">' + months + '</div>';
+      } else {
+        var first = new Date(earnYear, earnMonth - 1, 1).getDay();
+        var count = new Date(earnYear, earnMonth, 0).getDate();
+        var heads = ['日', '一', '二', '三', '四', '五', '六'].map(function (w) { return '<div class="cal-wd">' + w + '</div>'; }).join('');
+        var cells = '';
+        for (var i = 0; i < first; i++) cells += '<div></div>';
+        for (var d = 1; d <= count; d++) {
+          var today = earnYear === EARN_TODAY.y && earnMonth === EARN_TODAY.m && d === EARN_TODAY.d;
+          cells += earnCell(today ? '今天' : String(d), dayAmount(earnYear, earnMonth, d), 'data-earn-day="' + d + '"');
+        }
+        body = '<div class="cal-grid">' + heads + cells + '</div>';
+      }
+      return '<div class="cal-card"><div class="cal-tools"><div class="cal-grain">' + grains + '</div><div class="cal-nav"><button type="button" data-earn-move="-1" aria-label="上一页">‹</button><b>' + earnNavLabel() + '</b><button type="button" data-earn-move="1" aria-label="下一页">›</button></div></div><div class="cal-sum">' + earnSumLabel() + ' <b>' + money2(earnSumValue()) + '</b></div>' + body + '</div>';
+    }
+    function earnPage() {
+      return '<section class="screen on earn-screen">' +
+        '<div class="status-bar"><span>9:41</span><span>5G</span></div>' +
+        '<div class="nav-bar"><span style="width:36px"></span><div class="title">收益日历</div><span style="width:36px"></span></div>' +
+        '<div class="scroll earn-scroll">' +
+        '<div class="earn-total"><div class="earn-k">总收益(元)</div><div class="earn-v">' + money2(EARN_SETTLED) + '</div></div>' +
+        earnCalendar() + earnNote() + '</div>' +
+        '<nav class="tabbar"><button type="button" data-go="plaza"><b>⌂</b>广场</button><button type="button" data-go="claims"><b>☰</b>已领</button><button type="button" data-go="earn" class="on"><b>¥</b>收益</button></nav>' +
+        '<div class="toast" id="toast"></div></section>';
+    }
+    function earnDayPage() {
+      var y = earnYear;
+      var m = earnMonth;
+      var d = earnDay;
+      var amt = dayAmount(y, m, d);
+      var lines = dayLines(y, m, d);
+      var cards = lines.map(function (line) { return earnLineCard(y, m, d, line); }).join('');
+      var body = cards;
+      if (amt == null) body = '<div class="empty">这一天还没到</div>';
+      else if (!(amt > 0) || !cards) body = '<div class="empty">这一天没有代发收益入账</div>';
+      return shell(m + '月' + d + '日', 'earn', '<div class="scroll earn-scroll">' + body + '</div>', '', 'earn');
+    }
+    var previewRaf = 0;
+    function syncProjectScroll(rowId, barId) {
+      var row = document.getElementById(rowId);
+      var bar = document.getElementById(barId);
+      if (!row || !bar) return;
+      var thumb = bar.querySelector('i');
+      function place() {
+        var max = row.scrollWidth - row.clientWidth;
+        if (max <= 1) { bar.classList.remove('show'); return; }
+        bar.classList.add('show');
+        var w = Math.max(40, Math.min(80, (row.clientWidth / row.scrollWidth) * 100));
+        thumb.style.width = w + '%';
+        thumb.style.left = ((row.scrollLeft / max) * (100 - w)) + '%';
+      }
+      row.addEventListener('scroll', place);
+      place();
+    }
+    function bindProjectChip(el, pick) {
+      var id = el.getAttribute('data-proj');
+      if (id == null) id = el.getAttribute('data-cproj');
+      var sx = 0;
+      var sy = 0;
+      el.addEventListener('pointerdown', function (e) {
+        if (!id) return;
+        sx = e.clientX;
+        sy = e.clientY;
+        clearTimeout(projPress);
+        projPress = setTimeout(function () {
+          projHold = true;
+          favAsk = id;
+          draw();
+          setTimeout(function () { projHold = false; }, 400);
+        }, 480);
+      });
+      el.addEventListener('pointermove', function (e) {
+        if (Math.abs(e.clientX - sx) > 8 || Math.abs(e.clientY - sy) > 8) clearTimeout(projPress);
+      });
+      el.addEventListener('pointerup', function () { clearTimeout(projPress); });
+      el.addEventListener('pointercancel', function () { clearTimeout(projPress); });
+      el.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+      el.addEventListener('click', function () {
+        if (projHold) { projHold = false; return; }
+        pick(id || '');
+      });
+    }
+    function draw() {
+      clearTimeout(projPress);
+      if (previewRaf) { cancelAnimationFrame(previewRaf); previewRaf = 0; }
+      document.body.classList.toggle('pc', view === 'editor');
+      var detailViews = view === 'detail-platform' || view === 'detail-pack' || view === 'detail-charge' || view === 'detail-charge-points' || view === 'detail-charge-short' || view === 'detail-exchange' || view === 'detail-own-pick' || view === 'detail-own-hold';
+      var claimViews = view === 'claims' || view === 'claims-fill' || view === 'claims-fill-sheet' || view === 'claims-fill-block' || view === 'claims-timeout';
+      var html = view === 'plaza' ? plaza()
+        : detailViews ? manuscriptDetail(view === 'detail-own-hold' ? 'claims' : 'plaza')
+        : claimViews ? claims()
+        : view === 'earn' ? earnPage()
+        : view === 'earn-day' ? earnDayPage()
+        : view === 'detail-download' ? downloadDetail()
+        : editor();
+      document.getElementById('app').innerHTML = html;
+      bind();
+      if (kwDlTip) {
+        var tip = document.getElementById('toast');
+        if (tip) {
+          tip.textContent = '请先到领取记录页面填写关键词';
+          tip.classList.add('show', 'stay');
+        }
+      }
+      if (pendingToast) {
+        var msg = pendingToast;
+        pendingToast = '';
+        toast(msg);
+      }
+    }
+    function bind() {
+      document.querySelectorAll('[data-earn-day]').forEach(function (el) {
+        el.addEventListener('click', function () { earnDay = Number(el.getAttribute('data-earn-day')); view = 'earn-day'; draw(); });
+      });
+      document.querySelectorAll('[data-earn-grain]').forEach(function (el) {
+        el.addEventListener('click', function () { earnGrain = el.getAttribute('data-earn-grain'); draw(); });
+      });
+      document.querySelectorAll('[data-earn-move]').forEach(function (el) {
+        el.addEventListener('click', function () { shiftEarn(Number(el.getAttribute('data-earn-move'))); draw(); });
+      });
+      document.querySelectorAll('[data-earn-pick]').forEach(function (el) {
+        el.addEventListener('click', function () {
+          earnMonth = Number(el.getAttribute('data-earn-pick'));
+          earnGrain = 'day';
+          draw();
+        });
+      });
+      document.querySelectorAll('[data-earn-year]').forEach(function (el) {
+        el.addEventListener('click', function () {
+          earnYear = Number(el.getAttribute('data-earn-year'));
+          earnGrain = 'month';
+          draw();
+        });
+      });
+      document.querySelectorAll('[data-go]').forEach(function (el) {
+        el.addEventListener('click', function () {
+          var id = el.getAttribute('data-id');
+          if (id) currentId = id;
+          go(el.getAttribute('data-go'));
+        });
+      });
+      document.querySelectorAll('[data-proj]').forEach(function (el) {
+        bindProjectChip(el, function (id) { project = id; draw(); });
+      });
+      syncProjectScroll('plazaProjects', 'plazaScroll');
+      var favClose = document.getElementById('favClose');
+      if (favClose) favClose.onclick = function () { favAsk = ''; draw(); };
+      var favMask = document.getElementById('favMask');
+      if (favMask) favMask.onclick = function () { favAsk = ''; draw(); };
+      var favToggle = document.getElementById('favToggle');
+      if (favToggle) favToggle.onclick = function () {
+        if (!favAsk) return;
+        if (favProjects[favAsk]) delete favProjects[favAsk];
+        else favProjects[favAsk] = true;
+        favAsk = '';
+        draw();
+      };
+      document.querySelectorAll('[data-dtab]').forEach(function (el) {
+        el.addEventListener('click', function () {
+          detailPane = el.getAttribute('data-dtab') === 'remind' ? 'remind' : 'steps';
+          draw();
+        });
+      });
+      document.querySelectorAll('[data-ep]').forEach(function (el) {
+        el.addEventListener('click', function () {
+          if (loading) return;
+          currentId = el.getAttribute('data-ep');
+          draw();
+        });
+      });
+      var playClip = document.getElementById('playClip');
+      if (playClip) playClip.onclick = function () {
+        var end = document.getElementById('vEnd');
+        var prog = document.getElementById('vProg');
+        if (!end || !prog) return;
+        end.classList.remove('show');
+        playClip.style.display = 'none';
+        prog.style.width = '0%';
+        var start = Date.now();
+        if (previewRaf) cancelAnimationFrame(previewRaf);
+        function tick() {
+          if (!document.getElementById('vProg')) { previewRaf = 0; return; }
+          var p = Math.min(1, (Date.now() - start) / 5000);
+          prog.style.width = (p * 100) + '%';
+          if (p < 1) previewRaf = requestAnimationFrame(tick);
+          else {
+            playClip.style.display = '';
+            end.classList.add('show');
+            previewRaf = 0;
+          }
+        }
+        previewRaf = requestAnimationFrame(tick);
+      };
+      document.querySelectorAll('[data-open]').forEach(function (el) {
+        el.addEventListener('click', function () {
+          var key = el.getAttribute('data-open');
+          if (openDd === key) openDd = '';
+          else { openDd = key; ddDraft = picked[key] || ''; }
+          draw();
+        });
+      });
+      var mask = document.getElementById('ddMask');
+      if (mask) mask.onclick = function () { openDd = ''; draw(); };
+      var ddClose = document.getElementById('ddClose');
+      if (ddClose) ddClose.onclick = function () { openDd = ''; draw(); };
+      document.querySelectorAll('[data-ddkey]').forEach(function (el) {
+        el.addEventListener('click', function () { ddDraft = el.getAttribute('data-val'); draw(); });
+      });
+      var ddOk = document.getElementById('ddOk');
+      if (ddOk) ddOk.onclick = function () {
+        if (openDd) picked[openDd] = ddDraft;
+        openDd = '';
+        draw();
+      };
+      var feedSearch = document.getElementById('feedSearch');
+      if (feedSearch) feedSearch.oninput = function () {
+        search = feedSearch.value;
+        var pos = feedSearch.selectionStart;
+        draw();
+        var again = document.getElementById('feedSearch');
+        if (again) { again.focus(); again.setSelectionRange(pos, pos); }
+      };
+      document.querySelectorAll('[data-cproj]').forEach(function (el) {
+        bindProjectChip(el, function (id) { claimProject = id; draw(); });
+      });
+      syncProjectScroll('claimProjects', 'claimScroll');
+      document.querySelectorAll('[data-cst]').forEach(function (el) {
+        el.addEventListener('click', function () { claimStatus = el.getAttribute('data-cst'); draw(); });
+      });
+      document.querySelectorAll('[data-act]').forEach(function (el) {
+        el.addEventListener('click', function (e) {
+          e.stopPropagation();
+          var row = claimRows.filter(function (c) { return c.id === el.getAttribute('data-cid'); })[0];
+          var act = el.getAttribute('data-act');
+          if (!row) return;
+          if (act === 'dl') {
+            if (row.kwState === 'fill') { kwDlTip = true; draw(); return; }
+            if (row.kwState === 'timeout') return;
+            if (row.status === '已超时') { toast('回填已超时'); return; }
+            startDownload(row.work, false);
+            return;
+          }
+          if (act === 'pickkw') { kwSheetClaimId = row.id; kwDlTip = false; draw(); return; }
+          if (act === 'fills') { fillListId = row.id; draw(); return; }
+          if (row.status === '已超时') { toast('已超时，无法回填'); return; }
+          toast('进入现有回填页，不在这里新建。');
+        });
+      });
+      var openMode = document.getElementById('openMode');
+      if (openMode) openMode.onclick = function () {
+        var w = findWork(currentId);
+        if (w && w.kw === 'own' && !w.got.some(Boolean)) { ownPickOpen = true; draw(); return; }
+        requestClaim();
+      };
+      var ownKwClose = document.getElementById('ownKwClose');
+      if (ownKwClose) ownKwClose.onclick = function () { ownPickOpen = false; kwSheetClaimId = ''; draw(); };
+      var ownKwMask = document.getElementById('ownKwMask');
+      if (ownKwMask) ownKwMask.onclick = function () { ownPickOpen = false; kwSheetClaimId = ''; draw(); };
+      document.querySelectorAll('[data-kwpick]').forEach(function (el) {
+        el.addEventListener('click', function () {
+          var pick = el.getAttribute('data-kwpick');
+          if (kwSheetClaimId) {
+            var row = claimRows.filter(function (c) { return c.id === kwSheetClaimId; })[0];
+            if (row && pick !== 'defer') {
+              row.kwState = '';
+              row.pickedWord = pick;
+              var ww = findWork(row.work);
+              ww.word = pick;
+              ww.keywordOut = true;
+            }
+            kwSheetClaimId = '';
+            draw();
+            return;
+          }
+          if (pick === 'defer') {
+            var held = findWork(currentId);
+            if (quotaLeft < 1) { ownPickOpen = false; requestClaim(); return; }
+            quotaLeft -= 1;
+            held.got = held.got.map(function () { return true; });
+            held.keywordOut = false;
+            ownPickOpen = false;
+            ownHoldPop = true;
+            ensureClaim(currentId);
+            var heldRow = claimRows.filter(function (c) { return c.work === currentId; })[0];
+            if (heldRow) { heldRow.kwState = 'fill'; heldRow.downloadedAt = 0; }
+            draw();
+            return;
+          }
+          ownPickOpen = false;
+          var chosen = findWork(currentId);
+          chosen.word = pick;
+          requestClaim();
+        });
+      });
+      var holdOk = document.getElementById('holdOk');
+      if (holdOk) holdOk.onclick = function () { ownHoldPop = false; view = 'claims-fill'; claimStatus = '未回填'; draw(); };
+      var chargeCancel = document.getElementById('chargeCancel');
+      if (chargeCancel) chargeCancel.onclick = function () { chargeAsk = false; draw(); };
+      var chargeMask = document.getElementById('chargeMask');
+      if (chargeMask) chargeMask.onclick = function () { chargeAsk = false; draw(); };
+      var chargeOk = document.getElementById('chargeOk');
+      if (chargeOk) chargeOk.onclick = confirmCustomClaim;
+      var buyClose = document.getElementById('buyClose');
+      if (buyClose) buyClose.onclick = function () { buyOpen = false; ptsShort = false; draw(); };
+      var buyMask = document.getElementById('buyMask');
+      if (buyMask) buyMask.onclick = function () { buyOpen = false; ptsShort = false; draw(); };
+      document.querySelectorAll('[data-sku]').forEach(function (el) {
+        el.addEventListener('click', function () { skuPick = Number(el.getAttribute('data-sku')); draw(); });
+      });
+      var buyOk = document.getElementById('buyOk');
+      if (buyOk) buyOk.onclick = function () {
+        var sku = COUNT_SKUS[skuPick];
+        if (!sku) return;
+        if (points < sku.points) { ptsShort = true; ptsShortKind = ''; draw(); return; }
+        points -= sku.points;
+        quotaLeft += sku.times;
+        buyOpen = false;
+        ptsShort = false;
+        pendingToast = '兑换成功，次数 +' + sku.times + '，消耗 ' + sku.points + ' 积分';
+        draw();
+      };
+      var ptsLater = document.getElementById('ptsLater');
+      if (ptsLater) ptsLater.onclick = function () { ptsShort = false; ptsShortKind = ''; draw(); };
+      var ptsGoBuy = document.getElementById('ptsGoBuy');
+      if (ptsGoBuy) ptsGoBuy.onclick = function () { ptsShort = false; ptsBuy = true; draw(); };
+      var ptsBuyClose = document.getElementById('ptsBuyClose');
+      if (ptsBuyClose) ptsBuyClose.onclick = function () {
+        ptsBuy = false;
+        if (ptsShortKind === 'custom') ptsShort = true;
+        draw();
+      };
+      document.querySelectorAll('[data-buypack]').forEach(function (el) {
+        el.addEventListener('click', function () {
+          var pack = Number(el.getAttribute('data-buypack')) || 0;
+          points += pack;
+          ptsBuy = false;
+          pendingToast = '已购买 ' + el.getAttribute('data-buypack') + ' 积分';
+          if (ptsShortKind === 'custom') {
+            var rule = editorRule(findWork(currentId));
+            if (points >= rule.cost) { ptsShortKind = ''; chargeAsk = true; }
+            else ptsShort = true;
+          }
+          draw();
+        });
+      });
+      var abortDl = document.getElementById('abortDl');
+      if (abortDl) abortDl.onclick = function () { abortDownload(); };
+      var backfillLater = document.getElementById('backfillLater');
+      if (backfillLater) backfillLater.onclick = function () { backfillPrompt = false; draw(); };
+      var backfillGo = document.getElementById('backfillGo');
+      if (backfillGo) backfillGo.onclick = function () {
+        backfillPrompt = false;
+        pendingToast = '进入现有回填页，不在这里新建。';
+        draw();
+      };
+      var fillListClose = document.getElementById('fillListClose');
+      if (fillListClose) fillListClose.onclick = function () { fillListId = ''; draw(); };
+      var fillMask = document.getElementById('fillMask');
+      if (fillMask) fillMask.onclick = function () { fillListId = ''; draw(); };
+      var modeClose = document.getElementById('modeClose');
+      if (modeClose) modeClose.onclick = function () { modeSheet = false; modePick = ''; draw(); };
+      var modeMask = document.getElementById('modeMask');
+      if (modeMask) modeMask.onclick = function () { modeSheet = false; modePick = ''; draw(); };
+      document.querySelectorAll('[data-mode]').forEach(function (el) {
+        el.addEventListener('click', function () { modePick = el.getAttribute('data-mode'); draw(); });
+      });
+      var modeConfirm = document.getElementById('modeConfirm');
+      if (modeConfirm) modeConfirm.onclick = function () {
+        if (!modePick) { toast('请先选择领取方式'); return; }
+        startClaim(modePick);
+      };
+      document.querySelectorAll('[data-clip-dl]').forEach(function (el) {
+        el.addEventListener('click', function () {
+          var w = findWork(currentId);
+          var i = Number(el.getAttribute('data-clip-dl'));
+          if (!w.got[i]) { toast('这条素材还未领取'); return; }
+          toast(w.clips[i] + '已开始下载');
+        });
+      });
+      document.querySelectorAll('[data-clip-claim]').forEach(function (el) {
+        el.addEventListener('click', function () { requestClaim(); });
+      });
+      var quickKw = document.getElementById('quickKw');
+      if (quickKw) quickKw.onclick = function () { toast('跳转到对应项目的题词页面'); };
+      var dyPublish = document.getElementById('dyPublish');
+      if (dyPublish) dyPublish.onclick = function () {
+        var blocked = claimRows.filter(function (c) { return c.work === currentId && (c.kwState === 'fill' || c.kwState === 'timeout'); })[0];
+        if (blocked && blocked.kwState === 'fill') { kwDlTip = true; draw(); return; }
+        if (blocked) return;
+        startDownload(currentId, false);
+      };
+      var wmBtn = document.getElementById('wmBtn');
+      if (wmBtn) wmBtn.onclick = function () {
+        var w = findWork(currentId);
+        toast(w.kw === 'platform' ? '帐号运营稿件不支持添加水印' : '当前稿件不支持添加水印');
+      };
+      document.querySelectorAll('[data-tproj]').forEach(function (el) {
+        el.addEventListener('click', function () { editorProject = el.getAttribute('data-tproj'); draw(); });
+      });
+      document.querySelectorAll('[data-copy]').forEach(function (el) {
+        el.addEventListener('click', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          var text = el.getAttribute('data-copy') || '';
+          var done = function () { toast('已复制'); };
+          if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, done);
+          else done();
+        });
+      });
+      document.querySelectorAll('[data-blink]').forEach(function (el) {
+        el.addEventListener('click', function (e) {
+          e.preventDefault();
+          toast('已复制书籍链接');
+        });
+      });
+      document.querySelectorAll('[data-wlink]').forEach(function (el) {
+        el.addEventListener('click', function (e) {
+          e.preventDefault();
+          toast('已复制作品链接');
+        });
+      });
+      document.querySelectorAll('[data-epane]').forEach(function (el) {
+        el.addEventListener('click', function () {
+          editorPane = el.getAttribute('data-epane');
+          if (editorPane !== 'tasks') editorOpen = '';
+          uploadKey = '';
+          draw();
+        });
+      });
+      document.querySelectorAll('[data-listch]').forEach(function (el) {
+        el.addEventListener('click', function () { listTab = el.getAttribute('data-listch'); uploadKey = ''; fillOpen = ''; draw(); });
+      });
+      var wqGo = document.getElementById('wqGo');
+      if (wqGo) wqGo.onclick = function () { readWorkQuery(); draw(); };
+      var wqReset = document.getElementById('wqReset');
+      if (wqReset) wqReset.onclick = function () {
+        workQuery = { id: '', word: '', project: '', state: '', kind: '', mat: '', occ: '', fileStatus: '', upload: '', audit: '' };
+        draw();
+      };
+      var workFilter = document.getElementById('workFilter');
+      if (workFilter) workFilter.addEventListener('keydown', function (e) {
+        if (e.key !== 'Enter') return;
+        readWorkQuery();
+        draw();
+      });
+      document.querySelectorAll('[data-fills]').forEach(function (el) {
+        el.addEventListener('click', function () { fillOpen = el.getAttribute('data-fills'); draw(); });
+      });
+      var fillClose = document.getElementById('fillClose');
+      if (fillClose) fillClose.onclick = function () { fillOpen = ''; draw(); };
+      var fillMask = document.getElementById('fillMask');
+      if (fillMask) fillMask.onclick = function () { fillOpen = ''; draw(); };
+      function readUploadFields() {
+        function val(id) {
+          var el = document.getElementById(id);
+          return el ? el.value : null;
+        }
+        var kw = val('upKeyword');
+        if (kw !== null) upKeyword = kw.trim();
+        var remind = val('upRemind');
+        if (remind !== null) upRemind = remind.trim();
+        var project = val('upProject');
+        if (project !== null) upProject = project;
+        var kind = val('upKind');
+        if (kind !== null) upKind = kind;
+        var mat = val('upMat');
+        if (mat !== null) upMat = mat;
+        var book = val('upBookName');
+        if (book !== null) upBookName = book.trim();
+        var bookId = val('upBookId');
+        if (bookId !== null) upBookId = bookId.trim();
+        var link = val('upBookLink');
+        if (link !== null) upBookLink = link.trim();
+      }
+      function closeUpload() { uploadOpen = false; uploadKey = ''; draw(); }
+      var openUpload = document.getElementById('openUpload');
+      if (openUpload) openUpload.onclick = function () {
+        uploadOpen = true;
+        upStep = 1;
+        upMode = '任务协作';
+        upKeyword = '';
+        upRemind = '';
+        upPicked = false;
+        upPack = '文件夹';
+        draw();
+      };
+      document.querySelectorAll('[data-upmode]').forEach(function (el) {
+        el.addEventListener('click', function () {
+          readUploadFields();
+          upMode = el.getAttribute('data-upmode');
+          if (listTab !== '站外' && upMode !== '帐号运营') upKeyword = '';
+          draw();
+        });
+      });
+      ['upProject', 'upBookId'].forEach(function (id) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener('change', function () {
+          readUploadFields();
+          if (keywordChoices().indexOf(upKeyword) < 0) upKeyword = '';
+          draw();
+        });
+      });
+      var upClose = document.getElementById('upClose');
+      if (upClose) upClose.onclick = closeUpload;
+      var upMask = document.getElementById('upMask');
+      if (upMask) upMask.onclick = closeUpload;
+      document.querySelectorAll('[data-pack]').forEach(function (el) {
+        el.addEventListener('click', function () { upPack = el.getAttribute('data-pack'); draw(); });
+      });
+      var upPickReal = document.getElementById('upPickReal');
+      if (upPickReal) upPickReal.onclick = function () { upPicked = true; pendingToast = '已选择本地成片'; draw(); };
+      var upUseDemo = document.getElementById('upUseDemo');
+      if (upUseDemo) upUseDemo.onclick = function () { upPicked = true; draw(); };
+      var upBack = document.getElementById('upBack');
+      if (upBack) upBack.onclick = function () { readUploadFields(); upStep = Math.max(1, upStep - 1); draw(); };
+      var upNext = document.getElementById('upNext');
+      if (upNext) upNext.onclick = function () {
+        readUploadFields();
+        if (upStep === 1 && keywordNeeded()) {
+          var choices = keywordChoices();
+          if (!choices.length || choices.indexOf(upKeyword) < 0) {
+            toast(choices.length ? '请选择一个已通过关键词' : '这个项目的这本书还没有你在右豹侧审核通过的关键词');
+            return;
+          }
+        }
+        if (upStep === 1 && !upBookName) { toast('请填写书籍名称'); return; }
+        if (upStep === 2 && !upPicked) { toast('请先选择文件夹或压缩包'); return; }
+        upStep = Math.min(3, upStep + 1);
+        draw();
+      };
+      var upPublish = document.getElementById('upPublish');
+      if (upPublish) upPublish.onclick = function () {
+        readUploadFields();
+        if (keywordNeeded() && keywordChoices().indexOf(upKeyword) < 0) { toast('请选择一个已通过关键词'); return; }
+        var prefix = listTab === '站外' ? 'X-' : 'M-';
+        var id = prefix + (20500 + listSeq++);
+        var fileName = (upMode === '帐号运营' ? upKeyword : (upBookName || '稿件')) + (upKind === '图集' ? '' : '.mp4');
+        listRows.unshift({
+          id: id, channel: listTab, title: upMode === '帐号运营' ? upKeyword : upBookName, project: upProject,
+          book: upBookName, bookId: upBookId || '—', info: '12.0 MB (1)', fileName: fileName, tip: '—', remind: upRemind, editor: '周凯',
+          kind: upKind, mat: upMat, occ: '空闲', fileStatus: '正常', upload: '已上传', audit: '审核中', time: '刚刚',
+          mode: upMode, fills: []
+        });
+        uploadOpen = false;
+        pendingToast = '已上传到' + listTab + '稿件';
+        draw();
+      };
+      document.querySelectorAll('[data-del-task]').forEach(function (el) {
+        el.addEventListener('click', function () { delTaskId = el.getAttribute('data-del-task'); draw(); });
+      });
+      function closeDel() { delTaskId = ''; draw(); }
+      var delCancel = document.getElementById('delCancel');
+      if (delCancel) delCancel.onclick = closeDel;
+      var delBack = document.getElementById('delBack');
+      if (delBack) delBack.onclick = closeDel;
+      var delMask = document.getElementById('delMask');
+      if (delMask) delMask.onclick = function () { delTaskId = ''; draw(); };
+      var delOk = document.getElementById('delOk');
+      if (delOk) delOk.onclick = function () {
+        var id = delTaskId;
+        editorTasks.forEach(function (t) {
+          var next = [];
+          (t.kws || []).forEach(function (k, i) {
+            if (t.id + '-' + i !== id) next.push(k);
+          });
+          t.kws = next;
+        });
+        delTaskId = '';
+        fillOpen = '';
+        uploadKey = '';
+        pendingToast = '已删除这条任务稿件';
+        draw();
+      };
+      document.querySelectorAll('[data-noupload]').forEach(function (el) {
+        el.addEventListener('click', function () { toast('还没领取这个任务，不能上传稿件'); });
+      });
+      document.querySelectorAll('[data-legacy]').forEach(function (el) {
+        el.addEventListener('click', function () { toast('站外分享仍走现有页，这里不改'); });
+      });
+      document.querySelectorAll('[data-open-task]').forEach(function (el) {
+        el.addEventListener('click', function () { editorOpen = el.getAttribute('data-open-task'); draw(); });
+      });
+      var taskDrawerClose = document.getElementById('taskDrawerClose');
+      if (taskDrawerClose) taskDrawerClose.onclick = function () { editorOpen = ''; draw(); };
+      var taskDrawerMask = document.getElementById('taskDrawerMask');
+      if (taskDrawerMask) taskDrawerMask.onclick = function () { editorOpen = ''; draw(); };
+      document.querySelectorAll('[data-take]').forEach(function (el) {
+        el.addEventListener('click', function () {
+          var row = findFlat(el.getAttribute('data-take'));
+          if (!row || row.kw.got) { toast('这个任务已经领取'); return; }
+          if (flatTasks().some(function (r) { return r.kw.got && r.kw.mine; })) { toast('你已经领过一个任务'); return; }
+          row.kw.got = true;
+          row.kw.mine = true;
+          pendingToast = '领取成功，当时不分钱';
+          draw();
+        });
+      });
+    }
+    if (boot === 'detail-own-pick') {
+      view = 'detail-own-pick';
+      currentId = 'p7';
+      ownPickOpen = true;
+    }
+    if (boot === 'detail-own-hold') {
+      view = 'detail-own-hold';
+      currentId = 'p7';
+      var heldWork = findWork('p7');
+      heldWork.got = [true];
+      heldWork.keywordOut = false;
+      quotaLeft = 0;
+      ownHoldPop = true;
+      claimRows.unshift({ id: 'c4', work: 'p7', kwState: 'fill', status: '未回填', time: '刚刚', downloadedAt: 0, expireAt: now + 2 * 86400000, fills: [], backfillPrompted: false });
+    }
+    if (boot === 'claims-fill' || boot === 'claims-fill-sheet' || boot === 'claims-fill-block') {
+      view = boot;
+      claimStatus = '未回填';
+      claimRows.unshift({ id: 'c4', work: 'p7', kwState: 'fill', status: '未回填', time: '刚刚', downloadedAt: 0, expireAt: now + 2 * 86400000, fills: [], backfillPrompted: false });
+      var fillWork = findWork('p7');
+      fillWork.got = [true];
+      fillWork.keywordOut = false;
+      if (boot === 'claims-fill-sheet') kwSheetClaimId = 'c4';
+      if (boot === 'claims-fill-block') kwDlTip = true;
+    }
+    if (boot === 'claims-timeout') {
+      view = 'claims-timeout';
+      claimStatus = '未回填';
+      claimRows.unshift({ id: 'c5', work: 'p18', kwState: 'timeout', status: '未回填', time: '1小时前', downloadedAt: 0, expireAt: now + 2 * 86400000, fills: [], backfillPrompted: false });
+      var timeoutWork = findWork('p18');
+      timeoutWork.got = [true];
+      timeoutWork.keywordOut = false;
+    }
+    draw();
+  </script>
+</body>
+</html>
