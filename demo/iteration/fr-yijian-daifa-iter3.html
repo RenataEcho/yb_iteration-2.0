@@ -36,10 +36,9 @@
     .badge-fr { background: #fffbeb; color: var(--accent-fr); border: 1px solid #fde68a; }
     .badge-version { background: #f5f3ff; color: var(--accent-version); border: 1px solid #ddd6fe; }
     .page-tab-bar, .admin-tab-bar, .channel-tab-bar { display: flex; gap: 0; margin-bottom: 16px; background: var(--surface-glass); border: 1px solid rgba(255,255,255,0.55); border-radius: var(--radius-lg); padding: 4px; box-shadow: var(--shadow); width: fit-content; }
+    .page-tab-bar { position: relative; z-index: 520; }
     .admin-tab-bar, .channel-tab-bar { margin: 12px 16px 0; }
     .filter-field[hidden] { display: none; }
-    .mode-line { display: grid; grid-template-columns: 1fr 148px; gap: 12px; align-items: start; }
-    .mode-line .form-field { margin-bottom: 12px; }
     .checks label { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; }
     .checks input { width: 16px; height: 16px; flex: none; }
     .page-tab-bar button, .admin-tab-bar button, .channel-tab-bar button { padding: 8px 20px; border: none; background: transparent; cursor: pointer; font-size: 13px; color: var(--text-secondary); border-radius: 10px; }
@@ -141,6 +140,14 @@
     .mode-share .field-note { margin: 4px 0 0; font-size: 12px; color: var(--text-muted); line-height: 1.5; }
     .form-field input, .form-field select { width: 100%; height: 36px; font-size: 13px; }
     .form-field .checks input { width: 16px; height: 16px; flex: none; }
+    .mode-rows { display: flex; flex-direction: column; gap: 8px; }
+    .mode-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 32px; }
+    .mode-row > label { display: inline-flex; align-items: center; gap: 6px; margin: 0; font-size: 13px; color: var(--text-primary); cursor: pointer; }
+    .form-field .mode-row > label input { width: 16px; height: 16px; flex: none; }
+    .mode-ratio, .points-line { display: flex; align-items: center; gap: 6px; }
+    .mode-ratio[hidden], #edPointsWrap[hidden] { display: none; }
+    .form-field .mode-ratio input, .form-field .points-line input { width: 88px; flex: none; }
+    .mode-ratio span, .points-line span { font-size: 12px; color: var(--text-secondary); }
     .field-hint { margin-top: 4px; font-size: 11px; color: var(--text-muted); }
     .drawer-overlay, .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,.35); z-index: 500; opacity: 0; pointer-events: none; }
     .drawer-overlay.open, .modal-overlay.open { opacity: 1; pointer-events: auto; }
@@ -148,6 +155,13 @@
     .drawer.wide { width: min(920px, 100%); }
     .drawer table { min-width: 720px; }
     .drawer.open { transform: translateX(0); }
+    #ruleDrawer { width: min(960px, 100%); }
+    #ruleDrawer .drawer-header { flex-shrink: 0; gap: 12px; }
+    #ruleDrawer .drawer-header h2 { font-size: 15px; font-weight: 700; }
+    .drawer-header-actions { display: flex; align-items: center; gap: 8px; }
+    a.btn-ghost-sm { text-decoration: none; display: inline-flex; align-items: center; }
+    #ruleDrawer .drawer-body { flex: 1; min-height: 0; padding: 0; overflow: hidden; }
+    #ruleDrawer .drawer-body iframe { width: 100%; height: 100%; border: 0; display: block; background: #fff; }
     .drawer-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-weight: 700; }
     .drawer-close { width: 28px; height: 28px; border: none; background: #f1f5f9; border-radius: 6px; cursor: pointer; }
     .drawer-body { padding: 16px 20px 28px; overflow: auto; }
@@ -173,10 +187,19 @@
     .sheet-add { margin-top: 8px; }
     #kwBody table { min-width: 0; }
     .modal-overlay.open .modal { display: block; }
+    #edOverlay .modal { max-height: calc(100vh - 48px); }
+    #edOverlay.open .modal { display: flex; flex-direction: column; }
+    #edOverlay .modal-body { overflow: auto; }
     .modal-header, .modal-footer { padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; }
     .modal-footer { justify-content: flex-end; gap: 8px; }
     .modal-body { padding: 0 18px 8px; }
     .flow-page-intro { padding: 16px 18px 0; font-size: 12px; color: var(--text-muted); line-height: 1.55; }
+    .flow-tab-bar { display: flex; gap: 4px; padding: 12px 16px 0; border-bottom: 1px solid var(--border); overflow-x: auto; }
+    .flow-tab-bar button { padding: 8px 16px; border: none; background: none; cursor: pointer; white-space: nowrap; font-size: 13px; color: var(--text-secondary); border-bottom: 2px solid transparent; margin-bottom: -1px; }
+    .flow-tab-bar button.active { color: var(--primary); font-weight: 600; border-bottom-color: var(--primary); }
+    .flow-panel-body { display: none; }
+    .flow-panel-body.active { display: block; }
+    .flow-panel-desc { padding: 14px 18px 0; font-size: 12px; color: var(--text-secondary); line-height: 1.55; }
     .flow-svg-wrap { overflow: auto; max-height: 72vh; padding: 8px 12px; }
     .flow-legend { display: flex; flex-wrap: wrap; gap: 12px; padding: 4px 18px 16px; font-size: 11px; color: var(--text-muted); }
     .flow-legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 4px; vertical-align: -2px; }
@@ -216,7 +239,7 @@
     <header class="page-header">
       <div>
         <h1>一键代发迭代 3.0 <span class="badge badge-fr">FR-020</span><span class="badge badge-version">v1 当前</span></h1>
-        <p class="page-desc">用户领取帐号运营稿件时不选词。详情标题旁是项目、运营模式、稿件类型，分成是这条稿件剪辑手的分成比例。订单结算后按这个比例切分，用户拿走剩下的。管理后台是剪辑手管理和稿件管理。代运营合作模式可多选任务协作、帐号运营，分成比例单独填一个百分比。稿件管理的回填作品是数量，点数字看列表。剪辑手 PC 只留上传 list 的右豹稿件和站外稿件。</p>
+        <p class="page-desc">用户领取帐号运营稿件时不选词。详情标题旁是项目、运营模式、稿件类型，分成是这条稿件剪辑手的分成比例。订单结算后按这个比例切分，用户拿走剩下的。管理后台是剪辑手管理和稿件管理。代运营合作模式可多选，每个选中的模式单独填比例。稿件收费方式是跟随平台或定制，定制再填单次积分。稿件管理的回填作品是数量，点数字看列表。剪辑手 PC 只留上传 list 的右豹稿件和站外稿件。</p>
       </div>
       <button class="btn btn-rule" id="toggleRuleDrawer" type="button">需求规则</button>
     </header>
@@ -234,12 +257,18 @@
           <div class="scene-head">
             <div>
               <h2>用户端</h2>
-              <p class="scene-lead">素材类型和其他筛选项一样用底部浮层，点确定后生效。广场是宫格。视频素材按一个项目、一本书、一名剪辑手收成一个包，点进详情再选单条稿件领取。图集和视频每领 1 个，数量少 1 个；已经领取的再次下载只能去已领记录。点领取稿件按剪辑手收费方式扣费，然后下载并保存到相册。保存完成前可以中断下载，次数不退。第一次保存成功后提示去回填或稍后。已领列表没有复制链接。未回填是立即回填，已回填改为追加回填，并显示回填作品数量。点回填作品数量弹出开发规则：打开现有的该关键词作品列表即可。底部收益沿用收益日历。</p>
+              <p class="scene-lead">最前面六台是任务协作先领后填：选词、尽快申请关键词、填写关键词、选这本书的词、未填不能下载、超时未填写。素材类型和其他筛选项一样用底部浮层，点确定后生效。广场是宫格。视频素材按一个项目、一本书、一名剪辑手收成一个包，点进详情再选单条稿件领取。图集和视频每领 1 个，数量少 1 个；已经领取的再次下载只能去已领记录。点领取稿件按剪辑手收费方式扣费，然后下载并保存到相册。保存完成前可以中断下载，次数不退。第一次保存成功后提示去回填或稍后。已领列表没有复制链接。未回填是立即回填，已回填改为追加回填，并显示回填作品数量。点回填作品数量弹出开发规则：打开现有的该关键词作品列表即可。底部收益沿用收益日历。</p>
             </div>
             <button class="btn-preview" type="button" data-preview="fe" aria-pressed="false">全屏预览</button>
           </div>
           <div class="scene-list">
-            <button class="scene-btn active" type="button" data-screen="plaza">作品广场</button>
+            <button class="scene-btn active" type="button" data-screen="detail-own-pick">任务协作选词</button>
+            <button class="scene-btn" type="button" data-screen="detail-own-hold">先领后填提示</button>
+            <button class="scene-btn" type="button" data-screen="claims-fill">填写关键词</button>
+            <button class="scene-btn" type="button" data-screen="claims-fill-sheet">选这本书的词</button>
+            <button class="scene-btn" type="button" data-screen="claims-fill-block">未填不能下载</button>
+            <button class="scene-btn" type="button" data-screen="claims-timeout">超时未填写</button>
+            <button class="scene-btn" type="button" data-screen="plaza">作品广场</button>
             <button class="scene-btn" type="button" data-screen="detail-platform">帐号运营详情</button>
             <button class="scene-btn" type="button" data-screen="detail-pack">视频包</button>
             <button class="scene-btn" type="button" data-screen="detail-charge">定制收费</button>
@@ -249,11 +278,17 @@
             <button class="scene-btn" type="button" data-screen="claims">已领列表</button>
             <button class="scene-btn" type="button" data-screen="earn">收益</button>
           </div>
-          <p class="scene-hint">点场景滚到对应画面。稿件详情按状态直接摆出来：视频包、定制收费还有免费次数（标题下有积分价格，不弹确认）、定制收费扣积分（确认兑换只显示应扣积分和当前余额）、积分不足（直接摆出购买引导）、平台规则兑换次数。</p>
+          <p class="scene-hint">点场景滚到对应画面。稿件详情按状态直接摆出来：视频包、定制收费还有免费次数（标题下有积分价格，不弹确认）、定制收费扣积分（确认兑换只显示应扣积分和当前余额）、积分不足（直接摆出购买引导）、平台规则兑换次数。任务协作先领后填也按状态摆出：选词含「暂无关键词,先领稿件稍后申请词」、领取后尽快申请关键词、领取记录「填写关键词」、选这本书的词、未填点下载的提示、超时「超时未填写关键词」。</p>
         </div>
         <div class="glass-card mockup-board">
           <div class="board-scroll" id="feBoardScroll">
             <div class="board-row">
+              <figure class="board-tile" id="tile-detail-own-pick"><figcaption class="board-cap">任务协作 <em>选择关键词，含先领后填</em></figcaption><div class="board-phone"><iframe title="任务协作选词" src="yijian-daifa-iter3-demo.html?embed=1&screen=detail-own-pick&v=65"></iframe></div></figure>
+              <figure class="board-tile" id="tile-detail-own-hold"><figcaption class="board-cap">先领后填 <em>尽快申请关键词，1 小时释放</em></figcaption><div class="board-phone"><iframe title="先领后填提示" src="yijian-daifa-iter3-demo.html?embed=1&screen=detail-own-hold&v=65"></iframe></div></figure>
+              <figure class="board-tile" id="tile-claims-fill"><figcaption class="board-cap">领取记录 <em>填写关键词</em></figcaption><div class="board-phone"><iframe title="填写关键词" src="yijian-daifa-iter3-demo.html?embed=1&screen=claims-fill&v=65"></iframe></div></figure>
+              <figure class="board-tile" id="tile-claims-fill-sheet"><figcaption class="board-cap">领取记录 <em>这本书的关键词</em></figcaption><div class="board-phone"><iframe title="选这本书的词" src="yijian-daifa-iter3-demo.html?embed=1&screen=claims-fill-sheet&v=65"></iframe></div></figure>
+              <figure class="board-tile" id="tile-claims-fill-block"><figcaption class="board-cap">未填词 <em>请先到领取记录填写关键词</em></figcaption><div class="board-phone"><iframe title="未填不能下载" src="yijian-daifa-iter3-demo.html?embed=1&screen=claims-fill-block&v=65"></iframe></div></figure>
+              <figure class="board-tile" id="tile-claims-timeout"><figcaption class="board-cap">超时 <em>超时未填写关键词</em></figcaption><div class="board-phone"><iframe title="超时未填写" src="yijian-daifa-iter3-demo.html?embed=1&screen=claims-timeout&v=65"></iframe></div></figure>
               <figure class="board-tile" id="tile-plaza"><figcaption class="board-cap">作品广场 <em>代发运营模式</em></figcaption><div class="board-phone"><iframe title="作品广场" src="yijian-daifa-iter3-demo.html?embed=1&screen=plaza&v=55"></iframe></div></figure>
               <figure class="board-tile" id="tile-detail-platform"><figcaption class="board-cap">帐号运营 <em>供稿者分成、用户分成</em></figcaption><div class="board-phone"><iframe title="帐号运营详情" src="yijian-daifa-iter3-demo.html?embed=1&screen=detail-platform&v=58"></iframe></div></figure>
               <figure class="board-tile" id="tile-detail-pack"><figcaption class="board-cap">稿件详情 <em>视频包</em></figcaption><div class="board-phone"><iframe title="视频包" src="yijian-daifa-iter3-demo.html?embed=1&screen=detail-pack&v=58"></iframe></div></figure>
@@ -282,7 +317,7 @@
         </div>
         <div class="glass-card mockup-board">
           <div class="board-scroll">
-            <div class="board-pc"><iframe title="剪辑手上传" src="yijian-daifa-iter3-demo.html?embed=1&screen=editor&v=55"></iframe></div>
+            <div class="board-pc"><iframe title="剪辑手上传" src="yijian-daifa-iter3-demo.html?embed=1&screen=editor&v=62"></iframe></div>
           </div>
         </div>
       </div>
@@ -295,7 +330,7 @@
           <button type="button" data-admin="pane-works">稿件管理</button>
         </div>
         <div id="pane-editors" class="admin-pane active">
-          <div class="table-toolbar"><div><h3>剪辑手</h3><p>复刻一键代发 1.0 剪辑手管理。代运营合作模式至少选一个。分成比例单独填 0 到 100。必填右豹 ID、昵称、备注、发布平台。稿件需要审核默认是。</p></div><button class="btn btn-primary" type="button" id="openEditor">录入</button></div>
+          <div class="table-toolbar"><div><h3>剪辑手</h3><p>复刻一键代发 1.0 剪辑手管理。代运营合作模式至少选一个，选中的模式各自填 0 到 100 的比例。稿件收费方式为定制时填写单次积分。必填右豹 ID、昵称、备注、发布平台。</p></div><button class="btn btn-primary" type="button" id="openEditor">录入</button></div>
           <div class="ed-kpi">
             <div class="ed-kpi-head"><span>数据统计</span><em>按当前筛选汇总</em></div>
             <div class="ed-stats" id="edStats" style="grid-template-columns:repeat(4,minmax(0,1fr))"></div>
@@ -305,7 +340,7 @@
             <div class="filter-field"><label>状态</label><select id="edS"><option value="">全部</option><option>已录入</option><option>已停用</option></select></div>
             <div class="filter-actions" style="display:flex;gap:8px"><button class="btn-ghost-sm" type="button" id="edReset">重置</button><button class="btn btn-primary" type="button" id="edGo">查询</button></div>
           </div>
-          <div class="table-wrap"><table><thead><tr><th>ID</th><th>右豹 ID</th><th>昵称</th><th>代运营合作模式</th><th>分成比例</th><th>发布平台</th><th>稿件需要审核</th><th>可上传项目</th><th>稿件数据</th><th>收益数据</th><th>状态</th><th>录入时间</th><th>操作</th></tr></thead><tbody id="edBody"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>ID</th><th>右豹 ID</th><th>昵称</th><th>代运营合作模式</th><th>稿件收费方式</th><th>发布平台</th><th>稿件需要审核</th><th>可上传项目</th><th>稿件数据</th><th>收益数据</th><th>状态</th><th>录入时间</th><th>操作</th></tr></thead><tbody id="edBody"></tbody></table></div>
         </div>
         <div id="pane-works" class="admin-pane">
           <div class="channel-tab-bar" id="wkChannelBar">
@@ -328,123 +363,206 @@
 
     <div id="view-flow" class="page-view">
       <div class="glass-card">
-        <p class="flow-page-intro">用户领走稿件且订单已结算后，按剪辑手的分成比例切分。剪辑手拿走应结算乘以快照，用户拿走剩下的。</p>
-        <div class="flow-svg-wrap">
-          <svg width="1100" height="1680" viewBox="0 0 1100 1680">
-            <defs>
-              <marker id="flow-arrow-20" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#94a3b8"/></marker>
-            </defs>
-            <g fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#flow-arrow-20)">
-              <polyline points="430,64 430,96"/>
-              <polyline points="350,136 190,136"/>
-              <polyline points="40,136 18,136 18,8 430,8 430,16"/>
-              <polyline points="430,176 430,208"/>
-              <polyline points="430,256 430,288"/>
-              <polyline points="430,448 430,480"/>
-              <polyline points="350,328 190,328"/>
-              <polyline points="40,328 18,328 18,232 300,232"/>
-              <polyline points="430,368 430,400"/>
-              <polyline points="510,520 760,520"/>
-              <polyline points="940,520 1064,520 1064,232 560,232"/>
-              <polyline points="430,560 430,592"/>
-              <polyline points="430,640 430,672"/>
-              <polyline points="430,720 430,752"/>
-              <polyline points="430,800 430,832"/>
-              <polyline points="430,880 430,912"/>
-              <polyline points="350,952 240,952"/>
-              <polyline points="430,992 430,1024"/>
-              <polyline points="430,1072 430,1104"/>
-              <polyline points="350,1144 190,1144"/>
-              <polyline points="430,1184 430,1216"/>
-              <polyline points="115,1168 115,1352 300,1352"/>
-              <polyline points="430,1264 430,1328"/>
-              <polyline points="430,1376 430,1408"/>
-              <polyline points="430,1456 430,1488"/>
-              <polyline points="350,1528 210,1528"/>
-              <polyline points="430,1568 430,1600"/>
-            </g>
-            <g font-family="PingFang SC, Microsoft YaHei, sans-serif" text-anchor="middle">
-              <rect x="300" y="16" width="260" height="48" rx="8" fill="#dcfce7" stroke="#16a34a"/>
-              <text x="430" y="36" font-size="13" fill="#14532d">录入剪辑手</text>
-              <text x="430" y="52" font-size="10" fill="#166534">右豹 ID · 合作模式 · 分成比例</text>
-              <polygon points="430,96 510,136 430,176 350,136" fill="#fef9c3" stroke="#ca8a04"/>
-              <text x="430" y="132" font-size="12" fill="#854d0e">必填齐全？</text>
-              <text x="250" y="128" font-size="11" fill="#dc2626">否</text>
-              <rect x="40" y="112" width="150" height="48" rx="8" fill="#fee2e2" stroke="#dc2626"/>
-              <text x="115" y="140" font-size="13" fill="#991b1b">不能保存</text>
-              <text x="444" y="198" font-size="11" fill="#16a34a" text-anchor="start">是</text>
-              <rect x="300" y="208" width="260" height="48" rx="8" fill="#dcfce7" stroke="#16a34a"/>
-              <text x="430" y="236" font-size="13" fill="#14532d">剪辑手已录入</text>
-              <polygon points="430,288 510,328 430,368 350,328" fill="#fef9c3" stroke="#ca8a04"/>
-              <text x="430" y="332" font-size="12" fill="#854d0e">项目已授权？</text>
-              <text x="250" y="320" font-size="11" fill="#dc2626">否</text>
-              <rect x="40" y="304" width="150" height="48" rx="8" fill="#fee2e2" stroke="#dc2626"/>
-              <text x="115" y="332" font-size="13" fill="#991b1b">不能提交</text>
-              <text x="444" y="390" font-size="11" fill="#16a34a" text-anchor="start">是</text>
-              <rect x="300" y="400" width="260" height="48" rx="8" fill="#dcfce7" stroke="#16a34a"/>
-              <text x="430" y="428" font-size="13" fill="#14532d">提交审核</text>
-              <polygon points="430,480 510,520 430,560 350,520" fill="#fef9c3" stroke="#ca8a04"/>
-              <text x="430" y="524" font-size="12" fill="#854d0e">申请通过？</text>
-              <text x="620" y="512" font-size="11" fill="#64748b" text-anchor="start">否</text>
-              <rect x="760" y="496" width="180" height="48" rx="8" fill="#f1f5f9" stroke="#94a3b8"/>
-              <text x="850" y="524" font-size="13" fill="#475569">不下发任务</text>
-              <text x="444" y="582" font-size="11" fill="#16a34a" text-anchor="start">是</text>
-              <rect x="300" y="592" width="260" height="48" rx="8" fill="#dcfce7" stroke="#16a34a"/>
-              <text x="430" y="620" font-size="13" fill="#14532d">稿件进入广场</text>
-              <rect x="300" y="672" width="260" height="48" rx="8" fill="#dbeafe" stroke="#2563eb"/>
-              <text x="430" y="692" font-size="13" fill="#1e3a8a">剪辑手上传稿件</text>
-              <text x="430" y="708" font-size="10" fill="#64748b">右豹或站外，此时不分成</text>
-              <rect x="300" y="752" width="260" height="48" rx="8" fill="#dbeafe" stroke="#2563eb"/>
-              <text x="430" y="772" font-size="13" fill="#1e3a8a">打开稿件详情</text>
-              <text x="430" y="788" font-size="10" fill="#64748b">看到剪辑手分成比例</text>
-              <rect x="300" y="832" width="260" height="48" rx="8" fill="#dbeafe" stroke="#2563eb"/>
-              <text x="430" y="852" font-size="13" fill="#1e3a8a">作品广场筛选</text>
-              <text x="430" y="868" font-size="10" fill="#64748b">帐号代发 / 关键词领取</text>
-              <polygon points="430,912 510,952 430,992 350,952" fill="#fef9c3" stroke="#ca8a04"/>
-              <text x="430" y="956" font-size="12" fill="#854d0e">帐号代发？</text>
-              <text x="268" y="944" font-size="11" fill="#64748b">否</text>
-              <rect x="40" y="928" width="200" height="48" rx="8" fill="#dbeafe" stroke="#2563eb"/>
-              <text x="140" y="948" font-size="12" fill="#1e3a8a">关键词领取</text>
-              <text x="140" y="964" font-size="10" fill="#64748b">领取时不选词</text>
-              <text x="444" y="1014" font-size="11" fill="#16a34a" text-anchor="start">是</text>
-              <rect x="300" y="1024" width="260" height="48" rx="8" fill="#dbeafe" stroke="#2563eb"/>
-              <text x="430" y="1044" font-size="13" fill="#1e3a8a">领取这一条稿件</text>
-              <text x="430" y="1060" font-size="10" fill="#64748b">消耗 1 次，没有稿件包</text>
-              <polygon points="430,1104 510,1144 430,1184 350,1144" fill="#fef9c3" stroke="#ca8a04"/>
-              <text x="430" y="1148" font-size="12" fill="#854d0e">是稿件包？</text>
-              <text x="250" y="1136" font-size="11" fill="#64748b">否</text>
-              <rect x="40" y="1120" width="150" height="48" rx="8" fill="#dbeafe" stroke="#2563eb"/>
-              <text x="115" y="1140" font-size="13" fill="#1e3a8a">领取这一条</text>
-              <text x="115" y="1156" font-size="10" fill="#64748b">消耗 1 次</text>
-              <text x="444" y="1206" font-size="11" fill="#16a34a" text-anchor="start">是</text>
-              <rect x="300" y="1216" width="260" height="48" rx="8" fill="#dbeafe" stroke="#2563eb"/>
-              <text x="430" y="1236" font-size="13" fill="#1e3a8a">不会出现</text>
-              <text x="430" y="1252" font-size="10" fill="#64748b">一个任务一条稿件</text>
-              <rect x="300" y="1328" width="260" height="48" rx="8" fill="#dcfce7" stroke="#16a34a"/>
-              <text x="430" y="1348" font-size="13" fill="#14532d">下发同一个关键词</text>
-              <text x="430" y="1364" font-size="10" fill="#166534">下载保存后只下发一次</text>
-              <rect x="300" y="1408" width="260" height="48" rx="8" fill="#dbeafe" stroke="#2563eb"/>
-              <text x="430" y="1428" font-size="13" fill="#1e3a8a">领取记录点卡片</text>
-              <text x="430" y="1444" font-size="10" fill="#64748b">进详情后再下载</text>
-              <polygon points="430,1488 520,1528 430,1568 340,1528" fill="#fef9c3" stroke="#ca8a04"/>
-              <text x="430" y="1524" font-size="11" fill="#854d0e">已领走且</text>
-              <text x="430" y="1540" font-size="11" fill="#854d0e">订单已产出？</text>
-              <text x="268" y="1520" font-size="11" fill="#64748b">否</text>
-              <rect x="40" y="1504" width="170" height="48" rx="8" fill="#f1f5f9" stroke="#94a3b8"/>
-              <text x="125" y="1532" font-size="13" fill="#475569">两份分成为 0</text>
-              <text x="444" y="1590" font-size="11" fill="#16a34a" text-anchor="start">是</text>
-              <rect x="300" y="1600" width="260" height="48" rx="8" fill="#dcfce7" stroke="#16a34a"/>
-              <text x="430" y="1620" font-size="13" fill="#14532d">按分成比例切分</text>
-              <text x="430" y="1636" font-size="10" fill="#166534">用户拿走剩下的，没有官方留下</text>
-            </g>
-          </svg>
+        <p class="flow-page-intro">按定稿拆成三张。帐号运营领取不选词，保存成功后才下发关键词。用户无词领取只覆盖任务协作里选「暂无关键词,先领稿件稍后申请词」。分成在已下载且订单已结算后，按领取时的模式比例快照切一次。</p>
+        <div class="flow-tab-bar" role="tablist">
+          <button type="button" class="active" data-flow="flow-1" role="tab">流程1 · 帐号运营模式领取</button>
+          <button type="button" data-flow="flow-2" role="tab">流程2 · 用户无词领取</button>
+          <button type="button" data-flow="flow-3" role="tab">流程3 · 分成模式</button>
+        </div>
+        <div id="flow-1" class="flow-panel-body active">
+          <p class="flow-panel-desc">帐号运营。一个任务、一个关键词、一条稿件，没有稿件包。领取过程不出现选择关键词。</p>
+          <div class="flow-svg-wrap">
+            <svg width="1100" height="900" viewBox="0 0 1100 900">
+              <defs><marker id="flow-arrow-1" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#94a3b8"/></marker></defs>
+              <g fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#flow-arrow-1)">
+                <polyline points="560,68 560,96"/>
+                <polyline points="560,148 560,176"/>
+                <polyline points="560,228 560,256"/>
+                <polyline points="440,296 248,296"/>
+                <polyline points="560,336 560,364"/>
+                <polyline points="440,404 268,404"/>
+                <polyline points="560,444 560,472"/>
+                <polyline points="560,524 560,552"/>
+                <polyline points="470,592 268,592"/>
+                <polyline points="560,632 560,660"/>
+                <polyline points="560,712 560,740"/>
+              </g>
+              <g font-family="PingFang SC, Microsoft YaHei, sans-serif" text-anchor="middle">
+                <rect x="410" y="16" width="300" height="52" rx="8" fill="#dbeafe" stroke="#2563eb"/>
+                <text x="560" y="36" font-size="13" fill="#1e3a8a">作品广场</text>
+                <text x="560" y="54" font-size="10" fill="#64748b">代发运营模式选「帐号运营」</text>
+                <rect x="410" y="96" width="300" height="52" rx="8" fill="#dbeafe" stroke="#2563eb"/>
+                <text x="560" y="116" font-size="13" fill="#1e3a8a">打开稿件详情</text>
+                <text x="560" y="134" font-size="10" fill="#64748b">不选词，领取前关键词脱敏</text>
+                <rect x="410" y="176" width="300" height="52" rx="8" fill="#dbeafe" stroke="#2563eb"/>
+                <text x="560" y="196" font-size="13" fill="#1e3a8a">点领取稿件</text>
+                <text x="560" y="214" font-size="10" fill="#64748b">没有稿件包，不选领取方式</text>
+                <polygon points="560,256 680,296 560,336 440,296" fill="#fef9c3" stroke="#ca8a04"/>
+                <text x="560" y="292" font-size="12" fill="#854d0e">能领这一条？</text>
+                <text x="560" y="308" font-size="10" fill="#854d0e">未被别人下载占用，本人没有别的词</text>
+                <text x="360" y="288" font-size="11" fill="#dc2626">否</text>
+                <rect x="28" y="270" width="220" height="52" rx="8" fill="#fee2e2" stroke="#dc2626"/>
+                <text x="138" y="290" font-size="13" fill="#991b1b">不能领取</text>
+                <text x="138" y="308" font-size="10" fill="#991b1b">不下载，不写已领</text>
+                <text x="574" y="356" font-size="11" fill="#16a34a" text-anchor="start">是</text>
+                <polygon points="560,364 680,404 560,444 440,404" fill="#fef9c3" stroke="#ca8a04"/>
+                <text x="560" y="400" font-size="12" fill="#854d0e">扣费成功？</text>
+                <text x="560" y="416" font-size="10" fill="#854d0e">免费次数、平台兑换或确认兑换</text>
+                <text x="370" y="396" font-size="11" fill="#dc2626">否</text>
+                <rect x="28" y="378" width="240" height="52" rx="8" fill="#fee2e2" stroke="#dc2626"/>
+                <text x="148" y="398" font-size="13" fill="#991b1b">不下载、不写已领</text>
+                <text x="148" y="416" font-size="10" fill="#991b1b">积分不足可购买后回到确认</text>
+                <text x="574" y="464" font-size="11" fill="#16a34a" text-anchor="start">是</text>
+                <rect x="410" y="472" width="300" height="52" rx="8" fill="#dbeafe" stroke="#2563eb"/>
+                <text x="560" y="492" font-size="13" fill="#1e3a8a">下载并保存到相册</text>
+                <text x="560" y="510" font-size="10" fill="#64748b">正在下载，正在保存，然后已保存</text>
+                <polygon points="560,552 650,592 560,632 470,592" fill="#fef9c3" stroke="#ca8a04"/>
+                <text x="560" y="588" font-size="12" fill="#854d0e">保存完成前中断？</text>
+                <text x="370" y="584" font-size="11" fill="#dc2626">是</text>
+                <rect x="28" y="566" width="240" height="52" rx="8" fill="#f1f5f9" stroke="#94a3b8"/>
+                <text x="148" y="586" font-size="13" fill="#475569">不退次，进入已领列表</text>
+                <text x="148" y="604" font-size="10" fill="#64748b">可再下载且不再扣次，保存成功才下发</text>
+                <text x="574" y="652" font-size="11" fill="#16a34a" text-anchor="start">否</text>
+                <rect x="410" y="660" width="300" height="52" rx="8" fill="#dcfce7" stroke="#16a34a"/>
+                <text x="560" y="680" font-size="13" fill="#14532d">下发平台关键词</text>
+                <text x="560" y="698" font-size="10" fill="#166534">等于这条剪辑任务上的词，只下发一次</text>
+                <rect x="410" y="740" width="300" height="52" rx="8" fill="#dbeafe" stroke="#2563eb"/>
+                <text x="560" y="760" font-size="13" fill="#1e3a8a">第一次保存成功后提示回填</text>
+                <text x="560" y="778" font-size="10" fill="#64748b">稍后留在详情，去回填进现有回填</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+        <div id="flow-2" class="flow-panel-body">
+          <p class="flow-panel-desc">任务协作里选「暂无关键词,先领稿件稍后申请词」。选了具体关键词的不走这张图，仍下载保存。帐号运营不出现这个选项。</p>
+          <div class="flow-svg-wrap">
+            <svg width="1180" height="900" viewBox="0 0 1180 900">
+              <defs><marker id="flow-arrow-2" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#94a3b8"/></marker></defs>
+              <g fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#flow-arrow-2)">
+                <polyline points="470,68 470,96"/>
+                <polyline points="620,122 760,122"/>
+                <polyline points="470,148 470,176"/>
+                <polyline points="470,228 470,256"/>
+                <polyline points="470,308 470,336"/>
+                <polyline points="380,376 250,376"/>
+                <polyline points="470,416 470,444"/>
+                <polyline points="470,496 470,524"/>
+                <polyline points="470,576 470,604"/>
+                <polyline points="620,630 760,630"/>
+                <polyline points="470,656 470,684"/>
+                <polyline points="560,724 760,724"/>
+                <polyline points="470,764 470,792"/>
+              </g>
+              <g font-family="PingFang SC, Microsoft YaHei, sans-serif" text-anchor="middle">
+                <rect x="320" y="16" width="300" height="52" rx="8" fill="#dbeafe" stroke="#2563eb"/>
+                <text x="470" y="36" font-size="13" fill="#1e3a8a">作品广场</text>
+                <text x="470" y="54" font-size="10" fill="#64748b">代发运营模式选「任务协作」</text>
+                <rect x="320" y="96" width="300" height="52" rx="8" fill="#dbeafe" stroke="#2563eb"/>
+                <text x="470" y="116" font-size="13" fill="#1e3a8a">稿件详情出现选择关键词</text>
+                <text x="470" y="134" font-size="10" fill="#64748b">领取前抬头显示「未领取」</text>
+                <rect x="760" y="96" width="250" height="52" rx="8" fill="#f1f5f9" stroke="#94a3b8"/>
+                <text x="885" y="116" font-size="12" fill="#475569">选了具体关键词</text>
+                <text x="885" y="134" font-size="10" fill="#64748b">扣费后下载保存，不下发平台词</text>
+                <rect x="320" y="176" width="300" height="52" rx="8" fill="#dbeafe" stroke="#2563eb"/>
+                <text x="470" y="196" font-size="13" fill="#1e3a8a">选中固定项</text>
+                <text x="470" y="214" font-size="10" fill="#64748b">暂无关键词,先领稿件稍后申请词</text>
+                <rect x="320" y="256" width="300" height="52" rx="8" fill="#dbeafe" stroke="#2563eb"/>
+                <text x="470" y="276" font-size="13" fill="#1e3a8a">点领取</text>
+                <text x="470" y="294" font-size="10" fill="#64748b">按剪辑手收费方式扣次数或积分</text>
+                <polygon points="470,336 560,376 470,416 380,376" fill="#fef9c3" stroke="#ca8a04"/>
+                <text x="470" y="372" font-size="12" fill="#854d0e">扣费成功？</text>
+                <text x="470" y="388" font-size="10" fill="#854d0e">次数或积分</text>
+                <text x="310" y="368" font-size="11" fill="#dc2626">否</text>
+                <rect x="20" y="350" width="230" height="52" rx="8" fill="#fee2e2" stroke="#dc2626"/>
+                <text x="135" y="370" font-size="13" fill="#991b1b">不写已领</text>
+                <text x="135" y="388" font-size="10" fill="#991b1b">稿件仍可被领，不起 1 小时</text>
+                <text x="484" y="436" font-size="11" fill="#16a34a" text-anchor="start">是</text>
+                <rect x="320" y="444" width="300" height="52" rx="8" fill="#dcfce7" stroke="#16a34a"/>
+                <text x="470" y="464" font-size="13" fill="#14532d">只写下这次领取</text>
+                <text x="470" y="482" font-size="10" fill="#166534">不开始下载，不保存到相册</text>
+                <rect x="320" y="524" width="300" height="52" rx="8" fill="#dbeafe" stroke="#2563eb"/>
+                <text x="470" y="544" font-size="13" fill="#1e3a8a">提示尽快申请关键词</text>
+                <text x="470" y="562" font-size="10" fill="#64748b">1 小时内未填写则过期释放</text>
+                <rect x="320" y="604" width="300" height="52" rx="8" fill="#dbeafe" stroke="#2563eb"/>
+                <text x="470" y="624" font-size="13" fill="#1e3a8a">领取记录</text>
+                <text x="470" y="642" font-size="10" fill="#64748b">点「填写关键词」打开底部浮层</text>
+                <rect x="760" y="604" width="280" height="52" rx="8" fill="#fee2e2" stroke="#dc2626"/>
+                <text x="900" y="624" font-size="12" fill="#991b1b">此时点下载不保存</text>
+                <text x="900" y="642" font-size="10" fill="#991b1b">请先到领取记录页面填写关键词</text>
+                <polygon points="470,684 560,724 470,764 380,724" fill="#fef9c3" stroke="#ca8a04"/>
+                <text x="470" y="720" font-size="12" fill="#854d0e">1 小时内填了词？</text>
+                <text x="470" y="736" font-size="10" fill="#854d0e">这本书的关键词</text>
+                <text x="640" y="716" font-size="11" fill="#dc2626" text-anchor="start">否</text>
+                <rect x="760" y="698" width="300" height="52" rx="8" fill="#f1f5f9" stroke="#94a3b8"/>
+                <text x="910" y="718" font-size="12" fill="#475569">超时释放，次数和积分不退</text>
+                <text x="910" y="736" font-size="10" fill="#64748b">改为「超时未填写关键词」，点下载不保存</text>
+                <text x="484" y="784" font-size="11" fill="#16a34a" text-anchor="start">是</text>
+                <rect x="320" y="792" width="300" height="52" rx="8" fill="#dcfce7" stroke="#16a34a"/>
+                <text x="470" y="812" font-size="13" fill="#14532d">可以下载保存</text>
+                <text x="470" y="830" font-size="10" fill="#166534">关键词是所选的那一个，不下发平台关键词</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+        <div id="flow-3" class="flow-panel-body">
+          <p class="flow-panel-desc">领取成功时按稿件所属模式写下剪辑手比例快照。已下载且订单已结算后才切。不读官方帐号上的两份比例，不给官方留一份。</p>
+          <div class="flow-svg-wrap">
+            <svg width="1100" height="760" viewBox="0 0 1100 760">
+              <defs><marker id="flow-arrow-3" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#94a3b8"/></marker></defs>
+              <g fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#flow-arrow-3)">
+                <polyline points="560,68 560,96"/>
+                <polyline points="560,148 560,176"/>
+                <polyline points="470,216 268,216"/>
+                <polyline points="560,256 560,284"/>
+                <polyline points="470,324 268,324"/>
+                <polyline points="560,364 560,392"/>
+                <polyline points="560,444 560,472"/>
+                <polyline points="560,524 560,552"/>
+                <polyline points="560,604 560,632"/>
+              </g>
+              <g font-family="PingFang SC, Microsoft YaHei, sans-serif" text-anchor="middle">
+                <rect x="410" y="16" width="300" height="52" rx="8" fill="#dbeafe" stroke="#2563eb"/>
+                <text x="560" y="36" font-size="13" fill="#1e3a8a">领取成功</text>
+                <text x="560" y="54" font-size="10" fill="#64748b">还没领走则两份为 0。领走时记快照</text>
+                <rect x="410" y="96" width="300" height="52" rx="8" fill="#dcfce7" stroke="#16a34a"/>
+                <text x="560" y="116" font-size="13" fill="#14532d">写入分成比例快照</text>
+                <text x="560" y="134" font-size="10" fill="#166534">取该模式当时的比例，之后改了不重算</text>
+                <polygon points="560,176 650,216 560,256 470,216" fill="#fef9c3" stroke="#ca8a04"/>
+                <text x="560" y="212" font-size="12" fill="#854d0e">已下载成功？</text>
+                <text x="370" y="208" font-size="11" fill="#64748b">否</text>
+                <rect x="28" y="190" width="240" height="52" rx="8" fill="#f1f5f9" stroke="#94a3b8"/>
+                <text x="148" y="210" font-size="13" fill="#475569">两份分成为 0</text>
+                <text x="148" y="228" font-size="10" fill="#64748b">尚未保存成功。保存成功后再看结算</text>
+                <text x="574" y="276" font-size="11" fill="#16a34a" text-anchor="start">是</text>
+                <polygon points="560,284 650,324 560,364 470,324" fill="#fef9c3" stroke="#ca8a04"/>
+                <text x="560" y="320" font-size="12" fill="#854d0e">订单已结算？</text>
+                <text x="370" y="316" font-size="11" fill="#64748b">否</text>
+                <rect x="28" y="298" width="240" height="52" rx="8" fill="#f1f5f9" stroke="#94a3b8"/>
+                <text x="148" y="318" font-size="13" fill="#475569">两份仍为 0</text>
+                <text x="148" y="336" font-size="10" fill="#64748b">待结算不写收益明细</text>
+                <text x="574" y="384" font-size="11" fill="#16a34a" text-anchor="start">是</text>
+                <rect x="410" y="392" width="300" height="52" rx="8" fill="#dcfce7" stroke="#16a34a"/>
+                <text x="560" y="412" font-size="13" fill="#14532d">剪辑手分成 = 应结算 × 快照</text>
+                <text x="560" y="430" font-size="10" fill="#166534">四舍五入到分，记给这条稿件的剪辑手</text>
+                <rect x="410" y="472" width="300" height="52" rx="8" fill="#dcfce7" stroke="#16a34a"/>
+                <text x="560" y="492" font-size="13" fill="#14532d">用户分成 = 应结算 − 剪辑手分成</text>
+                <text x="560" y="510" font-size="10" fill="#166534">记给领走并下载的那一名用户</text>
+                <rect x="410" y="552" width="300" height="52" rx="8" fill="#dcfce7" stroke="#16a34a"/>
+                <text x="560" y="572" font-size="13" fill="#14532d">一个词只切这一次</text>
+                <text x="560" y="590" font-size="10" fill="#166534">两边相加等于应结算，不给官方留一份</text>
+                <rect x="410" y="632" width="300" height="52" rx="8" fill="#dcfce7" stroke="#16a34a"/>
+                <text x="560" y="652" font-size="13" fill="#14532d">写入既有项目收益明细</text>
+                <text x="560" y="670" font-size="10" fill="#166534">两侧同时写入。广场和详情不展示金额</text>
+              </g>
+            </svg>
+          </div>
         </div>
         <div class="flow-legend">
           <span><i style="background:#dbeafe;border:1px solid #2563eb"></i>前端</span>
           <span><i style="background:#dcfce7;border:1px solid #16a34a"></i>后端</span>
           <span><i style="background:#fef9c3;border:1px solid #ca8a04"></i>校验</span>
           <span><i style="background:#fee2e2;border:1px solid #dc2626"></i>阻断</span>
-          <span><i style="background:#f1f5f9;border:1px solid #94a3b8"></i>跳过</span>
+          <span><i style="background:#f1f5f9;border:1px solid #94a3b8"></i>不进入下一步</span>
         </div>
       </div>
     </div>
@@ -488,59 +606,16 @@
   </main>
 
   <div class="drawer-overlay" id="ruleOverlay"></div>
-  <aside class="drawer" id="ruleDrawer">
-    <div class="drawer-header"><h2>FR-020 · v1 需求规则</h2><button class="drawer-close" type="button" id="closeRule">×</button></div>
-    <div class="rule-tab-bar">
-      <button type="button" class="active" data-rule="rule-fe">前端需求</button>
-      <button type="button" data-rule="rule-be">后台需求</button>
+  <aside class="drawer" id="ruleDrawer" aria-label="需求规则">
+    <div class="drawer-header">
+      <h2>FR-020 · 需求规则</h2>
+      <div class="drawer-header-actions">
+        <a class="btn-ghost-sm" href="fr-yijian-daifa-iter3-rules.html" target="_blank" rel="noopener">新窗口打开 / 打印</a>
+        <button class="drawer-close" type="button" id="closeRule">×</button>
+      </div>
     </div>
     <div class="drawer-body">
-      <div class="rule-panel active" id="rule-fe">
-        <div class="rule-section"><h3>1 业务目标</h3><div class="rule-content">用户领取帐号运营稿件时看到供稿者分成和用户分成，不用自己选词。剪辑手 PC 不放剪辑任务和任务稿件。</div></div>
-        <div class="rule-section"><h3>2 页面与入口</h3><div class="rule-content"><ul>
-          <li>作品广场顶部项目只有一行，一行 5 个。超过 5 个显示滑动条。长按项目可设为常用或取消常用。排序是常用在前，然后按后台排序值从大到小。作品广场只列出还没领取的稿件。已经领取的从广场去掉，已领列表仍能进入。素材类型、代发运营模式、剪辑师、稿件类型都用底部浮层，点选项只是选中，点确定后列表才变。素材类型有全部、AI漫画、图文素材、混剪素材、口播素材、解说营销。广场是宫格。视频素材按一个项目、一本书、一名剪辑手显示成一个包，进入详情后再选单条稿件领取。图集和视频每领取 1 个，数量少 1 个。已经领取的稿件不能在广场详情里再次下载，再次下载只能去已领记录。代发运营模式：全部、任务协作、帐号运营。</li>
-          <li>稿件详情标题旁是项目名称、运营模式、稿件类型。定制收费稿件在标题正下方显示积分价格，不写「定制收费」。平台积分规则稿件不显示这条价格。稿件作者、关键词、供稿者分成、用户分成放在同一行。书籍信息是书籍名称、书籍 ID、书籍链接、书籍类型，不显示项目名称。书籍名称、书籍 ID、书籍链接可以复制。任务协作在领取成功前，关键词固定显示「未领取」，领取成功后显示用户领取时选择的关键词。帐号运营在领取成功前关键词脱敏，领取成功后显示完整关键词。领取步骤旁边有「剪辑师提醒」，切过去是剪辑师上传这条稿件时写的提示语和推荐文案。</li>
-          <li>帐号运营是一个任务、一个关键词、一条稿件，没有稿件包。点领取稿件直接领取这一条，按剪辑手收费方式扣费，然后下载并保存到相册。保存完成前可以中断下载，已扣的次数或积分不退，不下发关键词。第一次保存成功后弹出回填提示，可以稍后留下或去回填。底部与 1.0 相同。还没领完时是剩余次数、快捷提词、领取稿件。领完后是添加水印、下载并发布到抖音。领取过程不出现选择关键词。</li>
-          <li>已领列表沿用现有列表。去掉复制链接。未回填是立即回填，已回填改为追加回填，并显示回填作品数量。点回填作品数量弹出开发规则：打开现有的该关键词作品列表即可，不在这里新建作品列表。点卡片进入稿件详情，可以再次下载，不再扣次。</li>
-          <li>底部增加收益，版式沿用收益日历。标题「收益日历」单独占导航栏，不和数据区叠在一起。总收益卡片在上，日历在下，两块分开。白卡片只显示已结算总收益(元)，不显示未结算。日历可切日、月、年：日视图是本月收益和日历，月视图是本年各月，年视图是近三年。日历底部说明：此收益数据仅统计帐号代发稿件类型的分成；分成将会入账至项目收益钱包；日历每个日期可点击查看每天关于代发入账的明细。详情卡片标题是项目方-关键词和金额，描述是「代发收益入账」，下面是时间戳。</li>
-          <li>剪辑手 PC 不出现剪辑任务，上传 list 不出现任务稿件。右豹稿件和站外稿件仍在。上传稿件先选代发运营模式：任务协作是用户自由关键词领取稿件；帐号运营是剪辑手提供关键词和稿件，用户一键领取。上传 list 显示回填数据，点数字打开回填作品，列有媒体平台、帐号 ID、帐号昵称、作品链接、发布时间、回填时间。</li>
-        </ul></div></div>
-        <div class="rule-section"><h3>3 交互规则</h3><div class="rule-content"><ul>
-          <li>一名用户只领走并下载这一条稿件。领走之后不能再领。</li>
-          <li>本轮剪辑手 PC 不出现剪辑任务，也不出现任务稿件。</li>
-          <li>帐号运营领取成功并保存到相册后，系统下发这条稿件上的关键词。用户这次领取里不填写、不挑选关键词。</li>
-          <li>领取按稿件剪辑手的收费方式扣费。免费次数全平台共用。平台积分规则：优先扣 1 次，次数不够再按平台档位兑换次数，兑换并扣次成功后才下载；不走定制扣积分确认。定制不走平台档位。有免费次数仍扣 1 次，不弹扣积分确认。没有免费次数且余额够扣时，先弹出确认兑换，只写出应扣积分和当前余额，应扣积分等于标题下的积分价格；不写定制收费，不写剪辑手是谁。确认兑换后才扣。取消则不扣、不领取、不写已领。余额低于应扣积分时不弹确认兑换，改为弹出积分不足，写出需要的积分、当前余额和还差多少，并可去购买积分。买够后回到确认兑换。这两步不扣、不下载、不写已领，不打开平台档位兑换。</li>
-          <li>帐号代发不会出现稿件包，也没有分次领取、一次全部领取和包内素材。</li>
-          <li>这条稿件领走之后不能再领。</li>
-          <li>用户还没领走，或订单还没结算，剪辑手分成和用户分成都是 0。</li>
-        </ul></div></div>
-        <div class="rule-section"><h3>4 边界规则</h3><div class="rule-content"><ul>
-          <li>剩余次数不足 1 次时，不能领成功。</li>
-          <li>未领取成功的详情不提供下载。</li>
-          <li>帐号运营没有稿件包，一条稿件对应一次领取。</li>
-        </ul></div></div>
-        <div class="rule-section"><h3>5 业务流程</h3><div class="rule-content">见页内「业务流程」。</div></div>
-      </div>
-      <div class="rule-panel" id="rule-be">
-        <div class="rule-section"><h3>1 业务目标</h3><div class="rule-content">管理后台复刻一键代发 1.0 的剪辑手管理和稿件管理。代运营合作模式是多选，分成比例是单独一个百分比。稿件管理的回填作品是数量。入账按稿件剪辑手的分成比例切分，用户拿走剩余。</div></div>
-        <div class="rule-section"><h3>2 数据表与字段</h3><div class="rule-content"><ul>
-          <li>剪辑手管理与一键代发 1.0 相同。代运营合作模式多选任务协作、帐号运营，这个控件不出现比例，选中后也不展开比例。分成比例单独填 0 到 100 的一个百分比。任务协作是用户自由关键词领取稿件。帐号运营是剪辑手提供关键词和稿件，用户一键领取。备注和来源只进详情。表头统计剪辑手数量、累计稿件数量、累计稿件大小、累计结算收益。</li>
-          <li>列表和详情里，合作模式只显示已选名称，分成比例只显示那一个百分比。</li>
-          <li>稿件管理有右豹稿件、站外稿件。右豹含发布技巧、素材类型、占用、审核。站外没有这四项，状态是空闲、部分领取、已领完。两栏都有稿件状态（正常 / 已删除）和回填作品。</li>
-          <li>回填作品格内是数量。点数量打开列表，列是媒体平台、帐号 ID、帐号昵称、作品链接、发布时间、回填时间。数量等于条数。0 也可点，列表为空。已删除只出现在稿件状态，回填作品数量仍单独保留。</li>
-          <li>收益拆站内稿件收益和站外稿件收益，各自点开抽屉。</li>
-          <li>本页不出现官方帐号、剪辑任务、任务稿件。不移植批量审核、二维码和 OSS 删除。站外分享链接点了只提示已复制。</li>
-        </ul></div></div>
-        <div class="rule-section"><h3>3 列表与筛选</h3><div class="rule-content"><ul>
-          <li>剪辑手可按右豹 ID、昵称、状态查询。录入和编辑用弹窗。行内可看详情、停用、启用。名下仍有稿件不能删除。</li>
-          <li>稿件可按标题或 ID 查询。右豹还可按占用、审核筛选；站外按空闲、部分领取、已领完筛选。两栏都可按稿件状态筛选。点回填作品的数量打开列表。</li>
-        </ul></div></div>
-        <div class="rule-section"><h3>4 边界规则</h3><div class="rule-content"><ul>
-          <li>缺右豹 ID、昵称、分成比例、备注，或发布平台一个都没选，或合作模式一个都没选，不能保存。分成比例是 0 到 100。两个模式都没选时提示至少选一个合作模式。</li>
-          <li>用户领走稿件且订单已结算之后，才按领取时写下的剪辑手分成比例切分。剪辑手分成是应结算乘以快照，四舍五入到分。用户分成是应结算减去剪辑手分成。待结算不切。之后改剪辑手比例，不重算已经切出的分成。</li>
-          <li>本页不改 FR-014、FR-017、FR-018 的历史页。</li>
-        </ul></div></div>
-      </div>
+      <iframe title="FR-020 需求规则" src="fr-yijian-daifa-iter3-rules.html"></iframe>
     </div>
   </aside>
 
@@ -549,13 +624,18 @@
     <div class="modal-body">
       <div class="form-field"><label>右豹 ID</label><input id="edYb" placeholder="YB10086"></div>
       <div class="form-field"><label>昵称</label><input id="edName" placeholder="周凯"></div>
-      <div class="mode-line">
-        <div class="form-field"><label>代运营合作模式</label><div class="checks" id="edModes">
+      <div class="form-field"><label>代运营合作模式</label><div class="mode-rows" id="edModes">
+        <div class="mode-row">
           <label><input type="checkbox" value="任务协作"> 任务协作</label>
+          <div class="mode-ratio" id="edShareTaskWrap" hidden><input id="edShareTask" type="number" min="0" max="100" placeholder="40"><span>%</span></div>
+        </div>
+        <div class="mode-row">
           <label><input type="checkbox" value="帐号运营"> 帐号运营</label>
-        </div></div>
-        <div class="form-field"><label>分成比例</label><input id="edShare" type="number" min="0" max="100" placeholder="40"></div>
-      </div>
+          <div class="mode-ratio" id="edShareAccountWrap" hidden><input id="edShareAccount" type="number" min="0" max="100" placeholder="50"><span>%</span></div>
+        </div>
+      </div></div>
+      <div class="form-field"><label>稿件收费方式</label><select id="edCharge"><option>跟随平台</option><option>定制</option></select></div>
+      <div class="form-field" id="edPointsWrap" hidden><label>单次积分</label><div class="points-line"><span>单次</span><input id="edPoints" type="number" min="1" step="1" placeholder="80"><span>积分</span></div></div>
       <div class="form-field"><label>备注</label><input id="edNote" placeholder="客服接入"></div>
       <div class="form-field"><label>稿件需要审核</label><select id="edReview"><option>是</option><option>否</option></select></div>
       <div class="form-field"><label>发布平台</label><div class="checks" id="edPlatforms">
@@ -589,9 +669,9 @@
     function openModal(id) { document.getElementById(id).classList.add('open'); }
     function closeModal(id) { document.getElementById(id).classList.remove('open'); }
     var editors = [
-      { id: 'E-01', ybId: 'YB10086', name: '周凯', modes: ['任务协作', '帐号运营'], share: '40%', review: '是', platforms: ['右豹', '站外'], projects: '番茄小说、红果短剧', uploaded: 12, claimed: 4, sizeMb: 186, onsite: 1280, offsite: 360, status: '已录入', time: '09-12 10:20', note: '客服转来，两种渠道都开通', source: '客服' },
-      { id: 'E-02', ybId: 'YB10091', name: '陈予', modes: ['任务协作'], share: '30%', review: '是', platforms: ['右豹'], projects: '红果短剧', uploaded: 6, claimed: 2, sizeMb: 74, onsite: 640, offsite: 0, status: '已录入', time: '09-18 15:04', note: '只开通右豹', source: '客服' },
-      { id: 'E-03', ybId: 'YB10102', name: '苏晚', modes: ['帐号运营'], share: '35%', review: '否', platforms: ['右豹', '站外'], projects: '番茄小说', uploaded: 3, claimed: 1, sizeMb: 28, onsite: 210, offsite: 90, status: '已停用', time: '09-20 11:30', note: '停用后不能上传', source: '运营' }
+      { id: 'E-01', ybId: 'YB10086', name: '周凯', modes: ['任务协作', '帐号运营'], taskShare: '40%', accountShare: '50%', charge: '跟随平台', points: '', review: '是', platforms: ['右豹', '站外'], projects: '番茄小说、红果短剧', uploaded: 12, claimed: 4, sizeMb: 186, onsite: 1280, offsite: 360, status: '已录入', time: '09-12 10:20', note: '客服转来，两种渠道都开通', source: '客服' },
+      { id: 'E-02', ybId: 'YB10091', name: '陈予', modes: ['任务协作'], taskShare: '30%', accountShare: '', charge: '定制', points: '80', review: '是', platforms: ['右豹'], projects: '红果短剧', uploaded: 6, claimed: 2, sizeMb: 74, onsite: 640, offsite: 0, status: '已录入', time: '09-18 15:04', note: '只开通右豹', source: '客服' },
+      { id: 'E-03', ybId: 'YB10102', name: '苏晚', modes: ['帐号运营'], taskShare: '', accountShare: '35%', charge: '跟随平台', points: '', review: '否', platforms: ['右豹', '站外'], projects: '番茄小说', uploaded: 3, claimed: 1, sizeMb: 28, onsite: 210, offsite: 90, status: '已停用', time: '09-20 11:30', note: '停用后不能上传', source: '运营' }
     ];
     var edSeq = 4;
     var editingId = '';
@@ -619,7 +699,7 @@
         '<div class="ed-stat"><span>累计稿件大小</span><strong>' + size + ' MB</strong></div>' +
         '<div class="ed-stat earn"><span>累计结算收益</span><strong>' + money(earn) + '</strong></div>';
       document.getElementById('edBody').innerHTML = rows.map(function (e) {
-        return '<tr><td>' + esc(e.id) + '</td><td>' + esc(e.ybId) + '</td><td>' + esc(e.name) + '</td><td>' + esc(e.modes.join('、')) + '</td><td>' + esc(e.share) + '</td>' +
+        return '<tr><td>' + esc(e.id) + '</td><td>' + esc(e.ybId) + '</td><td>' + esc(e.name) + '</td><td>' + modeHtml(e) + '</td><td>' + chargeHtml(e) + '</td>' +
           '<td>' + esc(e.platforms.join('、')) + '</td><td>' + edTag(e.review) + '</td><td>' + esc(e.projects) + '</td>' +
           '<td>已上传 ' + e.uploaded + '<div class="cell-sub">已被领取 ' + e.claimed + '</div><div class="cell-sub">累计 ' + e.sizeMb + ' MB</div></td>' +
           '<td><button class="link" type="button" data-earn="' + e.id + '" data-side="onsite">站内稿件收益 ' + money(e.onsite) + '</button>' +
@@ -632,6 +712,37 @@
             : '<button class="link" type="button" data-start="' + e.id + '">启用</button>') +
           '<button class="link link-danger" type="button" data-del="' + e.id + '">删除</button></td></tr>';
       }).join('') || '<tr><td colspan="13">没有匹配的剪辑手</td></tr>';
+    }
+    function modeLines(e) {
+      var lines = [];
+      if (e.modes.indexOf('任务协作') !== -1) lines.push('任务协作 ' + e.taskShare);
+      if (e.modes.indexOf('帐号运营') !== -1) lines.push('帐号运营 ' + e.accountShare);
+      return lines;
+    }
+    function modeHtml(e) {
+      return modeLines(e).map(function (line, i) {
+        return i === 0 ? esc(line) : '<div class="cell-sub">' + esc(line) + '</div>';
+      }).join('');
+    }
+    function chargeHtml(e) {
+      if (e.charge === '定制') return '定制<div class="cell-sub">单次 ' + esc(String(e.points)) + ' 积分</div>';
+      return '跟随平台';
+    }
+    function chargePlain(e) {
+      return e.charge === '定制' ? '定制，单次 ' + e.points + ' 积分' : '跟随平台';
+    }
+    function syncEditorExtras() {
+      var taskOn = document.querySelector('#edModes input[value="任务协作"]').checked;
+      var accountOn = document.querySelector('#edModes input[value="帐号运营"]').checked;
+      document.getElementById('edShareTaskWrap').hidden = !taskOn;
+      document.getElementById('edShareAccountWrap').hidden = !accountOn;
+      document.getElementById('edPointsWrap').hidden = document.getElementById('edCharge').value !== '定制';
+    }
+    function readRatio(id) {
+      var raw = document.getElementById(id).value.trim();
+      var n = Number(raw);
+      if (raw === '' || !(n >= 0 && n <= 100)) return '';
+      return String(n) + '%';
     }
     function findEd(id) { return editors.filter(function (e) { return e.id === id; })[0]; }
     function openDetail(title, html, wide) {
@@ -648,10 +759,13 @@
     function fillEditorForm(e) {
       document.getElementById('edYb').value = e ? e.ybId : '';
       document.getElementById('edName').value = e ? e.name : '';
-      document.getElementById('edShare').value = e ? String(e.share).replace('%', '') : '';
-      Array.prototype.forEach.call(document.querySelectorAll('#edModes input'), function (el) {
-        el.checked = !!(e && e.modes.indexOf(el.value) !== -1);
-      });
+      document.querySelector('#edModes input[value="任务协作"]').checked = !!(e && e.modes.indexOf('任务协作') !== -1);
+      document.querySelector('#edModes input[value="帐号运营"]').checked = !!(e && e.modes.indexOf('帐号运营') !== -1);
+      document.getElementById('edShareTask').value = e && e.taskShare ? String(e.taskShare).replace('%', '') : '';
+      document.getElementById('edShareAccount').value = e && e.accountShare ? String(e.accountShare).replace('%', '') : '';
+      document.getElementById('edCharge').value = e && e.charge ? e.charge : '跟随平台';
+      document.getElementById('edPoints').value = e && e.charge === '定制' ? String(e.points) : '';
+      syncEditorExtras();
       document.getElementById('edNote').value = e ? e.note : '';
       document.getElementById('edReview').value = e ? e.review : '是';
       Array.prototype.forEach.call(document.querySelectorAll('#edPlatforms input'), function (el) {
@@ -674,7 +788,7 @@
       var e = findEd(id);
       if (!e) return;
       if (t.getAttribute('data-ed')) {
-        openDetail('剪辑手详情', '<dl class="kv"><dt>右豹 ID</dt><dd>' + esc(e.ybId) + '</dd><dt>昵称</dt><dd>' + esc(e.name) + '</dd><dt>代运营合作模式</dt><dd>' + esc(e.modes.join('、')) + '</dd><dt>分成比例</dt><dd>' + esc(e.share) + '</dd><dt>发布平台</dt><dd>' + esc(e.platforms.join('、')) + '</dd><dt>稿件需要审核</dt><dd>' + esc(e.review) + '</dd><dt>可上传项目</dt><dd>' + esc(e.projects) + '</dd><dt>备注</dt><dd>' + esc(e.note) + '</dd><dt>来源</dt><dd>' + esc(e.source) + '</dd></dl>');
+        openDetail('剪辑手详情', '<dl class="kv"><dt>右豹 ID</dt><dd>' + esc(e.ybId) + '</dd><dt>昵称</dt><dd>' + esc(e.name) + '</dd><dt>代运营合作模式</dt><dd>' + esc(modeLines(e).join('、')) + '</dd><dt>稿件收费方式</dt><dd>' + esc(chargePlain(e)) + '</dd><dt>发布平台</dt><dd>' + esc(e.platforms.join('、')) + '</dd><dt>稿件需要审核</dt><dd>' + esc(e.review) + '</dd><dt>可上传项目</dt><dd>' + esc(e.projects) + '</dd><dt>备注</dt><dd>' + esc(e.note) + '</dd><dt>来源</dt><dd>' + esc(e.source) + '</dd></dl>');
       } else if (t.getAttribute('data-edit')) {
         openEditorForm(id);
       } else if (t.getAttribute('data-stop')) {
@@ -707,29 +821,42 @@
     };
     document.getElementById('edClose').onclick = document.getElementById('edCancel').onclick = function () { closeModal('edOverlay'); };
     document.getElementById('edOverlay').onclick = function (ev) { if (ev.target.id === 'edOverlay') closeModal('edOverlay'); };
+    document.getElementById('edModes').onchange = syncEditorExtras;
+    document.getElementById('edCharge').onchange = syncEditorExtras;
     document.getElementById('edSave').onclick = function () {
       var ybId = document.getElementById('edYb').value.trim();
       var name = document.getElementById('edName').value.trim();
-      var share = document.getElementById('edShare').value.trim();
       var note = document.getElementById('edNote').value.trim();
       var review = document.getElementById('edReview').value;
-      var modes = Array.prototype.map.call(document.querySelectorAll('#edModes input:checked'), function (el) { return el.value; });
+      var modes = Array.prototype.map.call(document.querySelectorAll('#edModes input[type=checkbox]:checked'), function (el) { return el.value; });
       var platforms = Array.prototype.map.call(document.querySelectorAll('#edPlatforms input:checked'), function (el) { return el.value; });
       var projects = Array.prototype.map.call(document.querySelectorAll('#edProjects input:checked'), function (el) { return el.value; });
       if (!ybId || !name || !note) { toast('请填写右豹 ID、昵称、备注'); return; }
       if (!modes.length) { toast('至少选一个合作模式'); return; }
-      var shareN = Number(share);
-      if (share === '' || !(shareN >= 0 && shareN <= 100)) { toast('分成比例要在 0 到 100'); return; }
+      var taskShare = modes.indexOf('任务协作') === -1 ? '' : readRatio('edShareTask');
+      var accountShare = modes.indexOf('帐号运营') === -1 ? '' : readRatio('edShareAccount');
+      if ((modes.indexOf('任务协作') !== -1 && !taskShare) || (modes.indexOf('帐号运营') !== -1 && !accountShare)) {
+        toast('已选模式的分成比例要在 0 到 100');
+        return;
+      }
+      var charge = document.getElementById('edCharge').value;
+      var points = '';
+      if (charge === '定制') {
+        var rawPoints = document.getElementById('edPoints').value.trim();
+        var pointsN = Number(rawPoints);
+        if (rawPoints === '' || !Number.isInteger(pointsN) || pointsN < 1) { toast('请填写单次积分'); return; }
+        points = String(pointsN);
+      }
       if (!platforms.length) { toast('发布平台至少选一个'); return; }
-      var shareText = String(shareN) + '%';
       if (editors.some(function (e) { return e.ybId === ybId && e.id !== editingId; })) { toast('这个右豹 ID 已经录入'); return; }
       if (editingId) {
         var row = findEd(editingId);
-        row.ybId = ybId; row.name = name; row.modes = modes; row.share = shareText; row.note = note; row.review = review;
+        row.ybId = ybId; row.name = name; row.modes = modes; row.taskShare = taskShare; row.accountShare = accountShare;
+        row.charge = charge; row.points = points; row.note = note; row.review = review;
         row.platforms = platforms; row.projects = projects.join('、') || '—';
         toast('已保存');
       } else {
-        editors.unshift({ id: 'E-0' + (edSeq++), ybId: ybId, name: name, modes: modes, share: shareText, review: review, platforms: platforms, projects: projects.join('、') || '—', uploaded: 0, claimed: 0, sizeMb: 0, onsite: 0, offsite: 0, status: '已录入', time: '刚刚', note: note, source: '运营' });
+        editors.unshift({ id: 'E-0' + (edSeq++), ybId: ybId, name: name, modes: modes, taskShare: taskShare, accountShare: accountShare, charge: charge, points: points, review: review, platforms: platforms, projects: projects.join('、') || '—', uploaded: 0, claimed: 0, sizeMb: 0, onsite: 0, offsite: 0, status: '已录入', time: '刚刚', note: note, source: '运营' });
         toast('已录入');
       }
       closeModal('edOverlay');
@@ -915,9 +1042,6 @@
       exitPreview();
       document.querySelectorAll('.page-tab-bar button').forEach(function (btn) { btn.classList.toggle('active', btn.dataset.page === id); });
       document.querySelectorAll('.page-view').forEach(function (view) { view.classList.toggle('active', view.id === id); });
-      var rule = (id === 'view-admin' || id === 'view-ledger') ? 'rule-be' : 'rule-fe';
-      document.querySelectorAll('.rule-tab-bar button').forEach(function (btn) { btn.classList.toggle('active', btn.dataset.rule === rule); });
-      document.querySelectorAll('.rule-panel').forEach(function (p) { p.classList.toggle('active', p.id === rule); });
       if (id === 'view-fe') requestAnimationFrame(scalePhones);
     }
     document.querySelectorAll('.page-tab-bar button').forEach(function (btn) { btn.onclick = function () { showPage(btn.dataset.page); }; });
@@ -958,17 +1082,31 @@
     document.getElementById('toggleRuleDrawer').onclick = function () { toggleRule(!ruleDrawer.classList.contains('open')); };
     document.getElementById('closeRule').onclick = function () { toggleRule(false); };
     ruleOverlay.onclick = function () { toggleRule(false); };
-    document.querySelectorAll('.rule-tab-bar button').forEach(function (btn) {
-      btn.onclick = function () {
-        document.querySelectorAll('.rule-tab-bar button').forEach(function (b) { b.classList.toggle('active', b === btn); });
-        document.querySelectorAll('.rule-panel').forEach(function (p) { p.classList.toggle('active', p.id === btn.dataset.rule); });
-      };
-    });
     var tab = new URLSearchParams(location.search).get('tab');
     if (tab === 'pc') showPage('view-pc');
     if (tab === 'admin') showPage('view-admin');
     if (tab === 'flow') showPage('view-flow');
     if (tab === 'ledger') showPage('view-ledger');
+    function switchFlowTab(flowId, btn) {
+      document.querySelectorAll('.flow-tab-bar button').forEach(function (b) { b.classList.toggle('active', b === btn); });
+      document.querySelectorAll('.flow-panel-body').forEach(function (p) { p.classList.toggle('active', p.id === flowId); });
+      var params = new URLSearchParams(location.search);
+      params.set('tab', 'flow');
+      params.set('flow', flowId.replace('flow-', ''));
+      history.replaceState(null, '', '?' + params.toString());
+    }
+    document.querySelectorAll('.flow-tab-bar button').forEach(function (btn) {
+      btn.onclick = function () { switchFlowTab(btn.dataset.flow, btn); };
+    });
+    var flowParam = new URLSearchParams(location.search).get('flow');
+    if (flowParam) {
+      var flowId = flowParam.indexOf('flow-') === 0 ? flowParam : 'flow-' + flowParam;
+      var flowBtn = document.querySelector('.flow-tab-bar button[data-flow="' + flowId + '"]');
+      if (flowBtn) {
+        showPage('view-flow');
+        switchFlowTab(flowId, flowBtn);
+      }
+    }
     renderEditors();
     renderWorks();
     window.addEventListener('resize', scalePhones);
